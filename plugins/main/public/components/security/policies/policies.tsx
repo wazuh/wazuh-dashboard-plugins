@@ -6,6 +6,7 @@ import {
   EuiPageContentBody,
   EuiButton,
   EuiTitle,
+  EuiText,
 } from '@elastic/eui';
 import { PoliciesTable } from './policies-table';
 import { usePagination } from '../../common/hooks/usePagination';
@@ -82,6 +83,10 @@ export const Policies = withUserAuthorizationPrompt([
           <EuiTitle>
             <h2>Policies</h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            Manage the policies of the Wazuh manager API. These are separate
+            from the policies managed in Indexer management &gt; Security.
+          </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           {!loading && (

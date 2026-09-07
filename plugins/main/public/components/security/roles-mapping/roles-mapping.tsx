@@ -5,6 +5,7 @@ import {
   EuiPageContentHeaderSection,
   EuiPageContentBody,
   EuiTitle,
+  EuiText,
 } from '@elastic/eui';
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
@@ -174,6 +175,11 @@ export const RolesMapping = withUserAuthorizationPrompt([
           <EuiTitle>
             <h2>Roles mapping</h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            Map roles of the Wazuh manager API to authentication contexts. These
+            are separate from the mappings managed in Indexer management &gt;
+            Security.
+          </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           {!loadingTable && (

@@ -5,6 +5,7 @@ import {
   EuiPageContentHeaderSection,
   EuiPageContentBody,
   EuiTitle,
+  EuiText,
 } from '@elastic/eui';
 import { RolesTable } from './roles-table';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -120,6 +121,10 @@ export const Roles = withUserAuthorizationPrompt([
           <EuiTitle>
             <h2>Roles</h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            Manage the roles of the Wazuh manager API. These are separate from
+            the roles managed in Indexer management &gt; Security.
+          </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           {!loadingTable && (
