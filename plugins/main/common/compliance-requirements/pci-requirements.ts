@@ -20,6 +20,8 @@ export const pciRequirementsFile = {
     'Network access into and out of the cardholder data environment is limited to what is explicitly required.',
   '1.4':
     'Network connections between trusted and untrusted networks are controlled.',
+  '1.5':
+    'Risks to the CDE from computing devices able to connect to both untrusted networks and the CDE are mitigated.',
   '2.2': 'Every system component is configured and managed securely.',
   '2.2.2':
     'Vendor-supplied default accounts are inventoried, and any still in use have their default password changed.',
@@ -31,20 +33,27 @@ export const pciRequirementsFile = {
     'All non-console administrative access uses strong cryptography for encryption.',
   '3.2':
     'Account data is retained only for as long as, and to the extent that, it is actually needed.',
+  '3.3': 'Sensitive authentication data is not stored after authorization.',
   '3.4':
     'Access to full PAN displays and the ability to copy cardholder data are restricted to those with a business need.',
   '3.5':
     'The primary account number is protected using strong measures wherever it is stored.',
   '3.6':
     'Cryptographic keys that protect stored account data are themselves secured against disclosure or misuse.',
+  '3.7':
+    'Where cryptography protects stored account data, key management processes covering the whole key lifecycle are defined and implemented.',
   '4.1':
     'A documented process governs how cardholder data is protected with strong cryptography while transmitted over open, public networks.',
+  '4.2':
+    'Primary account numbers are protected with strong cryptography during transmission.',
   '5.1':
     'A documented process governs how all systems and networks are protected from malicious software.',
   '5.2':
     'Malicious software is actively prevented from running, or is detected and remediated when found.',
   '5.3':
     'Anti-malware mechanisms remain active, are kept up to date, and are monitored for tampering or being disabled.',
+  '5.3.5':
+    'Anti-malware mechanisms cannot be disabled or altered by users unless documented and authorized by management for a limited time.',
   '6.2':
     'Custom and bespoke software is built using secure development practices from the outset.',
   '6.3':
@@ -61,6 +70,8 @@ export const pciRequirementsFile = {
     'Each change to a production system component is documented, including its reason and a description of what changed.',
   '6.5.2':
     'After a significant change, applicable PCI DSS controls are re-verified as being in place and documentation is updated.',
+  '6.5.4':
+    'Roles and functions are separated between production and pre-production environments so only reviewed and approved changes are deployed.',
   '6.5.5':
     'Live primary account numbers are kept out of pre-production and test environments unless those environments meet CDE-level protection.',
   '7.1':
@@ -69,6 +80,8 @@ export const pciRequirementsFile = {
     "Access to system components and data is granted deliberately, matching each user's defined role.",
   '7.2.5':
     'Application and system accounts, and the privileges tied to them, are assigned based on least privilege for the role.',
+  '7.3':
+    'Access to system components and data is managed via an access control system.',
   '8.1':
     'A documented process governs how users are identified and how their access to system components is authenticated.',
   '8.1.1':
@@ -85,10 +98,14 @@ export const pciRequirementsFile = {
     'Strong, multi-factor authentication is required for users and administrators accessing the environment.',
   '8.3.1':
     'Access for users and administrators is authenticated using at least one recognized authentication factor, such as a password.',
+  '8.3.2':
+    'Strong cryptography renders every authentication factor unreadable during transmission and storage on all system components.',
   '8.3.4':
     'An account is locked out after no more than ten consecutive invalid authentication attempts.',
   '8.3.6':
     'Passwords used to satisfy authentication requirements are at least 12 characters (8 if the system cannot support 12) and mix letters with numbers.',
+  '8.3.9':
+    'Where a password or passphrase is the only authentication factor, it is changed at least every 90 days or access is granted dynamically from the account posture.',
   '8.4':
     'Multi-factor authentication secures every path of access into the cardholder data environment.',
   '8.5':
@@ -103,12 +120,32 @@ export const pciRequirementsFile = {
     'Audit logs capture enough detail to detect anomalies, investigate suspicious activity, and support forensic analysis.',
   '10.2.1':
     'Audit logging is enabled and actively running for every system component that touches cardholder data.',
+  '10.2.1.1':
+    'Audit logs capture all individual user access to cardholder data.',
+  '10.2.1.2':
+    'Audit logs capture all actions taken by any individual with administrative access, including interactive use of application or system accounts.',
+  '10.2.1.3': 'Audit logs capture all access to audit logs.',
+  '10.2.1.4': 'Audit logs capture all invalid logical access attempts.',
+  '10.2.1.5':
+    'Audit logs capture every change to identification and authentication credentials, including account creation, privilege elevation and account changes.',
+  '10.2.1.6':
+    'Audit logs capture the initialization of new audit logs and the starting, stopping or pausing of existing ones.',
+  '10.2.1.7':
+    'Audit logs capture all creation and deletion of system-level objects.',
   '10.2.2':
     'Each logged event records who performed it, along with the other details needed to reconstruct what happened.',
   '10.3':
     'Audit logs are protected against deletion and unauthorized alteration.',
+  '10.3.1':
+    'Read access to audit log files is limited to those with a job-related need.',
+  '10.3.2':
+    'Audit log files are protected to prevent modifications by individuals.',
+  '10.3.4':
+    'File integrity monitoring or change-detection mechanisms run on audit logs so existing log data cannot change without raising an alert.',
   '10.4':
     'Audit logs are reviewed on a regular basis to catch anomalies or suspicious activity.',
+  '10.4.1':
+    'Security events and the logs of the system components handling cardholder data are reviewed at least once daily.',
   '10.5':
     'Audit log history is retained long enough, and kept accessible enough, to support later analysis.',
   '10.5.1':
@@ -123,61 +160,24 @@ export const pciRequirementsFile = {
     'Wireless access points are periodically tested for, and both authorized and unauthorized access points are actively managed.',
   '11.3':
     'Internal and external vulnerabilities are identified on a regular basis, prioritized by risk, and addressed.',
+  '11.3.1':
+    'Internal vulnerability scans run at least once every three months, and the high-risk and critical findings are resolved and confirmed by a rescan.',
   '11.4':
     'Internal and external penetration testing is performed regularly, and any exploitable weakness found is corrected.',
+  '11.4.1':
+    'A penetration testing methodology is defined, documented and implemented, covering the whole cardholder data environment perimeter and its critical systems.',
   '11.5':
     'Network intrusions and unexpected changes to critical files are detected and responded to.',
+  '11.5.1':
+    'Intrusion-detection or intrusion-prevention techniques monitor all traffic at the perimeter and at critical points of the cardholder data environment.',
+  '11.5.2':
+    'A change-detection mechanism alerts on unauthorized modification of critical files and compares them at least once weekly.',
+  '12.2':
+    'Acceptable use policies for end-user technologies are defined and implemented.',
   '12.3':
     'Risks to the cardholder data environment are formally assessed, evaluated, and actively managed.',
   '12.10':
     'Suspected or confirmed security incidents affecting the CDE trigger an immediate response.',
   '12.10.5':
     'The incident response plan covers monitoring and acting on alerts from intrusion detection/prevention, network security controls, and file/change-detection systems.',
-  '8.3.2':
-    'Strong cryptography renders every authentication factor unreadable during transmission and storage on all system components.',
-  '10.2.1.1':
-    'Audit logs capture all individual user access to cardholder data.',
-  '10.2.1.2':
-    'Audit logs capture all actions taken by any individual with administrative access, including interactive use of application or system accounts.',
-  '10.2.1.6':
-    'Audit logs capture the initialization of new audit logs and the starting, stopping or pausing of existing ones.',
-  '10.2.1.7':
-    'Audit logs capture all creation and deletion of system-level objects.',
-  '10.3.2':
-    'Audit log files are protected to prevent modifications by individuals.',
-  '10.4.1':
-    'Security events and the logs of the system components handling cardholder data are reviewed at least once daily.',
-  '11.3.1':
-    'Internal vulnerability scans run at least once every three months, and the high-risk and critical findings are resolved and confirmed by a rescan.',
-  '11.4.1':
-    'A penetration testing methodology is defined, documented and implemented, covering the whole cardholder data environment perimeter and its critical systems.',
-  '11.5.1':
-    'Intrusion-detection or intrusion-prevention techniques monitor all traffic at the perimeter and at critical points of the cardholder data environment.',
-  '11.5.2':
-    'A change-detection mechanism alerts on unauthorized modification of critical files and compares them at least once weekly.',
-  '1.5':
-    'Risks to the CDE from computing devices able to connect to both untrusted networks and the CDE are mitigated.',
-  '3.3': 'Sensitive authentication data is not stored after authorization.',
-  '3.7':
-    'Where cryptography protects stored account data, key management processes covering the whole key lifecycle are defined and implemented.',
-  '4.2':
-    'Primary account numbers are protected with strong cryptography during transmission.',
-  '5.3.5':
-    'Anti-malware mechanisms cannot be disabled or altered by users unless documented and authorized by management for a limited time.',
-  '6.5.4':
-    'Roles and functions are separated between production and pre-production environments so only reviewed and approved changes are deployed.',
-  '7.3':
-    'Access to system components and data is managed via an access control system.',
-  '8.3.9':
-    'Where a password or passphrase is the only authentication factor, it is changed at least every 90 days or access is granted dynamically from the account posture.',
-  '10.2.1.3': 'Audit logs capture all access to audit logs.',
-  '10.2.1.4': 'Audit logs capture all invalid logical access attempts.',
-  '10.2.1.5':
-    'Audit logs capture every change to identification and authentication credentials, including account creation, privilege elevation and account changes.',
-  '10.3.1':
-    'Read access to audit log files is limited to those with a job-related need.',
-  '10.3.4':
-    'File integrity monitoring or change-detection mechanisms run on audit logs so existing log data cannot change without raising an alert.',
-  '12.2':
-    'Acceptable use policies for end-user technologies are defined and implemented.',
 };
