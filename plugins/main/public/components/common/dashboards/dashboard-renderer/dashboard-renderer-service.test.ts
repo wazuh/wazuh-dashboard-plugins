@@ -88,6 +88,91 @@ describe('Dashboard Renderer Service', () => {
       expect(result['1'].type).toBe('visualization');
     });
 
+    test('should merge embeddableConfig into explicitInput', () => {
+      const panelsJSON = JSON.stringify([
+        {
+          gridData: { x: 0, y: 0, w: 24, h: 15, i: '1' },
+          panelIndex: '1',
+          panelRefName: 'panel_1',
+          embeddableConfig: {
+            title: 'Custom header',
+            vis: { legendOpen: false },
+          },
+        },
+      ]);
+
+      const references = [
+        { name: 'panel_1', type: 'visualization', id: 'vis-1' },
+      ];
+
+      const result = transformPanelsJSON(panelsJSON, references);
+
+      expect(result['1'].explicitInput).toEqual({
+        id: '1',
+        savedObjectId: 'vis-1',
+        title: 'Custom header',
+        vis: { legendOpen: false },
+      });
+    });
+
+    test('should keep an empty embeddableConfig title so the panel stays headerless', () => {
+      const panelsJSON = JSON.stringify([
+        {
+          gridData: { x: 0, y: 0, w: 24, h: 15, i: '1' },
+          panelIndex: '1',
+          panelRefName: 'panel_1',
+          embeddableConfig: { title: '' },
+        },
+      ]);
+
+      const references = [
+        { name: 'panel_1', type: 'visualization', id: 'vis-1' },
+      ];
+
+      const result = transformPanelsJSON(panelsJSON, references);
+
+      expect(result['1'].explicitInput.title).toBe('');
+    });
+
+    test('should let embeddableConfig override a top level panel title', () => {
+      const panelsJSON = JSON.stringify([
+        {
+          gridData: { x: 0, y: 0, w: 24, h: 15, i: '1' },
+          panelIndex: '1',
+          panelRefName: 'panel_1',
+          title: 'Legacy header',
+          embeddableConfig: { title: 'Custom header' },
+        },
+      ]);
+
+      const references = [
+        { name: 'panel_1', type: 'visualization', id: 'vis-1' },
+      ];
+
+      const result = transformPanelsJSON(panelsJSON, references);
+
+      expect(result['1'].explicitInput.title).toBe('Custom header');
+    });
+
+    test('should leave explicitInput without a title when the panel sets none', () => {
+      const panelsJSON = JSON.stringify([
+        {
+          gridData: { x: 0, y: 0, w: 24, h: 15, i: '1' },
+          panelIndex: '1',
+          panelRefName: 'panel_1',
+          embeddableConfig: {},
+        },
+      ]);
+
+      const references = [
+        { name: 'panel_1', type: 'visualization', id: 'vis-1' },
+      ];
+
+      const result = transformPanelsJSON(panelsJSON, references);
+
+      expect(result['1'].explicitInput).not.toHaveProperty('title');
+    });
+
     test('should handle empty panels JSON', () => {
       const panelsJSON = JSON.stringify([]);
       const references: any[] = [];

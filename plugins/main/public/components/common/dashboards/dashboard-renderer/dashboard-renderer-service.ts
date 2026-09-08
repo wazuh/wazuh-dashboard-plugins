@@ -19,24 +19,57 @@ type DashboardRendererDataSource = {
   fingerprint?: number;
 };
 
+/**
+ * Turns the `panelsJSON` of a dashboard saved object into the panel map the
+ * embeddable container expects.
+ *
+ * A dashboard panel can override the embeddable it renders through its own
+ * `embeddableConfig` (and, in older objects, a sibling `title`). The platform
+ * applies those overrides by merging them into `explicitInput` - see
+ * `convertSavedDashboardPanelToPanelState` in the `dashboard` plugin - which is
+ * where `EmbeddablePanel` reads them from. The relevant one here is `title`:
+ * when a panel sets it the panel header uses that value, and an empty string
+ * renders the panel with no header at all, regardless of how the underlying
+ * saved object is named.
+ *
+ * This function used to rebuild `explicitInput` from scratch as
+ * `{ id, savedObjectId }` and drop `embeddableConfig` on the floor, so those
+ * overrides were silently ignored here while the platform's own dashboard app
+ * honoured them. The same saved object rendered differently depending on which
+ * of the two displayed it. Merging them keeps both paths in agreement.
+ */
 export function transformPanelsJSON(
   panelsJSON: string,
   refs: SavedDashboardSO['references'],
 ): Record<string, PanelInputSpec> {
   const panelsArr = JSON.parse(panelsJSON) as Array<any>;
   return Object.fromEntries(
-    panelsArr.map(({ gridData, panelIndex, panelRefName, type, ...rest }) => [
-      panelIndex,
-      {
-        ...rest,
+    panelsArr.map(
+      ({
+        embeddableConfig,
         gridData,
-        type: type ?? 'visualization',
-        explicitInput: {
-          id: panelIndex,
-          savedObjectId: refs.find(({ name }) => name === panelRefName)?.id,
-        },
-      } as PanelInputSpec,
-    ]),
+        panelIndex,
+        panelRefName,
+        title,
+        type,
+        ...rest
+      }) => [
+        panelIndex,
+        {
+          ...rest,
+          gridData,
+          type: type ?? 'visualization',
+          /* `embeddableConfig` goes last so a panel that sets a key in both
+          places wins with the newer one, matching the platform. */
+          explicitInput: {
+            id: panelIndex,
+            savedObjectId: refs.find(({ name }) => name === panelRefName)?.id,
+            ...(title === undefined ? {} : { title }),
+            ...embeddableConfig,
+          },
+        } as PanelInputSpec,
+      ],
+    ),
   );
 }
 
