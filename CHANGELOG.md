@@ -194,6 +194,7 @@
 | [#9048](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9048)                          | Fixed the Server API proxy reporting rejected requests as server errors: `POST /api/request` now answers with the status the Server API returned instead of turning every 400 or 404 into a 500                                                                                       |
 | [#9116](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9116)                          | Fixed the API console's request and RBAC action catalogues drifting from the Server API                                                                                                                                                                                               |
 | [#9108](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9108)                          | Fixed the PCI DSS compliance requirement descriptions being a stale mix of v3.2.1 and v4.0 wording by rewriting the whole dictionary against PCI DSS v4.0, adding the requirement codes the detection rules report, and dropping the ones v4.0 retired                                |
+| [#9112](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9112)                          | Fixed the IT Hygiene System > Hardware dashboard showing the Overview dashboard memory panel instead of its own                                                                                                                                                                       |
 
 ## Prior versions
 
