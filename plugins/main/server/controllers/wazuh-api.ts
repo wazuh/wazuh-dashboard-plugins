@@ -34,6 +34,7 @@ import {
 } from '../../package.json';
 import { extractErrorMessage } from '../lib/extract-error-message';
 import { detectCCS } from '../lib/ccs-detector';
+import { neutralizeCsvFormulaValues } from '../../common/services/neutralize-csv-formula';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -925,10 +926,17 @@ export class WazuhApiCtrl {
             ? { [UnsupportedKeysJson2CsvAsyncSize]: size }
             : {}),
         }));
+        itemsArray = neutralizeCsvFormulaValues(itemsArray);
         let csv = await converter.json2csvAsync(itemsArray, options);
 
         return response.ok({
-          headers: { 'Content-Type': 'text/csv' },
+          headers: {
+            'Content-Type': 'text/csv',
+            'Content-Disposition': `attachment; filename="${tmpPath.replace(
+              /[^\w.-]+/g,
+              '-',
+            )}.csv"`,
+          },
           body: csv,
         });
       } else if (
