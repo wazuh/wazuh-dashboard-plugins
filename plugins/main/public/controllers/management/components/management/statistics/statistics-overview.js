@@ -56,11 +56,6 @@ export class WzStatisticsOverview extends Component {
         id: 'normalization',
         name: 'Normalization',
       },
-      // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
-      // {
-      //   id: 'analysisd',
-      //   name: 'Analysis Engine',
-      // },
     ];
   }
 
