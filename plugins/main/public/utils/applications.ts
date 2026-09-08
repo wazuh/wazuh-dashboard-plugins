@@ -7,6 +7,7 @@ import {
   LogoMicrosoftGraphAPI,
   LogoOffice365,
 } from '../components/common/logos';
+import { getWzCurrentAppID } from '../kibana-services';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -771,6 +772,26 @@ export const Applications = [
     return 0;
   }
 });
+
+// Derives a `?tab=...` search string from the currently active app's own
+// redirectTo(), so query-param routers can fall back to their current
+// app's default tab instead of rendering blank on an unknown/missing tab.
+export const getCurrentAppDefaultTabSearch = (
+  fallbackSearch: string,
+): string => {
+  const currentApp = Applications.find(({ id }) => getWzCurrentAppID() === id);
+  const redirectPath = currentApp?.redirectTo();
+
+  if (redirectPath) {
+    const queryIndex = redirectPath.indexOf('?');
+
+    if (queryIndex !== -1) {
+      return redirectPath.slice(queryIndex);
+    }
+  }
+
+  return fallbackSearch;
+};
 
 // Categories
 export const Categories = [
