@@ -23,7 +23,7 @@ import { ISecurityFactory } from './security-factory';
  * Request headers a caller is allowed to set on the outbound Server API
  * request. Every other header - most importantly `Authorization` - is decided
  * by this service, so a caller can never choose the credential that is used
- * upstream. See GHSA-7rvv-9467-96mc.
+ * upstream.
  */
 const ALLOWED_REQUEST_HEADERS = new Set(['content-type']);
 

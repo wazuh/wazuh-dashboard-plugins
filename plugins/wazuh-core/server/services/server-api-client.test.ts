@@ -88,7 +88,6 @@ describe('ServerAPIClient._buildRequestOptions', () => {
     expect(options.headers['content-type']).toBe('application/xml');
   });
 
-  // Regression test for GHSA-7rvv-9467-96mc: a caller-supplied Authorization
   // header must never replace the credential chosen by the server.
   it.each(['Authorization', 'authorization', 'AUTHORIZATION'])(
     'ignores a caller-supplied %s header',
