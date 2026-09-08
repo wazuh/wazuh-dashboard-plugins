@@ -204,6 +204,12 @@
 | [wazuh-dashboard#1586](https://github.com/wazuh/wazuh-dashboard/issues/1586)                   | Fixed the `saved-objects:index-patterns` health check reporting a `TypeError` instead of the error that prevented the `wazuh-events-v5*` index pattern initialization, caused by passing the internal saved objects repository where a saved objects client was expected              |
 | [#9167](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9167)                          | Fixed Vulnerability Detection > Inventory warning that the module was not enabled, and the deploy agent wizard omitting the registration password, when the server reports these settings as native booleans                                                                          |
 
+### Fixed
+
+| Issue                                                                 | Comment                                                                                                                                                                       |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [#9135](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9135) | Fixed `match_only_text` fields (e.g. `file.diff`) being generated as aggregatable and doc-values-backed in known-fields/index-pattern definitions, which don't support either |
+
 ## Prior versions
 
 - [v4.14.7](https://github.com/wazuh/wazuh-dashboard-plugins/blob/v4.14.7/CHANGELOG.md)
