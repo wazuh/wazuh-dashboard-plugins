@@ -12,6 +12,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Upgraded jsdom and its dependencies (`lodash` to `4.18.1`, `form-data` to `3.0.5`) [#8978](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8978)
 
+### Fixed
+
+- Fixed override of Server API authorization header [#9141](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9141)
+
 ## Wazuh v4.14.8 - OpenSearch Dashboards 2.19.6 - Revision 00
 
 ### Added
