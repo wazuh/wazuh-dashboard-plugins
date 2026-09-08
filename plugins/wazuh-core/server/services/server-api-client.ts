@@ -25,6 +25,13 @@ interface APIHost {
   port: number;
   run_as: boolean;
 }
+/**
+ * Request headers a caller is allowed to set on the outbound Server API
+ * request. Every other header - most importantly `Authorization` - is decided
+ * by this service, so a caller can never choose the credential that is used
+ * upstream.
+ */
+const ALLOWED_REQUEST_HEADERS = new Set(['content-type']);
 
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 type RequestPath = string;
@@ -149,13 +156,44 @@ export class ServerAPIClient {
       method: method,
       headers: {
         'content-type': 'application/json',
-        Authorization: 'Bearer ' + token,
-        ...(headers ? headers : {}),
+        ...this._filterRequestHeaders(headers),
+        // Set after the caller headers so it can never be overridden.
+        Authorization: `Bearer ${token}`,
       },
       data: body || rest || {},
       params: params || {},
       url: `${api.url}:${api.port}${path}`,
     };
+  }
+
+  /**
+   * Keep only the caller-provided headers that are safe to send upstream
+   * @param headers Headers provided by the caller
+   * @returns The subset of headers present in the allowlist
+   */
+  private _filterRequestHeaders(headers: unknown): Record<string, unknown> {
+    if (!headers || typeof headers !== 'object') {
+      return {};
+    }
+
+    const allowed: Record<string, unknown> = {};
+    const rejected: string[] = [];
+
+    for (const [name, value] of Object.entries(headers)) {
+      if (ALLOWED_REQUEST_HEADERS.has(name.toLowerCase())) {
+        allowed[name] = value;
+      } else {
+        rejected.push(name);
+      }
+    }
+
+    if (rejected.length > 0) {
+      this.logger.warn(
+        `Ignored request headers that are not allowed: ${rejected.join(', ')}`,
+      );
+    }
+
+    return allowed;
   }
 
   /**
@@ -178,9 +216,8 @@ export class ServerAPIClient {
         username: api.username,
         password: api.password,
       },
-      url: `${api.url}:${api.port}/security/user/authenticate${
-        options.useRunAs ? '/run_as' : ''
-      }`,
+      url: `${api.url}:${api.port}/security/user/authenticate${options.useRunAs ? '/run_as' : ''
+        }`,
       ...(!!options?.authContext ? { data: options?.authContext } : {}),
     };
 
@@ -213,14 +250,14 @@ export class ServerAPIClient {
 
         const token = useRunAs
           ? await this._authenticate(apiHostID, {
-              useRunAs: true,
-              authContext: (
-                await this.dashboardSecurity.getCurrentUser(request, context)
-              ).authContext,
-            })
+            useRunAs: true,
+            authContext: (
+              await this.dashboardSecurity.getCurrentUser(request, context)
+            ).authContext,
+          })
           : await this._authenticate(apiHostID, {
-              useRunAs: false,
-            });
+            useRunAs: false,
+          });
         return token;
       },
       request: async (
@@ -254,7 +291,7 @@ export class ServerAPIClient {
     try {
       const token =
         this._CacheInternalUserAPIHostToken.has(options.apiHostID) &&
-        !options.forceRefresh
+          !options.forceRefresh
           ? this._CacheInternalUserAPIHostToken.get(options.apiHostID)
           : await this._authenticateInternalUser(options.apiHostID);
       return await this._request(method, path, data, { ...options, token });
