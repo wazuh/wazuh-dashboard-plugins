@@ -13,6 +13,7 @@ export enum routes {
   ctiRegistrationStatus = `${ctiBasePath}/status`,
   contentUpdate = `${ctiBasePath}/update`,
   ctiConsumers = `${ctiBasePath}/consumers`,
+  ctiRegistrationPermission = `${ctiBasePath}/permission`,
 }
 
 /** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
@@ -65,6 +66,16 @@ export const ctiConsoleApiPaths = {
 
 /** Content Manager plugin HTTP path prefix (cluster plugin / Imposter mock). */
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/_content_manager';
+
+/**
+ * Turns Content Manager `POST …/subscription` into a privilege probe: the OpenSearch
+ * security plugin evaluates the action and answers `{ accessAllowed, missingPrivileges }`
+ * INSTEAD of executing it, so the call takes no body, has no side effects and always
+ * answers HTTP 200 — callers must branch on `accessAllowed`, never on the status code.
+ * See wazuh-indexer-plugins#1547.
+ */
+export const CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM =
+  'perform_permission_check';
 
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,

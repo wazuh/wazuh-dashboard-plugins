@@ -2,6 +2,10 @@ jest.mock('../../../plugin-services', () => ({
   getCore: jest.fn(),
 }));
 
+jest.mock('../../../services/cti-registration-permission', () => ({
+  fetchCtiRegistrationPermission: jest.fn(),
+}));
+
 import React from 'react';
 import {
   render,
@@ -19,6 +23,7 @@ import {
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
   statusCodes,
 } from '../../../../common/constants';
+import { fetchCtiRegistrationPermission } from '../../../services/cti-registration-permission';
 import { ModalCti } from './modal-cti';
 jest.mock('@osd/i18n', () => ({
   i18n: {
@@ -43,6 +48,11 @@ const mockRefetchStatus = jest.fn().mockResolvedValue(undefined);
 
 const defaultStatusCti = { status: 404, message: '' };
 
+const mockedFetchCtiRegistrationPermission =
+  fetchCtiRegistrationPermission as jest.Mock;
+
+const MISSING_PRIVILEGE = 'cluster:admin/content_manager/subscription/create';
+
 describe('ModalCti component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,6 +61,10 @@ describe('ModalCti component', () => {
     ctiFlowState.reset();
     ctiFlowState.setSubscription(null);
     mockHttpGet.mockResolvedValue({ data: [] });
+    mockedFetchCtiRegistrationPermission.mockResolvedValue({
+      accessAllowed: true,
+      missingPrivileges: [],
+    });
     (getCore as jest.Mock).mockReturnValue({
       http: { post: mockHttpPost, get: mockHttpGet },
     });
@@ -202,6 +216,176 @@ describe('ModalCti component', () => {
       expect(
         document.querySelector('[data-test-subj="ctiRegistrationInProgress"]'),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('registration permission', () => {
+    it('probes the permission when the environment is not registered', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByRole('button', { name: 'Register' }),
+      ).toBeInTheDocument();
+      expect(mockedFetchCtiRegistrationPermission).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not probe when the environment is already registered', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByRole('button', { name: 'Consumers' }),
+      ).toBeInTheDocument();
+      expect(mockedFetchCtiRegistrationPermission).not.toHaveBeenCalled();
+    });
+
+    it('warns instead of offering to register when the user is denied', async () => {
+      mockedFetchCtiRegistrationPermission.mockResolvedValue({
+        accessAllowed: false,
+        missingPrivileges: [],
+      });
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          document.querySelector(
+            '[data-test-subj="ctiRegistrationPermissionDenied"]',
+          ),
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.getByText('You cannot register this environment'),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Register' }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+    });
+
+    it('drops the registration invitation when the user is denied', async () => {
+      mockedFetchCtiRegistrationPermission.mockResolvedValue({
+        accessAllowed: false,
+        missingPrivileges: [],
+      });
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          document.querySelector(
+            '[data-test-subj="ctiRegistrationPermissionDenied"]',
+          ),
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.queryByText(/Register your Wazuh XDR to receive/),
+      ).not.toBeInTheDocument();
+    });
+
+    it('lists the missing privileges reported by the indexer', async () => {
+      mockedFetchCtiRegistrationPermission.mockResolvedValue({
+        accessAllowed: false,
+        missingPrivileges: [MISSING_PRIVILEGE],
+      });
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(await screen.findByText(MISSING_PRIVILEGE)).toBeInTheDocument();
+      expect(screen.getByText('Missing privileges:')).toBeInTheDocument();
+    });
+
+    it('offers no action either way while the probe is in flight', async () => {
+      let resolveProbe!: (value: unknown) => void;
+      mockedFetchCtiRegistrationPermission.mockReturnValue(
+        new Promise(resolve => {
+          resolveProbe = resolve;
+        }),
+      );
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          document.querySelector('[data-test-subj="ctiModalSyncSpinner"]'),
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.queryByRole('button', { name: 'Register' }),
+      ).not.toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '[data-test-subj="ctiRegistrationPermissionDenied"]',
+        ),
+      ).not.toBeInTheDocument();
+
+      await act(async () => {
+        resolveProbe({ accessAllowed: true, missingPrivileges: [] });
+        await Promise.resolve();
+      });
+
+      expect(
+        await screen.findByRole('button', { name: 'Register' }),
+      ).toBeInTheDocument();
+    });
+
+    it('keeps the Register action when the probe cannot be evaluated', async () => {
+      mockedFetchCtiRegistrationPermission.mockResolvedValue({
+        accessAllowed: true,
+        missingPrivileges: [],
+      });
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByRole('button', { name: 'Register' }),
+      ).toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '[data-test-subj="ctiRegistrationPermissionDenied"]',
+        ),
+      ).not.toBeInTheDocument();
     });
   });
 });
