@@ -75,7 +75,9 @@ export type tOptionalParameters =
   | 'serverAddress'
   | 'agentName'
   | 'agentGroups'
-  | 'wazuhPassword';
+  | 'wazuhPassword'
+  | 'sslVerification'
+  | 'managerCa';
 
 ///////////////////////////////////////////////////////////////////
 /// Package repository helpers (evaluated lazily at call time)
@@ -260,6 +262,30 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
       }
 
       return value !== '' ? `${property}=$'${value}'` : '';
+    },
+  },
+  /* The agent verifies the manager certificate on its own -- an unset
+  `<verification_mode>` resolves to the endpoint's system CA store, or to
+  `certificate` when a CA is configured -- so the enabled state contributes
+  nothing and only the opt-out is spelled out. Emitting `system` here instead
+  would be harmful: the agent rejects `system` combined with a CA and drops the
+  CA, silently undoing a `WAZUH_REGISTRATION_CA` added to the command by hand. */
+  sslVerification: {
+    property: 'SSL_VERIFICATION',
+    getParamCommand: props => {
+      const { property, value } = props;
+      return value === false ? `${property}='none'` : '';
+    },
+  },
+  /* Path to a CA already present on the endpoint, which the installer writes
+  into `<agent><ssl><certificate_authorities>`. Left empty the agent falls back
+  to the endpoint's system CA store. */
+  managerCa: {
+    property: 'WAZUH_REGISTRATION_CA',
+    getParamCommand: props => {
+      const { property, value } = props;
+      const parsedValue = typeof value === 'string' ? value.trim() : value;
+      return parsedValue ? `${property}='${parsedValue}'` : '';
     },
   },
 };
