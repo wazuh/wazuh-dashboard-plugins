@@ -31,18 +31,6 @@ By default uses the version declared in the package.json and the `common/known-f
 - Handles nested field types properly
 - Generates JSON files in the destination directory
 
-### `verify-field-capabilities.js`
-
-Checks that the `aggregatable`/`searchable` values generated for a handful of `match_only_text` fields (`file.diff`, `wazuh.case.title`, `wazuh.case.description`, `wazuh.case.comments.comment`, `group.description`) match what a live cluster reports through OpenSearch's `_field_caps` API - the same source OSD's own "Refresh field list" uses once a real index backs an index pattern, independently of the known-fields JSON.
-
-**Usage:**
-
-```bash
-node scripts/generate-known-fields/verify-field-capabilities.js
-```
-
-Connects to `https://localhost:9200` with `admin:admin` (the dev-container defaults). A field with no live documents yet is reported as "not present in live mapping" (not a failure); the script exits non-zero only on a real mismatch.
-
 ## Generated Files
 
 The script generates JSON files in the destination directory: events, states, monitoring and statistics
