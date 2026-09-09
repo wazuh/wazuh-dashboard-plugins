@@ -7,7 +7,7 @@ import { getCore } from '../plugin-services';
  * so a probe we could not read must never hide the Register action.
  */
 const PERMISSION_NOT_EVALUATED: CtiRegistrationPermissionApiBody = {
-  accessAllowed: false,
+  accessAllowed: true,
   missingPrivileges: [],
 };
 

@@ -14,7 +14,7 @@ import { getWazuhCheckUpdatesServices } from '../../plugin-services';
  * action from users who are allowed to register.
  */
 const PERMISSION_NOT_EVALUATED: CtiRegistrationPermissionApiBody = {
-  accessAllowed: false,
+  accessAllowed: true,
   missingPrivileges: [],
 };
 
