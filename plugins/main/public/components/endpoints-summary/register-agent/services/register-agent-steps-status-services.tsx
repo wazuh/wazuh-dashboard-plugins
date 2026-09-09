@@ -75,9 +75,18 @@ const serverEndpointIsIncomplete = (
   !formFields.serverAddress.value ||
   ENDPOINT_FIELDS.some(key => Boolean(formFields[key]?.error));
 
+/* The wizard mints an enrollment token and installs the agent with it, so
+until the operator generates one there is no command to show. The flag is false
+whenever the token path is not in use -- the operator lacks
+`enrollment_token:create`, or the manager does not know the action -- and the
+wizard falls back to the enrollment password. */
 export const showCommandsSections = (
   formFields: UseFormReturn['fields'],
+  enrollmentTokenIsMissing: boolean = false,
 ): boolean => {
+  if (enrollmentTokenIsMissing) {
+    return false;
+  }
   if (
     !formFields.operatingSystemSelection.value ||
     serverEndpointIsIncomplete(formFields)
@@ -108,10 +117,11 @@ export const getOSSelectorStepStatus = (
 export const getAgentCommandsStepStatus = (
   formFields: UseFormReturn['fields'],
   wasCopied: boolean,
+  enrollmentTokenIsMissing: boolean = false,
 ): tFormStepsStatus | 'disabled' => {
-  if (!showCommandsSections(formFields)) {
+  if (!showCommandsSections(formFields, enrollmentTokenIsMissing)) {
     return 'disabled';
-  } else if (showCommandsSections(formFields) && wasCopied) {
+  } else if (wasCopied) {
     return 'complete';
   } else {
     return 'current';
@@ -154,6 +164,20 @@ export const getOptionalParameterStepStatus = (
   }
 };
 
+export const getEnrollmentTokenStepStatus = (
+  formFields: UseFormReturn['fields'],
+  hasEnrollmentToken: boolean,
+): tFormStepsStatus => {
+  if (
+    !formFields.operatingSystemSelection.value ||
+    formFields.operatingSystemSelection.error ||
+    serverEndpointIsIncomplete(formFields)
+  ) {
+    return 'disabled';
+  }
+  return hasEnrollmentToken ? 'complete' : 'current';
+};
+
 export const getPasswordStepStatus = (
   formFields: UseFormReturn['fields'],
 ): tFormStepsStatus => {
@@ -171,10 +195,12 @@ export const getPasswordStepStatus = (
 export enum tFormStepsLabel {
   operatingSystemSelection = 'operating system',
   serverAddress = 'server address',
+  enrollmentToken = 'enrollment token',
 }
 
 export const getIncompleteSteps = (
   formFields: UseFormReturn['fields'],
+  enrollmentTokenIsMissing: boolean = false,
 ): tFormStepsLabel[] => {
   const steps: FormStepsDependencies = {
     operatingSystemSelection: ['operatingSystemSelection'],
@@ -182,12 +208,18 @@ export const getIncompleteSteps = (
   };
   const statusManager = new RegisterAgentFormStatusManager(formFields, steps);
   // replace fields array using label names
-  return statusManager.getIncompleteSteps().map(field => {
+  const incompleteSteps = statusManager.getIncompleteSteps().map(field => {
     return tFormStepsLabel[field] || field;
   });
+
+  return enrollmentTokenIsMissing
+    ? [...incompleteSteps, tFormStepsLabel.enrollmentToken]
+    : incompleteSteps;
 };
 
 export enum tFormFieldsLabel {
+  enrollmentTokenTtl = 'enrollment token lifetime',
+  enrollmentTokenMaxUses = 'enrollment token enrollments',
   agentName = 'agent name',
   agentGroups = 'agent groups',
   serverAddress = 'server address',
@@ -202,16 +234,22 @@ seen or corrected -- reporting it would block the commands with no way out. */
 const fieldIsNotApplicable = (
   fieldName: string,
   formFields: UseFormReturn['fields'],
-): boolean => fieldName === 'managerCa' && !formFields.sslVerification?.value;
+  hasEnrollmentToken: boolean,
+): boolean =>
+  fieldName === 'managerCa' &&
+  (!formFields.sslVerification?.value || hasEnrollmentToken);
 
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],
+  hasEnrollmentToken: boolean = false,
 ): tFormFieldsLabel[] => {
   const statusManager = new RegisterAgentFormStatusManager(formFields);
 
   return statusManager
     .getInvalidFields()
-    .filter(field => !fieldIsNotApplicable(field, formFields))
+    .filter(
+      field => !fieldIsNotApplicable(field, formFields, hasEnrollmentToken),
+    )
     .map(field => {
       return tFormFieldsLabel[field] || field;
     });

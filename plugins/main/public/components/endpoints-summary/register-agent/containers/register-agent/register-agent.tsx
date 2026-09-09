@@ -35,8 +35,11 @@ import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateAgentName,
+  validateEnrollmentTokenMaxUses,
+  validateEnrollmentTokenTtl,
   validateManagerCaPath,
 } from '../../utils/validations';
+import { EnrollmentToken } from '../../services/enrollment-token-service';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -68,10 +71,20 @@ export const RegisterAgent = compose(
   const [wazuhPassword, setWazuhPassword] = useState('');
   const [groups, setGroups] = useState([]);
   const [needsPassword, setNeedsPassword] = useState<boolean>(false);
+  const [enrollmentToken, setEnrollmentToken] =
+    useState<EnrollmentToken | null>(null);
   const [missingPasswordReadPermissions] = useUserPermissionsRequirements([
     [{ action: 'cluster:update_config', resource: 'node:id:*' }],
   ]);
   const canReadAuthdPassword = !missingPasswordReadPermissions;
+  /* Minting a token is how the wizard deploys an agent. A server that does not
+  know the action -- one older than the mint endpoint, or whose RBAC policy
+  predates it -- reports it as missing here, which is also what a user without
+  the permission gets, and both fall back to the enrollment password path. */
+  const [missingEnrollmentTokenPermissions] = useUserPermissionsRequirements([
+    [{ action: 'enrollment_token:create', resource: '*:*:*' }],
+  ]);
+  const canCreateEnrollmentToken = !missingEnrollmentTokenPermissions;
 
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
@@ -101,6 +114,19 @@ export const RegisterAgent = compose(
       type: 'text',
       initialValue: configuration['enrollment.path'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPathPrefix,
+    },
+    /* Both parameterize the token the server mints, not the agent install, and
+    both are optional: left empty the server applies its own defaults, a 30 day
+    lifetime and unlimited enrollments. */
+    enrollmentTokenTtl: {
+      type: 'text',
+      initialValue: '',
+      validate: validateEnrollmentTokenTtl,
+    },
+    enrollmentTokenMaxUses: {
+      type: 'number',
+      initialValue: '',
+      validate: validateEnrollmentTokenMaxUses,
     },
     agentName: {
       type: 'text',
@@ -273,6 +299,9 @@ export const RegisterAgent = compose(
                       needsPassword={needsPassword}
                       wazuhPassword={wazuhPassword}
                       canReadAuthdPassword={canReadAuthdPassword}
+                      canCreateEnrollmentToken={canCreateEnrollmentToken}
+                      enrollmentToken={enrollmentToken}
+                      onEnrollmentTokenChange={setEnrollmentToken}
                       osCard={osCard}
                     />
                   </EuiFlexItem>

@@ -72,6 +72,7 @@ type IMacOSTypes = IMacOSApple | IMacOSIntel;
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
 export type tOptionalParameters =
+  | 'enrollmentToken'
   | 'serverAddress'
   | 'agentName'
   | 'agentGroups'
@@ -211,6 +212,19 @@ export const osCommandsDefinitions = [
 ///////////////////////////////////////////////////////////////////
 
 export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
+  /* The token the manager minted for this deployment. It already names the
+  manager (`adr`) and pins its CA, so the installer takes the connection target
+  and the trust anchor from it and the wizard emits no endpoint, CA or password
+  variable beside it -- the installer refuses a token any of those contradict.
+  The token text is unpadded base64url, so the single quotes that wrap every
+  other value here are enough on the three shells. */
+  enrollmentToken: {
+    property: 'WAZUH_ENROLLMENT_TOKEN',
+    getParamCommand: props => {
+      const { property, value } = props;
+      return value ? `${property}='${value}'` : '';
+    },
+  },
   /* The installer takes the whole connection target -- host, optional port and
   optional path prefix -- in one variable, which is what the agent writes into
   its `<manager><endpoint>`. The wizard composes the value from its three

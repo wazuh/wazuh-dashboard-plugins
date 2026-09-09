@@ -45,3 +45,11 @@ export const OPTIONAL_PARAMETERS_TEXT = [
       'By default, the deployment uses the hostname as the agent name. Optionally, you can use a different agent name in the field below.',
   },
 ];
+
+export const ENROLLMENT_TOKEN_TEXTS = [
+  {
+    title: 'Enrollment token',
+    subtitle:
+      'The server mints a token that names this manager and pins its certificate authority, and the agent enrolls with it instead of the shared enrollment password. The lifetime and the number of enrollments it allows are optional: left empty, the server applies its own defaults.',
+  },
+];
