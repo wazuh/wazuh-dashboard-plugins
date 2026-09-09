@@ -22,8 +22,10 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
+import converter from 'json-2-csv';
 import * as FileSaver from '../../../services/file-saver';
 import { formatUIDate } from '../../../react-services';
+import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -93,13 +95,17 @@ export function AgentStatTable({
   );
 }
 
-function downloadCsv(columns: any[], data: any[], filename: string) {
+async function downloadCsv(columns: any[], data: any[], filename: string) {
   try {
-    const header = columns.map(column => column.name).join(',');
-    const body = data
-      .map(row => columns.map(column => row[column.field]).join(','))
-      .join('\n');
-    const result = [header, body].join('\n');
+    const options = {
+      emptyFieldValue: '',
+      keys: columns.map(column => ({
+        field: column.field,
+        title: column.name,
+      })),
+    };
+    const rows = neutralizeCsvFormulaValues(data);
+    const result = await converter.json2csvAsync(rows, options);
     const blob = new Blob([result], { type: 'text/csv' }); // eslint-disable-line
     FileSaver.saveAs(blob, `${filename}.csv`);
   } catch (error) {

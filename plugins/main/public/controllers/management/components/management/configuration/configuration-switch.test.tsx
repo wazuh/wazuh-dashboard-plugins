@@ -75,6 +75,8 @@ jest.mock('./util-components/configuration-path', () => () => <></>);
 
 jest.mock('./util-components/refresh-cluster-info-button', () => () => <></>);
 
+jest.mock('./util-components/refresh-agent-config-button', () => () => <></>);
+
 jest.mock('../../../../../components/agents/prompts', () => ({
   PromptNoActiveAgentWithoutSelect: () => <></>,
   __esModule: true,
