@@ -145,6 +145,46 @@ describe('WzConfigurationOverview', () => {
     expect(screen.getByText('/etc/hosts')).toBeInTheDocument();
   });
 
+  it('hides Windows-only sections and shows Who-data for a non-Windows agent', async () => {
+    renderOverview({
+      agent: { ...agent, os: { platform: 'linux' } },
+      report: { content: {}, modules: [] },
+    });
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Integrity monitoring/ }),
+    );
+    await screen.findAllByText('Who-data audit keys');
+    expect(screen.queryByText('Registries limit')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Monitored registry entries'),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Log collection/ }),
+    );
+    expect(screen.queryByText('Windows events logs')).not.toBeInTheDocument();
+  });
+
+  it('shows Windows-only sections and hides Who-data for a Windows agent', async () => {
+    renderOverview({
+      agent: { ...agent, os: { platform: 'windows' } },
+      report: { content: {}, modules: [] },
+    });
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Integrity monitoring/ }),
+    );
+    await screen.findByText('Registries limit');
+    expect(screen.getByText('Monitored registry entries')).toBeInTheDocument();
+    expect(screen.queryByText('Who-data audit keys')).not.toBeInTheDocument();
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Log collection/ }),
+    );
+    await screen.findByText('Windows events logs');
+  });
+
   it('renders a multi-property dynamic list as a master-detail layout', async () => {
     (getSearchableSettingsData as jest.Mock).mockResolvedValue({
       values: {

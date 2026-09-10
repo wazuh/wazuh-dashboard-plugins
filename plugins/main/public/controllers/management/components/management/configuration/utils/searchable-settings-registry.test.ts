@@ -48,6 +48,31 @@ describe('searchableSettingsRegistry', () => {
     return field;
   };
 
+  it('restricts Windows-only and Who-data (non-Windows) entries by platform', () => {
+    const windowsOnlyIds = [
+      'integrity-monitoring.registry-limit.enabled',
+      'integrity-monitoring.registry-limit.entries',
+      'integrity-monitoring.registry-ignore',
+      'integrity-monitoring.registry-ignore-sregex',
+      'integrity-monitoring.registry',
+      'log-collection.windows-events',
+    ];
+    for (const id of windowsOnlyIds) {
+      expect(findField(id).platform).toBe('windows');
+    }
+
+    const notWindowsIds = [
+      'integrity-monitoring.who-data.restart_audit',
+      'integrity-monitoring.who-data.startup_healthcheck',
+      'integrity-monitoring.who-data.provider',
+      'integrity-monitoring.who-data.queue_size',
+      'integrity-monitoring.who-data.audit_key',
+    ];
+    for (const id of notWindowsIds) {
+      expect(findField(id).platform).toBe('not-windows');
+    }
+  });
+
   it('resolves registration-service.port against auth-auth (regular request)', () => {
     const field = findField('registration-service.port');
     const merged = { 'auth-auth': { auth: { port: 1515 } } };

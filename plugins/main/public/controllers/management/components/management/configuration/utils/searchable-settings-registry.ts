@@ -61,6 +61,10 @@ export interface SearchableSettingField {
    * can jump back into the section it came from. */
   goto: string;
   appliesTo: 'manager' | 'agent';
+  /** Restricts an agent-only field to agents reporting (or not reporting)
+   * as Windows, e.g. registry-monitoring settings vs. Linux/macOS-only
+   * who-data settings. Unset means it applies to every platform. */
+  platform?: 'windows' | 'not-windows';
   manager?: {
     request: ManagerFieldSource;
     /** lodash-get path, resolved against the request's merged result. */
@@ -93,6 +97,9 @@ export interface SearchableSettingList {
   tab?: string;
   goto: string;
   appliesTo: 'agent';
+  /** Restricts the list to agents reporting (or not reporting) as Windows.
+   * Unset means it applies to every platform. */
+  platform?: 'windows' | 'not-windows';
   /** Subsection heading, e.g. "Monitored directories", "Ignored files". */
   title: string;
   description?: string;
@@ -1174,6 +1181,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Registries limit',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
+    platform: 'windows',
     agentPath: 'fim.syscheck.registry_limit.enabled',
     render: renderValueYesThenEnabled,
   },
@@ -1184,6 +1192,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Registries limit',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
+    platform: 'windows',
     agentPath: 'fim.syscheck.registry_limit.entries',
   },
   ...(
@@ -1200,6 +1209,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Who-data',
     goto: 'integrity-monitoring',
     appliesTo: 'agent' as const,
+    platform: 'not-windows' as const,
     agentPath: `fim.syscheck.whodata.${field}`,
   })),
   {
@@ -1251,6 +1261,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Ignored',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
+    platform: 'windows',
     title: 'Ignored registry entries',
     description:
       'A list of registry entries that will be ignored (Windows only)',
@@ -1269,6 +1280,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Ignored',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
+    platform: 'windows',
     title: 'Ignored registry entry patterns',
     description:
       'A list of registry entry patterns that will be ignored (Windows only)',
@@ -1287,6 +1299,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Who-data',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
+    platform: 'not-windows',
     title: 'Who-data audit keys',
     description:
       'Server will include in its FIM baseline those events being monitored by Audit using audit_key.',
@@ -1396,6 +1409,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Monitored',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
+    platform: 'windows',
     title: 'Monitored registry entries',
     description:
       'A list of registry entries that will be monitored (Windows only)',
@@ -1528,6 +1542,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Windows Events',
     goto: 'log-collection',
     appliesTo: 'agent',
+    platform: 'windows',
     title: 'Windows events logs',
     description: 'List of Windows logs that will be processed',
     help: LOG_COLLECTION_HELP,

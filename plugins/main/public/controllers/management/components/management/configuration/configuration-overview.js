@@ -209,10 +209,19 @@ class WzConfigurationOverview extends Component {
    * fields/lists. A category/subsection with nothing left after filtering
    * is dropped entirely rather than shown empty.
    */
+  entryMatchesPlatform(entry, agentPlatform) {
+    if (!entry.platform) {
+      return true;
+    }
+    return entry.platform === 'windows'
+      ? agentPlatform === 'windows'
+      : agentPlatform !== 'windows';
+  }
   getGroupedSettings() {
     const { query, searchData } = this.state;
     const isManager = !this.props.agent;
     const appliesTo = isManager ? 'manager' : 'agent';
+    const agentPlatform = this.props.agent?.os?.platform;
     const q = query ? query.trim().toLowerCase() : '';
     const values = searchData?.values;
 
@@ -223,7 +232,9 @@ class WzConfigurationOverview extends Component {
           .map(setting => {
             const entries = searchableSettingsRegistry.filter(
               entry =>
-                entry.goto === setting.goto && entry.appliesTo === appliesTo,
+                entry.goto === setting.goto &&
+                entry.appliesTo === appliesTo &&
+                this.entryMatchesPlatform(entry, agentPlatform),
             );
             const matching = entries.filter(entry =>
               this.entryMatchesQuery(entry, q, values),
