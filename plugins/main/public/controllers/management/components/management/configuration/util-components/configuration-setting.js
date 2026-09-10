@@ -89,7 +89,11 @@ class WzConfigurationSetting extends Component {
               <ul>
                 {value.map((v, key) => (
                   <li key={`${keyItem}-${label}-${key}`}>
-                    <EuiFieldText value={String(v)} readOnly />
+                    <EuiFieldText
+                      value={String(v)}
+                      title={String(v)}
+                      readOnly
+                    />
                   </li>
                 ))}
               </ul>
@@ -127,6 +131,7 @@ class WzConfigurationSetting extends Component {
                   .toLowerCase()
                   .replace(/\s/g, '-')}`}
                 value={String(value)}
+                title={String(value)}
                 readOnly
               />
             )}
