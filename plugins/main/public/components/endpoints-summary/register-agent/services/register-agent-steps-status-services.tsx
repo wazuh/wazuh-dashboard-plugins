@@ -218,6 +218,7 @@ export const getIncompleteSteps = (
 };
 
 export enum tFormFieldsLabel {
+  existingEnrollmentToken = 'existing enrollment token',
   enrollmentTokenTtl = 'enrollment token lifetime',
   enrollmentTokenMaxUses = 'enrollment token enrollments',
   agentName = 'agent name',
@@ -228,16 +229,36 @@ export enum tFormFieldsLabel {
   managerCa = 'manager CA file path',
 }
 
+/* The three fields that parameterize a mint request, none of which is sent when
+a stored token is being reused instead. */
+const TOKEN_REQUEST_FIELDS = [
+  'enrollmentTokenTtl',
+  'enrollmentTokenMaxUses',
+  'enrollmentTokenDescription',
+];
+
 /* Fields the form is still holding a value for but that the wizard is no
-longer asking about. Their input is not rendered, so an error on them cannot be
-seen or corrected -- reporting it would block the commands with no way out. */
+longer asking about, because their input is not rendered or is disabled. An
+error on them cannot be seen or corrected, so reporting it would block the
+commands with no way out. */
 const fieldIsNotApplicable = (
   fieldName: string,
   formFields: UseFormReturn['fields'],
   hasEnrollmentToken: boolean,
-): boolean =>
-  fieldName === 'managerCa' &&
-  (!formFields.sslVerification?.value || hasEnrollmentToken);
+): boolean => {
+  if (
+    fieldName === 'managerCa' &&
+    (!formFields.sslVerification?.value || hasEnrollmentToken)
+  ) {
+    return true;
+  }
+  /* A token the operator already had is being reused, so no mint request is
+  made and the fields that would parameterize it are disabled. */
+  return (
+    TOKEN_REQUEST_FIELDS.includes(fieldName) &&
+    String(formFields.existingEnrollmentToken?.value ?? '').trim().length > 0
+  );
+};
 
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],

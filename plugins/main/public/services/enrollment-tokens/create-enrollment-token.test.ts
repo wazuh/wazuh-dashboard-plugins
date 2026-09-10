@@ -2,11 +2,11 @@
 import {
   buildEnrollmentTokenRequestBody,
   createEnrollmentToken,
-  ENROLLMENT_TOKENS_ENDPOINT,
-} from './enrollment-token-service';
-import { WzRequest } from '../../../../react-services/wz-request';
+} from './create-enrollment-token';
+import { ENROLLMENT_TOKENS_ENDPOINT } from './constants';
+import { WzRequest } from '../../react-services/wz-request';
 
-jest.mock('../../../../react-services/wz-request', () => ({
+jest.mock('../../react-services/wz-request', () => ({
   WzRequest: { apiReq: jest.fn() },
 }));
 
@@ -48,6 +48,39 @@ describe('buildEnrollmentTokenRequestBody', () => {
       prefix: '/wazuh-manager',
       ttl: '12h',
       max_uses: 50,
+    });
+  });
+
+  it('sends the description the operator wrote, trimmed', () => {
+    expect(
+      buildEnrollmentTokenRequestBody({
+        address: 'manager.example.com',
+        description: '  Laptops, Q4 rollout  ',
+      }),
+    ).toEqual({
+      address: 'manager.example.com',
+      description: 'Laptops, Q4 rollout',
+    });
+  });
+
+  it('only sends the flags that are turned on, so the server keeps its defaults', () => {
+    expect(
+      buildEnrollmentTokenRequestBody({
+        address: 'manager.example.com',
+        embedCa: false,
+        noCredential: false,
+      }),
+    ).toEqual({ address: 'manager.example.com' });
+    expect(
+      buildEnrollmentTokenRequestBody({
+        address: 'manager.example.com',
+        embedCa: true,
+        noCredential: true,
+      }),
+    ).toEqual({
+      address: 'manager.example.com',
+      embed_ca: true,
+      no_credential: true,
     });
   });
 

@@ -1,0 +1,35 @@
+/*
+ * Wazuh app - Styles for the truncated-value-with-tooltip control
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+// EuiToolTip wraps its child in a `display: inline-block` anchor with no
+// width of its own, so it shrink-wraps to the natural, unwrapped width of
+// the text inside -- which is exactly as wide as the value, ellipsis or not.
+// Forcing it down to block gives it the width of the row instead, which is
+// what `overflow`/`text-overflow` on the value itself actually needs to clip
+// against.
+.wz-truncated-value-tooltip-wrapper {
+  display: block;
+  min-width: 0;
+
+  .euiToolTipAnchor {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+.wz-truncated-value-tooltip {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

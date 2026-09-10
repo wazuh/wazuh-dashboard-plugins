@@ -192,12 +192,16 @@ export const getRegisterAgentFormValues = (form: UseFormReturn) => {
 
 const ENDPOINT_FIELDS = ['serverAddress', 'serverPort', 'serverPath'];
 
-/* These two parameterize the request the wizard makes to the manager to mint
-the token; they are not deployment variables and must never reach the generated
-command. */
-const ENROLLMENT_TOKEN_REQUEST_FIELDS = [
+/* Fields of the enrollment token step that are not deployment variables and
+must never reach the generated command: three parameterize the request the
+wizard makes to the manager to mint a token, and the fourth holds a token the
+operator already had. The token the agent is installed with reaches the command
+as `optionalParams.enrollmentToken`, whichever of the two paths produced it. */
+const ENROLLMENT_TOKEN_FORM_FIELDS = [
+  'existingEnrollmentToken',
   'enrollmentTokenTtl',
   'enrollmentTokenMaxUses',
+  'enrollmentTokenDescription',
 ];
 
 export interface IParseRegisterFormValues {
@@ -234,8 +238,8 @@ export const parseRegisterAgentFormValues = (
   formValues.forEach(field => {
     if (ENDPOINT_FIELDS.includes(field.name as string)) {
       endpointComponents[field.name as string] = field.value;
-    } else if (ENROLLMENT_TOKEN_REQUEST_FIELDS.includes(field.name as string)) {
-      // Consumed by the mint request, not by the install command.
+    } else if (ENROLLMENT_TOKEN_FORM_FIELDS.includes(field.name as string)) {
+      // Consumed by the token step, not by the install command.
     } else if (field.name === 'operatingSystemSelection') {
       // search the architecture defined in architecture array and get the os name defined in title array in the same index
       const operatingSystem = OSOptionsDefined.find(os =>

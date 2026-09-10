@@ -17,6 +17,7 @@ import { WzUpdatesNotification } from './components/wz-updates-notification';
 import { WzCtiUpsellNotification } from './components/wz-cti-upsell-notification';
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
+import { MainEnrollmentTokens } from './components/enrollment-tokens';
 import { AgentView } from './components/endpoints-summary/agent';
 import WzManagement from './controllers/management/components/management/management-provider';
 import { Overview } from './components/overview/overview';
@@ -124,6 +125,11 @@ export const Application = withGuardAsync(
           path={`/${SECTIONS.AGENTS_PREVIEW}/`}
           exact
           render={MainEndpointsSummary}
+        ></Route>
+        <Route
+          path={`/${SECTIONS.ENROLLMENT_TOKENS}/`}
+          exact
+          render={MainEnrollmentTokens}
         ></Route>
         <Route
           path={`/${SECTIONS.MANAGER}`}

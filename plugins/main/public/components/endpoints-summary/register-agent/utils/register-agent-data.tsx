@@ -34,7 +34,7 @@ export const SERVER_ADDRESS_TEXTS = [
   {
     title: 'Server address',
     subtitle:
-      'The agent reaches the server at a single endpoint built from an address, a port, and a path prefix. Only the address is required: leave the other two empty and the agent falls back to its own defaults.',
+      'The agent reaches the server at a single endpoint built from an address, a port, and a path prefix. Only the address is required: the other two are under the advanced options, and left empty the agent falls back to its own defaults.',
   },
 ];
 
@@ -50,6 +50,6 @@ export const ENROLLMENT_TOKEN_TEXTS = [
   {
     title: 'Enrollment token',
     subtitle:
-      'The server mints a token that names this manager and pins its certificate authority, and the agent enrolls with it instead of the shared enrollment password. The lifetime and the number of enrollments it allows are optional: left empty, the server applies its own defaults.',
+      'The agent enrolls with a token that names this manager and pins its certificate authority, instead of with the shared enrollment password. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, or open the advanced options to reuse a token kept from an earlier deployment or to set those values yourself.',
   },
 ];

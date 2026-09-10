@@ -35,11 +35,14 @@ import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateAgentName,
-  validateEnrollmentTokenMaxUses,
-  validateEnrollmentTokenTtl,
+  validateExistingEnrollmentToken,
   validateManagerCaPath,
 } from '../../utils/validations';
-import { EnrollmentToken } from '../../services/enrollment-token-service';
+import {
+  validateEnrollmentTokenMaxUses,
+  validateEnrollmentTokenTtl,
+} from '../../../../../services/enrollment-tokens';
+import { EnrollmentToken } from '../../interfaces/types';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -115,9 +118,17 @@ export const RegisterAgent = compose(
       initialValue: configuration['enrollment.path'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPathPrefix,
     },
-    /* Both parameterize the token the server mints, not the agent install, and
-    both are optional: left empty the server applies its own defaults, a 30 day
-    lifetime and unlimited enrollments. */
+    /* A token the operator kept from an earlier mint. Filling it deploys with
+    that token instead of asking the server for a new one, so it excludes the
+    three fields below. */
+    existingEnrollmentToken: {
+      type: 'text',
+      initialValue: '',
+      validate: validateExistingEnrollmentToken,
+    },
+    /* These three parameterize the token the server mints, not the agent
+    install, and all are optional: left empty the server applies its own
+    defaults, a 30 day lifetime and unlimited enrollments. */
     enrollmentTokenTtl: {
       type: 'text',
       initialValue: '',
@@ -127,6 +138,12 @@ export const RegisterAgent = compose(
       type: 'number',
       initialValue: '',
       validate: validateEnrollmentTokenMaxUses,
+    },
+    /* Free text kept with the token on the server so it can be told apart from
+    the others when they are listed later. It never reaches the agent. */
+    enrollmentTokenDescription: {
+      type: 'text',
+      initialValue: '',
     },
     agentName: {
       type: 'text',

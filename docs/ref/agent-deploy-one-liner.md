@@ -17,14 +17,24 @@ interface, for example in end-to-end testing scenarios.
 
 ![Select platform](../img/agent-deploy-oneliner/agent-wizard-platform.webp)
 
-4. In **Server address**, enter the hostname or IP address of the Wazuh manager the agent will register against.
+4. In **Server address**, enter the hostname or IP address of the Wazuh manager
+   the agent will register against. The port and the path prefix sit behind
+   **View advanced options** and are only needed when the manager does not
+   listen on the defaults.
 
 ![Set manager address](../img/agent-deploy-oneliner/set-server-address.webp)
 
-5. In **Enrollment token**, select **Generate token**. The server mints a token
-   for the address typed in the previous step and answers with its identifier and
-   expiry. **Lifetime** and **Enrollments allowed** are optional: left empty, the
-   server applies its own defaults, 30 days and unlimited enrollments.
+5. In **Enrollment token**, select **Generate token**. The server mints one for
+   the address typed in the previous step, with its own defaults -- a 30 day
+   lifetime and unlimited enrollments -- and answers with its identifier and
+   expiry.
+
+   **View advanced options** opens the rest of the step: **Use existing token**,
+   to deploy with a token kept from an earlier deployment instead of minting a
+   new one, and **Lifetime**, **Enrollments allowed** and **Description**, which
+   parameterize the mint request. The two paths exclude each other, so filling
+   **Use existing token** disables the other three, and using any of them
+   disables **Use existing token**.
 
 6. **Optional configuration** (when required):
    - **Agent name**: define how the agent is identified.
@@ -83,8 +93,21 @@ The wizard does not build the enrollment credentials itself: it asks the server
 to mint an **enrollment token** for the address the operator typed
 (`POST /agents/enrollment-tokens`) and shows whatever the server answers,
 including its refusal when the address is not one of the names in the listener
-certificate. The token is returned by that response only and is never listed
-again, so the deployment command has to be copied before leaving the page.
+certificate. **Lifetime**, **Enrollments allowed** and **Description**
+parameterize that request only; the description is kept with the token on the
+server so it can be told apart from the others when they are listed later, and
+none of the three reaches the agent. The token is returned by that response only
+and is never listed again, so the deployment command has to be copied before
+leaving the page.
+
+An operator who kept a token from an earlier deployment can reuse it through
+**Use existing token** instead of minting a new one. Only the token text is
+known in that case -- the manager returns the metadata once, at mint time -- so
+the wizard shows neither the address it names nor its expiry, and it is the
+manager that refuses an expired or exhausted token at enrollment time. The field
+is checked only for what would break the generated command apart, a space or a
+single quote, since the manager is what decides whether the text is a token it
+issued.
 
 The token names the manager and pins its certificate authority, and it carries
 the credential the agent enrolls with. The installer refuses a token supplied
@@ -92,7 +115,15 @@ together with a value that contradicts it, so with a token in hand the wizard
 emits `WAZUH_ENROLLMENT_TOKEN` alone and no `WAZUH_MANAGER_ENDPOINT`,
 `WAZUH_REGISTRATION_PASSWORD`, `WAZUH_REGISTRATION_CA` or `SSL_VERIFICATION`
 beside it. Editing the server address after generating a token discards it,
-since the address the agent would reach comes from the token.
+since the address the agent would reach comes from the token. A token supplied
+through **Use existing token** is left alone, because it was not minted from
+those fields and they say nothing about the manager it names.
+
+A section that holds a value opens by itself rather than hiding it: the port and
+the path prefix arrive from the app configuration, so a deployment that sets
+them shows them. So does a section holding a field in error, since an error that
+cannot be seen cannot be corrected and the deployment commands stay blocked
+until it is.
 
 Minting requires the `enrollment_token:create` permission. Where it is missing --
 including against a server whose RBAC policy predates the action -- the wizard

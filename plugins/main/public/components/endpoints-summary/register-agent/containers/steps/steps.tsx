@@ -26,7 +26,7 @@ import CommandOutput from '../../components/command-output/command-output';
 import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
 import EnrollmentTokenInput from '../../components/enrollment-token/enrollment-token';
-import { EnrollmentToken } from '../../services/enrollment-token-service';
+import { EnrollmentToken } from '../../interfaces/types';
 import {
   getAgentCommandsStepStatus,
   tFormStepsStatus,

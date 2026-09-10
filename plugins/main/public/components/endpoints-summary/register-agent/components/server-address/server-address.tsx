@@ -6,11 +6,13 @@ import {
   EuiButtonEmpty,
   EuiSwitch,
   EuiLink,
+  EuiSpacer,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
 import { EnhancedFieldConfiguration } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
+import AdvancedOptions from '../advanced-options/advanced-options';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import {
@@ -179,44 +181,50 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiFlexGroup wrap>
-        <EuiFlexItem grow={true}>
-          <InputForm
-            {...serverPort}
-            label={
-              <span className='registerAgentLabels'>
-                {`Port - `}
-                <em>optional</em>
-              </span>
-            }
-            footer={
-              <EndpointDefaultHint>
-                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PORT} default will be used`}
-              </EndpointDefaultHint>
-            }
-            fullWidth={false}
-            placeholder={AGENT_ENDPOINT_DEFAULT_PORT}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={true}>
-          <InputForm
-            {...serverPath}
-            label={
-              <span className='registerAgentLabels'>
-                {`Path prefix - `}
-                <em>optional</em>
-              </span>
-            }
-            footer={
-              <EndpointDefaultHint>
-                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PATH} default will be used`}
-              </EndpointDefaultHint>
-            }
-            fullWidth={false}
-            placeholder={AGENT_ENDPOINT_DEFAULT_PATH}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      {/* The port and the path prefix are optional and rarely changed, so they
+      are folded away and the step is just the address until the operator asks
+      for them. */}
+      <AdvancedOptions fields={[serverPort, serverPath]}>
+        <EuiFlexGroup wrap>
+          <EuiFlexItem grow={true} className='registerAgentFormColumn'>
+            <InputForm
+              {...serverPort}
+              label={
+                <span className='registerAgentLabels'>
+                  {`Port - `}
+                  <em>optional</em>
+                </span>
+              }
+              footer={
+                <EndpointDefaultHint>
+                  {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PORT} default will be used`}
+                </EndpointDefaultHint>
+              }
+              fullWidth={false}
+              placeholder={AGENT_ENDPOINT_DEFAULT_PORT}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={true} className='registerAgentFormColumn'>
+            <InputForm
+              {...serverPath}
+              label={
+                <span className='registerAgentLabels'>
+                  {`Path prefix - `}
+                  <em>optional</em>
+                </span>
+              }
+              footer={
+                <EndpointDefaultHint>
+                  {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PATH} default will be used`}
+                </EndpointDefaultHint>
+              }
+              fullWidth={false}
+              placeholder={AGENT_ENDPOINT_DEFAULT_PATH}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </AdvancedOptions>
+      <EuiSpacer size='s' />
       <EuiFlexGroup wrap>
         <EuiFlexItem grow={false}>
           <EuiSwitch
