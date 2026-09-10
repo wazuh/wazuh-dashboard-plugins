@@ -112,9 +112,18 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     pendingUpgradeAgents.map(pendingAgent => pendingAgent.id),
   );
 
-  const onSelectionChange = (selectedItems: Agent[]) => {
-    setSelectedItems(selectedItems);
-    if (selectedItems.length < agentList.totalItems) {
+  const onSelectionChange = (visibleSelected: Agent[]) => {
+    // EuiBasicTable only reports the currently visible page's checked rows.
+    // Reconcile against the visible page so a selection made on a previous
+    // page is preserved when the user changes page/search/sort.
+    setSelectedItems(prevSelected => {
+      const visibleIds = new Set(agentList.items.map(({ id }) => id));
+      const keptFromOtherPages = prevSelected.filter(
+        ({ id }) => !visibleIds.has(id),
+      );
+      return [...keptFromOtherPages, ...visibleSelected];
+    });
+    if (visibleSelected.length < agentList.items?.length) {
       setAllAgentsSelected(false);
     }
   };
@@ -159,8 +168,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     setAgentList(data);
   };
 
+  const isEveryVisibleItemSelected =
+    agentList.items?.length > 0 &&
+    agentList.items.every(({ id }) =>
+      selectedItems.some(selected => selected.id === id),
+    );
+
   const showSelectAllItems =
-    (selectedItems.length === agentList.items?.length &&
+    (isEveryVisibleItemSelected &&
       selectedItems.length < agentList.totalItems) ||
     allAgentsSelected;
 
@@ -202,7 +217,6 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
 
   const tableRender = () => {
     // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
-    // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
     // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
     return (
       <EuiFlexGroup className='wz-overflow-auto'>

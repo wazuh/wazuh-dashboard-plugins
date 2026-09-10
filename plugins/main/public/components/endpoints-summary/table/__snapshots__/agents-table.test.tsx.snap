@@ -15,13 +15,14 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
                 class="euiFlexItem"
+                style="min-width:0"
               >
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
@@ -591,13 +592,14 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
                 class="euiFlexItem"
+                style="min-width:0"
               >
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
@@ -1167,13 +1169,14 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
                 class="euiFlexItem"
+                style="min-width:0"
               >
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
