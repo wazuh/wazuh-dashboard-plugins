@@ -43,9 +43,11 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
     <div
       className="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
     >
-      <EuiFlexItem>
+      <EuiFlexItem
+        grow={false}
+      >
         <div
-          className="euiFlexItem"
+          className="euiFlexItem euiFlexItem--flexGrowZero"
         >
           <EuiFlexGroup
             alignItems="center"
@@ -55,9 +57,20 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
             <div
               className="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
-              <EuiFlexItem>
+              <EuiFlexItem
+                style={
+                  Object {
+                    "minWidth": 0,
+                  }
+                }
+              >
                 <div
                   className="euiFlexItem"
+                  style={
+                    Object {
+                      "minWidth": 0,
+                    }
+                  }
                 >
                   <EuiFlexGroup
                     alignItems="center"

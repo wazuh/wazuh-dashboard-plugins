@@ -10,7 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import { EuiBasicTable, EuiBasicTableProps, EuiSpacer } from '@elastic/eui';
 import _ from 'lodash';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -97,28 +104,45 @@ export interface ITableWithSearcHBarProps<T> {
    * API request filters
    */
   filters?: any;
+  /**
+   * Fired synchronously, in the same call stack as EuiBasicTable's own
+   * onPageChange/onColumnSortChange, before the new page/sort is fetched.
+   * Lets a consumer tell apart a real page/sort change from a genuine
+   * selection change, both of which reach `selection.onSelectionChange`
+   * indistinguishably otherwise.
+   */
+  onPageOrSortChange?: () => void;
 }
 
-export function TableWithSearchBar<T>({
-  onSearch,
-  searchBarProps = {},
-  tableColumns,
-  rowProps,
-  tablePageSizeOptions = [15, 25, 50, 100],
-  tableInitialSortingDirection = 'asc',
-  tableInitialSortingField = '',
-  tableInitialPageSize,
-  tableProps = {},
-  reload,
-  endpoint,
-  ...rest
-}: ITableWithSearcHBarProps<T>) {
+// Exposes EuiBasicTable's imperative `setSelection`, the only way to
+// change selection after mount: `selection.selected` is read once, at
+// mount, as `initialSelected`.
+export type TableWithSearchBarHandle = {
+  setSelection: (items: any[]) => void;
+};
+
+function TableWithSearchBarInner<T>(
+  {
+    onSearch,
+    searchBarProps = {},
+    tableColumns,
+    rowProps,
+    tablePageSizeOptions = [15, 25, 50, 100],
+    tableInitialSortingDirection = 'asc',
+    tableInitialSortingField = '',
+    tableInitialPageSize,
+    tableProps = {},
+    reload,
+    endpoint,
+    ...rest
+  }: ITableWithSearcHBarProps<T>,
+  forwardedRef: React.Ref<TableWithSearchBarHandle>,
+) {
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState(rest.filters || {});
-  // Added a timestamp to track when the same filter is added multiple times
-  // after being manually removed.
+  // Tracks when the same filter is re-added after being manually removed.
   const [filtersTimeMark, setFiltersTimeMark] = useState<number>(Date.now());
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -134,6 +158,10 @@ export function TableWithSearchBar<T>({
 
   const isMounted = useRef(false);
   const tableRef = useRef();
+
+  useImperativeHandle(forwardedRef, () => ({
+    setSelection: (items: any[]) => tableRef.current?.setSelection(items),
+  }));
 
   const searchBarWQLOptions = useMemo(
     () => ({
@@ -156,6 +184,7 @@ export function TableWithSearchBar<T>({
 
   function tableOnChange({ page = {}, sort = {} }) {
     if (isMounted.current) {
+      rest.onPageOrSortChange?.();
       const { index: pageIndex, size: pageSize } = page;
       const { field, direction } = sort;
       setPagination({
@@ -172,24 +201,26 @@ export function TableWithSearchBar<T>({
   }
 
   useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the pagination state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
+    // Skipped on mount; the pagination reset also triggers the fetch effect through its own dependency.
     if (isMounted.current) {
-      // Reset the page index when the endpoint or reload changes.
-      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
       updateRefresh();
     }
   }, [endpoint, reload]);
+
+  useEffect(() => {
+    // Reset the table selection only when the endpoint changes.
+    // Changing the filters, pagination, sorting or refresh must not
+    // discard a selection that spans multiple pages/searches.
+    if (isMounted.current) {
+      tableRef.current?.setSelection([]);
+    }
+  }, [endpoint]);
 
   useEffect(
     function () {
       (async () => {
         try {
           setLoading(true);
-
-          // Reset the table selection in case is enabled
-          tableRef.current.setSelection([]);
 
           const { items, totalItems } = await onSearch(
             endpoint,
@@ -203,7 +234,7 @@ export function TableWithSearchBar<T>({
           setItems([]);
           setTotalItems(0);
           const options = {
-            context: `${TableWithSearchBar.name}.useEffect`,
+            context: `${TableWithSearchBarInner.name}.useEffect`,
             level: UI_LOGGER_LEVELS.ERROR,
             severity: UI_ERROR_SEVERITIES.BUSINESS,
             error: {
@@ -221,18 +252,15 @@ export function TableWithSearchBar<T>({
   );
 
   useEffect(() => {
-    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
-    // We don't want to set the filters state because there is another effect that has this dependency
-    // and will cause the effect is triggered (redoing the onSearch function).
+    // Skipped on mount; the filters reset also triggers the fetch effect through its own dependency.
     if (isMounted.current && !_.isEqual(rest.filters, filters)) {
       setFilters(rest.filters || {});
       updateRefresh();
     }
   }, [rest.filters]);
 
-  // It is required that this effect runs after other effects that use isMounted
-  // to avoid that these effects run when the component is mounted, only running
-  // when one of its dependencies changes.
+  // Must run after the other isMounted-gated effects, so isMounted flips to
+  // true only once those effects have already skipped their mount-time run.
   useEffect(() => {
     isMounted.current = true;
   }, []);
@@ -266,7 +294,6 @@ export function TableWithSearchBar<T>({
         input={rest?.filters?.q || ''}
         inputTimeMark={filtersTimeMark}
         onSearch={({ apiQuery }) => {
-          // Set the query, reset the page index and update the refresh
           setFilters(apiQuery);
           updateRefresh();
         }}
@@ -289,3 +316,15 @@ export function TableWithSearchBar<T>({
     </>
   );
 }
+
+const TableWithSearchBarForwardRef = forwardRef(TableWithSearchBarInner);
+TableWithSearchBarForwardRef.displayName = 'TableWithSearchBar';
+
+// forwardRef doesn't support generics directly (pre-TS5 syntax); cast the
+// wrapped component back to a generic call signature so existing callers
+// that don't pass a ref keep their exact prior typing.
+export const TableWithSearchBar = TableWithSearchBarForwardRef as <T>(
+  props: ITableWithSearcHBarProps<T> & {
+    ref?: React.Ref<TableWithSearchBarHandle>;
+  },
+) => ReturnType<typeof TableWithSearchBarInner>;
