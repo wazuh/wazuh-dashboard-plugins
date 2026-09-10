@@ -285,6 +285,37 @@ describe('WzConfigurationOverview', () => {
     ).toBeInTheDocument();
   });
 
+  it("counts only settings with a visible value in a category's badge", async () => {
+    // None of Active response's 4 registry fields have a reported value here.
+    // 'disabled' still renders (its render fallback always returns a
+    // truthy 'enabled'/'disabled' string), so only it should count.
+    (getSearchableSettingsData as jest.Mock).mockResolvedValue({
+      values: {},
+      sources: {},
+    });
+
+    renderOverview({ agent, report: { content: {}, modules: [] } });
+
+    const activeResponseButton = await screen.findByRole('button', {
+      name: /Active response/,
+    });
+    expect(within(activeResponseButton).getByText('1')).toBeInTheDocument();
+  });
+
+  it('counts only settings with a visible value in the search summary', async () => {
+    (getSearchableSettingsData as jest.Mock).mockResolvedValue({
+      values: {},
+      sources: {},
+    });
+
+    renderOverview({ agent, report: { content: {}, modules: [] } });
+    const search = await screen.findByPlaceholderText(/Search settings/);
+
+    fireEvent.change(search, { target: { value: 'active response' } });
+
+    await screen.findByText(/1 of \d+ settings/);
+  });
+
   it('hides an unconfigured list entirely once a query does not match it', async () => {
     (getSearchableSettingsData as jest.Mock).mockResolvedValue({
       values: {},

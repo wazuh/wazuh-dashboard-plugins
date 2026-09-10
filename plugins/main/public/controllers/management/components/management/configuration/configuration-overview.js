@@ -209,6 +209,21 @@ class WzConfigurationOverview extends Component {
    * fields/lists. A category/subsection with nothing left after filtering
    * is dropped entirely rather than shown empty.
    */
+  hasVisibleFieldValue(value, render) {
+    const resolved = render ? render(value) : value;
+    return (
+      Boolean(resolved) ||
+      typeof resolved === 'number' ||
+      typeof resolved === 'boolean'
+    );
+  }
+  entryHasVisibleValue(entry, values) {
+    const rawValue = values?.[entry.id];
+    if (entry.kind === 'list') {
+      return Array.isArray(rawValue) && rawValue.length > 0;
+    }
+    return this.hasVisibleFieldValue(rawValue, entry.render);
+  }
   entryMatchesPlatform(entry, agentPlatform) {
     if (!entry.platform) {
       return true;
@@ -295,7 +310,9 @@ class WzConfigurationOverview extends Component {
               id: setting.goto,
               title: setting.name,
               description: setting.description,
-              entriesCount: q ? matching.length : entries.length,
+              entriesCount: (q ? matching : entries).filter(entry =>
+                this.entryHasVisibleValue(entry, values),
+              ).length,
               subsections,
             };
           })
@@ -303,15 +320,19 @@ class WzConfigurationOverview extends Component {
       }))
       .filter(group => group.categories.length);
   }
-  countEntries(groupedSettings) {
+  countEntries(groupedSettings, values) {
     let count = 0;
     for (const group of groupedSettings) {
       for (const category of group.categories) {
         for (const subsection of category.subsections) {
           for (const fieldGroup of subsection.fieldGroups) {
-            count += fieldGroup.fields.length;
+            count += fieldGroup.fields.filter(field =>
+              this.hasVisibleFieldValue(field.value, field.render),
+            ).length;
           }
-          count += subsection.lists.length;
+          count += subsection.lists.filter(list =>
+            this.entryHasVisibleValue(list, values),
+          ).length;
         }
       }
     }
@@ -349,7 +370,9 @@ class WzConfigurationOverview extends Component {
     const indexedCount = searchableSettingsRegistry.filter(entry =>
       isManager ? entry.appliesTo === 'manager' : entry.appliesTo === 'agent',
     ).length;
-    const matchCount = query ? this.countEntries(groupedSettings) : null;
+    const matchCount = query
+      ? this.countEntries(groupedSettings, this.state.searchData?.values)
+      : null;
     // groupedSettings already reflects every category (unfiltered) whenever
     // query is empty -- the branch that actually uses these two is only
     // reached in that case.
