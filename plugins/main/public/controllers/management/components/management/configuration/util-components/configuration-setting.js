@@ -21,7 +21,6 @@ import {
   EuiIconTip,
 } from '@elastic/eui';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
-import helpLinks from '../log-collection/help-links';
 
 class WzConfigurationSetting extends Component {
   constructor(props) {
@@ -96,11 +95,7 @@ class WzConfigurationSetting extends Component {
               </ul>
             ) : Array.isArray(value) && columns ? (
               <>
-                <WzConfigurationSettingsHeader
-                  title={label}
-                  info={info}
-                  help={helpLinks}
-                />
+                <WzConfigurationSettingsHeader title={label} info={info} />
                 {value.map((group, groupIndex) => (
                   <EuiAccordion
                     key={`accordion_${groupIndex}`}

@@ -237,9 +237,12 @@ class NavigationService {
     return search.toString();
   }
 
-  public updateAndNavigateSearchParams(params: {
-    [key: string]: string | null;
-  }): void {
+  public updateAndNavigateSearchParams(
+    params: {
+      [key: string]: string | null;
+    },
+    options?: { replace?: boolean },
+  ): void {
     const urlParams = this.getParams();
 
     // Update or delete parameters according to their value
@@ -252,7 +255,12 @@ class NavigationService {
     });
 
     const queryString = this.buildSearch(urlParams);
-    this.navigate(`${this.getPathname()}${queryString}`);
+    const path = `${this.getPathname()}${queryString}`;
+    if (options?.replace) {
+      this.replace(path);
+    } else {
+      this.navigate(path);
+    }
   }
 
   public switchTab(newTab: string): void {
