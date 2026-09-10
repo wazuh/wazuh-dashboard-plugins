@@ -37,6 +37,9 @@ import {
 import { formatUINumber } from '../../../react-services/format-number';
 import { formatSorting } from './format-sorting';
 
+/**
+ * Search input custom filter button
+ */
 interface CustomFilterButton {
   label: string;
   field: string;
@@ -104,8 +107,12 @@ function TableWzAPIInner(
   const onDataChange = data =>
     typeof rest.onDataChange === 'function' ? rest.onDataChange(data) : null;
 
+  /**
+   * Changing the reloadFootprint timestamp will trigger reloading the table
+   */
   const [reloadFootprint, setReloadFootprint] = useState(rest.reload || 0);
 
+  // Persist page size, sorting, and selected fields together
   const defaultPageSize = rest.tablePageSizeOptions?.[0] || 15;
   const defaultSorting = {
     field: rest.tableInitialSortingField || '',
@@ -135,6 +142,7 @@ function TableWzAPIInner(
       [field, ...(composeField ?? [])].includes(tableStateRaw?.sorting?.field),
   );
 
+  // Ensure tableState has the correct structure with defaults
   const tableState = {
     pageSize: tableStateRaw?.pageSize ?? defaultPageSize,
     sorting:
@@ -160,6 +168,7 @@ function TableWzAPIInner(
     try {
       const { pageIndex, pageSize } = pagination;
 
+      // Update persisted table state when page size or sorting changes
       setTableStateRaw(prevState => ({
         ...prevState,
         pageSize,
@@ -228,6 +237,9 @@ function TableWzAPIInner(
     }
   };
 
+  /**
+   *  Generate a new reload footprint and set reload to propagate refresh
+   */
   const triggerReload = () => {
     setReloadFootprint(Date.now());
     if (setReload) {
@@ -284,8 +296,11 @@ function TableWzAPIInner(
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
+            {/* Render optional custom action button */}
             {renderActionButtons(actionButtons, filters)}
+            {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
+            {/* Render optional export to CSV button */}
             {rest.downloadCsv && (
               <>
                 <ExportTableCsv
@@ -304,6 +319,7 @@ function TableWzAPIInner(
                 />
               </>
             )}
+            {/* Render optional post custom action button */}
             {renderActionButtons(postActionButtons, filters)}
             {rest.showFieldSelector && (
               <EuiFlexItem grow={false}>

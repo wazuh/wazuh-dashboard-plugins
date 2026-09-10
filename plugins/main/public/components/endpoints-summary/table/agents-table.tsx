@@ -217,6 +217,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
 
   const tableRender = () => {
     // The EuiBasicTable tableLayout is set to "auto" to improve the use of empty space in the component.
+    // Previously the tableLayout is set to "fixed" with percentage width for each column, but the use of space was not optimal.
     // Important: If all the columns have the truncateText property set to true, the table cannot adjust properly when the viewport size is small.
     return (
       <EuiFlexGroup className='wz-overflow-auto'>

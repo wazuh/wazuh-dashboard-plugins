@@ -142,7 +142,8 @@ function TableWithSearchBarInner<T>(
   const [items, setItems] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState(rest.filters || {});
-  // Tracks when the same filter is re-added after being manually removed.
+  // Added a timestamp to track when the same filter is added multiple times
+  // after being manually removed.
   const [filtersTimeMark, setFiltersTimeMark] = useState<number>(Date.now());
   const [pagination, setPagination] = useState({
     pageIndex: 0,
@@ -201,8 +202,12 @@ function TableWithSearchBarInner<T>(
   }
 
   useEffect(() => {
-    // Skipped on mount; the pagination reset also triggers the fetch effect through its own dependency.
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the pagination state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
     if (isMounted.current) {
+      // Reset the page index when the endpoint or reload changes.
+      // This will cause that onSearch function is triggered because to changes in pagination in the another effect.
       updateRefresh();
     }
   }, [endpoint, reload]);
@@ -252,15 +257,18 @@ function TableWithSearchBarInner<T>(
   );
 
   useEffect(() => {
-    // Skipped on mount; the filters reset also triggers the fetch effect through its own dependency.
+    // This effect is triggered when the component is mounted because of how to the useEffect hook works.
+    // We don't want to set the filters state because there is another effect that has this dependency
+    // and will cause the effect is triggered (redoing the onSearch function).
     if (isMounted.current && !_.isEqual(rest.filters, filters)) {
       setFilters(rest.filters || {});
       updateRefresh();
     }
   }, [rest.filters]);
 
-  // Must run after the other isMounted-gated effects, so isMounted flips to
-  // true only once those effects have already skipped their mount-time run.
+  // It is required that this effect runs after other effects that use isMounted
+  // to avoid that these effects run when the component is mounted, only running
+  // when one of its dependencies changes.
   useEffect(() => {
     isMounted.current = true;
   }, []);
@@ -294,6 +302,7 @@ function TableWithSearchBarInner<T>(
         input={rest?.filters?.q || ''}
         inputTimeMark={filtersTimeMark}
         onSearch={({ apiQuery }) => {
+          // Set the query, reset the page index and update the refresh
           setFilters(apiQuery);
           updateRefresh();
         }}

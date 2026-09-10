@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+//Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
 import WzGroupEditor from './groups-editor';
@@ -40,9 +41,11 @@ class WzGroups extends Component {
   }
 
   getGroupDetail = async () => {
+    // Check if there is a group in the URL
     const { group } = this.props.search;
     if (group) {
       try {
+        // Try if the group can be accesed
         const responseGroup = await WzRequest.apiReq('GET', '/groups', {
           params: { groups_list: group },
         });
@@ -82,6 +85,7 @@ class WzGroups extends Component {
     }
   }
   componentWillUnmount() {
+    // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
   }
 
