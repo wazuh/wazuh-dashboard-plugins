@@ -337,6 +337,7 @@ class WzConfigurationOverview extends Component {
             query={query}
           />
         ))}
+        <EuiSpacer size='m' />
       </Fragment>
     ));
   }
