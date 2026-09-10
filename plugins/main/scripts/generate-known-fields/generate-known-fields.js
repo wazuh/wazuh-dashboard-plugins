@@ -391,6 +391,7 @@ function mapIndexFieldType(esType, field) {
   const typeMapping = {
     keyword: 'string',
     text: 'string',
+    match_only_text: 'string',
     flat_object: 'string',
     date: 'date',
     long: 'number',
@@ -436,7 +437,7 @@ function isSearchable(fieldProps, esType) {
  */
 function isAggregatable(fieldProps, esType) {
   // Text fields are generally not aggregatable unless they have fielddata
-  if (esType === 'text') {
+  if (['text', 'match_only_text'].includes(esType)) {
     return fieldProps.fielddata === true;
   }
 
@@ -448,7 +449,13 @@ function isAggregatable(fieldProps, esType) {
     return false;
 
   // Most structured types are aggregatable
-  return !['text', 'flat_object', '_source', 'nested'].includes(esType);
+  return ![
+    'text',
+    'match_only_text',
+    'flat_object',
+    '_source',
+    'nested',
+  ].includes(esType);
 }
 
 /**
@@ -463,6 +470,7 @@ function shouldReadFromDocValues(fieldProps, esType) {
       '_source',
       '_type',
       'text',
+      'match_only_text',
       'flat_object',
       'nested',
     ].includes(esType)

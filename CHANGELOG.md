@@ -6,6 +6,12 @@
 | ----- | ----------------------- |
 |       | Support for Wazuh 5.1.0 |
 
+### Fixed
+
+| Issue                                                                 | Comment                                                                                                                                                                                                                                                                                               |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [#9135](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9135) | Fixed `match_only_text` fields (e.g. `file.diff`) being generated as aggregatable and doc-values-backed in known-fields/index-pattern definitions, which don't support either; and stopped offering a sort control on non-aggregatable columns across Discover-style tables, which OpenSearch rejects |
+
 ## Prior versions
 
 - [v4.14.7](https://github.com/wazuh/wazuh-dashboard-plugins/blob/v4.14.7/CHANGELOG.md)
