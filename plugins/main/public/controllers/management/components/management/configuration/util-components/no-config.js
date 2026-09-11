@@ -19,7 +19,7 @@ import {
   EuiSpacer,
   EuiPanel,
   EuiFlexGroup,
-  EuiFlexItem
+  EuiFlexItem,
 } from '@elastic/eui';
 
 import WzHelpButtonPopover from './help-button-popover';
@@ -35,22 +35,23 @@ class WzNoConfig extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <div style={{ textAlign: 'center' }}>
-              <EuiIcon type="help" style={{ marginRight: '4px' }} />
-                <span>Configuration not available</span>
+              <EuiIcon type='help' style={{ marginRight: '4px' }} />
+              <span>Configuration not available</span>
               {help && <WzHelpButtonPopover links={help} />}
-              <EuiHorizontalRule margin="s" />
+              <EuiHorizontalRule margin='s' />
               {(error === 'not-present' && (
                 <p>This section is not present on the configuration file.</p>
               )) || (
                 <span>
                   There was a problem while fetching the configuration for this
-                  section. It may be a server problem or the configuration doesn't exist.
+                  section. It may be a server problem or the configuration
+                  doesn't exist.
                 </span>
               )}
-              <EuiSpacer size="s" />
+              <EuiSpacer size='s' />
               <div>
                 <p>
-                  Click on the <EuiIcon type="questionInCircle" /> icon for
+                  Click on the <EuiIcon type='questionInCircle' /> icon for
                   help. Check the documentation links to learn more about how to
                   configure it.
                 </p>
@@ -65,7 +66,7 @@ class WzNoConfig extends Component {
 
 WzNoConfig.propTypes = {
   error: PropTypes.string.isRequired,
-  links: PropTypes.array
+  links: PropTypes.array,
 };
 
 export default WzNoConfig;

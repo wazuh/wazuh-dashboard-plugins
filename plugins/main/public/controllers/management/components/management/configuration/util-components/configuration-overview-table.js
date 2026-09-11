@@ -20,7 +20,7 @@ import {
   EuiTableRow,
   EuiTableRowCell,
   EuiSpacer,
-  EuiTitle
+  EuiTitle,
 } from '@elastic/eui';
 
 class WzConfigurationOverviewTable extends Component {
@@ -31,10 +31,10 @@ class WzConfigurationOverviewTable extends Component {
     const { title, items, columns, onClick } = this.props;
     return (
       <Fragment>
-        <EuiTitle size="s">
+        <EuiTitle size='s'>
           <h2>{title}</h2>
         </EuiTitle>
-        <EuiSpacer size="s" />
+        <EuiSpacer size='s' />
         <EuiTable>
           <EuiTableHeader>
             {columns.map((column, key) => (

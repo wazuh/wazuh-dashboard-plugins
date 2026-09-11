@@ -18,7 +18,7 @@ import {
   EuiFlexItem,
   EuiButtonEmpty,
   EuiSpacer,
-  EuiPanel
+  EuiPanel,
 } from '@elastic/eui';
 
 import WzConfigurationSettingsGroup from './configuration-settings-group';
@@ -30,7 +30,7 @@ class WzConfigurationSettingsListSelector extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedItem: 0
+      selectedItem: 0,
     };
   }
   selectItem(selectedItem) {
@@ -41,10 +41,12 @@ class WzConfigurationSettingsListSelector extends Component {
     const { items, settings, keyList } = this.props;
     return (
       <Fragment>
-        <EuiSpacer size="m" />
-        <EuiFlexGroup alignItems="flexStart">
+        <EuiSpacer size='m' />
+        <EuiFlexGroup alignItems='flexStart'>
           <EuiFlexItem grow={false} style={{ maxWidth: 25, minWidth: 250 }}>
-            <EuiPanel style={{ background: IS_DARK_THEME ? '#1a1b20' : '#fafbfd' }}>
+            <EuiPanel
+              style={{ background: IS_DARK_THEME ? '#1a1b20' : '#fafbfd' }}
+            >
               <ul>
                 {items.map((item, key) => (
                   <li key={`${keyList}-${key}`}>
@@ -80,7 +82,7 @@ class WzConfigurationSettingsListSelector extends Component {
 WzConfigurationSettingsListSelector.propTypes = {
   items: PropTypes.array.isRequired,
   settings: PropTypes.array.isRequired,
-  keyList: PropTypes.string
+  keyList: PropTypes.string,
 };
 
 export default WzConfigurationSettingsListSelector;
