@@ -11,7 +11,6 @@
  */
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
-import { getAgentReportedConfiguration } from './agent-config-service';
 import { delayAsPromise } from '../../../../../../../common/utils';
 
 /**
@@ -25,7 +24,7 @@ import { delayAsPromise } from '../../../../../../../common/utils';
  * @param {function} updateWazuhNotReadyYet
  * @returns {object} Map of key → config object (or error string)
  */
-const getFullEndpointConfig = async (
+export const getFullEndpointConfig = async (
   node,
   sections,
   updateWazuhNotReadyYet,
@@ -50,103 +49,6 @@ const getFullEndpointConfig = async (
     );
     for (const section of sections) {
       result[section.key] = errorMsg;
-    }
-  }
-  return result;
-};
-
-/**
- * Get the configuration of a manager node or of an agent.
- *
- * Manager context (`node` is set): fetches the requested sections from the
- * Server API and returns them keyed by `component-configuration`.
- *
- * Supports two section formats:
- *  - Standard:      { component: string, configuration: string }
- *    Calls /cluster/{node}/configuration/{component}/{configuration}
- *
- *  - Full endpoint: { useFullEndpoint: true, key: string }
- *    Delegates to getFullEndpointConfig which calls
- *    /cluster/{node}/configuration once and extracts the requested
- *    keys. Only valid in manager context (node must be set).
- *
- * Agent context (`node` is false): the Server API no longer exposes an agent
- * configuration endpoint. The agent pushes its effective configuration to the
- * manager, which keeps the latest report per agent in the wazuh-agent-config
- * index, so the whole report is read at once and returned keyed by module name
- * (`agent`, `fim`, `logcollector`, ...). `sections` does not apply.
- *
- * @param {string} agentId Agent ID
- * @param {array} sections Sections. Manager context only
- * @param {false|string} [node=false] Node
- */
-export const getCurrentConfig = async (
-  agentId,
-  sections,
-  node = false,
-  updateWazuhNotReadyYet,
-) => {
-  if (!agentId || typeof agentId !== 'string') {
-    throw new Error('Invalid parameters');
-  }
-
-  if (!node) {
-    /* An agent with no document has never reported. That is the expected case
-    rather than an error: reporting is an ossec.conf toggle disabled by
-    default, so the views render their own empty state. */
-    const reportedConfiguration = await getAgentReportedConfiguration(agentId);
-
-    return reportedConfiguration ? reportedConfiguration.content : {};
-  }
-
-  if (!sections || !Array.isArray(sections) || !sections.length) {
-    throw new Error('Invalid parameters');
-  }
-
-  const result = {};
-
-  const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
-  const regularSections = sections.filter(s => !s.useFullEndpoint);
-
-  if (fullEndpointSections.length > 0) {
-    Object.assign(
-      result,
-      await getFullEndpointConfig(
-        node,
-        fullEndpointSections,
-        updateWazuhNotReadyYet,
-      ),
-    );
-  }
-
-  for (const section of regularSections) {
-    const { component, configuration } = section;
-    if (
-      !component ||
-      typeof component !== 'string' ||
-      !configuration ||
-      typeof configuration !== 'string'
-    ) {
-      throw new Error('Invalid section');
-    }
-    try {
-      const partialResult = await WzRequest.apiReq(
-        'GET',
-        `/cluster/${node}/configuration/${component}/${configuration}`,
-        {},
-      );
-
-      result[`${component}-${configuration}`] =
-        partialResult.data.data.total_affected_items !== 0
-          ? partialResult.data.data.affected_items[0]
-          : {};
-    } catch (error) {
-      result[`${component}-${configuration}`] = await handleError(
-        error,
-        'Fetch configuration',
-        updateWazuhNotReadyYet,
-        node,
-      );
     }
   }
   return result;

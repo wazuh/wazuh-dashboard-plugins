@@ -22,6 +22,7 @@ import {
   updateRefreshTime,
 } from '../../../../../../redux/actions/configurationActions';
 import { clusterNodes } from '../utils/wz-fetch';
+import { clearSettingsSearchDataCache } from '../utils/settings-search-service';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
@@ -65,6 +66,11 @@ class WzRefreshClusterInfoButton extends Component {
       getErrorOrchestrator().handleError(options);
     }
     this.setState({ isLoading: false });
+    /* Search results are keyed by node, but a refresh means "reload this
+    node's data now" -- drop the cache before the refreshTime bump below
+    triggers the search feature's own reload, so it doesn't just replay a
+    stale cached read for the same node. */
+    clearSettingsSearchDataCache();
     this.props.updateRefreshTime();
   }
   render() {

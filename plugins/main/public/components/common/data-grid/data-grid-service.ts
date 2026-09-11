@@ -185,6 +185,9 @@ const mapToDataGridColumn = (
     name: field.name,
     schema: field.type,
     actions: { showHide: true },
+    // Non-aggregatable fields (e.g. ECS match_only_text) have no doc_values
+    // and OpenSearch rejects a sort on them, so default to non-sortable.
+    isSortable: field.aggregatable,
     ...defaultColumn,
     cellActions: cellFilterActions(
       field,

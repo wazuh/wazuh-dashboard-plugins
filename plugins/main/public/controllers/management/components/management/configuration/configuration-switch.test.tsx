@@ -25,44 +25,7 @@ jest.mock('./utils/agent-config-service', () => ({
   clearAgentReportedConfigurationCache: jest.fn(),
 }));
 
-jest.mock('./global-configuration/global-configuration', () => ({
-  WzConfigurationGlobalConfigurationManager: () => <></>,
-  WzConfigurationGlobalConfigurationAgent: () => <></>,
-  __esModule: true,
-}));
-
 jest.mock('./edit-configuration/edit-configuration', () => () => <></>);
-
-jest.mock('./registration-service/registration-service', () => () => <></>);
-
-jest.mock('./cluster/cluster', () => () => <></>);
-
-jest.mock('./client/client', () => () => <></>);
-
-jest.mock('./alerts/alerts-labels', () => ({
-  WzConfigurationAlertsLabelsAgent: () => <></>,
-  __esModule: true,
-}));
-
-jest.mock('./policy-monitoring/policy-monitoring', () => () => <></>);
-
-jest.mock('./vulnerabilities/vulnerabilities', () => () => <></>);
-
-jest.mock('./inventory/inventory', () => () => <></>);
-
-jest.mock('./active-response/active-response-agent', () => () => <></>);
-
-jest.mock('./commands/commands', () => () => <></>);
-
-jest.mock('./log-collection/log-collection', () => () => <></>);
-
-jest.mock('./integrity-monitoring/integrity-monitoring', () => () => <></>);
-
-jest.mock('./util-components/view-selector', () => ({
-  default: () => <></>,
-  WzViewSelectorSwitch: () => <></>,
-  __esModule: true,
-}));
 
 jest.mock('./util-components/loading', () => () => <></>);
 
@@ -70,12 +33,6 @@ jest.mock('./util-hocs/render-if', () => ({
   withRenderIfOrWrapped: () => <></>,
   __esModule: true,
 }));
-
-jest.mock('./util-components/configuration-path', () => () => <></>);
-
-jest.mock('./util-components/refresh-cluster-info-button', () => () => <></>);
-
-jest.mock('./util-components/refresh-agent-config-button', () => () => <></>);
 
 jest.mock('../../../../../components/agents/prompts', () => ({
   PromptNoActiveAgentWithoutSelect: () => <></>,
