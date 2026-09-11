@@ -5,6 +5,7 @@ import {
   EuiPageContentHeaderSection,
   EuiPageContentBody,
   EuiTitle,
+  EuiText,
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { UsersTable } from './components/users-table';
@@ -135,6 +136,9 @@ export const Users = withUserAuthorizationPrompt([
           <EuiTitle>
             <h2>Users</h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            Manage the users of the manager API.
+          </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           {!rolesLoading && (

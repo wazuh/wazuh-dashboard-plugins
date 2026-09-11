@@ -91,6 +91,22 @@ services:
           openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
         done
 
+        echo "Generating the agent-facing server certificate"
+        # The manager serves agents over HTTPS, and agents verify that
+        # certificate, so it needs the server profile and a SAN covering the
+        # address agents connect to. The wazuh.manager.local certificate below
+        # is a client one and OpenSSL rejects it here with "unsuitable
+        # certificate purpose".
+        cat /conf/host.json | \
+        sed "s/HOST/wazuh.manager.local/g" | \
+        cfssl gencert \
+          -ca $$certs/root-ca.pem \
+          -ca-key $$certs/root-ca-key.pem \
+          -config /conf/cfssl.json \
+          -profile=server - | \
+        cfssljson -bare agent-comms
+        openssl pkcs8 -topk8 -inform pem -in agent-comms-key.pem -outform pem -nocrypt -out agent-comms.key
+
         echo "Generating clients certificates"
           for i in admin server saml wazuh.manager.local; do
             echo "Generating cert for $$i"
@@ -387,6 +403,10 @@ services:
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
       - WAZUH_REGISTRATION_PASSWORD=WazuhRegistrationDev123
+      # Agent-facing HTTPS certificate. Signed by the environment's root CA and
+      # issued for "wazuh.manager.local", so agents can verify the manager.
+      - AGENT_SSL_CERTIFICATE=/etc/server_certs/agent-comms.pem
+      - AGENT_SSL_CERTIFICATE_KEY=/etc/server_certs/agent-comms-key.pem
     volumes:
       - wm_certs:/etc/server_certs
     ports:
@@ -410,19 +430,48 @@ services:
       - WAZUH_REGISTRATION_PASSWORD=${WAZUH_REGISTRATION_PASSWORD:-WazuhRegistrationDev123}
     volumes:
       - ./agents:/packages-agents
+      # The manager's root CA, so the agent can verify the manager certificate
+      - wm_certs:/etc/server_certs:ro
     command:
       - /bin/bash
       - -c
       - |
-        # Update and install dependencies
+        # Update and install dependencies. ca-certificates is required: the
+        # agent verifies the manager certificate by default, and without an OS
+        # trust store it refuses to start with "no OS CA bundle was found".
         apt update -y
-        apt install -y lsb-release adduser
+        apt install -y lsb-release adduser ca-certificates
 
-        # Install Wazuh agent (registration password only if defined)
+        # The manager generates its certificates on startup, so wait for the
+        # root CA to appear in the shared volume before installing. Give up
+        # rather than wait forever: without the CA the agent cannot verify the
+        # manager, and a container stuck in this loop looks like a hang.
+        ca_wait=0
+        while [ ! -f /etc/server_certs/root-ca.pem ]; do
+          if [ "$$ca_wait" -ge 120 ]; then
+            echo "ERROR: the manager root CA did not appear at /etc/server_certs/root-ca.pem after $${ca_wait}s."
+            echo "The certificate generator may not have run. Check the 'generator' service."
+            exit 1
+          fi
+          echo "Waiting for the manager root CA..."
+          sleep 2
+          ca_wait=$$((ca_wait + 2))
+        done
+
+        # Copy the CA out of the shared volume. The manager keeps it readable
+        # only by its own user, and wazuh-agentd drops privileges, so it needs
+        # its own world-readable copy or it exits with "verify_mode requires a
+        # readable CA file".
+        cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
+        chmod 644 /etc/wazuh-manager-root-ca.pem
+
+        # Install Wazuh agent (registration password only if defined).
+        # WAZUH_REGISTRATION_CA pins the manager's root CA: the agent then
+        # verifies the certificate chain instead of trusting any certificate.
         if [ -n "$$WAZUH_REGISTRATION_PASSWORD" ]; then
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" dpkg -i /packages-agents/wazuh-agent*.deb
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" dpkg -i /packages-agents/wazuh-agent*.deb
         else
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' dpkg -i /packages-agents/wazuh-agent*.deb
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' dpkg -i /packages-agents/wazuh-agent*.deb
         fi
 
         # Start Wazuh agent
@@ -442,6 +491,8 @@ services:
       - WAZUH_REGISTRATION_PASSWORD=${WAZUH_REGISTRATION_PASSWORD:-WazuhRegistrationDev123}
     volumes:
       - ./agents:/packages-agents
+      # The manager's root CA, so the agent can verify the manager certificate
+      - wm_certs:/etc/server_certs:ro
     command:
       - /bin/bash
       - -c
@@ -453,11 +504,36 @@ services:
         yum makecache
         yum upgrade -y
 
-        # Install wazuh-agent (registration password only if defined)
+        # The manager generates its certificates on startup, so wait for the
+        # root CA to appear in the shared volume before installing. Give up
+        # rather than wait forever: without the CA the agent cannot verify the
+        # manager, and a container stuck in this loop looks like a hang.
+        ca_wait=0
+        while [ ! -f /etc/server_certs/root-ca.pem ]; do
+          if [ "$$ca_wait" -ge 120 ]; then
+            echo "ERROR: the manager root CA did not appear at /etc/server_certs/root-ca.pem after $${ca_wait}s."
+            echo "The certificate generator may not have run. Check the 'generator' service."
+            exit 1
+          fi
+          echo "Waiting for the manager root CA..."
+          sleep 2
+          ca_wait=$$((ca_wait + 2))
+        done
+
+        # Copy the CA out of the shared volume. The manager keeps it readable
+        # only by its own user, and wazuh-agentd drops privileges, so it needs
+        # its own world-readable copy or it exits with "verify_mode requires a
+        # readable CA file".
+        cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
+        chmod 644 /etc/wazuh-manager-root-ca.pem
+
+        # Install wazuh-agent (registration password only if defined).
+        # WAZUH_REGISTRATION_CA pins the manager's root CA: the agent then
+        # verifies the certificate chain instead of trusting any certificate.
         if [ -n "$$WAZUH_REGISTRATION_PASSWORD" ]; then
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" yum localinstall -y /packages-agents/wazuh-agent*.rpm
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" yum localinstall -y /packages-agents/wazuh-agent*.rpm
         else
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' yum localinstall -y /packages-agents/wazuh-agent*.rpm
         fi
 
         # Start wazuh-agent

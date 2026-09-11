@@ -185,7 +185,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -547,7 +548,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -627,7 +629,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -718,7 +721,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1022,25 +1026,20 @@
           },
           {
             "name": "section",
-            "description": "Indicates the wazuh configuration section",
+            "description": "Indicates the manager configuration section (a top-level key of etc/wazuh-manager.conf)",
             "schema": {
               "type": "string",
               "enum": [
-                "active-response",
-                "alerts",
-                "auth",
-                "client",
-                "client_buffer",
-                "cluster",
-                "command",
                 "global",
                 "logging",
                 "remote",
-                "reports",
-                "socket",
+                "auth",
+                "wdb",
                 "vulnerability-detection",
                 "indexer",
-                "syscollector"
+                "agent-upgrade",
+                "task-manager",
+                "cluster"
               ]
             }
           },
@@ -1067,18 +1066,12 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": [
-                "auth",
-                "monitor",
-                "request",
-                "wazuh-manager-db",
-                "wmodules"
-              ]
+              "enum": ["auth", "request", "wazuh-manager-db", "wmodules"]
             }
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Tag</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>&lt;auth&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>monitor</td>\n<td>internal</td>\n<td><code>&lt;monitord&gt;</code></td>\n</tr>\n<td>request</td>\n<td>global</td>\n<td><code>&lt;global&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>&lt;remote&gt;</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>&lt;remoted&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>&lt;wazuh_db&gt;</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>&lt;wdb&gt;</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td><code>&lt;wodle&gt;</code></td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Source</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>auth</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>global</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>remote</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>remoted.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>wazuh_db.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>wdb</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td>module configuration reported by wazuh-manager-modulesd (<code>vulnerability-detection</code>, <code>agent-upgrade</code>, <code>task-manager</code>)</td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -1290,7 +1283,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1811,7 +1805,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -1990,7 +1985,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2090,7 +2086,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2281,7 +2278,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2445,7 +2443,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2569,7 +2568,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2660,7 +2660,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2748,7 +2749,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2847,7 +2849,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -2946,7 +2949,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -3131,7 +3135,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -3265,7 +3270,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -3365,7 +3371,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -3470,7 +3477,8 @@
             "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
             "schema": {
               "type": "string",
-              "format": "search"
+              "format": "search",
+              "maxLength": 1024
             }
           },
           {
@@ -4140,6 +4148,44 @@
         "documentation": "https://documentation.wazuh.com/5.1/user-manual/api/reference.html#operation/api.controllers.agent_controller.restart_agents",
         "description": "Restart all agents or a list of them",
         "summary": "Restart agents",
+        "tags": ["Agents"],
+        "query": [
+          {
+            "name": "agents_list",
+            "description": "List of agent IDs (separated by comma), all agents selected by default if not specified",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 3,
+                "description": "Agent ID",
+                "format": "numbers"
+              }
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/scan/vulnerability",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.scan_agents",
+        "description": "Request an on-demand vulnerability scan for all agents or a list of them",
+        "summary": "Scan agents for vulnerabilities",
         "tags": ["Agents"],
         "query": [
           {
@@ -5123,8 +5169,8 @@
               "id": {
                 "type": "string",
                 "minLength": 3,
-                "description": "Agent ID",
-                "format": "numbers"
+                "description": "Agent ID. Must be a positive integer no greater than 2147483647 (2^31-1), and other than 0, which is reserved for the manager",
+                "format": "agent_id"
               },
               "key": {
                 "type": "string",

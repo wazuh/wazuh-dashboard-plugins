@@ -1,3 +1,4 @@
+import { first } from 'rxjs/operators';
 import {
   PluginInitializerContext,
   CoreSetup,
@@ -25,6 +26,8 @@ import {
 } from './plugin-services';
 import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
 import { initializeClientContentManager } from './services/plugins/content-manager';
+import { setCtiConsoleBaseUrl } from './services/cti-registration/cti-console-url';
+import type { WazuhCheckUpdatesPluginConfigType } from './index';
 
 declare module 'opensearch-dashboards/server' {
   interface RequestHandlerContext {
@@ -39,13 +42,25 @@ export class WazuhCheckUpdatesPlugin
   implements Plugin<WazuhCheckUpdatesPluginSetup, WazuhCheckUpdatesPluginStart>
 {
   private readonly logger: Logger;
+  private readonly initializerContext: PluginInitializerContext;
 
   constructor(initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
+    this.initializerContext = initializerContext;
   }
 
   public async setup(core: CoreSetup, plugins: PluginSetup) {
     this.logger.debug('wazuh_check_updates: Setup');
+
+    // The CTI API base URL is a compiled constant unless
+    // `wazuh_check_updates.ctiApiUrl` overrides it. Read it before the routes are
+    // defined so no handler can observe the pre-configuration value.
+    const pluginConfig = await this.initializerContext.config
+      .create<WazuhCheckUpdatesPluginConfigType>()
+      .pipe(first())
+      .toPromise();
+
+    setCtiConsoleBaseUrl(pluginConfig.ctiApiUrl);
 
     setWazuhCore(plugins.wazuhCore);
     setWazuhCheckUpdatesServices({ logger: this.logger });
