@@ -255,7 +255,12 @@ function TableWzAPIInner(
 
   const ReloadButton = (
     <EuiFlexItem grow={false}>
-      <EuiButtonEmpty iconType='refresh' onClick={() => triggerReload()}>
+      <EuiButtonEmpty
+        iconType='refresh'
+        onClick={() => triggerReload()}
+        isLoading={isLoading}
+        isDisabled={isLoading}
+      >
         Refresh
       </EuiButtonEmpty>
     </EuiFlexItem>
@@ -316,6 +321,7 @@ function TableWzAPIInner(
                       : rest.title
                   }
                   maxRows={maxRows}
+                  isLoading={isLoading}
                 />
               </>
             )}
