@@ -44,4 +44,21 @@ describe('SearchBar component', () => {
     selected query language */
     expect(wrapper.container).toMatchSnapshot();
   });
+
+  it('clears the displayed input text when an external caller sets input back to an empty string', () => {
+    const wrapper = render(
+      <SearchBar {...componentProps} input='group=default' inputTimeMark={1} />,
+    );
+
+    const searchInput = wrapper.container.querySelector(
+      'input[placeholder="Search"]',
+    ) as HTMLInputElement;
+    expect(searchInput.value).toBe('group=default');
+
+    wrapper.rerender(
+      <SearchBar {...componentProps} input='' inputTimeMark={2} />,
+    );
+
+    expect(searchInput.value).toBe('');
+  });
 });

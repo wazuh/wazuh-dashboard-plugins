@@ -13,7 +13,7 @@ import {
 } from '@elastic/eui';
 import { Agent } from '../../../types';
 import { GroupResult, RESULT_TYPE } from './edit-groups-modal';
-import { ErrorAgent } from '../../../services/paginated-agents-group';
+import { ErrorAgent } from '../../../services/paginated-agents-request';
 
 interface EditAgentsGroupsModalResultProps {
   addOrRemove: 'add' | 'remove';

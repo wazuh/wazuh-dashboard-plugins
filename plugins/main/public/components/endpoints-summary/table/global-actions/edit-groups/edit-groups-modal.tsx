@@ -26,7 +26,7 @@ import {
 } from '../../../services';
 import { Agent } from '../../../types';
 import { EditAgentsGroupsModalResult } from './result';
-import { ErrorAgent } from '../../../services/paginated-agents-group';
+import { ErrorAgent } from '../../../services/paginated-agents-request';
 
 export enum RESULT_TYPE {
   SUCCESS = 'success',
