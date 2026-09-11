@@ -1,6 +1,11 @@
 import axios from 'axios';
+import {
+  WAZUH_CTI_CONSOLE_BASE_URL,
+  ctiConsoleApiPaths,
+} from '../../../common/constants';
 import { getCtiToken, pollCtiToken } from './token';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+import { setCtiConsoleBaseUrl } from './cti-console-url';
 
 jest.mock('axios');
 jest.mock('../../plugin-services', () => ({
@@ -18,6 +23,36 @@ describe('token', () => {
     logger.error.mockClear();
     mockedGetWazuhCheckUpdatesServices.mockReturnValue({ logger });
     mockedAxios.post.mockReset();
+  });
+
+  afterEach(() => {
+    setCtiConsoleBaseUrl(WAZUH_CTI_CONSOLE_BASE_URL);
+  });
+
+  test('getCtiToken targets the configured CTI API URL', async () => {
+    setCtiConsoleBaseUrl('http://imposter:8080');
+    mockedAxios.post.mockResolvedValue({ data: {} });
+
+    await getCtiToken('client-id');
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      `http://imposter:8080${ctiConsoleApiPaths.environmentsToken}`,
+      expect.any(String),
+      expect.any(Object),
+    );
+  });
+
+  test('pollCtiToken targets the configured CTI API URL', async () => {
+    setCtiConsoleBaseUrl('http://imposter:8080');
+    mockedAxios.post.mockResolvedValue({ data: {} });
+
+    await pollCtiToken('client-id', 'device-code');
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      `http://imposter:8080${ctiConsoleApiPaths.environmentsToken}`,
+      expect.any(String),
+      expect.any(Object),
+    );
   });
 
   test('getCtiToken sends Accept-Encoding: gzip, br and preserves Content-Type', async () => {

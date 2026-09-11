@@ -4,6 +4,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
 <ExportTableCsv
   endpoint="/"
   filters={Array []}
+  isLoading={false}
   title=""
   totalItems={0}
 >
@@ -16,6 +17,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
       <EuiButtonEmpty
         iconType="importAction"
         isDisabled={true}
+        isLoading={false}
         onClick={[Function]}
       >
         <button
@@ -30,6 +32,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
             iconSide="left"
             iconSize="m"
             iconType="importAction"
+            isLoading={false}
             textProps={
               Object {
                 "className": "euiButtonEmpty__text",
