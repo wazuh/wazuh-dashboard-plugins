@@ -38,6 +38,7 @@ import WzLoading from './util-components/loading';
 import { withRenderIfOrWrapped } from './util-hocs/render-if';
 import WzConfigurationPath from './util-components/configuration-path';
 import WzRefreshClusterInfoButton from './util-components/refresh-cluster-info-button';
+import WzRefreshAgentConfigButton from './util-components/refresh-agent-config-button';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
 import { clusterNodes as requestClusterNodes } from './utils/wz-fetch';
@@ -253,10 +254,15 @@ class WzConfigurationSwitch extends Component {
                 updateConfigurationSection={this.updateConfigurationSection}
                 badge={badge}
               >
-                {/* Only show refresh button when no agent is pinned */}
-                {isManager && (
+                {isManager ? (
                   <EuiFlexItem grow={false}>
                     <WzRefreshClusterInfoButton />
+                  </EuiFlexItem>
+                ) : (
+                  <EuiFlexItem grow={false}>
+                    <WzRefreshAgentConfigButton
+                      onRefresh={this.readAgentReport}
+                    />
                   </EuiFlexItem>
                 )}
               </WzConfigurationPath>
