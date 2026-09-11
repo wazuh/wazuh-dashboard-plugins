@@ -11,7 +11,6 @@
  */
 
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
-import moment from 'moment-timezone';
 import {
   EuiTitle,
   EuiLoadingSpinner,
@@ -21,7 +20,6 @@ import {
   EuiButtonEmpty,
   EuiToolTip,
   EuiIcon,
-  EuiBadge,
   EuiCheckboxGroup,
 } from '@elastic/eui';
 import { TableWithSearchBar } from './table-with-search-bar';
@@ -34,7 +32,6 @@ import {
   useEffectEnsureComponentMounted,
 } from '../hooks';
 import { formatUINumber } from '../../../react-services/format-number';
-import { formatUIDate } from '../../../react-services/time-service';
 import { formatSorting } from './format-sorting';
 
 /**
@@ -89,7 +86,6 @@ export function TableWzAPI({
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState<Filters>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<number | null>(null);
   const onFiltersChange = (filters: Filters) =>
     typeof rest.onFiltersChange === 'function'
       ? rest.onFiltersChange(filters)
@@ -183,7 +179,6 @@ export function TableWzAPI({
         (response || {}).data || {}
       ).data;
       setIsLoading(false);
-      setLastUpdated(Date.now());
       setTotalItems(totalItems);
 
       const result = {
@@ -257,16 +252,6 @@ export function TableWzAPI({
     </EuiFlexItem>
   );
 
-  const LastUpdatedBadge = lastUpdated ? (
-    <EuiFlexItem grow={false}>
-      <EuiToolTip content={formatUIDate(lastUpdated)}>
-        <EuiBadge color='hollow' iconType='clock'>
-          {`Updated ${moment(lastUpdated).fromNow()}`}
-        </EuiBadge>
-      </EuiToolTip>
-    </EuiFlexItem>
-  ) : null;
-
   const header = (
     <>
       <EuiFlexGroup wrap alignItems='center' responsive={false}>
@@ -297,8 +282,6 @@ export function TableWzAPI({
           <EuiFlexGroup wrap alignItems={'center'} responsive={false}>
             {/* Render optional custom action button */}
             {renderActionButtons(actionButtons, filters)}
-            {/* Render optional last updated indicator */}
-            {rest.showReload && LastUpdatedBadge}
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}

@@ -19,7 +19,6 @@ import { mount } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
 import { useAppConfig, useStateStorage } from '../hooks';
 import { WzRequest } from '../../../react-services/wz-request';
-import { formatUIDate } from '../../../react-services/time-service';
 
 jest.mock('../hooks', () => ({
   useAppConfig: jest.fn(),
@@ -38,10 +37,6 @@ jest.mock('../../../kibana-services', () => ({
       get: () => 'test',
     };
   },
-  getUiSettings: () => ({
-    get: (key: string) =>
-      key === 'dateFormat' ? 'YYYY-MM-DD HH:mm:ss' : 'Browser',
-  }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
@@ -127,16 +122,13 @@ describe('Table WZ API component', () => {
     wrapper!.unmount();
   });
 
-  it('reflects the Refresh button loading/disabled state on the request lifecycle, and shows a last-updated badge once it resolves', async () => {
+  it('reflects the Refresh button loading/disabled state on the request lifecycle', async () => {
     (useAppConfig as jest.Mock).mockReturnValue({
       data: {
         'reports.csv.maxRows': 10000,
       },
     });
     (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
-
-    const now = new Date('2026-01-01T00:00:00.000Z').getTime();
-    jest.spyOn(Date, 'now').mockReturnValue(now);
 
     (WzRequest.apiReq as jest.Mock).mockResolvedValue(mockApiResponse());
 
@@ -160,15 +152,10 @@ describe('Table WZ API component', () => {
 
     const refreshButton = () =>
       wrapper!.find('EuiButtonEmpty[iconType="refresh"]');
-    const lastUpdatedBadge = () => wrapper!.find('EuiBadge[iconType="clock"]');
 
     // The initial load has already resolved by this point.
     expect(refreshButton().prop('isLoading')).toBe(false);
     expect(refreshButton().prop('isDisabled')).toBe(false);
-    expect(lastUpdatedBadge().exists()).toBe(true);
-    expect(lastUpdatedBadge().closest('EuiToolTip').prop('content')).toBe(
-      formatUIDate(now),
-    );
 
     // Trigger a manual refresh through a request we control, to verify the
     // button's state is wired to that specific request settling, not to an
@@ -197,7 +184,6 @@ describe('Table WZ API component', () => {
 
     expect(refreshButton().prop('isLoading')).toBe(false);
     expect(refreshButton().prop('isDisabled')).toBe(false);
-    expect(lastUpdatedBadge().exists()).toBe(true);
 
     wrapper!.unmount();
   });
