@@ -300,6 +300,7 @@ export function TableWzAPI({
                       : rest.title
                   }
                   maxRows={maxRows}
+                  isLoading={isLoading}
                 />
               </>
             )}
