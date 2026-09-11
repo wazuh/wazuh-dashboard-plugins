@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  *
  */
+/* eslint-disable camelcase -- Wazuh Server API response fixtures use snake_case */
 
 import React from 'react';
 import { act } from '@testing-library/react';
@@ -18,6 +19,7 @@ import { mount } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
 import { useAppConfig, useStateStorage } from '../hooks';
 import { WzRequest } from '../../../react-services/wz-request';
+import { formatUIDate } from '../../../react-services/time-service';
 
 jest.mock('../hooks', () => ({
   useAppConfig: jest.fn(),
@@ -36,6 +38,10 @@ jest.mock('../../../kibana-services', () => ({
       get: () => 'test',
     };
   },
+  getUiSettings: () => ({
+    get: (key: string) =>
+      key === 'dateFormat' ? 'YYYY-MM-DD HH:mm:ss' : 'Browser',
+  }),
 }));
 
 jest.mock('../../../react-services/common-services', () => ({
@@ -82,7 +88,15 @@ const columns = [
   },
 ];
 
+const mockApiResponse = (items: Record<string, unknown>[] = []) => ({
+  data: { data: { affected_items: items, total_affected_items: items.length } },
+});
+
 describe('Table WZ API component', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('renders correctly to match the snapshot', async () => {
     (useAppConfig as jest.Mock).mockReturnValue({
       data: {
@@ -110,6 +124,81 @@ describe('Table WZ API component', () => {
 
     wrapper!.update();
     expect(wrapper!).toMatchSnapshot();
+    wrapper!.unmount();
+  });
+
+  it('reflects the Refresh button loading/disabled state on the request lifecycle, and shows a last-updated badge once it resolves', async () => {
+    (useAppConfig as jest.Mock).mockReturnValue({
+      data: {
+        'reports.csv.maxRows': 10000,
+      },
+    });
+    (useStateStorage as jest.Mock).mockReturnValue([[], jest.fn()]);
+
+    const now = new Date('2026-01-01T00:00:00.000Z').getTime();
+    jest.spyOn(Date, 'now').mockReturnValue(now);
+
+    (WzRequest.apiReq as jest.Mock).mockResolvedValue(mockApiResponse());
+
+    let wrapper = null;
+
+    await act(async () => {
+      wrapper = mount(
+        <TableWzAPI
+          title='Table'
+          downloadCsv={false}
+          tableColumns={columns}
+          endpoint={'/'}
+          searchTable={false}
+          showReload
+          error={false}
+        />,
+      );
+      await Promise.resolve();
+    });
+    wrapper!.update();
+
+    const refreshButton = () =>
+      wrapper!.find('EuiButtonEmpty[iconType="refresh"]');
+    const lastUpdatedBadge = () => wrapper!.find('EuiBadge[iconType="clock"]');
+
+    // The initial load has already resolved by this point.
+    expect(refreshButton().prop('isLoading')).toBe(false);
+    expect(refreshButton().prop('isDisabled')).toBe(false);
+    expect(lastUpdatedBadge().exists()).toBe(true);
+    expect(lastUpdatedBadge().closest('EuiToolTip').prop('content')).toBe(
+      formatUIDate(now),
+    );
+
+    // Trigger a manual refresh through a request we control, to verify the
+    // button's state is wired to that specific request settling, not to an
+    // arbitrary timer.
+    let resolveRefresh: (value: unknown) => void = () => {};
+    (WzRequest.apiReq as jest.Mock).mockReturnValueOnce(
+      new Promise(resolve => {
+        resolveRefresh = resolve;
+      }),
+    );
+
+    await act(async () => {
+      refreshButton().prop('onClick')();
+      await Promise.resolve();
+    });
+    wrapper!.update();
+
+    expect(refreshButton().prop('isLoading')).toBe(true);
+    expect(refreshButton().prop('isDisabled')).toBe(true);
+
+    await act(async () => {
+      resolveRefresh(mockApiResponse());
+      await Promise.resolve();
+    });
+    wrapper!.update();
+
+    expect(refreshButton().prop('isLoading')).toBe(false);
+    expect(refreshButton().prop('isDisabled')).toBe(false);
+    expect(lastUpdatedBadge().exists()).toBe(true);
+
     wrapper!.unmount();
   });
 });
