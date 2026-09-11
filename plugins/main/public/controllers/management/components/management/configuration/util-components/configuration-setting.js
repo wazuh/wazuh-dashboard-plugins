@@ -21,7 +21,6 @@ import {
   EuiIconTip,
 } from '@elastic/eui';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
-import helpLinks from '../log-collection/help-links';
 
 class WzConfigurationSetting extends Component {
   constructor(props) {
@@ -90,17 +89,17 @@ class WzConfigurationSetting extends Component {
               <ul>
                 {value.map((v, key) => (
                   <li key={`${keyItem}-${label}-${key}`}>
-                    <EuiFieldText value={String(v)} readOnly />
+                    <EuiFieldText
+                      value={String(v)}
+                      title={String(v)}
+                      readOnly
+                    />
                   </li>
                 ))}
               </ul>
             ) : Array.isArray(value) && columns ? (
               <>
-                <WzConfigurationSettingsHeader
-                  title={label}
-                  info={info}
-                  help={helpLinks}
-                />
+                <WzConfigurationSettingsHeader title={label} info={info} />
                 {value.map((group, groupIndex) => (
                   <EuiAccordion
                     key={`accordion_${groupIndex}`}
@@ -132,6 +131,7 @@ class WzConfigurationSetting extends Component {
                   .toLowerCase()
                   .replace(/\s/g, '-')}`}
                 value={String(value)}
+                title={String(value)}
                 readOnly
               />
             )}

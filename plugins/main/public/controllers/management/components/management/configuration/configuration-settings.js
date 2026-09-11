@@ -104,6 +104,12 @@ export default [
         goto: 'commands',
         when: 'agent',
       },
+      {
+        name: 'Active response',
+        description: 'Active response settings for this agent',
+        goto: 'active-response-agent',
+        when: 'agent',
+      },
     ],
   },
   {
