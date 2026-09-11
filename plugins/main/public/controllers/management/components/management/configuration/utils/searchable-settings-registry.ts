@@ -504,9 +504,8 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     help: FIM_HELP,
   },
   [configurationHeaderKey('integrity-monitoring', 'Who-data')]: {
-    title: 'Who-data audit keys',
-    description:
-      'Server will include in its FIM baseline those events being monitored by Audit using audit_key.',
+    title: 'Who-data',
+    description: 'Settings for the underlying who-data (Audit) monitoring',
     help: FIM_HELP,
   },
 };

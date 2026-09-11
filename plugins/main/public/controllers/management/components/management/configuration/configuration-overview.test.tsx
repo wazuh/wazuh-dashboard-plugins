@@ -154,7 +154,11 @@ describe('WzConfigurationOverview', () => {
     fireEvent.click(
       await screen.findByRole('button', { name: /Integrity monitoring/ }),
     );
-    await screen.findAllByText('Who-data audit keys');
+    await screen.findByText('Who-data audit keys');
+    expect(screen.getAllByText('Who-data audit keys')).toHaveLength(1);
+    expect(
+      screen.getByRole('heading', { name: 'Who-data' }),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Registries limit')).not.toBeInTheDocument();
     expect(
       screen.queryByText('Monitored registry entries'),
