@@ -12,6 +12,7 @@ import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
 import { formatUIDate } from '../../../react-services';
+import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
 
 type ParseData<T> =
   | {
@@ -154,7 +155,9 @@ export const exportSearchToCSV = async (
     keys: resultsFields,
   };
 
-  let csv = await converter.json2csvAsync(data, options);
+  const rows = neutralizeCsvFormulaValues(data);
+
+  let csv = await converter.json2csvAsync(rows, options);
 
   const blobData = new Blob([csv], {
     type: 'text/csv',

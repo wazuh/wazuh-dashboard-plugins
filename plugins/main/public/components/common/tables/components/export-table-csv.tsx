@@ -24,6 +24,7 @@ export function ExportTableCsv({
   filters,
   title,
   maxRows,
+  isLoading,
 }) {
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -59,7 +60,8 @@ export function ExportTableCsv({
   return (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty
-        isDisabled={totalItems == 0}
+        isDisabled={totalItems == 0 || isLoading}
+        isLoading={isLoading}
         iconType='importAction'
         onClick={() => downloadCsv()}
       >
@@ -86,4 +88,5 @@ ExportTableCsv.defaultProps = {
   totalItems: 0,
   filters: [],
   title: '',
+  isLoading: false,
 };

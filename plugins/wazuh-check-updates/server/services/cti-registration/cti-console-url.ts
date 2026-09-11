@@ -11,5 +11,16 @@ export class CtiConfigurationError extends Error {
   }
 }
 
+/**
+ * `wazuh_check_updates.ctiApiUrl` once the plugin has read its configuration.
+ * Seeded with the compiled constant so a read before `setup()` resolves behaves
+ * like a default installation, where the setting is absent.
+ */
+let ctiApiUrl: string = WAZUH_CTI_CONSOLE_BASE_URL;
+
+export const setCtiConsoleBaseUrl = (url: string): void => {
+  ctiApiUrl = url;
+};
+
 export const getCtiConsoleBaseUrl = (): string =>
-  WAZUH_CTI_CONSOLE_BASE_URL.trim().replace(/\/$/, '');
+  ctiApiUrl.trim().replace(/\/$/, '');

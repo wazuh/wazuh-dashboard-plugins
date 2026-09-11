@@ -16,7 +16,8 @@ import WzLogs from './mg-logs/logs';
 import WzConfiguration from './configuration/configuration-main';
 import WzStatistics from './statistics/statistics-main';
 import { ClusterOverview } from './cluster/cluster-overview';
-import { Switch, Route } from '../../../../components/router-search';
+import { Redirect, Switch, Route } from '../../../../components/router-search';
+import { getCurrentAppDefaultTabSearch } from '../../../../utils/applications';
 
 const WzManagementMain = props => (
   <Switch>
@@ -39,6 +40,7 @@ const WzManagementMain = props => (
     <Route path='?tab=configuration'>
       <WzConfiguration />
     </Route>
+    <Redirect to={getCurrentAppDefaultTabSearch('?tab=status')}></Redirect>
   </Switch>
 );
 
