@@ -521,6 +521,25 @@ export const endpointGroups = {
   redirectTo: () => '/manager/?tab=groups',
 };
 
+export const enrollmentTokens = {
+  category: 'wz-category-agents-management',
+  id: 'enrollment-tokens',
+  title: i18n.translate('wz-app-enrollment-tokens-title', {
+    defaultMessage: 'Enrollment tokens',
+  }),
+  breadcrumbLabel: i18n.translate('wz-app-enrollment-tokens-breadcrumbLabel', {
+    defaultMessage: 'Enrollment tokens',
+  }),
+  description: i18n.translate('wz-app-enrollment-tokens-description', {
+    defaultMessage: 'Create, review and revoke the tokens agents enroll with.',
+  }),
+  euiIconType: 'lock',
+  order: 602,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/enrollment-tokens/',
+};
+
 export const serverStatus = {
   category: 'wz-category-server-management',
   id: 'server-status',
@@ -751,6 +770,7 @@ export const Applications = [
   docker,
   endpointSummary,
   endpointGroups,
+  enrollmentTokens,
   serverStatus,
   // cluster,
   statistics,

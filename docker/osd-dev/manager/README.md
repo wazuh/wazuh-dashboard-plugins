@@ -7,6 +7,30 @@ This directory contains the files required to run a Wazuh manager container in t
 - **Dockerfile**: Defines the Docker image for Wazuh manager.
 - **entrypoint.sh**: Entrypoint script to initialize the container.
 - **installer.sh**: Script used to automate the installation and configuration of Wazuh manager and its dependencies inside the container.
+- **wazuh-certs-tool.sh**: Pinned copy of the Wazuh certificate tool (see the header for its origin). The entrypoint runs it to issue the agent-facing HTTPS listener certificate.
+- **wazuh-certs.yml**: Node inventory read by `wazuh-certs-tool.sh`.
+
+## Certificates
+
+The manager package does not generate certificates, so the entrypoint issues
+them at startup with `wazuh-certs-tool.sh` and installs them under the names the
+shipped `wazuh-manager.conf` already expects, leaving that file untouched:
+
+| File                                                 | Read by                                                                        |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `etc/certs/remoted.pem`, `etc/certs/remoted-key.pem` | `<remote><https>` (the listener agents enroll and report through) and `<auth>` |
+| `etc/certs/root-ca.pem`                              | `<remote><https><ca_certificate>`                                              |
+
+The listener certificate carries a SAN covering the address agents connect to,
+which the self-signed one the package used to generate did not.
+
+It signs with the root CA the `generator` service publishes into the shared
+`wm_certs` volume rather than minting a new one: that CA is the trust anchor the
+indexer, the dashboard, imposter and the agents already share. If the CA is
+missing the container waits up to 120s and then exits, which usually means the
+`generator` service did not run.
+
+To change the certificate's SAN or its filename prefix, edit `wazuh-certs.yml`.
 
 ## Usage
 

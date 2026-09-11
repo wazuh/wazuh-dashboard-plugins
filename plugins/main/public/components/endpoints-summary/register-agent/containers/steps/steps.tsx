@@ -25,6 +25,8 @@ import { UseFormReturn } from '../../../../common/form/types';
 import CommandOutput from '../../components/command-output/command-output';
 import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
+import EnrollmentTokenInput from '../../components/enrollment-token/enrollment-token';
+import { EnrollmentToken } from '../../interfaces/types';
 import {
   getAgentCommandsStepStatus,
   tFormStepsStatus,
@@ -33,6 +35,7 @@ import {
   getOptionalParameterStepStatus,
   showCommandsSections,
   getPasswordStepStatus,
+  getEnrollmentTokenStepStatus,
   getIncompleteSteps,
   getInvalidFields,
   tFormFieldsLabel,
@@ -50,6 +53,9 @@ interface IStepsProps {
   osCard: React.ReactElement;
   wazuhPassword: string;
   canReadAuthdPassword: boolean;
+  canCreateEnrollmentToken: boolean;
+  enrollmentToken: EnrollmentToken | null;
+  onEnrollmentTokenChange: (enrollmentToken: EnrollmentToken | null) => void;
 }
 
 export const Steps = ({
@@ -58,8 +64,18 @@ export const Steps = ({
   osCard,
   wazuhPassword,
   canReadAuthdPassword,
+  canCreateEnrollmentToken,
+  enrollmentToken,
+  onEnrollmentTokenChange,
 }: IStepsProps) => {
-  const passwordPermissionMissing = needsPassword && !canReadAuthdPassword;
+  /* The enrollment token replaces the password: the agent enrolls with the
+  credential the token carries, so the password steps are only reached when the
+  server cannot mint one for this user. */
+  const passwordPermissionMissing =
+    !canCreateEnrollmentToken && needsPassword && !canReadAuthdPassword;
+  /* Blocks the command steps while the token path is in use and no token has
+  been generated yet. */
+  const enrollmentTokenIsMissing = canCreateEnrollmentToken && !enrollmentToken;
   const initialParsedFormValues = {
     operatingSystem: {
       name: '',
@@ -69,7 +85,8 @@ export const Steps = ({
       agentGroups: '',
       agentName: '',
       serverAddress: '',
-      wazuhPassword,
+      wazuhPassword: canCreateEnrollmentToken ? '' : wazuhPassword,
+      enrollmentToken: enrollmentToken?.token || '',
       sslVerification: true,
       managerCa: '',
     },
@@ -94,14 +111,26 @@ export const Steps = ({
     );
     setRegisterAgentFormValues(registerAgentFormValuesParsed);
     setInstallCommandStepStatus(
-      getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
+      getAgentCommandsStepStatus(
+        form.fields,
+        installCommandWasCopied,
+        enrollmentTokenIsMissing,
+      ),
     );
     setStartCommandStepStatus(
-      getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
+      getAgentCommandsStepStatus(
+        form.fields,
+        startCommandWasCopied,
+        enrollmentTokenIsMissing,
+      ),
     );
-    setMissingStepsName(getIncompleteSteps(form.fields) || []);
-    setInvalidFieldsName(getInvalidFields(form.fields) || []);
-  }, [form.fields]);
+    setMissingStepsName(
+      getIncompleteSteps(form.fields, enrollmentTokenIsMissing) || [],
+    );
+    setInvalidFieldsName(
+      getInvalidFields(form.fields, Boolean(enrollmentToken)) || [],
+    );
+  }, [form.fields, enrollmentToken]);
 
   const { installCommand, startCommand, selectOS, setOptionalParams } =
     useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
@@ -112,10 +141,14 @@ export const Steps = ({
   // install - start commands step state
   const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
   const [installCommandStepStatus, setInstallCommandStepStatus] =
-    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
+    useState<tFormStepsStatus>(
+      getAgentCommandsStepStatus(form.fields, false, enrollmentTokenIsMissing),
+    );
   const [startCommandWasCopied, setStartCommandWasCopied] = useState(false);
   const [startCommandStepStatus, setStartCommandStepStatus] =
-    useState<tFormStepsStatus>(getAgentCommandsStepStatus(form.fields, false));
+    useState<tFormStepsStatus>(
+      getAgentCommandsStepStatus(form.fields, false, enrollmentTokenIsMissing),
+    );
 
   useEffect(() => {
     if (
@@ -134,13 +167,21 @@ export const Steps = ({
 
   useEffect(() => {
     setInstallCommandStepStatus(
-      getAgentCommandsStepStatus(form.fields, installCommandWasCopied),
+      getAgentCommandsStepStatus(
+        form.fields,
+        installCommandWasCopied,
+        enrollmentTokenIsMissing,
+      ),
     );
   }, [installCommandWasCopied]);
 
   useEffect(() => {
     setStartCommandStepStatus(
-      getAgentCommandsStepStatus(form.fields, startCommandWasCopied),
+      getAgentCommandsStepStatus(
+        form.fields,
+        startCommandWasCopied,
+        enrollmentTokenIsMissing,
+      ),
     );
   }, [startCommandWasCopied]);
 
@@ -163,7 +204,25 @@ export const Steps = ({
       ),
       status: getServerAddressStepStatus(form.fields),
     },
-    ...(needsPassword && !wazuhPassword
+    ...(canCreateEnrollmentToken
+      ? [
+          {
+            title: 'Enrollment token:',
+            children: (
+              <EnrollmentTokenInput
+                formFields={form.fields}
+                enrollmentToken={enrollmentToken}
+                onEnrollmentTokenChange={onEnrollmentTokenChange}
+              />
+            ),
+            status: getEnrollmentTokenStepStatus(
+              form.fields,
+              Boolean(enrollmentToken),
+            ),
+          },
+        ]
+      : []),
+    ...(!canCreateEnrollmentToken && needsPassword && !wazuhPassword
       ? [
           {
             title: 'Password',
@@ -215,7 +274,12 @@ export const Steps = ({
       : []),
     {
       title: 'Optional settings:',
-      children: <OptionalsInputs formFields={form.fields} />,
+      children: (
+        <OptionalsInputs
+          formFields={form.fields}
+          hasEnrollmentToken={Boolean(enrollmentToken)}
+        />
+      ),
       status: getOptionalParameterStepStatus(
         form.fields,
         installCommandWasCopied,
@@ -259,10 +323,16 @@ export const Steps = ({
             <>
               <CommandOutput
                 commandText={installCommand}
-                showCommand={showCommandsSections(form.fields)}
+                showCommand={showCommandsSections(
+                  form.fields,
+                  enrollmentTokenIsMissing,
+                )}
                 os={registerAgentFormValues.operatingSystem.name}
                 onCopy={() => setInstallCommandWasCopied(true)}
                 password={registerAgentFormValues.optionalParams.wazuhPassword}
+                enrollmentToken={
+                  registerAgentFormValues.optionalParams.enrollmentToken
+                }
               />
               <OsCommandWarning
                 os={registerAgentFormValues.operatingSystem.name}
@@ -310,7 +380,10 @@ export const Steps = ({
           {!missingStepsName?.length && !invalidFieldsName?.length ? (
             <CommandOutput
               commandText={startCommand}
-              showCommand={showCommandsSections(form.fields)}
+              showCommand={showCommandsSections(
+                form.fields,
+                enrollmentTokenIsMissing,
+              )}
               os={registerAgentFormValues.operatingSystem.name}
               onCopy={() => setStartCommandWasCopied(true)}
             />
@@ -334,7 +407,9 @@ export const Steps = ({
           // This shows the link preview on hover,
           href={NavigationService.getInstance().getUrlForApp(
             endpointSummary.id,
-            { path: `#/${SECTIONS.AGENTS_PREVIEW}` },
+            {
+              path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+            },
           )}
           aria-label={`Open ${endpointSummary.breadcrumbLabel}`}
         >

@@ -91,22 +91,6 @@ services:
           openssl pkcs8 -topk8 -inform pem -in $$i-key.pem -outform pem -nocrypt -out $$i.key
         done
 
-        echo "Generating the agent-facing server certificate"
-        # The manager serves agents over HTTPS, and agents verify that
-        # certificate, so it needs the server profile and a SAN covering the
-        # address agents connect to. The wazuh.manager.local certificate below
-        # is a client one and OpenSSL rejects it here with "unsuitable
-        # certificate purpose".
-        cat /conf/host.json | \
-        sed "s/HOST/wazuh.manager.local/g" | \
-        cfssl gencert \
-          -ca $$certs/root-ca.pem \
-          -ca-key $$certs/root-ca-key.pem \
-          -config /conf/cfssl.json \
-          -profile=server - | \
-        cfssljson -bare agent-comms
-        openssl pkcs8 -topk8 -inform pem -in agent-comms-key.pem -outform pem -nocrypt -out agent-comms.key
-
         echo "Generating clients certificates"
           for i in admin server saml wazuh.manager.local; do
             echo "Generating cert for $$i"
@@ -382,6 +366,10 @@ services:
     depends_on:
       wazuh.indexer:
         condition: service_healthy
+      # The entrypoint signs the agent listener certificate with the root CA
+      # this service publishes into wm_certs.
+      generator:
+        condition: service_healthy
     image: wazuh-manager-pkg:${IMAGE_TAG:-latest}
     build:
       context: ./manager
@@ -403,10 +391,6 @@ services:
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
       - WAZUH_REGISTRATION_PASSWORD=WazuhRegistrationDev123
-      # Agent-facing HTTPS certificate. Signed by the environment's root CA and
-      # issued for "wazuh.manager.local", so agents can verify the manager.
-      - AGENT_SSL_CERTIFICATE=/etc/server_certs/agent-comms.pem
-      - AGENT_SSL_CERTIFICATE_KEY=/etc/server_certs/agent-comms-key.pem
     volumes:
       - wm_certs:/etc/server_certs
     ports:

@@ -1,0 +1,44 @@
+/*
+ * Wazuh app - Styles for the truncated-value-with-popover control
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+// EuiPopover (and the tooltip/anchor elements it wraps its `button` in) are
+// all `display: inline-block` with no width of their own, so each one
+// shrink-wraps to the natural, unwrapped width of the text inside -- which
+// is exactly as wide as the value, ellipsis or not. Forcing the whole chain
+// down to block gives each one the width of the row instead, which is what
+// `overflow`/`text-overflow` on the value itself actually needs to clip
+// against.
+.wz-truncated-value-popover-wrapper {
+  display: block;
+  min-width: 0;
+
+  .euiPopover,
+  .euiPopover__anchor,
+  .euiToolTipAnchor {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+.wz-truncated-value-popover {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.wz-truncated-value-popover__content {
+  max-width: 400px;
+  word-break: break-all;
+}

@@ -17,10 +17,11 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
+  hasEnrollmentToken?: boolean;
 }
 
 const OptionalsInputs = (props: OptionalsInputsProps) => {
-  const { formFields } = props;
+  const { formFields, hasEnrollmentToken = false } = props;
   const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
   const onButtonAgentName = () =>
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
@@ -59,37 +60,58 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
-      {/* Enrollment authenticates one way, so TLS is the only thing that proves
-      the endpoint is talking to the real manager. The switch carries its own
-      label, so no form row label is passed here. */}
-      <InputForm {...formFields.sslVerification} />
-      <EuiSpacer size='m' />
-      {sslVerificationIsEnabled ? (
-        <InputForm
-          {...formFields.managerCa}
-          fullWidth={false}
-          label={
-            <span className='registerAgentLabels'>
-              {'Manager CA file path on the endpoint - '}
-              <em>optional</em>
-            </span>
-          }
-          footer={
-            <EuiText size='xs' color='subdued'>
-              If left empty, the endpoint&apos;s system CA store is used, which
-              only trusts publicly issued certificates. Supply the manager CA to
-              verify a self-signed certificate.
-            </EuiText>
-          }
-          placeholder='/var/ossec/etc/manager-ca.pem'
-        />
-      ) : (
+      {/* An enrollment token pins the certificate authority the agent verifies
+      the manager against, and the installer refuses a token supplied together
+      with a CA of its own. With a token in hand neither input applies, so
+      neither is offered. */}
+      {hasEnrollmentToken ? (
         <EuiCallOut
-          color='warning'
-          title={warningForSslVerification}
-          iconType='alert'
+          color='primary'
+          title='The enrollment token pins the manager certificate authority'
+          iconType='iInCircle'
           className='warningForAgentName'
-        />
+        >
+          <p>
+            The agent verifies the manager against the authority the token
+            carries, so no certificate authority path is needed and verification
+            cannot be turned off.
+          </p>
+        </EuiCallOut>
+      ) : (
+        <>
+          {/* Enrollment authenticates one way, so TLS is the only thing that
+          proves the endpoint is talking to the real manager. The switch carries
+          its own label, so no form row label is passed here. */}
+          <InputForm {...formFields.sslVerification} />
+          <EuiSpacer size='m' />
+          {sslVerificationIsEnabled ? (
+            <InputForm
+              {...formFields.managerCa}
+              fullWidth={false}
+              label={
+                <span className='registerAgentLabels'>
+                  {'Manager CA file path on the endpoint - '}
+                  <em>optional</em>
+                </span>
+              }
+              footer={
+                <EuiText size='xs' color='subdued'>
+                  If left empty, the endpoint&apos;s system CA store is used,
+                  which only trusts publicly issued certificates. Supply the
+                  manager CA to verify a self-signed certificate.
+                </EuiText>
+              }
+              placeholder='/var/ossec/etc/manager-ca.pem'
+            />
+          ) : (
+            <EuiCallOut
+              color='warning'
+              title={warningForSslVerification}
+              iconType='alert'
+              className='warningForAgentName'
+            />
+          )}
+        </>
       )}
       <EuiSpacer size='m' />
       <InputForm
