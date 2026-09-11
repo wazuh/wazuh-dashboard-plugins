@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
+  EuiPage,
   EuiPanel,
   EuiTitle,
   EuiButtonIcon,
@@ -294,38 +295,38 @@ export const ManageAgents = withErrorBoundary(
     );
 
     return (
-      <EuiPanel paddingSize='m'>
-        <EuiFlexGroup alignItems='center' gutterSize='s'>
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              aria-label='Back'
-              color='primary'
-              iconType='arrowLeft'
-              onClick={cancelButton}
-            />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiTitle size='m'>
-              <h1>Manage agents of group {currentGroup.name}</h1>
-            </EuiTitle>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiSpacer size='m' />
-        {applyState ? (
-          <>
-            <ApplyResultView
-              status={applyState.status}
-              title={applyState.title}
-              hasFailures={applyState.hasFailures}
-              errorAgents={applyState.errorAgents}
-              onDismiss={() => setApplyState(undefined)}
-            />
-            <EuiSpacer size='m' />
-          </>
-        ) : null}
-        <EuiFlexGroup>
-          <EuiFlexItem style={{ minWidth: 0 }} grow={4}>
-            <EuiPanel hasBorder paddingSize='m'>
+      <EuiPage style={{ background: 'transparent' }}>
+        <EuiPanel paddingSize='m'>
+          <EuiFlexGroup alignItems='center' gutterSize='s'>
+            <EuiFlexItem grow={false}>
+              <EuiButtonIcon
+                aria-label='Back'
+                color='primary'
+                iconType='arrowLeft'
+                onClick={cancelButton}
+              />
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiTitle size='m'>
+                <h1>Manage agents of group {currentGroup.name}</h1>
+              </EuiTitle>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size='m' />
+          {applyState ? (
+            <>
+              <ApplyResultView
+                status={applyState.status}
+                title={applyState.title}
+                hasFailures={applyState.hasFailures}
+                errorAgents={applyState.errorAgents}
+                onDismiss={() => setApplyState(undefined)}
+              />
+              <EuiSpacer size='m' />
+            </>
+          ) : null}
+          <EuiFlexGroup>
+            <EuiFlexItem style={{ minWidth: 0 }} grow={4}>
               <TableWzAPI
                 ref={tableRef}
                 title={showMembersOnly ? 'Members' : 'All agents'}
@@ -364,45 +365,45 @@ export const ManageAgents = withErrorBoundary(
                   },
                 }}
               />
-            </EuiPanel>
-          </EuiFlexItem>
-          {!isMobile && (
-            <EuiFlexItem grow={false} style={{ alignSelf: 'stretch' }}>
-              {/* euiHorizontalRule's own class gives a theme-aware color
-                  without a hardcoded hex, resized into a vertical line. */}
-              <div
-                className='euiHorizontalRule'
-                style={{ width: 1, height: '100%', margin: 0 }}
-              />
             </EuiFlexItem>
-          )}
-          <EuiFlexItem
-            style={
-              isMobile
-                ? { minWidth: 0 }
-                : {
-                    minWidth: 0,
-                    position: 'sticky',
-                    top: 16,
-                    alignSelf: 'flexStart',
-                  }
-            }
-            grow={2}
-          >
-            {/* Sticky + flexStart only above mobile: this row wraps to
+            {!isMobile && (
+              <EuiFlexItem grow={false} style={{ alignSelf: 'stretch' }}>
+                {/* euiHorizontalRule's own class gives a theme-aware color
+                  without a hardcoded hex, resized into a vertical line. */}
+                <div
+                  className='euiHorizontalRule'
+                  style={{ width: 1, height: '100%', margin: 0 }}
+                />
+              </EuiFlexItem>
+            )}
+            <EuiFlexItem
+              style={
+                isMobile
+                  ? { minWidth: 0 }
+                  : {
+                      minWidth: 0,
+                      position: 'sticky',
+                      top: 16,
+                      alignSelf: 'flexStart',
+                    }
+              }
+              grow={2}
+            >
+              {/* Sticky + flexStart only above mobile: this row wraps to
                 full-width stacked items below OUI's responsive breakpoint,
                 where sticky positioning has nothing useful to stick to. */}
-            <StagedChangesPanel
-              adds={adds}
-              removes={removes}
-              memberTotal={memberTotal}
-              onUnstage={unstage}
-              onDiscardAll={discardAll}
-              onApply={applyChanges}
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPanel>
+              <StagedChangesPanel
+                adds={adds}
+                removes={removes}
+                memberTotal={memberTotal}
+                onUnstage={unstage}
+                onDiscardAll={discardAll}
+                onApply={applyChanges}
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
+      </EuiPage>
     );
   },
 );
