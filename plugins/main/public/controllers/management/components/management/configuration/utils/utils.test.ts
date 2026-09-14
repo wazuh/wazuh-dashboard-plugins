@@ -1,6 +1,5 @@
 import {
   reportedEnabled,
-  normalizeConfigBoolean,
   renderValueNoThenEnabled,
   renderValueYesThenEnabled,
   renderValueBooleanYesNo,
@@ -36,25 +35,6 @@ describe('reportedEnabled', () => {
     expect(reportedEnabled(true, 'no')).toBe(false);
     expect(reportedEnabled(true, 'yes')).toBe(true);
     expect(reportedEnabled(false, 'yes')).toBe(false);
-  });
-});
-
-describe('normalizeConfigBoolean', () => {
-  it('passes booleans through unchanged', () => {
-    expect(normalizeConfigBoolean(true)).toBe(true);
-    expect(normalizeConfigBoolean(false)).toBe(false);
-  });
-
-  it('maps the legacy yes/no dialect to booleans', () => {
-    expect(normalizeConfigBoolean('yes')).toBe(true);
-    expect(normalizeConfigBoolean('no')).toBe(false);
-  });
-
-  it('returns undefined for anything else', () => {
-    expect(normalizeConfigBoolean(undefined)).toBeUndefined();
-    expect(normalizeConfigBoolean(null)).toBeUndefined();
-    expect(normalizeConfigBoolean(0)).toBeUndefined();
-    expect(normalizeConfigBoolean('other')).toBeUndefined();
   });
 });
 

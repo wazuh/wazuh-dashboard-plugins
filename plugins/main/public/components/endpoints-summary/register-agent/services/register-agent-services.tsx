@@ -6,18 +6,10 @@ import {
 } from '../core/config/os-commands-definitions';
 import { RegisterAgentData } from '../interfaces/types';
 import { composeAgentEndpoint } from '../../../../../common/services/agent-endpoint';
-
-type RemoteItem = {
-  connection: 'syslog' | 'secure';
-  ipv6: 'yes' | 'no';
-  allowed_ips?: string[];
-  queue_size?: string;
-};
-
-type RemoteConfig = {
-  name: string;
-  haveSecureConnection: boolean | null;
-};
+import {
+  ConfigurationBoolean,
+  isConfigEnabled,
+} from '../../../../../common/services/configuration-value';
 
 export type ServerAddressOptions = {
   label: string;
@@ -25,43 +17,27 @@ export type ServerAddressOptions = {
   nodetype: string;
 };
 
-/**
- * Get the remote configuration from api
- */
-async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
-  let config: RemoteConfig = {
-    name: nodeName,
-    haveSecureConnection: false,
+export type AuthConfiguration = {
+  auth?: {
+    use_password?: ConfigurationBoolean;
   };
+  'authd.pass'?: string;
+};
 
-  try {
-    const result = await WzRequest.apiReq(
-      'GET',
-      `/cluster/${nodeName}/configuration/request/remote`,
-      {},
-    );
-    const items = result?.data?.data?.affected_items || [];
-    const remote = items[0]?.remote;
-    if (remote) {
-      const remoteFiltered = remote.filter((item: RemoteItem) => {
-        return item.connection === 'secure';
-      });
-
-      remoteFiltered.length > 0
-        ? (config.haveSecureConnection = true)
-        : (config.haveSecureConnection = false);
-    }
-    return config;
-  } catch (error) {
-    return config;
-  }
+export interface RegistrationPassword {
+  needsPassword: boolean;
+  /** Empty when no password is needed, or when the caller cannot read it. */
+  password: string;
 }
+
 /**
  * Get the cluster auth configuration from Wazuh API
  * @param node
  * @returns
  */
-async function getAuthConfiguration(node: string) {
+async function getAuthConfiguration(
+  node: string,
+): Promise<AuthConfiguration | undefined> {
   const authConfigUrl = `/cluster/${node}/configuration/auth/auth`;
   const result = await WzRequest.apiReq('GET', authConfigUrl, {});
   const auth = result?.data?.data?.affected_items?.[0];
@@ -69,36 +45,15 @@ async function getAuthConfiguration(node: string) {
 }
 
 /**
- * Get the connection configuration from the nodes registered in the cluster
- * @param nodeSelected
- * @param defaultServerAddress
+ * Whether the enrollment command has to carry a registration password, and
+ * which one.
  */
-async function getConnectionConfig(
-  nodeSelected: ServerAddressOptions,
-  defaultServerAddress?: string,
-) {
-  const nodeName = nodeSelected?.label;
-  const nodeIp = nodeSelected?.value;
-  if (!defaultServerAddress) {
-    if (nodeSelected.nodetype !== 'custom') {
-      const remoteConfig = await getRemoteConfiguration(nodeName);
-      return {
-        serverAddress: nodeIp,
-        connectionSecure: remoteConfig.haveSecureConnection,
-      };
-    } else {
-      return {
-        serverAddress: nodeName,
-        connectionSecure: true,
-      };
-    }
-  } else {
-    return {
-      serverAddress: defaultServerAddress,
-      connectionSecure: true,
-    };
-  }
-}
+export const resolveRegistrationPassword = (
+  authConfig?: AuthConfiguration,
+): RegistrationPassword =>
+  isConfigEnabled(authConfig?.auth?.use_password)
+    ? { needsPassword: true, password: authConfig?.['authd.pass'] || '' }
+    : { needsPassword: false, password: '' };
 
 type NodeItem = {
   name: string;
@@ -156,21 +111,17 @@ export const getMasterNode = (
 };
 
 /**
- * Get the remote and the auth configuration from the cluster master node
+ * Get the auth configuration from the cluster master node
  * This function get the config from cluster mode
  */
 export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  const remote = await getRemoteConfiguration(masterNode[0].label);
   const auth = await getAuthConfiguration(masterNode[0].label);
   return {
-    remote,
     auth,
   };
 };
-
-export { getConnectionConfig, getRemoteConfiguration };
 
 export const getGroups = async () => {
   const result = await WzRequest.apiReq('GET', '/groups', {});

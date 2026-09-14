@@ -7,8 +7,9 @@ import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { useUserPermissionsRequirements } from '../../../../common/hooks';
+import { isConfigEnabled } from '../../../../../../common/services/configuration-value';
 
-async function checkVDIsEnabledCluster() {
+export async function checkVDIsEnabledCluster() {
   // Get nodes
   const responseNodes = await clusterNodes();
 
@@ -25,7 +26,9 @@ async function checkVDIsEnabledCluster() {
       responseNodeWmodules.data.data?.affected_items?.[0]?.wmodules?.find(
         ({ ['vulnerability-detection']: wmodule }) => wmodule,
       );
-    if (vdConfiguration?.['vulnerability-detection']?.enabled === 'yes') {
+    if (
+      isConfigEnabled(vdConfiguration?.['vulnerability-detection']?.enabled)
+    ) {
       return true;
     }
   }
