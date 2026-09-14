@@ -113,11 +113,12 @@ The token names the manager and pins its certificate authority, and it carries
 the credential the agent enrolls with. The installer refuses a token supplied
 together with a value that contradicts it, so with a token in hand the wizard
 emits `WAZUH_ENROLLMENT_TOKEN` alone and no `WAZUH_MANAGER_ENDPOINT`,
-`WAZUH_REGISTRATION_PASSWORD`, `WAZUH_REGISTRATION_CA` or `SSL_VERIFICATION`
-beside it. Editing the server address after generating a token discards it,
-since the address the agent would reach comes from the token. A token supplied
-through **Use existing token** is left alone, because it was not minted from
-those fields and they say nothing about the manager it names.
+`WAZUH_REGISTRATION_PASSWORD`, `WAZUH_REGISTRATION_CA` or
+`WAZUH_SSL_VERIFICATION` beside it. Editing the server address after generating
+a token discards it, since the address the agent would reach comes from the
+token. A token supplied through **Use existing token** is left alone, because it
+was not minted from those fields and they say nothing about the manager it
+names.
 
 A section that holds a value opens by itself rather than hiding it: the port and
 the path prefix arrive from the app configuration, so a deployment that sets

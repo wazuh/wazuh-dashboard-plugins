@@ -234,8 +234,8 @@ describe('parseRegisterAgentFormValues - CA and verification interaction', () =>
   ] as any;
 
   /* Otherwise turning the switch off after typing a path would emit both
-  SSL_VERIFICATION='none' and the CA, a command that supplies a CA and then
-  refuses to use it. */
+  WAZUH_SSL_VERIFICATION='none' and the CA, a command that supplies a CA and
+  then refuses to use it. */
   it('drops the CA when verification is disabled', () => {
     const result = RegisterAgentService.parseRegisterAgentFormValues(
       [

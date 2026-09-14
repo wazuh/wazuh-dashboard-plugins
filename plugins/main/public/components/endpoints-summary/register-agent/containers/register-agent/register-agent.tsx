@@ -153,7 +153,8 @@ export const RegisterAgent = compose(
     /* Enrollment authenticates one way, agent to manager, so the manager is
     authenticated solely by TLS. The agent verifies by default -- against the
     endpoint's system CA store, or against the CA below when one is given -- and
-    turning this off generates an explicit SSL_VERIFICATION=none opt-out. */
+    turning this off generates an explicit WAZUH_SSL_VERIFICATION=none
+    opt-out. */
     sslVerification: {
       type: 'switch',
       initialValue: true,

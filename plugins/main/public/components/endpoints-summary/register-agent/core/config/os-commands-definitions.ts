@@ -285,7 +285,7 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
   would be harmful: the agent rejects `system` combined with a CA and drops the
   CA, silently undoing a `WAZUH_REGISTRATION_CA` added to the command by hand. */
   sslVerification: {
-    property: 'SSL_VERIFICATION',
+    property: 'WAZUH_SSL_VERIFICATION',
     getParamCommand: props => {
       const { property, value } = props;
       return value === false ? `${property}='none'` : '';
