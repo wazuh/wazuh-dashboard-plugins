@@ -105,6 +105,19 @@ const descriptionInput = () =>
   screen.getByPlaceholderText('What this token is for');
 const generateButton = () => screen.getByRole('button', { name: /Generate/ });
 
+/* The id generator is stubbed in this environment, so every control shares one
+`aria-labelledby` target and an accessible-name query cannot tell them apart.
+The switches are reached through their visible label instead. */
+const switchFor = (label: string) =>
+  screen
+    .getByText(label)
+    .closest('.euiSwitch')
+    ?.querySelector('button[role="switch"]') as HTMLElement;
+
+const embedCaSwitch = () => switchFor('Carry the CA certificate in the token');
+const noCredentialSwitch = () =>
+  switchFor('Mint the token without a credential');
+
 beforeEach(() => {
   createToken.mockReset();
 });
@@ -156,6 +169,79 @@ describe('EnrollmentTokenInput advanced options', () => {
       },
     });
     expect(existingTokenInput()).toBeInTheDocument();
+  });
+});
+
+describe('EnrollmentTokenInput token flags', () => {
+  it('folds the switches away with the rest of the advanced options', () => {
+    renderInput({ collapsed: true });
+    expect(
+      screen.queryByText('Carry the CA certificate in the token'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Mint the token without a credential'),
+    ).not.toBeInTheDocument();
+  });
+
+  it('offers both off, which is what the manager defaults to', () => {
+    renderInput();
+    expect(embedCaSwitch()).not.toBeChecked();
+    expect(noCredentialSwitch()).not.toBeChecked();
+  });
+
+  it('mints with both flags off when neither switch was touched', async () => {
+    createToken.mockResolvedValue({
+      token: 'abc',
+      id: 'id-1',
+      address: 'manager.example.com',
+      expires: '2026-10-09T05:12:40+00:00',
+    });
+    renderInput();
+
+    fireEvent.click(generateButton());
+
+    await waitFor(() => expect(createToken).toHaveBeenCalled());
+    expect(createToken).toHaveBeenCalledWith(
+      expect.objectContaining({ embedCa: false, noCredential: false }),
+    );
+  });
+
+  it.each([
+    ['Carry the CA certificate in the token', 'embedCa'],
+    ['Mint the token without a credential', 'noCredential'],
+  ])('sends %s with the mint request', async (label, flag) => {
+    createToken.mockResolvedValue({
+      token: 'abc',
+      id: 'id-1',
+      address: 'manager.example.com',
+      expires: '2026-10-09T05:12:40+00:00',
+    });
+    renderInput();
+
+    fireEvent.click(switchFor(label));
+    expect(switchFor(label)).toBeChecked();
+    fireEvent.click(generateButton());
+
+    await waitFor(() => expect(createToken).toHaveBeenCalled());
+    expect(createToken).toHaveBeenCalledWith(
+      expect.objectContaining({ [flag]: true }),
+    );
+  });
+
+  /* They parameterize a mint request like the fields beside them, so they take
+  the same side of the either/or as the rest of the generate path. */
+  it('claims the mint path, disabling the reuse field', () => {
+    renderInput();
+    fireEvent.click(embedCaSwitch());
+    expect(existingTokenInput()).toBeDisabled();
+  });
+
+  it('is disabled while a stored token is being reused', () => {
+    renderInput({
+      formFields: { existingEnrollmentToken: field('eyJ2ZXIiOjEs') },
+    });
+    expect(embedCaSwitch()).toBeDisabled();
+    expect(noCredentialSwitch()).toBeDisabled();
   });
 });
 

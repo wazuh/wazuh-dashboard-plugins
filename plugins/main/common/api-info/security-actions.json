@@ -19,7 +19,6 @@
     },
     "related_endpoints": [
       "GET /agents",
-      "GET /agents/{agent_id}/key",
       "GET /agents/no_group",
       "GET /agents/outdated",
       "GET /agents/stats/distinct",
@@ -76,6 +75,16 @@
       "PUT /agents/group"
     ]
   },
+  "agent:read_secrets": {
+    "description": "Read the agents' pre-shared keys -- the secrets stored in client.keys -- in clear",
+    "resources": ["agent:id", "agent:group"],
+    "example": {
+      "actions": ["agent:read_secrets"],
+      "resources": ["agent:id:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["GET /agents/{agent_id}/key"]
+  },
   "agent:restart": {
     "description": "Restart agents",
     "resources": ["agent:id", "agent:group"],
@@ -123,6 +132,39 @@
       "effect": "allow"
     },
     "related_endpoints": ["GET /agents/uninstall"]
+  },
+  "enrollment_token:create": {
+    "description": "Mint enrollment tokens (the credential a new agent pastes to enroll over HTTPS)",
+    "resources": ["*:*"],
+    "example": {
+      "actions": ["enrollment_token:create"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["POST /agents/enrollment-tokens"]
+  },
+  "enrollment_token:read": {
+    "description": "List enrollment tokens (their id, address, dates and uses; never their credential)",
+    "resources": ["*:*"],
+    "example": {
+      "actions": ["enrollment_token:read"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["GET /agents/enrollment-tokens"]
+  },
+  "enrollment_token:delete": {
+    "description": "Revoke enrollment tokens",
+    "resources": ["*:*"],
+    "example": {
+      "actions": ["enrollment_token:delete"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "DELETE /agents/enrollment-tokens",
+      "DELETE /agents/enrollment-tokens/{token_id}"
+    ]
   },
   "agent:scan_vulnerability": {
     "description": "Trigger an on-demand vulnerability scan on agents",
@@ -203,6 +245,20 @@
       "PUT /cluster/restart",
       "PUT /cluster/reload",
       "GET /cluster/configuration/validation",
+      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+    ]
+  },
+  "cluster:read_secrets": {
+    "description": "Read the sensitive configuration values -- the enrollment password and the cluster key -- in clear instead of masked",
+    "resources": ["node:id"],
+    "example": {
+      "actions": ["cluster:read_secrets"],
+      "resources": ["node:id:master-node"],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "GET /cluster/local/config",
+      "GET /cluster/{node_id}/configuration",
       "GET /cluster/{node_id}/configuration/{component}/{configuration}"
     ]
   },

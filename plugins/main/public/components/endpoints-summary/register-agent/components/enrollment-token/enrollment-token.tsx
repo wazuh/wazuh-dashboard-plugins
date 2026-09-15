@@ -5,8 +5,10 @@ import {
   EuiCode,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiFormRow,
   EuiHorizontalRule,
   EuiLink,
+  EuiSwitch,
   EuiToolTip,
   EuiSpacer,
   EuiText,
@@ -49,6 +51,10 @@ const EnrollmentTokenInput = ({
 }: EnrollmentTokenInputProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  /* Not part of the validated form state: plain booleans with no validation of
+  their own, both off because that is what the manager defaults to. */
+  const [embedCa, setEmbedCa] = useState(false);
+  const [noCredential, setNoCredential] = useState(false);
 
   const { serverAddress, serverPort, serverPath } = formFields;
   const endpoint = ENDPOINT_FIELDS.map(field => formFields[field]?.value ?? '');
@@ -67,9 +73,12 @@ const EnrollmentTokenInput = ({
   minted: a token generated with all three left empty must still leave the reuse
   field open, or an operator who generated one and then wants to deploy with a
   stored token instead would have no way back. */
-  const tokenRequestWasStarted = TOKEN_REQUEST_FIELDS.some(
-    field => String(formFields[field]?.value ?? '').trim().length > 0,
-  );
+  const tokenRequestWasStarted =
+    TOKEN_REQUEST_FIELDS.some(
+      field => String(formFields[field]?.value ?? '').trim().length > 0,
+    ) ||
+    embedCa ||
+    noCredential;
 
   /* The token carries the manager address it was minted for, and the command
   takes the connection target from the token rather than from these fields. A
@@ -129,6 +138,8 @@ const EnrollmentTokenInput = ({
         ttl: formFields.enrollmentTokenTtl?.value,
         maxUses: formFields.enrollmentTokenMaxUses?.value,
         description: formFields.enrollmentTokenDescription?.value,
+        embedCa,
+        noCredential,
       });
       onEnrollmentTokenChange({ ...token, source: 'generated' });
     } catch (requestError) {
@@ -273,6 +284,38 @@ const EnrollmentTokenInput = ({
               fullWidth={false}
               placeholder='What this token is for'
             />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiSpacer size='m' />
+        {/* Paired into the same two columns the fields above use: both are
+        short, so side by side they cost one row of height instead of two. They
+        wrap onto their own lines with the rest when the panel narrows. */}
+        <EuiFlexGroup wrap>
+          <EuiFlexItem grow={true} className='registerAgentFormColumn'>
+            <EuiFormRow
+              label='Embed CA'
+              helpText='Carries the CA certificate inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.'
+            >
+              <EuiSwitch
+                label='Carry the CA certificate in the token'
+                checked={embedCa}
+                disabled={isReusingToken}
+                onChange={event => setEmbedCa(event.target.checked)}
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+          <EuiFlexItem grow={true} className='registerAgentFormColumn'>
+            <EuiFormRow
+              label='Without credential'
+              helpText='Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment.'
+            >
+              <EuiSwitch
+                label='Mint the token without a credential'
+                checked={noCredential}
+                disabled={isReusingToken}
+                onChange={event => setNoCredential(event.target.checked)}
+              />
+            </EuiFormRow>
           </EuiFlexItem>
         </EuiFlexGroup>
       </AdvancedOptions>

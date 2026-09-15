@@ -181,6 +181,7 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
           />
         </EuiFlexItem>
       </EuiFlexGroup>
+      <EuiSpacer size='m' />
       {/* The port and the path prefix are optional and rarely changed, so they
       are folded away and the step is just the address until the operator asks
       for them. */}

@@ -62,8 +62,9 @@ export const CreateEnrollmentTokenFlyout = ({
   const [mintedToken, setMintedToken] = useState<MintedEnrollmentToken | null>(
     null,
   );
-  /* Not part of the validated form state: a plain boolean with no validation
-  of its own. */
+  /* Not part of the validated form state: plain booleans with no validation of
+  their own. */
+  const [embedCa, setEmbedCa] = useState(false);
   const [noCredential, setNoCredential] = useState(false);
 
   const initialFields: FormConfiguration = {
@@ -115,6 +116,7 @@ export const CreateEnrollmentTokenFlyout = ({
         ttl: fields.ttl.value,
         maxUses: fields.maxUses.value,
         description: fields.description.value,
+        embedCa,
         noCredential,
       });
 
@@ -273,6 +275,18 @@ export const CreateEnrollmentTokenFlyout = ({
                 </EuiText>
               }
             />
+            <EuiSpacer size='m' />
+            <EuiFormRow
+              label='Embed CA'
+              helpText='Carries the CA certificate inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.'
+              fullWidth
+            >
+              <EuiSwitch
+                label='Carry the CA certificate in the token'
+                checked={embedCa}
+                onChange={event => setEmbedCa(event.target.checked)}
+              />
+            </EuiFormRow>
             <EuiSpacer size='m' />
             <EuiFormRow
               label='Without credential'

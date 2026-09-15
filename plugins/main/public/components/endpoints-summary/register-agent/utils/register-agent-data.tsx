@@ -50,6 +50,6 @@ export const ENROLLMENT_TOKEN_TEXTS = [
   {
     title: 'Enrollment token',
     subtitle:
-      'The agent enrolls with a token that names this manager and pins its certificate authority, instead of with the shared enrollment password. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, or open the advanced options to reuse a token kept from an earlier deployment or to set those values yourself.',
+      'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, or open the advanced options to reuse a token kept from an earlier deployment or to set those values yourself.',
   },
 ];
