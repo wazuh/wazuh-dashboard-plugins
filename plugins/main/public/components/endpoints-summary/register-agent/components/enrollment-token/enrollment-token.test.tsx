@@ -20,6 +20,17 @@ jest.mock('../../../../../services/enrollment-tokens', () => ({
   createEnrollmentToken: jest.fn(),
 }));
 
+/* The link to the Enrollment tokens app resolves its URL through the
+navigation service, which has no history to read outside the running app. */
+jest.mock('../../../../../react-services/navigation-service', () => ({
+  __esModule: true,
+  default: {
+    getInstance: () => ({
+      getAppURL: (appId: string) => `/app/${appId}`,
+    }),
+  },
+}));
+
 const createToken = createEnrollmentToken as jest.Mock;
 
 const defaultFormFieldData: EnhancedFieldConfiguration = {
@@ -149,6 +160,21 @@ describe('EnrollmentTokenInput advanced options', () => {
 });
 
 describe('EnrollmentTokenInput', () => {
+  /* Leaving the wizard would discard a token generated here, which is the one
+  value it cannot show again, so the link opens the app in its own tab rather
+  than navigating in place. */
+  it('links to the Enrollment tokens app in a new tab', () => {
+    renderInput();
+
+    const link = screen.getByRole('link', {
+      name: /Manage the minted tokens/,
+    });
+
+    expect(link).toHaveAttribute('href', '/app/enrollment-tokens');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noreferrer'));
+  });
+
   it('offers both paths when nothing has been filled in', () => {
     renderInput();
     expect(existingTokenInput()).toBeEnabled();

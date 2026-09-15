@@ -37,6 +37,11 @@ interface, for example in end-to-end testing scenarios.
    disables **Use existing token**.
 
 6. **Optional configuration** (when required):
+   - **Verify the manager certificate**: leave it enabled unless the endpoint
+     cannot verify the manager listener. While it is enabled, **Manager CA file
+     path on the endpoint** takes the certificate authority to verify the
+     manager against. See
+     [Manager certificate verification](#manager-certificate-verification).
    - **Agent name**: define how the agent is identified.
    - **Agent group**: assign the agent to an existing group (for example, `default`).
 
@@ -109,16 +114,20 @@ is checked only for what would break the generated command apart, a space or a
 single quote, since the manager is what decides whether the text is a token it
 issued.
 
-The token names the manager and pins its certificate authority, and it carries
-the credential the agent enrolls with. The installer refuses a token supplied
-together with a value that contradicts it, so with a token in hand the wizard
-emits `WAZUH_ENROLLMENT_TOKEN` alone and no `WAZUH_MANAGER_ENDPOINT`,
-`WAZUH_REGISTRATION_PASSWORD`, `WAZUH_REGISTRATION_CA` or
-`WAZUH_SSL_VERIFICATION` beside it. Editing the server address after generating
-a token discards it, since the address the agent would reach comes from the
-token. A token supplied through **Use existing token** is left alone, because it
-was not minted from those fields and they say nothing about the manager it
-names.
+The token names the manager and carries the credential the agent enrolls with.
+The installer refuses a token supplied together with a value that contradicts
+it, so with a token in hand the wizard emits neither
+`WAZUH_MANAGER_ENDPOINT` nor `WAZUH_REGISTRATION_PASSWORD` beside
+`WAZUH_ENROLLMENT_TOKEN`. Editing the server address after generating a token
+discards it, since the address the agent would reach comes from the token. A
+token supplied through **Use existing token** is left alone, because it was not
+minted from those fields and they say nothing about the manager it names.
+
+How the endpoint verifies the manager is not one of those values, and the token
+settles nothing about it. The **Optional settings** step keeps deciding it,
+with or without a token, and both variables it generates may accompany
+`WAZUH_ENROLLMENT_TOKEN` in the command. See
+[Manager certificate verification](#manager-certificate-verification).
 
 A section that holds a value opens by itself rather than hiding it: the port and
 the path prefix arrive from the app configuration, so a deployment that sets
@@ -130,6 +139,36 @@ Minting requires the `enrollment_token:create` permission. Where it is missing -
 including against a server whose RBAC policy predates the action -- the wizard
 falls back to the enrollment password, and the **Enrollment token** step is not
 shown.
+
+## Manager certificate verification
+
+Enrollment authenticates the agent to the manager, not the manager to the
+agent. What establishes that the endpoint is talking to the real manager is the
+TLS certificate its listener presents, and the **Optional settings** step
+decides how that certificate is verified through two controls, both shown
+whether or not the deployment uses an enrollment token:
+
+- **Verify the manager certificate**, enabled by default.
+- **Manager CA file path on the endpoint**, shown while verification is
+  enabled. It takes the path of a certificate authority already present on the
+  endpoint, which the installer writes into the agent configuration.
+
+Three combinations are possible, and each generates a different command:
+
+| Wizard state                           | What the generated command carries                                                                                                                                                                                                                                                             |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verification enabled, no CA path       | Nothing. The agent verifies the manager against the endpoint's own system CA store, which trusts publicly issued certificates only.                                                                                                                                                            |
+| Verification enabled, CA path supplied | `WAZUH_REGISTRATION_CA='<path>'`. The agent verifies the manager against that authority, which is what a self-signed manager certificate requires.                                                                                                                                             |
+| Verification disabled                  | `WAZUH_SSL_VERIFICATION='none'`, and the CA path input is hidden, since an authority to verify against means nothing once nothing is verified. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only. |
+
+An enrollment token does not replace any of this. The token carries a **pin**,
+the SHA-256 digest of the manager certificate authority's public key, and a
+digest is not the authority itself: the agent still obtains the certificate
+authority separately -- from the endpoint's system store, from the path
+supplied here, or from the manager's own `/cacerts` endpoint -- and uses the
+pin to establish that what it obtained is the expected one. Supplying the
+authority therefore remains the operator's decision beside a token, exactly as
+it is without one.
 
 ## Notes
 
@@ -183,17 +222,19 @@ starting the dev server:
 
 ### Deployment variables
 
-| Option                         | Description                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| WAZUH_MANAGER_ENDPOINT         | The Wazuh manager the agent connects to, as a single connection target: `host[:port][/path]`. `host` is an IP address or FQDN; the port and the path prefix are optional and default to `1517` and `/wazuh-manager/` when omitted. The path prefix must match the manager's `<remote><https><global_prefix>`, or every request the agent sends answers `404`. This is the variable the wizard generates. |
-| WAZUH_REGISTRATION_SERVER      | Specifies the Wazuh enrollment server, used for the Wazuh agent enrollment. If empty, the host from WAZUH_MANAGER_ENDPOINT will be used.                                                                                                                                                                                                                                                                 |
-| WAZUH_REGISTRATION_PORT        | Specifies the port used by the Wazuh enrollment server.                                                                                                                                                                                                                                                                                                                                                  |
-| WAZUH_REGISTRATION_PASSWORD    | Sets password used to authenticate during enrollment, stored in etc/authd.pass.                                                                                                                                                                                                                                                                                                                          |
-| WAZUH_KEEP_ALIVE_INTERVAL      | Sets the time between Wazuh agent checks for Wazuh manager connection.                                                                                                                                                                                                                                                                                                                                   |
-| WAZUH_TIME_RECONNECT           | Sets the time interval for the Wazuh agent to reconnect with the Wazuh manager when connectivity is lost.                                                                                                                                                                                                                                                                                                |
-| WAZUH_REGISTRATION_CA          | Host SSL validation need of Certificate of Authority. This option specifies the CA path.                                                                                                                                                                                                                                                                                                                 |
-| WAZUH_REGISTRATION_CERTIFICATE | The SSL agent verification needs a CA signed certificate and the respective key. This option specifies the certificate path.                                                                                                                                                                                                                                                                             |
-| WAZUH_REGISTRATION_KEY         | Specifies the key path completing the required variables with WAZUH_REGISTRATION_CERTIFICATE for the SSL agent verification process.                                                                                                                                                                                                                                                                     |
-| WAZUH_AGENT_NAME               | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                                                                                                                                             |
-| WAZUH_AGENT_GROUP              | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                                                                                                                                            |
-| ENROLLMENT_DELAY               | Assigns the time that agentd should wait after a successful enrollment.                                                                                                                                                                                                                                                                                                                                  |
+| Option                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WAZUH_MANAGER_ENDPOINT         | The Wazuh manager the agent connects to, as a single connection target: `host[:port][/path]`. `host` is an IP address or FQDN; the port and the path prefix are optional and default to `1517` and `/wazuh-manager/` when omitted. The path prefix must match the manager's `<remote><https><global_prefix>`, or every request the agent sends answers `404`. This is the variable the wizard generates when the deployment does not use an enrollment token. |
+| WAZUH_ENROLLMENT_TOKEN         | The enrollment token the agent enrolls with, minted by the server for one manager address. It names the manager and carries the enrollment credential, so it replaces `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD` rather than accompanying them. This is the variable the wizard generates when the **Enrollment token** step is available.                                                                                                    |
+| WAZUH_REGISTRATION_SERVER      | Specifies the Wazuh enrollment server, used for the Wazuh agent enrollment. If empty, the host from WAZUH_MANAGER_ENDPOINT will be used.                                                                                                                                                                                                                                                                                                                      |
+| WAZUH_REGISTRATION_PORT        | Specifies the port used by the Wazuh enrollment server.                                                                                                                                                                                                                                                                                                                                                                                                       |
+| WAZUH_REGISTRATION_PASSWORD    | Sets password used to authenticate during enrollment, stored in etc/authd.pass.                                                                                                                                                                                                                                                                                                                                                                               |
+| WAZUH_KEEP_ALIVE_INTERVAL      | Sets the time between Wazuh agent checks for Wazuh manager connection.                                                                                                                                                                                                                                                                                                                                                                                        |
+| WAZUH_TIME_RECONNECT           | Sets the time interval for the Wazuh agent to reconnect with the Wazuh manager when connectivity is lost.                                                                                                                                                                                                                                                                                                                                                     |
+| WAZUH_REGISTRATION_CA          | Host SSL validation need of Certificate of Authority. This option specifies the CA path.                                                                                                                                                                                                                                                                                                                                                                      |
+| WAZUH_SSL_VERIFICATION         | Set to `none` to stop the agent from verifying the manager certificate, which leaves the connection open to interception. Omitted, the agent verifies the certificate against `WAZUH_REGISTRATION_CA` when one is supplied, and against the endpoint's system CA store otherwise.                                                                                                                                                                             |
+| WAZUH_REGISTRATION_CERTIFICATE | The SSL agent verification needs a CA signed certificate and the respective key. This option specifies the certificate path.                                                                                                                                                                                                                                                                                                                                  |
+| WAZUH_REGISTRATION_KEY         | Specifies the key path completing the required variables with WAZUH_REGISTRATION_CERTIFICATE for the SSL agent verification process.                                                                                                                                                                                                                                                                                                                          |
+| WAZUH_AGENT_NAME               | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                                                                                                                                                                                                  |
+| WAZUH_AGENT_GROUP              | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                                                                                                                                                                                                 |
+| ENROLLMENT_DELAY               | Assigns the time that agentd should wait after a successful enrollment.                                                                                                                                                                                                                                                                                                                                                                                       |

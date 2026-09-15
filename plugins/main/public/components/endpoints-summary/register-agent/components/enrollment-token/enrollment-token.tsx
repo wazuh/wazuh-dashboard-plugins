@@ -6,6 +6,8 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiHorizontalRule,
+  EuiLink,
+  EuiToolTip,
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
@@ -15,6 +17,8 @@ import AdvancedOptions from '../advanced-options/advanced-options';
 import { ENROLLMENT_TOKEN_TEXTS } from '../../utils/register-agent-data';
 import { createEnrollmentToken } from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
+import { enrollmentTokens } from '../../../../../utils/applications';
+import NavigationService from '../../../../../react-services/navigation-service';
 import '../group-input/group-input.scss';
 
 interface EnrollmentTokenInputProps {
@@ -146,7 +150,21 @@ const EnrollmentTokenInput = ({
       <EuiFlexGroup gutterSize='s' wrap>
         {ENROLLMENT_TOKEN_TEXTS.map((data, index) => (
           <EuiFlexItem key={index}>
-            <EuiText className='stepSubtitle'>{data.subtitle}</EuiText>
+            <EuiText className='stepSubtitle'>
+              {data.subtitle}{' '}
+              <EuiToolTip content={`Navigate to ${enrollmentTokens.title}`}>
+                <EuiLink
+                  href={NavigationService.getInstance().getAppURL(
+                    enrollmentTokens.id,
+                  )}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  external
+                >
+                  {`Manage the minted tokens`}
+                </EuiLink>
+              </EuiToolTip>
+            </EuiText>
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
@@ -309,8 +327,7 @@ const EnrollmentTokenInput = ({
             className='warningForAgentName'
           >
             <p>
-              Token <EuiCode>{enrollmentToken.id}</EuiCode> for{' '}
-              <EuiCode>{enrollmentToken.address}</EuiCode>, valid until{' '}
+              Token successfully generated, valid until{' '}
               {formatExpiration(enrollmentToken.expires)}.
             </p>
             <p>
