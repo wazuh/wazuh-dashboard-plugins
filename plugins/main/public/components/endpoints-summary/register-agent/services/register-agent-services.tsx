@@ -219,19 +219,20 @@ export const parseRegisterAgentFormValues = (
     path: endpointComponents.serverPath,
   });
 
-  /* An enrollment token already names the manager and pins its CA, and carries
-  the credential the agent enrolls with. The installer refuses a token that any
-  of those variables contradicts -- a password beside a token that carries a
-  credential, a CA beside a token that pins one, an endpoint that is not the
-  token's own address -- so with a token in hand none of them is emitted. The
-  fields keep their values in the form, so clearing the token restores the
-  command they produced. */
+  /* An enrollment token already names the manager and carries the credential
+  the agent enrolls with, and the installer refuses a token that either of
+  those variables contradicts -- a password beside a token that carries a
+  credential, an endpoint that is not the token's own address -- so neither is
+  emitted beside one. The fields keep their values in the form, so clearing the
+  token restores the command they produced.
+
+  TLS is not one of them. The token carries a pin, a digest of the manager CA's
+  public key, which the agent checks against a CA it still has to obtain
+  separately -- so how the endpoint trusts the listener stays the operator's to
+  say, with or without a token. */
   if (parsedForm.optionalParams.enrollmentToken) {
     parsedForm.optionalParams.serverAddress = '';
     parsedForm.optionalParams.wazuhPassword = '';
-    parsedForm.optionalParams.managerCa = '';
-    parsedForm.optionalParams.sslVerification = true;
-    return parsedForm;
   }
 
   /* A CA pins the certificate the agent checks, so it means nothing once

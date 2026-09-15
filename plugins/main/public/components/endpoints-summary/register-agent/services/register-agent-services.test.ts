@@ -205,10 +205,42 @@ describe('parseRegisterAgentFormValues - enrollment token interaction', () => {
     expect(result.optionalParams).not.toHaveProperty('enrollmentTokenMaxUses');
   });
 
-  /* The installer refuses a token supplied together with a password, a CA or an
-  endpoint that contradicts the token's own address, so none of them is emitted
+  /* The installer refuses a token supplied together with a password or an
+  endpoint that contradicts the token's own address, so neither is emitted
   beside a token. */
-  it('drops the endpoint, the password and the CA when a token is in use', () => {
+  it('drops the endpoint and the password when a token is in use', () => {
+    const result = RegisterAgentService.parseRegisterAgentFormValues(
+      baseValues,
+      osOptions,
+      initialValuesWithToken(),
+    );
+
+    expect(result.optionalParams.enrollmentToken).toBe('eyJ2ZXIiOjEs');
+    expect(result.optionalParams.serverAddress).toBe('');
+    expect(result.optionalParams.wazuhPassword).toBe('');
+  });
+
+  /* A token carries a pin, not the CA itself, so the agent still has to be
+  told which CA to check the manager against -- the token settles nothing about
+  TLS and neither field is dropped beside one. */
+  it('keeps the CA beside a token', () => {
+    const result = RegisterAgentService.parseRegisterAgentFormValues(
+      [
+        ...baseValues,
+        { name: 'sslVerification', value: true },
+        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
+      ],
+      osOptions,
+      initialValuesWithToken(),
+    );
+
+    expect(result.optionalParams.sslVerification).toBe(true);
+    expect(result.optionalParams.managerCa).toBe(
+      '/var/ossec/etc/manager-ca.pem',
+    );
+  });
+
+  it('keeps verification turned off beside a token, without the CA', () => {
     const result = RegisterAgentService.parseRegisterAgentFormValues(
       [
         ...baseValues,
@@ -219,11 +251,8 @@ describe('parseRegisterAgentFormValues - enrollment token interaction', () => {
       initialValuesWithToken(),
     );
 
-    expect(result.optionalParams.enrollmentToken).toBe('eyJ2ZXIiOjEs');
-    expect(result.optionalParams.serverAddress).toBe('');
-    expect(result.optionalParams.wazuhPassword).toBe('');
+    expect(result.optionalParams.sslVerification).toBe(false);
     expect(result.optionalParams.managerCa).toBe('');
-    expect(result.optionalParams.sslVerification).toBe(true);
   });
 
   it('keeps composing the endpoint when no token is in use', () => {

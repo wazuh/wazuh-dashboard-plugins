@@ -244,12 +244,8 @@ commands with no way out. */
 const fieldIsNotApplicable = (
   fieldName: string,
   formFields: UseFormReturn['fields'],
-  hasEnrollmentToken: boolean,
 ): boolean => {
-  if (
-    fieldName === 'managerCa' &&
-    (!formFields.sslVerification?.value || hasEnrollmentToken)
-  ) {
+  if (fieldName === 'managerCa' && !formFields.sslVerification?.value) {
     return true;
   }
   /* A token the operator already had is being reused, so no mint request is
@@ -262,15 +258,12 @@ const fieldIsNotApplicable = (
 
 export const getInvalidFields = (
   formFields: UseFormReturn['fields'],
-  hasEnrollmentToken: boolean = false,
 ): tFormFieldsLabel[] => {
   const statusManager = new RegisterAgentFormStatusManager(formFields);
 
   return statusManager
     .getInvalidFields()
-    .filter(
-      field => !fieldIsNotApplicable(field, formFields, hasEnrollmentToken),
-    )
+    .filter(field => !fieldIsNotApplicable(field, formFields))
     .map(field => {
       return tFormFieldsLabel[field] || field;
     });

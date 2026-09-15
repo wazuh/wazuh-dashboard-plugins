@@ -127,9 +127,7 @@ export const Steps = ({
     setMissingStepsName(
       getIncompleteSteps(form.fields, enrollmentTokenIsMissing) || [],
     );
-    setInvalidFieldsName(
-      getInvalidFields(form.fields, Boolean(enrollmentToken)) || [],
-    );
+    setInvalidFieldsName(getInvalidFields(form.fields) || []);
   }, [form.fields, enrollmentToken]);
 
   const { installCommand, startCommand, selectOS, setOptionalParams } =
@@ -274,12 +272,7 @@ export const Steps = ({
       : []),
     {
       title: 'Optional settings:',
-      children: (
-        <OptionalsInputs
-          formFields={form.fields}
-          hasEnrollmentToken={Boolean(enrollmentToken)}
-        />
-      ),
+      children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
         installCommandWasCopied,
