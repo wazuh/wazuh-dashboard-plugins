@@ -1,3 +1,13 @@
+/* One input column is the EUI form width, and the form block is two of those
+side by side plus the flex gutter between them. Every input, its hint and the
+step text are measured against these two so the wizard reads the same however
+much room the panel has: an input never stretches to fill a wide screen, and a
+row of two never squeezes below a usable width -- it breaks onto two lines
+instead. */
+$registerAgentInputWidth: 400px;
+$registerAgentFormGutter: 24px;
+$registerAgentFormWidth: $registerAgentInputWidth * 2 + $registerAgentFormGutter;
+
 .register-agent-wizard-container {
   .euiStep__title {
     font-style: normal;
@@ -13,6 +23,7 @@
     font-size: 14px;
     line-height: 24px;
     margin-bottom: 9px;
+    max-width: $registerAgentFormWidth;
   }
 
   .stepSubtitle {
@@ -21,6 +32,24 @@
     font-size: 14px;
     line-height: 24px;
     margin-bottom: 20px;
+    max-width: $registerAgentFormWidth;
+  }
+
+  /* Caps the label, the control and the hint underneath together, so a row
+  holding a single input is the same width as "Server address" instead of
+  stretching across the panel, and the hint wraps under its own input rather
+  than running the full width. Beats EUI's .euiFormRow--fullWidth on
+  specificity, which is what InputForm sets on every row. */
+  .euiFormRow {
+    max-width: $registerAgentInputWidth;
+  }
+
+  /* An input column in a row that holds more than one. It still takes an equal
+  share of the panel, but it asks for a whole input width up front, so two of
+  them wrap onto separate lines once the panel can no longer fit both. The
+  compound selector is needed to override .euiFlexItem's own flex-basis. */
+  .euiFlexItem.registerAgentFormColumn {
+    flex-basis: $registerAgentInputWidth;
   }
 
   .titleAndIcon {

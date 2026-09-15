@@ -143,6 +143,18 @@ export const getRegisterAgentFormValues = (form: UseFormReturn) => {
 
 const ENDPOINT_FIELDS = ['serverAddress', 'serverPort', 'serverPath'];
 
+/* Fields of the enrollment token step that are not deployment variables and
+must never reach the generated command: three parameterize the request the
+wizard makes to the manager to mint a token, and the fourth holds a token the
+operator already had. The token the agent is installed with reaches the command
+as `optionalParams.enrollmentToken`, whichever of the two paths produced it. */
+const ENROLLMENT_TOKEN_FORM_FIELDS = [
+  'existingEnrollmentToken',
+  'enrollmentTokenTtl',
+  'enrollmentTokenMaxUses',
+  'enrollmentTokenDescription',
+];
+
 export interface IParseRegisterFormValues {
   operatingSystem: {
     name: tOperatingSystem['name'] | '';
@@ -177,6 +189,8 @@ export const parseRegisterAgentFormValues = (
   formValues.forEach(field => {
     if (ENDPOINT_FIELDS.includes(field.name as string)) {
       endpointComponents[field.name as string] = field.value;
+    } else if (ENROLLMENT_TOKEN_FORM_FIELDS.includes(field.name as string)) {
+      // Consumed by the token step, not by the install command.
     } else if (field.name === 'operatingSystemSelection') {
       // search the architecture defined in architecture array and get the os name defined in title array in the same index
       const operatingSystem = OSOptionsDefined.find(os =>
@@ -204,6 +218,22 @@ export const parseRegisterAgentFormValues = (
     port: endpointComponents.serverPort,
     path: endpointComponents.serverPath,
   });
+
+  /* An enrollment token already names the manager and carries the credential
+  the agent enrolls with, and the installer refuses a token that either of
+  those variables contradicts -- a password beside a token that carries a
+  credential, an endpoint that is not the token's own address -- so neither is
+  emitted beside one. The fields keep their values in the form, so clearing the
+  token restores the command they produced.
+
+  TLS is not one of them. The token carries a pin, a digest of the manager CA's
+  public key, which the agent checks against a CA it still has to obtain
+  separately -- so how the endpoint trusts the listener stays the operator's to
+  say, with or without a token. */
+  if (parsedForm.optionalParams.enrollmentToken) {
+    parsedForm.optionalParams.serverAddress = '';
+    parsedForm.optionalParams.wazuhPassword = '';
+  }
 
   /* A CA pins the certificate the agent checks, so it means nothing once
   verification is off -- and the agent would still write it to the config,

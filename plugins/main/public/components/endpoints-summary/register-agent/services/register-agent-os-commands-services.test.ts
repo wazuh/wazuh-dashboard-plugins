@@ -22,7 +22,7 @@ beforeEach(() => {
       agentName: "WAZUH_AGENT_NAME='test'",
       serverAddress: "WAZUH_MANAGER_ENDPOINT='1.1.1.1:1517/wazuh-manager/'",
       wazuhPassword: "WAZUH_REGISTRATION_PASSWORD='<CUSTOM_PASSWORD>'",
-      sslVerification: "SSL_VERIFICATION='none'",
+      sslVerification: "WAZUH_SSL_VERIFICATION='none'",
       managerCa: "WAZUH_REGISTRATION_CA='/var/ossec/etc/manager-ca.pem'",
     },
     urlPackage: 'https://test.com/agent.deb',
@@ -262,7 +262,7 @@ all; only a CA path or the explicit opt-out reach the command. */
 describe('SSL verification states', () => {
   const serverAddress = "WAZUH_MANAGER_ENDPOINT='1.1.1.1:1517/wazuh-manager/'";
   const managerCa = "WAZUH_REGISTRATION_CA='/var/ossec/etc/manager-ca.pem'";
-  const sslVerificationOff = "SSL_VERIFICATION='none'";
+  const sslVerificationOff = "WAZUH_SSL_VERIFICATION='none'";
 
   const states = {
     'verification on without a CA': { serverAddress },
