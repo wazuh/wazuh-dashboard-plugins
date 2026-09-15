@@ -3,6 +3,7 @@ import {
   EuiButton,
   EuiCallOut,
   EuiCode,
+  EuiCopy,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
@@ -377,8 +378,22 @@ const EnrollmentTokenInput = ({
             </p>
             <p>
               The token itself is returned once and cannot be retrieved again.
-              Copy the deployment command below before leaving this page.
+              It is not shown here: copy it, or the deployment command below,
+              before leaving this page.
             </p>
+            {/* The token authenticates the enrollment, so it is handed over
+            through the clipboard rather than rendered where it can be read off
+            the screen. */}
+            <EuiCopy
+              textToCopy={enrollmentToken.token}
+              beforeMessage='Copy the token to the clipboard'
+            >
+              {copy => (
+                <EuiButton size='s' iconType='copy' onClick={copy}>
+                  Copy token
+                </EuiButton>
+              )}
+            </EuiCopy>
           </EuiCallOut>
         </>
       ) : null}

@@ -227,7 +227,7 @@ export const CreateEnrollmentTokenFlyout = ({
                   manager is configured with.
                 </EuiText>
               }
-              placeholder='/wazuh-manager'
+              placeholder='/wazuh-manager/'
             />
             <InputForm
               {...fields.ttl}

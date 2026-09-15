@@ -312,6 +312,25 @@ describe('EnrollmentTokenInput', () => {
     expect(existingTokenInput()).toBeEnabled();
   });
 
+  /* The token authenticates the enrollment: it is handed over through the
+  clipboard, never rendered where it can be read off the screen. */
+  it('hands the generated token over through the clipboard without showing it', () => {
+    const execCommand = jest.fn().mockReturnValue(true);
+    (document as unknown as { execCommand: unknown }).execCommand = execCommand;
+    renderInput({
+      enrollmentToken: {
+        source: 'generated',
+        token: 'eyJ2ZXIiOjEs',
+        id: 'i',
+        address: 'a',
+        expires: 'e',
+      },
+    });
+    expect(screen.queryByText(/eyJ2ZXIiOjEs/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /Copy token/ }));
+    expect(execCommand).toHaveBeenCalledWith('copy');
+  });
+
   it('takes a readable stored token as the token to deploy with', () => {
     const { onEnrollmentTokenChange } = renderInput({
       formFields: { existingEnrollmentToken: field('  eyJ2ZXIiOjEs  ') },
