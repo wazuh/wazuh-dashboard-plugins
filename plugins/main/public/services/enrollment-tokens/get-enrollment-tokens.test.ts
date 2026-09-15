@@ -57,6 +57,47 @@ describe('getEnrollmentTokens', () => {
     });
   });
 
+  it('passes the search term the operator submitted', async () => {
+    apiReq.mockResolvedValue({
+      data: { data: { affected_items: [], total_affected_items: 0 } },
+    });
+
+    await getEnrollmentTokens(0, 10, '-created', 'web tier');
+
+    expect(apiReq).toHaveBeenCalledWith('GET', ENROLLMENT_TOKENS_ENDPOINT, {
+      params: { offset: 0, limit: 10, sort: '-created', search: 'web tier' },
+    });
+  });
+
+  /* An empty box is not a filter: sending `search=` would ask the manager for
+  the tokens containing the empty string rather than for all of them. */
+  it.each(['', '   ', undefined])(
+    'leaves the search out for %p',
+    async term => {
+      apiReq.mockResolvedValue({
+        data: { data: { affected_items: [], total_affected_items: 0 } },
+      });
+
+      await getEnrollmentTokens(0, 10, undefined, term);
+
+      expect(apiReq).toHaveBeenCalledWith('GET', ENROLLMENT_TOKENS_ENDPOINT, {
+        params: { offset: 0, limit: 10 },
+      });
+    },
+  );
+
+  it('trims the term before sending it', async () => {
+    apiReq.mockResolvedValue({
+      data: { data: { affected_items: [], total_affected_items: 0 } },
+    });
+
+    await getEnrollmentTokens(0, 10, undefined, '  web tier  ');
+
+    expect(apiReq).toHaveBeenCalledWith('GET', ENROLLMENT_TOKENS_ENDPOINT, {
+      params: { offset: 0, limit: 10, search: 'web tier' },
+    });
+  });
+
   it('reads an answer carrying no items as an empty listing', async () => {
     apiReq.mockResolvedValue({ data: { data: {} } });
 

@@ -61,9 +61,13 @@ export const EnrollmentTokenDetailsFlyout = ({
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
+        {/* Stacked rather than in two columns: an id, an address or a
+        description is free-form text with no spaces to break on, and a label
+        column beside it leaves too little room to read one. Each value gets the
+        width of the flyout instead, under its own label. */}
         <EuiDescriptionList
           compressed
-          type='column'
+          type='row'
           listItems={[
             {
               title: 'ID',

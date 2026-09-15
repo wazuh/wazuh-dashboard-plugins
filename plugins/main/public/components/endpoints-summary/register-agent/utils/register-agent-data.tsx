@@ -42,7 +42,7 @@ export const OPTIONAL_PARAMETERS_TEXT = [
   {
     title: 'Optional settings',
     subtitle:
-      'By default, the deployment uses the hostname as the agent name. Optionally, you can use a different agent name in the field below.',
+      'The agent verifies the manager certificate by default, against the endpoint system CA store or against a manager CA file given below. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
   },
 ];
 

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -40,6 +40,9 @@ import { PurgeEnrollmentTokens } from './components/purge-enrollment-tokens';
 
 export const EnrollmentTokens = () => {
   const [isCreateFlyoutVisible, setIsCreateFlyoutVisible] = useState(false);
+  /* The term the manager is filtering on, not what is being typed: the listing
+  is re-read on submit rather than on every keystroke. */
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handlePaginationError = (error: Error) => {
     getErrorOrchestrator().handleError({
@@ -55,6 +58,14 @@ export const EnrollmentTokens = () => {
     });
   };
 
+  /* `usePagination` calls its fetch function with the offset, the limit and the
+  sort, so the term rides in through the closure. */
+  const fetchTokens = useCallback(
+    (offset: number, limit: number, sort?: string) =>
+      getEnrollmentTokens(offset, limit, sort, searchTerm),
+    [searchTerm],
+  );
+
   const {
     items: tokens,
     loading,
@@ -66,7 +77,7 @@ export const EnrollmentTokens = () => {
     onTableChange,
     sorting,
   } = usePagination<EnrollmentTokenSummary>(
-    getEnrollmentTokens,
+    fetchTokens,
     handlePaginationError,
     /* Newest first: an operator comes here right after minting a token, so the
     one they are looking for is the one at the top. */
@@ -74,12 +85,14 @@ export const EnrollmentTokens = () => {
   );
 
   useEffect(() => {
-    getData();
+    /* A new term starts from the first page: the page the operator was on may
+    not exist in the filtered result. */
+    getData(0, pageSize);
     /* `getData` is rebuilt on every render -- it closes over the sort state and
     over this component's error handler -- so listing it here would refetch in a
-    loop. The first page is read once, on mount. */
+    loop. The listing is read on mount and whenever the term changes. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [searchTerm]);
 
   /* A purge or a revoke can empty the page the table is on, so the listing is
   read back from the first page rather than from the current one. */
@@ -121,6 +134,12 @@ export const EnrollmentTokens = () => {
       <EuiPageContentBody>
         <EnrollmentTokensTable
           tokens={tokens}
+          /* The manager's own free-text filter over the whole collection, so it
+          reaches tokens that are not on the page in hand. It is not restricted
+          to the description: the collection offers no per-field substring
+          filter. */
+          searchTerm={searchTerm}
+          onSearch={setSearchTerm}
           loading={loading}
           pageIndex={pageIndex}
           pageSize={pageSize}

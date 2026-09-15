@@ -21,19 +21,30 @@ import { EnrollmentTokenSummary } from './types';
  * Neither the token text nor its credential is part of the listing: a token
  * that was not kept when it was minted cannot be recovered from here.
  *
- * The signature matches what `usePagination` calls a fetch function with, so
- * the table drives the offset, the limit and the sort.
+ * The first three arguments are what `usePagination` calls a fetch function
+ * with, so the table drives the offset, the limit and the sort. `search` is
+ * bound by the caller.
+ *
+ * `search` is the API's own free-text filter: it keeps the tokens containing
+ * the string and is applied by the manager, so it filters the whole collection
+ * rather than the page in hand. It is not limited to one field -- an id or an
+ * address matches it as well as a description -- because the collection
+ * exposes no per-field substring filter: `q` compares whole values only, and
+ * its `~` operator answers 500 on this resource.
  */
 export const getEnrollmentTokens = async (
   offset = 0,
   limit = 10,
   sort?: string,
+  search?: string,
 ): Promise<{ tokens: EnrollmentTokenSummary[]; total: number }> => {
+  const searchTerm = search?.trim();
   const response = (await WzRequest.apiReq('GET', ENROLLMENT_TOKENS_ENDPOINT, {
     params: {
       offset,
       limit,
       ...(sort ? { sort } : {}),
+      ...(searchTerm ? { search: searchTerm } : {}),
     },
   })) as IApiResponse<EnrollmentTokenSummary>;
   const tokens = response?.data?.data?.affected_items ?? [];

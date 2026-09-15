@@ -307,7 +307,9 @@ const EnrollmentTokenInput = ({
           <EuiFlexItem grow={true} className='registerAgentFormColumn'>
             <EuiFormRow
               label='Without credential'
-              helpText='Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment.'
+              helpText={
+                'Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment. If you enable it, check that the Wazuh manager configuration has <use_password> set to "no".'
+              }
             >
               <EuiSwitch
                 label='Mint the token without a credential'

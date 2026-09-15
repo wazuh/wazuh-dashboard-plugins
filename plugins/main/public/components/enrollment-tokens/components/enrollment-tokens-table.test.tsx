@@ -54,6 +54,62 @@ jest.mock('@elastic/eui', () => ({
       {children}
     </div>
   ),
+  EuiButtonEmpty: ({
+    children,
+    onClick,
+    'aria-label': ariaLabel,
+  }: MockNode & { onClick: () => void; 'aria-label': string }) => (
+    <button aria-label={ariaLabel} onClick={onClick}>
+      {children}
+    </button>
+  ),
+  EuiIcon: () => <span data-test-subj='icon' />,
+  EuiFieldSearch: ({
+    defaultValue,
+    onSearch,
+    'aria-label': ariaLabel,
+    placeholder,
+  }: {
+    defaultValue?: string;
+    onSearch: (term: string) => void;
+    'aria-label': string;
+    placeholder?: string;
+  }) => (
+    <input
+      aria-label={ariaLabel}
+      placeholder={placeholder}
+      defaultValue={defaultValue}
+      onKeyDown={event =>
+        event.key === 'Enter' &&
+        onSearch((event.target as HTMLInputElement).value)
+      }
+    />
+  ),
+  EuiSpacer: () => <div />,
+  /* Stands in for the real checkbox group closely enough to assert on: one
+  checkbox per column, reporting its own checked state and reporting clicks
+  back by column id. */
+  EuiCheckboxGroup: ({
+    options,
+    onChange,
+  }: {
+    options: { id: string; label: string; checked: boolean }[];
+    onChange: (id: string) => void;
+  }) => (
+    <div data-test-subj='column-selector'>
+      {options.map(option => (
+        <label key={option.id}>
+          <input
+            type='checkbox'
+            aria-label={option.label}
+            checked={option.checked}
+            onChange={() => onChange(option.id)}
+          />
+          {option.label}
+        </label>
+      ))}
+    </div>
+  ),
 }));
 jest.mock('../../common/buttons', () => ({
   WzButtonPermissionsModalConfirm: ({
@@ -114,10 +170,13 @@ const TOKEN = {
 
 const renderTable = ({
   onRevoked = jest.fn(),
-}: { onRevoked?: () => void } = {}) =>
+  onSearch = jest.fn(),
+}: { onRevoked?: () => void; onSearch?: (term: string) => void } = {}) =>
   render(
     <EnrollmentTokensTable
       tokens={[TOKEN]}
+      searchTerm=''
+      onSearch={onSearch}
       loading={false}
       pageIndex={0}
       pageSize={10}
@@ -130,6 +189,122 @@ const renderTable = ({
 
 const columnNamed = (name: string) =>
   mockBasicTableProps.columns.find(column => column.name === name);
+
+const columnNames = () =>
+  mockBasicTableProps.columns.map(column => column.name);
+
+const openColumnSelector = () =>
+  fireEvent.click(screen.getByLabelText('Select visible columns'));
+
+const toggleColumn = (label: string) =>
+  fireEvent.click(screen.getByLabelText(label));
+
+describe('EnrollmentTokensTable toolbar', () => {
+  it('reports the term the operator submitted', () => {
+    const onSearch = jest.fn();
+    renderTable({ onSearch });
+
+    const box = screen.getByLabelText('Search enrollment tokens');
+    fireEvent.change(box, { target: { value: 'web tier' } });
+    fireEvent.keyDown(box, { key: 'Enter' });
+
+    expect(onSearch).toHaveBeenCalledWith('web tier');
+  });
+
+  it('keeps the search box and the column selector on one row', () => {
+    renderTable();
+    expect(
+      screen.getByLabelText('Search enrollment tokens'),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText('Select visible columns')).toBeInTheDocument();
+  });
+});
+
+describe('EnrollmentTokensTable columns', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
+  it('shows the everyday columns and keeps the occasional ones out of the way', () => {
+    renderTable();
+    expect(columnNames()).toEqual([
+      'Status',
+      'Created',
+      'Description',
+      'Uses',
+      'Expires',
+      'Actions',
+    ]);
+  });
+
+  it('keeps the selector shut until it is asked for', () => {
+    renderTable();
+    expect(screen.queryByLabelText('ID')).not.toBeInTheDocument();
+    openColumnSelector();
+    expect(screen.getByLabelText('ID')).toBeInTheDocument();
+  });
+
+  it.each(['ID', 'Address', 'Credential'])('adds %s on request', name => {
+    renderTable();
+    openColumnSelector();
+    toggleColumn(name);
+    expect(columnNames()).toContain(name);
+  });
+
+  /* Declaration order, not the order they were checked off: a column put back
+  belongs where the others expect to find it. */
+  it('puts a re-added column back in its place', () => {
+    renderTable();
+    openColumnSelector();
+    toggleColumn('ID');
+    expect(columnNames()).toEqual([
+      'Status',
+      'ID',
+      'Created',
+      'Description',
+      'Uses',
+      'Expires',
+      'Actions',
+    ]);
+  });
+
+  it('removes a column that is turned off', () => {
+    renderTable();
+    openColumnSelector();
+    toggleColumn('Description');
+    expect(columnNames()).not.toContain('Description');
+  });
+
+  /* A table with no columns has no way back, so the last one standing ignores
+  the click. */
+  it('refuses to turn off the last column', () => {
+    renderTable();
+    openColumnSelector();
+    for (const name of [
+      'Status',
+      'Created',
+      'Description',
+      'Uses',
+      'Expires',
+    ]) {
+      toggleColumn(name);
+    }
+    expect(columnNames()).toEqual(['Actions']);
+
+    toggleColumn('Actions');
+    expect(columnNames()).toEqual(['Actions']);
+  });
+
+  it('remembers the choice for the next visit', () => {
+    const first = renderTable();
+    openColumnSelector();
+    toggleColumn('Address');
+    first.unmount();
+
+    renderTable();
+    expect(columnNames()).toContain('Address');
+  });
+});
 
 describe('EnrollmentTokensTable', () => {
   beforeEach(() => {

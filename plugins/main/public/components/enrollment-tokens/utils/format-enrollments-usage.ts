@@ -12,11 +12,11 @@
 
 import { EnrollmentTokenSummary } from '../../../services/enrollment-tokens';
 
-/* A `max_uses` of 0 is the manager's way of saying unlimited, so it is
-spelled out rather than shown as a limit of zero. */
+/* A `max_uses` of 0 is the manager's way of saying unlimited, so it is spelled
+out rather than shown as a limit of zero -- and with no allowance to count
+against, the use count on its own says nothing about whether the token is
+running out, which is what this column is read for. */
 export const formatEnrollmentsUsage = (
   token: Pick<EnrollmentTokenSummary, 'uses' | 'max_uses'>,
 ): string =>
-  token.max_uses
-    ? `${token.uses ?? 0} / ${token.max_uses}`
-    : `${token.uses ?? 0}`;
+  token.max_uses ? `${token.uses ?? 0} / ${token.max_uses}` : 'Unlimited';

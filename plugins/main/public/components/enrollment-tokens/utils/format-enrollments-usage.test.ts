@@ -2,11 +2,13 @@
 import { formatEnrollmentsUsage } from './format-enrollments-usage';
 
 describe('formatEnrollmentsUsage', () => {
-  it('shows the bare count when the token allows unlimited enrollments', () => {
-    expect(formatEnrollmentsUsage({ uses: 900, max_uses: 0 })).toBe('900');
+  it('spells out an unlimited allowance', () => {
+    expect(formatEnrollmentsUsage({ uses: 900, max_uses: 0 })).toBe(
+      'Unlimited',
+    );
     expect(
       formatEnrollmentsUsage({ uses: undefined, max_uses: undefined }),
-    ).toBe('0');
+    ).toBe('Unlimited');
   });
 
   it('shows the count against the allowance when it is limited', () => {
