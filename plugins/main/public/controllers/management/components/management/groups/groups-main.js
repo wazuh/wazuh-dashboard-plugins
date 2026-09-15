@@ -31,7 +31,7 @@ import {
   withUserAuthorizationPrompt,
 } from '../../../../../components/common/hocs';
 import { endpointGroups } from '../../../../../utils/applications';
-import { MultipleAgentSelector } from '../../../../../components/management/groups/multiple-agent-selector';
+import { ManageAgents } from '../../../../../components/management/groups/manage-agents';
 import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzGroups extends Component {
@@ -97,7 +97,7 @@ class WzGroups extends Component {
           ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
             (fileContent && <WzGroupEditor />) || <WzGroupsOverview />)}
         {showAddAgents && itemDetail && (
-          <MultipleAgentSelector
+          <ManageAgents
             currentGroup={itemDetail}
             cancelButton={() => this.props.updateShowAddAgents(false)}
           />
