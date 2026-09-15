@@ -202,6 +202,7 @@
 | [#9108](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9108)                          | Fixed the PCI DSS compliance requirement descriptions being a stale mix of v3.2.1 and v4.0 wording by rewriting the whole dictionary against PCI DSS v4.0, adding the requirement codes the detection rules report, and dropping the ones v4.0 retired                                |
 | [#9112](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9112)                          | Fixed the IT Hygiene System > Hardware dashboard showing the Overview dashboard memory panel instead of its own                                                                                                                                                                       |
 | [#9130](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9130)                          | Fixed the agent Configuration view caching the reported configuration for the whole visit with no way to refresh it; added a Refresh control in agent context                                                                                                                         |
+| [wazuh-dashboard#1586](https://github.com/wazuh/wazuh-dashboard/issues/1586)                   | Fixed the `saved-objects:index-patterns` health check reporting a `TypeError` instead of the error that prevented the `wazuh-events-v5*` index pattern initialization, caused by passing the internal saved objects repository where a saved objects client was expected              |
 
 ## Prior versions
 

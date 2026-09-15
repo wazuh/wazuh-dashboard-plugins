@@ -234,6 +234,39 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
     );
   });
 
+  it('should pass a saved objects client exposing the error helpers to uiSettings', async () => {
+    const { runCtx, savedObjectsClient } = createRunContext(null);
+
+    savedObjectsClient.get.mockResolvedValue({
+      id: 'wazuh-events-*',
+      attributes: { title: 'wazuh-events-*', fields: '[]' },
+    });
+
+    const task = initializationTaskCreatorIndexPatternBatch({
+      taskName: 'index-patterns',
+      batchSize: 5,
+      indexPatterns: [
+        {
+          taskName: 'task-events',
+          indexPatternID: 'wazuh-events-*',
+          options: { checkDefaultIndexPattern: true },
+        },
+      ],
+    });
+
+    await task.run(runCtx);
+
+    // UiSettingsClient destructures `errors` from the client it receives, so a
+    // bare repository makes it throw a TypeError that masks the real failure.
+    const [clientGivenToUiSettings] =
+      runCtx.services.core.uiSettings.asScopedToClient.mock.calls[0];
+
+    expect(clientGivenToUiSettings.errors).toBeDefined();
+    expect(typeof clientGivenToUiSettings.errors.isForbiddenError).toBe(
+      'function',
+    );
+  });
+
   it('should NOT set defaultIndex when checkDefaultIndexPattern is true and default already exists', async () => {
     const { runCtx, savedObjectsClient, uiSettingsClient } =
       createRunContext('existing-id');
