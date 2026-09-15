@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { normalizeConfigBoolean } from '../../../../../../../common/services/configuration-value';
+
 /**
  * Capitalize a string
  * @param {string} str String to capitalize
@@ -23,24 +25,6 @@ export const capitalize = str => str[0].toUpperCase() + str.slice(1);
  * @returns {boolean}
  */
 export const isString = value => typeof value === 'string';
-
-/**
- * Normalize a manager configuration boolean field into a real boolean.
- * Accepts either the legacy 'yes'/'no' string dialect (agent reports, older
- * agent fields) or a native boolean (manager fields).
- * Anything else is not a boolean value at all and resolves to `undefined`,
- * so callers keep their existing wrong-type/missing-value fallback.
- * @param {*} value Value to normalize
- * @returns {boolean|undefined}
- */
-export const normalizeConfigBoolean = value =>
-  typeof value === 'boolean'
-    ? value
-    : value === 'yes'
-    ? true
-    : value === 'no'
-    ? false
-    : undefined;
 
 export const reportedEnabled = (value, enabledValue) => {
   if (value === undefined || value === null) {
