@@ -20,6 +20,7 @@ import { InputForm } from '../../../../common/form';
 import {
   getGroups,
   getMasterConfiguration,
+  resolveRegistrationPassword,
 } from '../../services/register-agent-services';
 import { useForm } from '../../../../common/form/hooks';
 import { FormConfiguration } from '../../../../common/form/types';
@@ -209,16 +210,11 @@ export const RegisterAgent = compose(
 
       // Handle master config
       if (masterConfigResult.status === 'fulfilled') {
-        const masterConfig = masterConfigResult.value;
-        const { auth: authConfig } = masterConfig;
-        // get wazuh password configuration
-        let wazuhPassword = '';
-        const needsPassword = authConfig?.auth?.use_password === 'yes';
-        if (needsPassword) {
-          wazuhPassword = authConfig?.['authd.pass'] || '';
-        }
+        const { needsPassword, password } = resolveRegistrationPassword(
+          masterConfigResult.value.auth,
+        );
         setNeedsPassword(needsPassword);
-        setWazuhPassword(wazuhPassword);
+        setWazuhPassword(password);
       }
 
       // Handle wazuh version

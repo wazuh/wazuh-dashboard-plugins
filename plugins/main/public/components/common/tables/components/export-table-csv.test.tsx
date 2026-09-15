@@ -40,4 +40,20 @@ describe('Export Table Csv component', () => {
     const wrapper = mount(<ExportTableCsv />);
     expect(wrapper).toMatchSnapshot();
   });
+
+  it('disables and shows a loading state on the button while isLoading is true, even when there are items to export', () => {
+    const wrapper = mount(<ExportTableCsv totalItems={10} isLoading />);
+    const button = wrapper.find('EuiButtonEmpty');
+
+    expect(button.prop('isDisabled')).toBe(true);
+    expect(button.prop('isLoading')).toBe(true);
+  });
+
+  it('enables the button when there are items to export and isLoading is false', () => {
+    const wrapper = mount(<ExportTableCsv totalItems={10} isLoading={false} />);
+    const button = wrapper.find('EuiButtonEmpty');
+
+    expect(button.prop('isDisabled')).toBe(false);
+    expect(button.prop('isLoading')).toBe(false);
+  });
 });

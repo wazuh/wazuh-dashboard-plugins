@@ -241,7 +241,12 @@ export function TableWzAPI({
 
   const ReloadButton = (
     <EuiFlexItem grow={false}>
-      <EuiButtonEmpty iconType='refresh' onClick={() => triggerReload()}>
+      <EuiButtonEmpty
+        iconType='refresh'
+        onClick={() => triggerReload()}
+        isLoading={isLoading}
+        isDisabled={isLoading}
+      >
         Refresh
       </EuiButtonEmpty>
     </EuiFlexItem>
@@ -295,6 +300,7 @@ export function TableWzAPI({
                       : rest.title
                   }
                   maxRows={maxRows}
+                  isLoading={isLoading}
                 />
               </>
             )}
