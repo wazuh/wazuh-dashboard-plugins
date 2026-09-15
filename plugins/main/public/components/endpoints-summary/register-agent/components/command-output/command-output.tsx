@@ -64,7 +64,12 @@ export default function CommandOutput(props: ICommandSectionProps) {
     <Fragment>
       <EuiSpacer />
       <EuiText>
-        <div className='copy-codeblock-wrapper'>
+        <div
+          className='copy-codeblock-wrapper'
+          style={{
+            wordBreak: 'break-word',
+          }}
+        >
           <EuiCodeBlock
             style={{
               zIndex: '100',
