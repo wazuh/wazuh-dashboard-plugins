@@ -36,11 +36,9 @@ import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { getChrome, getCore } from '../../../kibana-services';
-import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withGlobalBreadcrumb, withGuard } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { PromptAgentNeverConnected } from '../../agents/prompts';
 import { WzButton } from '../buttons';
 import {
@@ -61,6 +59,7 @@ import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { InventoryMetrics } from '../../agents/syscollector/components';
 import { Typography } from '../typography/typography';
+import { getAgentPinnedApplications } from './utils/pinned-applications';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -203,40 +202,28 @@ export const AgentsWelcome = compose(
     renderModules() {
       return (
         <Fragment>
-          {this.state.menuAgent.map((applicationId, i) => {
-            const moduleID = Object.keys(WAZUH_MODULES).find(
-              key => WAZUH_MODULES[key]?.appId === applicationId,
-            ).appId;
-            if (
-              i < this.state.maxModules &&
-              hasAgentSupportModule(this.props.agent, moduleID)
-            ) {
-              return (
-                <EuiFlexItem
-                  key={i}
-                  grow={false}
-                  style={{ marginLeft: 0, marginTop: 7 }}
+          {getAgentPinnedApplications(
+            this.state.menuAgent,
+            this.props.agent,
+            this.state.maxModules,
+          ).map(application => (
+            <EuiFlexItem
+              key={application.id}
+              grow={false}
+              style={{ marginLeft: 0, marginTop: 7 }}
+            >
+              <RedirectAppLinks application={getCore().application}>
+                <EuiButtonEmpty
+                  href={NavigationService.getInstance().getAppURL(
+                    application.id,
+                  )}
+                  style={{ cursor: 'pointer' }}
                 >
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiButtonEmpty
-                      href={NavigationService.getInstance().getAppURL(
-                        applicationId,
-                      )}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <span>
-                        {
-                          Applications.find(({ id }) => id === applicationId)
-                            .title
-                        }
-                        &nbsp;
-                      </span>
-                    </EuiButtonEmpty>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-              );
-            }
-          })}
+                  <span>{application.title}&nbsp;</span>
+                </EuiButtonEmpty>
+              </RedirectAppLinks>
+            </EuiFlexItem>
+          ))}
           <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
             <EuiPopover
               button={
