@@ -21,6 +21,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { WzFlyout } from '../../common/flyouts';
+import './enrollment-token-details-flyout.scss';
 import { formatUIDate } from '../../../react-services/time-service';
 import { EnrollmentTokenSummary } from '../../../services/enrollment-tokens';
 import {
@@ -62,9 +63,9 @@ export const EnrollmentTokenDetailsFlyout = ({
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
         {/* Stacked rather than in two columns: an id, an address or a
-        description is free-form text with no spaces to break on, and a label
-        column beside it leaves too little room to read one. Each value gets the
-        width of the flyout instead, under its own label. */}
+        description is free-form text, and a label column beside it leaves too
+        little room to read one. Each value gets the width of the flyout
+        instead, under its own label. */}
         <EuiDescriptionList
           compressed
           type='row'
@@ -86,9 +87,14 @@ export const EnrollmentTokenDetailsFlyout = ({
               ),
             },
             {
+              /* Prose, not an opaque identifier: it is shown whole, wrapped
+              over as many lines as it takes, rather than cut to one line with
+              the rest behind a tooltip. */
               title: 'Description',
               description: token.description ? (
-                <TruncatedValueTooltip value={token.description} />
+                <span className='wz-enrollment-token-description'>
+                  {token.description}
+                </span>
               ) : (
                 '-'
               ),

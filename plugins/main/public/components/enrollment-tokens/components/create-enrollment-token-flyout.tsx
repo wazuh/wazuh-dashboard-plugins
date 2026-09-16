@@ -30,7 +30,11 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { WzFlyout } from '../../common/flyouts';
+import {
+  UnsavedChangesGuardedFlyout,
+  useReportUnsavedChanges,
+  useUnsavedChangesGuard,
+} from '../../common/unsaved-changes-guard';
 import { InputForm } from '../../common/form';
 import { useForm } from '../../common/form/hooks';
 import { FormConfiguration } from '../../common/form/types';
@@ -50,18 +54,26 @@ interface CreateEnrollmentTokenFlyoutProps {
   onClose: (minted: boolean) => void;
 }
 
-export const CreateEnrollmentTokenFlyout = ({
+interface CreateEnrollmentTokenFlyoutContentProps {
+  mintedToken: MintedEnrollmentToken | null;
+  onMinted: (token: MintedEnrollmentToken) => void;
+  onClose: () => void;
+}
+
+/* The header, the body and the footer live below the guarded flyout because
+only a descendant can report unsaved changes to it and guard its own close
+actions against them. */
+const CreateEnrollmentTokenFlyoutContent = ({
+  mintedToken,
+  onMinted,
   onClose,
-}: CreateEnrollmentTokenFlyoutProps) => {
+}: CreateEnrollmentTokenFlyoutContentProps) => {
   const configuration = useSelector(
     (state: { appConfig: { data?: Record<string, string> } }) =>
       state.appConfig.data ?? {},
   );
   const [isMinting, setIsMinting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [mintedToken, setMintedToken] = useState<MintedEnrollmentToken | null>(
-    null,
-  );
   /* Not part of the validated form state: plain booleans with no validation of
   their own. */
   const [embedCa, setEmbedCa] = useState(false);
@@ -99,7 +111,19 @@ export const CreateEnrollmentTokenFlyout = ({
     },
   };
 
-  const { fields, errors } = useForm(initialFields);
+  const { fields, errors, changed } = useForm(initialFields);
+  const { guardAction } = useUnsavedChangesGuard();
+
+  /* A field moved away from the value it was offered with, or either switch
+  turned on, is work that closing the flyout would throw away. Once the token
+  is minted the form is gone and there is nothing left to lose, so the
+  confirmation stops getting in the way of the one screen the user has to close
+  to carry on. */
+  const hasUnsavedChanges =
+    !mintedToken &&
+    (Object.keys(changed).length > 0 || embedCa || noCredential);
+
+  useReportUnsavedChanges(hasUnsavedChanges);
 
   const addressIsMissing =
     String(fields.address?.value ?? '').trim().length === 0;
@@ -120,7 +144,7 @@ export const CreateEnrollmentTokenFlyout = ({
         noCredential,
       });
 
-      setMintedToken(token);
+      onMinted(token);
     } catch (requestError) {
       /* Whatever the manager answered is shown as it wrote it. It is the
       manager that checks the address against the names in its listener
@@ -135,13 +159,7 @@ export const CreateEnrollmentTokenFlyout = ({
   };
 
   return (
-    <WzFlyout
-      onClose={() => onClose(Boolean(mintedToken))}
-      flyoutProps={{
-        size: 'm',
-        'aria-labelledby': 'createEnrollmentTokenFlyoutTitle',
-      }}
-    >
+    <>
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size='m'>
           <h2 id='createEnrollmentTokenFlyoutTitle'>
@@ -166,9 +184,12 @@ export const CreateEnrollmentTokenFlyout = ({
               </p>
             </EuiCallOut>
             <EuiSpacer size='m' />
+            {/* Stacked, the same way the details flyout reads: the label sits
+            above its value so a token, an id or an address gets the width of
+            the flyout rather than what is left beside a label column. */}
             <EuiDescriptionList
               compressed
-              type='column'
+              type='row'
               listItems={[
                 {
                   title: 'Token',
@@ -307,7 +328,7 @@ export const CreateEnrollmentTokenFlyout = ({
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
               iconType='cross'
-              onClick={() => onClose(Boolean(mintedToken))}
+              onClick={() => guardAction(onClose)}
               flush='left'
             >
               {mintedToken ? 'Close' : 'Cancel'}
@@ -327,6 +348,34 @@ export const CreateEnrollmentTokenFlyout = ({
           )}
         </EuiFlexGroup>
       </EuiFlyoutFooter>
-    </WzFlyout>
+    </>
+  );
+};
+
+export const CreateEnrollmentTokenFlyout = ({
+  onClose,
+}: CreateEnrollmentTokenFlyoutProps) => {
+  /* Held above the guarded flyout so every way out of it -- the header X, the
+  footer button and the confirmation dialog -- reports whether a token was
+  minted without the content having to hand it back up. */
+  const [mintedToken, setMintedToken] = useState<MintedEnrollmentToken | null>(
+    null,
+  );
+  const close = () => onClose(Boolean(mintedToken));
+
+  return (
+    <UnsavedChangesGuardedFlyout
+      onClose={close}
+      size='m'
+      aria-labelledby='createEnrollmentTokenFlyoutTitle'
+      maskProps={{ onClick: () => {} }}
+      outsideClickCloses={true}
+    >
+      <CreateEnrollmentTokenFlyoutContent
+        mintedToken={mintedToken}
+        onMinted={setMintedToken}
+        onClose={close}
+      />
+    </UnsavedChangesGuardedFlyout>
   );
 };
