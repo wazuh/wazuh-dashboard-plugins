@@ -29,12 +29,18 @@ interface, for example in end-to-end testing scenarios.
    lifetime and unlimited enrollments -- and answers with its identifier and
    expiry.
 
-   **View advanced options** opens the rest of the step: **Use existing token**,
-   to deploy with a token kept from an earlier deployment instead of minting a
-   new one, and **Lifetime**, **Enrollments allowed** and **Description**, which
-   parameterize the mint request. The two paths exclude each other, so filling
-   **Use existing token** disables the other three, and using any of them
-   disables **Use existing token**.
+   The step offers the two ways of obtaining a token as tabs, since they
+   exclude each other and only the open one is in effect. **Generate a new
+   token** is the tab the step opens on; **Use an existing token** takes a token
+   kept from an earlier deployment instead of minting a new one. On the
+   generate tab, **View advanced options** opens **Lifetime**, **Enrollments
+   allowed** and **Description**, which parameterize the mint request, together
+   with the **Embed CA** and **Without credential** flags.
+
+   What was entered on a tab is kept when the other one is opened, so the work
+   is not lost by looking at the alternative. The token in hand always belongs
+   to the open tab: one obtained on the tab that is closed is set aside, and it
+   is restored when that tab is opened again.
 
 6. **Optional configuration** (when required):
    - **Verify the manager certificate**: leave it enabled unless the endpoint
@@ -105,8 +111,8 @@ none of the three reaches the agent. The token is returned by that response only
 and is never listed again, so the deployment command has to be copied before
 leaving the page.
 
-An operator who kept a token from an earlier deployment can reuse it through
-**Use existing token** instead of minting a new one. Only the token text is
+An operator who kept a token from an earlier deployment can reuse it on the
+**Use an existing token** tab instead of minting a new one. Only the token text is
 known in that case -- the manager returns the metadata once, at mint time -- so
 the wizard shows neither the address it names nor its expiry, and it is the
 manager that refuses an expired or exhausted token at enrollment time. The field
@@ -120,8 +126,9 @@ it, so with a token in hand the wizard emits neither
 `WAZUH_MANAGER_ENDPOINT` nor `WAZUH_REGISTRATION_PASSWORD` beside
 `WAZUH_ENROLLMENT_TOKEN`. Editing the server address after generating a token
 discards it, since the address the agent would reach comes from the token. A
-token supplied through **Use existing token** is left alone, because it was not
-minted from those fields and they say nothing about the manager it names.
+token supplied on the **Use an existing token** tab is left alone, because it
+was not minted from those fields and they say nothing about the manager it
+names.
 
 How the endpoint verifies the manager is not one of those values, and the token
 settles nothing about it. The **Optional settings** step keeps deciding it,
@@ -139,6 +146,10 @@ Minting requires the `enrollment_token:create` permission. Where it is missing -
 including against a server whose RBAC policy predates the action -- the wizard
 falls back to the enrollment password, and the **Enrollment token** step is not
 shown.
+
+The tokens the server has minted are listed, revoked and purged in the
+[Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from
+**Manage the minted tokens** in this step.
 
 ## Manager certificate verification
 

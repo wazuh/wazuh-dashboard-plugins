@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import EnrollmentTokenInput from './enrollment-token';
@@ -33,6 +33,13 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 
 const createToken = createEnrollmentToken as jest.Mock;
 
+const MINTED = {
+  token: 'abc',
+  id: 'id-1',
+  address: 'manager.example.com',
+  expires: '2026-10-09T05:12:40+00:00',
+};
+
 const defaultFormFieldData: EnhancedFieldConfiguration = {
   changed: true,
   value: '',
@@ -55,6 +62,13 @@ const field = (
   error,
 });
 
+/* A field whose `onChange` can be asserted on, for the tests about what a tab
+change does to the values left behind on the tab being closed. */
+const watchedField = (value = '', error: string | null = null) => ({
+  ...field(value, error),
+  onChange: jest.fn(),
+});
+
 const buildFormFields = (
   overrides: Partial<UseFormReturn['fields']> = {},
 ): UseFormReturn['fields'] => ({
@@ -73,9 +87,40 @@ text query would match the paragraph as well as the link. */
 const advancedOptionsToggle = () =>
   screen.getByRole('button', { name: /advanced options/ });
 
-/* The inputs live behind the advanced options link, so a test that is about
-one of them has to open the section first. `collapsed` keeps it shut for the
-tests that are about the folded state itself. */
+const generateTab = () =>
+  screen.getByRole('tab', { name: 'Generate a new token' });
+const existingTab = () =>
+  screen.getByRole('tab', { name: 'Use an existing token' });
+
+/* The step hands its token up to the wizard, which hands it back as a prop and
+decides from it what the deployment commands are built with. Holding that state
+here rather than passing a bare mock is what makes a tab change observable: the
+token committed on the tab being left has to come back as `null`. */
+const Harness = ({
+  formFields,
+  initialToken,
+  onTokenChange,
+}: {
+  formFields: UseFormReturn['fields'];
+  initialToken: EnrollmentToken | null;
+  onTokenChange: (token: EnrollmentToken | null) => void;
+}) => {
+  const [token, setToken] = useState<EnrollmentToken | null>(initialToken);
+  return (
+    <EnrollmentTokenInput
+      formFields={formFields}
+      enrollmentToken={token}
+      onEnrollmentTokenChange={next => {
+        setToken(next);
+        onTokenChange(next);
+      }}
+    />
+  );
+};
+
+/* The mint inputs live behind the advanced options link, so a test that is
+about one of them has to open the section first. `collapsed` keeps it shut for
+the tests that are about the folded state itself. */
 interface RenderOptions {
   formFields?: Partial<UseFormReturn['fields']>;
   enrollmentToken?: EnrollmentToken | null;
@@ -85,10 +130,10 @@ interface RenderOptions {
 const renderInput = (props: RenderOptions = {}) => {
   const onEnrollmentTokenChange = jest.fn();
   const utils = render(
-    <EnrollmentTokenInput
+    <Harness
       formFields={buildFormFields(props.formFields)}
-      enrollmentToken={props.enrollmentToken ?? null}
-      onEnrollmentTokenChange={onEnrollmentTokenChange}
+      initialToken={props.enrollmentToken ?? null}
+      onTokenChange={onEnrollmentTokenChange}
     />,
   );
   if (!props.collapsed && screen.queryByText('View advanced options')) {
@@ -122,12 +167,135 @@ beforeEach(() => {
   createToken.mockReset();
 });
 
-describe('EnrollmentTokenInput advanced options', () => {
-  it('keeps every input folded away until the operator asks for them', () => {
-    renderInput({ collapsed: true });
+/* A token is either minted here or reused from an earlier deployment. Reading
+one tab at a time is what keeps the step short, and it replaces the pair of
+inputs that used to sit on screen together with whichever one was not in use
+disabled. */
+describe('EnrollmentTokenInput token source tabs', () => {
+  it('opens on the generate tab, with the reuse field off screen', () => {
+    renderInput();
+    expect(generateTab()).toHaveAttribute('aria-selected', 'true');
+    expect(lifetimeInput()).toBeInTheDocument();
     expect(
       screen.queryByPlaceholderText('Paste a stored enrollment token'),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows only the reuse field on the other tab', () => {
+    renderInput();
+    fireEvent.click(existingTab());
+
+    expect(existingTokenInput()).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('30d')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Unlimited')).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText('What this token is for'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Carry the CA certificate in the token'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Generate/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  /* A token already in the field is in effect, so it must not sit behind a tab
+  the operator has no reason to open. */
+  it('opens on the reuse tab when a token is already in the field', () => {
+    renderInput({
+      formFields: { existingEnrollmentToken: field('eyJ2ZXIiOjEs') },
+    });
+    expect(existingTab()).toHaveAttribute('aria-selected', 'true');
+    expect(existingTokenInput()).toBeInTheDocument();
+  });
+
+  /* An error that cannot be seen cannot be corrected. */
+  it('opens on the reuse tab when that field is in error', () => {
+    renderInput({
+      formFields: {
+        existingEnrollmentToken: field(
+          "ey'JzZXIi",
+          'The character "\'" is not valid in an enrollment token.',
+        ),
+      },
+    });
+    expect(existingTab()).toHaveAttribute('aria-selected', 'true');
+  });
+
+  it('keeps what was typed on the tab being left', () => {
+    const existing = watchedField('eyJ2ZXIiOjEs');
+    renderInput({ formFields: { existingEnrollmentToken: existing } });
+
+    fireEvent.click(generateTab());
+    expect(existing.onChange).not.toHaveBeenCalled();
+  });
+
+  /* The wizard withholds the deployment commands while any field is in error
+  and names the field in a banner, so an error left on an input that is no
+  longer rendered would block the wizard from somewhere nobody can reach. */
+  it('clears a value that does not validate on the way out', () => {
+    const existing = watchedField(
+      "ey'JzZXIi",
+      'The character "\'" is not valid in an enrollment token.',
+    );
+    renderInput({ formFields: { existingEnrollmentToken: existing } });
+
+    fireEvent.click(generateTab());
+    expect(existing.onChange).toHaveBeenCalledWith({ target: { value: '' } });
+  });
+
+  it('clears a mint field that does not validate on the way out', () => {
+    const ttl = watchedField('banana', 'Use a number of seconds, or 30d.');
+    const description = watchedField('Laptops');
+    renderInput({
+      formFields: {
+        enrollmentTokenTtl: ttl,
+        enrollmentTokenDescription: description,
+      },
+    });
+
+    fireEvent.click(existingTab());
+    expect(ttl.onChange).toHaveBeenCalledWith({ target: { value: '' } });
+    /* Only the broken one: the rest of the tab is work worth coming back to. */
+    expect(description.onChange).not.toHaveBeenCalled();
+  });
+
+  /* The open tab owns the token the deployment command is built from. */
+  it('drops the token committed on the tab being left', () => {
+    const { onEnrollmentTokenChange } = renderInput({
+      enrollmentToken: { source: 'generated', ...MINTED },
+    });
+    onEnrollmentTokenChange.mockClear();
+
+    fireEvent.click(existingTab());
+    expect(onEnrollmentTokenChange).toHaveBeenCalledWith(null);
+  });
+
+  /* The server returns the token text once, so coming back to the tab must not
+  cost the operator a second mint. */
+  it('puts the token it minted back when the tab comes back', async () => {
+    createToken.mockResolvedValue(MINTED);
+    const { onEnrollmentTokenChange } = renderInput();
+
+    fireEvent.click(generateButton());
+    await waitFor(() =>
+      expect(screen.getByText(/Token successfully generated/)).toBeVisible(),
+    );
+
+    fireEvent.click(existingTab());
+    expect(onEnrollmentTokenChange).toHaveBeenLastCalledWith(null);
+
+    fireEvent.click(generateTab());
+    expect(onEnrollmentTokenChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ source: 'generated', token: 'abc' }),
+    );
+    expect(screen.getByText(/Token successfully generated/)).toBeVisible();
+  });
+});
+
+describe('EnrollmentTokenInput advanced options', () => {
+  it('keeps the mint inputs folded away until the operator asks for them', () => {
+    renderInput({ collapsed: true });
     expect(screen.queryByPlaceholderText('30d')).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText('Unlimited')).not.toBeInTheDocument();
     expect(
@@ -140,7 +308,6 @@ describe('EnrollmentTokenInput advanced options', () => {
   it('reveals them when the link is clicked', () => {
     renderInput({ collapsed: true });
     fireEvent.click(advancedOptionsToggle());
-    expect(existingTokenInput()).toBeInTheDocument();
     expect(lifetimeInput()).toBeInTheDocument();
     expect(enrollmentsInput()).toBeInTheDocument();
     expect(descriptionInput()).toBeInTheDocument();
@@ -162,13 +329,10 @@ describe('EnrollmentTokenInput advanced options', () => {
     renderInput({
       collapsed: true,
       formFields: {
-        existingEnrollmentToken: field(
-          '',
-          'The token must not contain spaces or line breaks.',
-        ),
+        enrollmentTokenTtl: field('banana', 'Use a number of seconds, or 30d.'),
       },
     });
-    expect(existingTokenInput()).toBeInTheDocument();
+    expect(lifetimeInput()).toBeInTheDocument();
   });
 });
 
@@ -190,12 +354,7 @@ describe('EnrollmentTokenInput token flags', () => {
   });
 
   it('mints with both flags off when neither switch was touched', async () => {
-    createToken.mockResolvedValue({
-      token: 'abc',
-      id: 'id-1',
-      address: 'manager.example.com',
-      expires: '2026-10-09T05:12:40+00:00',
-    });
+    createToken.mockResolvedValue(MINTED);
     renderInput();
 
     fireEvent.click(generateButton());
@@ -210,12 +369,7 @@ describe('EnrollmentTokenInput token flags', () => {
     ['Carry the CA certificate in the token', 'embedCa'],
     ['Mint the token without a credential', 'noCredential'],
   ])('sends %s with the mint request', async (label, flag) => {
-    createToken.mockResolvedValue({
-      token: 'abc',
-      id: 'id-1',
-      address: 'manager.example.com',
-      expires: '2026-10-09T05:12:40+00:00',
-    });
+    createToken.mockResolvedValue(MINTED);
     renderInput();
 
     fireEvent.click(switchFor(label));
@@ -226,22 +380,6 @@ describe('EnrollmentTokenInput token flags', () => {
     expect(createToken).toHaveBeenCalledWith(
       expect.objectContaining({ [flag]: true }),
     );
-  });
-
-  /* They parameterize a mint request like the fields beside them, so they take
-  the same side of the either/or as the rest of the generate path. */
-  it('claims the mint path, disabling the reuse field', () => {
-    renderInput();
-    fireEvent.click(embedCaSwitch());
-    expect(existingTokenInput()).toBeDisabled();
-  });
-
-  it('is disabled while a stored token is being reused', () => {
-    renderInput({
-      formFields: { existingEnrollmentToken: field('eyJ2ZXIiOjEs') },
-    });
-    expect(embedCaSwitch()).toBeDisabled();
-    expect(noCredentialSwitch()).toBeDisabled();
   });
 });
 
@@ -261,57 +399,6 @@ describe('EnrollmentTokenInput', () => {
     expect(link).toHaveAttribute('rel', expect.stringContaining('noreferrer'));
   });
 
-  it('offers both paths when nothing has been filled in', () => {
-    renderInput();
-    expect(existingTokenInput()).toBeEnabled();
-    expect(lifetimeInput()).toBeEnabled();
-    expect(enrollmentsInput()).toBeEnabled();
-    expect(descriptionInput()).toBeEnabled();
-  });
-
-  /* The two paths exclude each other: a token is either reused or minted, and
-  the mint request is not made at all once a stored token is in the field. */
-  it('disables the mint fields while a stored token is being reused', () => {
-    renderInput({
-      formFields: { existingEnrollmentToken: field('eyJ2ZXIiOjEs') },
-    });
-    expect(lifetimeInput()).toBeDisabled();
-    expect(enrollmentsInput()).toBeDisabled();
-    expect(descriptionInput()).toBeDisabled();
-    expect(generateButton()).toBeDisabled();
-  });
-
-  it.each([
-    ['enrollmentTokenTtl', '12h'],
-    ['enrollmentTokenMaxUses', '50'],
-    ['enrollmentTokenDescription', 'Laptops'],
-  ])('disables the reuse field once %s is filled', (name, value) => {
-    renderInput({
-      formFields: {
-        [name]: {
-          ...field(value),
-          type: name.includes('MaxUses') ? 'number' : 'text',
-        },
-      },
-    });
-    expect(existingTokenInput()).toBeDisabled();
-  });
-
-  /* Deciding exclusivity on the minted token as well would leave an operator
-  who generated one with no way back to the reuse field. */
-  it('keeps the reuse field open after a token was generated', () => {
-    renderInput({
-      enrollmentToken: {
-        source: 'generated',
-        token: 'abc',
-        id: 'i',
-        address: 'a',
-        expires: 'e',
-      },
-    });
-    expect(existingTokenInput()).toBeEnabled();
-  });
-
   /* The token authenticates the enrollment: it is handed over through the
   clipboard, never rendered where it can be read off the screen. */
   it('hands the generated token over through the clipboard without showing it', () => {
@@ -320,10 +407,8 @@ describe('EnrollmentTokenInput', () => {
     renderInput({
       enrollmentToken: {
         source: 'generated',
+        ...MINTED,
         token: 'eyJ2ZXIiOjEs',
-        id: 'i',
-        address: 'a',
-        expires: 'e',
       },
     });
     expect(screen.queryByText(/eyJ2ZXIiOjEs/)).not.toBeInTheDocument();
@@ -361,12 +446,7 @@ describe('EnrollmentTokenInput', () => {
   });
 
   it('sends the description with the mint request', async () => {
-    createToken.mockResolvedValue({
-      token: 'abc',
-      id: 'id-1',
-      address: 'manager.example.com',
-      expires: '2026-10-09T05:12:40+00:00',
-    });
+    createToken.mockResolvedValue(MINTED);
     const { onEnrollmentTokenChange } = renderInput({
       formFields: {
         enrollmentTokenTtl: field('12h'),
