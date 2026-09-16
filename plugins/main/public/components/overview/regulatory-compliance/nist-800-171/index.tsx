@@ -19,5 +19,5 @@ export const RegulatoryComplianceNIST800171 = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

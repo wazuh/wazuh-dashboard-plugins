@@ -1,31 +1,11 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { ModuleSubTabs } from '../../../common/tabs';
-import NavigationService from '../../../../react-services/navigation-service';
-import { useRouterSearch } from '../../../common/hooks';
+import { TabsManagedBySearchParamProps } from '../../../navigation/tabs-managed-by-search-params';
 
 interface ComplianceModuleProps {
-  moduleId: string;
-  tabs: any[];
+  tabs: TabsManagedBySearchParamProps['tabs'];
 }
 
-export const ComplianceModule = ({ moduleId, tabs }: ComplianceModuleProps) => {
-  const search = useRouterSearch();
-
-  useEffect(() => {
-    if (search.tabSubView) {
-      const isTabValid = tabs.some(t => t.id === search.tabSubView);
-
-      if (!isTabValid) {
-        const navigationService = NavigationService.getInstance();
-        const newSearch = { ...search, tabSubView: tabs[0].id };
-        const searchParams = new URLSearchParams(newSearch).toString();
-
-        navigationService.navigate(
-          `${navigationService.getPathname()}?${searchParams}`,
-        );
-      }
-    }
-  }, [moduleId]);
-
+export const ComplianceModule = ({ tabs }: ComplianceModuleProps) => {
   return <ModuleSubTabs tabs={tabs} />;
 };
