@@ -105,6 +105,14 @@ Always use the provided script to bring up or down the development environment. 
 - --server <version>: (Optional) Deploys an environment with a real Wazuh server using the given release version (e.g., 4.7.2) for WAZUH_STACK.
 - --server-local <tag>: (Optional) Deploys an environment with a local Wazuh server package using the given image tag (e.g., my-custom-image) for IMAGE_TAG.
   - Important for `server-local`: Place the Wazuh manager installation packages (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/manager/` and any Wazuh agent packages (`.rpm`/`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/agents/`.
+  - Agents in this mode enroll with an **enrollment token**, not a static
+    password: at startup each agent container mints its own token from the
+    manager's Server API (`POST /agents/enrollment-tokens`), authenticating
+    with `API_USERNAME`/`API_PASSWORD` (defaulting to the manager package's
+    built-in `wazuh-wui` superuser), then installs the package with
+    `WAZUH_ENROLLMENT_TOKEN`. Override the credentials with
+    `API_USERNAME=... API_PASSWORD=... ./dev.sh up ...` if you changed the
+    manager's default RBAC users.
   - If neither `--server` nor `--server-local` is specified, a standard development environment is deployed (profile standard).
 - --indexer-local [tag]: (Optional) Deploys an environment with a local Wazuh indexer package using the given image tag (e.g., my-custom-image) for IMAGE_INDEXER_PACKAGE_TAG.
   - Important: Place the Wazuh indexer installation package (`.deb`) in `wazuh-dashboard-plugins/docker/osd-dev/indexer/`.

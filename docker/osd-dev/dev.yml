@@ -390,7 +390,6 @@ services:
       - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
-      - WAZUH_REGISTRATION_PASSWORD=WazuhRegistrationDev123
     volumes:
       - wm_certs:/etc/server_certs
     ports:
@@ -411,7 +410,8 @@ services:
       - os-dev
       - mon
     environment:
-      - WAZUH_REGISTRATION_PASSWORD=${WAZUH_REGISTRATION_PASSWORD:-WazuhRegistrationDev123}
+      - API_USERNAME=${API_USERNAME:-wazuh-wui}
+      - API_PASSWORD=${API_PASSWORD:-wazuh-wui}
     volumes:
       - ./agents:/packages-agents
       # The manager's root CA, so the agent can verify the manager certificate
@@ -423,8 +423,10 @@ services:
         # Update and install dependencies. ca-certificates is required: the
         # agent verifies the manager certificate by default, and without an OS
         # trust store it refuses to start with "no OS CA bundle was found".
+        # curl/jq are required to mint the enrollment token from the manager's
+        # Server API below.
         apt update -y
-        apt install -y lsb-release adduser ca-certificates
+        apt install -y lsb-release adduser ca-certificates curl jq
 
         # The manager generates its certificates on startup, so wait for the
         # root CA to appear in the shared volume before installing. Give up
@@ -449,14 +451,42 @@ services:
         cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
         chmod 644 /etc/wazuh-manager-root-ca.pem
 
-        # Install Wazuh agent (registration password only if defined).
-        # WAZUH_REGISTRATION_CA pins the manager's root CA: the agent then
-        # verifies the certificate chain instead of trusting any certificate.
-        if [ -n "$$WAZUH_REGISTRATION_PASSWORD" ]; then
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" dpkg -i /packages-agents/wazuh-agent*.deb
-        else
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' dpkg -i /packages-agents/wazuh-agent*.deb
+        # The manager's Server API only starts once entrypoint.sh reaches
+        # "wazuh-manager-control start", which happens after the CA above is
+        # already written, so it needs its own wait. -k skips TLS
+        # verification for this call only, matching the indexer healthcheck
+        # convention already used in this file.
+        api_wait=0
+        until curl -sk -o /dev/null "https://wazuh.manager.local:55000/security/user/authenticate"; do
+          if [ "$$api_wait" -ge 120 ]; then
+            echo "ERROR: the manager Server API did not become reachable after $${api_wait}s."
+            exit 1
+          fi
+          echo "Waiting for the manager Server API..."
+          sleep 2
+          api_wait=$$((api_wait + 2))
+        done
+
+        # Mint a short-lived enrollment token from the manager's Server API,
+        # the same flow the "Deploy new agent" wizard uses, instead of a
+        # static registration password.
+        AUTH_TOKEN=$$(curl -sk -u "$$API_USERNAME:$$API_PASSWORD" -X POST "https://wazuh.manager.local:55000/security/user/authenticate" | jq -r '.data.token')
+        if [ -z "$$AUTH_TOKEN" ] || [ "$$AUTH_TOKEN" = "null" ]; then
+          echo "ERROR: could not authenticate against the manager Server API to mint an enrollment token."
+          exit 1
         fi
+
+        ENROLLMENT_TOKEN=$$(curl -sk -X POST "https://wazuh.manager.local:55000/agents/enrollment-tokens" -H "Authorization: Bearer $$AUTH_TOKEN" -H 'content-type: application/json' -d '{"address":"wazuh.manager.local"}' | jq -r '.data.token')
+        if [ -z "$$ENROLLMENT_TOKEN" ] || [ "$$ENROLLMENT_TOKEN" = "null" ]; then
+          echo "ERROR: the manager did not return an enrollment token."
+          exit 1
+        fi
+
+        # Install Wazuh agent. WAZUH_REGISTRATION_CA pins the manager's root
+        # CA: the agent then verifies the certificate chain instead of
+        # trusting any certificate. The token names the manager itself, so
+        # WAZUH_MANAGER is not set alongside it.
+        WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_ENROLLMENT_TOKEN="$$ENROLLMENT_TOKEN" dpkg -i /packages-agents/wazuh-agent*.deb
 
         # Start Wazuh agent
         /etc/init.d/wazuh-agent start
@@ -472,7 +502,8 @@ services:
       - os-dev
       - mon
     environment:
-      - WAZUH_REGISTRATION_PASSWORD=${WAZUH_REGISTRATION_PASSWORD:-WazuhRegistrationDev123}
+      - API_USERNAME=${API_USERNAME:-wazuh-wui}
+      - API_PASSWORD=${API_PASSWORD:-wazuh-wui}
     volumes:
       - ./agents:/packages-agents
       # The manager's root CA, so the agent can verify the manager certificate
@@ -487,6 +518,10 @@ services:
         yum clean all
         yum makecache
         yum upgrade -y
+
+        # curl/jq are required to mint the enrollment token from the
+        # manager's Server API below.
+        yum install -y curl jq
 
         # The manager generates its certificates on startup, so wait for the
         # root CA to appear in the shared volume before installing. Give up
@@ -511,14 +546,42 @@ services:
         cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
         chmod 644 /etc/wazuh-manager-root-ca.pem
 
-        # Install wazuh-agent (registration password only if defined).
-        # WAZUH_REGISTRATION_CA pins the manager's root CA: the agent then
-        # verifies the certificate chain instead of trusting any certificate.
-        if [ -n "$$WAZUH_REGISTRATION_PASSWORD" ]; then
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_REGISTRATION_PASSWORD="$$WAZUH_REGISTRATION_PASSWORD" yum localinstall -y /packages-agents/wazuh-agent*.rpm
-        else
-          WAZUH_MANAGER='wazuh.manager.local' WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' yum localinstall -y /packages-agents/wazuh-agent*.rpm
+        # The manager's Server API only starts once entrypoint.sh reaches
+        # "wazuh-manager-control start", which happens after the CA above is
+        # already written, so it needs its own wait. -k skips TLS
+        # verification for this call only, matching the indexer healthcheck
+        # convention already used in this file.
+        api_wait=0
+        until curl -sk -o /dev/null "https://wazuh.manager.local:55000/security/user/authenticate"; do
+          if [ "$$api_wait" -ge 120 ]; then
+            echo "ERROR: the manager Server API did not become reachable after $${api_wait}s."
+            exit 1
+          fi
+          echo "Waiting for the manager Server API..."
+          sleep 2
+          api_wait=$$((api_wait + 2))
+        done
+
+        # Mint a short-lived enrollment token from the manager's Server API,
+        # the same flow the "Deploy new agent" wizard uses, instead of a
+        # static registration password.
+        AUTH_TOKEN=$$(curl -sk -u "$$API_USERNAME:$$API_PASSWORD" -X POST "https://wazuh.manager.local:55000/security/user/authenticate" | jq -r '.data.token')
+        if [ -z "$$AUTH_TOKEN" ] || [ "$$AUTH_TOKEN" = "null" ]; then
+          echo "ERROR: could not authenticate against the manager Server API to mint an enrollment token."
+          exit 1
         fi
+
+        ENROLLMENT_TOKEN=$$(curl -sk -X POST "https://wazuh.manager.local:55000/agents/enrollment-tokens" -H "Authorization: Bearer $$AUTH_TOKEN" -H 'content-type: application/json' -d '{"address":"wazuh.manager.local"}' | jq -r '.data.token')
+        if [ -z "$$ENROLLMENT_TOKEN" ] || [ "$$ENROLLMENT_TOKEN" = "null" ]; then
+          echo "ERROR: the manager did not return an enrollment token."
+          exit 1
+        fi
+
+        # Install wazuh-agent. WAZUH_REGISTRATION_CA pins the manager's root
+        # CA: the agent then verifies the certificate chain instead of
+        # trusting any certificate. The token names the manager itself, so
+        # WAZUH_MANAGER is not set alongside it.
+        WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_ENROLLMENT_TOKEN="$$ENROLLMENT_TOKEN" yum localinstall -y /packages-agents/wazuh-agent*.rpm
 
         # Start wazuh-agent
         /var/ossec/bin/wazuh-control start
