@@ -6,6 +6,7 @@ import {
   ServerAPIInternalUserClient,
   ServerAPIScopedUserClient,
   CTIFeedsClient,
+  CertificateValidityClient,
 } from './services';
 import { IConfigurationEnhanced } from './services/enhance-configuration';
 
@@ -17,6 +18,7 @@ export interface WazuhCorePluginSetup {
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   serverAPIClient: ServerAPIClient;
   ctiFeedsClient: CTIFeedsClient;
+  certificateValidityClient: CertificateValidityClient;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
@@ -35,6 +37,7 @@ export interface WazuhCorePluginStart {
   API_USER_STATUS_RUN_AS: typeof API_USER_STATUS_RUN_AS;
   serverAPIClient: ServerAPIClient;
   ctiFeedsClient: CTIFeedsClient;
+  certificateValidityClient: CertificateValidityClient;
   api: {
     client: {
       asInternalUser: ServerAPIInternalUserClient;
