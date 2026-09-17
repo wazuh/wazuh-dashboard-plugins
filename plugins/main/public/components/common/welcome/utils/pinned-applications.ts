@@ -26,18 +26,55 @@ type Application = (typeof Applications)[number];
  *
  * @param pinnedApplicationIds pinned application identifiers, in display order
  * @param agent agent being displayed
- * @param maxApplications maximum amount of shortcuts that fit in the header
  */
 export function getAgentPinnedApplications(
   pinnedApplicationIds: string[],
   agent: Agent | undefined,
-  maxApplications: number,
 ): Application[] {
   return pinnedApplicationIds
     .map(applicationId => Applications.find(({ id }) => id === applicationId))
     .filter(
       (application): application is Application =>
         Boolean(application) && hasAgentSupportModule(agent, application!.id),
+    );
+}
+
+/** Maximum amount of applications that can be pinned to the agent header. */
+export const MAX_PINNED_APPLICATIONS = 5;
+
+const MIN_PINNED_APPLICATIONS = 1;
+
+/** Drop unknown applications and the ones over the pin limit. */
+export function sanitizePinnedApplications(
+  pinnedApplicationIds: string[],
+): string[] {
+  return pinnedApplicationIds
+    .filter(pinnedApplicationId =>
+      Applications.some(({ id }) => id === pinnedApplicationId),
     )
-    .slice(0, maxApplications);
+    .slice(0, MAX_PINNED_APPLICATIONS);
+}
+
+export function canPinApplication(pinnedApplicationIds: string[]): boolean {
+  return pinnedApplicationIds.length < MAX_PINNED_APPLICATIONS;
+}
+
+export function canUnpinApplication(pinnedApplicationIds: string[]): boolean {
+  return pinnedApplicationIds.length > MIN_PINNED_APPLICATIONS;
+}
+
+/** Pin or unpin an application. Returns the list unchanged at the limits. */
+export function togglePinnedApplication(
+  pinnedApplicationIds: string[],
+  applicationId: string,
+): string[] {
+  if (pinnedApplicationIds.includes(applicationId)) {
+    return canUnpinApplication(pinnedApplicationIds)
+      ? pinnedApplicationIds.filter(id => id !== applicationId)
+      : pinnedApplicationIds;
+  }
+
+  return canPinApplication(pinnedApplicationIds)
+    ? [...pinnedApplicationIds, applicationId]
+    : pinnedApplicationIds;
 }
