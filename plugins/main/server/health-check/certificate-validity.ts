@@ -5,7 +5,7 @@ import {
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import type { CertificateValidityOutcome } from '../../../wazuh-core/common/certificate-validity';
-import type { InitializationTaskRunContext } from './types';
+import { taskResult, type InitializationTaskRunContext } from './types';
 import {
   CertificateEvaluation,
   evaluateCertificateValidity,
@@ -88,18 +88,17 @@ function buildMessage(evaluation: CertificateEvaluation): string {
   )}.`;
 }
 
-/**
- * The only place an internal severity meets the platform result model: the task
- * is non-critical, so returning yields `green` and throwing yields `yellow`.
- */
-function reportEvaluation(
-  evaluation: CertificateEvaluation,
-): CertificateEvaluation {
+/** The only place an internal severity meets the platform result model. */
+function reportEvaluation(evaluation: CertificateEvaluation) {
   if (evaluation.severity === 'ok') {
-    return evaluation;
+    return taskResult.ok(evaluation);
   }
 
-  throw new Error(buildMessage(evaluation));
+  const message = buildMessage(evaluation);
+
+  return evaluation.severity === 'critical'
+    ? taskResult.error(message, evaluation)
+    : taskResult.warning(message, evaluation);
 }
 
 /** Reports the worst certificate state across the manager nodes. */

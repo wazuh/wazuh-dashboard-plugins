@@ -114,9 +114,10 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     ).toBe(TASK_NAME);
   });
 
-  it('resolves when every certificate is healthy (R10)', async () => {
+  it('reports ok when every certificate is healthy (R10)', async () => {
     await expect(runTask(buildServices())).resolves.toMatchObject({
-      severity: 'ok',
+      status: 'ok',
+      data: { severity: 'ok' },
     });
   });
 
@@ -134,7 +135,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     );
   });
 
-  it('throws when a certificate is near expiration (R10)', async () => {
+  it('warns when a certificate is near expiration (R10)', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -145,24 +146,68 @@ describe('initializationTaskCreatorCertificateValidity', () => {
       },
     });
 
-    await expect(runTask(services)).rejects.toThrow(/node01/);
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'warning',
+      message: expect.stringContaining('node01'),
+    });
   });
 
-  it('throws rather than resolving when the state is undetermined (S6.1)', async () => {
+  it('reports an error when a certificate is about to expire (R10)', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', 3 * DAY),
+        },
+      },
+    });
+
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'error',
+      message: expect.stringContaining('node01'),
+      data: { severity: 'critical' },
+    });
+  });
+
+  it('reports an error when a certificate has already expired (R10)', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', -1 * DAY),
+        },
+      },
+    });
+
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'error',
+      message: expect.stringMatching(/expired/i),
+    });
+  });
+
+  it('warns rather than reporting ok when the state is undetermined (S6.1)', async () => {
     const services = buildServices({
       outcomes: { node01: { kind: 'notFound', node: 'node01' } },
     });
 
-    await expect(runTask(services)).rejects.toThrow(/could not be determined/i);
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'warning',
+      message: expect.stringMatching(/could not be determined/i),
+    });
   });
 
-  it('does not resolve when only one of two nodes is undetermined (S6.5)', async () => {
+  it('does not report ok when only one of two nodes is undetermined (S6.5)', async () => {
     const services = buildServices({
       nodes: ['node01', 'worker-02'],
       outcomes: { 'worker-02': { kind: 'notFound', node: 'worker-02' } },
     });
 
-    await expect(runTask(services)).rejects.toThrow(/worker-02/);
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'warning',
+      message: expect.stringContaining('worker-02'),
+    });
   });
 
   it('degrades to undetermined when the cluster cannot be listed (T5.5)', async () => {
@@ -170,7 +215,10 @@ describe('initializationTaskCreatorCertificateValidity', () => {
       getNodes: jest.fn().mockRejectedValue(new Error('boom')),
     });
 
-    await expect(runTask(services)).rejects.toThrow(/could not be determined/i);
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'warning',
+      message: expect.stringMatching(/could not be determined/i),
+    });
   });
 
   it('accepts a single host object, not only a list', async () => {
@@ -186,7 +234,10 @@ describe('initializationTaskCreatorCertificateValidity', () => {
   it('degrades to undetermined when no API host is configured', async () => {
     const services = buildServices({ hosts: [] });
 
-    await expect(runTask(services)).rejects.toThrow(/could not be determined/i);
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'warning',
+      message: expect.stringMatching(/could not be determined/i),
+    });
   });
 
   it('builds an actionable message (R7, R8)', async () => {
@@ -200,7 +251,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
       },
     });
 
-    const message = await runTask(services).catch(error => error.message);
+    const { message } = (await runTask(services)) as { message: string };
 
     expect(message).toContain('node01');
     expect(message).toContain('CN=manager-01');
