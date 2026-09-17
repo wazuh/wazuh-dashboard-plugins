@@ -1,19 +1,13 @@
 import {
   CERTIFICATE_EXPIRY_CRITICAL_SECONDS,
   CERTIFICATE_EXPIRY_WARNING_SECONDS,
-  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
 } from '../../common/constants';
-import { webDocumentationLink } from '../../common/services/web_documentation';
 import type { CertificateValidityOutcome } from '../../../wazuh-core/common/certificate-validity';
 import { taskResult, type InitializationTaskRunContext } from './types';
 import {
   CertificateEvaluation,
   evaluateCertificateValidity,
 } from './certificate-validity-evaluator';
-
-/** No certificate renewal page is published yet. */
-const DOCUMENTATION_PATH =
-  PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING;
 
 interface APIHostReference {
   id: string;
@@ -85,9 +79,7 @@ function buildMessage(evaluation: CertificateEvaluation): string {
     ? `\n\nThe manager evaluated this on ${evaluation.oldestEvaluatedAt}; it is refreshed periodically, so it may not reflect a certificate replaced since then.`
     : '';
 
-  return `${headline}\n\n${details}${staleness}\n\nRead more in our troubleshooting guide: ${webDocumentationLink(
-    DOCUMENTATION_PATH,
-  )}.`;
+  return `${headline}\n\n${details}${staleness}`;
 }
 
 /** The only place an internal severity meets the platform result model. */

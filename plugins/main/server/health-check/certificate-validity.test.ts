@@ -328,7 +328,23 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(message).toContain('CN=manager-01');
     expect(message).toContain('2026-10-01T00:00:00Z');
     expect(message).toContain('10 day(s)');
-    expect(message).toContain('https://documentation.wazuh.com');
     expect(message).toContain('2026-09-15T10:00:00Z');
+  });
+
+  it('links to no documentation page while none covers certificates', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', 10 * DAY),
+        },
+      },
+    });
+
+    const { message } = (await runTask(services)) as { message: string };
+
+    expect(message).not.toContain('documentation.wazuh.com');
+    expect(message).not.toMatch(/https?:\/\//);
   });
 });
