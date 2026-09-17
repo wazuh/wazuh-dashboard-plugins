@@ -21,3 +21,22 @@ span.statWithLink:hover {
 .wz-module-card-title .euiCard__content .euiTitle {
   font-weight: 400;
 }
+
+// Pinned application shortcuts of the agent header. The ones that do not fit
+// wrap to a second row that is clipped, so a shortcut is either fully visible
+// or not visible at all. The hidden ones stay in the applications menu.
+// `.euiFlexItem` is in the selector to win over its `flex-direction: column`.
+.euiFlexItem.wz-agent-pinned-applications {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  min-width: 0;
+  overflow: hidden;
+  // Matches the menu button. A margin, to override the 2px flex gutter.
+  margin-top: 7px;
+  max-height: $ouiButtonHeight;
+
+  > * {
+    flex: 0 0 auto; // natural width, so shortcuts wrap instead of squashing
+  }
+}
