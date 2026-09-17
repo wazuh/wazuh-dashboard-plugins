@@ -120,10 +120,18 @@ export const initializationTaskCreatorCertificateValidity = ({
       criticalSeconds: CERTIFICATE_EXPIRY_CRITICAL_SECONDS,
     });
 
-    ctx.logger.debug(
-      `Server certificates validity: [${evaluation.severity}] over [${evaluation.nodesEvaluated}] node(s)`,
-    );
+    const result = reportEvaluation(evaluation);
 
-    return reportEvaluation(evaluation);
+    if (result.status === 'ok') {
+      ctx.logger.info(
+        `The certificates of [${evaluation.nodesEvaluated}] manager node(s) are valid`,
+      );
+    } else if (result.status === 'error') {
+      ctx.logger.error(result.message);
+    } else {
+      ctx.logger.warn(result.message);
+    }
+
+    return result;
   },
 });

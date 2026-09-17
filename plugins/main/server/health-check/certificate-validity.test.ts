@@ -104,6 +104,16 @@ const runTask = (services: Services) =>
     services: asContract(services),
   }).run(buildContext() as unknown as InitializationTaskRunContext);
 
+const runTaskWithContext = async (services: Services) => {
+  const context = buildContext();
+  const result = await initializationTaskCreatorCertificateValidity({
+    taskName: TASK_NAME,
+    services: asContract(services),
+  }).run(context as unknown as InitializationTaskRunContext);
+
+  return { result, logger: context.logger };
+};
+
 describe('initializationTaskCreatorCertificateValidity', () => {
   it('exposes the given task name (S1.1)', () => {
     expect(
@@ -238,6 +248,46 @@ describe('initializationTaskCreatorCertificateValidity', () => {
       status: 'warning',
       message: expect.stringMatching(/could not be determined/i),
     });
+  });
+
+  it('reports a healthy check at info, not debug (S8.x)', async () => {
+    const { logger } = await runTaskWithContext(buildServices());
+
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.stringContaining('are valid'),
+    );
+  });
+
+  it('reports a critical certificate at error level (S8.x)', async () => {
+    const { logger } = await runTaskWithContext(
+      buildServices({
+        outcomes: {
+          node01: {
+            kind: 'ok',
+            node: 'node01',
+            snapshot: snapshot('node01', 3 * DAY),
+          },
+        },
+      }),
+    );
+
+    expect(logger.error).toHaveBeenCalledWith(
+      expect.stringContaining('node01'),
+    );
+    expect(logger.info).not.toHaveBeenCalled();
+  });
+
+  it('reports an undetermined state at warn level (S8.x)', async () => {
+    const { logger } = await runTaskWithContext(
+      buildServices({
+        outcomes: { node01: { kind: 'notFound', node: 'node01' } },
+      }),
+    );
+
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringMatching(/could not be determined/i),
+    );
+    expect(logger.error).not.toHaveBeenCalled();
   });
 
   it('builds an actionable message (R7, R8)', async () => {
