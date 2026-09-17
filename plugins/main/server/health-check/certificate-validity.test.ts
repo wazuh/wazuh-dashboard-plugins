@@ -290,6 +290,27 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
+  it('lists one line per affected node, not one paragraph (R7)', async () => {
+    const nodes = ['node01', 'worker-02', 'worker-03'];
+    const services = buildServices({
+      nodes,
+      outcomes: Object.fromEntries(
+        nodes.map(node => [
+          node,
+          { kind: 'ok', node, snapshot: snapshot(node, 3 * DAY) },
+        ]),
+      ) as Record<string, CertificateValidityOutcome>,
+    });
+
+    const { message } = (await runTask(services)) as { message: string };
+    const bulleted = message.split('\n').filter(line => line.startsWith('- '));
+
+    expect(bulleted).toHaveLength(nodes.length);
+    for (const node of nodes) {
+      expect(bulleted.some(line => line.includes(node))).toBe(true);
+    }
+  });
+
   it('builds an actionable message (R7, R8)', async () => {
     const services = buildServices({
       outcomes: {

@@ -77,13 +77,15 @@ function buildMessage(evaluation: CertificateEvaluation): string {
       ? 'The state of the server certificates could not be determined.'
       : 'The server certificates require attention.';
 
-  const details = evaluation.findings.map(finding => finding.detail).join(' ');
+  const details = evaluation.findings
+    .map(finding => `- ${finding.detail}`)
+    .join('\n');
 
   const staleness = evaluation.oldestEvaluatedAt
-    ? ` The manager evaluated this on ${evaluation.oldestEvaluatedAt}; it is refreshed periodically, so it may not reflect a certificate replaced since then.`
+    ? `\n\nThe manager evaluated this on ${evaluation.oldestEvaluatedAt}; it is refreshed periodically, so it may not reflect a certificate replaced since then.`
     : '';
 
-  return `${headline} ${details}${staleness} Read more in our troubleshooting guide: ${webDocumentationLink(
+  return `${headline}\n\n${details}${staleness}\n\nRead more in our troubleshooting guide: ${webDocumentationLink(
     DOCUMENTATION_PATH,
   )}.`;
 }
