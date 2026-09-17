@@ -86,12 +86,12 @@ export class CertificateValidityClient {
     document: unknown,
   ): CertificateValidityOutcome {
     const reported = document as
-      | { state?: string; reason?: string }
+      | { available?: boolean; reason?: string }
       | undefined;
 
-    if (reported?.state === 'unavailable') {
+    if (reported?.available === false) {
       this.logger.debug(
-        `Certificate state unavailable on node [${node}]: ${reported.reason}`,
+        `Node [${node}] could not describe its certificates: ${reported.reason}`,
       );
 
       return {

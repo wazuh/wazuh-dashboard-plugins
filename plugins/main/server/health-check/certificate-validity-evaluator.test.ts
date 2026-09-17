@@ -20,6 +20,7 @@ const certificate = (
   subject: 'CN=Corp Root CA',
   issuer: 'CN=Corp Root CA',
   not_before: '2026-01-01T00:00:00Z',
+  not_before_ts: 1_767_225_600,
   not_after: '2036-01-01T00:00:00Z',
   not_after_ts: 2_082_758_400,
   seconds_until_expiry: 3650 * DAY,
@@ -34,9 +35,11 @@ const snapshot = (
     node?: string;
     listener?: Partial<ServerCertificate>;
     certificates?: ServerCertificate[];
+    caBundle?: Partial<CertificateValiditySnapshot['ca_bundle']>;
   } = {},
 ): CertificateValiditySnapshot => ({
   node: overrides.node ?? 'node01',
+  available: true,
   evaluated_at: '2026-09-15T10:00:00Z',
   evaluated_at_ts: NOW - 3600,
   listener: certificate({
@@ -52,9 +55,12 @@ const snapshot = (
     publication_vouched: true,
     content_sha256: 'abc',
     certificates_count: 1,
+    certificates_limit: 6,
     serialized_bytes: 2428,
     serialized_bytes_limit: 8191,
+    chain_valid: true,
     certificates: overrides.certificates ?? [certificate()],
+    ...overrides.caBundle,
   },
 });
 
@@ -134,6 +140,61 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     );
 
     expect(result.severity).toBe('critical');
+  });
+
+  // wazuh/wazuh#39410: a CA:FALSE or expired signer reads signs_active_leaf true
+  // and chain_valid false. Reading only the signature reported this as healthy.
+  it('reports a bundle that signs the leaf but does not validate (S4.5)', () => {
+    const evaluation = evaluateCertificateValidity(
+      [
+        ok({
+          caBundle: {
+            chain_valid: false,
+            chain_error: 'invalid CA certificate',
+          },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    expect(evaluation.severity).toBe('critical');
+    expect(evaluation.findings).toContainEqual(
+      expect.objectContaining({
+        reason: 'chain-invalid',
+        severity: 'critical',
+      }),
+    );
+    expect(evaluation.findings[0].detail).toContain('invalid CA certificate');
+  });
+
+  it('does not treat an unknown chain verdict as a failure (S4.5)', () => {
+    const evaluation = evaluateCertificateValidity(
+      [ok({ caBundle: { chain_valid: null } })],
+      OPTIONS,
+    );
+
+    expect(evaluation.severity).toBe('ok');
+  });
+
+  it('warns while the bundle file cannot be read (S4.8)', () => {
+    const evaluation = evaluateCertificateValidity(
+      [
+        ok({
+          caBundle: {
+            last_read_failure: {
+              cause: 'cannot be opened (No such file or directory)',
+              consecutive: 2,
+            },
+          },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    expect(evaluation.severity).toBe('warning');
+    expect(evaluation.findings).toContainEqual(
+      expect.objectContaining({ reason: 'bundle-unreadable' }),
+    );
   });
 
   it('accepts a bundle where any CA signs the active leaf', () => {

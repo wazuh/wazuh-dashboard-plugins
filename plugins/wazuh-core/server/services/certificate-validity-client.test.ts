@@ -10,6 +10,7 @@ const buildSnapshot = (
   overrides: Partial<CertificateValiditySnapshot> = {},
 ): CertificateValiditySnapshot => ({
   node: 'node01',
+  available: true,
   evaluated_at: '2026-09-15T10:00:00Z',
   evaluated_at_ts: 1_789_423_200,
   listener: {
@@ -17,6 +18,7 @@ const buildSnapshot = (
     issuer: 'CN=Corp Root CA',
     sans: ['manager-01.example.com'],
     not_before: '2026-01-01T00:00:00Z',
+    not_before_ts: 1_767_225_600,
     not_after: '2027-01-01T00:00:00Z',
     not_after_ts: 1_798_761_600,
     seconds_until_expiry: 9_338_400,
@@ -30,13 +32,16 @@ const buildSnapshot = (
     publication_vouched: true,
     content_sha256: 'abc',
     certificates_count: 1,
+    certificates_limit: 6,
     serialized_bytes: 2428,
     serialized_bytes_limit: 8191,
+    chain_valid: true,
     certificates: [
       {
         subject: 'CN=Corp Root CA',
         issuer: 'CN=Corp Root CA',
         not_before: '2026-01-01T00:00:00Z',
+        not_before_ts: 1_767_225_600,
         not_after: '2036-01-01T00:00:00Z',
         not_after_ts: 2_082_758_400,
         seconds_until_expiry: 315_360_000,
@@ -117,29 +122,32 @@ describe('CertificateValidityClient.getNodeTls', () => {
     });
   });
 
-  it('maps the explicit unavailable state to unavailable (S3.4)', async () => {
-    const client = buildClient(
-      jest.fn().mockResolvedValue({
-        data: {
+  it.each([
+    'remoted not running',
+    'admin socket unreachable',
+    'listener not started',
+    'timeout',
+    'admin client unavailable',
+  ])(
+    'maps available:false with reason %p to unavailable (S3.4)',
+    async reason => {
+      const client = buildClient(
+        jest.fn().mockResolvedValue({
           data: {
-            affected_items: [
-              {
-                node: 'node01',
-                state: 'unavailable',
-                reason: 'remoted is down',
-              },
-            ],
+            data: {
+              affected_items: [{ node: 'node01', available: false, reason }],
+            },
           },
-        },
-      }),
-    );
+        }),
+      );
 
-    await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
-      kind: 'unavailable',
-      node: 'node01',
-      reason: 'remoted is down',
-    });
-  });
+      await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
+        kind: 'unavailable',
+        node: 'node01',
+        reason,
+      });
+    },
+  );
 
   it('maps an error without a response to transportError (S3.5)', async () => {
     const client = buildClient(

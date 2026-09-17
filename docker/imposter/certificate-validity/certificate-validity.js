@@ -12,6 +12,8 @@
 //   critical     red,    listener expires in 3 days
 //   expired      red,    listener expired yesterday
 //   ca-mismatch  red,    no CA in the bundle signs the listener certificate
+//   chain-invalid red,   signs the leaf but does not validate as a chain
+//   read-failure yellow, the bundle file cannot be read right now
 //   unavailable  yellow, the manager could not reach the daemon
 //   notfound     yellow, the node does not expose the resource
 var SCENARIO = 'healthy';
@@ -29,6 +31,7 @@ function certificate(subject, issuer, secondsUntilExpiry, extra) {
     subject: subject,
     issuer: issuer,
     not_before: iso(nowTs - 365 * DAY),
+    not_before_ts: nowTs - 365 * DAY,
     not_after: iso(nowTs + secondsUntilExpiry),
     not_after_ts: nowTs + secondsUntilExpiry,
     seconds_until_expiry: secondsUntilExpiry,
@@ -43,6 +46,9 @@ function certificate(subject, issuer, secondsUntilExpiry, extra) {
 
 var leafSeconds = 3650 * DAY;
 var signsActiveLeaf = true;
+var chainValid = true;
+var chainError = null;
+var readFailure = null;
 
 switch (SCENARIO) {
   case 'warning':
@@ -56,6 +62,19 @@ switch (SCENARIO) {
     break;
   case 'ca-mismatch':
     signsActiveLeaf = false;
+    chainValid = false;
+    chainError = 'unable to get local issuer certificate';
+    break;
+  case 'chain-invalid':
+    chainValid = false;
+    chainError = 'invalid CA certificate';
+    break;
+  case 'read-failure':
+    readFailure = {
+      cause: 'cannot be opened (No such file or directory)',
+      errno: 2,
+      consecutive: 2,
+    };
     break;
 }
 
@@ -92,11 +111,14 @@ if (SCENARIO === 'notfound') {
 } else {
   var snapshot = {
     node: nodeId,
+    available: true,
     evaluated_at: iso(nowTs - 3600),
     evaluated_at_ts: nowTs - 3600,
     listener: certificate('CN=' + nodeId, 'CN=Corp Root CA', leafSeconds, {
       sans: [nodeId + '.example.com', '10.0.0.5'],
       path: 'etc/certs/remoted.pem',
+      loaded_at: iso(nowTs - 86400),
+      loaded_at_ts: nowTs - 86400,
     }),
     ca_bundle: {
       path: 'etc/certs/root-ca.pem',
@@ -104,8 +126,10 @@ if (SCENARIO === 'notfound') {
       publication_vouched: true,
       content_sha256: 'e3b0c44298fc1c149afbf4c8996fb924',
       certificates_count: 1,
+      certificates_limit: 6,
       serialized_bytes: 2428,
       serialized_bytes_limit: 8191,
+      chain_valid: chainValid,
       certificates: [
         certificate('CN=Corp Root CA', 'CN=Corp Root CA', 3650 * DAY, {
           signs_active_leaf: signsActiveLeaf,
@@ -113,6 +137,14 @@ if (SCENARIO === 'notfound') {
       ],
     },
   };
+
+  if (chainError) {
+    snapshot.ca_bundle.chain_error = chainError;
+  }
+
+  if (readFailure) {
+    snapshot.ca_bundle.last_read_failure = readFailure;
+  }
 
   respond()
     .withStatusCode(200)

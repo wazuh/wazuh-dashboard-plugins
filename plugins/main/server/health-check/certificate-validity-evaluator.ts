@@ -12,6 +12,8 @@ export type FindingReason =
   | 'expiring'
   | 'expired'
   | 'ca-mismatch'
+  | 'chain-invalid'
+  | 'bundle-unreadable'
   | 'undetermined';
 
 export interface CertificateFinding {
@@ -149,6 +151,54 @@ function undeterminedFinding(
   };
 }
 
+/**
+ * `signs_active_leaf` answers whether a CA signed the leaf. This answers what a
+ * verifying agent concludes, dates and constraints included, so an expired or
+ * non-CA signer fails here while still signing.
+ */
+function chainFinding(
+  node: string,
+  snapshot: CertificateValiditySnapshot,
+): CertificateFinding | null {
+  const bundle = snapshot.ca_bundle;
+
+  if (bundle.chain_valid !== false) {
+    return null;
+  }
+
+  const reason = bundle.chain_error
+    ? ` The manager reported: ${bundle.chain_error}.`
+    : '';
+
+  return {
+    node,
+    severity: 'critical',
+    scope: 'ca',
+    reason: 'chain-invalid',
+    detail: `The listener certificate on node ${node} does not validate against the CA bundle it serves.${reason} Agents verifying against this bundle will be rejected.`,
+  };
+}
+
+/** The described bundle is the last one the manager read, not the file on disk. */
+function readFailureFinding(
+  node: string,
+  snapshot: CertificateValiditySnapshot,
+): CertificateFinding | null {
+  const failure = snapshot.ca_bundle.last_read_failure;
+
+  if (!failure) {
+    return null;
+  }
+
+  return {
+    node,
+    severity: 'warning',
+    scope: 'ca',
+    reason: 'bundle-unreadable',
+    detail: `The CA bundle on node ${node} ${failure.cause} on the last ${failure.consecutive} read(s), so what follows describes the last copy the manager read.`,
+  };
+}
+
 function evaluateSnapshot(
   snapshot: CertificateValiditySnapshot,
   options: EvaluationOptions,
@@ -157,6 +207,8 @@ function evaluateSnapshot(
   const findings = [
     expiryFinding(node, 'listener', snapshot.listener, options),
     mismatchFinding(node, snapshot),
+    chainFinding(node, snapshot),
+    readFailureFinding(node, snapshot),
     ...snapshot.ca_bundle.certificates.map(certificate =>
       expiryFinding(node, 'ca', certificate, options),
     ),
