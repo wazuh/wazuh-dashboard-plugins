@@ -1023,6 +1023,13 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_STATS =
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 
+export const HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY =
+  'server-api:certificate-validity';
+
+// Certificate validity health check
+export const CERTIFICATE_EXPIRY_WARNING_SECONDS = 30 * 24 * 60 * 60;
+export const CERTIFICATE_EXPIRY_CRITICAL_SECONDS = 7 * 24 * 60 * 60;
+
 export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
   'wazuh.integration.decoders',
