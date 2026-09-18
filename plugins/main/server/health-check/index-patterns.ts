@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { SavedObjectsClient } from '../../../../src/core/server';
 import { IndexPatternsFetcher } from '../../../../src/plugins/data/server';
 import {
   indexPatternHasMissingFields,
@@ -203,7 +204,12 @@ function getSavedObjectsClient(
   scope: InitializationTaskContext,
 ) {
   if (scope.includes('internal')) {
-    return ctx.services.core.savedObjects.createInternalRepository();
+    // The repository does not implement SavedObjectsClientContract: it lacks
+    // the `errors` helpers that consumers such as UiSettingsClient rely on to
+    // classify failures. Wrapping it keeps that contract.
+    return new SavedObjectsClient(
+      ctx.services.core.savedObjects.createInternalRepository(),
+    );
   }
 
   if (scope.includes('user')) {

@@ -118,3 +118,142 @@ describe('Table With Search Bar component', () => {
     wrapper!.unmount();
   });
 });
+
+describe('Table With Search Bar component - selection reset', () => {
+  const selectionColumns = columns;
+  const selectionProps = {
+    ...tableProps,
+    onSearch: jest.fn().mockResolvedValue({
+      items: [{ id: '1' }, { id: '2' }],
+      totalItems: 2,
+    }),
+    tableColumns: selectionColumns,
+    rowProps: () => ({}),
+    tableProps: {
+      selection: {
+        onSelectionChange: () => {},
+        selectable: () => true,
+      },
+      itemId: 'id',
+    },
+  };
+
+  const setSelection = (wrapper: any) => {
+    const tableInstance = wrapper.find('EuiBasicTable').instance();
+    act(() => {
+      tableInstance.setSelection([{ id: '1' }]);
+    });
+    wrapper.update();
+    return tableInstance;
+  };
+
+  const getSelection = (tableInstance: any) => tableInstance.state.selection;
+
+  it('does not clear the selection when filters change', async () => {
+    let wrapper: any = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...selectionProps} />);
+    });
+    wrapper.update();
+
+    const tableInstance = setSelection(wrapper);
+    expect(getSelection(tableInstance)).toHaveLength(1);
+
+    await act(async () => {
+      wrapper.setProps({ filters: { q: 'name=agent1' } });
+    });
+    wrapper.update();
+
+    expect(getSelection(tableInstance)).toHaveLength(1);
+    wrapper.unmount();
+  });
+
+  it('does not clear the selection when pagination changes', async () => {
+    let wrapper: any = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...selectionProps} />);
+    });
+    wrapper.update();
+
+    const tableInstance = setSelection(wrapper);
+
+    await act(async () => {
+      // With 2 total mocked items, page index 1 is only valid at page
+      // size 1 (2 pages of 1). An out-of-range index/size combination
+      // makes EuiBasicTable's own pagination bar auto-correct the page,
+      // which unconditionally clears the selection — not a case this
+      // test is about.
+      wrapper
+        .find('EuiBasicTable')
+        .props()
+        .onChange({ page: { index: 1, size: 1 } });
+    });
+    wrapper.update();
+
+    expect(getSelection(tableInstance)).toHaveLength(1);
+    wrapper.unmount();
+  });
+
+  it('does not clear the selection when sorting changes', async () => {
+    let wrapper: any = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...selectionProps} />);
+    });
+    wrapper.update();
+
+    const tableInstance = setSelection(wrapper);
+
+    await act(async () => {
+      wrapper
+        .find('EuiBasicTable')
+        .props()
+        .onChange({ sort: { field: 'name', direction: 'desc' } });
+    });
+    wrapper.update();
+
+    expect(getSelection(tableInstance)).toHaveLength(1);
+    wrapper.unmount();
+  });
+
+  it('does not clear the selection when refresh (reload) changes', async () => {
+    let wrapper: any = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...selectionProps} reload={0} />);
+    });
+    wrapper.update();
+
+    const tableInstance = setSelection(wrapper);
+
+    await act(async () => {
+      wrapper.setProps({ reload: 1 });
+    });
+    wrapper.update();
+
+    expect(getSelection(tableInstance)).toHaveLength(1);
+    wrapper.unmount();
+  });
+
+  it('clears the selection when the endpoint changes', async () => {
+    let wrapper: any = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...selectionProps} />);
+    });
+    wrapper.update();
+
+    const tableInstance = setSelection(wrapper);
+    expect(getSelection(tableInstance)).toHaveLength(1);
+
+    await act(async () => {
+      wrapper.setProps({ endpoint: '/other-endpoint' });
+    });
+    wrapper.update();
+
+    expect(getSelection(tableInstance)).toEqual([]);
+    wrapper.unmount();
+  });
+});

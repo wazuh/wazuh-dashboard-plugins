@@ -1,4 +1,8 @@
-import { validateAgentName, validateManagerCaPath } from './validations';
+import {
+  validateAgentName,
+  validateExistingEnrollmentToken,
+  validateManagerCaPath,
+} from './validations';
 
 describe('Validations', () => {
   test('should return undefined for an empty value', () => {
@@ -65,5 +69,31 @@ describe('validateManagerCaPath', () => {
   test('should return an error message for a path containing a single quote', () => {
     const result = validateManagerCaPath("/etc/ca's.pem");
     expect(result).toBe('The character "\'" is not valid in a file path.');
+  });
+});
+
+describe('validateExistingEnrollmentToken', () => {
+  it.each(['', '   ', 'eyJ2ZXIiOjEs', 'AAECAwQFBgcICQoLDA0ODw-_'])(
+    'accepts %p',
+    value => {
+      expect(validateExistingEnrollmentToken(value)).toBeUndefined();
+    },
+  );
+
+  /* The token is interpolated into the command inside single quotes, so these
+  two are what would break it apart. */
+  it.each(['eyJ2ZXIi OjEs', 'eyJ2ZXIi\nOjEs', 'eyJ2ZXIi\tOjEs'])(
+    'rejects %p for containing whitespace',
+    value => {
+      expect(validateExistingEnrollmentToken(value)).toEqual(
+        'The token must not contain spaces or line breaks.',
+      );
+    },
+  );
+
+  it('rejects a token carrying a single quote', () => {
+    expect(validateExistingEnrollmentToken("ey'JzZXIi")).toEqual(
+      'The character "\'" is not valid in an enrollment token.',
+    );
   });
 });

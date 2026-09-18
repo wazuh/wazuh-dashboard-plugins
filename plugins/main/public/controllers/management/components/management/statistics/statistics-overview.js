@@ -21,7 +21,6 @@ import {
   EuiTabs,
   EuiTab,
   EuiSpacer,
-  EuiProgress,
 } from '@elastic/eui';
 import { clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
@@ -39,7 +38,7 @@ export class WzStatisticsOverview extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedTabId: 'remoted',
+      selectedTabId: 'normalization',
       stats: {},
       isLoading: false,
       loadingNode: false,
@@ -48,10 +47,11 @@ export class WzStatisticsOverview extends Component {
       refreshVisualizations: Date.now(),
     };
     this.tabs = [
-      {
-        id: 'remoted',
-        name: 'Comms',
-      },
+      // Comms tab hidden from the UI — kept for potential reuse, see #9170
+      // {
+      //   id: 'remoted',
+      //   name: 'Comms',
+      // },
       {
         id: 'normalization',
         name: 'Normalization',

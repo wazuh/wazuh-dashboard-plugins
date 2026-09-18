@@ -9,6 +9,8 @@ export interface IInputFormType {
   setInputRef: (reference: any) => void;
   placeholder: string;
   dataTestSubj: string;
+  fullWidth?: boolean;
+  disabled?: boolean;
 }
 
 export interface IInputForm {

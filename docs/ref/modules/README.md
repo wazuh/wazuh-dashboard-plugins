@@ -3,6 +3,7 @@
 - [Health check](./healthcheck.md)
 - [Notifications and Alerting](./notifications-alerting.md)
 - [Indexer Management Settings](./indexer-settings.md)
+- [Enrollment tokens](./enrollment-tokens/README.md)
 - [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md)
 - [Ruleset Management](./ruleset-management/README.md)
   - [Normalization](./ruleset-management/normalization.md)
