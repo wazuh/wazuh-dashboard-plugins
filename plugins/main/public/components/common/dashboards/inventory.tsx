@@ -103,6 +103,7 @@ const InventoryDashboard = compose(
                 ({ dashboardId, agentDashboardId, className = '' }) => {
                   const dashboard = (
                     <DashboardRenderer
+                      key={dashboardId || agentDashboardId}
                       dashboardId={dashboardId}
                       agentDashboardId={agentDashboardId}
                       className={classnames(className, {

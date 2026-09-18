@@ -38,4 +38,38 @@ describe('TopNavMenu Component', () => {
     );
     expect(container).toMatchSnapshot();
   });
+
+  it('does not trigger a unique-key console warning when an item defines renderWrapper', () => {
+    const itemsWithWrapper: TopNavMenuItem[] = [
+      ...mockedItems,
+      {
+        id: 'api-reference',
+        label: 'API Reference',
+        description: 'API Reference',
+        onClick: jest.fn(),
+        testId: 'apiReference',
+        renderWrapper: ({ children, ['data-test-subj']: dataTestSubj }) => (
+          <a data-test-subj={dataTestSubj} href='#'>
+            {children}
+          </a>
+        ),
+        position: MenuItemPosition.LEFT,
+      },
+    ];
+
+    const consoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    render(<TopNavMenu items={itemsWithWrapper} useUpdatedUX={false} />);
+
+    const hasKeyWarning = consoleError.mock.calls.some(args =>
+      args.some(
+        arg => typeof arg === 'string' && arg.includes('unique "key" prop'),
+      ),
+    );
+    expect(hasKeyWarning).toBe(false);
+
+    consoleError.mockRestore();
+  });
 });
