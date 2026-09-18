@@ -31,6 +31,7 @@ import {
   tDataGridColumn,
   TDataGridReturn,
   useDataGrid,
+  DATA_GRID_NON_EUI_PROP_KEYS,
 } from '../data-grid';
 
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
@@ -149,7 +150,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
 
       return (
         <EuiDataGrid
-          {...omit(dataGridProps, ['columnsAvailable', 'setPagination'])}
+          {...omit(dataGridProps, DATA_GRID_NON_EUI_PROP_KEYS)}
           className={sideNavDocked ? 'dataGridDockedNav' : ''}
           toolbarVisibility={{
             showColumnSelector: { allowHide: false },

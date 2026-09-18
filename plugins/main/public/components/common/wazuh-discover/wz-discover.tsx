@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { omit } from 'lodash';
 import {
   EuiDataGrid,
   EuiPageTemplate,
@@ -21,6 +22,7 @@ import {
   useDataGrid,
   exportSearchToCSV,
   getAllCustomRenders,
+  DATA_GRID_NON_EUI_PROP_KEYS,
 } from '../data-grid';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import {
@@ -314,7 +316,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiDataGrid
-                      {...dataGridProps}
+                      {...omit(dataGridProps, DATA_GRID_NON_EUI_PROP_KEYS)}
                       className={sideNavDocked ? 'dataGridDockedNav' : ''}
                       toolbarVisibility={{
                         showColumnSelector: { allowHide: false },

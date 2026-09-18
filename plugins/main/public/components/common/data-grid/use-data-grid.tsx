@@ -47,6 +47,16 @@ export type TDataGridReturn = EuiDataGridProps & {
   columnsAvailable: string[];
 };
 
+/* Keys of the useDataGrid() return value that are hook-only extras, not part
+of the EuiDataGridProps contract. Consumers must omit these before spreading
+the return value onto <EuiDataGrid>, or the leftover props land on its
+internal DOM nodes and React warns about unrecognized attributes. */
+export const DATA_GRID_NON_EUI_PROP_KEYS = [
+  'columnsAvailable',
+  'setPagination',
+  'dataGridStatePersistenceManager',
+] as const;
+
 export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
   const {
     moduleId,
