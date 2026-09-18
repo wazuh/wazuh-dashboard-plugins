@@ -85,12 +85,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -277,6 +278,88 @@
         ]
       },
       {
+        "name": "/agents/enrollment-tokens",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_enrollment_tokens",
+        "description": "List the enrollment tokens the manager has minted: id, address, creation and expiry, allowed and consumed uses, whether each is revoked and whether it carries a credential. The token text and its credential are never returned",
+        "summary": "List enrollment tokens",
+        "tags": ["Agents"],
+        "query": [
+          {
+            "name": "limit",
+            "description": "Maximum number of elements to return. Although up to 100.000 can be specified, it is recommended not to exceed 500 elements. Responses may be slower the more this number is exceeded. ",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 500,
+              "minimum": 1,
+              "maximum": 100000
+            }
+          },
+          {
+            "name": "offset",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 0,
+              "minimum": 0,
+              "maximum": 2147483647
+            }
+          },
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "q",
+            "description": "Query to filter results by. For example q=&quot;status=active&quot;",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "description": "Look for elements containing the specified string. To obtain a complementary search, use '-' at the beginning",
+            "schema": {
+              "type": "string",
+              "format": "search",
+              "maxLength": 1024
+            }
+          },
+          {
+            "name": "select",
+            "description": "Select which fields to return (separated by comma). Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "names"
+              }
+            }
+          },
+          {
+            "name": "sort",
+            "description": "Sort the collection by a field or fields (separated by comma). Use +/- at the beggining to list in ascending or descending order. Use '.' for nested fields. For example, '{field1: field2}' may be selected with 'field1.field2'",
+            "schema": {
+              "type": "string",
+              "format": "sort"
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
         "name": "/agents/no_group",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.get_agent_no_group",
         "description": "Return a list with all the available agents without an assigned group",
@@ -296,12 +379,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -377,12 +461,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -469,12 +554,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -641,7 +727,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -687,7 +773,6 @@
                 "wdb",
                 "vulnerability-detection",
                 "indexer",
-                "agent-upgrade",
                 "task-manager",
                 "cluster"
               ]
@@ -721,7 +806,7 @@
           },
           {
             "name": ":configuration",
-            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Source</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>auth</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>global</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>remote</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>remoted.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>wazuh_db.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>wdb</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td>module configuration reported by wazuh-manager-modulesd (<code>vulnerability-detection</code>, <code>agent-upgrade</code>, <code>task-manager</code>)</td>\n</tr>\n</tbody>\n</table>\n",
+            "description": "<p>Selected manager's configuration to read. The configuration to read depends on the selected component.\nThe following table shows all available combinations of component and configuration values:</p>\n<table class=\"table table-striped table-bordered\">\n<thead>\n<tr>\n<th>Component</th>\n<th>Configuration</th>\n<th>Source</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>auth</td>\n<td>auth</td>\n<td><code>auth</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>global</td>\n<td><code>global</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>remote</td>\n<td><code>remote</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>request</td>\n<td>internal</td>\n<td><code>remoted.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>internal</td>\n<td><code>wazuh_db.*</code> keys of <code>etc/wazuh-manager-internal-options.conf</code></td>\n</tr>\n<tr>\n<td>wazuh-manager-db</td>\n<td>wdb</td>\n<td><code>wdb</code> section of <code>etc/wazuh-manager.conf</code></td>\n</tr>\n<tr>\n<td>wmodules</td>\n<td>wmodules</td>\n<td>module configuration reported by wazuh-manager-modulesd (<code>vulnerability-detection</code>, <code>task-manager</code>)</td>\n</tr>\n</tbody>\n</table>\n",
             "required": true,
             "schema": {
               "type": "string",
@@ -737,7 +822,7 @@
           },
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -773,7 +858,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -824,7 +909,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -860,7 +945,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -905,12 +990,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -983,7 +1069,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -1019,7 +1105,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -1239,12 +1325,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -1394,12 +1481,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -1495,12 +1583,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -1600,12 +1689,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -1687,12 +1777,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -1852,12 +1943,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -1977,12 +2069,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2058,12 +2151,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2158,12 +2252,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2258,12 +2353,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2358,12 +2454,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2532,12 +2629,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2667,12 +2765,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2768,12 +2867,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -2869,12 +2969,13 @@
           },
           {
             "name": "offset",
-            "description": "First element to return in the collection",
+            "description": "First element to return in the collection. Must not exceed 2147483647 (2^31-1), the upper bound of its int32 format",
             "schema": {
               "type": "integer",
               "format": "int32",
               "default": 0,
-              "minimum": 0
+              "minimum": 0,
+              "maximum": 2147483647
             }
           },
           {
@@ -3715,7 +3816,7 @@
         "args": [
           {
             "name": ":node_id",
-            "description": "Cluster node name",
+            "description": "Cluster node name. A name the cluster does not have answers 404, and a configured node that is not connected at that moment is reported the same way",
             "required": true,
             "schema": {
               "type": "string",
@@ -4200,9 +4301,118 @@
                 "description": "If this is not included, the API will get the IP automatically. Allowed values: IP, IP/NET, ANY",
                 "type": "string",
                 "format": "alphanumeric_symbols"
+              },
+              "force": {
+                "type": "object",
+                "description": "Remove the old agent with the same name or IP if the configuration is matched. Unlike `/agents/insert`, replacement is disabled unless `enabled` is set to `true`",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enable force option"
+                  },
+                  "disconnected_time": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Enable force disconnected_time option"
+                      },
+                      "value": {
+                        "type": "string",
+                        "default": "1h",
+                        "description": "Time the agent must has been disconnected to force the insertion. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For example, `7d`, `10s` and `10` are valid values. If no time unit is specified, seconds are used",
+                        "format": "timeframe"
+                      }
+                    }
+                  },
+                  "after_registration_time": {
+                    "type": "string",
+                    "default": "1h",
+                    "description": "Time the agent must has been registered to force the insertion. Time in seconds, ‘[n_days]d’, ‘[n_hours]h’, ‘[n_minutes]m’ or ‘[n_seconds]s’. For example, `7d`, `10s` and `10` are valid values. If no time unit is specified, seconds are used",
+                    "format": "timeframe"
+                  }
+                }
               }
             },
             "required": ["name"]
+          }
+        ]
+      },
+      {
+        "name": "/agents/enrollment-tokens",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.create_enrollment_token",
+        "description": "Mint an enrollment token: the credential a new agent pastes to enroll over the HTTPS agent API (`POST /enroll` on the manager's port 1517) without the shared enrollment password. The token names the manager (`address`, which must be one of the names in the listener certificate, `remote.https.certificate`) and pins its CA; unless `no_credential` is set it also carries a random secret the agent signs its enrollment with. The `token` text is returned in this response only and never listed again. Tokens are minted on the master node",
+        "summary": "Create enrollment token",
+        "tags": ["Agents"],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "body": [
+          {
+            "type": "object",
+            "required": ["address"],
+            "properties": {
+              "address": {
+                "description": "Name (or IP) the agents connect to. Must be one of the names in the listener certificate (`remote.https.certificate`); an address outside it is refused with error 1768",
+                "type": "string",
+                "format": "alphanumeric_symbols"
+              },
+              "port": {
+                "description": "Listener port to write into the token when it differs from the configured one",
+                "type": "integer",
+                "format": "int32",
+                "minimum": 1,
+                "maximum": 65535
+              },
+              "prefix": {
+                "description": "URL prefix to write into the token when it differs from the configured one",
+                "type": "string",
+                "format": "alphanumeric_symbols"
+              },
+              "ttl": {
+                "description": "Lifetime: seconds, or a number followed by `d`, `h`, `m` or `s`. Default: 30 days",
+                "type": "string",
+                "format": "timeframe"
+              },
+              "max_uses": {
+                "description": "Enrollments the token allows. 0 (the default) means unlimited",
+                "type": "integer",
+                "format": "int32",
+                "minimum": 0
+              },
+              "description": {
+                "description": "Free text shown when listing the tokens",
+                "type": "string",
+                "format": "alphanumeric_symbols"
+              },
+              "embed_ca": {
+                "description": "Carry the CA certificate inside the token instead of its pin (no `/cacerts` fetch by the agent)",
+                "type": "boolean",
+                "default": false
+              },
+              "no_credential": {
+                "description": "Token without credential: address and pin only. It can point an agent at the manager but cannot authenticate its enrollment",
+                "type": "boolean",
+                "default": false
+              }
+            }
           }
         ]
       },
@@ -4647,7 +4857,7 @@
       {
         "name": "/security/user/authenticate/run_as",
         "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.security_controller.run_as_login",
-        "description": "This method should be called to get an API token using an authorization context body. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config",
+        "description": "This method should be called to get an API token using an authorization context body. This token will expire after auth_token_exp_timeout seconds (default: 900). This value can be changed using PUT /security/config. An authorization context that matches no rule yields a token with no roles. An empty object is resolved against the rules like any other context, and matches none of the default ones. The body must be a JSON object: a missing body, or one that is not an object, is rejected with a 400",
         "summary": "Login auth_context",
         "tags": ["Security"],
         "query": [
@@ -5023,6 +5233,79 @@
               "type": "string",
               "description": "Group name",
               "format": "group_names"
+            }
+          }
+        ],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/enrollment-tokens",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_enrollment_tokens",
+        "description": "Remove enrollment tokens from the manager's store. This is not the same as revoking one: a revoked token stays listed with `revoked: true`, a purged one is gone. `status=dead`, the default, removes only the tokens that can no longer authorise an enrollment (revoked, expired or out of uses) and never touches a usable one; `status=all` empties the store, the tokens still in use included. The store is written on the master node",
+        "summary": "Purge enrollment tokens",
+        "tags": ["Agents"],
+        "query": [
+          {
+            "name": "pretty",
+            "description": "Show results in human-readable format",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "status",
+            "description": "Which tokens to remove",
+            "schema": {
+              "type": "string",
+              "enum": ["dead", "all"],
+              "default": "dead"
+            },
+            "required": false
+          },
+          {
+            "name": "wait_for_complete",
+            "description": "Disable timeout response",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ]
+      },
+      {
+        "name": "/agents/enrollment-tokens/:token_id",
+        "documentation": "https://documentation.wazuh.com/5.0/user-manual/api/reference.html#operation/api.controllers.agent_controller.delete_enrollment_token",
+        "description": "Revoke an enrollment token. A revoked token enrolls nobody from that moment on (the managers refuse it with a 401 of class `token_revoked`) and stays listed with `revoked: true`. Revoking an already revoked token succeeds again",
+        "summary": "Revoke enrollment token",
+        "tags": ["Agents"],
+        "args": [
+          {
+            "name": ":token_id",
+            "description": "Enrollment token ID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Enrollment token ID: 22 base64url characters",
+              "pattern": "^[A-Za-z0-9_-]{22}$",
+              "example": "AAECAwQFBgcICQoLDA0ODw"
             }
           }
         ],

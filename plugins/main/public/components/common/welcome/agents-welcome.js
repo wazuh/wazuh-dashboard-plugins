@@ -31,20 +31,17 @@ import {
   RequirementVis,
 } from './components';
 import { AgentInfo } from './agent-info/agent-info';
-import MenuAgent from './components/menu-agent';
+import { MenuAgent } from './components/menu-agent';
 import './welcome.scss';
 import { WzDatePicker } from '../../../components/wz-date-picker';
 import { TabVisualizations } from '../../../factories/tab-visualizations';
 import { getChrome, getCore } from '../../../kibana-services';
-import { hasAgentSupportModule } from '../../../react-services/wz-agents';
 import { withErrorBoundary, withGlobalBreadcrumb, withGuard } from '../hocs';
 import { compose } from 'redux';
 import { API_NAME_AGENT_STATUS } from '../../../../common/constants';
-import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 import { PromptAgentNeverConnected } from '../../agents/prompts';
 import { WzButton } from '../buttons';
 import {
-  Applications,
   configurationAssessment,
   fileIntegrityMonitoring,
   endpointSummary,
@@ -61,6 +58,10 @@ import VulsPanel from './components/vuls_panel/vuls_welcome_panel';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { InventoryMetrics } from '../../agents/syscollector/components';
 import { Typography } from '../typography/typography';
+import {
+  getAgentPinnedApplications,
+  sanitizePinnedApplications,
+} from './utils/pinned-applications';
 
 export const AgentsWelcome = compose(
   withErrorBoundary,
@@ -105,42 +106,27 @@ export const AgentsWelcome = compose(
         actionAgents: true, // Hide actions agents
         selectedRequirement: 'pci',
         menuAgent: [],
-        maxModules: 5,
+        isNarrowHeader: false,
         widthWindow: window.innerWidth,
         isLocked: false,
       };
     }
 
+    /**
+     * How many shortcuts fit is decided by CSS (`.wz-agent-pinned-applications`
+     * in `welcome.scss`). Only the narrowest case, with no room for any of
+     * them, is decided here.
+     */
     updateWidth = () => {
-      let menuSize;
-      if (this.state.isLocked) {
-        menuSize = window.innerWidth - this.offset - this.sidebarSizeDefault;
-      } else {
-        menuSize = window.innerWidth - this.offset;
-      }
-      let maxModules = 5;
-      if (menuSize > 1400) {
-        maxModules = 5;
-      } else {
-        if (menuSize > 1250) {
-          maxModules = 4;
-        } else {
-          if (menuSize > 1100) {
-            maxModules = 3;
-          } else {
-            if (menuSize > 900) {
-              maxModules = 2;
-            } else {
-              maxModules = 1;
-              if (menuSize < 750) {
-                maxModules = null;
-              }
-            }
-          }
-        }
-      }
+      const menuSize =
+        window.innerWidth -
+        this.offset -
+        (this.state.isLocked ? this.sidebarSizeDefault : 0);
 
-      this.setState({ maxModules: maxModules, widthWindow: window.innerWidth });
+      this.setState({
+        isNarrowHeader: menuSize < 750,
+        widthWindow: window.innerWidth,
+      });
     };
 
     async componentDidMount() {
@@ -166,6 +152,7 @@ export const AgentsWelcome = compose(
 
     componentWillUnmount() {
       this.drawerLokedSubscribtion?.unsubscribe();
+      window.removeEventListener('resize', this.updateWidth); //eslint-disable-line
     }
 
     updatePinnedApplications(applications) {
@@ -188,10 +175,7 @@ export const AgentsWelcome = compose(
             ];
       }
 
-      // Ensure the pinned applications are supported
-      pinnedApplications = pinnedApplications.filter(pinnedApplication =>
-        Applications.some(({ id }) => id === pinnedApplication),
-      );
+      pinnedApplications = sanitizePinnedApplications(pinnedApplications);
 
       window.localStorage.setItem(
         'wz-menu-agent-apps-pinned',
@@ -203,75 +187,65 @@ export const AgentsWelcome = compose(
     renderModules() {
       return (
         <Fragment>
-          {this.state.menuAgent.map((applicationId, i) => {
-            const moduleID = Object.keys(WAZUH_MODULES).find(
-              key => WAZUH_MODULES[key]?.appId === applicationId,
-            ).appId;
-            if (
-              i < this.state.maxModules &&
-              hasAgentSupportModule(this.props.agent, moduleID)
-            ) {
-              return (
-                <EuiFlexItem
-                  key={i}
-                  grow={false}
-                  style={{ marginLeft: 0, marginTop: 7 }}
-                >
-                  <RedirectAppLinks application={getCore().application}>
-                    <EuiButtonEmpty
-                      href={NavigationService.getInstance().getAppURL(
-                        applicationId,
-                      )}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <span>
-                        {
-                          Applications.find(({ id }) => id === applicationId)
-                            .title
-                        }
-                        &nbsp;
-                      </span>
-                    </EuiButtonEmpty>
-                  </RedirectAppLinks>
-                </EuiFlexItem>
-              );
-            }
-          })}
-          <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-            <EuiPopover
-              button={
+          <EuiFlexItem grow={false} className='wz-agent-pinned-applications'>
+            {getAgentPinnedApplications(
+              this.state.menuAgent,
+              this.props.agent,
+            ).map(application => (
+              <RedirectAppLinks
+                key={application.id}
+                application={getCore().application}
+              >
                 <EuiButtonEmpty
-                  iconSide='right'
-                  iconType='arrowDown'
-                  onClick={() =>
-                    this.setState({ switchModule: !this.state.switchModule })
-                  }
+                  href={NavigationService.getInstance().getAppURL(
+                    application.id,
+                  )}
+                  style={{ cursor: 'pointer' }}
                 >
-                  More...
+                  <span>{application.title}&nbsp;</span>
                 </EuiButtonEmpty>
-              }
-              isOpen={this.state.switchModule}
-              closePopover={() => this.setState({ switchModule: false })}
-              repositionOnScroll={false}
-              anchorPosition='downCenter'
-            >
-              <div>
-                <div style={{ maxWidth: 730 }}>
-                  <MenuAgent
-                    isAgent={this.props.agent}
-                    pinnedApplications={this.state.menuAgent}
-                    updatePinnedApplications={applications =>
-                      this.updatePinnedApplications(applications)
-                    }
-                    closePopover={() => {
-                      this.setState({ switchModule: false });
-                    }}
-                  ></MenuAgent>
-                </div>
-              </div>
-            </EuiPopover>
+              </RedirectAppLinks>
+            ))}
+          </EuiFlexItem>
+          <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
+            {this.renderApplicationsPopover('More...')}
           </EuiFlexItem>
         </Fragment>
+      );
+    }
+
+    renderApplicationsPopover(buttonLabel) {
+      return (
+        <EuiPopover
+          button={
+            <EuiButtonEmpty
+              iconSide='right'
+              iconType='arrowDown'
+              onClick={() =>
+                this.setState({ switchModule: !this.state.switchModule })
+              }
+            >
+              {buttonLabel}
+            </EuiButtonEmpty>
+          }
+          isOpen={this.state.switchModule}
+          closePopover={() => this.setState({ switchModule: false })}
+          repositionOnScroll={false}
+          anchorPosition='downCenter'
+        >
+          <div style={{ maxWidth: 730 }}>
+            <MenuAgent
+              agent={this.props.agent}
+              pinnedApplications={this.state.menuAgent}
+              updatePinnedApplications={applications =>
+                this.updatePinnedApplications(applications)
+              }
+              closePopover={() => {
+                this.setState({ switchModule: false });
+              }}
+            />
+          </div>
+        </EuiPopover>
       );
     }
 
@@ -284,48 +258,14 @@ export const AgentsWelcome = compose(
           responsive={false}
           gutterSize='xs'
         >
-          <EuiFlexItem
-            grow={false}
-            className='wz-module-header-agent-title wz-module-header-agent-title-left'
-          >
+          <EuiFlexItem className='wz-module-header-agent-title wz-module-header-agent-title-left'>
             <EuiFlexGroup responsive={false} gutterSize='xs'>
-              {(this.state.maxModules !== null && this.renderModules()) || (
+              {this.state.isNarrowHeader ? (
                 <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                  <EuiPopover
-                    button={
-                      <EuiButtonEmpty
-                        iconSide='right'
-                        iconType='arrowDown'
-                        onClick={() =>
-                          this.setState({
-                            switchModule: !this.state.switchModule,
-                          })
-                        }
-                      >
-                        Applications
-                      </EuiButtonEmpty>
-                    }
-                    isOpen={this.state.switchModule}
-                    closePopover={() => this.setState({ switchModule: false })}
-                    repositionOnScroll={false}
-                    anchorPosition='downCenter'
-                  >
-                    <div>
-                      <div style={{ maxWidth: 730 }}>
-                        <MenuAgent
-                          isAgent={this.props.agent}
-                          pinnedApplications={this.state.menuAgent}
-                          updatePinnedApplications={applications =>
-                            this.updatePinnedApplications(applications)
-                          }
-                          closePopover={() => {
-                            this.setState({ switchModule: false });
-                          }}
-                        ></MenuAgent>
-                      </div>
-                    </div>
-                  </EuiPopover>
+                  {this.renderApplicationsPopover('Applications')}
                 </EuiFlexItem>
+              ) : (
+                this.renderModules()
               )}
             </EuiFlexGroup>
           </EuiFlexItem>
@@ -345,12 +285,12 @@ export const AgentsWelcome = compose(
                   onClick={() => this.props.switchTab(AgentTabs.STATS)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
-                    this.state.maxModules === null
+                    this.state.isNarrowHeader
                       ? { position: 'bottom', content: 'Stats' }
                       : undefined
                   }
                 >
-                  {this.state.maxModules !== null ? 'Stats' : ''}
+                  {this.state.isNarrowHeader ? '' : 'Stats'}
                 </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
@@ -360,12 +300,12 @@ export const AgentsWelcome = compose(
                   onClick={() => this.props.switchTab(AgentTabs.CONFIGURATION)}
                   className='wz-it-hygiene-header-button'
                   tooltip={
-                    this.state.maxModules === null
+                    this.state.isNarrowHeader
                       ? { position: 'bottom', content: 'Configuration' }
                       : undefined
                   }
                 >
-                  {this.state.maxModules !== null ? 'Configuration' : ''}
+                  {this.state.isNarrowHeader ? '' : 'Configuration'}
                 </WzButton>
               </EuiFlexItem>
             </EuiFlexGroup>

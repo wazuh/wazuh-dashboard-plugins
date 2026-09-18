@@ -129,13 +129,14 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
           class="euiFlexGroup euiFlexGroup--gutterSmall euiFlexGroup--directionColumn"
         >
           <div
-            class="euiFlexItem"
+            class="euiFlexItem euiFlexItem--flexGrowZero"
           >
             <div
               class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"
             >
               <div
                 class="euiFlexItem"
+                style="min-width:0"
               >
                 <div
                   class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow euiFlexGroup--wrap"

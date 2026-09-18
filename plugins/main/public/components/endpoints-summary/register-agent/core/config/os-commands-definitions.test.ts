@@ -18,7 +18,7 @@ describe('optionalParamsDefinitions - sslVerification', () => {
       const result = optionalParamsDefinitions.sslVerification.getParamCommand(
         {
           name: 'sslVerification',
-          property: 'SSL_VERIFICATION',
+          property: 'WAZUH_SSL_VERIFICATION',
           value: true,
         },
         selectedOS,
@@ -33,12 +33,12 @@ describe('optionalParamsDefinitions - sslVerification', () => {
       const result = optionalParamsDefinitions.sslVerification.getParamCommand(
         {
           name: 'sslVerification',
-          property: 'SSL_VERIFICATION',
+          property: 'WAZUH_SSL_VERIFICATION',
           value: false,
         },
         selectedOS,
       );
-      expect(result).toBe("SSL_VERIFICATION='none'");
+      expect(result).toBe("WAZUH_SSL_VERIFICATION='none'");
     },
   );
 });
