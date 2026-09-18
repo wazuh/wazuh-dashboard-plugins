@@ -1,6 +1,7 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { EuiDataGridCellValueElementProps } from '@elastic/eui';
+import { SearchResponse } from '@opensearch-project/opensearch/api/types';
 import {
   useDataGrid,
   DataGridProps,
@@ -235,6 +236,16 @@ describe('useDataGrid hook', () => {
       const { result } = renderHook(() => useDataGrid(props));
 
       expect(result.current.rowCount).toBe(0);
+    });
+
+    it('should return 0, not NaN, when results is the initial placeholder with no hits property (e.g. useState({} as SearchResponse) before the first fetch resolves)', () => {
+      const props = createBaseProps({
+        results: {} as SearchResponse,
+      });
+      const { result } = renderHook(() => useDataGrid(props));
+
+      expect(result.current.rowCount).toBe(0);
+      expect(Number.isNaN(result.current.rowCount)).toBe(false);
     });
 
     it('should limit rows to MAX_ENTRIES_PER_QUERY', () => {

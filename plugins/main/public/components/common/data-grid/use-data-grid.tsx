@@ -74,7 +74,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     localStorageStatePersistenceManager(moduleId);
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
-  const rowCount = results ? (results?.hits?.total as number) : 0;
+  const rowCount = (results?.hits?.total as number) ?? 0;
 
   /** Sorting **/
   // get default sorting from default columns
