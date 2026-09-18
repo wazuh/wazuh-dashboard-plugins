@@ -1,0 +1,27 @@
+/*
+ * Wazuh app - Styles for the enrollment token details flyout
+ * Copyright (C) 2015-2022 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+// Unlike the id and the address, a description is prose written by whoever
+// minted the token: it has spaces to break on, so it wraps onto as many lines
+// as it needs instead of being clipped to one with an ellipsis and read
+// through a tooltip. `overflow-wrap` only breaks inside a word when that one
+// word is wider than the flyout on its own, which keeps the wrapping on word
+// boundaries everywhere else.
+// Justified so the wrapped lines share a straight right edge with the values
+// above and below them, which are single lines that all start and stop at the
+// same place.
+.wz-enrollment-token-description {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  text-align: justify;
+}

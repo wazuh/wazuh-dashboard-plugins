@@ -59,9 +59,13 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
-      {/* Enrollment authenticates one way, so TLS is the only thing that proves
-      the endpoint is talking to the real manager. The switch carries its own
-      label, so no form row label is passed here. */}
+      {/* Enrollment authenticates one way, so TLS is the only thing that
+      proves the endpoint is talking to the real manager. An enrollment token
+      does not settle this either way: it carries a pin -- a digest of the
+      manager CA's public key -- which the agent checks against a CA it still
+      has to obtain on its own, from the endpoint's system store or from this
+      path. The switch carries its own label, so no form row label is passed
+      here. */}
       <InputForm {...formFields.sslVerification} />
       <EuiSpacer size='m' />
       {sslVerificationIsEnabled ? (

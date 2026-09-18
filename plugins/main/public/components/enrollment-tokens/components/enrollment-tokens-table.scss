@@ -1,0 +1,12 @@
+/* The column checkboxes read as one row of options above the table rather than
+as a stacked list, which is how the same selector reads in the agents table. */
+.enrollmentTokensColumnSelector {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin: 8px 0;
+
+  div {
+    margin-right: 20px;
+  }
+}

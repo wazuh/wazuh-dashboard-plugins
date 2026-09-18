@@ -6,14 +6,18 @@ function getSearchParamsAsObject(location) {
   return Object.fromEntries([...searchParams.entries()]);
 }
 
-// See changes in the location object and returns the search parameters
-// FIXME: This hook relies some parent component where is used is re-rendered when the location object changes, else the hook will not update the search params. This need to be redone adding a listener to the history object, but for now this is enough for the current use cases.
+// Tracks the router's query params, resyncing on every navigation (in-app,
+// browser back/forward, or a shared link) via a history listener.
 export const useRouterSearch = () => {
   const navigationService = NavigationService.getInstance();
-  const location = navigationService.getLocation();
-  const [state, setState] = useState(getSearchParamsAsObject(location));
+  const [state, setState] = useState(() =>
+    getSearchParamsAsObject(navigationService.getLocation()),
+  );
   useEffect(() => {
-    setState(getSearchParamsAsObject(location));
-  }, [location]);
+    const unlisten = navigationService.listen(location => {
+      setState(getSearchParamsAsObject(location));
+    });
+    return unlisten;
+  }, [navigationService]);
   return state;
 };

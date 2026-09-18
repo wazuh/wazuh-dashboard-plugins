@@ -8,6 +8,7 @@ export const InputFormText = ({
   onChange,
   placeholder,
   fullWidth,
+  disabled,
 }: IInputFormType) => {
   return (
     <EuiFieldText
@@ -16,6 +17,7 @@ export const InputFormText = ({
       isInvalid={isInvalid}
       onChange={onChange}
       placeholder={placeholder}
+      disabled={disabled}
     />
   );
 };

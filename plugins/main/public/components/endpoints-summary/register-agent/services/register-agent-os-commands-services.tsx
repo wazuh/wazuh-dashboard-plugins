@@ -13,6 +13,7 @@ export const getAllOptionals = (
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
     [
+      'enrollmentToken',
       'serverAddress',
       'wazuhPassword',
       'agentGroups',
@@ -41,6 +42,7 @@ export const getAllOptionalsMacos = (
   // create paramNameOrderList, which is an array of the keys of optionals add interface
   const paramNameOrderList: (keyof IOptionalParameters<tOptionalParameters>)[] =
     [
+      'enrollmentToken',
       'serverAddress',
       'agentGroups',
       'agentName',

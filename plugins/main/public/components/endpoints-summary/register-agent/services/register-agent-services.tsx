@@ -6,18 +6,10 @@ import {
 } from '../core/config/os-commands-definitions';
 import { RegisterAgentData } from '../interfaces/types';
 import { composeAgentEndpoint } from '../../../../../common/services/agent-endpoint';
-
-type RemoteItem = {
-  connection: 'syslog' | 'secure';
-  ipv6: 'yes' | 'no';
-  allowed_ips?: string[];
-  queue_size?: string;
-};
-
-type RemoteConfig = {
-  name: string;
-  haveSecureConnection: boolean | null;
-};
+import {
+  ConfigurationBoolean,
+  isConfigEnabled,
+} from '../../../../../common/services/configuration-value';
 
 export type ServerAddressOptions = {
   label: string;
@@ -25,43 +17,27 @@ export type ServerAddressOptions = {
   nodetype: string;
 };
 
-/**
- * Get the remote configuration from api
- */
-async function getRemoteConfiguration(nodeName: string): Promise<RemoteConfig> {
-  let config: RemoteConfig = {
-    name: nodeName,
-    haveSecureConnection: false,
+export type AuthConfiguration = {
+  auth?: {
+    use_password?: ConfigurationBoolean;
   };
+  'authd.pass'?: string;
+};
 
-  try {
-    const result = await WzRequest.apiReq(
-      'GET',
-      `/cluster/${nodeName}/configuration/request/remote`,
-      {},
-    );
-    const items = result?.data?.data?.affected_items || [];
-    const remote = items[0]?.remote;
-    if (remote) {
-      const remoteFiltered = remote.filter((item: RemoteItem) => {
-        return item.connection === 'secure';
-      });
-
-      remoteFiltered.length > 0
-        ? (config.haveSecureConnection = true)
-        : (config.haveSecureConnection = false);
-    }
-    return config;
-  } catch (error) {
-    return config;
-  }
+export interface RegistrationPassword {
+  needsPassword: boolean;
+  /** Empty when no password is needed, or when the caller cannot read it. */
+  password: string;
 }
+
 /**
  * Get the cluster auth configuration from Wazuh API
  * @param node
  * @returns
  */
-async function getAuthConfiguration(node: string) {
+async function getAuthConfiguration(
+  node: string,
+): Promise<AuthConfiguration | undefined> {
   const authConfigUrl = `/cluster/${node}/configuration/auth/auth`;
   const result = await WzRequest.apiReq('GET', authConfigUrl, {});
   const auth = result?.data?.data?.affected_items?.[0];
@@ -69,36 +45,15 @@ async function getAuthConfiguration(node: string) {
 }
 
 /**
- * Get the connection configuration from the nodes registered in the cluster
- * @param nodeSelected
- * @param defaultServerAddress
+ * Whether the enrollment command has to carry a registration password, and
+ * which one.
  */
-async function getConnectionConfig(
-  nodeSelected: ServerAddressOptions,
-  defaultServerAddress?: string,
-) {
-  const nodeName = nodeSelected?.label;
-  const nodeIp = nodeSelected?.value;
-  if (!defaultServerAddress) {
-    if (nodeSelected.nodetype !== 'custom') {
-      const remoteConfig = await getRemoteConfiguration(nodeName);
-      return {
-        serverAddress: nodeIp,
-        connectionSecure: remoteConfig.haveSecureConnection,
-      };
-    } else {
-      return {
-        serverAddress: nodeName,
-        connectionSecure: true,
-      };
-    }
-  } else {
-    return {
-      serverAddress: defaultServerAddress,
-      connectionSecure: true,
-    };
-  }
-}
+export const resolveRegistrationPassword = (
+  authConfig?: AuthConfiguration,
+): RegistrationPassword =>
+  isConfigEnabled(authConfig?.auth?.use_password)
+    ? { needsPassword: true, password: authConfig?.['authd.pass'] || '' }
+    : { needsPassword: false, password: '' };
 
 type NodeItem = {
   name: string;
@@ -156,21 +111,17 @@ export const getMasterNode = (
 };
 
 /**
- * Get the remote and the auth configuration from the cluster master node
+ * Get the auth configuration from the cluster master node
  * This function get the config from cluster mode
  */
 export const getMasterConfiguration = async () => {
   const nodes = await fetchClusterNodesOptions();
   const masterNode = getMasterNode(nodes);
-  const remote = await getRemoteConfiguration(masterNode[0].label);
   const auth = await getAuthConfiguration(masterNode[0].label);
   return {
-    remote,
     auth,
   };
 };
-
-export { getConnectionConfig, getRemoteConfiguration };
 
 export const getGroups = async () => {
   const result = await WzRequest.apiReq('GET', '/groups', {});
@@ -191,6 +142,18 @@ export const getRegisterAgentFormValues = (form: UseFormReturn) => {
 };
 
 const ENDPOINT_FIELDS = ['serverAddress', 'serverPort', 'serverPath'];
+
+/* Fields of the enrollment token step that are not deployment variables and
+must never reach the generated command: three parameterize the request the
+wizard makes to the manager to mint a token, and the fourth holds a token the
+operator already had. The token the agent is installed with reaches the command
+as `optionalParams.enrollmentToken`, whichever of the two paths produced it. */
+const ENROLLMENT_TOKEN_FORM_FIELDS = [
+  'existingEnrollmentToken',
+  'enrollmentTokenTtl',
+  'enrollmentTokenMaxUses',
+  'enrollmentTokenDescription',
+];
 
 export interface IParseRegisterFormValues {
   operatingSystem: {
@@ -226,6 +189,8 @@ export const parseRegisterAgentFormValues = (
   formValues.forEach(field => {
     if (ENDPOINT_FIELDS.includes(field.name as string)) {
       endpointComponents[field.name as string] = field.value;
+    } else if (ENROLLMENT_TOKEN_FORM_FIELDS.includes(field.name as string)) {
+      // Consumed by the token step, not by the install command.
     } else if (field.name === 'operatingSystemSelection') {
       // search the architecture defined in architecture array and get the os name defined in title array in the same index
       const operatingSystem = OSOptionsDefined.find(os =>
@@ -253,6 +218,22 @@ export const parseRegisterAgentFormValues = (
     port: endpointComponents.serverPort,
     path: endpointComponents.serverPath,
   });
+
+  /* An enrollment token already names the manager and carries the credential
+  the agent enrolls with, and the installer refuses a token that either of
+  those variables contradicts -- a password beside a token that carries a
+  credential, an endpoint that is not the token's own address -- so neither is
+  emitted beside one. The fields keep their values in the form, so clearing the
+  token restores the command they produced.
+
+  TLS is not one of them. The token carries a pin, a digest of the manager CA's
+  public key, which the agent checks against a CA it still has to obtain
+  separately -- so how the endpoint trusts the listener stays the operator's to
+  say, with or without a token. */
+  if (parsedForm.optionalParams.enrollmentToken) {
+    parsedForm.optionalParams.serverAddress = '';
+    parsedForm.optionalParams.wazuhPassword = '';
+  }
 
   /* A CA pins the certificate the agent checks, so it means nothing once
   verification is off -- and the agent would still write it to the config,

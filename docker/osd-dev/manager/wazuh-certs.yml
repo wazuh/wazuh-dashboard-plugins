@@ -1,0 +1,16 @@
+# Node inventory for wazuh-certs-tool.sh, read by the manager entrypoint.
+#
+# Only the manager node is listed: the indexer, the dashboard and the SAML/
+# imposter certificates come from the "generator" service in dev.yml, which
+# also owns the root CA this manager reuses.
+#
+# "name" doubles as the output filename prefix, so the entrypoint expects
+# <name>-remoted.pem / <name>-remoted-key.pem. It is also added to the SAN, so
+# it must match the address agents connect to.
+nodes:
+  manager:
+    - name: wazuh.manager.local
+      ip: 127.0.0.1
+      dns:
+        - wazuh.manager.local
+        - localhost
