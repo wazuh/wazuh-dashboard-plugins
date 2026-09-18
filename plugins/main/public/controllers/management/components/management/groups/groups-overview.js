@@ -19,7 +19,7 @@ import {
 } from '@elastic/eui';
 
 // Wazuh components
-import WzGroupsActionButtons from './actions-buttons-main';
+import { AddNewGroupButton } from '../../../../../components/management/groups/add-new-group-button';
 
 import { connect } from 'react-redux';
 import {
@@ -185,7 +185,7 @@ export class WzGroupsOverview extends Component {
 
   render() {
     const actionButtons = [
-      <WzGroupsActionButtons reloadTable={this.reloadTable} />,
+      <AddNewGroupButton onGroupCreated={this.reloadTable} />,
     ];
 
     const getRowProps = item => {
