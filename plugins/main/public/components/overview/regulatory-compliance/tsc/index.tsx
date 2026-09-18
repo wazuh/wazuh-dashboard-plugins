@@ -19,5 +19,5 @@ export const RegulatoryComplianceTSC = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

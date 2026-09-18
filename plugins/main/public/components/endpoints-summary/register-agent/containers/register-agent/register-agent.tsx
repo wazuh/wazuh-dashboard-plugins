@@ -20,6 +20,7 @@ import { InputForm } from '../../../../common/form';
 import {
   getGroups,
   getMasterConfiguration,
+  resolveRegistrationPassword,
 } from '../../services/register-agent-services';
 import { useForm } from '../../../../common/form/hooks';
 import { FormConfiguration } from '../../../../common/form/types';
@@ -35,8 +36,14 @@ import GroupInput from '../../components/group-input/group-input';
 import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateAgentName,
+  validateExistingEnrollmentToken,
   validateManagerCaPath,
 } from '../../utils/validations';
+import {
+  validateEnrollmentTokenMaxUses,
+  validateEnrollmentTokenTtl,
+} from '../../../../../services/enrollment-tokens';
+import { EnrollmentToken } from '../../interfaces/types';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -68,10 +75,20 @@ export const RegisterAgent = compose(
   const [wazuhPassword, setWazuhPassword] = useState('');
   const [groups, setGroups] = useState([]);
   const [needsPassword, setNeedsPassword] = useState<boolean>(false);
+  const [enrollmentToken, setEnrollmentToken] =
+    useState<EnrollmentToken | null>(null);
   const [missingPasswordReadPermissions] = useUserPermissionsRequirements([
     [{ action: 'cluster:update_config', resource: 'node:id:*' }],
   ]);
   const canReadAuthdPassword = !missingPasswordReadPermissions;
+  /* Minting a token is how the wizard deploys an agent. A server that does not
+  know the action -- one older than the mint endpoint, or whose RBAC policy
+  predates it -- reports it as missing here, which is also what a user without
+  the permission gets, and both fall back to the enrollment password path. */
+  const [missingEnrollmentTokenPermissions] = useUserPermissionsRequirements([
+    [{ action: 'enrollment_token:create', resource: '*:*:*' }],
+  ]);
+  const canCreateEnrollmentToken = !missingEnrollmentTokenPermissions;
 
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
@@ -102,6 +119,33 @@ export const RegisterAgent = compose(
       initialValue: configuration['enrollment.path'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPathPrefix,
     },
+    /* A token the operator kept from an earlier mint. Filling it deploys with
+    that token instead of asking the server for a new one, so it excludes the
+    three fields below. */
+    existingEnrollmentToken: {
+      type: 'text',
+      initialValue: '',
+      validate: validateExistingEnrollmentToken,
+    },
+    /* These three parameterize the token the server mints, not the agent
+    install, and all are optional: left empty the server applies its own
+    defaults, a 30 day lifetime and unlimited enrollments. */
+    enrollmentTokenTtl: {
+      type: 'text',
+      initialValue: '',
+      validate: validateEnrollmentTokenTtl,
+    },
+    enrollmentTokenMaxUses: {
+      type: 'number',
+      initialValue: '',
+      validate: validateEnrollmentTokenMaxUses,
+    },
+    /* Free text kept with the token on the server so it can be told apart from
+    the others when they are listed later. It never reaches the agent. */
+    enrollmentTokenDescription: {
+      type: 'text',
+      initialValue: '',
+    },
     agentName: {
       type: 'text',
       initialValue: '',
@@ -110,7 +154,8 @@ export const RegisterAgent = compose(
     /* Enrollment authenticates one way, agent to manager, so the manager is
     authenticated solely by TLS. The agent verifies by default -- against the
     endpoint's system CA store, or against the CA below when one is given -- and
-    turning this off generates an explicit SSL_VERIFICATION=none opt-out. */
+    turning this off generates an explicit WAZUH_SSL_VERIFICATION=none
+    opt-out. */
     sslVerification: {
       type: 'switch',
       initialValue: true,
@@ -165,16 +210,11 @@ export const RegisterAgent = compose(
 
       // Handle master config
       if (masterConfigResult.status === 'fulfilled') {
-        const masterConfig = masterConfigResult.value;
-        const { auth: authConfig } = masterConfig;
-        // get wazuh password configuration
-        let wazuhPassword = '';
-        const needsPassword = authConfig?.auth?.use_password === 'yes';
-        if (needsPassword) {
-          wazuhPassword = authConfig?.['authd.pass'] || '';
-        }
+        const { needsPassword, password } = resolveRegistrationPassword(
+          masterConfigResult.value.auth,
+        );
         setNeedsPassword(needsPassword);
-        setWazuhPassword(wazuhPassword);
+        setWazuhPassword(password);
       }
 
       // Handle wazuh version
@@ -273,6 +313,9 @@ export const RegisterAgent = compose(
                       needsPassword={needsPassword}
                       wazuhPassword={wazuhPassword}
                       canReadAuthdPassword={canReadAuthdPassword}
+                      canCreateEnrollmentToken={canCreateEnrollmentToken}
+                      enrollmentToken={enrollmentToken}
+                      onEnrollmentTokenChange={setEnrollmentToken}
                       osCard={osCard}
                     />
                   </EuiFlexItem>
