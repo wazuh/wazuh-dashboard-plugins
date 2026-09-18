@@ -55,14 +55,29 @@ const snapshot = (
   },
 });
 
-const buildContext = () => ({
+const buildContext = (settings: Record<string, unknown> = {}) => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
     error: jest.fn(),
   },
-  context: {},
+  context: {
+    services: {
+      core: {
+        savedObjects: { createInternalRepository: jest.fn(() => ({})) },
+        uiSettings: {
+          asScopedToClient: jest.fn(() => ({
+            get: jest.fn((key: string) =>
+              key in settings
+                ? Promise.resolve(settings[key])
+                : Promise.reject(new Error(`Setting ${key} not found`)),
+            ),
+          })),
+        },
+      },
+    },
+  },
 });
 
 const buildServices = ({
@@ -98,14 +113,17 @@ type Services = ReturnType<typeof buildServices>;
 const asContract = (services: Services) =>
   services as unknown as CertificateValidityServices;
 
-const runTask = (services: Services) =>
+const runTask = (services: Services, settings?: Record<string, unknown>) =>
   initializationTaskCreatorCertificateValidity({
     taskName: TASK_NAME,
     services: asContract(services),
-  }).run(buildContext() as unknown as InitializationTaskRunContext);
+  }).run(buildContext(settings) as unknown as InitializationTaskRunContext);
 
-const runTaskWithContext = async (services: Services) => {
-  const context = buildContext();
+const runTaskWithContext = async (
+  services: Services,
+  settings?: Record<string, unknown>,
+) => {
+  const context = buildContext(settings);
   const result = await initializationTaskCreatorCertificateValidity({
     taskName: TASK_NAME,
     services: asContract(services),
@@ -247,6 +265,97 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     await expect(runTask(services)).resolves.toMatchObject({
       status: 'warning',
       message: expect.stringMatching(/could not be determined/i),
+    });
+  });
+
+  it('uses the default thresholds when the settings are not set (S9.1)', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', 20 * DAY),
+        },
+      },
+    });
+
+    await expect(runTask(services)).resolves.toMatchObject({
+      status: 'warning',
+    });
+  });
+
+  it('honours a configured warning threshold (S9.2)', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', 20 * DAY),
+        },
+      },
+    });
+
+    // 20 days is inside the default 30-day warning, outside a 10-day one
+    await expect(
+      runTask(services, { 'healthCheck.certificates.warningDays': 10 }),
+    ).resolves.toMatchObject({ status: 'ok' });
+  });
+
+  it('honours a configured error threshold (S9.2)', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', 20 * DAY),
+        },
+      },
+    });
+
+    await expect(
+      runTask(services, { 'healthCheck.certificates.criticalDays': 25 }),
+    ).resolves.toMatchObject({ status: 'error' });
+  });
+
+  it('refuses an error threshold above the warning one (S9.3)', async () => {
+    const { result, logger } = await runTaskWithContext(
+      buildServices({
+        outcomes: {
+          node01: {
+            kind: 'ok',
+            node: 'node01',
+            snapshot: snapshot('node01', 20 * DAY),
+          },
+        },
+      }),
+      {
+        'healthCheck.certificates.warningDays': 7,
+        'healthCheck.certificates.criticalDays': 60,
+      },
+    );
+
+    // the defaults apply, so 20 days warns instead of erroring
+    expect(result).toMatchObject({ status: 'warning' });
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringMatching(/not lower than the warning/i),
+    );
+  });
+
+  it('ignores a setting that is not a positive integer (S9.4)', async () => {
+    const services = buildServices({
+      outcomes: {
+        node01: {
+          kind: 'ok',
+          node: 'node01',
+          snapshot: snapshot('node01', 20 * DAY),
+        },
+      },
+    });
+
+    await expect(
+      runTask(services, { 'healthCheck.certificates.warningDays': -5 }),
+    ).resolves.toMatchObject({
+      status: 'warning',
     });
   });
 
