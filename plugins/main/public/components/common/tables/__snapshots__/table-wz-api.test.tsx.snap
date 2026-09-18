@@ -5,7 +5,6 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
   downloadCsv={false}
   endpoint="/"
   error={false}
-  searchBar={false}
   searchTable={false}
   tableColumns={
     Array [
@@ -143,7 +142,6 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
             error={false}
             onSearch={[Function]}
             reload={0}
-            searchBar={false}
             searchTable={false}
             tableColumns={
               Array [

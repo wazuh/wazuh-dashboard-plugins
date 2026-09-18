@@ -65,6 +65,8 @@ function TableWzAPIInner(
     addOnTitle,
     extra,
     setReload,
+    title = null,
+    downloadCsv = false,
     ...rest
   }: {
     actionButtons?:
@@ -75,7 +77,7 @@ function TableWzAPIInner(
       | ReactNode
       | ReactNode[]
       | (({ filters }: { filters: Filters }) => ReactNode);
-    title?: string;
+    title?: string | null;
     addOnTitle?: ReactNode;
     description?: string;
     extra?: ReactNode;
@@ -279,10 +281,10 @@ function TableWzAPIInner(
         <EuiFlexItem style={{ minWidth: 0 }}>
           <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-              {rest.title && (
+              {title && (
                 <EuiTitle data-test-subj='table-wz-api-title' size='s'>
                   <h1>
-                    {rest.title}{' '}
+                    {title}{' '}
                     {isLoading ? (
                       <EuiLoadingSpinner size='s' />
                     ) : (
@@ -306,7 +308,7 @@ function TableWzAPIInner(
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
-            {rest.downloadCsv && (
+            {downloadCsv && (
               <>
                 <ExportTableCsv
                   endpoint={rest.endpoint}
@@ -316,9 +318,8 @@ function TableWzAPIInner(
                     sort: formatSorting(tableState.sorting),
                   })}
                   title={
-                    typeof rest.downloadCsv === 'string'
-                      ? rest.downloadCsv
-                      : rest.title
+                    (typeof downloadCsv === 'string' ? downloadCsv : title) ??
+                    undefined
                   }
                   maxRows={maxRows}
                   isLoading={isLoading}
@@ -382,7 +383,7 @@ function TableWzAPIInner(
     <TableWithSearchBar
       ref={forwardedRef}
       onSearch={onSearch}
-      {...{ ...rest, reload: reloadFootprint }}
+      {...{ ...rest, title, downloadCsv, reload: reloadFootprint }}
       tableColumns={tableColumns}
       selectedFields={tableState.selectedFields}
       tableInitialPageSize={tableState.pageSize}
@@ -392,7 +393,7 @@ function TableWzAPIInner(
   ) : (
     <TableDefault
       onSearch={onSearch}
-      {...{ ...rest, reload: reloadFootprint }}
+      {...{ ...rest, title, downloadCsv, reload: reloadFootprint }}
       tableInitialPageSize={tableState.pageSize}
       tableInitialSortingField={tableState.sorting.field}
       tableInitialSortingDirection={tableState.sorting.direction}
@@ -418,10 +419,3 @@ function TableWzAPIInner(
 
 export const TableWzAPI = forwardRef(TableWzAPIInner);
 TableWzAPI.displayName = 'TableWzAPI';
-
-// Set default props
-TableWzAPI.defaultProps = {
-  title: null,
-  downloadCsv: false,
-  searchBar: false,
-};
