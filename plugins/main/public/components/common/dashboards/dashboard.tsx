@@ -71,6 +71,7 @@ export const Dashboard = props => {
             ({ dashboardId, agentDashboardId, className = '' }) => {
               const dashboard = (
                 <DashboardRenderer
+                  key={dashboardId || agentDashboardId}
                   dashboardId={dashboardId}
                   agentDashboardId={agentDashboardId}
                   className={classnames(className, {
