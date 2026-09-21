@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { omit } from 'lodash';
 import { IntlProvider } from 'react-intl';
 import {
   EuiDataGrid,
@@ -36,7 +35,7 @@ import { LoadingSearchbarProgress } from '../../../../../../public/components/co
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
 import {
   useDataGrid,
-  DATA_GRID_NON_EUI_PROP_KEYS,
+  toEuiDataGridProps,
 } from '../../../../common/data-grid/use-data-grid';
 import {
   HideOnErrorInitializatingDataSource,
@@ -268,7 +267,7 @@ const InventoryVulsComponent = () => {
               >
                 <div className='vulsInventoryDataGrid'>
                   <EuiDataGrid
-                    {...omit(dataGridProps, DATA_GRID_NON_EUI_PROP_KEYS)}
+                    {...toEuiDataGridProps(dataGridProps)}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
                     toolbarVisibility={{
                       showColumnSelector: { allowHide: false },

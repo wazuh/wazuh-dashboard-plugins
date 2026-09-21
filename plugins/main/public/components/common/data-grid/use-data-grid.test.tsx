@@ -6,6 +6,7 @@ import {
   useDataGrid,
   DataGridProps,
   DATA_GRID_NON_EUI_PROP_KEYS,
+  toEuiDataGridProps,
 } from './use-data-grid';
 import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
 
@@ -102,6 +103,17 @@ describe('useDataGrid hook', () => {
 
     DATA_GRID_NON_EUI_PROP_KEYS.forEach(key => {
       expect(result.current).toHaveProperty(key);
+    });
+  });
+
+  it('toEuiDataGridProps strips every DATA_GRID_NON_EUI_PROP_KEYS entry', () => {
+    const props = createBaseProps();
+    const { result } = renderHook(() => useDataGrid(props));
+
+    const euiProps = toEuiDataGridProps(result.current);
+
+    DATA_GRID_NON_EUI_PROP_KEYS.forEach(key => {
+      expect(euiProps).not.toHaveProperty(key);
     });
   });
 

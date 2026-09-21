@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { omit } from 'lodash';
 import {
   EuiFlexItem,
   EuiToolTip,
@@ -18,7 +17,7 @@ import {
   tDataGridColumn,
   getAllCustomRenders,
   PaginationOptions,
-  DATA_GRID_NON_EUI_PROP_KEYS,
+  toEuiDataGridProps,
 } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
@@ -169,7 +168,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
               If this is used in future versions, we should add the functionality to manage the
               visibility of columns thorugh the Available fields button.
             */
-            {...omit(dataGridProps, DATA_GRID_NON_EUI_PROP_KEYS)}
+            {...toEuiDataGridProps(dataGridProps)}
             className={sideNavDocked ? 'dataGridDockedNav' : ''}
             toolbarVisibility={{
               additionalControls: (

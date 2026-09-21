@@ -31,7 +31,7 @@ import {
   tDataGridColumn,
   TDataGridReturn,
   useDataGrid,
-  DATA_GRID_NON_EUI_PROP_KEYS,
+  toEuiDataGridProps,
 } from '../data-grid';
 
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
@@ -65,7 +65,6 @@ import {
   withWrapComponent,
 } from '../hocs';
 import { compose } from 'redux';
-import { omit } from 'lodash';
 import { useEffectEnsureComponentMounted } from '../hooks';
 import RestoreStateColumnsButton from './components/restore-state-columns';
 
@@ -150,7 +149,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
 
       return (
         <EuiDataGrid
-          {...omit(dataGridProps, DATA_GRID_NON_EUI_PROP_KEYS)}
+          {...toEuiDataGridProps(dataGridProps)}
           className={sideNavDocked ? 'dataGridDockedNav' : ''}
           toolbarVisibility={{
             showColumnSelector: { allowHide: false },
