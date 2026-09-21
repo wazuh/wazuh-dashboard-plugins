@@ -61,15 +61,17 @@ describe('TopNavMenu Component', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    render(<TopNavMenu items={itemsWithWrapper} useUpdatedUX={false} />);
+    try {
+      render(<TopNavMenu items={itemsWithWrapper} useUpdatedUX={false} />);
 
-    const hasKeyWarning = consoleError.mock.calls.some(args =>
-      args.some(
-        arg => typeof arg === 'string' && arg.includes('unique "key" prop'),
-      ),
-    );
-    expect(hasKeyWarning).toBe(false);
-
-    consoleError.mockRestore();
+      const hasKeyWarning = consoleError.mock.calls.some(args =>
+        args.some(
+          arg => typeof arg === 'string' && arg.includes('unique "key" prop'),
+        ),
+      );
+      expect(hasKeyWarning).toBe(false);
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

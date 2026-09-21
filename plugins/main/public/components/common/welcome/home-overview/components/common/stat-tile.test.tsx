@@ -34,25 +34,27 @@ describe('StatTile', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    render(
-      <StatTile
-        value={
-          <div>
-            <a href='#'>42</a>
-          </div>
-        }
-        label='Passed'
-        data-test-subj='tile'
-      />,
-    );
+    try {
+      render(
+        <StatTile
+          value={
+            <div>
+              <a href='#'>42</a>
+            </div>
+          }
+          label='Passed'
+          data-test-subj='tile'
+        />,
+      );
 
-    const hasNestingWarning = consoleError.mock.calls.some(args =>
-      args.some(
-        arg => typeof arg === 'string' && arg.includes('validateDOMNesting'),
-      ),
-    );
-    expect(hasNestingWarning).toBe(false);
-
-    consoleError.mockRestore();
+      const hasNestingWarning = consoleError.mock.calls.some(args =>
+        args.some(
+          arg => typeof arg === 'string' && arg.includes('validateDOMNesting'),
+        ),
+      );
+      expect(hasNestingWarning).toBe(false);
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });

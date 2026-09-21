@@ -21,32 +21,34 @@ describe('ConfigurationCards', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    render(
-      <ConfigurationCards configuration={configuration} goBack={() => {}} />,
-    );
+    try {
+      render(
+        <ConfigurationCards configuration={configuration} goBack={() => {}} />,
+      );
 
-    const hasKeyWarning = consoleError.mock.calls.some(args =>
-      args.some(
-        arg => typeof arg === 'string' && arg.includes('unique "key" prop'),
-      ),
-    );
-    expect(hasKeyWarning).toBe(false);
+      const hasKeyWarning = consoleError.mock.calls.some(args =>
+        args.some(
+          arg => typeof arg === 'string' && arg.includes('unique "key" prop'),
+        ),
+      );
+      expect(hasKeyWarning).toBe(false);
 
-    consoleError.mockRestore();
-
-    expect(screen.getByText('Hidden')).toBeInTheDocument();
-    expect(screen.getByText('false')).toBeInTheDocument();
-    expect(screen.getByText('Name')).toBeInTheDocument();
-    expect(screen.getByText('node-01')).toBeInTheDocument();
-    expect(screen.getByText('Node name')).toBeInTheDocument();
-    expect(screen.getByText('worker-node')).toBeInTheDocument();
-    expect(screen.getByText('Node type')).toBeInTheDocument();
-    expect(screen.getByText('master')).toBeInTheDocument();
-    expect(screen.getByText('Bind address')).toBeInTheDocument();
-    expect(screen.getByText('0.0.0.0')).toBeInTheDocument();
-    expect(screen.getByText('IP')).toBeInTheDocument();
-    expect(screen.getByText('10.0.0.1')).toBeInTheDocument();
-    expect(screen.getByText('Port')).toBeInTheDocument();
-    expect(screen.getByText('1516')).toBeInTheDocument();
+      expect(screen.getByText('Hidden')).toBeInTheDocument();
+      expect(screen.getByText('false')).toBeInTheDocument();
+      expect(screen.getByText('Name')).toBeInTheDocument();
+      expect(screen.getByText('node-01')).toBeInTheDocument();
+      expect(screen.getByText('Node name')).toBeInTheDocument();
+      expect(screen.getByText('worker-node')).toBeInTheDocument();
+      expect(screen.getByText('Node type')).toBeInTheDocument();
+      expect(screen.getByText('master')).toBeInTheDocument();
+      expect(screen.getByText('Bind address')).toBeInTheDocument();
+      expect(screen.getByText('0.0.0.0')).toBeInTheDocument();
+      expect(screen.getByText('IP')).toBeInTheDocument();
+      expect(screen.getByText('10.0.0.1')).toBeInTheDocument();
+      expect(screen.getByText('Port')).toBeInTheDocument();
+      expect(screen.getByText('1516')).toBeInTheDocument();
+    } finally {
+      consoleError.mockRestore();
+    }
   });
 });
