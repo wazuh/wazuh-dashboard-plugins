@@ -90,6 +90,28 @@ export const RegisterAgent = compose(
   ]);
   const canCreateEnrollmentToken = !missingEnrollmentTokenPermissions;
 
+  /* A group created from the wizard is selected right away, so the list it is
+  picked from has to be read again. */
+  const refreshGroups = async () => {
+    try {
+      setGroups(await getGroups());
+    } catch (error) {
+      const options = {
+        context: 'RegisterAgent.refreshGroups',
+        level: UI_LOGGER_LEVELS.ERROR,
+        severity: UI_ERROR_SEVERITIES.BUSINESS,
+        display: true,
+        store: false,
+        error: {
+          error: error,
+          message: error.message || error,
+          title: error.name || error,
+        },
+      };
+      ErrorHandler.handleError(error, options);
+    }
+  };
+
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
       type: 'custom',
@@ -184,7 +206,7 @@ export const RegisterAgent = compose(
       type: 'custom',
       initialValue: [],
       component: props => {
-        return <GroupInput {...props} />;
+        return <GroupInput {...props} onGroupCreated={refreshGroups} />;
       },
       options: {
         groups,

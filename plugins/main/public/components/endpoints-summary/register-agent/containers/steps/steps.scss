@@ -74,7 +74,22 @@ $registerAgentFormWidth: $registerAgentInputWidth * 2 + $registerAgentFormGutter
     align-items: center;
   }
 
+  /* The selector sits beside the "Add new group" button in a flex item that
+  does not grow, so its width has to be stated or it collapses to the input's
+  intrinsic size. */
+  .euiFlexItem.registerAgentGroupsSelector {
+    width: $registerAgentInputWidth;
+    max-width: 100%;
+  }
+
+  /* Flushes the icon-only help buttons against the labels they annotate. */
   .euiButtonEmpty .euiButtonEmpty__content {
     padding: 0;
+  }
+
+  /* A button with a text label takes EUI's padding back, so its hover and
+  focus background is not flush against the text. */
+  .euiButtonEmpty.addNewGroupButton .euiButtonEmpty__content {
+    padding: 0 8px;
   }
 }
