@@ -65,7 +65,7 @@ function TableWzAPIInner(
     addOnTitle,
     extra,
     setReload,
-    title = null,
+    title,
     downloadCsv = false,
     ...rest
   }: {
@@ -77,7 +77,7 @@ function TableWzAPIInner(
       | ReactNode
       | ReactNode[]
       | (({ filters }: { filters: Filters }) => ReactNode);
-    title?: string | null;
+    title?: string;
     addOnTitle?: ReactNode;
     description?: string;
     extra?: ReactNode;
@@ -317,10 +317,7 @@ function TableWzAPIInner(
                     ...filters,
                     sort: formatSorting(tableState.sorting),
                   })}
-                  title={
-                    (typeof downloadCsv === 'string' ? downloadCsv : title) ??
-                    undefined
-                  }
+                  title={typeof downloadCsv === 'string' ? downloadCsv : title}
                   maxRows={maxRows}
                   isLoading={isLoading}
                 />
@@ -383,7 +380,7 @@ function TableWzAPIInner(
     <TableWithSearchBar
       ref={forwardedRef}
       onSearch={onSearch}
-      {...{ ...rest, title, downloadCsv, reload: reloadFootprint }}
+      {...{ ...rest, reload: reloadFootprint }}
       tableColumns={tableColumns}
       selectedFields={tableState.selectedFields}
       tableInitialPageSize={tableState.pageSize}
@@ -393,7 +390,7 @@ function TableWzAPIInner(
   ) : (
     <TableDefault
       onSearch={onSearch}
-      {...{ ...rest, title, downloadCsv, reload: reloadFootprint }}
+      {...{ ...rest, reload: reloadFootprint }}
       tableInitialPageSize={tableState.pageSize}
       tableInitialSortingField={tableState.sorting.field}
       tableInitialSortingDirection={tableState.sorting.direction}

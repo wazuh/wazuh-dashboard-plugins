@@ -137,7 +137,6 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
           className="euiFlexItem"
         >
           <TableDefault
-            downloadCsv={false}
             endpoint="/"
             error={false}
             onSearch={[Function]}
@@ -172,7 +171,6 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
             tableInitialPageSize={15}
             tableInitialSortingDirection="asc"
             tableInitialSortingField=""
-            title="Table"
           >
             <EuiBasicTable
               columns={
