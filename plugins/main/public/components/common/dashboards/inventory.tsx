@@ -100,10 +100,10 @@ const InventoryDashboard = compose(
           {getDashboardPanels && (
             <>
               {getDashboardPanels.map(
-                ({ dashboardId, agentDashboardId, className = '' }) => {
+                ({ dashboardId, agentDashboardId, className = '' }, index) => {
                   const dashboard = (
                     <DashboardRenderer
-                      key={dashboardId || agentDashboardId}
+                      key={index}
                       dashboardId={dashboardId}
                       agentDashboardId={agentDashboardId}
                       className={classnames(className, {
@@ -127,11 +127,7 @@ const InventoryDashboard = compose(
                   );
 
                   if (className) {
-                    return (
-                      <div key={dashboardId || agentDashboardId}>
-                        {dashboard}
-                      </div>
-                    );
+                    return <div key={index}>{dashboard}</div>;
                   }
 
                   return dashboard;

@@ -68,10 +68,10 @@ export const Dashboard = props => {
 
         <div className='wz-dashboard-responsive' id='dashboardViewport'>
           {props.getDashboardPanels.map(
-            ({ dashboardId, agentDashboardId, className = '' }) => {
+            ({ dashboardId, agentDashboardId, className = '' }, index) => {
               const dashboard = (
                 <DashboardRenderer
-                  key={dashboardId || agentDashboardId}
+                  key={index}
                   dashboardId={dashboardId}
                   agentDashboardId={agentDashboardId}
                   className={classnames(className, {
@@ -92,10 +92,7 @@ export const Dashboard = props => {
                 /* Add a wrapper div with the className to apply styles that allow to overwrite
                 some styles using CSS selectors */
                 return (
-                  <div
-                    className={className}
-                    key={dashboardId || agentDashboardId}
-                  >
+                  <div className={className} key={index}>
                     {dashboard}
                   </div>
                 );
