@@ -72,6 +72,10 @@ describe('OverviewSection', () => {
     // data flowed through: active hero + a severity value + a tactic
     expect(container.textContent).toContain('agents active');
     expect(screen.getByText('35,682')).toBeInTheDocument();
+    expect(screen.getByText('Critical severity')).toBeInTheDocument();
+    expect(screen.getByText('High severity')).toBeInTheDocument();
+    expect(screen.getByText('Medium severity')).toBeInTheDocument();
+    expect(screen.getByText('Low severity')).toBeInTheDocument();
     expect(screen.getByText('Initial Access')).toBeInTheDocument();
   });
 

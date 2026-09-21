@@ -4,6 +4,14 @@ import { render } from '@testing-library/react';
 import { FindingSeverityTiles } from './finding-severity-tiles';
 
 describe('FindingSeverityTiles', () => {
+  it('renders the full severity label for each band', () => {
+    const { getByText } = render(
+      <FindingSeverityTiles counts={{ critical: 0, high: 1601 }} />,
+    );
+    expect(getByText('Critical severity')).toBeInTheDocument();
+    expect(getByText('High severity')).toBeInTheDocument();
+  });
+
   it('uses a custom test-subj prefix so two instances can coexist on a page', () => {
     const { container } = render(
       <FindingSeverityTiles

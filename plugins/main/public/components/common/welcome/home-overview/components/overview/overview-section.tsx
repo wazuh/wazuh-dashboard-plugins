@@ -21,7 +21,6 @@ import {
   getMitreUrl,
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
-import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 import { homeOverviewI18n } from '../../i18n';
 
@@ -83,12 +82,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                     findings.indexPatternId,
                   )
                 }
-                getTooltip={band =>
-                  homeOverviewI18n.clickToSeeField(
-                    FINDING_SEVERITY_FIELD,
-                    band,
-                  )
-                }
+                getTooltip={band => homeOverviewI18n.severityRuleLevel(band)}
               />
             )}
           </WidgetGroup>

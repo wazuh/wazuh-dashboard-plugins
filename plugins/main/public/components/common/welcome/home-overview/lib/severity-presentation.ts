@@ -17,35 +17,35 @@ export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
   {
     band: 'critical',
     label: i18n.translate('wazuh.homeOverview.severity.critical', {
-      defaultMessage: 'Critical',
+      defaultMessage: 'Critical severity',
     }),
     color: HOME_OVERVIEW_COLOR.danger,
   },
   {
     band: 'high',
     label: i18n.translate('wazuh.homeOverview.severity.high', {
-      defaultMessage: 'High',
+      defaultMessage: 'High severity',
     }),
     color: HOME_OVERVIEW_COLOR.warning,
   },
   {
     band: 'medium',
     label: i18n.translate('wazuh.homeOverview.severity.medium', {
-      defaultMessage: 'Medium',
+      defaultMessage: 'Medium severity',
     }),
     color: HOME_OVERVIEW_COLOR.info,
   },
   {
     band: 'low',
     label: i18n.translate('wazuh.homeOverview.severity.low', {
-      defaultMessage: 'Low',
+      defaultMessage: 'Low severity',
     }),
     color: HOME_OVERVIEW_COLOR.success,
   },
   {
     band: 'informational',
     label: i18n.translate('wazuh.homeOverview.severity.informational', {
-      defaultMessage: 'Informational',
+      defaultMessage: 'Informational severity',
     }),
     color: HOME_OVERVIEW_TEXT_COLOR.text,
   },

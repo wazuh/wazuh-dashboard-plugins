@@ -12,9 +12,9 @@ describe('SeverityDistributionBar', () => {
         testSubjPrefix='vulnerability-severity'
       />,
     );
-    expect(screen.getByText('Critical')).toBeInTheDocument();
+    expect(screen.getByText('Critical severity')).toBeInTheDocument();
     expect(screen.getByText('18')).toBeInTheDocument();
-    expect(screen.getByText('High')).toBeInTheDocument();
+    expect(screen.getByText('High severity')).toBeInTheDocument();
     expect(screen.getByText('361')).toBeInTheDocument();
     // Bands absent from counts (e.g. Informational/Pending) aren't rendered.
     expect(screen.queryByText('Informational')).not.toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('SeverityDistributionBar', () => {
         onSelect={band => `#/discover?band=${band}`}
       />,
     );
-    const link = screen.getByText('Critical').closest('a');
+    const link = screen.getByText('Critical severity').closest('a');
     expect(link).toHaveAttribute('href', '#/discover?band=critical');
   });
 

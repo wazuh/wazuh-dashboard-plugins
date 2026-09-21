@@ -1,4 +1,5 @@
 import { i18n } from '@osd/i18n';
+import { SeverityBand } from './interfaces/types';
 
 const t = (id: string, defaultMessage: string) =>
   i18n.translate(`wazuh.homeOverview.${id}`, { defaultMessage });
@@ -35,10 +36,7 @@ export const homeOverviewI18n = {
   agentStatusActive: t('agentStatus.active', 'Active'),
   agentStatusDisconnected: t('agentStatus.disconnected', 'Disconnected'),
   agentStatusPending: t('agentStatus.pending', 'Pending'),
-  agentStatusNeverConnected: t(
-    'agentStatus.neverConnected',
-    'Never connected',
-  ),
+  agentStatusNeverConnected: t('agentStatus.neverConnected', 'Never connected'),
   findings: t('findings.title', 'Findings'),
   last24Hours: t('caption.last24Hours', 'Last 24 hours'),
   currentState: t('caption.currentState', 'Current state'),
@@ -49,10 +47,7 @@ export const homeOverviewI18n = {
   ),
   mitreTopTactics: t('mitre.topTactics', 'MITRE ATT&CK top tactics'),
   mitreAttack: t('mitre.link', 'MITRE ATT&CK'),
-  noMitreTactics: t(
-    'mitre.emptyTactics',
-    'No MITRE ATT&CK tactics observed',
-  ),
+  noMitreTactics: t('mitre.emptyTactics', 'No MITRE ATT&CK tactics observed'),
   techniquesObserved: t('mitre.techniquesObserved', 'Techniques observed'),
   top5Techniques: t('mitre.top5Techniques', 'Top 5 techniques'),
   noTechniques: t('mitre.emptyTechniques', 'No techniques observed'),
@@ -73,10 +68,7 @@ export const homeOverviewI18n = {
     'File integrity baselined fleet-wide',
   ),
   top5ModifiedFiles: t('fim.top5ModifiedFiles', 'Top 5 modified files'),
-  noFilesOrRegistry: t(
-    'fim.emptyFiles',
-    'No files or registry objects found',
-  ),
+  noFilesOrRegistry: t('fim.emptyFiles', 'No files or registry objects found'),
   count: t('table.count', 'Count'),
   iocMatches: t('malware.iocMatches', 'IOC matches'),
   top5IocFeedTypes: t('malware.top5IocFeedTypes', 'Top 5 IOC feed types'),
@@ -144,10 +136,7 @@ export const homeOverviewI18n = {
   services: t('itHygiene.services', 'Services'),
   itHygiene: t('itHygiene.link', 'IT Hygiene'),
   top5PackageName: t('vulnerabilities.top5PackageName', 'Top 5 package name'),
-  noVulnerabilities: t(
-    'vulnerabilities.empty',
-    'No vulnerabilities found',
-  ),
+  noVulnerabilities: t('vulnerabilities.empty', 'No vulnerabilities found'),
   cloudSecurity: t('cloudSecurity.title', 'Cloud security'),
   cloudSecurityDescription: t(
     'cloudSecurity.description',
@@ -155,20 +144,34 @@ export const homeOverviewI18n = {
   ),
   passed: t('sca.passed', 'Passed'),
   failed: t('sca.failed', 'Failed'),
-  severityCritical: t('severity.critical', 'Critical'),
-  severityHigh: t('severity.high', 'High'),
-  severityMedium: t('severity.medium', 'Medium'),
-  severityLow: t('severity.low', 'Low'),
-  severityInformational: t('severity.informational', 'Informational'),
+  severityCritical: t('severity.critical', 'Critical severity'),
+  severityHigh: t('severity.high', 'High severity'),
+  severityMedium: t('severity.medium', 'Medium severity'),
+  severityLow: t('severity.low', 'Low severity'),
+  severityInformational: t('severity.informational', 'Informational severity'),
+  severityRuleLevel: (band: SeverityBand) => {
+    switch (band) {
+      case 'critical':
+        return t('severity.ruleLevel.critical', 'Rule level 15 or above');
+      case 'high':
+        return t('severity.ruleLevel.high', 'Rule level 12–14');
+      case 'medium':
+        return t('severity.ruleLevel.medium', 'Rule level 7–11');
+      case 'low':
+        return t('severity.ruleLevel.low', 'Rule level 0–6');
+      case 'informational':
+        return t(
+          'severity.ruleLevel.informational',
+          'Informational rule level',
+        );
+    }
+  },
   clickToSeeField: (field: string, band: string) =>
     i18n.translate('wazuh.homeOverview.findings.clickToSeeField', {
       defaultMessage: 'Click to see {field}: {band}',
       values: { field, band },
     }),
-  manageIndexPatterns: t(
-    'widget.manageIndexPatterns',
-    'Manage index patterns',
-  ),
+  manageIndexPatterns: t('widget.manageIndexPatterns', 'Manage index patterns'),
   couldNotLoadData: t('widget.couldNotLoadData', 'Could not load data'),
   notAvailable: t('widget.notAvailable', 'Not available'),
   findingsCountEvolution: t(
@@ -204,10 +207,7 @@ export const homeOverviewI18n = {
     'sca.checkAgentSettings',
     'Check your agent settings to generate scans.',
   ),
-  vulnerabilityDetection: t(
-    'vulnerabilities.title',
-    'Vulnerability Detection',
-  ),
+  vulnerabilityDetection: t('vulnerabilities.title', 'Vulnerability Detection'),
   openVulnerabilityDetection: t(
     'vulnerabilities.open',
     'Open Vulnerability Detection',
