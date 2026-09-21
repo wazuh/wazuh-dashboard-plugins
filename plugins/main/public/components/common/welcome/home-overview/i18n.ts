@@ -144,11 +144,21 @@ export const homeOverviewI18n = {
   ),
   passed: t('sca.passed', 'Passed'),
   failed: t('sca.failed', 'Failed'),
-  severityCritical: t('severity.critical', 'Critical severity'),
-  severityHigh: t('severity.high', 'High severity'),
-  severityMedium: t('severity.medium', 'Medium severity'),
-  severityLow: t('severity.low', 'Low severity'),
-  severityInformational: t('severity.informational', 'Informational severity'),
+  get severityCritical() {
+    return t('severity.critical', 'Critical severity');
+  },
+  get severityHigh() {
+    return t('severity.high', 'High severity');
+  },
+  get severityMedium() {
+    return t('severity.medium', 'Medium severity');
+  },
+  get severityLow() {
+    return t('severity.low', 'Low severity');
+  },
+  get severityInformational() {
+    return t('severity.informational', 'Informational severity');
+  },
   severityRuleLevel: (band: SeverityBand) => {
     switch (band) {
       case 'critical':

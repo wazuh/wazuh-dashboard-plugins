@@ -25,4 +25,13 @@ describe('SEVERITY_PRESENTATION', () => {
       SEVERITY_PRESENTATION.find(({ band }) => band === 'informational')?.color,
     ).toBe(HOME_OVERVIEW_TEXT_COLOR.text);
   });
+
+  it('translates labels on read so the locale catalog is not frozen at import', () => {
+    expect(
+      SEVERITY_PRESENTATION.find(({ band }) => band === 'critical')?.label,
+    ).toBe('Critical severity');
+    expect(
+      SEVERITY_PRESENTATION.find(({ band }) => band === 'high')?.label,
+    ).toBe('High severity');
+  });
 });
