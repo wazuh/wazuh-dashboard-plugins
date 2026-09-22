@@ -161,7 +161,9 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
           ref={ref}
           rowProps={enhancedRowProps}
           isExpandable={isExpandable}
-          itemIdToExpandedRowMap={isExpandable && itemIdToExpandedRowMap}
+          itemIdToExpandedRowMap={
+            isExpandable ? itemIdToExpandedRowMap : undefined
+          }
           itemId={itemId}
           columns={enhancedTableColumns}
           {...props}

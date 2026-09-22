@@ -119,6 +119,27 @@ describe('Table With Search Bar component', () => {
   });
 });
 
+describe('Table With Search Bar component - itemIdToExpandedRowMap', () => {
+  it('does not pass a boolean itemIdToExpandedRowMap to EuiBasicTable when expandable rows are not configured', async () => {
+    let wrapper: any = null;
+
+    await act(async () => {
+      wrapper = mount(<TableWithSearchBar {...tableProps} />);
+    });
+
+    await waitFor(() => expect(tableProps.onSearch).toHaveBeenCalled());
+
+    wrapper!.update();
+
+    const itemIdToExpandedRowMap = wrapper!
+      .find('EuiBasicTable')
+      .props().itemIdToExpandedRowMap;
+    expect(typeof itemIdToExpandedRowMap).not.toBe('boolean');
+
+    wrapper!.unmount();
+  });
+});
+
 describe('Table With Search Bar component - selection reset', () => {
   const selectionColumns = columns;
   const selectionProps = {
