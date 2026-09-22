@@ -1,4 +1,5 @@
 import { initializeDefaultNotificationChannel } from './index';
+import { TASK_RESULT } from '../../types';
 import { defaultChannels } from '../common/constants';
 
 // Mock the client
@@ -47,7 +48,10 @@ describe('initializeDefaultNotificationChannel', () => {
       });
 
       const task = initializeDefaultNotificationChannel(mockClient as any);
-      await task.run(ctx);
+      const result = await task.run(ctx);
+
+      expect(result[TASK_RESULT]).toBe(true);
+      expect(result.status).toBe('ok');
 
       expect(mockClient.callAsInternalUser).toHaveBeenCalledWith(
         'notifications.getConfigs',
@@ -79,7 +83,13 @@ describe('initializeDefaultNotificationChannel', () => {
       });
 
       const task = initializeDefaultNotificationChannel(mockClient as any);
-      await task.run(ctx);
+      const result = await task.run(ctx);
+
+      expect(result[TASK_RESULT]).toBe(true);
+      expect(result.status).toBe('warning');
+      expect(result.message).toBe(
+        '3 default notification channels are missing',
+      );
 
       expect(mockClient.callAsInternalUser).toHaveBeenCalledTimes(1);
       expect(ctx.logger.debug).toHaveBeenCalledWith(
