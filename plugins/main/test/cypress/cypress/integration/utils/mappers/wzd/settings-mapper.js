@@ -1,6 +1,4 @@
-import {
-  WAZUH_MENU_PAGE
-} from '../../../pageobjects/wzd/wazuh-menu/wazuh-menu.page';
+import { WAZUH_MENU_PAGE } from '../../../pageobjects/wzd/wazuh-menu/wazuh-menu.page';
 
 export const SETTINGS_MENU_LINKS = {
   'API configuration': WAZUH_MENU_PAGE['settingsApiConfigurationLink'],
@@ -9,5 +7,4 @@ export const SETTINGS_MENU_LINKS = {
   Configuration: WAZUH_MENU_PAGE['settingsConfigurationLink'],
   Logs: WAZUH_MENU_PAGE['settingsLogsLink'],
   Miscellaneous: WAZUH_MENU_PAGE['settingsMiscellaneousLink'],
-  About: WAZUH_MENU_PAGE['settingsAboutLink'],
 };
