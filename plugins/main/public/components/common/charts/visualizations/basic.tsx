@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useCallback, useState } from 'react';
 import { ChartLegend } from './legend';
 import { ChartDonut, ChartDonutProps } from '../charts/donut';
@@ -39,9 +40,13 @@ export const VisualizationBasic = ({
   isLoading,
   size,
   type,
-  noDataTitle = 'No data',
+  noDataTitle = i18n.translate('wazuh.common.charts.noDataTitle', {
+    defaultMessage: 'No data',
+  }),
   noDataMessage,
-  errorTitle = 'Error',
+  errorTitle = i18n.translate('wazuh.common.charts.errorTitle', {
+    defaultMessage: 'Error',
+  }),
   errorMessage,
   error,
 }: VisualizationBasicProps) => {
@@ -202,7 +207,10 @@ export const VisualizationBasicWidgetSelectorHeader = ({
           options={selectorOptions}
           value={selectedOption}
           onChange={onChange}
-          aria-label='Select options'
+          aria-label={i18n.translate(
+            'wazuh.common.charts.selectOptionsAriaLabel',
+            { defaultMessage: 'Select options' },
+          )}
         />
       </EuiFlexItem>
     </EuiFlexGroup>

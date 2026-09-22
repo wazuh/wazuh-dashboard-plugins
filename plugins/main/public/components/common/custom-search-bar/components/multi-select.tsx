@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   EuiFieldSearch,
@@ -227,7 +228,12 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               <div className='euiFilterSelect__noteContent'>
                 <EuiLoadingChart size='m' />
                 <EuiSpacer size='xs' />
-                <p>Loading filters</p>
+                <p>
+                  {i18n.translate(
+                    'wazuh.common.customSearchBar.loadingFilters',
+                    { defaultMessage: 'Loading filters' },
+                  )}
+                </p>
               </div>
             </div>
           )}
@@ -236,7 +242,12 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               <div className='euiFilterSelect__noteContent'>
                 <EuiIcon type='minusInCircle' />
                 <EuiSpacer size='xs' />
-                <p>No filters found</p>
+                <p>
+                  {i18n.translate(
+                    'wazuh.common.customSearchBar.noFiltersFound',
+                    { defaultMessage: 'No filters found' },
+                  )}
+                </p>
               </div>
             </div>
           )}
