@@ -11,9 +11,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import { EuiPanel, EuiTitle, EuiBasicTableColumn, EuiInMemoryTable } from '@elastic/eui';
-import { SearchResponse, IndexPattern } from '../../../../../../src/core/server';
+import {
+  EuiPanel,
+  EuiTitle,
+  EuiBasicTableColumn,
+  EuiInMemoryTable,
+} from '@elastic/eui';
+import {
+  SearchResponse,
+  IndexPattern,
+} from '../../../../../../src/core/server';
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { i18n } from '@osd/i18n';
 import { search } from '../../../search-bar/search-bar-service';
 import { tFilter } from '../../../data-source';
 
@@ -32,8 +41,8 @@ type AggTableProps = {
     dateRange: {
       to: string;
       from: string;
-    }
-  }
+    };
+  };
 };
 
 export const AggTable = ({
@@ -49,7 +58,9 @@ export const AggTable = ({
   const [order, setOrder] = useState({ _count: 'desc' });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
-  const [esResults, setEsResults] = useState<SearchResponse | undefined>(undefined);
+  const [esResults, setEsResults] = useState<SearchResponse | undefined>(
+    undefined,
+  );
   const preAppliedAggs = useMemo(() => {
     return {
       buckets: {
@@ -71,14 +82,14 @@ export const AggTable = ({
         indexPattern: searchParams.indexPattern,
         query: searchParams.query,
         dateRange: searchParams.dateRange,
-      })
+      });
       setEsResults(response);
     } catch (error) {
       setError(error);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchAggData();
@@ -87,7 +98,6 @@ export const AggTable = ({
     JSON.stringify(searchParams.query),
     JSON.stringify(order),
   ]);
-
 
   const buckets = ((esResults?.aggregations || {}).buckets || {}).buckets || [];
   const columns: EuiBasicTableColumn<any>[] = [
@@ -98,13 +108,15 @@ export const AggTable = ({
     },
     {
       field: 'doc_count',
-      name: 'Count',
+      name: i18n.translate('wazuh.common.aggTable.columns.count', {
+        defaultMessage: 'Count',
+      }),
       isExpander: false,
       align: 'right',
       sortable: true,
     },
   ];
-  const getRowProps = (item) => {
+  const getRowProps = item => {
     const { key } = item;
     return {
       'data-test-subj': `row-${key}`,
@@ -146,4 +158,4 @@ export const AggTable = ({
       />
     </EuiPanel>
   );
-}
+};

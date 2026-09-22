@@ -19,6 +19,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiConfirmModal, EuiFlyout, EuiOverlayMask } from '@elastic/eui';
 
 export interface UnsavedChangesGuardContextValue {
@@ -144,14 +145,31 @@ export const UnsavedChangesGuardedFlyout: React.FC<
       {pendingAction && (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title={i18n.translate(
+              'wazuh.common.unsavedChangesGuard.unsavedChangesModal.title',
+              {
+                defaultMessage: 'Unsubmitted changes',
+              },
+            )}
             onConfirm={cancelPendingAction}
             onCancel={confirmPendingAction}
-            cancelButtonText='Yes, do it'
-            confirmButtonText="No, don't do it"
+            cancelButtonText={i18n.translate(
+              'wazuh.common.unsavedChangesGuard.unsavedChangesModal.cancelButton',
+              { defaultMessage: 'Yes, do it' },
+            )}
+            confirmButtonText={i18n.translate(
+              'wazuh.common.unsavedChangesGuard.unsavedChangesModal.confirmButton',
+              { defaultMessage: "No, don't do it" },
+            )}
           >
             <p style={{ textAlign: 'center' }}>
-              There are unsaved changes. Are you sure you want to proceed?
+              {i18n.translate(
+                'wazuh.common.unsavedChangesGuard.unsavedChangesModal.body',
+                {
+                  defaultMessage:
+                    'There are unsaved changes. Are you sure you want to proceed?',
+                },
+              )}
             </p>
           </EuiConfirmModal>
         </EuiOverlayMask>
