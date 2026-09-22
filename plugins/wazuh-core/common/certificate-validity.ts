@@ -38,6 +38,12 @@ export interface ServerCaBundle {
   serialized_bytes: number;
   serialized_bytes_limit: number;
   /**
+   * Whether some CA in the bundle signs the certificate the listener serves.
+   * Authoritative: `certificates` below is capped by `certificates_limit` and
+   * describes the last good read, so it can omit the signing CA.
+   */
+  matches_active_leaf?: boolean;
+  /**
    * Whether the listener certificate validates with this bundle as its only
    * trust store: dates and constraints included, unlike `signs_active_leaf`.
    * `null` when there is nothing to validate against.

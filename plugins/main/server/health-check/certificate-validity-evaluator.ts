@@ -113,9 +113,13 @@ function mismatchFinding(
   node: string,
   snapshot: CertificateValiditySnapshot,
 ): CertificateFinding | null {
-  const certificates = snapshot.ca_bundle.certificates;
+  const bundle = snapshot.ca_bundle;
 
-  if (certificates.some(candidate => candidate.signs_active_leaf === true)) {
+  const matches =
+    bundle.matches_active_leaf ??
+    bundle.certificates.some(candidate => candidate.signs_active_leaf === true);
+
+  if (matches) {
     return null;
   }
 

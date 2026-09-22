@@ -129,6 +129,7 @@ if (SCENARIO === 'notfound') {
       certificates_limit: 6,
       serialized_bytes: 2428,
       serialized_bytes_limit: 8191,
+      matches_active_leaf: signsActiveLeaf,
       chain_valid: chainValid,
       certificates: [
         certificate('CN=Corp Root CA', 'CN=Corp Root CA', 3650 * DAY, {
