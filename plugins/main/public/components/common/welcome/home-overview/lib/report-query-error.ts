@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import {
   ErrorFactory,
   ErrorHandler,
@@ -32,9 +33,20 @@ function flush(): void {
 
   const labels = failures.map(([label]) => label).join(', ');
   const detail = failures
-    .map(([label, error]) => `${label}: ${describeError(error)}`)
+    .map(([label, error]) =>
+      i18n.translate('wazuh.common.homeOverviewQueryError.detailLine', {
+        defaultMessage: '{label}: {error}',
+        values: { label, error: describeError(error) },
+      }),
+    )
     .join('\n');
-  const title = `Home overview: could not load ${labels}`;
+  const title = i18n.translate(
+    'wazuh.common.homeOverviewQueryError.toastTitle',
+    {
+      defaultMessage: 'Home overview: could not load {labels}',
+      values: { labels },
+    },
+  );
 
   const lastError = failures[failures.length - 1][1];
   const representativeError =

@@ -12,6 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiPanel,
   EuiFlexItem,
@@ -208,7 +209,14 @@ export const AgentsWelcome = compose(
             ))}
           </EuiFlexItem>
           <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-            {this.renderApplicationsPopover('More...')}
+            {this.renderApplicationsPopover(
+              i18n.translate(
+                'wazuh.common.agentWelcomeHeader.moreApplications',
+                {
+                  defaultMessage: 'More...',
+                },
+              ),
+            )}
           </EuiFlexItem>
         </Fragment>
       );
@@ -262,7 +270,14 @@ export const AgentsWelcome = compose(
             <EuiFlexGroup responsive={false} gutterSize='xs'>
               {this.state.isNarrowHeader ? (
                 <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
-                  {this.renderApplicationsPopover('Applications')}
+                  {this.renderApplicationsPopover(
+                    i18n.translate(
+                      'wazuh.common.agentWelcomeHeader.applications',
+                      {
+                        defaultMessage: 'Applications',
+                      },
+                    ),
+                  )}
                 </EuiFlexItem>
               ) : (
                 this.renderModules()
@@ -286,11 +301,21 @@ export const AgentsWelcome = compose(
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.isNarrowHeader
-                      ? { position: 'bottom', content: 'Stats' }
+                      ? {
+                          position: 'bottom',
+                          content: i18n.translate(
+                            'wazuh.common.agentWelcomeHeader.stats',
+                            { defaultMessage: 'Stats' },
+                          ),
+                        }
                       : undefined
                   }
                 >
-                  {this.state.isNarrowHeader ? '' : 'Stats'}
+                  {this.state.isNarrowHeader
+                    ? ''
+                    : i18n.translate('wazuh.common.agentWelcomeHeader.stats', {
+                        defaultMessage: 'Stats',
+                      })}
                 </WzButton>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ marginTop: 7 }}>
@@ -301,11 +326,26 @@ export const AgentsWelcome = compose(
                   className='wz-it-hygiene-header-button'
                   tooltip={
                     this.state.isNarrowHeader
-                      ? { position: 'bottom', content: 'Configuration' }
+                      ? {
+                          position: 'bottom',
+                          content: i18n.translate(
+                            'wazuh.common.agentWelcomeHeader.configuration',
+                            {
+                              defaultMessage: 'Configuration',
+                            },
+                          ),
+                        }
                       : undefined
                   }
                 >
-                  {this.state.isNarrowHeader ? '' : 'Configuration'}
+                  {this.state.isNarrowHeader
+                    ? ''
+                    : i18n.translate(
+                        'wazuh.common.agentWelcomeHeader.configuration',
+                        {
+                          defaultMessage: 'Configuration',
+                        },
+                      )}
                 </WzButton>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -328,7 +368,15 @@ export const AgentsWelcome = compose(
                 <Typography level='section'>MITRE ATT&CK</Typography>
               </EuiFlexItem>
               <EuiFlexItem grow={false} style={{ alignSelf: 'center' }}>
-                <EuiToolTip position='top' content='Open MITRE ATT&CK'>
+                <EuiToolTip
+                  position='top'
+                  content={i18n.translate(
+                    'wazuh.common.agentWelcomeMitre.openApp',
+                    {
+                      defaultMessage: 'Open MITRE ATT&CK',
+                    },
+                  )}
+                >
                   <RedirectAppLinks application={getCore().application}>
                     <EuiButtonIcon
                       iconType='popout'
@@ -336,7 +384,12 @@ export const AgentsWelcome = compose(
                       href={NavigationService.getInstance().getAppURL(
                         mitreAttack.id,
                       )}
-                      aria-label='Open MITRE ATT&CK'
+                      aria-label={i18n.translate(
+                        'wazuh.common.agentWelcomeMitre.openApp',
+                        {
+                          defaultMessage: 'Open MITRE ATT&CK',
+                        },
+                      )}
                     />
                   </RedirectAppLinks>
                 </EuiToolTip>
