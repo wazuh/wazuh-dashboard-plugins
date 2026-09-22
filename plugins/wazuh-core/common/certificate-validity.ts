@@ -30,7 +30,8 @@ export interface CaBundleReadFailure {
 
 export interface ServerCaBundle {
   path: string;
-  publication: number;
+  /** `null` without a servable bundle, `0` served but unvouched. */
+  publication: number | null;
   publication_vouched: boolean;
   content_sha256: string;
   certificates_count: number;

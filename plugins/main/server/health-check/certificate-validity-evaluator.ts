@@ -87,6 +87,11 @@ function expiryFinding(
   const expired = secondsUntilExpiry <= 0;
   const daysRemaining = Math.floor(secondsUntilExpiry / SECONDS_PER_DAY);
   const subject = certificate.subject;
+  // A verifying agent repairs its trust over the same TLS the bundle secures.
+  const consequence =
+    scope === 'ca'
+      ? ' Every verifying agent fails the handshake from that date, and /cacerts, the route that would repair their trust, travels over that same TLS.'
+      : '';
 
   return {
     node,
@@ -100,12 +105,12 @@ function expiryFinding(
     detail: expired
       ? `The ${describeScope(scope)} ${subject} on node ${node} expired on ${
           certificate.not_after
-        }.`
+        }.${consequence}`
       : `The ${describeScope(
           scope,
         )} ${subject} on node ${node} expires in ${daysRemaining} day(s), on ${
           certificate.not_after
-        }.`,
+        }.${consequence}`,
   };
 }
 
@@ -135,7 +140,7 @@ function mismatchFinding(
     severity: 'critical',
     scope: 'ca',
     reason: 'ca-mismatch',
-    detail: `No CA in the bundle on node ${node} signs the certificate the listener is serving. Agents validating against this bundle will be rejected.`,
+    detail: `No CA in the bundle on node ${node} chains to the certificate the listener is serving, so the manager answers 503 at /cacerts on that node and agents cannot refresh their trust.`,
   };
 }
 
@@ -186,7 +191,7 @@ function chainFinding(
     severity: 'critical',
     scope: 'ca',
     reason: 'chain-invalid',
-    detail: `The listener certificate on node ${node} does not validate against the CA bundle it serves.${reason} Agents verifying against this bundle will be rejected.`,
+    detail: `The listener certificate on node ${node} does not validate against the CA bundle it serves as its only trust store.${reason} A verifying agent fails the handshake even where the signature alone would match.`,
   };
 }
 
@@ -195,18 +200,25 @@ function readFailureFinding(
   node: string,
   snapshot: CertificateValiditySnapshot,
 ): CertificateFinding | null {
-  const failure = snapshot.ca_bundle.last_read_failure;
+  const bundle = snapshot.ca_bundle;
+  const failure = bundle.last_read_failure;
 
   if (!failure) {
     return null;
   }
+
+  // A bundle that never read has no last copy to describe.
+  const described =
+    bundle.certificates_count > 0
+      ? ' so what follows describes the last copy the manager read.'
+      : ' and it has never been read, so nothing describes its contents.';
 
   return {
     node,
     severity: 'warning',
     scope: 'ca',
     reason: 'bundle-unreadable',
-    detail: `The CA bundle on node ${node} ${failure.cause} on the last ${failure.consecutive} read(s), so what follows describes the last copy the manager read.`,
+    detail: `The CA bundle on node ${node} ${failure.cause} on the last ${failure.consecutive} read(s),${described}`,
   };
 }
 
@@ -215,10 +227,19 @@ function evaluateSnapshot(
   options: EvaluationOptions,
 ): CertificateFinding[] {
   const node = snapshot.node;
+  const listenerExpiry = expiryFinding(
+    node,
+    'listener',
+    snapshot.listener,
+    options,
+  );
+  // An expired certificate chains to nothing, so both bundle verdicts below
+  // follow from it and would send an operator to an intact bundle.
+  const expired = listenerExpiry?.reason === 'expired';
   const findings = [
-    expiryFinding(node, 'listener', snapshot.listener, options),
-    mismatchFinding(node, snapshot),
-    chainFinding(node, snapshot),
+    listenerExpiry,
+    expired ? null : mismatchFinding(node, snapshot),
+    expired ? null : chainFinding(node, snapshot),
     readFailureFinding(node, snapshot),
     ...snapshot.ca_bundle.certificates.map(certificate =>
       expiryFinding(node, 'ca', certificate, options),

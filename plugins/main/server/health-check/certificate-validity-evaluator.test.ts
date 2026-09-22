@@ -75,6 +75,115 @@ const ok = (
   snapshot: snapshot(overrides),
 });
 
+describe('the findings name the consequence the manager documents', () => {
+  it('names the 503 the manager answers when no CA chains to the leaf', () => {
+    const result = evaluateCertificateValidity(
+      [ok({ caBundle: { matches_active_leaf: false } })],
+      OPTIONS,
+    );
+
+    const finding = result.findings.find(
+      candidate => candidate.reason === 'ca-mismatch',
+    );
+
+    expect(finding?.detail).toContain('503');
+    expect(finding?.detail).toContain('/cacerts');
+  });
+
+  it('warns that a verifying agent fails the handshake once a CA expires', () => {
+    const result = evaluateCertificateValidity(
+      [
+        ok({
+          certificates: [
+            certificate({
+              signs_active_leaf: true,
+              seconds_until_expiry: 10 * DAY,
+            }),
+          ],
+        }),
+      ],
+      OPTIONS,
+    );
+
+    const finding = result.findings.find(candidate => candidate.scope === 'ca');
+
+    expect(finding?.detail).toContain('fails the handshake');
+  });
+
+  it('does not repeat the CA consequence on an expiring listener certificate', () => {
+    const result = evaluateCertificateValidity(
+      [ok({ listener: { seconds_until_expiry: 10 * DAY } })],
+      OPTIONS,
+    );
+
+    const finding = result.findings.find(
+      candidate => candidate.scope === 'listener',
+    );
+
+    expect(finding?.detail).toContain('expires in 10 day(s)');
+    expect(finding?.detail).not.toContain('/cacerts');
+    expect(finding?.detail).not.toContain('fails the handshake');
+  });
+});
+
+describe('an expired listener certificate is reported as one problem', () => {
+  const expiredLeaf = () =>
+    ok({
+      listener: { seconds_until_expiry: -3 * DAY },
+      caBundle: {
+        matches_active_leaf: false,
+        chain_valid: false,
+        chain_error: 'certificate has expired',
+      },
+    });
+
+  it('reports the expiry and not the bundle verdicts it causes', () => {
+    const result = evaluateCertificateValidity([expiredLeaf()], OPTIONS);
+    const reasons = result.findings.map(finding => finding.reason);
+
+    expect(reasons).toEqual(['expired']);
+    expect(reasons).not.toContain('ca-mismatch');
+    expect(reasons).not.toContain('chain-invalid');
+  });
+
+  it('still reports the bundle verdicts while the certificate is only expiring', () => {
+    const result = evaluateCertificateValidity(
+      [
+        ok({
+          listener: { seconds_until_expiry: 10 * DAY },
+          caBundle: { matches_active_leaf: false },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    expect(result.findings.map(finding => finding.reason)).toContain(
+      'ca-mismatch',
+    );
+  });
+
+  it('keeps an unreadable bundle, which the expiry does not explain', () => {
+    const result = evaluateCertificateValidity(
+      [
+        ok({
+          listener: { seconds_until_expiry: -3 * DAY },
+          caBundle: {
+            last_read_failure: {
+              cause: 'cannot be opened (Permission denied)',
+              consecutive: 2,
+            },
+          },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    expect(result.findings.map(finding => finding.reason)).toContain(
+      'bundle-unreadable',
+    );
+  });
+});
+
 describe('mismatchFinding — the CA match verdict has three states', () => {
   it('reports a mismatch only when the manager says so', () => {
     const result = evaluateCertificateValidity(
@@ -258,6 +367,55 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     expect(evaluation.findings).toContainEqual(
       expect.objectContaining({ reason: 'bundle-unreadable' }),
     );
+  });
+
+  it('points at the last copy it read while one exists', () => {
+    const evaluation = evaluateCertificateValidity(
+      [
+        ok({
+          caBundle: {
+            certificates_count: 3,
+            last_read_failure: {
+              cause: 'cannot be opened (Permission denied)',
+              consecutive: 2,
+            },
+          },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    const finding = evaluation.findings.find(
+      candidate => candidate.reason === 'bundle-unreadable',
+    );
+
+    expect(finding?.detail).toContain('the last copy the manager read');
+  });
+
+  it('describes no copy for a bundle that never read', () => {
+    const evaluation = evaluateCertificateValidity(
+      [
+        ok({
+          certificates: [],
+          caBundle: {
+            certificates_count: 0,
+            matches_active_leaf: null,
+            last_read_failure: {
+              cause: 'cannot be opened (No such file or directory)',
+              consecutive: 17,
+            },
+          },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    const finding = evaluation.findings.find(
+      candidate => candidate.reason === 'bundle-unreadable',
+    );
+
+    expect(finding?.detail).toContain('never been read');
+    expect(finding?.detail).not.toContain('the last copy the manager read');
   });
 
   it('accepts a bundle where any CA signs the active leaf', () => {

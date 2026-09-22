@@ -441,7 +441,8 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(message).toContain('2026-10-01T00:00:00Z');
     expect(message).toContain('10 day(s)');
     expect(message).toContain('2026-09-14T08:00:00Z');
-    expect(message).toContain('remoted restarts');
+    expect(message).toContain('Ensure the listener certificate is replaced');
+    expect(message).toContain('remoted restarted');
     expect(message).not.toContain('2026-09-15T10:00:00Z');
   });
 
@@ -459,8 +460,29 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     const { message } = (await runTask(services)) as { message: string };
 
     expect(message).toContain('No CA in the bundle');
-    expect(message).not.toContain('remoted restarts');
+    expect(message).not.toContain('remoted restart');
     expect(message).not.toContain('2026-09-14T08:00:00Z');
+  });
+
+  it('states each action once, not once per node (R7)', async () => {
+    const nodes = ['node01', 'worker-02', 'worker-03'];
+    const services = buildServices({
+      nodes,
+      outcomes: Object.fromEntries(
+        nodes.map(node => [
+          node,
+          { kind: 'ok', node, snapshot: snapshot(node, 10 * DAY) },
+        ]),
+      ),
+    });
+
+    const { message } = (await runTask(services)) as { message: string };
+    const occurrences =
+      message.split('Ensure the listener certificate').length - 1;
+
+    expect(message).toContain('worker-03');
+    expect(message.split('expires in 10 day(s)').length - 1).toBe(3);
+    expect(occurrences).toBe(1);
   });
 
   it('links to no documentation page while none covers certificates', async () => {

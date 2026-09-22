@@ -9,6 +9,7 @@ import type { CertificateValidityOutcome } from '../../../wazuh-core/common/cert
 import { taskResult, type InitializationTaskRunContext } from './types';
 import {
   CertificateEvaluation,
+  CertificateFinding,
   evaluateCertificateValidity,
 } from './certificate-validity-evaluator';
 
@@ -138,6 +139,50 @@ async function collectOutcomes(
   }
 }
 
+/**
+ * One line per problem, not per node: the action is the same on every node it
+ * affects, so repeating it buries the findings it is meant to resolve.
+ */
+function guidanceFor(
+  finding: CertificateFinding,
+  evaluation: CertificateEvaluation,
+): string | null {
+  if (finding.reason === 'expiring' || finding.reason === 'expired') {
+    if (finding.scope !== 'listener') {
+      return 'Ensure the CA certificate is replaced in the bundle with wazuh-manager-certs.';
+    }
+
+    // remoted serves the certificate it loaded until it restarts.
+    const loaded = evaluation.oldestListenerLoadedAt
+      ? ` The manager has served the one it loaded on ${evaluation.oldestListenerLoadedAt} since then, so replacing the file alone does not clear this.`
+      : '';
+
+    return `Ensure the listener certificate is replaced and remoted restarted.${loaded}`;
+  }
+
+  switch (finding.reason) {
+    case 'ca-mismatch': {
+      return 'Ensure the bundle carries a CA that chains to the certificate the listener serves.';
+    }
+
+    case 'chain-invalid': {
+      return 'Ensure the bundle validates the served certificate on its own, dates and constraints included.';
+    }
+
+    case 'bundle-unreadable': {
+      return 'Ensure the bundle file exists and the manager can read it.';
+    }
+
+    case 'undetermined': {
+      return 'Ensure every manager node is reachable and exposes the certificate validity resource.';
+    }
+
+    default: {
+      return null;
+    }
+  }
+}
+
 function buildMessage(evaluation: CertificateEvaluation): string {
   const headline =
     evaluation.severity === 'unknown'
@@ -148,15 +193,17 @@ function buildMessage(evaluation: CertificateEvaluation): string {
     .map(finding => `- ${finding.detail}`)
     .join('\n');
 
-  // Only a listener finding outlives its fix: remoted holds the certificate
-  // until it restarts.
-  const listenerRemediation =
-    evaluation.oldestListenerLoadedAt &&
-    evaluation.findings.some(finding => finding.scope === 'listener')
-      ? `\n\nThe manager loaded the listener certificate on ${evaluation.oldestListenerLoadedAt} and serves it until remoted restarts, so replacing the file on disk does not clear this until then.`
-      : '';
+  const guidance = [
+    ...new Set(
+      evaluation.findings
+        .map(finding => guidanceFor(finding, evaluation))
+        .filter((line): line is string => line !== null),
+    ),
+  ];
 
-  return `${headline}\n\n${details}${listenerRemediation}`;
+  const actions = guidance.length > 0 ? `\n\n${guidance.join('\n')}` : '';
+
+  return `${headline}\n\n${details}${actions}`;
 }
 
 /** The only place an internal severity meets the platform result model. */
