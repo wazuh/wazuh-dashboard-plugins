@@ -30,6 +30,8 @@ const snapshot = (
     fingerprint: 'x509-sha256:aa',
     serial: '0x1a2b',
     path: 'etc/certs/remoted.pem',
+    loaded_at: '2026-09-14T08:00:00Z',
+    loaded_at_ts: 1_789_344_000,
   },
   ca_bundle: {
     path: 'etc/certs/root-ca.pem',
@@ -39,6 +41,7 @@ const snapshot = (
     certificates_count: 1,
     serialized_bytes: 2428,
     serialized_bytes_limit: 8191,
+    matches_active_leaf: true,
     certificates: [
       {
         subject: 'CN=Corp Root CA',
@@ -437,7 +440,27 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(message).toContain('CN=manager-01');
     expect(message).toContain('2026-10-01T00:00:00Z');
     expect(message).toContain('10 day(s)');
-    expect(message).toContain('2026-09-15T10:00:00Z');
+    expect(message).toContain('2026-09-14T08:00:00Z');
+    expect(message).toContain('remoted restarts');
+    expect(message).not.toContain('2026-09-15T10:00:00Z');
+  });
+
+  it('does not tell an operator to restart over a CA finding (R8)', async () => {
+    const bundleOnly = snapshot('node01', 3650 * DAY);
+
+    bundleOnly.ca_bundle.matches_active_leaf = false;
+
+    const services = buildServices({
+      outcomes: {
+        node01: { kind: 'ok', node: 'node01', snapshot: bundleOnly },
+      },
+    });
+
+    const { message } = (await runTask(services)) as { message: string };
+
+    expect(message).toContain('No CA in the bundle');
+    expect(message).not.toContain('remoted restarts');
+    expect(message).not.toContain('2026-09-14T08:00:00Z');
   });
 
   it('links to no documentation page while none covers certificates', async () => {

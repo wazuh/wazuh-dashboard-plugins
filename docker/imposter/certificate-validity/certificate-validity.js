@@ -122,8 +122,8 @@ if (SCENARIO === 'notfound') {
     }),
     ca_bundle: {
       path: 'etc/certs/root-ca.pem',
-      publication: nowTs - 3600,
-      publication_vouched: true,
+      publication: 0,
+      publication_vouched: false,
       content_sha256: 'e3b0c44298fc1c149afbf4c8996fb924',
       certificates_count: 1,
       certificates_limit: 6,

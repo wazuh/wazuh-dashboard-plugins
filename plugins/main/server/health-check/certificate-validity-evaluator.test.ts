@@ -59,6 +59,9 @@ const snapshot = (
     serialized_bytes: 2428,
     serialized_bytes_limit: 8191,
     chain_valid: true,
+    matches_active_leaf: (overrides.certificates ?? [certificate()]).some(
+      candidate => candidate.signs_active_leaf === true,
+    ),
     certificates: overrides.certificates ?? [certificate()],
     ...overrides.caBundle,
   },
@@ -70,6 +73,66 @@ const ok = (
   kind: 'ok',
   node: overrides?.node ?? 'node01',
   snapshot: snapshot(overrides),
+});
+
+describe('mismatchFinding — the CA match verdict has three states', () => {
+  it('reports a mismatch only when the manager says so', () => {
+    const result = evaluateCertificateValidity(
+      [ok({ caBundle: { matches_active_leaf: false } })],
+      OPTIONS,
+    );
+
+    expect(result.severity).toBe('critical');
+    expect(result.findings.map(finding => finding.reason)).toContain(
+      'ca-mismatch',
+    );
+  });
+
+  it('does not claim a mismatch for a bundle the manager could not read', () => {
+    const result = evaluateCertificateValidity(
+      [
+        ok({
+          certificates: [],
+          caBundle: {
+            matches_active_leaf: null,
+            certificates_count: 0,
+            last_read_failure: {
+              cause: 'cannot be opened (No such file or directory)',
+              errno: 2,
+              consecutive: 7,
+            },
+          },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    const reasons = result.findings.map(finding => finding.reason);
+
+    expect(reasons).not.toContain('ca-mismatch');
+    expect(reasons).toContain('bundle-unreadable');
+    expect(
+      result.findings.every(
+        finding => !finding.detail.includes('No CA in the bundle'),
+      ),
+    ).toBe(true);
+  });
+
+  it('does not infer the verdict from the certificates it was given', () => {
+    const result = evaluateCertificateValidity(
+      [
+        ok({
+          certificates: [certificate({ signs_active_leaf: false })],
+          caBundle: { matches_active_leaf: true },
+        }),
+      ],
+      OPTIONS,
+    );
+
+    expect(result.findings.map(finding => finding.reason)).not.toContain(
+      'ca-mismatch',
+    );
+  });
 });
 
 describe('evaluateCertificateValidity — single node severity (R4)', () => {
@@ -407,19 +470,35 @@ describe('evaluateCertificateValidity — finding content (R7, R8)', () => {
     });
   });
 
-  it('exposes the oldest evaluation time so staleness is visible (S8.1)', () => {
+  it('exposes the oldest listener load time, not the evaluation time (S8.1)', () => {
     const older = snapshot({ node: 'node01' });
+    const newer = snapshot({ node: 'worker-02' });
 
     older.evaluated_at = '2026-09-14T00:00:00Z';
+    older.listener.loaded_at = '2026-09-10T00:00:00Z';
+    newer.listener.loaded_at = '2026-09-12T00:00:00Z';
 
     const result = evaluateCertificateValidity(
       [
         { kind: 'ok', node: 'node01', snapshot: older },
-        ok({ node: 'worker-02', listener: { seconds_until_expiry: 10 * DAY } }),
+        { kind: 'ok', node: 'worker-02', snapshot: newer },
       ],
       OPTIONS,
     );
 
-    expect(result.oldestEvaluatedAt).toBe('2026-09-14T00:00:00Z');
+    expect(result.oldestListenerLoadedAt).toBe('2026-09-10T00:00:00Z');
+  });
+
+  it('exposes no load time when the manager does not date the listener', () => {
+    const undated = snapshot({ node: 'node01' });
+
+    delete undated.listener.loaded_at;
+
+    const result = evaluateCertificateValidity(
+      [{ kind: 'ok', node: 'node01', snapshot: undated }],
+      OPTIONS,
+    );
+
+    expect(result.oldestListenerLoadedAt).toBeUndefined();
   });
 });

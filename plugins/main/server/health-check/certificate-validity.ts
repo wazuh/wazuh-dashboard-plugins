@@ -148,11 +148,15 @@ function buildMessage(evaluation: CertificateEvaluation): string {
     .map(finding => `- ${finding.detail}`)
     .join('\n');
 
-  const staleness = evaluation.oldestEvaluatedAt
-    ? `\n\nThe manager evaluated this on ${evaluation.oldestEvaluatedAt}; it is refreshed periodically, so it may not reflect a certificate replaced since then.`
-    : '';
+  // Only a listener finding outlives its fix: remoted holds the certificate
+  // until it restarts.
+  const listenerRemediation =
+    evaluation.oldestListenerLoadedAt &&
+    evaluation.findings.some(finding => finding.scope === 'listener')
+      ? `\n\nThe manager loaded the listener certificate on ${evaluation.oldestListenerLoadedAt} and serves it until remoted restarts, so replacing the file on disk does not clear this until then.`
+      : '';
 
-  return `${headline}\n\n${details}${staleness}`;
+  return `${headline}\n\n${details}${listenerRemediation}`;
 }
 
 /** The only place an internal severity meets the platform result model. */

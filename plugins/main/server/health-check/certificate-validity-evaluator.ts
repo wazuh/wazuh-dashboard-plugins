@@ -33,7 +33,7 @@ export interface CertificateEvaluation {
   findings: CertificateFinding[];
   nodesEvaluated: number;
   nodesUndetermined: string[];
-  oldestEvaluatedAt?: string;
+  oldestListenerLoadedAt?: string;
 }
 
 export interface EvaluationOptions {
@@ -113,14 +113,21 @@ function mismatchFinding(
   node: string,
   snapshot: CertificateValiditySnapshot,
 ): CertificateFinding | null {
-  const bundle = snapshot.ca_bundle;
+  const matches = snapshot.ca_bundle.matches_active_leaf;
 
-  const matches =
-    bundle.matches_active_leaf ??
-    bundle.certificates.some(candidate => candidate.signs_active_leaf === true);
-
-  if (matches) {
+  if (matches === true) {
     return null;
+  }
+
+  // The manager answers `null` for a bundle it could not read.
+  if (matches !== false) {
+    return {
+      node,
+      severity: 'unknown',
+      scope: 'ca',
+      reason: 'undetermined',
+      detail: `The manager did not report whether the CA bundle on node ${node} signs the certificate the listener is serving.`,
+    };
   }
 
   return {
@@ -247,11 +254,14 @@ export function evaluateCertificateValidity(
 
   const findings: CertificateFinding[] = [];
   const nodesUndetermined: string[] = [];
-  const evaluatedAt: string[] = [];
+  const listenerLoadedAt: string[] = [];
 
   for (const outcome of outcomes) {
     if (outcome.kind === 'ok') {
-      evaluatedAt.push(outcome.snapshot.evaluated_at);
+      if (outcome.snapshot.listener.loaded_at) {
+        listenerLoadedAt.push(outcome.snapshot.listener.loaded_at);
+      }
+
       findings.push(...evaluateSnapshot(outcome.snapshot, options));
     } else {
       nodesUndetermined.push(outcome.node);
@@ -269,6 +279,6 @@ export function evaluateCertificateValidity(
     findings,
     nodesEvaluated: outcomes.length,
     nodesUndetermined,
-    oldestEvaluatedAt: evaluatedAt.sort()[0],
+    oldestListenerLoadedAt: listenerLoadedAt.sort()[0],
   };
 }
