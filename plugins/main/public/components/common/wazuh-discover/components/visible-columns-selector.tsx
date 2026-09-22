@@ -67,7 +67,7 @@ export const DataGridVisibleColumnsSelector = ({
           onClick={() => setIsOpen(!isOpen)}
         >
           <FormattedMessage
-            id='wz.discover.availableFields'
+            id='wazuh.common.wazuhDiscover.availableFields'
             defaultMessage='{availableColumns} available fields'
             values={{ availableColumns: availableColumns?.length ?? 0 }}
           />
@@ -76,7 +76,7 @@ export const DataGridVisibleColumnsSelector = ({
               position='top'
               content={
                 <FormattedMessage
-                  id='wz.discover.availableFields.warningTooltip'
+                  id='wazuh.common.wazuhDiscover.availableFieldsLimitTooltip'
                   defaultMessage='The number of columns exceeds the limit of {maxAvailableColumns}. Only the first {maxAvailableColumns} columns are displayed but you can still search on all columns.'
                   values={{ maxAvailableColumns }}
                 />

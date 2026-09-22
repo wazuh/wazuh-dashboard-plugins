@@ -1,7 +1,5 @@
 {
   "prefix": "wazuhCore",
-  "paths": {
-    "wazuhCore": "."
-  },
-  "translations": ["translations/en-US.json"]
+  "paths": { "wazuhCore": "." },
+  "translations": []
 }
