@@ -6,7 +6,7 @@ import type {
 } from './saved-object.types';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type { DashboardDefinitionFromFile } from './dashboard-definition-reader';
-import type { InitializationTaskRunContext } from '../types';
+import { TASK_RESULT, type InitializationTaskRunContext } from '../types';
 
 jest.mock('./dashboard-definition-reader', () => ({
   readDashboardDefinitionFiles: jest.fn(),
@@ -96,7 +96,11 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
       initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
     const result = await task.run(ctx);
 
-    expect(result).toEqual({ status: 'ok' });
+    expect(result).toEqual({
+      [TASK_RESULT]: true,
+      status: 'ok',
+      data: undefined,
+    });
     expect(mockCreateInternalRepository).toHaveBeenCalledTimes(1);
     expect(mockReadDashboardDefinitionFiles).toHaveBeenCalledTimes(1);
     expect(mockClient.get).toHaveBeenCalledWith(
@@ -140,7 +144,11 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
       initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
     const result = await task.run(ctx);
 
-    expect(result).toEqual({ status: 'ok' });
+    expect(result).toEqual({
+      [TASK_RESULT]: true,
+      status: 'ok',
+      data: undefined,
+    });
     expect(mockCreateInternalRepository).toHaveBeenCalledTimes(1);
     expect(mockClient.get).not.toHaveBeenCalled();
     expect(mockClient.create).toHaveBeenCalledWith(

@@ -16,6 +16,7 @@
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import type { InitializationTaskRunContext } from '../services';
+import { taskResult } from '../types';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type {
   GenericAttributes,
@@ -205,7 +206,7 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
 
         ctx.logger.debug('Saved objects provisioning finished');
 
-        return { status: 'ok' };
+        return taskResult.ok();
       } catch (error) {
         const message = `Error provisioning saved objects: ${
           error instanceof Error ? error.message : String(error)

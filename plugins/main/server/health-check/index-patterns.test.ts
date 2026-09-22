@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { initializationTaskCreatorIndexPatternBatch } from './index-patterns';
+import { TASK_RESULT } from './types';
 
 describe('initializationTaskCreatorIndexPatternBatch', () => {
   const mockLogger = {
@@ -81,8 +82,10 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
 
     const result = await task.run(runCtx);
 
-    expect(result).toHaveLength(3);
-    expect(result).toEqual(
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('ok');
+    expect(result.data).toHaveLength(3);
+    expect(result.data).toEqual(
       expect.arrayContaining([
         { id: 'pattern-a*', title: 'pattern-a*' },
         { id: 'pattern-b*', title: 'pattern-b*' },
@@ -304,7 +307,9 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
     });
 
     const result = await task.run(runCtx);
-    expect(result).toEqual([]);
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('ok');
+    expect(result.data).toEqual([]);
   });
 });
 

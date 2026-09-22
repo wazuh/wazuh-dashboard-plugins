@@ -5,10 +5,11 @@ import {
   indexPatternHasMissingFields,
   indexPatternHasTimeField,
 } from '../../common/services/index-patterns';
-import type {
-  HealthCheckTaskContext,
-  InitializationTaskContext,
-  InitializationTaskRunContext,
+import {
+  taskResult,
+  type HealthCheckTaskContext,
+  type InitializationTaskContext,
+  type InitializationTaskRunContext,
 } from './types';
 
 interface EnsureIndexPatternExistenceContextTask {
@@ -416,7 +417,7 @@ export const initializationTaskCreatorIndexPatternBatch = ({
             .join('\n'),
       );
     }
-    return results;
+    return taskResult.ok(results);
   },
 });
 
