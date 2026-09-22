@@ -24,30 +24,37 @@ export const ConfigurationCards = ({
 }: ConfigurationCardsProps) => {
   const configurationItemsList = [
     {
+      key: 'hidden',
       label: 'Hidden',
       value: String(configuration?.hidden),
     },
     {
+      key: 'name',
       label: 'Name',
       value: configuration?.name,
     },
     {
+      key: 'node-name',
       label: 'Node name',
       value: configuration?.node_name,
     },
     {
+      key: 'node-type',
       label: 'Node type',
       value: configuration?.node_type,
     },
     {
+      key: 'bind-address',
       label: 'Bind address',
       value: configuration?.bind_addr,
     },
     {
+      key: 'ip',
       label: 'IP',
       value: configuration?.nodes?.[0],
     },
     {
+      key: 'port',
       label: 'Port',
       value: configuration?.port,
     },

@@ -26,6 +26,7 @@ export const StatTile: React.FC<StatTileProps> = ({
   <EuiStat
     title={value}
     description={label}
+    titleElement='div'
     titleColor={color as EuiStatProps['titleColor']}
     textAlign={textAlign}
     titleSize={titleSize}
