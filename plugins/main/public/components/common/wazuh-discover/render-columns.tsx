@@ -26,7 +26,10 @@ const renderLinksReference = (value: string) => {
           {!!index && ', '}
           <EuiToolTip
             position='top'
-            content='Navigate to the vulnerability reference'
+            content={i18n.translate(
+              'wazuh.common.wazuhDiscover.fieldLinkTooltip.vulnerabilityExternalReference',
+              { defaultMessage: 'Navigate to the vulnerability reference' },
+            )}
           >
             <EuiLink
               href={link}
