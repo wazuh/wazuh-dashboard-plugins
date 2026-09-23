@@ -1,5 +1,8 @@
 import { initializeDefaultNotificationChannel } from './index';
-import { TASK_RESULT } from '../../types';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../../../mocks/health-check-task-context.mock';
 import { defaultChannels } from '../common/constants';
 
 // Mock the client
@@ -8,14 +11,15 @@ const mockClient = {
 };
 
 // Mock context with logger
-const mockContext = () => ({
-  logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  },
-});
+const mockContext = () =>
+  withTaskResult({
+    logger: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    },
+  });
 
 describe('initializeDefaultNotificationChannel', () => {
   beforeEach(() => {

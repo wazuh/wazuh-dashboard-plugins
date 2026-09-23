@@ -1,6 +1,6 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
 import { ChannelDefinition, defaultChannels } from '../common/constants';
-import { taskResult, type InitializationTaskRunContext } from '../../types';
+import type { InitializationTaskRunContext } from '../../types';
 
 const verifyExistingDefaultChannels = async (
   client: ILegacyClusterClient,
@@ -63,7 +63,7 @@ export const initializeDefaultNotificationChannel = (
             'All default notification channels are present and verified',
           );
 
-          return taskResult.ok();
+          return ctx.taskResult.ok();
         }
 
         const stillMissing =
@@ -72,7 +72,7 @@ export const initializeDefaultNotificationChannel = (
 
         ctx.logger.warn(message);
 
-        return taskResult.warning(message);
+        return ctx.taskResult.warning(message);
       } catch (error: any) {
         const message = `Error verifying default notification channels: ${error.message}`;
         ctx.logger.error(message);

@@ -1,36 +1,5 @@
 import type { Logger } from 'opensearch_dashboards/server';
-
-/**
- * Mirror of the platform health check result contract. `Symbol.for` resolves to
- * the same registry symbol the platform reads, so no import is needed.
- */
-export const TASK_RESULT: unique symbol = Symbol.for('healthcheck.taskResult');
-
-export type TaskResult<T = unknown> = { readonly [TASK_RESULT]: true } & (
-  | { status: 'ok'; data?: T }
-  | { status: 'warning'; message: string; data?: T }
-  | { status: 'error'; message: string; data?: T }
-);
-
-export const taskResult = {
-  ok: <T = unknown>(data?: T): TaskResult<T> => ({
-    [TASK_RESULT]: true,
-    status: 'ok',
-    data,
-  }),
-  warning: <T = unknown>(message: string, data?: T): TaskResult<T> => ({
-    [TASK_RESULT]: true,
-    status: 'warning',
-    message,
-    data,
-  }),
-  error: <T = unknown>(message: string, data?: T): TaskResult<T> => ({
-    [TASK_RESULT]: true,
-    status: 'error',
-    message,
-    data,
-  }),
-};
+import type { TaskResultFactory } from '../../../../src/core/common/healthcheck';
 
 export type TaskExecutionContext =
   | 'internal'
@@ -54,6 +23,7 @@ export interface HealthCheckTaskContext {
 
 export interface PluginTaskRunContext extends HealthCheckTaskContext {
   context: HealthCheckTaskContext;
+  taskResult: TaskResultFactory;
 }
 
 export type InitializationTaskRunContext = PluginTaskRunContext;

@@ -6,7 +6,11 @@ import type {
 } from './saved-object.types';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type { DashboardDefinitionFromFile } from './dashboard-definition-reader';
-import { TASK_RESULT, type InitializationTaskRunContext } from '../types';
+import type { InitializationTaskRunContext } from '../types';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../../mocks/health-check-task-context.mock';
 
 jest.mock('./dashboard-definition-reader', () => ({
   readDashboardDefinitionFiles: jest.fn(),
@@ -69,7 +73,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     } as unknown as jest.Mocked<SavedObjectsClientContract>;
     mockCreateInternalRepository = jest.fn(() => mockClient);
 
-    ctx = {
+    ctx = withTaskResult({
       logger: createLogger(),
       context: {
         services: {
@@ -80,7 +84,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
           },
         },
       },
-    } as unknown as InitializationTaskRunContext;
+    }) as unknown as InitializationTaskRunContext;
 
     mockReadDashboardDefinitionFiles.mockReturnValue([mockDefinition]);
   });

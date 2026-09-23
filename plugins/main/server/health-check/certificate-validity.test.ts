@@ -12,6 +12,10 @@ import {
   CERTIFICATE_EXPIRY_CRITICAL_SETTING,
   CERTIFICATE_EXPIRY_WARNING_SETTING,
 } from '../../common/constants';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../mocks/health-check-task-context.mock';
 
 const DAY = 24 * 60 * 60;
 const TASK_NAME = 'server-api:certificate-validity';
@@ -62,14 +66,15 @@ const snapshot = (
   },
 });
 
-const buildContext = () => ({
-  logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  },
-});
+const buildContext = () =>
+  withTaskResult({
+    logger: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    },
+  });
 
 const buildConfiguration = (settings: Record<string, number> = {}) => {
   const values: Record<string, number> = {
@@ -159,6 +164,29 @@ describe('initializationTaskCreatorCertificateValidity', () => {
       status: 'ok',
       data: { severity: 'ok' },
     });
+  });
+
+  it('returns the result the platform constructors build', async () => {
+    const healthy = (await runTask(buildServices())) as unknown as Record<
+      PropertyKey,
+      unknown
+    >;
+    const expiring = (await runTask(
+      buildServices({
+        outcomes: {
+          node01: {
+            kind: 'ok',
+            node: 'node01',
+            snapshot: snapshot('node01', 3 * DAY),
+          },
+        },
+      }),
+    )) as unknown as Record<PropertyKey, unknown>;
+
+    expect(healthy[TASK_RESULT]).toBe(true);
+    expect(healthy.status).toBe('ok');
+    expect(expiring[TASK_RESULT]).toBe(true);
+    expect(expiring.status).toBe('error');
   });
 
   it('queries every node reported by the cluster', async () => {

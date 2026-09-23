@@ -4,7 +4,7 @@ import {
 } from '../../common/constants';
 import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
-import { taskResult, type InitializationTaskRunContext } from './types';
+import type { InitializationTaskRunContext } from './types';
 import { checkCCS } from '../lib/ccs-detector';
 
 const MESSAGES = {
@@ -159,7 +159,7 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
       );
 
       if (hasAvailable) {
-        return taskResult.ok(results);
+        return ctx.taskResult.ok(results);
       }
 
       const isCCS = results?.length > 1;
@@ -270,7 +270,7 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           .map((result: { id: string }) => result.id)
           .join(', ')}`,
       );
-      return taskResult.ok(enabledHosts);
+      return ctx.taskResult.ok(enabledHosts);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);

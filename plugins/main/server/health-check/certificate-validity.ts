@@ -3,7 +3,7 @@ import {
   CERTIFICATE_EXPIRY_WARNING_SETTING,
 } from '../../common/constants';
 import type { CertificateValidityOutcome } from '../../../wazuh-core/common/certificate-validity';
-import { taskResult, type InitializationTaskRunContext } from './types';
+import type { InitializationTaskRunContext } from './types';
 import {
   CertificateEvaluation,
   CertificateFinding,
@@ -159,7 +159,10 @@ function buildMessage(evaluation: CertificateEvaluation): string {
 }
 
 /** Maps an evaluator severity to a platform task result. */
-function reportEvaluation(evaluation: CertificateEvaluation) {
+function reportEvaluation(
+  { taskResult }: InitializationTaskRunContext,
+  evaluation: CertificateEvaluation,
+) {
   if (evaluation.severity === 'ok') {
     return taskResult.ok(evaluation);
   }
@@ -190,7 +193,7 @@ export const initializationTaskCreatorCertificateValidity = ({
       ...thresholds,
     });
 
-    const result = reportEvaluation(evaluation);
+    const result = reportEvaluation(ctx, evaluation);
 
     if (result.status === 'ok') {
       ctx.logger.info(
