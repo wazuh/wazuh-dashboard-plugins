@@ -42,6 +42,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { WzFieldSearchDelay } from '../../../../../components/common/search';
 import { logs } from '../../../../../utils/applications';
+import { i18n } from '@osd/i18n';
 
 export default compose(
   withGlobalBreadcrumb([{ text: logs.breadcrumbLabel }]),
@@ -139,7 +140,12 @@ export default compose(
         ];
         this.setState({ daemonsList });
       } catch (error) {
-        throw new Error('Error fetching daemons list: ' + error);
+        throw new Error(
+          i18n.translate('wazuh.logs.logs.fetchDaemonsListError', {
+            defaultMessage: 'Error fetching daemons list: {error}',
+            values: { error: String(error) },
+          }),
+        );
       }
     }
 
@@ -193,7 +199,12 @@ export default compose(
         totalItems = tmpResult?.data?.data?.total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
       } catch (error) {
-        throw new Error('Error fetching logs: ' + error);
+        throw new Error(
+          i18n.translate('wazuh.logs.logs.fetchLogsError', {
+            defaultMessage: 'Error fetching logs: {error}',
+            values: { error: String(error) },
+          }),
+        );
       }
 
       this.setState({ totalItems });
@@ -246,27 +257,76 @@ export default compose(
           };
         }
       } catch (error) {
-        throw new Error('Error building logs path: ' + error);
+        throw new Error(
+          i18n.translate('wazuh.logs.logs.buildLogsPathError', {
+            defaultMessage: 'Error building logs path: {error}',
+            values: { error: String(error) },
+          }),
+        );
       }
     }
 
     getDaemonsOptions() {
+      const allDaemonsText = i18n.translate(
+        'wazuh.logs.logs.allDaemonsOption',
+        {
+          defaultMessage: 'All daemons',
+        },
+      );
       return this.state.daemonsList.length > 0
         ? this.state.daemonsList.map(item => {
-            return { value: item, text: item === 'all' ? 'All daemons' : item };
+            return {
+              value: item,
+              text: item === 'all' ? allDaemonsText : item,
+            };
           })
-        : [{ value: 'all', text: 'All daemons' }];
+        : [{ value: 'all', text: allDaemonsText }];
     }
 
     getLogLevelOptions() {
       return [
-        { value: 'all', text: 'All log levels' },
-        { value: 'info', text: 'Info' },
-        { value: 'error', text: 'Error' },
-        { value: 'warning', text: 'Warning' },
-        { value: 'critical', text: 'Critical' },
-        { value: 'debug', text: 'Debug' },
-        { value: 'debug2', text: 'Debug2' },
+        {
+          value: 'all',
+          text: i18n.translate('wazuh.logs.logs.allLogLevelsOption', {
+            defaultMessage: 'All log levels',
+          }),
+        },
+        {
+          value: 'info',
+          text: i18n.translate('wazuh.logs.logs.infoLevelOption', {
+            defaultMessage: 'Info',
+          }),
+        },
+        {
+          value: 'error',
+          text: i18n.translate('wazuh.logs.logs.errorLevelOption', {
+            defaultMessage: 'Error',
+          }),
+        },
+        {
+          value: 'warning',
+          text: i18n.translate('wazuh.logs.logs.warningLevelOption', {
+            defaultMessage: 'Warning',
+          }),
+        },
+        {
+          value: 'critical',
+          text: i18n.translate('wazuh.logs.logs.criticalLevelOption', {
+            defaultMessage: 'Critical',
+          }),
+        },
+        {
+          value: 'debug',
+          text: i18n.translate('wazuh.logs.logs.debugLevelOption', {
+            defaultMessage: 'Debug',
+          }),
+        },
+        {
+          value: 'debug2',
+          text: i18n.translate('wazuh.logs.logs.debug2LevelOption', {
+            defaultMessage: 'Debug2',
+          }),
+        },
       ];
     }
 
@@ -274,7 +334,13 @@ export default compose(
       try {
         if (this.state.nodeList && Array.isArray(this.state.nodeList)) {
           return this.state.nodeList.map(item => {
-            return { value: item.name, text: `${item.name} (${item.type})` };
+            return {
+              value: item.name,
+              text: i18n.translate('wazuh.logs.logs.nodeOption', {
+                defaultMessage: '{name} ({type})',
+                values: { name: item.name, type: item.type },
+              }),
+            };
           });
         } else {
           return false;
@@ -287,7 +353,9 @@ export default compose(
           store: true,
           error: {
             error: error,
-            message: 'Error obtaining list of nodes.',
+            message: i18n.translate('wazuh.logs.logs.nodeListError', {
+              defaultMessage: 'Error obtaining list of nodes.',
+            }),
             title: error.name,
           },
         };
@@ -381,7 +449,9 @@ export default compose(
         this.setState({ generatingCsv: true });
         this.showToast(
           'success',
-          'Your download should begin automatically...',
+          i18n.translate('wazuh.logs.logs.downloadToast', {
+            defaultMessage: 'Your download should begin automatically...',
+          }),
           3000,
         );
         const filters = this.buildFilters();
@@ -421,7 +491,11 @@ export default compose(
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiTitle size={'m'}>
-                <h2>Logs</h2>
+                <h2>
+                  {i18n.translate('wazuh.logs.logs.title', {
+                    defaultMessage: 'Logs',
+                  })}
+                </h2>
               </EuiTitle>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
@@ -433,7 +507,9 @@ export default compose(
                     isLoading={this.state.generatingCsv}
                     isDisabled={!this.state.logsList}
                   >
-                    Export formatted
+                    {i18n.translate('wazuh.logs.logs.exportFormattedButton', {
+                      defaultMessage: 'Export formatted',
+                    })}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -442,7 +518,11 @@ export default compose(
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiTextColor color='subdued'>
-                <p>List and filter logs.</p>
+                <p>
+                  {i18n.translate('wazuh.logs.logs.description', {
+                    defaultMessage: 'List and filter logs.',
+                  })}
+                </p>
               </EuiTextColor>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -455,7 +535,12 @@ export default compose(
                     options={daemonsOptions}
                     value={this.state.selectedDaemon}
                     onChange={this.onDaemonChange}
-                    aria-label='Filter by daemon'
+                    aria-label={i18n.translate(
+                      'wazuh.logs.logs.filterDaemonAriaLabel',
+                      {
+                        defaultMessage: 'Filter by daemon',
+                      },
+                    )}
                   />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
@@ -464,7 +549,10 @@ export default compose(
                     options={logLevelOptions}
                     value={this.state.logLevelSelect}
                     onChange={this.onLogLevelChange}
-                    aria-label='Filter by log level'
+                    aria-label={i18n.translate(
+                      'wazuh.logs.logs.filterLogLevelAriaLabel',
+                      { defaultMessage: 'Filter by log level' },
+                    )}
                   />
                 </EuiFlexItem>
                 {this.state.selectedNode && (
@@ -474,20 +562,32 @@ export default compose(
                       options={nodeList}
                       value={this.state.selectedNode}
                       onChange={this.onSelectNode}
-                      aria-label='Select node'
+                      aria-label={i18n.translate(
+                        'wazuh.logs.logs.selectNodeAriaLabel',
+                        {
+                          defaultMessage: 'Select node',
+                        },
+                      )}
                     />
                   </EuiFlexItem>
                 )}
                 <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
                   <EuiSwitch
-                    label='Descending sort'
+                    label={i18n.translate(
+                      'wazuh.logs.logs.descendingSortLabel',
+                      {
+                        defaultMessage: 'Descending sort',
+                      },
+                    )}
                     checked={this.state.descendingSort}
                     onChange={this.onSortSwitchChange}
                   />
                 </EuiFlexItem>
                 <EuiFlexItem grow={false} style={{ paddingTop: '10px' }}>
                   <EuiSwitch
-                    label='Realtime'
+                    label={i18n.translate('wazuh.logs.logs.realtimeLabel', {
+                      defaultMessage: 'Realtime',
+                    })}
                     checked={this.state.realTime}
                     onChange={() => this.switchRealTime()}
                   />
@@ -502,8 +602,15 @@ export default compose(
                 delay={500}
                 onChange={this.onSearchBarChange}
                 onSearch={this.onSearchBarSearch}
-                placeholder='Filter logs'
-                aria-label='Filter logs'
+                placeholder={i18n.translate(
+                  'wazuh.logs.logs.searchPlaceholder',
+                  {
+                    defaultMessage: 'Filter logs',
+                  },
+                )}
+                aria-label={i18n.translate('wazuh.logs.logs.searchAriaLabel', {
+                  defaultMessage: 'Filter logs',
+                })}
                 fullWidth
               />
             </EuiFlexItem>
@@ -557,7 +664,9 @@ export default compose(
                           : undefined
                       }
                     >
-                      Load more logs
+                      {i18n.translate('wazuh.logs.logs.loadMoreButton', {
+                        defaultMessage: 'Load more logs',
+                      })}
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -566,7 +675,9 @@ export default compose(
           )) || (
             <EuiCallOut
               color='warning'
-              title='No results match your search criteria.'
+              title={i18n.translate('wazuh.logs.logs.noResultsCallout', {
+                defaultMessage: 'No results match your search criteria.',
+              })}
               iconType='alert'
             />
           )}

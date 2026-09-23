@@ -14,6 +14,7 @@ import React, { Component } from 'react';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
+import { i18n } from '@osd/i18n';
 
 export class WzStatusNodeInfo extends Component {
   _isMounted = false;
@@ -33,8 +34,13 @@ export class WzStatusNodeInfo extends Component {
   render() {
     const { nodeInfo, selectedNode } = this.props.state;
     const title = selectedNode
-      ? selectedNode + ' information'
-      : 'Manager information';
+      ? i18n.translate('wazuh.serverStatus.nodeInfo.nodeTitle', {
+          defaultMessage: '{selectedNode} information',
+          values: { selectedNode },
+        })
+      : i18n.translate('wazuh.serverStatus.nodeInfo.managerTitle', {
+          defaultMessage: 'Manager information',
+        });
 
     const greyStyle = {
       color: 'grey',
@@ -54,15 +60,33 @@ export class WzStatusNodeInfo extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Version</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate('wazuh.serverStatus.nodeInfo.versionLabel', {
+              defaultMessage: 'Version',
+            })}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.version}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Installation path</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.serverStatus.nodeInfo.installationPathLabel',
+              {
+                defaultMessage: 'Installation path',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.path}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Installation type</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate(
+              'wazuh.serverStatus.nodeInfo.installationTypeLabel',
+              {
+                defaultMessage: 'Installation type',
+              },
+            )}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{nodeInfo.type}</EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>

@@ -21,6 +21,7 @@ import { TableWzAPI } from '../../../../components/common/tables';
 import { PinnedAgentManager } from '../../../../components/wz-agent-selector/wz-agent-selector-service';
 import WzIconSVG from '../../../../components/common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../../react-services';
+import { i18n } from '@osd/i18n';
 
 export class AgentSelectionTable extends Component {
   constructor(props) {
@@ -32,27 +33,35 @@ export class AgentSelectionTable extends Component {
     this.columns = [
       {
         field: 'id',
-        name: 'ID',
+        name: i18n.translate('wazuh.core.agentSelectionTable.idColumn', {
+          defaultMessage: 'ID',
+        }),
         width: '60px',
         searchable: true,
         sortable: true,
       },
       {
         field: 'name',
-        name: 'Name',
+        name: i18n.translate('wazuh.core.agentSelectionTable.nameColumn', {
+          defaultMessage: 'Name',
+        }),
         searchable: true,
         sortable: true,
       },
       {
         field: 'group',
-        name: 'Group',
+        name: i18n.translate('wazuh.core.agentSelectionTable.groupColumn', {
+          defaultMessage: 'Group',
+        }),
         sortable: true,
         searchable: true,
         render: groups => this.renderGroups(groups),
       },
       {
         field: 'version',
-        name: 'Version',
+        name: i18n.translate('wazuh.core.agentSelectionTable.versionColumn', {
+          defaultMessage: 'Version',
+        }),
         width: '80px',
         searchable: true,
         sortable: true,
@@ -60,14 +69,21 @@ export class AgentSelectionTable extends Component {
       {
         field: 'os.name,os.version',
         composeField: ['os.name', 'os.version'],
-        name: 'Operating system',
+        name: i18n.translate(
+          'wazuh.core.agentSelectionTable.operatingSystemColumn',
+          {
+            defaultMessage: 'Operating system',
+          },
+        ),
         sortable: true,
         searchable: true,
         render: (field, agentData) => this.addIconPlatformRender(agentData),
       },
       {
         field: 'status',
-        name: 'Status',
+        name: i18n.translate('wazuh.core.agentSelectionTable.statusColumn', {
+          defaultMessage: 'Status',
+        }),
         searchable: true,
         sortable: true,
         width: 'auto',
@@ -138,7 +154,12 @@ export class AgentSelectionTable extends Component {
       <GroupTruncate
         groups={groups}
         length={20}
-        label={'more'}
+        label={i18n.translate(
+          'wazuh.core.agentSelectionTable.moreGroupsLabel',
+          {
+            defaultMessage: 'more',
+          },
+        )}
         action={'filter'}
         filterAction={this.filterGroupBadge}
         {...this.props}
@@ -172,19 +193,37 @@ export class AgentSelectionTable extends Component {
                   agent={selectedAgent}
                   style={{ whiteSpace: 'no-wrap' }}
                 >
-                  {selectedAgent.name} ({selectedAgent.id})
+                  {i18n.translate(
+                    'wazuh.core.agentSelectionTable.pinnedAgent',
+                    {
+                      defaultMessage: '{name} ({id})',
+                      values: {
+                        name: selectedAgent.name,
+                        id: selectedAgent.id,
+                      },
+                    },
+                  )}
                 </AgentStatus>
               </EuiFlexItem>
               <EuiFlexItem
                 grow={false}
                 style={{ marginTop: 10, marginLeft: 4 }}
               >
-                <EuiToolTip position='top' content='Unpin agent'>
+                <EuiToolTip
+                  position='top'
+                  content={i18n.translate(
+                    'wazuh.core.agentSelectionTable.unpinAgentTooltip',
+                    { defaultMessage: 'Unpin agent' },
+                  )}
+                >
                   <EuiButtonIcon
                     color='danger'
                     onClick={() => this.unselectAgents()}
                     iconType='pinFilled'
-                    aria-label='unpin agent'
+                    aria-label={i18n.translate(
+                      'wazuh.core.agentSelectionTable.unpinAgentAriaLabel',
+                      { defaultMessage: 'unpin agent' },
+                    )}
                   />
                 </EuiToolTip>
               </EuiFlexItem>
@@ -217,19 +256,55 @@ export class AgentSelectionTable extends Component {
             suggestions: {
               field(currentValue) {
                 return [
-                  { label: 'id', description: 'filter by ID' },
-                  { label: 'group', description: 'filter by group' },
-                  { label: 'name', description: 'filter by name' },
+                  {
+                    label: 'id',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionId',
+                      { defaultMessage: 'filter by ID' },
+                    ),
+                  },
+                  {
+                    label: 'group',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionGroup',
+                      { defaultMessage: 'filter by group' },
+                    ),
+                  },
+                  {
+                    label: 'name',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionName',
+                      { defaultMessage: 'filter by name' },
+                    ),
+                  },
                   {
                     label: 'os.name',
-                    description: 'filter by operating system name',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionOsName',
+                      { defaultMessage: 'filter by operating system name' },
+                    ),
                   },
                   {
                     label: 'os.version',
-                    description: 'filter by operating system version',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionOsVersion',
+                      { defaultMessage: 'filter by operating system version' },
+                    ),
                   },
-                  { label: 'status', description: 'filter by status' },
-                  { label: 'version', description: 'filter by version' },
+                  {
+                    label: 'status',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionStatus',
+                      { defaultMessage: 'filter by status' },
+                    ),
+                  },
+                  {
+                    label: 'version',
+                    description: i18n.translate(
+                      'wazuh.core.agentSelectionTable.suggestionVersion',
+                      { defaultMessage: 'filter by version' },
+                    ),
+                  },
                 ];
               },
               value: async (currentValue, { field }) => {

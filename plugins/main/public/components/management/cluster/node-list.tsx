@@ -11,12 +11,33 @@ import { withErrorBoundary } from '../../common/hocs';
 import { TableWzAPI } from '../../common/tables';
 import { WzRequest } from '../../../react-services';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../common/constants';
+import { i18n } from '@osd/i18n';
 
 const searchBarWQLFieldSuggestions = [
-  { label: 'ip', description: 'filter by IP address' },
-  { label: 'name', description: 'filter by name' },
-  { label: 'type', description: 'filter by type' },
-  { label: 'version', description: 'filter by version' },
+  {
+    label: 'ip',
+    description: i18n.translate('wazuh.cluster.nodeList.suggestionIp', {
+      defaultMessage: 'filter by IP address',
+    }),
+  },
+  {
+    label: 'name',
+    description: i18n.translate('wazuh.cluster.nodeList.suggestionName', {
+      defaultMessage: 'filter by name',
+    }),
+  },
+  {
+    label: 'type',
+    description: i18n.translate('wazuh.cluster.nodeList.suggestionType', {
+      defaultMessage: 'filter by type',
+    }),
+  },
+  {
+    label: 'version',
+    description: i18n.translate('wazuh.cluster.nodeList.suggestionVersion', {
+      defaultMessage: 'filter by version',
+    }),
+  },
 ];
 
 export const NodeList = withErrorBoundary(
@@ -26,26 +47,34 @@ export const NodeList = withErrorBoundary(
       this.columns = [
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate('wazuh.cluster.nodeList.columnName', {
+            defaultMessage: 'Name',
+          }),
           searchable: true,
           sortable: true,
           truncateText: true,
         },
         {
           field: 'version',
-          name: 'Version',
+          name: i18n.translate('wazuh.cluster.nodeList.columnVersion', {
+            defaultMessage: 'Version',
+          }),
           searchable: true,
           sortable: true,
         },
         {
           field: 'ip',
-          name: 'IP address',
+          name: i18n.translate('wazuh.cluster.nodeList.columnIpAddress', {
+            defaultMessage: 'IP address',
+          }),
           searchable: true,
           sortable: true,
         },
         {
           field: 'type',
-          name: 'Type',
+          name: i18n.translate('wazuh.cluster.nodeList.columnType', {
+            defaultMessage: 'Type',
+          }),
           searchable: true,
           sortable: true,
         },
@@ -60,27 +89,46 @@ export const NodeList = withErrorBoundary(
         <EuiPanel>
           <EuiFlexGroup responsive={false} alignItems='center' gutterSize='s'>
             <EuiFlexItem grow={false}>
-              <EuiToolTip content='Go back' position='bottom'>
+              <EuiToolTip
+                content={i18n.translate(
+                  'wazuh.cluster.nodeList.goBackTooltip',
+                  {
+                    defaultMessage: 'Go back',
+                  },
+                )}
+                position='bottom'
+              >
                 <EuiButtonIcon
                   color='primary'
                   size='m'
                   display='empty'
                   iconType='arrowLeft'
-                  aria-label='Back'
+                  aria-label={i18n.translate(
+                    'wazuh.cluster.nodeList.backAriaLabel',
+                    {
+                      defaultMessage: 'Back',
+                    },
+                  )}
                   onClick={() => this.props.goBack()}
                 />
               </EuiToolTip>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <h2>Cluster nodes</h2>
+                <h2>
+                  {i18n.translate('wazuh.cluster.nodeList.title', {
+                    defaultMessage: 'Cluster nodes',
+                  })}
+                </h2>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
               <TableWzAPI
-                title='Nodes'
+                title={i18n.translate('wazuh.cluster.nodeList.tableTitle', {
+                  defaultMessage: 'Nodes',
+                })}
                 endpoint='/cluster/nodes'
                 tableColumns={this.columns}
                 tableInitialSortingField='name'
