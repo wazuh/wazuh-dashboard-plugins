@@ -75,9 +75,9 @@ const schemaMapper = (setting: TPluginSetting) => {
     case EpluginSettingType.number: {
       // add options for min and max
       const numberOptions: NumberOptions = {
+        ...schemaDef,
         min: setting?.options?.number?.min,
         max: setting?.options?.number?.max,
-        validate: validate,
       };
 
       schemaConfig = schema.number(numberOptions);
