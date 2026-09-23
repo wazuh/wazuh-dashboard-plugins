@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { AgentStatus } from '../../../agents/agent-status';
 
 export const manageAgentsColumns = ({
@@ -6,7 +7,9 @@ export const manageAgentsColumns = ({
 }: { fullWidth?: boolean } = {}) => [
   {
     field: 'id',
-    name: 'ID',
+    name: i18n.translate('wazuh.endpointGroups.manageAgents.idColumn', {
+      defaultMessage: 'ID',
+    }),
     sortable: true,
     show: true,
     searchable: true,
@@ -14,7 +17,9 @@ export const manageAgentsColumns = ({
   },
   {
     field: 'name',
-    name: 'Name',
+    name: i18n.translate('wazuh.endpointGroups.manageAgents.nameColumn', {
+      defaultMessage: 'Name',
+    }),
     sortable: true,
     show: true,
     searchable: true,
@@ -22,7 +27,9 @@ export const manageAgentsColumns = ({
   },
   {
     field: 'status',
-    name: 'Status',
+    name: i18n.translate('wazuh.endpointGroups.manageAgents.statusColumn', {
+      defaultMessage: 'Status',
+    }),
     sortable: true,
     show: true,
     width: fullWidth ? '31%' : '24%',
@@ -33,7 +40,9 @@ export const manageAgentsColumns = ({
   },
   {
     field: 'group',
-    name: 'Group(s)',
+    name: i18n.translate('wazuh.endpointGroups.manageAgents.groupsColumn', {
+      defaultMessage: 'Group(s)',
+    }),
     sortable: true,
     show: true,
     width: fullWidth ? '27%' : '20%',

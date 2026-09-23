@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { FormattedMessage } from '@osd/i18n/react';
+import { i18n } from '@osd/i18n';
 
 import { connect } from 'react-redux';
 import { cleanFileContent } from '../../../../../redux/actions/groupsActions';
@@ -117,8 +119,18 @@ class WzGroupsEditor extends Component {
       await saver(name, groupName, content);
       await validateConfigAfterSent();
       this.setState({ isSaving: false, hasChanges: false });
-      const textSuccess = 'File successfully edited';
-      this.showToast('success', 'Success', textSuccess, 3000);
+      const textSuccess = i18n.translate(
+        'wazuh.endpointGroups.editor.saveSuccessText',
+        { defaultMessage: 'File successfully edited' },
+      );
+      this.showToast(
+        'success',
+        i18n.translate('wazuh.endpointGroups.editor.saveSuccessTitle', {
+          defaultMessage: 'Success',
+        }),
+        textSuccess,
+        3000,
+      );
     } catch (error) {
       const options = {
         context: `${WzGroupsEditor.name}.save`,
@@ -127,7 +139,9 @@ class WzGroupsEditor extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error found saving the file.',
+          title: i18n.translate('wazuh.endpointGroups.editor.saveErrorTitle', {
+            defaultMessage: 'Error found saving the file.',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -159,7 +173,13 @@ class WzGroupsEditor extends Component {
         isDisabled={name.length <= 4 || (isEditable && xmlError ? true : false)}
         onClick={() => this.save(name)}
       >
-        {isEditable && xmlError ? 'XML format error' : 'Save'}
+        {isEditable && xmlError
+          ? i18n.translate('wazuh.endpointGroups.editor.xmlFormatError', {
+              defaultMessage: 'XML format error',
+            })
+          : i18n.translate('wazuh.endpointGroups.editor.saveButton', {
+              defaultMessage: 'Save',
+            })}
       </WzButtonPermissions>
     );
 
@@ -171,17 +191,32 @@ class WzGroupsEditor extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title={i18n.translate(
+              'wazuh.endpointGroups.editor.unsavedChangesModalTitle',
+              { defaultMessage: 'Unsubmitted changes' },
+            )}
             onConfirm={() => {
               closeModal;
               this.props.cleanFileContent();
             }}
             onCancel={closeModal}
-            cancelButtonText="No, don't do it"
-            confirmButtonText='Yes, do it'
+            cancelButtonText={i18n.translate(
+              'wazuh.endpointGroups.editor.unsavedChangesModalCancel',
+              { defaultMessage: "No, don't do it" },
+            )}
+            confirmButtonText={i18n.translate(
+              'wazuh.endpointGroups.editor.unsavedChangesModalConfirm',
+              { defaultMessage: 'Yes, do it' },
+            )}
           >
             <p style={{ textAlign: 'center' }}>
-              There are unsaved changes. Are you sure you want to proceed?
+              {i18n.translate(
+                'wazuh.endpointGroups.editor.unsavedChangesModalBody',
+                {
+                  defaultMessage:
+                    'There are unsaved changes. Are you sure you want to proceed?',
+                },
+              )}
             </p>
           </EuiConfirmModal>
         </EuiOverlayMask>
@@ -198,9 +233,18 @@ class WzGroupsEditor extends Component {
                   <EuiFlexItem>
                     <EuiTitle>
                       <span style={{ fontSize: '22px' }}>
-                        <EuiToolTip position='right' content={`Back to groups`}>
+                        <EuiToolTip
+                          position='right'
+                          content={i18n.translate(
+                            'wazuh.endpointGroups.editor.backTooltip',
+                            { defaultMessage: 'Back to groups' },
+                          )}
+                        >
                           <EuiButtonIcon
-                            aria-label='Back'
+                            aria-label={i18n.translate(
+                              'wazuh.endpointGroups.editor.backAriaLabel',
+                              { defaultMessage: 'Back' },
+                            )}
                             color='primary'
                             iconSize='l'
                             iconType='arrowLeft'
@@ -213,8 +257,30 @@ class WzGroupsEditor extends Component {
                             }}
                           />
                         </EuiToolTip>
-                        {name} <span style={{ color: 'grey' }}>of</span>{' '}
-                        {groupName} <span style={{ color: 'grey' }}>group</span>
+                        <FormattedMessage
+                          id='wazuh.endpointGroups.editor.title'
+                          defaultMessage='{fileName} {of} {groupName} {group}'
+                          values={{
+                            fileName: name,
+                            groupName,
+                            of: (
+                              <span style={{ color: 'grey' }}>
+                                {i18n.translate(
+                                  'wazuh.endpointGroups.editor.titleOf',
+                                  { defaultMessage: 'of' },
+                                )}
+                              </span>
+                            ),
+                            group: (
+                              <span style={{ color: 'grey' }}>
+                                {i18n.translate(
+                                  'wazuh.endpointGroups.editor.titleGroup',
+                                  { defaultMessage: 'group' },
+                                )}
+                              </span>
+                            ),
+                          }}
+                        />
                       </span>
                     </EuiTitle>
                   </EuiFlexItem>
@@ -246,7 +312,10 @@ class WzGroupsEditor extends Component {
                             mode='xml'
                             wrapEnabled
                             setOptions={this.codeEditorOptions}
-                            aria-label='Code Editor'
+                            aria-label={i18n.translate(
+                              'wazuh.endpointGroups.editor.codeEditorAriaLabel',
+                              { defaultMessage: 'Code Editor' },
+                            )}
                             onLoad={editor => {
                               editor.getSession().setMode(new WazuhXmlMode());
                             }}
