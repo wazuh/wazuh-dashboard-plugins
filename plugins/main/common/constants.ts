@@ -647,7 +647,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   CONFIGURATION = 'configuration',
   LOGS = 'logs',
   MISCELLANEOUS = 'miscellaneous',
-  ABOUT = 'about',
 }
 
 export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
