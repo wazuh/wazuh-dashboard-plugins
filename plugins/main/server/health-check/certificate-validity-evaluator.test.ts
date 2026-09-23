@@ -244,8 +244,8 @@ describe('mismatchFinding — the CA match verdict has three states', () => {
   });
 });
 
-describe('evaluateCertificateValidity — single node severity (R4)', () => {
-  it('reports ok when everything is valid and far from expiry (S4.1)', () => {
+describe('evaluateCertificateValidity — single node severity', () => {
+  it('reports ok when everything is valid and far from expiry', () => {
     const result = evaluateCertificateValidity([ok()], OPTIONS);
 
     expect(result.severity).toBe('ok');
@@ -261,7 +261,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     ${7 * DAY}         | ${'critical'}
     ${1 * DAY}         | ${'critical'}
   `(
-    'maps $secondsUntilExpiry seconds remaining to $expected (S4.2, S4.3)',
+    'maps $secondsUntilExpiry seconds remaining to $expected',
     ({ secondsUntilExpiry, expected }) => {
       const result = evaluateCertificateValidity(
         [ok({ listener: { seconds_until_expiry: secondsUntilExpiry } })],
@@ -272,7 +272,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     },
   );
 
-  it('treats an expired certificate as expired, not as expiring (S4.4)', () => {
+  it('treats an expired certificate as expired, not as expiring', () => {
     const result = evaluateCertificateValidity(
       [ok({ listener: { seconds_until_expiry: -5 * DAY } })],
       OPTIONS,
@@ -283,7 +283,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     expect(result.findings[0].detail).not.toMatch(/expires in/i);
   });
 
-  it('reports a bundle that does not sign the active leaf (S4.5)', () => {
+  it('reports a bundle that does not sign the active leaf', () => {
     const result = evaluateCertificateValidity(
       [ok({ certificates: [certificate({ signs_active_leaf: false })] })],
       OPTIONS,
@@ -295,7 +295,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     );
   });
 
-  it('reports a mismatch even when every certificate is far from expiry (S4.5)', () => {
+  it('reports a mismatch even when every certificate is far from expiry', () => {
     const result = evaluateCertificateValidity(
       [
         ok({
@@ -316,7 +316,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
 
   // wazuh/wazuh#39410: a CA:FALSE or expired signer reads signs_active_leaf true
   // and chain_valid false. Reading only the signature reported this as healthy.
-  it('reports a bundle that signs the leaf but does not validate (S4.5)', () => {
+  it('reports a bundle that signs the leaf but does not validate', () => {
     const evaluation = evaluateCertificateValidity(
       [
         ok({
@@ -339,7 +339,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     expect(evaluation.findings[0].detail).toContain('invalid CA certificate');
   });
 
-  it('does not treat an unknown chain verdict as a failure (S4.5)', () => {
+  it('does not treat an unknown chain verdict as a failure', () => {
     const evaluation = evaluateCertificateValidity(
       [ok({ caBundle: { chain_valid: null } })],
       OPTIONS,
@@ -348,7 +348,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     expect(evaluation.severity).toBe('ok');
   });
 
-  it('warns while the bundle file cannot be read (S4.8)', () => {
+  it('warns while the bundle file cannot be read', () => {
     const evaluation = evaluateCertificateValidity(
       [
         ok({
@@ -434,7 +434,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     expect(result.severity).toBe('ok');
   });
 
-  it('reports both the leaf and a CA, taking the worst severity (S4.6)', () => {
+  it('reports both the leaf and a CA, taking the worst severity', () => {
     const result = evaluateCertificateValidity(
       [
         ok({
@@ -452,7 +452,7 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
     ]);
   });
 
-  it('depends on the reported period, not on the wall clock (S4.7)', () => {
+  it('depends on the reported period, not on the wall clock', () => {
     const outcomes = [ok({ listener: { seconds_until_expiry: 10 * DAY } })];
 
     const early = evaluateCertificateValidity(outcomes, OPTIONS);
@@ -465,8 +465,8 @@ describe('evaluateCertificateValidity — single node severity (R4)', () => {
   });
 });
 
-describe('evaluateCertificateValidity — multi-node aggregation (R5)', () => {
-  it('takes the worst state and names the affected node (S5.1)', () => {
+describe('evaluateCertificateValidity — multi-node aggregation', () => {
+  it('takes the worst state and names the affected node', () => {
     const result = evaluateCertificateValidity(
       [
         ok({ node: 'node01' }),
@@ -479,7 +479,7 @@ describe('evaluateCertificateValidity — multi-node aggregation (R5)', () => {
     expect(result.findings.map(finding => finding.node)).toEqual(['worker-02']);
   });
 
-  it('keeps each node with its own state (S5.2)', () => {
+  it('keeps each node with its own state', () => {
     const result = evaluateCertificateValidity(
       [
         ok({ node: 'node01', listener: { seconds_until_expiry: 20 * DAY } }),
@@ -497,7 +497,7 @@ describe('evaluateCertificateValidity — multi-node aggregation (R5)', () => {
     ]);
   });
 
-  it('does not treat divergent bundles as an error (S5.3)', () => {
+  it('does not treat divergent bundles as an error', () => {
     const result = evaluateCertificateValidity(
       [
         ok({
@@ -519,7 +519,7 @@ describe('evaluateCertificateValidity — multi-node aggregation (R5)', () => {
     expect(result.findings).toHaveLength(0);
   });
 
-  it('reports ok only when every node is ok (S5.4)', () => {
+  it('reports ok only when every node is ok', () => {
     const result = evaluateCertificateValidity(
       [ok({ node: 'node01' }), ok({ node: 'worker-02' })],
       OPTIONS,
@@ -530,7 +530,7 @@ describe('evaluateCertificateValidity — multi-node aggregation (R5)', () => {
   });
 });
 
-describe('evaluateCertificateValidity — undetermined states (R6)', () => {
+describe('evaluateCertificateValidity — undetermined states', () => {
   it.each`
     kind                | outcome
     ${'notFound'}       | ${{ kind: 'notFound', node: 'node01' }}
@@ -538,14 +538,14 @@ describe('evaluateCertificateValidity — undetermined states (R6)', () => {
     ${'unavailable'}    | ${{ kind: 'unavailable', node: 'node01', reason: 'remoted is down' }}
     ${'malformed'}      | ${{ kind: 'malformed', node: 'node01', detail: 'bad shape' }}
     ${'transportError'} | ${{ kind: 'transportError', node: 'node01', message: 'ECONNREFUSED' }}
-  `('reports $kind as unknown, never as healthy (S6.1-S6.4)', ({ outcome }) => {
+  `('reports $kind as unknown, never as healthy', ({ outcome }) => {
     const result = evaluateCertificateValidity([outcome], OPTIONS);
 
     expect(result.severity).toBe('unknown');
     expect(result.nodesUndetermined).toEqual(['node01']);
   });
 
-  it('states the permission problem when forbidden (S6.2)', () => {
+  it('states the permission problem when forbidden', () => {
     const result = evaluateCertificateValidity(
       [{ kind: 'forbidden', node: 'node01' }],
       OPTIONS,
@@ -563,7 +563,7 @@ describe('evaluateCertificateValidity — undetermined states (R6)', () => {
     expect(result.findings[0].detail).toContain('remoted is down');
   });
 
-  it('does not resolve when only some nodes are undetermined (S6.5)', () => {
+  it('does not resolve when only some nodes are undetermined', () => {
     const result = evaluateCertificateValidity(
       [ok({ node: 'node01' }), { kind: 'notFound', node: 'worker-02' }],
       OPTIONS,
@@ -573,7 +573,7 @@ describe('evaluateCertificateValidity — undetermined states (R6)', () => {
     expect(result.nodesUndetermined).toEqual(['worker-02']);
   });
 
-  it('ranks unknown above critical, so ignorance never hides a failure (S6.5)', () => {
+  it('ranks unknown above critical, so ignorance never hides a failure', () => {
     const result = evaluateCertificateValidity(
       [
         ok({ node: 'node01', listener: { seconds_until_expiry: -1 } }),
@@ -585,7 +585,7 @@ describe('evaluateCertificateValidity — undetermined states (R6)', () => {
     expect(result.severity).toBe('unknown');
   });
 
-  it('never asserts a certificate is expiring when the state is unknown (S6.6)', () => {
+  it('never asserts a certificate is expiring when the state is unknown', () => {
     const result = evaluateCertificateValidity(
       [{ kind: 'notFound', node: 'node01' }],
       OPTIONS,
@@ -602,8 +602,8 @@ describe('evaluateCertificateValidity — undetermined states (R6)', () => {
   });
 });
 
-describe('evaluateCertificateValidity — finding content (R7, R8)', () => {
-  it('identifies the node, the certificate, its subject and the expiry (S7.1-S7.4)', () => {
+describe('evaluateCertificateValidity — finding content', () => {
+  it('identifies the node, the certificate, its subject and the expiry', () => {
     const result = evaluateCertificateValidity(
       [
         ok({
@@ -628,7 +628,7 @@ describe('evaluateCertificateValidity — finding content (R7, R8)', () => {
     });
   });
 
-  it('exposes the oldest listener load time, not the evaluation time (S8.1)', () => {
+  it('exposes the oldest listener load time, not the evaluation time', () => {
     const older = snapshot({ node: 'node01' });
     const newer = snapshot({ node: 'worker-02' });
 

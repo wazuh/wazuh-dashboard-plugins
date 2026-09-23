@@ -78,7 +78,7 @@ const transportError = (code: string) =>
   Object.assign(new Error('connect ECONNREFUSED'), { code });
 
 describe('CertificateValidityClient.getNodeTls', () => {
-  it('returns an ok outcome carrying the snapshot (S3.1)', async () => {
+  it('returns an ok outcome carrying the snapshot', async () => {
     const snapshot = buildSnapshot();
     const client = buildClient(
       jest.fn().mockResolvedValue({
@@ -93,7 +93,7 @@ describe('CertificateValidityClient.getNodeTls', () => {
     });
   });
 
-  it('accepts a bare document without the affected_items envelope (S3.1)', async () => {
+  it('accepts a bare document without the affected_items envelope', async () => {
     const snapshot = buildSnapshot();
     const client = buildClient(
       jest.fn().mockResolvedValue({ data: { data: snapshot } }),
@@ -104,7 +104,7 @@ describe('CertificateValidityClient.getNodeTls', () => {
     expect(outcome).toEqual({ kind: 'ok', node: 'node01', snapshot });
   });
 
-  it('maps 404 to notFound, so an older manager is not a failure (S3.2)', async () => {
+  it('maps 404 to notFound, so an older manager is not a failure', async () => {
     const client = buildClient(jest.fn().mockRejectedValue(httpError(404)));
 
     await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
@@ -113,7 +113,7 @@ describe('CertificateValidityClient.getNodeTls', () => {
     });
   });
 
-  it('maps 403 to forbidden (S3.3)', async () => {
+  it('maps 403 to forbidden', async () => {
     const client = buildClient(jest.fn().mockRejectedValue(httpError(403)));
 
     await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
@@ -128,28 +128,25 @@ describe('CertificateValidityClient.getNodeTls', () => {
     'listener not started',
     'timeout',
     'admin client unavailable',
-  ])(
-    'maps available:false with reason %p to unavailable (S3.4)',
-    async reason => {
-      const client = buildClient(
-        jest.fn().mockResolvedValue({
+  ])('maps available:false with reason %p to unavailable', async reason => {
+    const client = buildClient(
+      jest.fn().mockResolvedValue({
+        data: {
           data: {
-            data: {
-              affected_items: [{ node: 'node01', available: false, reason }],
-            },
+            affected_items: [{ node: 'node01', available: false, reason }],
           },
-        }),
-      );
+        },
+      }),
+    );
 
-      await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
-        kind: 'unavailable',
-        node: 'node01',
-        reason,
-      });
-    },
-  );
+    await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
+      kind: 'unavailable',
+      node: 'node01',
+      reason,
+    });
+  });
 
-  it('maps an error without a response to transportError (S3.5)', async () => {
+  it('maps an error without a response to transportError', async () => {
     const client = buildClient(
       jest.fn().mockRejectedValue(transportError('ECONNREFUSED')),
     );
@@ -169,7 +166,7 @@ describe('CertificateValidityClient.getNodeTls', () => {
     ${'a missing ca_bundle'}   | ${{ node: 'node01', listener: { seconds_until_expiry: 1 } }}
     ${'a non-array bundle'}    | ${{ node: 'node01', listener: { seconds_until_expiry: 1 }, ca_bundle: { certificates: 'nope' } }}
     ${'a missing leaf period'} | ${{ node: 'node01', listener: {}, ca_bundle: { certificates: [] } }}
-  `('maps $description to malformed (S3.6)', async ({ body }) => {
+  `('maps $description to malformed', async ({ body }) => {
     const client = buildClient(
       jest
         .fn()
@@ -181,7 +178,7 @@ describe('CertificateValidityClient.getNodeTls', () => {
     expect(outcome.kind).toBe('malformed');
   });
 
-  it('never throws, whatever the failure (S3.7)', async () => {
+  it('never throws, whatever the failure', async () => {
     const client = buildClient(
       jest.fn().mockRejectedValue(new Error('something unexpected')),
     );

@@ -12,7 +12,6 @@ import {
   CERTIFICATE_EXPIRY_CRITICAL_SETTING,
   CERTIFICATE_EXPIRY_WARNING_SETTING,
 } from '../../common/constants';
-import { PLUGIN_SETTINGS } from '../../../wazuh-core/common/constants';
 
 const DAY = 24 * 60 * 60;
 const TASK_NAME = 'server-api:certificate-validity';
@@ -74,12 +73,8 @@ const buildContext = () => ({
 
 const buildConfiguration = (settings: Record<string, number> = {}) => {
   const values: Record<string, number> = {
-    [CERTIFICATE_EXPIRY_WARNING_SETTING]: PLUGIN_SETTINGS[
-      CERTIFICATE_EXPIRY_WARNING_SETTING
-    ].defaultValue as number,
-    [CERTIFICATE_EXPIRY_CRITICAL_SETTING]: PLUGIN_SETTINGS[
-      CERTIFICATE_EXPIRY_CRITICAL_SETTING
-    ].defaultValue as number,
+    [CERTIFICATE_EXPIRY_WARNING_SETTING]: 30,
+    [CERTIFICATE_EXPIRY_CRITICAL_SETTING]: 7,
     ...settings,
   };
 
@@ -150,7 +145,7 @@ const runTaskWithContext = async (
 };
 
 describe('initializationTaskCreatorCertificateValidity', () => {
-  it('exposes the given task name (S1.1)', () => {
+  it('exposes the given task name', () => {
     expect(
       initializationTaskCreatorCertificateValidity({
         taskName: TASK_NAME,
@@ -159,14 +154,14 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     ).toBe(TASK_NAME);
   });
 
-  it('reports ok when every certificate is healthy (R10)', async () => {
+  it('reports ok when every certificate is healthy', async () => {
     await expect(runTask(buildServices())).resolves.toMatchObject({
       status: 'ok',
       data: { severity: 'ok' },
     });
   });
 
-  it('queries every node reported by the cluster (S5.x)', async () => {
+  it('queries every node reported by the cluster', async () => {
     const services = buildServices({ nodes: ['node01', 'worker-02'] });
 
     await runTask(services);
@@ -180,7 +175,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     );
   });
 
-  it('warns when a certificate is near expiration (R10)', async () => {
+  it('warns when a certificate is near expiration', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -197,7 +192,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
-  it('reports an error when a certificate is about to expire (R10)', async () => {
+  it('reports an error when a certificate is about to expire', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -215,7 +210,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
-  it('reports an error when a certificate has already expired (R10)', async () => {
+  it('reports an error when a certificate has already expired', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -232,7 +227,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
-  it('warns rather than reporting ok when the state is undetermined (S6.1)', async () => {
+  it('warns rather than reporting ok when the state is undetermined', async () => {
     const services = buildServices({
       outcomes: { node01: { kind: 'notFound', node: 'node01' } },
     });
@@ -243,7 +238,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
-  it('does not report ok when only one of two nodes is undetermined (S6.5)', async () => {
+  it('does not report ok when only one of two nodes is undetermined', async () => {
     const services = buildServices({
       nodes: ['node01', 'worker-02'],
       outcomes: { 'worker-02': { kind: 'notFound', node: 'worker-02' } },
@@ -255,7 +250,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
-  it('degrades to undetermined when the cluster cannot be listed (T5.5)', async () => {
+  it('degrades to undetermined when the cluster cannot be listed', async () => {
     const services = buildServices({
       getNodes: jest.fn().mockRejectedValue(new Error('boom')),
     });
@@ -285,23 +280,37 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
-  it('uses the default thresholds when the settings are not set (S9.1)', async () => {
-    const services = buildServices({
-      outcomes: {
-        node01: {
-          kind: 'ok',
-          node: 'node01',
-          snapshot: snapshot('node01', 20 * DAY),
+  it('reads both thresholds from the configuration store', async () => {
+    const configuration = buildConfiguration();
+    const services = {
+      ...buildServices({
+        outcomes: {
+          node01: {
+            kind: 'ok',
+            node: 'node01',
+            snapshot: snapshot('node01', 20 * DAY),
+          },
         },
-      },
-    });
+      }),
+      configuration,
+    };
 
-    await expect(runTask(services)).resolves.toMatchObject({
-      status: 'warning',
-    });
+    await expect(
+      initializationTaskCreatorCertificateValidity({
+        taskName: TASK_NAME,
+        services: asContract(services),
+      }).run(buildContext() as unknown as InitializationTaskRunContext),
+    ).resolves.toMatchObject({ status: 'warning' });
+
+    expect(configuration.get).toHaveBeenCalledWith(
+      CERTIFICATE_EXPIRY_WARNING_SETTING,
+    );
+    expect(configuration.get).toHaveBeenCalledWith(
+      CERTIFICATE_EXPIRY_CRITICAL_SETTING,
+    );
   });
 
-  it('honours a configured warning threshold (S9.2)', async () => {
+  it('honours a configured warning threshold', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -318,7 +327,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     ).resolves.toMatchObject({ status: 'ok' });
   });
 
-  it('honours a configured error threshold (S9.2)', async () => {
+  it('honours a configured error threshold', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -334,7 +343,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     ).resolves.toMatchObject({ status: 'error' });
   });
 
-  it('reports a healthy check at info, not debug (S8.x)', async () => {
+  it('reports a healthy check at info, not debug', async () => {
     const { logger } = await runTaskWithContext(buildServices());
 
     expect(logger.info).toHaveBeenCalledWith(
@@ -342,7 +351,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     );
   });
 
-  it('reports a critical certificate at error level (S8.x)', async () => {
+  it('reports a critical certificate at error level', async () => {
     const { logger } = await runTaskWithContext(
       buildServices({
         outcomes: {
@@ -361,7 +370,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(logger.info).not.toHaveBeenCalled();
   });
 
-  it('reports an undetermined state at warn level (S8.x)', async () => {
+  it('reports an undetermined state at warn level', async () => {
     const { logger } = await runTaskWithContext(
       buildServices({
         outcomes: { node01: { kind: 'notFound', node: 'node01' } },
@@ -374,7 +383,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(logger.error).not.toHaveBeenCalled();
   });
 
-  it('lists one line per affected node, not one paragraph (R7)', async () => {
+  it('lists one line per affected node, not one paragraph', async () => {
     const nodes = ['node01', 'worker-02', 'worker-03'];
     const services = buildServices({
       nodes,
@@ -395,7 +404,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     }
   });
 
-  it('builds an actionable message (R7, R8)', async () => {
+  it('builds an actionable message', async () => {
     const services = buildServices({
       outcomes: {
         node01: {
@@ -418,7 +427,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(message).not.toContain('2026-09-15T10:00:00Z');
   });
 
-  it('does not tell an operator to restart over a CA finding (R8)', async () => {
+  it('does not tell an operator to restart over a CA finding', async () => {
     const bundleOnly = snapshot('node01', 3650 * DAY);
 
     bundleOnly.ca_bundle.matches_active_leaf = false;
@@ -436,7 +445,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     expect(message).not.toContain('2026-09-14T08:00:00Z');
   });
 
-  it('states each action once, not once per node (R7)', async () => {
+  it('states each action once, not once per node', async () => {
     const nodes = ['node01', 'worker-02', 'worker-03'];
     const services = buildServices({
       nodes,
