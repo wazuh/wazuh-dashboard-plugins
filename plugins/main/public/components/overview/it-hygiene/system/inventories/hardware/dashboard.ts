@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { getVisStateHostsTotalFreeMemoryTable } from '../../../dashboards/dashboard-kpi';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import {
@@ -19,7 +20,10 @@ const getVisStateAverageMetric = (
 ): SavedVis => {
   return {
     id: `it-hygiene-network-${field}`,
-    title: `Average ${field}`,
+    title: i18n.translate(
+      'wazuh.itHygiene.hardwareDashboard.averageMetric.title',
+      { defaultMessage: 'Average {field}', values: { field } },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -67,23 +71,42 @@ export const getOverviewSystemHardwareTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.name',
-      'Top 5 CPU names',
+      i18n.translate('wazuh.itHygiene.hardwareDashboard.topCpuNames.title', {
+        defaultMessage: 'Top 5 CPU names',
+      }),
       'it-hygiene-hardware',
-      { customLabel: 'CPUs' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.hardwareDashboard.topCpuNames.fieldLabel',
+          { defaultMessage: 'CPUs' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.cpu.cores',
-      'Top 5 CPU cores',
+      i18n.translate('wazuh.itHygiene.hardwareDashboard.topCpuCores.title', {
+        defaultMessage: 'Top 5 CPU cores',
+      }),
       'it-hygiene-hardware',
-      { customLabel: 'Cores count' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.hardwareDashboard.topCpuCores.fieldLabel',
+          { defaultMessage: 'Cores count' },
+        ),
+      },
     ),
     getVisStateHostsTotalFreeMemoryTable(
       indexPatternId,
       'host.memory.total',
       '',
       'it-hygiene-stat',
-      { customLabel: 'Hosts total memory' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.hardwareDashboard.memoryTable.label',
+          { defaultMessage: 'Hosts total memory' },
+        ),
+      },
     ),
   ]);
 };

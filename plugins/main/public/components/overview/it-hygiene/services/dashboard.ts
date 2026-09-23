@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
 import {
   getVisStateHorizontalBarByField,
@@ -9,10 +10,15 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'service.name',
-      'Top 5 services',
+      i18n.translate('wazuh.itHygiene.servicesDashboard.topServices.title', {
+        defaultMessage: 'Top 5 services',
+      }),
       'it-hygiene-services',
       {
-        customLabel: 'Services',
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.servicesDashboard.topServices.fieldLabel',
+          { defaultMessage: 'Services' },
+        ),
       },
     ),
     getVisStateMetricUniqueCountByField(
@@ -20,7 +26,9 @@ export const getOverviewServicesTab = (indexPatternId: string) => {
       'service.name',
       '',
       'it-hygiene-services',
-      'Unique services',
+      i18n.translate('wazuh.itHygiene.servicesDashboard.uniqueServices.label', {
+        defaultMessage: 'Unique services',
+      }),
     ),
   ]);
 };

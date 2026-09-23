@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -16,7 +17,10 @@ const getVisStateHostArchitectureMetric = (
 ): SavedVis => {
   return {
     id: `it-hygiene-host-architecture-${arch}`,
-    title: `Host architecture ${arch}`,
+    title: i18n.translate(
+      'wazuh.itHygiene.systemDashboard.hostArchitecture.metricTitle',
+      { defaultMessage: 'Host architecture {arch}', values: { arch } },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -64,7 +68,10 @@ const getVisStateHostArchitectureMetric = (
                   query: `host.architecture: ${arch}`,
                   language: 'kuery',
                 },
-                label: 'Host Architecture',
+                label: i18n.translate(
+                  'wazuh.itHygiene.systemDashboard.hostArchitecture.filterLabel',
+                  { defaultMessage: 'Host Architecture' },
+                ),
               },
             ],
           },
@@ -80,29 +87,58 @@ export const getOverviewSystemSystemTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.os.platform',
-      'Top 5 platforms',
+      i18n.translate('wazuh.itHygiene.systemDashboard.topPlatforms.title', {
+        defaultMessage: 'Top 5 platforms',
+      }),
       'it-hygiene-system',
-      { customLabel: 'Platforms' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.systemDashboard.topPlatforms.fieldLabel',
+          { defaultMessage: 'Platforms' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'host.os.name',
-      'Top 5 operating systems',
+      i18n.translate(
+        'wazuh.itHygiene.systemDashboard.topOperatingSystems.title',
+        { defaultMessage: 'Top 5 operating systems' },
+      ),
       'it-hygiene-system',
-      { customLabel: 'OS' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.systemDashboard.topOperatingSystems.fieldLabel',
+          { defaultMessage: 'OS' },
+        ),
+      },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'host.architecture',
-      'Architecture',
+      i18n.translate('wazuh.itHygiene.systemDashboard.hostArchitecture.title', {
+        defaultMessage: 'Architecture',
+      }),
       'it-hygiene-system',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Host architecture count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.systemDashboard.hostArchitecture.metricLabel',
+          { defaultMessage: 'Host architecture count' },
+        ),
         valueAxesTitleText: ' ',
-        fieldCustomLabel: 'Host architecture',
-        seriesLabel: 'Host architecture',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.systemDashboard.hostArchitecture.fieldLabel',
+          { defaultMessage: 'Host architecture' },
+        ),
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.systemDashboard.hostArchitecture.fieldLabel',
+          { defaultMessage: 'Host architecture' },
+        ),
       },
     ),
   ]);

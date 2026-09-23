@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { HEIGHT, STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -13,7 +14,10 @@ const getVisStateGlobalPacketLossMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-global-packet-loss-rate',
-    title: 'Average packet loss rate',
+    title: i18n.translate(
+      'wazuh.itHygiene.interfacesDashboard.packetLossRate.title',
+      { defaultMessage: 'Average packet loss rate' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -69,7 +73,10 @@ const getVisStateGlobalPacketLossMetric = (
                 WORKAROUND: multiply 100 to equilibrate the division by 100 done when the `isPercentMode` is true
               */,
 
-            customLabel: 'Average packet loss rate',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.interfacesDashboard.packetLossRate.title',
+              { defaultMessage: 'Average packet loss rate' },
+            ),
           },
           schema: 'metric',
         },
@@ -83,7 +90,10 @@ const getVisStateInactiveNetworkInterfacesMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-state-inactive',
-    title: 'Interfaces state Inactive',
+    title: i18n.translate(
+      'wazuh.itHygiene.interfacesDashboard.inactiveInterfaces.title',
+      { defaultMessage: 'Interfaces state Inactive' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -116,7 +126,10 @@ const getVisStateInactiveNetworkInterfacesMetric = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Inactive',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.interfacesDashboard.inactiveInterfaces.label',
+              { defaultMessage: 'Inactive' },
+            ),
           },
           schema: 'metric',
         },
@@ -131,7 +144,10 @@ const getVisStateInactiveNetworkInterfacesMetric = (
                   query: 'interface.state: Inactive',
                   language: 'kuery',
                 },
-                label: 'Interfaces',
+                label: i18n.translate(
+                  'wazuh.itHygiene.interfacesDashboard.interfaceState.filterLabel',
+                  { defaultMessage: 'Interfaces' },
+                ),
               },
             ],
           },
@@ -147,7 +163,10 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-state-unknown',
-    title: 'Interfaces state Unknown',
+    title: i18n.translate(
+      'wazuh.itHygiene.interfacesDashboard.unknownInterfaces.title',
+      { defaultMessage: 'Interfaces state Unknown' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -180,7 +199,10 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Unknown',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.interfacesDashboard.unknownInterfaces.label',
+              { defaultMessage: 'Unknown' },
+            ),
           },
           schema: 'metric',
         },
@@ -195,7 +217,10 @@ const getVisStateUnknownStateNetworkInterfacesMetric = (
                   query: 'interface.state: Unknown',
                   language: 'kuery',
                 },
-                label: 'Interfaces',
+                label: i18n.translate(
+                  'wazuh.itHygiene.interfacesDashboard.interfaceState.filterLabel',
+                  { defaultMessage: 'Interfaces' },
+                ),
               },
             ],
           },
@@ -211,7 +236,10 @@ const getVisStateWirelessNetworkInterfacesMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-type-wireless',
-    title: 'Interfaces type Wireless',
+    title: i18n.translate(
+      'wazuh.itHygiene.interfacesDashboard.wirelessInterfaces.title',
+      { defaultMessage: 'Interfaces type Wireless' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -244,7 +272,10 @@ const getVisStateWirelessNetworkInterfacesMetric = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Wireless',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.interfacesDashboard.wirelessInterfaces.label',
+              { defaultMessage: 'Wireless' },
+            ),
           },
           schema: 'metric',
         },
@@ -259,7 +290,10 @@ const getVisStateWirelessNetworkInterfacesMetric = (
                   query: 'interface.type: wireless',
                   language: 'kuery',
                 },
-                label: 'Interfaces type',
+                label: i18n.translate(
+                  'wazuh.itHygiene.interfacesDashboard.wirelessInterfaces.filterLabel',
+                  { defaultMessage: 'Interfaces type' },
+                ),
               },
             ],
           },
@@ -276,31 +310,61 @@ export const getOverviewNetworksInterfacesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.state',
-      'Interface states',
+      i18n.translate(
+        'wazuh.itHygiene.interfacesDashboard.interfaceStates.title',
+        { defaultMessage: 'Interface states' },
+      ),
       'it-hygiene-interfaces',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Interfaces state count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.interfacesDashboard.interfaceStates.metricLabel',
+          { defaultMessage: 'Interfaces state count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Interfaces state',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.interfacesDashboard.interfaceStates.fieldLabel',
+          { defaultMessage: 'Interfaces state' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'Interfaces state',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.interfacesDashboard.interfaceStates.fieldLabel',
+          { defaultMessage: 'Interfaces state' },
+        ),
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'interface.type',
-      'Interface types',
+      i18n.translate(
+        'wazuh.itHygiene.interfacesDashboard.interfaceTypes.title',
+        { defaultMessage: 'Interface types' },
+      ),
       'it-hygiene-interfaces',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Interfaces type count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.interfacesDashboard.interfaceTypes.metricLabel',
+          { defaultMessage: 'Interfaces type count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Type',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.interfacesDashboard.interfaceTypes.fieldLabel',
+          { defaultMessage: 'Type' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'Type',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.interfacesDashboard.interfaceTypes.fieldLabel',
+          { defaultMessage: 'Type' },
+        ),
       },
     ),
   ]);

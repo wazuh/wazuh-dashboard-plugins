@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -16,7 +17,13 @@ const getVisStateInterfaceState = (
 ): SavedVis => {
   return {
     id: `it-hygiene-network-interfaces-${interfaceState}`,
-    title: `Interfaces in ${interfaceState} state`,
+    title: i18n.translate(
+      'wazuh.itHygiene.trafficDashboard.interfaceState.title',
+      {
+        defaultMessage: 'Interfaces in {interfaceState} state',
+        values: { interfaceState },
+      },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -65,7 +72,10 @@ const getVisStateInterfaceState = (
                   query: `interface.state: ${interfaceState}`,
                   language: 'kuery',
                 },
-                label: 'Interface State',
+                label: i18n.translate(
+                  'wazuh.itHygiene.trafficDashboard.interfaceState.filterLabel',
+                  { defaultMessage: 'Interface State' },
+                ),
               },
             ],
           },
@@ -81,7 +91,10 @@ const getVisStateUDPOnlyTransportsMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-Transports-only-udp',
-    title: 'Transports operating only on UDP',
+    title: i18n.translate(
+      'wazuh.itHygiene.trafficDashboard.udpOnlyTransports.title',
+      { defaultMessage: 'Transports operating only on UDP' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -114,7 +127,10 @@ const getVisStateUDPOnlyTransportsMetric = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'UDP',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.trafficDashboard.udpOnlyTransports.label',
+              { defaultMessage: 'UDP' },
+            ),
           },
           schema: 'metric',
         },
@@ -129,7 +145,10 @@ const getVisStateUDPOnlyTransportsMetric = (
                   query: 'network.transport:"UDP"',
                   language: 'kuery',
                 },
-                label: 'Transport Protocols',
+                label: i18n.translate(
+                  'wazuh.itHygiene.trafficDashboard.udpOnlyTransports.filterLabel',
+                  { defaultMessage: 'Transport Protocols' },
+                ),
               },
             ],
           },
@@ -145,38 +164,72 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'destination.port',
-      'Top 5 destination ports',
+      i18n.translate(
+        'wazuh.itHygiene.trafficDashboard.topDestinationPorts.title',
+        { defaultMessage: 'Top 5 destination ports' },
+      ),
       'it-hygiene-ports',
       {
         fieldSize: 5,
-        metricCustomLabel: 'Top ports count',
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.topDestinationPorts.metricLabel',
+          { defaultMessage: 'Top ports count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Top ports',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.topDestinationPorts.fieldLabel',
+          { defaultMessage: 'Top ports' },
+        ),
         seriesMode: 'normal',
-        fieldCustomLabel: 'Top ports',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.topDestinationPorts.fieldLabel',
+          { defaultMessage: 'Top ports' },
+        ),
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.transport',
-      'Transport protocols',
+      i18n.translate(
+        'wazuh.itHygiene.trafficDashboard.transportProtocols.title',
+        { defaultMessage: 'Transport protocols' },
+      ),
       'it-hygiene-ports',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Transport protocols count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.transportProtocols.metricLabel',
+          { defaultMessage: 'Transport protocols count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Transport protocols',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.transportProtocols.title',
+          { defaultMessage: 'Transport protocols' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'Transport protocols',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.transportProtocols.title',
+          { defaultMessage: 'Transport protocols' },
+        ),
       },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'process.name',
-      'Top 5 processes',
+      i18n.translate('wazuh.itHygiene.trafficDashboard.topProcesses.title', {
+        defaultMessage: 'Top 5 processes',
+      }),
       'it-hygiene-ports',
-      { customLabel: 'Processes' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.trafficDashboard.topProcesses.fieldLabel',
+          { defaultMessage: 'Processes' },
+        ),
+      },
     ),
   ]);
 };

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../common/create-dashboard-panels-kpis';
 import { STYLE } from '../common/saved-vis/constants';
 import {
@@ -22,7 +23,13 @@ const getVisStateProcessesState = (
 ): SavedVis => {
   return {
     id: `it-hygiene-processes-state-${processState}`,
-    title: `Processes state ${processState}`,
+    title: i18n.translate(
+      'wazuh.itHygiene.processesDashboard.processState.title',
+      {
+        defaultMessage: 'Processes state {processState}',
+        values: { processState },
+      },
+    ),
     type: 'metric',
     params: {
       addLegend: false,
@@ -70,7 +77,10 @@ const getVisStateProcessesState = (
                   query: `process.state: ${processState}`,
                   language: 'kuery',
                 },
-                label: 'Process State',
+                label: i18n.translate(
+                  'wazuh.itHygiene.processesDashboard.processState.filterLabel',
+                  { defaultMessage: 'Process State' },
+                ),
               },
             ],
           },
@@ -86,14 +96,23 @@ export const getOverviewProcessesProcessesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'process.name',
-      'Top 5 processes',
+      i18n.translate('wazuh.itHygiene.processesDashboard.topProcesses.title', {
+        defaultMessage: 'Top 5 processes',
+      }),
       'it-hygiene-processes',
-      { customLabel: 'Processes' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.processesDashboard.topProcesses.fieldLabel',
+          { defaultMessage: 'Processes' },
+        ),
+      },
     ),
     getVisStateHistogramBy(
       indexPatternId,
       'process.start',
-      'Processes start time',
+      i18n.translate('wazuh.itHygiene.processesDashboard.startTime.title', {
+        defaultMessage: 'Processes start time',
+      }),
       'it-hygiene-processes',
       'h',
       { addLegend: false, customLabel: ' ', valueAxesTitleText: '' },
