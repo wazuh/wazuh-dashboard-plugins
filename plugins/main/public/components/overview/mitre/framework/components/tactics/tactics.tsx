@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiTitle,
   EuiFlexGroup,
@@ -102,7 +103,12 @@ export const Tactics = (props: tTacticsProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre alerts could not be fetched`,
+          title: i18n.translate(
+            'wazuh.mitreAttack.tactics.errorFetchingAlerts',
+            {
+              defaultMessage: 'Mitre alerts could not be fetched',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -177,10 +183,17 @@ export const Tactics = (props: tTacticsProps) => {
   const panels = [
     {
       id: 0,
-      title: 'Options',
+      title: i18n.translate('wazuh.mitreAttack.tactics.optionsMenu.title', {
+        defaultMessage: 'Options',
+      }),
       items: [
         {
-          name: 'Select all',
+          name: i18n.translate(
+            'wazuh.mitreAttack.tactics.optionsMenu.selectAll',
+            {
+              defaultMessage: 'Select all',
+            },
+          ),
           icon: <EuiIcon type='check' size='m' />,
           onClick: () => {
             closePopover();
@@ -188,7 +201,10 @@ export const Tactics = (props: tTacticsProps) => {
           },
         },
         {
-          name: 'Unselect all',
+          name: i18n.translate(
+            'wazuh.mitreAttack.tactics.optionsMenu.unselectAll',
+            { defaultMessage: 'Unselect all' },
+          ),
           icon: <EuiIcon type='cross' size='m' />,
           onClick: () => {
             closePopover();
@@ -209,7 +225,11 @@ export const Tactics = (props: tTacticsProps) => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTitle size='m'>
-            <h1>Tactics</h1>
+            <h1>
+              {i18n.translate('wazuh.mitreAttack.tactics.title', {
+                defaultMessage: 'Tactics',
+              })}
+            </h1>
           </EuiTitle>
         </EuiFlexItem>
 
@@ -219,7 +239,10 @@ export const Tactics = (props: tTacticsProps) => {
               <EuiButtonIcon
                 iconType='gear'
                 onClick={() => onGearButtonClick()}
-                aria-label={'tactics options'}
+                aria-label={i18n.translate(
+                  'wazuh.mitreAttack.tactics.optionsButton.ariaLabel',
+                  { defaultMessage: 'tactics options' },
+                )}
               ></EuiButtonIcon>
             }
             isOpen={isPopoverOpen}

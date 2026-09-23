@@ -15,6 +15,7 @@ import { WzRequest } from '../../../../react-services';
 import { Markdown } from '../../../common/util';
 import { formatUIDate } from '../../../../react-services';
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
   UI_LOGGER_LEVELS,
@@ -51,7 +52,10 @@ const getMitreAttackIntelligenceSuggestions = async (
       error: {
         error: error,
         message: error.message || error,
-        title: `Error getting suggestions`,
+        title: i18n.translate(
+          'wazuh.mitreAttack.intelligenceSearchBar.errorGettingSuggestions',
+          { defaultMessage: 'Error getting suggestions' },
+        ),
       },
     };
     getErrorOrchestrator().handleError(options);
@@ -59,13 +63,30 @@ const getMitreAttackIntelligenceSuggestions = async (
   }
 };
 
-function buildResource(label: string) {
-  const id = label.toLowerCase();
+function buildResource(id: string, label: string) {
   const endpoint: string = `/mitre/${id}`;
   const fieldsMitreAttactResource = [
-    { field: 'description', name: 'description' },
-    { field: 'external_id', name: 'external ID' },
-    { field: 'name', name: 'name' },
+    {
+      field: 'description',
+      description: i18n.translate(
+        'wazuh.mitreAttack.intelligenceSearchBar.filterByDescription',
+        { defaultMessage: 'filter by description' },
+      ),
+    },
+    {
+      field: 'external_id',
+      description: i18n.translate(
+        'wazuh.mitreAttack.intelligenceSearchBar.filterByExternalId',
+        { defaultMessage: 'filter by external ID' },
+      ),
+    },
+    {
+      field: 'name',
+      description: i18n.translate(
+        'wazuh.mitreAttack.intelligenceSearchBar.filterByName',
+        { defaultMessage: 'filter by name' },
+      ),
+    },
   ];
   return {
     label: label,
@@ -77,9 +98,9 @@ function buildResource(label: string) {
         },
         suggestions: {
           field(currentValue) {
-            return fieldsMitreAttactResource.map(({ field, name }) => ({
+            return fieldsMitreAttactResource.map(({ field, description }) => ({
               label: field,
-              description: `filter by ${name}`,
+              description,
             }));
           },
           value: async (currentValue, { field }) => {
@@ -102,7 +123,9 @@ function buildResource(label: string) {
     tableColumnsCreator: () => [
       {
         field: 'external_id',
-        name: 'ID',
+        name: i18n.translate('wazuh.mitreAttack.intelligenceTable.columns.id', {
+          defaultMessage: 'ID',
+        }),
         width: '12%',
         render: value => (
           <WzLink
@@ -115,7 +138,12 @@ function buildResource(label: string) {
       },
       {
         field: 'name',
-        name: 'Name',
+        name: i18n.translate(
+          'wazuh.mitreAttack.intelligenceTable.columns.name',
+          {
+            defaultMessage: 'Name',
+          },
+        ),
         sortable: true,
         width: '30%',
         render: (value, item) => (
@@ -129,7 +157,10 @@ function buildResource(label: string) {
       },
       {
         field: 'description',
-        name: 'Description',
+        name: i18n.translate(
+          'wazuh.mitreAttack.intelligenceTable.columns.description',
+          { defaultMessage: 'Description' },
+        ),
         sortable: true,
         render: value => (value ? <Markdown markdown={value} /> : ''),
         truncateText: true,
@@ -137,25 +168,39 @@ function buildResource(label: string) {
     ],
     mitreFlyoutHeaderProperties: [
       {
-        label: 'ID',
+        label: i18n.translate('wazuh.mitreAttack.intelligenceFlyout.id', {
+          defaultMessage: 'ID',
+        }),
         id: 'external_id',
       },
       {
-        label: 'Name',
+        label: i18n.translate('wazuh.mitreAttack.intelligenceFlyout.name', {
+          defaultMessage: 'Name',
+        }),
         id: 'name',
       },
       {
-        label: 'Created Time',
+        label: i18n.translate(
+          'wazuh.mitreAttack.intelligenceFlyout.createdTime',
+          {
+            defaultMessage: 'Created Time',
+          },
+        ),
         id: 'created_time',
         render: value => (value ? formatUIDate(value) : ''),
       },
       {
-        label: 'Modified Time',
+        label: i18n.translate(
+          'wazuh.mitreAttack.intelligenceFlyout.modifiedTime',
+          { defaultMessage: 'Modified Time' },
+        ),
         id: 'modified_time',
         render: value => (value ? formatUIDate(value) : ''),
       },
       {
-        label: 'Version',
+        label: i18n.translate('wazuh.mitreAttack.intelligenceFlyout.version', {
+          defaultMessage: 'Version',
+        }),
         id: 'mitre_version',
       },
     ],
@@ -163,9 +208,34 @@ function buildResource(label: string) {
 }
 
 export const MitreAttackResources = [
-  buildResource('Groups'),
-  buildResource('Mitigations'),
-  buildResource('Software'),
-  buildResource('Tactics'),
-  buildResource('Techniques'),
+  buildResource(
+    'groups',
+    i18n.translate('wazuh.mitreAttack.intelligenceResources.groups', {
+      defaultMessage: 'Groups',
+    }),
+  ),
+  buildResource(
+    'mitigations',
+    i18n.translate('wazuh.mitreAttack.intelligenceResources.mitigations', {
+      defaultMessage: 'Mitigations',
+    }),
+  ),
+  buildResource(
+    'software',
+    i18n.translate('wazuh.mitreAttack.intelligenceResources.software', {
+      defaultMessage: 'Software',
+    }),
+  ),
+  buildResource(
+    'tactics',
+    i18n.translate('wazuh.mitreAttack.intelligenceResources.tactics', {
+      defaultMessage: 'Tactics',
+    }),
+  ),
+  buildResource(
+    'techniques',
+    i18n.translate('wazuh.mitreAttack.intelligenceResources.techniques', {
+      defaultMessage: 'Techniques',
+    }),
+  ),
 ];
