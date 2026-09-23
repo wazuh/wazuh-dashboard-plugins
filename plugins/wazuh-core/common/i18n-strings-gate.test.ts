@@ -5,7 +5,7 @@ import {
   icuPlaceholders,
   renderFailures,
   scanSourceText,
-} from './i18n-strings-gate';
+} from '../test/i18n/i18n-strings-gate';
 
 const scan = (text: string, fileName = '/plugin/public/component.tsx') =>
   scanSourceText(fileName, text, '/plugin');

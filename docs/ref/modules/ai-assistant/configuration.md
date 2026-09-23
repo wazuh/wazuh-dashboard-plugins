@@ -102,7 +102,7 @@ PR. The plugin did previously carry `en-US.json` and `es-ES.json`, but neither e
 `en-US` is never consulted for the default locale `en`, and `es-ES` was not registered on packaged
 installs because the archive did not include the plugin's `.i18nrc.json` — while both had drifted
 badly from the source. `plugins/wazuh-ai-assistant/common/i18n-strings.test.ts` now runs the i18n
-gate shared by every Wazuh plugin (`plugins/wazuh-core/common/i18n-strings-gate.ts`), which keeps the
+gate shared by every Wazuh plugin (`plugins/wazuh-core/test/i18n/i18n-strings-gate.ts`), which keeps the
 source strings sound (namespaced ids, no id reused for two messages, every message valid ICU) and
 fails if a catalog is reintroduced without being declared.
 

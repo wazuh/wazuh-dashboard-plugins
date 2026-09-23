@@ -49,9 +49,10 @@
  * selects the branch that is not there. Each message is therefore rendered once per entry in
  * `PLURAL_PROBES`.
  *
- * Placement: `common/` of `wazuh-core` because every plugin depends on it and the gate belongs to
- * no single layer. It uses `fs` and `typescript`, so it must only ever be imported from test files,
- * which jest runs under Node and which no bundle includes.
+ * Placement: `test/` of `wazuh-core` because every plugin depends on it and the gate belongs to
+ * no single layer. It uses `fs` and `typescript`, so it lives outside `public/`, `server/` and
+ * `common/`: no bundle can import it and the plugin archive does not ship it. Only test files
+ * import it, and jest runs them under Node.
  */
 
 import * as fs from 'fs';
@@ -476,7 +477,7 @@ export function describeI18nStringsGate({
     it('has no i18n usage the extractor does not understand', () => {
       assertNoProblems(
         sourceScan().unrecognized,
-        'Teach the gate in wazuh-core/common/i18n-strings-gate.ts to extract the usage above, or ' +
+        'Teach the gate in wazuh-core/test/i18n/i18n-strings-gate.ts to extract the usage above, or ' +
           'rewrite the call site as i18n.translate() / <FormattedMessage>.',
       );
     });

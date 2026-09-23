@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import * as path from 'path';
-import { describeI18nStringsGate } from '../../wazuh-core/common/i18n-strings-gate';
+import { describeI18nStringsGate } from '../../wazuh-core/test/i18n/i18n-strings-gate';
 
 /*
  * Model answers are unaffected by this gate: the assistant replies in the language of the user's

@@ -272,13 +272,16 @@ export const ITHygiene = {
 export const activeResponses = {
   category: 'wz-category-security-operations',
   id: 'incident-response-dashboard',
-  title: i18n.translate('wazuh.activeResponses.app.title', {
+  title: i18n.translate('wazuh.incidentResponse.app.title', {
     defaultMessage: 'Incident Response',
   }),
-  breadcrumbLabel: i18n.translate('wazuh.activeResponses.app.breadcrumbLabel', {
-    defaultMessage: 'Incident Response',
-  }),
-  description: i18n.translate('wazuh.activeResponses.app.description', {
+  breadcrumbLabel: i18n.translate(
+    'wazuh.incidentResponse.app.breadcrumbLabel',
+    {
+      defaultMessage: 'Incident Response',
+    },
+  ),
+  description: i18n.translate('wazuh.incidentResponse.app.description', {
     defaultMessage:
       'Analyze the active response actions triggered across your environment.',
   }),

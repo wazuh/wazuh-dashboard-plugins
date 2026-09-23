@@ -884,7 +884,9 @@ genuinely distinct. Every segment is lowerCamelCase.
   `wazuh`, `wazuhCore`, `wazuhCheckUpdates` or `wazuhAiAssistant`.
 - `<area>` is the product area, not the directory. For `main`, take it from the registered
   application id in `public/utils/applications.ts`, camelCased (`file-integrity-monitoring` becomes
-  `fileIntegrityMonitoring`). Use `common` for shared components and `core` for app chrome.
+  `fileIntegrityMonitoring`), dropping a `wz-` prefix or a `-dashboard` suffix (`wz-home` becomes
+  `home`, `incident-response-dashboard` becomes `incidentResponse`). Use `common` for shared
+  components and `core` for app chrome.
 - `<component>` is the UI object: a table, a flyout, a form or a wizard step.
 - `<element>` is the string: a column, a button, a label or an error.
 
@@ -921,12 +923,14 @@ i18n.translate(`wazuh.${area}.app.title`, { defaultMessage: title });
   support ICU quoting (`'{'`).
 - Do not translate log lines, API field names, setting keys, index names, or anything persisted or
   matched programmatically.
-- Do not translate in `server/`. A server-side `translate()` resolves against the server's locale,
-  not the user's.
+- Do not translate in `server/`. Server messages end up in logs and API responses, so the UI
+  translates what it shows from a stable key instead. Code in `common/` that the server also runs,
+  such as `PLUGIN_SETTINGS` and `SettingsValidator` in `wazuh-core`, may translate: the locale is the
+  single `i18n.locale` setting, so the server and the browser resolve it the same way.
 
 ### The i18n gate
 
-`plugins/wazuh-core/common/i18n-strings-gate.ts` walks a plugin's source and fails when an id is
+`plugins/wazuh-core/test/i18n/i18n-strings-gate.ts` walks a plugin's source and fails when an id is
 not namespaced, is reused for two messages or is built at runtime, when a message does not render
 as ICU, or when `.i18nrc.json` and `translations/` disagree with the catalogs the plugin declares.
 Each plugin runs it from `common/i18n-strings.test.ts` as part of `yarn test:jest`.

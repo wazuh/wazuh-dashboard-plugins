@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 import * as path from 'path';
-import { describeI18nStringsGate } from './i18n-strings-gate';
+import { describeI18nStringsGate } from '../test/i18n/i18n-strings-gate';
 
 describeI18nStringsGate({
   pluginRoot: path.resolve(__dirname, '..'),
