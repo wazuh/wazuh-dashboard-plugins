@@ -87,7 +87,6 @@ function expiryFinding(
   const expired = secondsUntilExpiry <= 0;
   const daysRemaining = Math.floor(secondsUntilExpiry / SECONDS_PER_DAY);
   const subject = certificate.subject;
-  // A verifying agent repairs its trust over the same TLS the bundle secures.
   const consequence =
     scope === 'ca'
       ? ' Every verifying agent fails the handshake from that date, and /cacerts, the route that would repair their trust, travels over that same TLS.'
@@ -168,9 +167,8 @@ function undeterminedFinding(
 }
 
 /**
- * `signs_active_leaf` answers whether a CA signed the leaf. This answers what a
- * verifying agent concludes, dates and constraints included, so an expired or
- * non-CA signer fails here while still signing.
+ * `chain_valid` covers dates and constraints, so an expired or `CA:FALSE` CA
+ * fails it while its signature on the listener certificate still verifies.
  */
 function chainFinding(
   node: string,
@@ -195,7 +193,6 @@ function chainFinding(
   };
 }
 
-/** The described bundle is the last one the manager read, not the file on disk. */
 function readFailureFinding(
   node: string,
   snapshot: CertificateValiditySnapshot,
@@ -207,7 +204,7 @@ function readFailureFinding(
     return null;
   }
 
-  // A bundle that never read has no last copy to describe.
+  // The count is 0 when the manager never read the bundle.
   const described =
     bundle.certificates_count > 0
       ? ' so what follows describes the last copy the manager read.'
@@ -233,8 +230,8 @@ function evaluateSnapshot(
     snapshot.listener,
     options,
   );
-  // An expired certificate chains to nothing, so both bundle verdicts below
-  // follow from it and would send an operator to an intact bundle.
+  // An expired certificate chains to no CA, so the manager fails both bundle
+  // verdicts below for it too.
   const expired = listenerExpiry?.reason === 'expired';
   const findings = [
     listenerExpiry,

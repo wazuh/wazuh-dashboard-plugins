@@ -1027,12 +1027,10 @@ export const HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY =
   'server-api:certificate-validity';
 
 // Certificate validity health check
-export const CERTIFICATE_EXPIRY_WARNING_DAYS = 30;
-export const CERTIFICATE_EXPIRY_CRITICAL_DAYS = 7;
 export const CERTIFICATE_EXPIRY_WARNING_SETTING =
-  'healthCheck.certificates.warningDays';
+  'healthCheckCertificateExpiryWarningDays';
 export const CERTIFICATE_EXPIRY_CRITICAL_SETTING =
-  'healthCheck.certificates.criticalDays';
+  'healthCheckCertificateExpiryCriticalDays';
 
 export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,

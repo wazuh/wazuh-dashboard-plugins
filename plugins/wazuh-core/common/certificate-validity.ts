@@ -10,13 +10,13 @@ export interface ServerCertificate {
   seconds_until_expiry: number;
   fingerprint: string;
   serial: string;
-  /** CA bundle entries only: whether this CA signs the certificate the listener currently serves. */
+  /** CA bundle entries only: whether this CA signs the certificate the listener serves. */
   signs_active_leaf?: boolean;
   /** Listener leaf only. */
   sans?: string[];
   /** Listener leaf only. */
   path?: string;
-  /** Listener leaf only: when the manager loaded it, which is its last start. */
+  /** Listener leaf only: when remoted loaded it, at its last start. */
   loaded_at?: string;
   loaded_at_ts?: number;
 }
@@ -39,9 +39,8 @@ export interface ServerCaBundle {
   serialized_bytes: number;
   serialized_bytes_limit: number;
   /**
-   * Whether some CA in the bundle signs the certificate the listener serves.
-   * `null` for a bundle the manager could not read, which is not the same as
-   * no CA signing it.
+   * Whether some CA in the bundle chains to the certificate the listener serves.
+   * `null` when the manager could not read the bundle and cannot tell.
    */
   matches_active_leaf?: boolean | null;
   /**
@@ -54,7 +53,7 @@ export interface ServerCaBundle {
   chain_error?: string;
   /**
    * The certificates, sizes and hash beside this describe the last good read.
-   * A bundle that never read shows a count of 0 and this failure together.
+   * When the manager never read the bundle, the count is 0.
    */
   last_read_failure?: CaBundleReadFailure;
   certificates: ServerCertificate[];
@@ -64,10 +63,7 @@ export interface ServerCaBundle {
 export interface CertificateValiditySnapshot {
   node: string;
   available: true;
-  /**
-   * The manager keeps the listener leaf until it restarts, so this can lag by
-   * `certificateStatusInterval`, 24 h by default.
-   */
+  /** When the manager answered. The listener certificate carries its own date in `loaded_at`. */
   evaluated_at: string;
   evaluated_at_ts: number;
   listener: ServerCertificate;

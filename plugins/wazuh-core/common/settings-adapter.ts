@@ -113,8 +113,7 @@ export const uiSettingsAdapter = (
       name: setting.title,
       value: setting.defaultValue,
       description: setting.description,
-      // The advanced settings page capitalises the first letter and shows the
-      // rest as it arrives, so the words come separated by spaces.
+      // The advanced settings page capitalises the first letter and keeps the rest.
       category: [
         SettingCategory[setting.category].toLowerCase().replace(/_/gu, ' '),
       ],

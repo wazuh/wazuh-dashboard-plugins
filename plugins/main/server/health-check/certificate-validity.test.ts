@@ -8,6 +8,11 @@ import {
   CertificateValidityServices,
   initializationTaskCreatorCertificateValidity,
 } from './certificate-validity';
+import {
+  CERTIFICATE_EXPIRY_CRITICAL_SETTING,
+  CERTIFICATE_EXPIRY_WARNING_SETTING,
+} from '../../common/constants';
+import { PLUGIN_SETTINGS } from '../../../wazuh-core/common/constants';
 
 const DAY = 24 * 60 * 60;
 const TASK_NAME = 'server-api:certificate-validity';
@@ -58,30 +63,34 @@ const snapshot = (
   },
 });
 
-const buildContext = (settings: Record<string, unknown> = {}) => ({
+const buildContext = () => ({
   logger: {
     debug: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
     error: jest.fn(),
   },
-  context: {
-    services: {
-      core: {
-        savedObjects: { createInternalRepository: jest.fn(() => ({})) },
-        uiSettings: {
-          asScopedToClient: jest.fn(() => ({
-            get: jest.fn((key: string) =>
-              key in settings
-                ? Promise.resolve(settings[key])
-                : Promise.reject(new Error(`Setting ${key} not found`)),
-            ),
-          })),
-        },
-      },
-    },
-  },
 });
+
+const buildConfiguration = (settings: Record<string, number> = {}) => {
+  const values: Record<string, number> = {
+    [CERTIFICATE_EXPIRY_WARNING_SETTING]: PLUGIN_SETTINGS[
+      CERTIFICATE_EXPIRY_WARNING_SETTING
+    ].defaultValue as number,
+    [CERTIFICATE_EXPIRY_CRITICAL_SETTING]: PLUGIN_SETTINGS[
+      CERTIFICATE_EXPIRY_CRITICAL_SETTING
+    ].defaultValue as number,
+    ...settings,
+  };
+
+  return {
+    get: jest.fn((key: string) =>
+      key in values
+        ? Promise.resolve(values[key])
+        : Promise.reject(new Error(`Configuration ${key} not found`)),
+    ),
+  };
+};
 
 const buildServices = ({
   nodes = ['node01'],
@@ -116,20 +125,25 @@ type Services = ReturnType<typeof buildServices>;
 const asContract = (services: Services) =>
   services as unknown as CertificateValidityServices;
 
-const runTask = (services: Services, settings?: Record<string, unknown>) =>
+const withConfiguration = (
+  services: Services,
+  settings?: Record<string, number>,
+) => asContract({ ...services, configuration: buildConfiguration(settings) });
+
+const runTask = (services: Services, settings?: Record<string, number>) =>
   initializationTaskCreatorCertificateValidity({
     taskName: TASK_NAME,
-    services: asContract(services),
-  }).run(buildContext(settings) as unknown as InitializationTaskRunContext);
+    services: withConfiguration(services, settings),
+  }).run(buildContext() as unknown as InitializationTaskRunContext);
 
 const runTaskWithContext = async (
   services: Services,
-  settings?: Record<string, unknown>,
+  settings?: Record<string, number>,
 ) => {
-  const context = buildContext(settings);
+  const context = buildContext();
   const result = await initializationTaskCreatorCertificateValidity({
     taskName: TASK_NAME,
-    services: asContract(services),
+    services: withConfiguration(services, settings),
   }).run(context as unknown as InitializationTaskRunContext);
 
   return { result, logger: context.logger };
@@ -300,7 +314,7 @@ describe('initializationTaskCreatorCertificateValidity', () => {
 
     // 20 days is inside the default 30-day warning, outside a 10-day one
     await expect(
-      runTask(services, { 'healthCheck.certificates.warningDays': 10 }),
+      runTask(services, { [CERTIFICATE_EXPIRY_WARNING_SETTING]: 10 }),
     ).resolves.toMatchObject({ status: 'ok' });
   });
 
@@ -316,50 +330,8 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
 
     await expect(
-      runTask(services, { 'healthCheck.certificates.criticalDays': 25 }),
+      runTask(services, { [CERTIFICATE_EXPIRY_CRITICAL_SETTING]: 25 }),
     ).resolves.toMatchObject({ status: 'error' });
-  });
-
-  it('refuses an error threshold above the warning one (S9.3)', async () => {
-    const { result, logger } = await runTaskWithContext(
-      buildServices({
-        outcomes: {
-          node01: {
-            kind: 'ok',
-            node: 'node01',
-            snapshot: snapshot('node01', 20 * DAY),
-          },
-        },
-      }),
-      {
-        'healthCheck.certificates.warningDays': 7,
-        'healthCheck.certificates.criticalDays': 60,
-      },
-    );
-
-    // the defaults apply, so 20 days warns instead of erroring
-    expect(result).toMatchObject({ status: 'warning' });
-    expect(logger.warn).toHaveBeenCalledWith(
-      expect.stringMatching(/not lower than the warning/i),
-    );
-  });
-
-  it('ignores a setting that is not a positive integer (S9.4)', async () => {
-    const services = buildServices({
-      outcomes: {
-        node01: {
-          kind: 'ok',
-          node: 'node01',
-          snapshot: snapshot('node01', 20 * DAY),
-        },
-      },
-    });
-
-    await expect(
-      runTask(services, { 'healthCheck.certificates.warningDays': -5 }),
-    ).resolves.toMatchObject({
-      status: 'warning',
-    });
   });
 
   it('reports a healthy check at info, not debug (S8.x)', async () => {

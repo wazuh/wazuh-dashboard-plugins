@@ -553,11 +553,11 @@ hosts:
     defaultValue: true,
     validate: SettingsValidator.isBoolean,
   },
-  'healthCheck.certificates.warningDays': {
+  healthCheckCertificateExpiryWarningDays: {
     title: 'Certificate expiration warning',
     description:
       'Days before a server certificate expires at which the health check reports a warning.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    source: EConfigurationProviders.INITIALIZER_CONTEXT,
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.number,
     defaultValue: 30,
@@ -572,11 +572,11 @@ hosts:
       integer: true,
     }),
   },
-  'healthCheck.certificates.criticalDays': {
+  healthCheckCertificateExpiryCriticalDays: {
     title: 'Certificate expiration error',
     description:
       'Days before a server certificate expires at which the health check reports an error. Must be lower than the warning value.',
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
+    source: EConfigurationProviders.INITIALIZER_CONTEXT,
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.number,
     defaultValue: 7,

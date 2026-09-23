@@ -1,10 +1,7 @@
 import {
-  CERTIFICATE_EXPIRY_CRITICAL_DAYS,
   CERTIFICATE_EXPIRY_CRITICAL_SETTING,
-  CERTIFICATE_EXPIRY_WARNING_DAYS,
   CERTIFICATE_EXPIRY_WARNING_SETTING,
 } from '../../common/constants';
-import { SavedObjectsClient } from '../../../../src/core/server';
 import type { CertificateValidityOutcome } from '../../../wazuh-core/common/certificate-validity';
 import { taskResult, type InitializationTaskRunContext } from './types';
 import {
@@ -31,71 +28,31 @@ export interface CertificateValidityServices {
       node: string,
     ) => Promise<CertificateValidityOutcome>;
   };
+  configuration: {
+    get: (settingKey: string) => Promise<unknown>;
+  };
 }
 
 const SECONDS_PER_DAY = 24 * 60 * 60;
 
-/**
- * The settings live in the platform, not in the wazuh-core configuration store:
- * the store only carries the `opensearch_dashboards.yml` provider on the server.
- */
 async function readDays(
-  ctx: InitializationTaskRunContext,
+  services: CertificateValidityServices,
   settingKey: string,
-  fallback: number,
 ): Promise<number> {
-  try {
-    const core = ctx.context.services.core;
-    const savedObjectsClient = new SavedObjectsClient(
-      core.savedObjects.createInternalRepository(),
-    );
-    const value = await core.uiSettings
-      .asScopedToClient(savedObjectsClient)
-      .get(settingKey);
-
-    return typeof value === 'number' && Number.isInteger(value) && value > 0
-      ? value
-      : fallback;
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error);
-
-    ctx.logger.debug(
-      `Could not read [${settingKey}], using [${fallback}]: ${message}`,
-    );
-
-    return fallback;
-  }
+  return (await services.configuration.get(settingKey)) as number;
 }
 
-/**
- * The settings are validated one at a time, so nothing stops a critical
- * threshold above the warning one. That pair would invert their meaning, so it
- * is refused in favour of the defaults.
- */
 async function readThresholds(
-  ctx: InitializationTaskRunContext,
+  services: CertificateValidityServices,
 ): Promise<{ warningSeconds: number; criticalSeconds: number }> {
   const warningDays = await readDays(
-    ctx,
+    services,
     CERTIFICATE_EXPIRY_WARNING_SETTING,
-    CERTIFICATE_EXPIRY_WARNING_DAYS,
   );
   const criticalDays = await readDays(
-    ctx,
+    services,
     CERTIFICATE_EXPIRY_CRITICAL_SETTING,
-    CERTIFICATE_EXPIRY_CRITICAL_DAYS,
   );
-
-  if (criticalDays >= warningDays) {
-    ctx.logger.warn(
-      `The certificate expiration error threshold [${criticalDays}] is not lower than the warning one [${warningDays}]. Using [${CERTIFICATE_EXPIRY_WARNING_DAYS}] and [${CERTIFICATE_EXPIRY_CRITICAL_DAYS}] day(s) instead.`,
-    );
-
-    return {
-      warningSeconds: CERTIFICATE_EXPIRY_WARNING_DAYS * SECONDS_PER_DAY,
-      criticalSeconds: CERTIFICATE_EXPIRY_CRITICAL_DAYS * SECONDS_PER_DAY,
-    };
-  }
 
   return {
     warningSeconds: warningDays * SECONDS_PER_DAY,
@@ -103,7 +60,7 @@ async function readThresholds(
   };
 }
 
-/** An empty list means the nodes could not be enumerated, not that all is well. */
+/** Returns no outcome when the manager cannot list its nodes; the evaluator reports that as undetermined. */
 async function collectOutcomes(
   ctx: InitializationTaskRunContext,
   services: CertificateValidityServices,
@@ -139,10 +96,6 @@ async function collectOutcomes(
   }
 }
 
-/**
- * One line per problem, not per node: the action is the same on every node it
- * affects, so repeating it buries the findings it is meant to resolve.
- */
 function guidanceFor(
   finding: CertificateFinding,
   evaluation: CertificateEvaluation,
@@ -152,7 +105,6 @@ function guidanceFor(
       return 'Ensure the CA certificate is replaced in the bundle with wazuh-manager-certs.';
     }
 
-    // remoted serves the certificate it loaded until it restarts.
     const loaded = evaluation.oldestListenerLoadedAt
       ? ` The manager has served the one it loaded on ${evaluation.oldestListenerLoadedAt} since then, so replacing the file alone does not clear this.`
       : '';
@@ -206,7 +158,7 @@ function buildMessage(evaluation: CertificateEvaluation): string {
   return `${headline}\n\n${details}${actions}`;
 }
 
-/** The only place an internal severity meets the platform result model. */
+/** Maps an evaluator severity to a platform task result. */
 function reportEvaluation(evaluation: CertificateEvaluation) {
   if (evaluation.severity === 'ok') {
     return taskResult.ok(evaluation);
@@ -231,7 +183,7 @@ export const initializationTaskCreatorCertificateValidity = ({
   async run(ctx: InitializationTaskRunContext) {
     ctx.logger.debug('Starting check of the server certificates validity');
 
-    const thresholds = await readThresholds(ctx);
+    const thresholds = await readThresholds(services);
     const outcomes = await collectOutcomes(ctx, services);
     const evaluation = evaluateCertificateValidity(outcomes, {
       now: Math.floor(Date.now() / 1000),
