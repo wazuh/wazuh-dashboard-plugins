@@ -674,6 +674,44 @@ hosts:
     defaultValue: true,
     validate: SettingsValidator.isBoolean,
   },
+  healthCheckCertificateExpiryWarningDays: {
+    title: 'Certificate expiration warning',
+    description:
+      'Days before a server certificate expires at which the health check reports a warning.',
+    source: EConfigurationProviders.INITIALIZER_CONTEXT,
+    category: SettingCategory.HEALTH_CHECK,
+    type: EpluginSettingType.number,
+    defaultValue: 30,
+    options: {
+      number: {
+        min: 1,
+        integer: true,
+      },
+    },
+    validate: SettingsValidator.number({
+      min: 1,
+      integer: true,
+    }),
+  },
+  healthCheckCertificateExpiryCriticalDays: {
+    title: 'Certificate expiration error',
+    description:
+      'Days before a server certificate expires at which the health check reports an error. Must be lower than the warning value.',
+    source: EConfigurationProviders.INITIALIZER_CONTEXT,
+    category: SettingCategory.HEALTH_CHECK,
+    type: EpluginSettingType.number,
+    defaultValue: 7,
+    options: {
+      number: {
+        min: 1,
+        integer: true,
+      },
+    },
+    validate: SettingsValidator.number({
+      min: 1,
+      integer: true,
+    }),
+  },
   timeout: {
     title: i18n.translate('wazuhCore.settings.timeout.title', {
       defaultMessage: 'Request timeout',
