@@ -10,7 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useState } from 'react';
+import { FormattedMessage } from '@osd/i18n/react';
 import { useSelector } from 'react-redux';
 import {
   EuiButton,
@@ -151,12 +153,29 @@ const CreateEnrollmentTokenFlyoutContent = ({
       certificate, and a second rule computed here would drift from the one it
       actually enforces. */
       setError(
-        requestError?.message || 'The enrollment token could not be created.',
+        requestError?.message ||
+          i18n.translate(
+            'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.createError',
+            {
+              defaultMessage: 'The enrollment token could not be created.',
+            },
+          ),
       );
     } finally {
       setIsMinting(false);
     }
   };
+
+  const optionalMarker = (
+    <em>
+      {i18n.translate(
+        'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.optionalMarker',
+        {
+          defaultMessage: 'optional',
+        },
+      )}
+    </em>
+  );
 
   return (
     <>
@@ -164,8 +183,18 @@ const CreateEnrollmentTokenFlyoutContent = ({
         <EuiTitle size='m'>
           <h2 id='createEnrollmentTokenFlyoutTitle'>
             {mintedToken
-              ? 'Enrollment token created'
-              : 'Create enrollment token'}
+              ? i18n.translate(
+                  'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.createdTitle',
+                  {
+                    defaultMessage: 'Enrollment token created',
+                  },
+                )
+              : i18n.translate(
+                  'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.title',
+                  {
+                    defaultMessage: 'Create enrollment token',
+                  },
+                )}
           </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
@@ -173,14 +202,23 @@ const CreateEnrollmentTokenFlyoutContent = ({
         {mintedToken ? (
           <>
             <EuiCallOut
-              title='Copy the token now'
+              title={i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.copyNowTitle',
+                {
+                  defaultMessage: 'Copy the token now',
+                },
+              )}
               color='warning'
               iconType='alert'
             >
               <p>
-                The token text is returned once and is never listed again. A
-                token that is not kept here cannot be recovered, and a new one
-                has to be created instead.
+                {i18n.translate(
+                  'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.copyNowBody',
+                  {
+                    defaultMessage:
+                      'The token text is returned once and is never listed again. A token that is not kept here cannot be recovered, and a new one has to be created instead.',
+                  },
+                )}
               </p>
             </EuiCallOut>
             <EuiSpacer size='m' />
@@ -192,15 +230,41 @@ const CreateEnrollmentTokenFlyoutContent = ({
               type='row'
               listItems={[
                 {
-                  title: 'Token',
+                  title: i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.mintedTokenLabel',
+                    {
+                      defaultMessage: 'Token',
+                    },
+                  ),
                   description: (
                     <TruncatedValuePopover value={mintedToken.token} />
                   ),
                 },
-                { title: 'ID', description: mintedToken.id },
-                { title: 'Address', description: mintedToken.address },
                 {
-                  title: 'Expires',
+                  title: i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.mintedIdLabel',
+                    {
+                      defaultMessage: 'ID',
+                    },
+                  ),
+                  description: mintedToken.id,
+                },
+                {
+                  title: i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.mintedAddressLabel',
+                    {
+                      defaultMessage: 'Address',
+                    },
+                  ),
+                  description: mintedToken.address,
+                },
+                {
+                  title: i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.mintedExpiresLabel',
+                    {
+                      defaultMessage: 'Expires',
+                    },
+                  ),
                   description: formatUIDate(mintedToken.expires),
                 },
               ]}
@@ -210,12 +274,21 @@ const CreateEnrollmentTokenFlyoutContent = ({
           <EuiForm component='form' isInvalid={Boolean(error)} error={error}>
             <InputForm
               {...fields.address}
-              label='Address'
+              label={i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressLabel',
+                {
+                  defaultMessage: 'Address',
+                },
+              )}
               footer={
                 <EuiText size='xs' color='subdued'>
-                  The name agents connect to. It must be one of the names in the
-                  manager listener certificate; an address outside it is
-                  refused.
+                  {i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
+                    {
+                      defaultMessage:
+                        'The name agents connect to. It must be one of the names in the manager listener certificate; an address outside it is refused.',
+                    },
+                  )}
                 </EuiText>
               }
               placeholder='wazuh-manager.example.com'
@@ -224,13 +297,22 @@ const CreateEnrollmentTokenFlyoutContent = ({
               {...fields.port}
               label={
                 <span>
-                  Port - <em>optional</em>
+                  <FormattedMessage
+                    id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.portLabel'
+                    defaultMessage='Port - {optional}'
+                    values={{ optional: optionalMarker }}
+                  />
                 </span>
               }
               footer={
                 <EuiText size='xs' color='subdued'>
-                  Written into the token when it differs from the port the
-                  manager is configured with.
+                  {i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.portHelp',
+                    {
+                      defaultMessage:
+                        'Written into the token when it differs from the port the manager is configured with.',
+                    },
+                  )}
                 </EuiText>
               }
               placeholder='1517'
@@ -239,13 +321,22 @@ const CreateEnrollmentTokenFlyoutContent = ({
               {...fields.prefix}
               label={
                 <span>
-                  Path prefix - <em>optional</em>
+                  <FormattedMessage
+                    id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.prefixLabel'
+                    defaultMessage='Path prefix - {optional}'
+                    values={{ optional: optionalMarker }}
+                  />
                 </span>
               }
               footer={
                 <EuiText size='xs' color='subdued'>
-                  Written into the token when it differs from the prefix the
-                  manager is configured with.
+                  {i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.prefixHelp',
+                    {
+                      defaultMessage:
+                        'Written into the token when it differs from the prefix the manager is configured with.',
+                    },
+                  )}
                 </EuiText>
               }
               placeholder='/wazuh-manager/'
@@ -254,15 +345,25 @@ const CreateEnrollmentTokenFlyoutContent = ({
               {...fields.ttl}
               label={
                 <span>
-                  Lifetime - <em>optional</em>
+                  <FormattedMessage
+                    id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.ttlLabel'
+                    defaultMessage='Lifetime - {optional}'
+                    values={{ optional: optionalMarker }}
+                  />
                 </span>
               }
               footer={
                 <EuiText size='xs' color='subdued'>
-                  Seconds, or a number followed by <EuiCode>d</EuiCode>,{' '}
-                  <EuiCode>h</EuiCode>, <EuiCode>m</EuiCode> or{' '}
-                  <EuiCode>s</EuiCode>. Left empty, the server applies its
-                  default of 30 days.
+                  <FormattedMessage
+                    id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.ttlHelp'
+                    defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}. Left empty, the server applies its default of 30 days.'
+                    values={{
+                      days: <EuiCode>d</EuiCode>,
+                      hours: <EuiCode>h</EuiCode>,
+                      minutes: <EuiCode>m</EuiCode>,
+                      seconds: <EuiCode>s</EuiCode>,
+                    }}
+                  />
                 </EuiText>
               }
               placeholder='30d'
@@ -271,13 +372,22 @@ const CreateEnrollmentTokenFlyoutContent = ({
               {...fields.maxUses}
               label={
                 <span>
-                  Enrollments allowed - <em>optional</em>
+                  <FormattedMessage
+                    id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.maxUsesLabel'
+                    defaultMessage='Enrollments allowed - {optional}'
+                    values={{ optional: optionalMarker }}
+                  />
                 </span>
               }
               footer={
                 <EuiText size='xs' color='subdued'>
-                  How many agents the token can enroll. Left empty, or set to 0,
-                  the token allows unlimited enrollments.
+                  {i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.maxUsesHelp',
+                    {
+                      defaultMessage:
+                        'How many agents the token can enroll. Left empty, or set to 0, the token allows unlimited enrollments.',
+                    },
+                  )}
                 </EuiText>
               }
               placeholder='0'
@@ -286,36 +396,77 @@ const CreateEnrollmentTokenFlyoutContent = ({
               {...fields.description}
               label={
                 <span>
-                  Description - <em>optional</em>
+                  <FormattedMessage
+                    id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.descriptionLabel'
+                    defaultMessage='Description - {optional}'
+                    values={{ optional: optionalMarker }}
+                  />
                 </span>
               }
               footer={
                 <EuiText size='xs' color='subdued'>
-                  Free text shown in the listing so the token can be told apart
-                  from the others.
+                  {i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.descriptionHelp',
+                    {
+                      defaultMessage:
+                        'Free text shown in the listing so the token can be told apart from the others.',
+                    },
+                  )}
                 </EuiText>
               }
             />
             <EuiSpacer size='m' />
             <EuiFormRow
-              label='Embed CA'
-              helpText='Carries the CA certificate inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.'
+              label={i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.embedCaLabel',
+                {
+                  defaultMessage: 'Embed CA',
+                },
+              )}
+              helpText={i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.embedCaHelp',
+                {
+                  defaultMessage:
+                    'Carries the CA certificate inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.',
+                },
+              )}
               fullWidth
             >
               <EuiSwitch
-                label='Carry the CA certificate in the token'
+                label={i18n.translate(
+                  'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.embedCaSwitch',
+                  {
+                    defaultMessage: 'Carry the CA certificate in the token',
+                  },
+                )}
                 checked={embedCa}
                 onChange={event => setEmbedCa(event.target.checked)}
               />
             </EuiFormRow>
             <EuiSpacer size='m' />
             <EuiFormRow
-              label='Without credential'
-              helpText='Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment.'
+              label={i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.noCredentialLabel',
+                {
+                  defaultMessage: 'Without credential',
+                },
+              )}
+              helpText={i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.noCredentialHelp',
+                {
+                  defaultMessage:
+                    'Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment.',
+                },
+              )}
               fullWidth
             >
               <EuiSwitch
-                label='Mint the token without a credential'
+                label={i18n.translate(
+                  'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.noCredentialSwitch',
+                  {
+                    defaultMessage: 'Mint the token without a credential',
+                  },
+                )}
                 checked={noCredential}
                 onChange={event => setNoCredential(event.target.checked)}
               />
@@ -331,7 +482,19 @@ const CreateEnrollmentTokenFlyoutContent = ({
               onClick={() => guardAction(onClose)}
               flush='left'
             >
-              {mintedToken ? 'Close' : 'Cancel'}
+              {mintedToken
+                ? i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.closeButton',
+                    {
+                      defaultMessage: 'Close',
+                    },
+                  )
+                : i18n.translate(
+                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.cancelButton',
+                    {
+                      defaultMessage: 'Cancel',
+                    },
+                  )}
             </EuiButtonEmpty>
           </EuiFlexItem>
           {!mintedToken && (
@@ -342,7 +505,12 @@ const CreateEnrollmentTokenFlyoutContent = ({
                 isDisabled={formIsInvalid || isMinting}
                 onClick={onCreate}
               >
-                Create
+                {i18n.translate(
+                  'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.createButton',
+                  {
+                    defaultMessage: 'Create',
+                  },
+                )}
               </EuiButton>
             </EuiFlexItem>
           )}

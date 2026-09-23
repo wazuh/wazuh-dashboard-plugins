@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useState } from 'react';
 import {
   CriteriaWithPagination,
@@ -130,7 +131,14 @@ export const EnrollmentTokensTable = ({
   const onConfirmRevokeToken = (token: EnrollmentTokenSummary) => async () => {
     try {
       await revokeEnrollmentToken(String(token.id));
-      ErrorHandler.info('Enrollment token was successfully revoked');
+      ErrorHandler.info(
+        i18n.translate(
+          'wazuh.enrollmentTokens.enrollmentTokensTable.revokeSuccess',
+          {
+            defaultMessage: 'Enrollment token was successfully revoked',
+          },
+        ),
+      );
       onRevoked();
     } catch (error) {
       getErrorOrchestrator().handleError({
@@ -147,12 +155,71 @@ export const EnrollmentTokensTable = ({
     }
   };
 
+  /* Each name is both the column header and its entry in the column
+  selector. */
+  const columnNames = {
+    status: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.status',
+      {
+        defaultMessage: 'Status',
+      },
+    ),
+    id: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.id',
+      {
+        defaultMessage: 'ID',
+      },
+    ),
+    address: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.address',
+      {
+        defaultMessage: 'Address',
+      },
+    ),
+    created: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.created',
+      {
+        defaultMessage: 'Created',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.description',
+      {
+        defaultMessage: 'Description',
+      },
+    ),
+    uses: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.uses',
+      {
+        defaultMessage: 'Uses',
+      },
+    ),
+    credential: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.credential',
+      {
+        defaultMessage: 'Credential',
+      },
+    ),
+    expires: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.expires',
+      {
+        defaultMessage: 'Expires',
+      },
+    ),
+    actions: i18n.translate(
+      'wazuh.enrollmentTokens.enrollmentTokensTable.columns.actions',
+      {
+        defaultMessage: 'Actions',
+      },
+    ),
+  };
+
   const selectableColumns: SelectableColumn[] = [
     {
       id: 'status',
-      name: 'Status',
+      name: columnNames.status,
       column: {
-        name: 'Status',
+        name: columnNames.status,
         render: (token: EnrollmentTokenSummary) => {
           const { label, color } =
             ENROLLMENT_TOKEN_STATUS_LABEL[getEnrollmentTokenStatus(token)];
@@ -163,40 +230,40 @@ export const EnrollmentTokensTable = ({
     },
     {
       id: 'id',
-      name: 'ID',
+      name: columnNames.id,
       column: {
         field: 'id',
-        name: 'ID',
+        name: columnNames.id,
         sortable: true,
         render: (id?: string) => id ?? '-',
       },
     },
     {
       id: 'address',
-      name: 'Address',
+      name: columnNames.address,
       column: {
         field: 'address',
-        name: 'Address',
+        name: columnNames.address,
         sortable: true,
         render: (address?: string) => address ?? '-',
       },
     },
     {
       id: 'created',
-      name: 'Created',
+      name: columnNames.created,
       column: {
         field: 'created',
-        name: 'Created',
+        name: columnNames.created,
         sortable: true,
         render: (created?: string) => formatUIDate(created),
       },
     },
     {
       id: 'description',
-      name: 'Description',
+      name: columnNames.description,
       column: {
         field: 'description',
-        name: 'Description',
+        name: columnNames.description,
         render: (description?: string | null) => {
           if (!description) {
             return '-';
@@ -218,10 +285,10 @@ export const EnrollmentTokensTable = ({
     },
     {
       id: 'uses',
-      name: 'Uses',
+      name: columnNames.uses,
       column: {
         field: 'uses',
-        name: 'Uses',
+        name: columnNames.uses,
         /* Read against the allowance beside it, which is what says whether the
         token is running out. Sorting is on the use count alone -- the manager
         orders by a field, and "how close to exhausted" is not one. */
@@ -232,23 +299,36 @@ export const EnrollmentTokensTable = ({
     },
     {
       id: 'credential',
-      name: 'Credential',
+      name: columnNames.credential,
       column: {
         field: 'credential',
-        name: 'Credential',
+        name: columnNames.credential,
         sortable: true,
         /* A token minted with `no_credential` carries the address and the pin
         only: it can point an agent at the manager but cannot authenticate its
         enrollment, which is the whole of what this column reports. */
-        render: (credential?: boolean) => (credential ? 'Yes' : 'No'),
+        render: (credential?: boolean) =>
+          credential
+            ? i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokensTable.credentialYes',
+                {
+                  defaultMessage: 'Yes',
+                },
+              )
+            : i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokensTable.credentialNo',
+                {
+                  defaultMessage: 'No',
+                },
+              ),
       },
     },
     {
       id: 'expires',
-      name: 'Expires',
+      name: columnNames.expires,
       column: {
         field: 'expires',
-        name: 'Expires',
+        name: columnNames.expires,
         sortable: true,
         // The exact expiry stays one hover away rather than gone: the relative
         // form answers "do I need to act on this", the tooltip answers "when,
@@ -262,18 +342,23 @@ export const EnrollmentTokensTable = ({
     },
     {
       id: 'actions',
-      name: 'Actions',
+      name: columnNames.actions,
       column: {
         align: 'right',
         width: '90',
-        name: 'Actions',
+        name: columnNames.actions,
         render: (token: EnrollmentTokenSummary) => (
           <EuiFlexGroup responsive={false} gutterSize='none'>
             <EuiFlexItem grow={false}>
               <EuiButtonIcon
                 iconType='inspect'
                 color='text'
-                aria-label='View enrollment token details'
+                aria-label={i18n.translate(
+                  'wazuh.enrollmentTokens.enrollmentTokensTable.viewDetailsAriaLabel',
+                  {
+                    defaultMessage: 'View enrollment token details',
+                  },
+                )}
                 onClick={() => setViewingToken(token)}
               />
             </EuiFlexItem>
@@ -285,19 +370,50 @@ export const EnrollmentTokensTable = ({
                 ]}
                 tooltip={{
                   content: token.revoked
-                    ? 'The token is already revoked'
-                    : 'Revoke token',
+                    ? i18n.translate(
+                        'wazuh.enrollmentTokens.enrollmentTokensTable.alreadyRevokedTooltip',
+                        {
+                          defaultMessage: 'The token is already revoked',
+                        },
+                      )
+                    : i18n.translate(
+                        'wazuh.enrollmentTokens.enrollmentTokensTable.revokeTooltip',
+                        {
+                          defaultMessage: 'Revoke token',
+                        },
+                      ),
                   position: 'left',
                 }}
                 isDisabled={token.revoked}
-                modalTitle='Do you want to revoke the enrollment token?'
+                modalTitle={i18n.translate(
+                  'wazuh.enrollmentTokens.enrollmentTokensTable.revokeModalTitle',
+                  {
+                    defaultMessage:
+                      'Do you want to revoke the enrollment token?',
+                  },
+                )}
                 modalProps={{ buttonColor: 'danger' }}
                 onConfirm={onConfirmRevokeToken(token)}
                 iconType='cross'
                 color='danger'
-                aria-label='Revoke enrollment token'
-                modalCancelText='Cancel'
-                modalConfirmText='Confirm'
+                aria-label={i18n.translate(
+                  'wazuh.enrollmentTokens.enrollmentTokensTable.revokeAriaLabel',
+                  {
+                    defaultMessage: 'Revoke enrollment token',
+                  },
+                )}
+                modalCancelText={i18n.translate(
+                  'wazuh.enrollmentTokens.enrollmentTokensTable.revokeModalCancel',
+                  {
+                    defaultMessage: 'Cancel',
+                  },
+                )}
+                modalConfirmText={i18n.translate(
+                  'wazuh.enrollmentTokens.enrollmentTokensTable.revokeModalConfirm',
+                  {
+                    defaultMessage: 'Confirm',
+                  },
+                )}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -321,23 +437,40 @@ export const EnrollmentTokensTable = ({
     showPerPageOptions: true,
   };
 
+  const selectColumnsLabel = i18n.translate(
+    'wazuh.enrollmentTokens.enrollmentTokensTable.selectColumns',
+    {
+      defaultMessage: 'Select visible columns',
+    },
+  );
+
   return (
     <>
       <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
         <EuiFlexItem>
           <EuiFieldSearch
             fullWidth
-            placeholder='Search by description, ID or address'
-            aria-label='Search enrollment tokens'
+            placeholder={i18n.translate(
+              'wazuh.enrollmentTokens.enrollmentTokensTable.searchPlaceholder',
+              {
+                defaultMessage: 'Search by description, ID or address',
+              },
+            )}
+            aria-label={i18n.translate(
+              'wazuh.enrollmentTokens.enrollmentTokensTable.searchAriaLabel',
+              {
+                defaultMessage: 'Search enrollment tokens',
+              },
+            )}
             defaultValue={searchTerm}
             isClearable
             onSearch={onSearch}
           />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiToolTip content='Select visible columns' position='left'>
+          <EuiToolTip content={selectColumnsLabel} position='left'>
             <EuiButtonEmpty
-              aria-label='Select visible columns'
+              aria-label={selectColumnsLabel}
               aria-expanded={isColumnSelectorOpen}
               onClick={() => setIsColumnSelectorOpen(open => !open)}
             >
@@ -367,7 +500,12 @@ export const EnrollmentTokensTable = ({
         onChange={onTableChange}
         loading={loading}
         sorting={sorting}
-        noItemsMessage='No enrollment tokens were minted'
+        noItemsMessage={i18n.translate(
+          'wazuh.enrollmentTokens.enrollmentTokensTable.noItems',
+          {
+            defaultMessage: 'No enrollment tokens were minted',
+          },
+        )}
       />
       {viewingToken && (
         <EnrollmentTokenDetailsFlyout

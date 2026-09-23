@@ -70,11 +70,14 @@ exports[`AgentStatTable component Renders correctly to match the snapshot 1`] = 
                       data-euiicon-type="calendar"
                     />
                   </EuiIcon>
-                   Start:
+                   
+                  Start:
                    
                   -
                    
-                  - End:
+                  -
+                   
+                  End:
                    
                   -
                 </div>
