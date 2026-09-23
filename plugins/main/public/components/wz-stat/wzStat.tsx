@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, {
   Fragment,
   HTMLAttributes,
@@ -129,7 +130,9 @@ export const WzStat: FunctionComponent<
       <EuiScreenReaderOnly>
         <span>
           {isLoading ? (
-            <span token="euiStat.loadingText" default="Statistic is loading" />
+            i18n.translate('wazuh.core.stat.loadingText', {
+              defaultMessage: 'Statistic is loading',
+            })
           ) : (
             <Fragment>
               {reverse ? `${title} ${description}` : `${description} ${title}`}

@@ -41,8 +41,12 @@ export class ErrorHandler {
       const isFromAPI =
         origin.includes('/api/request') || origin.includes('/api/csv');
       return isFromAPI
-        ? 'API is not reachable. Reason: timeout.'
-        : 'Server did not respond';
+        ? i18n.translate('wazuh.core.request.apiTimeout', {
+            defaultMessage: 'API is not reachable. Reason: timeout.',
+          })
+        : i18n.translate('wazuh.core.request.serverDidNotRespond', {
+            defaultMessage: 'Server did not respond',
+          });
     }
 
     if ((((error || {}).response || {}).data || {}).message) {
@@ -81,7 +85,12 @@ export class ErrorHandler {
     if (typeof error === 'object' && error !== null) {
       return JSON.stringify(error);
     }
-    return error || 'Unexpected error';
+    return (
+      error ||
+      i18n.translate('wazuh.core.request.unexpectedError', {
+        defaultMessage: 'Unexpected error',
+      })
+    );
   }
 
   /**

@@ -86,7 +86,12 @@ export function HitsCounter({
                   tabIndex={0}
                   style={{ width: '19px', height: '19px', marginBottom: '2px' }}
                   type={tooltip.iconType || 'iInCircle'}
-                  aria-label={tooltip.ariaLabel || 'Info'}
+                  aria-label={
+                    tooltip.ariaLabel ||
+                    i18n.translate('wazuh.common.hitsCounter.infoAriaLabel', {
+                      defaultMessage: 'Info',
+                    })
+                  }
                 />
               </EuiToolTip>
             )}

@@ -10,17 +10,22 @@ import {
   EuiPopover
 } from '@elastic/eui';
 import { EuiInputPopover } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 const statusMap = {
   unsaved: {
     icon: 'dot',
     color: 'accent',
-    tooltip: 'Changes have not been saved.'
+    tooltip: i18n.translate('wazuh.core.suggestInput.unsavedTooltip', {
+      defaultMessage: 'Changes have not been saved.',
+    })
   },
   saved: {
     icon: 'checkInCircleFilled',
     color: 'secondary',
-    tooltip: 'Saved.'
+    tooltip: i18n.translate('wazuh.core.suggestInput.savedTooltip', {
+      defaultMessage: 'Saved.',
+    })
   },
   unchanged: {
     icon: '',
