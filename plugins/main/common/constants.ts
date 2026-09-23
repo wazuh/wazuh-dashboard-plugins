@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { version } from '../package.json';
+import { i18n } from '@osd/i18n';
 
 // Plugin
 export const PLUGIN_VERSION = version;
@@ -787,11 +788,25 @@ export const UI_COLOR_AGENT_STATUS = {
 } as const;
 
 export const UI_LABEL_NAME_AGENT_STATUS = {
-  [API_NAME_AGENT_STATUS.ACTIVE]: 'Active',
-  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'Disconnected',
-  [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
-  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
-  default: 'Unknown',
+  [API_NAME_AGENT_STATUS.ACTIVE]: i18n.translate(
+    'wazuh.common.agentStatus.active',
+    { defaultMessage: 'Active' },
+  ),
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: i18n.translate(
+    'wazuh.common.agentStatus.disconnected',
+    { defaultMessage: 'Disconnected' },
+  ),
+  [API_NAME_AGENT_STATUS.PENDING]: i18n.translate(
+    'wazuh.common.agentStatus.pending',
+    { defaultMessage: 'Pending' },
+  ),
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: i18n.translate(
+    'wazuh.common.agentStatus.neverConnected',
+    { defaultMessage: 'Never connected' },
+  ),
+  default: i18n.translate('wazuh.common.agentStatus.unknown', {
+    defaultMessage: 'Unknown',
+  }),
 } as const;
 
 export const UI_ORDER_AGENT_STATUS = [
@@ -806,27 +821,45 @@ export const UI_ORDER_AGENT_STATUS = [
 export const AGENT_STATUS_CODE = [
   {
     STATUS_CODE: 0,
-    STATUS_DESCRIPTION: 'Agent is connected',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuh.common.agentStatusCode.connected',
+      { defaultMessage: 'Agent is connected' },
+    ),
   },
   {
     STATUS_CODE: 1,
-    STATUS_DESCRIPTION: 'Invalid agent version',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuh.common.agentStatusCode.invalidVersion',
+      { defaultMessage: 'Invalid agent version' },
+    ),
   },
   {
     STATUS_CODE: 2,
-    STATUS_DESCRIPTION: 'Error retrieving version',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuh.common.agentStatusCode.versionError',
+      { defaultMessage: 'Error retrieving version' },
+    ),
   },
   {
     STATUS_CODE: 3,
-    STATUS_DESCRIPTION: 'Shutdown message received',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuh.common.agentStatusCode.shutdownReceived',
+      { defaultMessage: 'Shutdown message received' },
+    ),
   },
   {
     STATUS_CODE: 4,
-    STATUS_DESCRIPTION: 'Disconnected because no keepalive received',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuh.common.agentStatusCode.noKeepAlive',
+      { defaultMessage: 'Disconnected because no keepalive received' },
+    ),
   },
   {
     STATUS_CODE: 5,
-    STATUS_DESCRIPTION: 'Connection reset by manager',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuh.common.agentStatusCode.connectionReset',
+      { defaultMessage: 'Connection reset by manager' },
+    ),
   },
 ];
 
@@ -1220,11 +1253,20 @@ export const VULNERABILITIES_INVENTORY_AGENT_DASHBOARD_ID =
 
 // Main module tabs
 export const TAB_VIEW_ID_EVENTS = 'findings';
-export const TAB_VIEW_NAME_EVENTS = 'Findings';
+export const TAB_VIEW_NAME_EVENTS = i18n.translate(
+  'wazuh.common.moduleTabs.findings',
+  { defaultMessage: 'Findings' },
+);
 export const TAB_VIEW_ID_DASHBOARD = 'dashboard';
-export const TAB_VIEW_NAME_DASHBOARD = 'Dashboard';
+export const TAB_VIEW_NAME_DASHBOARD = i18n.translate(
+  'wazuh.common.moduleTabs.dashboard',
+  { defaultMessage: 'Dashboard' },
+);
 export const TAB_VIEW_ID_RESPONSES = 'responses';
-export const TAB_VIEW_NAME_RESPONSES = 'Responses';
+export const TAB_VIEW_NAME_RESPONSES = i18n.translate(
+  'wazuh.common.moduleTabs.responses',
+  { defaultMessage: 'Responses' },
+);
 
 export const CTI_CVE_LINK_BASE_PATH =
   'https://cti.wazuh.com/vulnerabilities/cves/';
