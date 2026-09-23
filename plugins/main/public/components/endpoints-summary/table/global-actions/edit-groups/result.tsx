@@ -11,6 +11,7 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Agent } from '../../../types';
 import { GroupResult, RESULT_TYPE } from './edit-groups-modal';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
@@ -41,13 +42,19 @@ export const EditAgentsGroupsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'Id',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.agentsTable.columns.id',
+            { defaultMessage: 'Id' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.agentsTable.columns.name',
+            { defaultMessage: 'Name' },
+          ),
           align: 'left',
           sortable: true,
         },
@@ -69,26 +76,38 @@ export const EditAgentsGroupsModalResult = ({
       columns={[
         {
           field: 'error.code',
-          name: 'Code',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.errorsTable.columns.code',
+            { defaultMessage: 'Code' },
+          ),
           align: 'left',
           sortable: true,
           width: '100px',
         },
         {
           field: 'error.message',
-          name: 'Error',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.errorsTable.columns.error',
+            { defaultMessage: 'Error' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'error.remediation',
-          name: 'Remediation',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.errorsTable.columns.remediation',
+            { defaultMessage: 'Remediation' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'id',
-          name: 'Agent IDs',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.errorsTable.columns.agentIds',
+            { defaultMessage: 'Agent IDs' },
+          ),
           align: 'left',
           render: ids => ids.join(', '),
         },
@@ -135,7 +154,10 @@ export const EditAgentsGroupsModalResult = ({
       steps={[
         {
           step: 1,
-          title: 'Retrieve agents data',
+          title: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsResult.retrieveAgentsStep',
+            { defaultMessage: 'Retrieve agents data' },
+          ),
           status: getAgentsStatus,
           children:
             getAgentsStatus === 'loading' ? null : getAgentsStatus ===
@@ -144,7 +166,13 @@ export const EditAgentsGroupsModalResult = ({
                 id='agentsAccordion'
                 arrowDisplay='none'
                 paddingSize='m'
-                buttonContent={`Agents details (${finalAgents.length})`}
+                buttonContent={i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsResult.agentsDetails',
+                  {
+                    defaultMessage: 'Agents details ({count})',
+                    values: { count: finalAgents.length },
+                  },
+                )}
               >
                 {agentsTable(finalAgents)}
               </EuiAccordion>
@@ -152,7 +180,10 @@ export const EditAgentsGroupsModalResult = ({
               <EuiCallOut
                 color='danger'
                 iconType='alert'
-                title='Could not get agents data'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsResult.getAgentsError',
+                  { defaultMessage: 'Could not get agents data' },
+                )}
               >
                 <EuiText>{getAgentsError?.message}</EuiText>
               </EuiCallOut>
@@ -160,7 +191,16 @@ export const EditAgentsGroupsModalResult = ({
         },
         {
           step: 2,
-          title: addOrRemove === 'add' ? 'Add groups' : 'Remove groups',
+          title:
+            addOrRemove === 'add'
+              ? i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsResult.addGroupsStep',
+                  { defaultMessage: 'Add groups' },
+                )
+              : i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsResult.removeGroupsStep',
+                  { defaultMessage: 'Remove groups' },
+                ),
           status: saveChangesStatus,
           children:
             getAgentsStatus === 'complete' ? (
@@ -198,7 +238,13 @@ export const EditAgentsGroupsModalResult = ({
                           paddingSize='m'
                           buttonContent={groupStatus({
                             status: RESULT_TYPE.SUCCESS,
-                            text: `${group} (${finalAgents.length})`,
+                            text: i18n.translate(
+                              'wazuh.endpointsSummary.bulkEditGroupsResult.groupWithCount',
+                              {
+                                defaultMessage: '{group} ({count})',
+                                values: { group, count: finalAgents.length },
+                              },
+                            ),
                           })}
                         >
                           {agentsTable(finalAgents)}
@@ -224,7 +270,14 @@ export const EditAgentsGroupsModalResult = ({
                           paddingSize='m'
                           buttonContent={groupStatus({
                             status: RESULT_TYPE.ERROR,
-                            text: `Failed agents (${totalErrorAgents})`,
+                            text: i18n.translate(
+                              'wazuh.endpointsSummary.bulkEditGroupsResult.failedAgents',
+                              {
+                                defaultMessage:
+                                  'Failed agents ({totalErrorAgents})',
+                                values: { totalErrorAgents },
+                              },
+                            ),
                           })}
                         >
                           {errorsTable(errorAgents)}
@@ -238,7 +291,13 @@ export const EditAgentsGroupsModalResult = ({
                               paddingSize='m'
                               buttonContent={groupStatus({
                                 status: RESULT_TYPE.SUCCESS,
-                                text: `Success agents (${successAgents?.length})`,
+                                text: i18n.translate(
+                                  'wazuh.endpointsSummary.bulkEditGroupsResult.successAgents',
+                                  {
+                                    defaultMessage: 'Success agents ({count})',
+                                    values: { count: successAgents?.length },
+                                  },
+                                ),
                               })}
                             >
                               {agentsTable(

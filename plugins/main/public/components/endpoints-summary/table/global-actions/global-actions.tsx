@@ -7,6 +7,7 @@ import {
   EuiHorizontalRule,
   EuiToolTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzElementPermissions } from '../../../common/permissions/element';
 import { Agent } from '../../types';
 import { EditAgentsGroupsModal } from './edit-groups/edit-groups-modal';
@@ -56,7 +57,9 @@ export const AgentsTableGlobalActions = ({
       iconSide='right'
       onClick={onButtonClick}
     >
-      More
+      {i18n.translate('wazuh.endpointsSummary.globalActions.moreButton', {
+        defaultMessage: 'More',
+      })}
     </EuiButtonEmpty>
   );
 
@@ -65,17 +68,75 @@ export const AgentsTableGlobalActions = ({
     : selectedAgents.length;
 
   const selectAgentsTooltip = (content: React.ReactNode) => (
-    <EuiToolTip content='Select agents to perfom the action'>
+    <EuiToolTip
+      content={i18n.translate(
+        'wazuh.endpointsSummary.globalActions.selectAgentsTooltip',
+        { defaultMessage: 'Select agents to perfom the action' },
+      )}
+    >
       <span>{content}</span>
     </EuiToolTip>
   );
 
   const actions = {
-    addGroups: 'Add groups to agents',
-    removeGroups: 'Remove groups from agents',
-    upgrade: 'Upgrade agents',
-    scanVulnerabilities: 'Scan vulnerabilities of agents',
-    remove: 'Remove agents',
+    addGroups: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.addGroups',
+      {
+        defaultMessage: 'Add groups to agents',
+      },
+    ),
+    removeGroups: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.removeGroups',
+      { defaultMessage: 'Remove groups from agents' },
+    ),
+    upgrade: i18n.translate('wazuh.endpointsSummary.globalActions.upgrade', {
+      defaultMessage: 'Upgrade agents',
+    }),
+    scanVulnerabilities: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.scanVulnerabilities',
+      { defaultMessage: 'Scan vulnerabilities of agents' },
+    ),
+    remove: i18n.translate('wazuh.endpointsSummary.globalActions.remove', {
+      defaultMessage: 'Remove agents',
+    }),
+  };
+
+  const actionsWithCount = {
+    addGroups: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.addGroupsWithCount',
+      {
+        defaultMessage: 'Add groups to agents ({totalAgents})',
+        values: { totalAgents },
+      },
+    ),
+    removeGroups: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.removeGroupsWithCount',
+      {
+        defaultMessage: 'Remove groups from agents ({totalAgents})',
+        values: { totalAgents },
+      },
+    ),
+    upgrade: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.upgradeWithCount',
+      {
+        defaultMessage: 'Upgrade agents ({totalAgents})',
+        values: { totalAgents },
+      },
+    ),
+    scanVulnerabilities: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.scanVulnerabilitiesWithCount',
+      {
+        defaultMessage: 'Scan vulnerabilities of agents ({totalAgents})',
+        values: { totalAgents },
+      },
+    ),
+    remove: i18n.translate(
+      'wazuh.endpointsSummary.globalActions.removeWithCount',
+      {
+        defaultMessage: 'Remove agents ({totalAgents})',
+        values: { totalAgents },
+      },
+    ),
   };
 
   return (
@@ -102,10 +163,7 @@ export const AgentsTableGlobalActions = ({
             {!totalAgents ? (
               selectAgentsTooltip(actions.addGroups)
             ) : (
-              <span>
-                {actions.addGroups}
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
+              <span>{actionsWithCount.addGroups}</span>
             )}
           </EuiContextMenuItem>
           <EuiContextMenuItem
@@ -120,10 +178,7 @@ export const AgentsTableGlobalActions = ({
             {!totalAgents ? (
               selectAgentsTooltip(actions.removeGroups)
             ) : (
-              <span>
-                {actions.removeGroups}
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
+              <span>{actionsWithCount.removeGroups}</span>
             )}
           </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />
@@ -138,10 +193,7 @@ export const AgentsTableGlobalActions = ({
             {!totalAgents ? (
               selectAgentsTooltip(actions.upgrade)
             ) : (
-              <span>
-                {actions.upgrade}
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
+              <span>{actionsWithCount.upgrade}</span>
             )}
           </EuiContextMenuItem>
           <EuiContextMenuItem
@@ -155,10 +207,7 @@ export const AgentsTableGlobalActions = ({
             {!totalAgents ? (
               selectAgentsTooltip(actions.scanVulnerabilities)
             ) : (
-              <span>
-                {actions.scanVulnerabilities}
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
+              <span>{actionsWithCount.scanVulnerabilities}</span>
             )}
           </EuiContextMenuItem>
           <EuiHorizontalRule margin='xs' />
@@ -173,10 +222,7 @@ export const AgentsTableGlobalActions = ({
             {!totalAgents ? (
               selectAgentsTooltip(actions.remove)
             ) : (
-              <span>
-                {actions.remove}
-                {totalAgents ? ` (${totalAgents})` : ''}
-              </span>
+              <span>{actionsWithCount.remove}</span>
             )}
           </EuiContextMenuItem>
         </EuiContextMenuPanel>

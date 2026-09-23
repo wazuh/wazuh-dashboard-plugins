@@ -11,6 +11,7 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Agent, ResponseScanAgentsVulnerabilities } from '../../../types';
 import { Result } from './scan-vulnerabilities-modal';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
@@ -44,13 +45,19 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'ID',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.agentsTable.columns.id',
+            { defaultMessage: 'ID' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.agentsTable.columns.name',
+            { defaultMessage: 'Name' },
+          ),
           align: 'left',
           sortable: true,
         },
@@ -77,13 +84,19 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'Agent ID',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.scannedAgentsTable.columns.agentId',
+            { defaultMessage: 'Agent ID' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.scannedAgentsTable.columns.name',
+            { defaultMessage: 'Name' },
+          ),
           align: 'left',
           sortable: true,
         },
@@ -105,26 +118,38 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
       columns={[
         {
           field: 'error.code',
-          name: 'Code',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.errorsTable.columns.code',
+            { defaultMessage: 'Code' },
+          ),
           align: 'left',
           sortable: true,
           width: '100px',
         },
         {
           field: 'error.message',
-          name: 'Error',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.errorsTable.columns.error',
+            { defaultMessage: 'Error' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'error.remediation',
-          name: 'Remediation',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.errorsTable.columns.remediation',
+            { defaultMessage: 'Remediation' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'id',
-          name: 'Agent IDs',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.errorsTable.columns.agentIds',
+            { defaultMessage: 'Agent IDs' },
+          ),
           align: 'left',
           render: ids => ids.join(', '),
         },
@@ -163,7 +188,10 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
       steps={[
         {
           step: 1,
-          title: 'Retrieve agents data',
+          title: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.retrieveAgentsStep',
+            { defaultMessage: 'Retrieve agents data' },
+          ),
           status: getAgentsStatus,
           children:
             getAgentsStatus === 'loading' ? null : getAgentsStatus ===
@@ -172,7 +200,13 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
                 id='scanVulnerabilitiesAgentsAccordion'
                 arrowDisplay='none'
                 paddingSize='m'
-                buttonContent={`Agents details (${finalAgents.length})`}
+                buttonContent={i18n.translate(
+                  'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.agentsDetails',
+                  {
+                    defaultMessage: 'Agents details ({count})',
+                    values: { count: finalAgents.length },
+                  },
+                )}
               >
                 {agentsTable(finalAgents)}
               </EuiAccordion>
@@ -180,7 +214,10 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
               <EuiCallOut
                 color='danger'
                 iconType='alert'
-                title='Could not get agents data'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.getAgentsError',
+                  { defaultMessage: 'Could not get agents data' },
+                )}
               >
                 <EuiText>{getAgentsError?.message}</EuiText>
               </EuiCallOut>
@@ -188,7 +225,10 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
         },
         {
           step: 2,
-          title: 'Scan status',
+          title: i18n.translate(
+            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.scanStatusStep',
+            { defaultMessage: 'Scan status' },
+          ),
           status: saveChangesStatus,
           children:
             getAgentsStatus === 'complete' ? (
@@ -205,7 +245,12 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
                         <EuiLoadingSpinner size='m' />
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiText>Sending scan request</EuiText>
+                        <EuiText>
+                          {i18n.translate(
+                            'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.sendingRequest',
+                            { defaultMessage: 'Sending scan request' },
+                          )}
+                        </EuiText>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>
@@ -219,7 +264,14 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
                           paddingSize='m'
                           buttonContent={resultStatus({
                             status: RESULT_TYPE.SUCCESS,
-                            text: `Agents queued for vulnerabilities scan (${successAgents.length})`,
+                            text: i18n.translate(
+                              'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.queuedAgents',
+                              {
+                                defaultMessage:
+                                  'Agents queued for vulnerabilities scan ({count})',
+                                values: { count: successAgents.length },
+                              },
+                            ),
                           })}
                         >
                           {scannedAgentsTable(successAgents)}
@@ -237,7 +289,14 @@ export const ScanVulnerabilitiesAgentsModalResult = ({
                           paddingSize='m'
                           buttonContent={resultStatus({
                             status: RESULT_TYPE.ERROR,
-                            text: `Agents not queued for vulnerabilities scan (${totalErrorAgents})`,
+                            text: i18n.translate(
+                              'wazuh.endpointsSummary.bulkScanVulnerabilitiesResult.notQueuedAgents',
+                              {
+                                defaultMessage:
+                                  'Agents not queued for vulnerabilities scan ({totalErrorAgents})',
+                                values: { totalErrorAgents },
+                              },
+                            ),
                           })}
                         >
                           {errorsTable(errorAgents)}
