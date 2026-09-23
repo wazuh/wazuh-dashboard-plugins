@@ -896,7 +896,9 @@ export const Categories = [
   },
   {
     id: 'management',
-    label: 'Indexer management',
+    label: i18n.translate('wazuh.core.appCategories.indexerManagement', {
+      defaultMessage: 'Indexer management',
+    }),
     order: 5e3,
     euiIconType: 'managementApp',
   },
