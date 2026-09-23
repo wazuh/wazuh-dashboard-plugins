@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { EuiBasicTable, EuiButtonIcon, EuiDescriptionList } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -10,15 +11,24 @@ import { withErrorBoundary } from '../../common/hocs';
 const ExpandedTableRow = withErrorBoundary(({ item }) => {
   const listItems = [
     {
-      title: 'Actions',
+      title: i18n.translate(
+        'wazuh.security.editRoleTable.policyDetails.actions',
+        { defaultMessage: 'Actions' },
+      ),
       description: `${item.policy.actions}`,
     },
     {
-      title: 'Resources',
+      title: i18n.translate(
+        'wazuh.security.editRoleTable.policyDetails.resources',
+        { defaultMessage: 'Resources' },
+      ),
       description: `${item.policy.resources}`,
     },
     {
-      title: 'Effect',
+      title: i18n.translate(
+        'wazuh.security.editRoleTable.policyDetails.effect',
+        { defaultMessage: 'Effect' },
+      ),
       description: `${item.policy.effect}`,
     },
   ];
@@ -64,12 +74,16 @@ export const EditRolesTable = ({
   const columns = [
     {
       field: 'label',
-      name: 'Policies',
+      name: i18n.translate('wazuh.security.editRoleTable.columns.policies', {
+        defaultMessage: 'Policies',
+      }),
       sortable: false,
       truncateText: true,
     },
     {
-      name: 'Actions',
+      name: i18n.translate('wazuh.security.editRoleTable.columns.actions', {
+        defaultMessage: 'Actions',
+      }),
       actions: [
         {
           render: item => (
@@ -102,7 +116,14 @@ export const EditRolesTable = ({
                     return;
                   }
                   ErrorHandler.info(
-                    `Policy was successfully removed from role ${role.name}`,
+                    i18n.translate(
+                      'wazuh.security.editRoleTable.removePolicySuccess',
+                      {
+                        defaultMessage:
+                          'Policy was successfully removed from role {roleName}',
+                        values: { roleName: role.name },
+                      },
+                    ),
                   );
                   await onChange();
                 } catch (err) {}

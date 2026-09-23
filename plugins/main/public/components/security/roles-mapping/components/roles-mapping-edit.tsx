@@ -14,6 +14,8 @@ import {
   EuiConfirmModal,
   EuiFieldText,
 } from '@elastic/eui';
+import { FormattedMessage } from '@osd/i18n/react';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
@@ -85,7 +87,11 @@ export const RolesMappingEdit = ({
         }),
       );
 
-      ErrorHandler.info('Role mapping was successfully updated');
+      ErrorHandler.info(
+        i18n.translate('wazuh.security.rolesMappingEdit.updateSuccess', {
+          defaultMessage: 'Role mapping was successfully updated',
+        }),
+      );
     } catch (error) {
       const options = {
         context: `${RolesMappingEdit.name}.editRule`,
@@ -110,19 +116,34 @@ export const RolesMappingEdit = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.security.rolesMappingEdit.unsavedChangesModal.title',
+            { defaultMessage: 'Unsubmitted changes' },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
             setHasChanges(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText='Yes, do it'
+          cancelButtonText={i18n.translate(
+            'wazuh.security.rolesMappingEdit.unsavedChangesModal.cancelButton',
+            { defaultMessage: "No, don't do it" },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.rolesMappingEdit.unsavedChangesModal.confirmButton',
+            { defaultMessage: 'Yes, do it' },
+          )}
           defaultFocusedButton='confirm'
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.security.rolesMappingEdit.unsavedChangesModal.body',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -152,9 +173,18 @@ export const RolesMappingEdit = ({
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
             <h2>
-              Edit <strong>{rule.name}&nbsp;&nbsp;</strong>
+              <FormattedMessage
+                id='wazuh.security.rolesMappingEdit.title'
+                defaultMessage='Edit {ruleName}'
+                values={{ ruleName: <strong>{rule.name}&nbsp;&nbsp;</strong> }}
+              />
               {WzAPIUtils.isReservedID(rule.id) && (
-                <EuiBadge color='primary'>Reserved</EuiBadge>
+                <EuiBadge color='primary'>
+                  {i18n.translate(
+                    'wazuh.security.rolesMappingEdit.reservedBadge',
+                    { defaultMessage: 'Reserved' },
+                  )}
+                </EuiBadge>
               )}
             </h2>
           </EuiTitle>
@@ -162,10 +192,19 @@ export const RolesMappingEdit = ({
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Role name'
+              label={i18n.translate(
+                'wazuh.security.rolesMappingEdit.nameLabel',
+                { defaultMessage: 'Role name' },
+              )}
               isInvalid={false}
-              error={'Please provide a role name'}
-              helpText='Introduce a name for this role mapping.'
+              error={i18n.translate(
+                'wazuh.security.rolesMappingEdit.nameError',
+                { defaultMessage: 'Please provide a role name' },
+              )}
+              helpText={i18n.translate(
+                'wazuh.security.rolesMappingEdit.nameHelpText',
+                { defaultMessage: 'Introduce a name for this role mapping.' },
+              )}
             >
               <EuiFieldText
                 placeholder=''
@@ -176,13 +215,25 @@ export const RolesMappingEdit = ({
               />
             </EuiFormRow>
             <EuiFormRow
-              label='Roles'
+              label={i18n.translate(
+                'wazuh.security.rolesMappingEdit.rolesLabel',
+                { defaultMessage: 'Roles' },
+              )}
               isInvalid={false}
-              error={'At least one role must be selected.'}
-              helpText='Assign roles to your users.'
+              error={i18n.translate(
+                'wazuh.security.rolesMappingEdit.rolesError',
+                { defaultMessage: 'At least one role must be selected.' },
+              )}
+              helpText={i18n.translate(
+                'wazuh.security.rolesMappingEdit.rolesHelpText',
+                { defaultMessage: 'Assign roles to your users.' },
+              )}
             >
               <EuiComboBox
-                placeholder='Select roles'
+                placeholder={i18n.translate(
+                  'wazuh.security.rolesMappingEdit.rolesPlaceholder',
+                  { defaultMessage: 'Select roles' },
+                )}
                 options={getRolesList(roles)}
                 isDisabled={WzAPIUtils.isReservedID(rule.id)}
                 selectedOptions={selectedRoles}

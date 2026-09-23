@@ -11,6 +11,7 @@ import {
   EuiComboBox,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
@@ -90,10 +91,18 @@ export const CreateRole = ({ closeFlyout }) => {
         return;
       }
       ErrorHandler.info(
-        'Role was successfully created with the selected policies',
+        i18n.translate('wazuh.security.createRole.createSuccess', {
+          defaultMessage:
+            'Role was successfully created with the selected policies',
+        }),
       );
     } catch (error) {
-      ErrorHandler.handle(error, 'There was an error');
+      ErrorHandler.handle(
+        error,
+        i18n.translate('wazuh.security.createRole.createError', {
+          defaultMessage: 'There was an error',
+        }),
+      );
     }
     closeFlyout(true);
   };
@@ -111,18 +120,33 @@ export const CreateRole = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.security.createRole.unsavedChangesModal.title',
+            { defaultMessage: 'Unsubmitted changes' },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
             setHasChanges(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText='Yes, do it'
+          cancelButtonText={i18n.translate(
+            'wazuh.security.createRole.unsavedChangesModal.cancelButton',
+            { defaultMessage: "No, don't do it" },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.createRole.unsavedChangesModal.confirmButton',
+            { defaultMessage: 'Yes, do it' },
+          )}
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.security.createRole.unsavedChangesModal.body',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -149,16 +173,27 @@ export const CreateRole = ({ closeFlyout }) => {
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
-            <h2>New role</h2>
+            <h2>
+              {i18n.translate('wazuh.security.createRole.title', {
+                defaultMessage: 'New role',
+              })}
+            </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Role name'
+              label={i18n.translate('wazuh.security.createRole.nameLabel', {
+                defaultMessage: 'Role name',
+              })}
               isInvalid={roleNameError}
-              error={'Please provide a role name'}
-              helpText='Introduce a name for this new role.'
+              error={i18n.translate('wazuh.security.createRole.nameError', {
+                defaultMessage: 'Please provide a role name',
+              })}
+              helpText={i18n.translate(
+                'wazuh.security.createRole.nameHelpText',
+                { defaultMessage: 'Introduce a name for this new role.' },
+              )}
             >
               <EuiFieldText
                 placeholder=''
@@ -168,13 +203,23 @@ export const CreateRole = ({ closeFlyout }) => {
               />
             </EuiFormRow>
             <EuiFormRow
-              label='Policies'
+              label={i18n.translate('wazuh.security.createRole.policiesLabel', {
+                defaultMessage: 'Policies',
+              })}
               isInvalid={selectedPoliciesError}
-              error={'At least one policy must be selected.'}
-              helpText='Assign policies to the role.'
+              error={i18n.translate('wazuh.security.createRole.policiesError', {
+                defaultMessage: 'At least one policy must be selected.',
+              })}
+              helpText={i18n.translate(
+                'wazuh.security.createRole.policiesHelpText',
+                { defaultMessage: 'Assign policies to the role.' },
+              )}
             >
               <EuiComboBox
-                placeholder='Select policies'
+                placeholder={i18n.translate(
+                  'wazuh.security.createRole.policiesPlaceholder',
+                  { defaultMessage: 'Select policies' },
+                )}
                 options={policies}
                 selectedOptions={selectedPolicies}
                 onChange={onChangePolicies}
@@ -192,7 +237,9 @@ export const CreateRole = ({ closeFlyout }) => {
               fill
               onClick={createUser}
             >
-              Create role
+              {i18n.translate('wazuh.security.createRole.createButton', {
+                defaultMessage: 'Create role',
+              })}
             </WzButtonPermissions>
           </EuiForm>
         </EuiFlyoutBody>
