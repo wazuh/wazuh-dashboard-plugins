@@ -17,8 +17,7 @@ export const WAZUH_MENU_PAGE = {
   //endregion Menu
   //region SubMenu
   //region Modules
-  modulesDirectoryLink:
-    '.wz-menu-right-side  div.euiFlexGroup > div > button > span > span',
+  modulesDirectoryLink: '.wz-menu-right-side  div.euiFlexGroup > div > button > span > span',
   securityEventsLink: '[data-test-subj=menuModulesSecurityEventsLink]',
   integrityMonitoringLink: '[data-test-subj=menuModulesFimLink]',
   amazonAwsLink: '[data-test-subj=menuModulesAwsLink]',
