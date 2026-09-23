@@ -1,16 +1,24 @@
-export const TASK_RESULT = Symbol.for('healthcheck.taskResult');
+import type { TaskResultFactory } from '../../../../src/core/server';
+import type { TASK_RESULT as PLATFORM_TASK_RESULT } from '../../../../src/core/common/healthcheck';
+
+type TaskResultBrand = typeof PLATFORM_TASK_RESULT;
+
+// Without the annotation the cast widens to `symbol`.
+export const TASK_RESULT: TaskResultBrand = Symbol.for(
+  'healthcheck.taskResult',
+) as TaskResultBrand;
 
 // This plugin's CI job runs on a platform build that may lack the constructors,
 // so the mock builds its own.
-const taskResult = {
-  ok: (data?: unknown) => ({ [TASK_RESULT]: true, status: 'ok', data }),
-  warning: (message: string, data?: unknown) => ({
+const taskResult: TaskResultFactory = {
+  ok: data => ({ [TASK_RESULT]: true, status: 'ok', data }),
+  warning: (message, data) => ({
     [TASK_RESULT]: true,
     status: 'warning',
     message,
     data,
   }),
-  error: (message: string, data?: unknown) => ({
+  error: (message, data) => ({
     [TASK_RESULT]: true,
     status: 'error',
     message,
