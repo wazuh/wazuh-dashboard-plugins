@@ -6,6 +6,7 @@ import {
   EuiText,
   EuiTextColor,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import './appInfo.scss';
 
@@ -27,12 +28,23 @@ export const SettingsAboutAppInfo = ({
       >
         <EuiFlexItem>
           <EuiText>
-            App version: <b>{appInfo}</b>
+            {i18n.translate(
+              'wazuh.dashboardsSettings.aboutAppInfo.appVersionLabel',
+              {
+                defaultMessage: 'App version:',
+              },
+            )}{' '}
+            <b>{appInfo}</b>
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem className='wzAboutAppInfoClusterItem'>
           <EuiText>
-            Cluster UUID:{' '}
+            {i18n.translate(
+              'wazuh.dashboardsSettings.aboutAppInfo.clusterUuidLabel',
+              {
+                defaultMessage: 'Cluster UUID:',
+              },
+            )}{' '}
             <b>
               {clusterUuid ? (
                 clusterUuid

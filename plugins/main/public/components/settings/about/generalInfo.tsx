@@ -8,6 +8,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { getHttp } from '../../../kibana-services';
 import { getAssetURL } from '../../../utils/assets';
 
@@ -43,26 +44,45 @@ export const SettingsAboutGeneralInfo = ({
   return (
     <EuiFlexGroup gutterSize='l' direction='row' responsive>
       <Section
-        title={`Welcome to the ${pluginAppName}`}
+        title={i18n.translate(
+          'wazuh.dashboardsSettings.aboutGeneralInfo.welcomeTitle',
+          {
+            defaultMessage: 'Welcome to the {pluginAppName}',
+            values: { pluginAppName },
+          },
+        )}
         content={
           <EuiText size='m'>
             <p>
-              Dashboard provides management and monitoring capabilities, giving
-              users control over the infrastructure. You can monitor your agents
-              status and configuration, query and visualize your alert data and
-              monitor manager rules and configuration.
+              {i18n.translate(
+                'wazuh.dashboardsSettings.aboutGeneralInfo.welcomeDescription',
+                {
+                  defaultMessage:
+                    'Dashboard provides management and monitoring capabilities, giving users control over the infrastructure. You can monitor your agents status and configuration, query and visualize your alert data and monitor manager rules and configuration.',
+                },
+              )}
             </p>
           </EuiText>
         }
       />
       <Section
-        title='Community'
+        title={i18n.translate(
+          'wazuh.dashboardsSettings.aboutGeneralInfo.communityTitle',
+          {
+            defaultMessage: 'Community',
+          },
+        )}
         content={
           <div>
             <EuiText size='m'>
               <p>
-                Enjoy your experience and please don't hesitate to give us your
-                feedback.
+                {i18n.translate(
+                  'wazuh.dashboardsSettings.aboutGeneralInfo.communityDescription',
+                  {
+                    defaultMessage:
+                      "Enjoy your experience and please don't hesitate to give us your feedback.",
+                  },
+                )}
               </p>
             </EuiText>
             <EuiSpacer size='l' />
@@ -84,13 +104,21 @@ export const SettingsAboutGeneralInfo = ({
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <EuiButtonIcon
-                  aria-label='Google Groups'
+                  aria-label={i18n.translate(
+                    'wazuh.dashboardsSettings.aboutGeneralInfo.googleGroupsAriaLabel',
+                    { defaultMessage: 'Google Groups' },
+                  )}
                   iconType={googleGroupsSVG}
                   iconSize='xxl'
                   href='https://groups.google.com/forum/#!forum/wazuh'
                   target='_blank'
                 >
-                  Google groups
+                  {i18n.translate(
+                    'wazuh.dashboardsSettings.aboutGeneralInfo.googleGroupsButton',
+                    {
+                      defaultMessage: 'Google groups',
+                    },
+                  )}
                 </EuiButtonIcon>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>

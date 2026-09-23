@@ -33,6 +33,8 @@ import {
   EuiDescriptionList,
   EuiProgress,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { AppState } from '../../../react-services/app-state';
 import { withErrorBoundary } from '../../common/hocs';
 import { compose } from 'redux';
@@ -104,9 +106,14 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking available updates: ${
-              error.message || error
-            }`,
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.checkUpdatesErrorTitle',
+              {
+                defaultMessage:
+                  'Error checking available updates: {errorMessage}',
+                values: { errorMessage: error.message || error },
+              },
+            ),
           },
         };
 
@@ -132,7 +139,12 @@ export const ApiTable = compose(
         navigator.clipboard
           .writeText(msg)
           .then(() => {
-            ErrorHandler.info('Text copied to clipboard');
+            ErrorHandler.info(
+              i18n.translate(
+                'wazuh.dashboardsSettings.apiTable.copyToClipboardSuccessToast',
+                { defaultMessage: 'Text copied to clipboard' },
+              ),
+            );
           })
           .catch(() => {
             this.fallbackCopyToClipboard(msg);
@@ -151,9 +163,19 @@ export const ApiTable = compose(
       successful = document.execCommand('copy');
       document.body.removeChild(el);
       if (successful) {
-        ErrorHandler.info('Text copied to clipboard');
+        ErrorHandler.info(
+          i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.copyToClipboardSuccessToast',
+            { defaultMessage: 'Text copied to clipboard' },
+          ),
+        );
       } else {
-        ErrorHandler.error('Could not copy text');
+        ErrorHandler.error(
+          i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.copyToClipboardErrorToast',
+            { defaultMessage: 'Could not copy text' },
+          ),
+        );
       }
     }
 
@@ -179,7 +201,17 @@ export const ApiTable = compose(
         APIConnection.status = 'online';
         APIConnection.allow_run_as = allow_run_as;
         APIConnection.verify_ca = verify_ca;
-        !silent && ErrorHandler.info('Connection success', 'Settings');
+        !silent &&
+          ErrorHandler.info(
+            i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.connectionSuccessToast',
+              { defaultMessage: 'Connection success' },
+            ),
+            i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.connectionSuccessToastLocation',
+              { defaultMessage: 'Settings' },
+            ),
+          );
         // WORKAROUND: Update the apiEntries with the modifications of the APIConnection object
         this.setState({
           apiEntries: this.state.apiEntries,
@@ -212,7 +244,12 @@ export const ApiTable = compose(
         error: {
           error: error,
           message,
-          title: error.name || 'Error',
+          title:
+            error.name ||
+            i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.checkFailureErrorTitle',
+              { defaultMessage: 'Error' },
+            ),
         },
       });
     }
@@ -238,7 +275,15 @@ export const ApiTable = compose(
         const currentApi = AppState.getCurrentAPI();
         const currentApiJSON = JSON.parse(currentApi);
 
-        ErrorHandler.info(`API with id ${currentApiJSON.id} set as default`);
+        ErrorHandler.info(
+          i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.setDefaultSuccessToast',
+            {
+              defaultMessage: 'API with id {apiId} set as default',
+              values: { apiId: currentApiJSON.id },
+            },
+          ),
+        );
 
         this.setState({ selectedAPIConnection: currentApiJSON.id });
       } catch (error) {
@@ -271,7 +316,10 @@ export const ApiTable = compose(
             ? error
             : (error || {}).message ||
               ((error || {}).data || {}).message ||
-              'API is not reachable';
+              i18n.translate(
+                'wazuh.dashboardsSettings.apiTable.apiNotReachable',
+                { defaultMessage: 'API is not reachable' },
+              );
         const status = code === 3099 ? 'down' : 'unknown';
         APIconnection.status = { status, downReason };
         throw error;
@@ -357,7 +405,10 @@ export const ApiTable = compose(
               ? error
               : (error || {}).message ||
                 ((error || {}).data || {}).message ||
-                'API is not reachable';
+                i18n.translate(
+                  'wazuh.dashboardsSettings.apiTable.apiNotReachable',
+                  { defaultMessage: 'API is not reachable' },
+                );
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
           throw error;
@@ -375,9 +426,14 @@ export const ApiTable = compose(
           error: {
             error: error,
             message: error.message || error,
-            title: `Error checking manager connection: ${
-              error.message || error
-            }`,
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.checkConnectionErrorTitle',
+              {
+                defaultMessage:
+                  'Error checking manager connection: {errorMessage}',
+                values: { errorMessage: error.message || error },
+              },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -389,7 +445,13 @@ export const ApiTable = compose(
         return (
           <span>
             <EuiLoadingSpinner size='s' />
-            <span>&nbsp;&nbsp;Checking</span>
+            <span>
+              &nbsp;&nbsp;
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTable.status.checking',
+                { defaultMessage: 'Checking' },
+              )}
+            </span>
           </span>
         );
       }
@@ -399,7 +461,9 @@ export const ApiTable = compose(
       if (item === 'online') {
         return (
           <EuiHealth color='success' style={{ wordBreak: 'normal' }}>
-            Online
+            {i18n.translate('wazuh.dashboardsSettings.apiTable.status.online', {
+              defaultMessage: 'Online',
+            })}
           </EuiHealth>
         );
       }
@@ -408,7 +472,10 @@ export const ApiTable = compose(
           <EuiFlexGroup alignItems='center' gutterSize='xs' responsive={false}>
             <EuiFlexItem grow={false}>
               <EuiHealth color='warning' style={{ wordBreak: 'normal' }}>
-                Warning
+                {i18n.translate(
+                  'wazuh.dashboardsSettings.apiTable.status.warning',
+                  { defaultMessage: 'Warning' },
+                )}
               </EuiHealth>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
@@ -416,7 +483,10 @@ export const ApiTable = compose(
                 <EuiButtonIcon
                   color='primary'
                   iconType='questionInCircle'
-                  aria-label='Info about the error'
+                  aria-label={i18n.translate(
+                    'wazuh.dashboardsSettings.apiTable.errorInfoAriaLabel',
+                    { defaultMessage: 'Info about the error' },
+                  )}
                   onClick={() => this.copyToClipBoard(item.downReason)}
                 />
               </EuiToolTip>
@@ -428,7 +498,10 @@ export const ApiTable = compose(
         <EuiFlexGroup alignItems='center' gutterSize='xs' responsive={false}>
           <EuiFlexItem grow={false}>
             <EuiHealth color='danger' style={{ wordBreak: 'normal' }}>
-              Offline
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTable.status.offline',
+                { defaultMessage: 'Offline' },
+              )}
             </EuiHealth>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -436,7 +509,10 @@ export const ApiTable = compose(
               <EuiButtonIcon
                 color='primary'
                 iconType='questionInCircle'
-                aria-label='Info about the error'
+                aria-label={i18n.translate(
+                  'wazuh.dashboardsSettings.apiTable.errorInfoAriaLabel',
+                  { defaultMessage: 'Info about the error' },
+                )}
                 onClick={() => this.copyToClipBoard(item.downReason)}
               />
             </EuiToolTip>
@@ -450,7 +526,13 @@ export const ApiTable = compose(
         return (
           <EuiToolTip
             position='top'
-            content='The configured API user uses the authentication context.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.runAs.enabledTooltip',
+              {
+                defaultMessage:
+                  'The configured API user uses the authentication context.',
+              },
+            )}
           >
             <EuiIcon type='check' />
           </EuiToolTip>
@@ -462,7 +544,13 @@ export const ApiTable = compose(
         return (
           <EuiToolTip
             position='top'
-            content='The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.runAs.notAllowedTooltip',
+              {
+                defaultMessage:
+                  'The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.',
+              },
+            )}
           >
             <EuiIcon color='danger' type='alert' />
           </EuiToolTip>
@@ -471,7 +559,13 @@ export const ApiTable = compose(
       return (
         <EuiToolTip
           position='top'
-          content='The configured API user does not use authentication context.'
+          content={i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.runAs.disabledTooltip',
+            {
+              defaultMessage:
+                'The configured API user does not use authentication context.',
+            },
+          )}
         >
           <p>-</p>
         </EuiToolTip>
@@ -483,7 +577,10 @@ export const ApiTable = compose(
         return (
           <EuiToolTip
             position='top'
-            content='CA certificate verification is enabled.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.verifyCa.enabledTooltip',
+              { defaultMessage: 'CA certificate verification is enabled.' },
+            )}
           >
             <EuiIcon type='check' />
           </EuiToolTip>
@@ -493,7 +590,13 @@ export const ApiTable = compose(
         return (
           <EuiToolTip
             position='top'
-            content='CA certificate verification is disabled. Either certificate paths are not configured.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.verifyCa.disabledTooltip',
+              {
+                defaultMessage:
+                  'CA certificate verification is disabled. Either certificate paths are not configured.',
+              },
+            )}
           >
             <p>-</p>
           </EuiToolTip>
@@ -502,7 +605,12 @@ export const ApiTable = compose(
       return (
         <EuiToolTip
           position='top'
-          content='CA certificate verification status is unknown.'
+          content={i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.verifyCa.unknownTooltip',
+            {
+              defaultMessage: 'CA certificate verification status is unknown.',
+            },
+          )}
         >
           <p>-</p>
         </EuiToolTip>
@@ -533,10 +641,34 @@ export const ApiTable = compose(
 
     renderDescriptionList(items, versionData, isLoading) {
       const API_UPDATES_STATUS_COLUMN = {
-        upToDate: { text: 'Up to date', color: 'success' },
-        availableUpdates: { text: 'Available updates', color: 'warning' },
-        disabled: { text: 'Checking updates disabled', color: 'subdued' },
-        error: { text: 'Error checking updates', color: 'danger' },
+        upToDate: {
+          text: i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.updatesStatus.upToDate',
+            { defaultMessage: 'Up to date' },
+          ),
+          color: 'success',
+        },
+        availableUpdates: {
+          text: i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.updatesStatus.availableUpdates',
+            { defaultMessage: 'Available updates' },
+          ),
+          color: 'warning',
+        },
+        disabled: {
+          text: i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.updatesStatus.disabled',
+            { defaultMessage: 'Checking updates disabled' },
+          ),
+          color: 'subdued',
+        },
+        error: {
+          text: i18n.translate(
+            'wazuh.dashboardsSettings.apiTable.updatesStatus.error',
+            { defaultMessage: 'Error checking updates' },
+          ),
+          color: 'danger',
+        },
       };
 
       const api = items[0];
@@ -544,29 +676,62 @@ export const ApiTable = compose(
 
       if (api) {
         listItems.push(
-          { title: 'ID', description: <EuiText size='s'>{api.id}</EuiText> },
           {
-            title: 'Cluster',
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.id',
+              { defaultMessage: 'ID' },
+            ),
+            description: <EuiText size='s'>{api.id}</EuiText>,
+          },
+          {
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.cluster',
+              { defaultMessage: 'Cluster' },
+            ),
             description: (
               <EuiText size='s'>{api.cluster_info?.cluster ?? '—'}</EuiText>
             ),
           },
-          { title: 'Host', description: <EuiText size='s'>{api.url}</EuiText> },
           {
-            title: 'Port',
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.host',
+              { defaultMessage: 'Host' },
+            ),
+            description: <EuiText size='s'>{api.url}</EuiText>,
+          },
+          {
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.port',
+              { defaultMessage: 'Port' },
+            ),
             description: <EuiText size='s'>{api.port}</EuiText>,
           },
           {
-            title: 'Username',
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.username',
+              { defaultMessage: 'Username' },
+            ),
             description: <EuiText size='s'>{api.username}</EuiText>,
           },
-          { title: 'Status', description: this.renderStatusCell(api.status) },
           {
-            title: 'Run as',
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.status',
+              { defaultMessage: 'Status' },
+            ),
+            description: this.renderStatusCell(api.status),
+          },
+          {
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.runAs',
+              { defaultMessage: 'Run as' },
+            ),
             description: this.renderRunAsCell(api.allow_run_as),
           },
           {
-            title: 'Verify CA',
+            title: i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.verifyCa',
+              { defaultMessage: 'Verify CA' },
+            ),
             description: this.renderVerifyCaCell(api.verify_ca),
           },
         );
@@ -575,16 +740,26 @@ export const ApiTable = compose(
           const vs = api.version_status;
           const color = API_UPDATES_STATUS_COLUMN[vs]?.color ?? 'subdued';
           const content =
-            API_UPDATES_STATUS_COLUMN[vs]?.text ?? 'Never checked';
+            API_UPDATES_STATUS_COLUMN[vs]?.text ??
+            i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.updatesStatus.neverChecked',
+              { defaultMessage: 'Never checked' },
+            );
           listItems.push(
             {
-              title: 'Version',
+              title: i18n.translate(
+                'wazuh.dashboardsSettings.apiTable.details.version',
+                { defaultMessage: 'Version' },
+              ),
               description: (
                 <EuiText size='s'>{api.current_version ?? '—'}</EuiText>
               ),
             },
             {
-              title: 'Updates status',
+              title: i18n.translate(
+                'wazuh.dashboardsSettings.apiTable.details.updatesStatus',
+                { defaultMessage: 'Updates status' },
+              ),
               description: !this.state.refreshingAvailableUpdates ? (
                 <EuiFlexGroup
                   alignItems='center'
@@ -602,7 +777,20 @@ export const ApiTable = compose(
                         position='top'
                         content={
                           <p>
-                            Click <b>Check updates</b> to get information
+                            <FormattedMessage
+                              id='wazuh.dashboardsSettings.apiTable.updatesStatus.neverCheckedTooltip'
+                              defaultMessage='Click {checkUpdates} to get information'
+                              values={{
+                                checkUpdates: (
+                                  <b>
+                                    {i18n.translate(
+                                      'wazuh.dashboardsSettings.apiTable.updatesStatus.neverCheckedTooltipButton',
+                                      { defaultMessage: 'Check updates' },
+                                    )}
+                                  </b>
+                                ),
+                              }}
+                            />
                           </p>
                         }
                       >
@@ -616,8 +804,16 @@ export const ApiTable = compose(
                   {vs === 'availableUpdates' && (
                     <EuiFlexItem grow={false}>
                       <WzButtonOpenFlyout
-                        tooltip={{ content: 'View available updates' }}
-                        flyoutTitle='Available updates'
+                        tooltip={{
+                          content: i18n.translate(
+                            'wazuh.dashboardsSettings.apiTable.updatesStatus.viewAvailableUpdatesTooltip',
+                            { defaultMessage: 'View available updates' },
+                          ),
+                        }}
+                        flyoutTitle={i18n.translate(
+                          'wazuh.dashboardsSettings.apiTable.availableUpdatesFlyout.title',
+                          { defaultMessage: 'Available updates' },
+                        )}
                         flyoutBody={() => (
                           <AvailableUpdatesFlyout updates={versionData} />
                         )}
@@ -635,7 +831,10 @@ export const ApiTable = compose(
                         <EuiButtonIcon
                           color='primary'
                           iconType='questionInCircle'
-                          aria-label='Info about the error'
+                          aria-label={i18n.translate(
+                            'wazuh.dashboardsSettings.apiTable.errorInfoAriaLabel',
+                            { defaultMessage: 'Info about the error' },
+                          )}
                           onClick={() => this.copyToClipBoard(api.error.detail)}
                         />
                       </EuiToolTip>
@@ -645,7 +844,11 @@ export const ApiTable = compose(
               ) : (
                 <span>
                   <EuiLoadingSpinner size='s' />
-                  &nbsp;&nbsp;Checking
+                  &nbsp;&nbsp;
+                  {i18n.translate(
+                    'wazuh.dashboardsSettings.apiTable.status.checking',
+                    { defaultMessage: 'Checking' },
+                  )}
                 </span>
               ),
             },
@@ -656,12 +859,23 @@ export const ApiTable = compose(
       if (isLoading && !api) {
         return (
           <EuiText>
-            <EuiLoadingSpinner size='m' /> Loading…
+            <EuiLoadingSpinner size='m' />{' '}
+            {i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.loading',
+              { defaultMessage: 'Loading…' },
+            )}
           </EuiText>
         );
       }
       if (!api) {
-        return <EuiText color='subdued'>No API connection configured.</EuiText>;
+        return (
+          <EuiText color='subdued'>
+            {i18n.translate(
+              'wazuh.dashboardsSettings.apiTable.details.noItemsMessage',
+              { defaultMessage: 'No API connection configured.' },
+            )}
+          </EuiText>
+        );
       }
       return (
         <EuiFlexGroup>
@@ -707,7 +921,12 @@ export const ApiTable = compose(
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiTitle>
-                      <h2>API connection</h2>
+                      <h2>
+                        {i18n.translate(
+                          'wazuh.dashboardsSettings.apiTable.title',
+                          { defaultMessage: 'API connection' },
+                        )}
+                      </h2>
                     </EuiTitle>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -724,7 +943,10 @@ export const ApiTable = compose(
                       onClick={async () => await this.refreshFromUi()}
                       isLoading={this.state.refreshingEntries}
                     >
-                      Refresh
+                      {i18n.translate(
+                        'wazuh.dashboardsSettings.apiTable.refreshButton',
+                        { defaultMessage: 'Refresh' },
+                      )}
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
@@ -732,10 +954,13 @@ export const ApiTable = compose(
                       position='top'
                       content={
                         <p>
-                          Reloads the API entry from the dashboard configuration
-                          and runs a connectivity check against the Wazuh
-                          manager. If the manager is available, the API entry is
-                          updated.
+                          {i18n.translate(
+                            'wazuh.dashboardsSettings.apiTable.refreshTooltip',
+                            {
+                              defaultMessage:
+                                'Reloads the API entry from the dashboard configuration and runs a connectivity check against the Wazuh manager. If the manager is available, the API entry is updated.',
+                            },
+                          )}
                         </p>
                       }
                     >
@@ -743,7 +968,10 @@ export const ApiTable = compose(
                         display='empty'
                         color='primary'
                         iconType='questionInCircle'
-                        aria-label='What Refresh does'
+                        aria-label={i18n.translate(
+                          'wazuh.dashboardsSettings.apiTable.refreshTooltipAriaLabel',
+                          { defaultMessage: 'What Refresh does' },
+                        )}
                       />
                     </EuiToolTip>
                   </EuiFlexItem>
@@ -759,9 +987,15 @@ export const ApiTable = compose(
                       }
                     >
                       <span>
-                        Check updates{' '}
+                        {i18n.translate(
+                          'wazuh.dashboardsSettings.apiTable.checkUpdatesButton',
+                          { defaultMessage: 'Check updates' },
+                        )}{' '}
                         <EuiToolTip
-                          title='Last dashboard check'
+                          title={i18n.translate(
+                            'wazuh.dashboardsSettings.apiTable.lastDashboardCheckTooltip',
+                            { defaultMessage: 'Last dashboard check' },
+                          )}
                           content={
                             this.state.availableUpdates
                               ?.last_check_date_dashboard
@@ -785,8 +1019,13 @@ export const ApiTable = compose(
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-                  The manager API entry configured for this dashboard and its
-                  current status.
+                  {i18n.translate(
+                    'wazuh.dashboardsSettings.apiTable.description',
+                    {
+                      defaultMessage:
+                        'The manager API entry configured for this dashboard and its current status.',
+                    },
+                  )}
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -796,35 +1035,62 @@ export const ApiTable = compose(
               >
                 <EuiFlexItem>
                   <EuiCallOut
-                    title='Connection issue detected on the active API'
+                    title={i18n.translate(
+                      'wazuh.dashboardsSettings.apiTable.apiDownCallout.title',
+                      {
+                        defaultMessage:
+                          'Connection issue detected on the active API',
+                      },
+                    )}
                     iconType='alert'
                     color='danger'
                   >
                     <EuiText size='s'>
-                      The current API host is unreachable or not responding.
-                      Review the configuration and validate connectivity.
+                      {i18n.translate(
+                        'wazuh.dashboardsSettings.apiTable.apiDownCallout.description',
+                        {
+                          defaultMessage:
+                            'The current API host is unreachable or not responding. Review the configuration and validate connectivity.',
+                        },
+                      )}
                     </EuiText>
                     <EuiSpacer size='s' />
                     <EuiFlexGroup>
                       <EuiFlexItem grow={false}>
                         <WzButtonOpenFlyout
-                          flyoutTitle={
-                            'The API connection could be down or inaccessible'
-                          }
+                          flyoutTitle={i18n.translate(
+                            'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.title',
+                            {
+                              defaultMessage:
+                                'The API connection could be down or inaccessible',
+                            },
+                          )}
                           flyoutBody={() => {
                             const steps = [
                               {
-                                title: 'Check the API server service status',
+                                title: i18n.translate(
+                                  'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.checkServiceStep',
+                                  {
+                                    defaultMessage:
+                                      'Check the API server service status',
+                                  },
+                                ),
                                 children: (
                                   <>
                                     {[
                                       {
-                                        label: 'For Systemd',
+                                        label: i18n.translate(
+                                          'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.systemdLabel',
+                                          { defaultMessage: 'For Systemd' },
+                                        ),
                                         command:
                                           'sudo systemctl status wazuh-manager',
                                       },
                                       {
-                                        label: 'For SysV Init',
+                                        label: i18n.translate(
+                                          'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.sysVInitLabel',
+                                          { defaultMessage: 'For SysV Init' },
+                                        ),
                                         command:
                                           'sudo service wazuh-manager status',
                                       },
@@ -848,8 +1114,14 @@ export const ApiTable = compose(
                                                 onClick={copy}
                                               >
                                                 <p>
-                                                  <EuiIcon type='copy' /> Copy
-                                                  command
+                                                  <EuiIcon type='copy' />{' '}
+                                                  {i18n.translate(
+                                                    'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.copyCommand',
+                                                    {
+                                                      defaultMessage:
+                                                        'Copy command',
+                                                    },
+                                                  )}
                                                 </p>
                                               </div>
                                             )}
@@ -862,16 +1134,31 @@ export const ApiTable = compose(
                                 ),
                               },
                               {
-                                title: 'Review the API host configuration',
+                                title: i18n.translate(
+                                  'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.reviewConfigurationStep',
+                                  {
+                                    defaultMessage:
+                                      'Review the API host configuration',
+                                  },
+                                ),
                               },
                               {
-                                title: 'Check the API connection',
+                                title: i18n.translate(
+                                  'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.checkConnectionStep',
+                                  {
+                                    defaultMessage: 'Check the API connection',
+                                  },
+                                ),
                                 children: (
                                   <>
                                     <EuiText size='s'>
-                                      Reload the API configuration from the
-                                      dashboard host and verify manager
-                                      connectivity.
+                                      {i18n.translate(
+                                        'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.checkConnectionStepDescription',
+                                        {
+                                          defaultMessage:
+                                            'Reload the API configuration from the dashboard host and verify manager connectivity.',
+                                        },
+                                      )}
                                     </EuiText>
                                     <EuiSpacer size='s' />
                                     <EuiButton
@@ -881,7 +1168,10 @@ export const ApiTable = compose(
                                       }
                                       isLoading={this.state.refreshingEntries}
                                     >
-                                      Refresh
+                                      {i18n.translate(
+                                        'wazuh.dashboardsSettings.apiTable.troubleshootingFlyout.refreshButton',
+                                        { defaultMessage: 'Refresh' },
+                                      )}
                                     </EuiButton>
                                   </>
                                 ),
@@ -896,7 +1186,10 @@ export const ApiTable = compose(
                             buttonType: 'empty',
                           }}
                         >
-                          Troubleshooting
+                          {i18n.translate(
+                            'wazuh.dashboardsSettings.apiTable.troubleshootingButton',
+                            { defaultMessage: 'Troubleshooting' },
+                          )}
                         </WzButtonOpenFlyout>
                       </EuiFlexItem>
                     </EuiFlexGroup>

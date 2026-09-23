@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -83,7 +84,13 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Cannot initialize Settings`,
+          title: i18n.translate(
+            'wazuh.dashboardsSettings.settings.initErrorTitle',
+            {
+              defaultMessage: '{errorName}: Cannot initialize Settings',
+              values: { errorName: error.name },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
