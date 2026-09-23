@@ -1048,7 +1048,10 @@ export const WQL = {
       field: ({ value }) =>
         fieldsSuggestion.includes(value)
           ? undefined
-          : `"${value}" is not valid field.`,
+          : i18n.translate('wazuh.core.searchBar.wql.unknownField', {
+              defaultMessage: '"{field}" is not valid field.',
+              values: { field: value },
+            }),
       ...(params.queryLanguage.parameters?.validate?.value
         ? {
             value: params.queryLanguage.parameters?.validate?.value,
