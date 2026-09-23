@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
@@ -13,35 +14,90 @@ export const getDashboard = (indexPatternId: string) => {
       'registry-keys-inventory',
       {
         size: 5,
-        fieldCustomLabel: 'Top 5 registry paths',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.topRegistryPathsLabel',
+          {
+            defaultMessage: 'Top 5 registry paths',
+          },
+        ),
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.owner',
-      'Registry owners',
+      i18n.translate(
+        'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryOwnersTitle',
+        {
+          defaultMessage: 'Registry owners',
+        },
+      ),
       'registry-keys-inventory',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Registry owner count',
+        otherBucket: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.ownersOthersBucketLabel',
+          {
+            defaultMessage: 'Others',
+          },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryOwnerCountLabel',
+          {
+            defaultMessage: 'Registry owner count',
+          },
+        ),
         valueAxesTitleText: ' ',
-        fieldCustomLabel: 'Registry owner',
-        seriesLabel: 'Registry owner',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryOwnerLabel',
+          {
+            defaultMessage: 'Registry owner',
+          },
+        ),
+        seriesLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryOwnerSeriesLabel',
+          {
+            defaultMessage: 'Registry owner',
+          },
+        ),
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.group',
-      'Registry groups',
+      i18n.translate(
+        'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryGroupsTitle',
+        {
+          defaultMessage: 'Registry groups',
+        },
+      ),
       'registry-keys-inventory',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Registry groups count',
+        otherBucket: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.groupsOthersBucketLabel',
+          {
+            defaultMessage: 'Others',
+          },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryGroupsCountLabel',
+          {
+            defaultMessage: 'Registry groups count',
+          },
+        ),
         valueAxesTitleText: ' ',
-        fieldCustomLabel: 'Registry group',
-        seriesLabel: 'Registry group',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryGroupLabel',
+          {
+            defaultMessage: 'Registry group',
+          },
+        ),
+        seriesLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryKeysDashboard.registryGroupSeriesLabel',
+          {
+            defaultMessage: 'Registry group',
+          },
+        ),
       },
     ),
   ]);

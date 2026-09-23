@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
@@ -13,7 +14,12 @@ export const getDashboard = (indexPatternId: string) => {
       'registry-values-inventory',
       {
         size: 5,
-        fieldCustomLabel: 'Top 5 registry paths',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryValuesDashboard.topRegistryPathsLabel',
+          {
+            defaultMessage: 'Top 5 registry paths',
+          },
+        ),
       },
     ),
     getVisStateTable(
@@ -23,21 +29,51 @@ export const getDashboard = (indexPatternId: string) => {
       'registry-values-inventory',
       {
         size: 5,
-        fieldCustomLabel: 'Top 5 registry values',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryValuesDashboard.topRegistryValuesLabel',
+          {
+            defaultMessage: 'Top 5 registry values',
+          },
+        ),
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'registry.data.type',
-      'Data types',
+      i18n.translate(
+        'wazuh.fileIntegrityMonitoring.registryValuesDashboard.dataTypesTitle',
+        {
+          defaultMessage: 'Data types',
+        },
+      ),
       'registry-values-inventory',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Registry data type count',
+        otherBucket: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryValuesDashboard.othersBucketLabel',
+          {
+            defaultMessage: 'Others',
+          },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryValuesDashboard.registryDataTypeCountLabel',
+          {
+            defaultMessage: 'Registry data type count',
+          },
+        ),
         valueAxesTitleText: ' ',
-        fieldCustomLabel: 'Registry data type',
-        seriesLabel: 'Registry data type',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryValuesDashboard.registryDataTypeLabel',
+          {
+            defaultMessage: 'Registry data type',
+          },
+        ),
+        seriesLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.registryValuesDashboard.registryDataTypeSeriesLabel',
+          {
+            defaultMessage: 'Registry data type',
+          },
+        ),
       },
     ),
   ]);
