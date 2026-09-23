@@ -41,6 +41,8 @@ import { Selector, SelectorContainer, SelectorLabel } from './selectors';
 import { isEqual } from 'lodash';
 import { WzAuthentication } from '../../react-services/wz-authentication';
 import { fetchManagerApiHostsList } from '../../react-services/manager-api-session-sync';
+import { SERVER_NOT_RECOVERED_MESSAGE } from '../../react-services/check-daemons-status';
+import { i18n } from '@osd/i18n';
 
 // =============================================================================
 // Header: Server API selector (only rendered when isCCS)
@@ -59,7 +61,11 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
   const notSelected = !Boolean(currentAPI);
   const actionError =
     action.error?.message ||
-    (!action.running && notSelected && 'Server API is not selected');
+    (!action.running &&
+      notSelected &&
+      i18n.translate('wazuh.core.serverApiSelector.notSelected', {
+        defaultMessage: 'Server API is not selected',
+      }));
 
   const isInvalid = Boolean(actionError);
 
@@ -107,7 +113,9 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error changing the selected API`,
+          title: i18n.translate('wazuh.core.serverApiSelector.changeError', {
+            defaultMessage: 'Error changing the selected API',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -121,7 +129,9 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
           actionError={actionError}
           showSelectorsInPopover={showSelectorsInPopover}
         >
-          Manager API
+          {i18n.translate('wazuh.core.serverApiSelector.label', {
+            defaultMessage: 'Manager API',
+          })}
         </SelectorLabel>
         <Selector showSelectorsInPopover={showSelectorsInPopover}>
           <div style={style}>
@@ -135,7 +145,10 @@ const ServerAPISelector = ({ showSelectorsInPopover }) => {
               }
               value={currentAPI?.id}
               onChange={changeAPI}
-              aria-label='API selector'
+              aria-label={i18n.translate(
+                'wazuh.core.serverApiSelector.ariaLabel',
+                { defaultMessage: 'API selector' },
+              )}
               hasNoInitialSelection={notSelected}
               isInvalid={isInvalid}
               append={
@@ -209,15 +222,23 @@ export const WzMenu = withWindowSize(
                 </EuiFlexItem>
               )}
             {this.props.state.wazuhNotReadyYet ===
-              'Server could not be recovered.' && (
+              SERVER_NOT_RECOVERED_MESSAGE && (
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   grow={false}
                   onClick={() => NavigationService.getInstance().reload()}
                   className='WzNotReadyButton'
-                  aria-label='Reload'
+                  aria-label={i18n.translate(
+                    'wazuh.core.serverNotReadyCallout.reload',
+                    { defaultMessage: 'Reload' },
+                  )}
                 >
-                  <span> Reload </span>
+                  <span>
+                    {' '}
+                    {i18n.translate('wazuh.core.serverNotReadyCallout.reload', {
+                      defaultMessage: 'Reload',
+                    })}{' '}
+                  </span>
                 </EuiButtonEmpty>
               </EuiFlexItem>
             )}
@@ -229,14 +250,22 @@ export const WzMenu = withWindowSize(
 
     render() {
       const openSelectorsButton = (
-        <EuiToolTip position='bottom' content='Show selectors'>
+        <EuiToolTip
+          position='bottom'
+          content={i18n.translate('wazuh.core.menu.showSelectors', {
+            defaultMessage: 'Show selectors',
+          })}
+        >
           <EuiButtonEmpty
             iconType='boxesVertical'
             iconSide='right'
             style={{ position: 'relative', right: 0 }}
             onClick={() => this.switchSelectorsPopOver()}
             size='s'
-            aria-label='Open selectors'
+            aria-label={i18n.translate(
+              'wazuh.core.menu.openSelectorsAriaLabel',
+              { defaultMessage: 'Open selectors' },
+            )}
           ></EuiButtonEmpty>
         </EuiToolTip>
       );

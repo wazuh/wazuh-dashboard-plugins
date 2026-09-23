@@ -9,6 +9,7 @@ import {
 import { tokenizer as tokenizerUQL } from './aql';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_DISPLAY_COUNT } from '../../../../common/constants';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { i18n } from '@osd/i18n';
 
 /* UI Query language
 https://documentation.wazuh.com/current/user-manual/wazuh-dashboard/global-queries.html
@@ -48,11 +49,21 @@ const language = {
     // eslint-disable-next-line camelcase
     operator_compare: {
       literal: {
-        '=': 'equality',
-        '!=': 'not equality',
-        '>': 'bigger',
-        '<': 'smaller',
-        '~': 'like as',
+        '=': i18n.translate('wazuh.core.searchBar.wql.operatorEquality', {
+          defaultMessage: 'equality',
+        }),
+        '!=': i18n.translate('wazuh.core.searchBar.wql.operatorNotEquality', {
+          defaultMessage: 'not equality',
+        }),
+        '>': i18n.translate('wazuh.core.searchBar.wql.operatorBigger', {
+          defaultMessage: 'bigger',
+        }),
+        '<': i18n.translate('wazuh.core.searchBar.wql.operatorSmaller', {
+          defaultMessage: 'smaller',
+        }),
+        '~': i18n.translate('wazuh.core.searchBar.wql.operatorLike', {
+          defaultMessage: 'like as',
+        }),
       },
     },
     conjunction: {
@@ -64,8 +75,12 @@ const language = {
     // eslint-disable-next-line camelcase
     operator_group: {
       literal: {
-        '(': 'open group',
-        ')': 'close group',
+        '(': i18n.translate('wazuh.core.searchBar.wql.openGroup', {
+          defaultMessage: 'open group',
+        }),
+        ')': i18n.translate('wazuh.core.searchBar.wql.closeGroup', {
+          defaultMessage: 'close group',
+        }),
       },
     },
   },
@@ -376,8 +391,14 @@ export async function getSuggestions(
       // Search function
       {
         type: 'function_search',
-        label: 'Search',
-        description: 'run the search query',
+        label: i18n.translate(
+          'wazuh.core.searchBar.wql.searchSuggestionLabel',
+          { defaultMessage: 'Search' },
+        ),
+        description: i18n.translate(
+          'wazuh.core.searchBar.wql.searchSuggestionDescription',
+          { defaultMessage: 'run the search query' },
+        ),
       },
       // fields
       ...(await options.suggestions.field()).map(mapSuggestionCreatorField),
@@ -481,8 +502,14 @@ export async function getSuggestions(
           ? [
               {
                 type: 'function_search',
-                label: 'Search',
-                description: 'run the search query',
+                label: i18n.translate(
+                  'wazuh.core.searchBar.wql.searchSuggestionLabel',
+                  { defaultMessage: 'Search' },
+                ),
+                description: i18n.translate(
+                  'wazuh.core.searchBar.wql.searchSuggestionDescription',
+                  { defaultMessage: 'run the search query' },
+                ),
               },
             ]
           : []),
@@ -757,9 +784,17 @@ function validateTokenValue(token: IToken): string | undefined {
     );
 
   return [
-    `"${value}" is not a valid value.`,
+    i18n.translate('wazuh.core.searchBar.wql.invalidValue', {
+      defaultMessage: '"{value}" is not a valid value.',
+      values: { value },
+    }),
     ...(invalidCharacters.length
-      ? [`Invalid characters found: ${invalidCharacters.join('')}`]
+      ? [
+          i18n.translate('wazuh.core.searchBar.wql.invalidCharacters', {
+            defaultMessage: 'Invalid characters found: {characters}',
+            values: { characters: invalidCharacters.join('') },
+          }),
+        ]
       : []),
   ].join(' ');
 }
@@ -875,13 +910,27 @@ function validate(
               },
             );
             if (validate.field(token)) {
-              errors.push(`"${token.value}" is not a valid field.`);
+              errors.push(
+                i18n.translate('wazuh.core.searchBar.wql.invalidField', {
+                  defaultMessage: '"{field}" is not a valid field.',
+                  values: { field: token.value },
+                }),
+              );
             } else if (!tokenOperatorNearToField) {
               errors.push(
-                `The operator for field "${token.value}" is missing.`,
+                i18n.translate('wazuh.core.searchBar.wql.missingOperator', {
+                  defaultMessage:
+                    'The operator for field "{field}" is missing.',
+                  values: { field: token.value },
+                }),
               );
             } else if (!tokenValueNearToField) {
-              errors.push(`The value for field "${token.value}" is missing.`);
+              errors.push(
+                i18n.translate('wazuh.core.searchBar.wql.missingValue', {
+                  defaultMessage: 'The value for field "{field}" is missing.',
+                  values: { field: token.value },
+                }),
+              );
             }
           }
           // Check if the value is allowed
@@ -937,11 +986,19 @@ function validate(
             );
             !tokenWhitespaceNearToFieldNext?.value?.length &&
               errors.push(
-                `There is no whitespace after conjunction "${token.value}".`,
+                i18n.translate('wazuh.core.searchBar.wql.missingWhitespace', {
+                  defaultMessage:
+                    'There is no whitespace after conjunction "{conjunction}".',
+                  values: { conjunction: token.value },
+                }),
               );
             !tokenFieldNearToFieldNext?.value?.length &&
               errors.push(
-                `There is no sentence after conjunction "${token.value}".`,
+                i18n.translate('wazuh.core.searchBar.wql.missingSentence', {
+                  defaultMessage:
+                    'There is no sentence after conjunction "{conjunction}".',
+                  values: { conjunction: token.value },
+                }),
               );
           }
         }
@@ -957,8 +1014,10 @@ function validate(
 export const WQL = {
   id: 'wql',
   label: 'WQL',
-  description:
-    'WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.',
+  description: i18n.translate('wazuh.core.searchBar.wql.description', {
+    defaultMessage:
+      'WQL (Wazuh Query Language) provides a human query syntax based on the Wazuh API query language.',
+  }),
   documentationLink: webDocumentationLink(
     'user-manual/wazuh-dashboard/global-queries.html#wql-queries',
   ),
@@ -1017,7 +1076,10 @@ export const WQL = {
             suggestions: transformSuggestionsToEuiSuggestItem(
               output.error.map(error => ({
                 type: 'validation_error',
-                label: 'Invalid',
+                label: i18n.translate(
+                  'wazuh.core.searchBar.wql.validationErrorLabel',
+                  { defaultMessage: 'Invalid' },
+                ),
                 description: error,
               })),
             ),
@@ -1032,7 +1094,10 @@ export const WQL = {
     return {
       filterButtons: params.queryLanguage.parameters?.options?.filterButtons ? (
         <EuiButtonGroup
-          legend='Search bar button filters'
+          legend={i18n.translate(
+            'wazuh.core.searchBar.wql.filterButtonsLegend',
+            { defaultMessage: 'Search bar button filters' },
+          )}
           name='textAlign'
           buttonSize='m'
           options={params.queryLanguage.parameters?.options?.filterButtons.map(
@@ -1067,7 +1132,10 @@ export const WQL = {
             ? [
                 {
                   type: 'validation_error',
-                  label: 'Invalid',
+                  label: i18n.translate(
+                    'wazuh.core.searchBar.wql.validationErrorLabel',
+                    { defaultMessage: 'Invalid' },
+                  ),
                   description: validationPartial,
                 },
               ]
