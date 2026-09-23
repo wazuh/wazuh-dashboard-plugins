@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for ISO 27001 requirements
- * Copyright (C) 2026 Wazuh, Inc.
+ * Copyright (C) 2015-2026 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,328 +9,483 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const iso27001RequirementsFile = {
-  // 'A.5': 'Information Security Policies.',
-  'A.5.1':
-    'Management direction of information security - To provide management direction and support for information security in accordance with business requirements and relevant laws and regulations',
-  'A.5.1.1':
-    'Policies for Information Security - The policies for information security shall be reviewed at planned intervals or if significant changes occur to ensure their continuing suitability, adequacy and effectiveness',
-  'A.5.1.2':
-    'Review of the policies for information security - The policies for information security shall be reviewed at planned intervals or if significant changes occur to ensure their continuing suitability, adequacy and effectiveness.',
-  // 'A.6': 'Organization of Information Security',
-  'A.6.1':
-    'Internal organization - Establish a management framework to initiate and control the implementation and operation of information security within the organization.',
-  'A.6.1.1':
-    'Information security roles and responsibilities - All information security responsibilities shall be defined and allocated.',
-  'A.6.1.2':
-    "Segregation of duties - Conflicting duties and areas of responsibility shall be segregated to reduce opportunities for unauthorized or unintentional modification or misuse of the organization's assets.",
-  'A.6.1.3':
-    'Contact with authorities - Appropriate contacts with relevant authorities shall be maintained.',
-  'A.6.1.4':
-    'Contact with special interest groups - Appropriate contacts with special interest groups or other specialist security forums and professional associations shall be maintained.',
-  'A.6.1.5':
-    'Information security in project management - Information security shall be addressed in project management, regardless of the type of project.',
-  'A.6.2':
-    'Mobile devices and teleworking - Ensure the security of teleworking and the use of mobile devices.',
-  'A.6.2.1':
-    'Mobile device policy - A policy and supporting security measures shall be adopted to manage the risks introduced by using mobile devices.',
-  'A.6.2.2':
-    'Teleworking - A policy and supporting security measures shall be implemented to protect information accessed, processed or stored at teleworking sites.',
-  // 'A.7': 'Human Resource Security',
-  'A.7.1':
-    'Prior to employment - Ensure that employees and contractors understand their responsibilities and are suitable for their roles.',
-  'A.7.1.1':
-    'Screening - Background verification checks shall be carried out in accordance with laws, regulations, ethics, and business requirements.',
-  'A.7.1.2':
-    'Terms and conditions of employment - Contracts shall state employee, contractor, and organizational responsibilities for information security.',
-  'A.7.2':
-    'During employment - Ensure employees and contractors are aware of and fulfil their information security responsibilities.',
-  'A.7.2.1':
-    'Management responsibilities - Management shall require all personnel to apply information security in accordance with established policies and procedures.',
-  'A.7.2.2':
-    'Information security awareness, education and training - All employees and relevant contractors shall receive appropriate awareness training and regular updates.',
-  'A.7.2.3':
-    'Disciplinary process - A formal disciplinary process shall exist to address information security breaches.',
-  'A.7.3':
-    'Termination and change of employment - Protect the organization’s interests during employment changes or termination.',
-  'A.7.3.1':
-    'Termination or change of employment responsibilities - Post‑employment information security responsibilities shall be defined, communicated, and enforced.',
-  // 'A.8': 'Asset Management',
-  'A.8.1':
-    'Responsibility for assets - Identify organizational assets and define protection responsibilities.',
-  'A.8.1.1':
-    'Inventory of assets - Assets shall be identified and an inventory maintained.',
-  'A.8.1.2': 'Ownership of assets - Assets in the inventory shall be owned.',
-  'A.8.1.3':
-    'Acceptable use of assets - Rules for acceptable use of information and associated assets shall be documented and implemented.',
-  'A.8.1.4':
-    'Return of assets - All organizational assets shall be returned upon termination of employment or contract.',
-  'A.8.2':
-    'Information classification - Ensure information receives appropriate protection.',
-  'A.8.2.1':
-    'Classification of information - Information shall be classified based on legal requirements, value, criticality, and sensitivity.',
-  'A.8.2.2':
-    'Labeling of information - Procedures for information labelling shall be developed and implemented.',
-  'A.8.2.3':
-    'Handling of assets - Procedures for handling assets shall follow the information classification scheme.',
-  'A.8.3':
-    'Media handling - Prevent unauthorized disclosure, modification, removal, or destruction of information stored on media.',
-  'A.8.3.1':
-    'Management of removable media - Procedures shall be implemented for managing removable media in accordance with the classification scheme.',
-  'A.8.3.2':
-    'Disposal of media - Media shall be disposed of securely using formal procedures.',
-  'A.8.3.3':
-    'Physical media transfer - Media shall be protected against unauthorized access, misuse, or corruption during transport.',
-  // 'A.9': 'Access Control',
-  'A.9.1':
-    'Business requirements of access control - Limit access to information and processing facilities.',
-  'A.9.1.1':
-    'Access control policy - An access control policy shall be established, documented, and reviewed.',
-  'A.9.1.2':
-    'Access to networks and network services - Users shall only be provided access to authorized network services.',
-  'A.9.2':
-    'User access management - Ensure authorized access and prevent unauthorized access.',
-  'A.9.2.1':
-    'User registration and de-registration - A formal process shall be implemented to assign and revoke access rights.',
-  'A.9.2.2':
-    'User access provisioning - A formal process shall assign or revoke access rights for all user types.',
-  'A.9.2.3':
-    'Management of privileged access rights - Allocation and use of privileged access rights shall be restricted and controlled.',
-  'A.9.2.4':
-    'Management of secret authentication information - Allocation of secret authentication information shall be controlled through a formal process.',
-  'A.9.2.5':
-    'Review of user access rights - Asset owners shall review user access rights at regular intervals.',
-  'A.9.2.6':
-    'Removal or adjustment of access rights - Access rights of all employees and external users shall be removed upon termination or adjusted upon change of employment or contract.',
-  'A.9.3':
-    'User responsibilities - Prevent unauthorized access to systems and applications.',
-  'A.9.3.1':
-    'User responsibilities - Users shall be accountable for safeguarding their authentication information.',
-  'A.9.4':
-    'System and application access control - Prevent unauthorized access to systems and applications.',
-  'A.9.4.1':
-    'Information access restriction - Access to information and application system functions shall be restricted in accordance with the access control policy.',
-  'A.9.4.2':
-    'Secure log-on procedures - Where required by policy, access to systems and applications shall be controlled by a secure log‑on procedure.',
-  'A.9.4.3':
-    'Password management system - Password management systems shall be interactive and ensure quality passwords.',
-  'A.9.4.4':
-    'Use of privileged utility programs - Use of utility programs capable of overriding system or application controls shall be restricted and tightly controlled.',
-  'A.9.4.5':
-    'Access control to program source code - Access to program source code shall be restricted.',
-  // 'A.10': 'Cryptography',
-  'A.10.1':
-    'Cryptographic controls - Ensure proper and effective use of cryptography to protect confidentiality, authenticity, and integrity of information.',
-  'A.10.1.1':
-    'Policy on the use of cryptographic controls - A policy for the use of cryptographic controls to protect information shall be developed and implemented.',
-  'A.10.1.2':
-    'Key management - A policy on the use, protection, and lifecycle management of cryptographic keys shall be developed and implemented.',
-  // 'A.11': 'Physical and Environmental Security',
-  'A.11.1':
-    'Secure areas - Prevent unauthorized physical access, damage, and interference to information and information processing facilities.',
-  'A.11.1.1':
-    'Physical security perimeter - Security perimeters shall be defined and used to protect areas containing sensitive or critical information and processing facilities.',
-  'A.11.1.2':
-    'Physical entry controls - Secure areas shall be protected by appropriate entry controls to ensure only authorized personnel are allowed access.',
-  'A.11.1.3':
-    'Securing offices, rooms and facilities - Physical security for offices, rooms, and facilities shall be designed and applied.',
-  'A.11.1.4':
-    'Protecting against external and environmental threats - Physical protection against natural disasters, malicious attacks, or accidents shall be designed and applied.',
-  'A.11.1.5':
-    'Working in secure areas - Procedures for working in secure areas shall be designed and applied.',
-  'A.11.1.6':
-    'Delivery and loading areas - Access points such as delivery and loading areas shall be controlled and, if possible, isolated from information processing facilities to avoid unauthorized access.',
-  'A.11.2':
-    'Equipment - Prevent loss, damage, theft, or compromise of assets and avoid operational interruptions.',
-  'A.11.2.1':
-    'Equipment siting and protection - Equipment shall be sited and protected to reduce risks from environmental threats, hazards, and unauthorized access.',
-  'A.11.2.2':
-    'Supporting utilities - Equipment shall be protected from power failures and other disruptions caused by failures in supporting utilities.',
-  'A.11.2.3':
-    'Cabling security - Power and telecommunications cabling carrying data or supporting information services shall be protected from interception, interference, or damage.',
-  'A.11.2.4':
-    'Equipment maintenance - Equipment shall be correctly maintained to ensure continued availability and integrity.',
-  'A.11.2.5':
-    'Removal of assets - Equipment, information, or software shall not be taken off‑site without prior authorization.',
-  'A.11.2.6':
-    'Security of equipment and assets off‑premises - Security shall be applied to off‑site assets, considering the different risks of working outside the organization’s premises.',
-  'A.11.2.7':
-    'Secure disposal or re‑use of equipment - All equipment containing storage media shall be verified to ensure sensitive data and licensed software have been removed or securely overwritten before disposal or re‑use.',
-  'A.11.2.8':
-    'Unattended user equipment - Users shall ensure that unattended equipment has appropriate protection.',
-  'A.11.2.9':
-    'Clear desk and clear screen policy - A clear desk policy for papers and removable media, and a clear screen policy for information processing facilities, shall be adopted.',
-  // 'A.12': 'Operations Security',
-  'A.12.1':
-    'Operational procedures and responsibilities - Ensure correct and secure operations of information processing facilities.',
-  'A.12.1.1':
-    'Documented operating procedures - Operating procedures shall be documented and made available to all users who need them.',
-  'A.12.1.2':
-    'Change management - Changes to the organization, business processes, information processing facilities, and systems that affect information security shall be controlled.',
-  'A.12.1.3':
-    'Capacity management - Resource usage shall be monitored, tuned, and projected to ensure required system performance.',
-  'A.12.1.4':
-    'Separation of development, testing and operational environments - These environments shall be separated to reduce risks of unauthorized access or changes to the operational environment.',
-  'A.12.2':
-    'Protection from malware - Ensure information and information processing facilities are protected against malware.',
-  'A.12.2.1':
-    'Controls against malware - Detection, prevention, and recovery controls against malware shall be implemented, combined with appropriate user awareness.',
-  'A.12.3': 'Backup - Protect against loss of data.',
-  'A.12.3.1':
-    'Information backup - Backup copies of information, software, and system images shall be taken and tested regularly in accordance with an agreed backup policy.',
-  'A.12.4': 'Logging and monitoring - Record events and generate evidence.',
-  'A.12.4.1':
-    'Event logging - Event logs recording user activities, exceptions, faults, and information security events shall be produced, kept, and regularly reviewed.',
-  'A.12.4.2':
-    'Protection of log information - Logging facilities and log information shall be protected against tampering and unauthorized access.',
-  'A.12.4.3':
-    'Administrator and operator logs - System administrator and operator activities shall be logged, protected, and regularly reviewed.',
-  'A.12.4.4':
-    'Clock synchronization - Clocks of all relevant information processing systems shall be synchronized to a single reference time source.',
-  'A.12.5':
-    'Control of operational software - Ensure the integrity of operational systems.',
-  'A.12.5.1':
-    'Installation of software on operational systems - Procedures shall be implemented to control the installation of software on operational systems.',
-  'A.12.6':
-    'Technical vulnerability management - Prevent exploitation of technical vulnerabilities.',
-  'A.12.6.1':
-    'Management of technical vulnerabilities - Information about technical vulnerabilities shall be obtained in a timely manner, exposure evaluated, and appropriate measures taken.',
-  'A.12.6.2':
-    'Restrictions on software installation - Rules governing software installation by users shall be established and implemented.',
-  'A.12.7':
-    'Information systems audit considerations - Minimize the impact of audit activities on operational systems.',
-  'A.12.7.1':
-    'Information systems audit controls - Audit requirements and activities shall be carefully planned and agreed to minimize disruptions to business processes.',
-  // 'A.13': 'Communications Security',
-  'A.13.1':
-    'Network security management - Ensure protection of information in networks and supporting information processing facilities.',
-  'A.13.1.1':
-    'Network controls - Networks shall be managed and controlled to protect information in systems and applications.',
-  'A.13.1.2':
-    'Security of network services - Security mechanisms, service levels, and management requirements of all network services shall be identified and included in service agreements, whether provided in‑house or outsourced.',
-  'A.13.1.3':
-    'Segregation in networks - Groups of information services, users, and information systems shall be segregated on networks.',
-  'A.13.2':
-    'Information transfer - Maintain the security of information transferred within the organization and with external entities.',
-  'A.13.2.1':
-    'Information transfer policies and procedures - Formal transfer policies, procedures, and controls shall protect information transferred via all communication facilities.',
-  'A.13.2.2':
-    'Agreements on information transfer - Agreements shall address the secure transfer of business information between the organization and external parties.',
-  'A.13.2.3':
-    'Electronic messaging - Information involved in electronic messaging shall be appropriately protected.',
-  'A.13.2.4':
-    'Confidentiality or non‑disclosure agreements - Requirements for confidentiality or non‑disclosure agreements shall be identified, documented, and regularly reviewed to reflect organizational needs.',
-  // 'A.14': 'System acquisition, development and maintenance',
-  'A.14.1':
-    'Security requirements of information systems - Ensure information security is integrated into information systems across their entire lifecycle, including systems providing services over public networks.',
-  'A.14.1.1':
-    'Information security requirements analysis and specification - Information security requirements shall be included in requirements for new systems or enhancements to existing systems.',
-  'A.14.1.2':
-    'Securing application services on public networks - Information in application services passing over public networks shall be protected from fraudulent activity, contract disputes, and unauthorized disclosure or modification.',
-  'A.14.1.3':
-    'Protecting application service transactions - Information in application service transactions shall be protected to prevent incomplete transmission, misrouting, unauthorized alteration, unauthorized disclosure, duplication, or replay.',
-  'A.14.2':
-    'Security in development and support processes - Ensure information security is designed and implemented within the development lifecycle.',
-  'A.14.2.1':
-    'Secure development policy - Rules for secure software and system development shall be established and applied.',
-  'A.14.2.2':
-    'System change control procedures - Changes to systems within the development lifecycle shall be controlled through formal change control procedures.',
-  'A.14.2.3':
-    'Technical review of applications after operating platform changes - Business‑critical applications shall be reviewed and tested after platform changes to ensure no adverse operational or security impact.',
-  'A.14.2.4':
-    'Restrictions on changes to software packages - Modifications to software packages shall be discouraged, limited to necessary changes, and strictly controlled.',
-  'A.14.2.5':
-    'Secure system engineering principles - Principles for engineering secure systems shall be established, documented, maintained, and applied.',
-  'A.14.2.6':
-    'Secure development environment - Secure development environments shall be established and appropriately protected throughout the system development lifecycle.',
-  'A.14.2.7':
-    'Outsourced development - The organization shall supervise and monitor outsourced system development activities.',
-  'A.14.2.8':
-    'System security testing - Security functionality shall be tested during development.',
-  'A.14.2.9':
-    'System acceptance testing - Acceptance testing programs and criteria shall be established for new systems, upgrades, and new versions.',
-  'A.14.3': 'Test data - Ensure protection of data used for testing.',
-  'A.14.3.1':
-    'Protection of test data - Test data shall be selected carefully, protected, and controlled.',
-  // 'A.15': 'Supplier relationships',
-  'A.15.1':
-    'Information security policy for supplier relationships - Ensure protection of organizational assets accessible by suppliers.',
-  'A.15.1.1':
-    'Information security policy for supplier relationships - Information security requirements for mitigating supplier access risks shall be agreed and documented.',
-  'A.15.1.2':
-    'Addressing security within supplier agreements - All relevant information security requirements shall be established and agreed with each supplier that may access, process, store, communicate, or provide IT infrastructure components for organizational information.',
-  'A.15.1.3':
-    'Information and communications technology supply chain - Supplier agreements shall include requirements addressing information security risks associated with ICT services and product supply chains.',
-  'A.15.2':
-    'Supplier service delivery management - Maintain agreed levels of information security and service delivery in line with supplier agreements.',
-  'A.15.2.1':
-    'Monitoring and review of supplier services - Organizations shall regularly monitor, review, and audit supplier service delivery.',
-  'A.15.2.2':
-    'Managing changes to supplier services - Changes to supplier‑provided services shall be managed, considering business criticality and reassessed risks.',
-  // 'A.16': 'Information security incident management',
-  'A.16.1':
-    'Management of information security incidents and improvements - Ensure a consistent and effective approach to managing information security incidents, including communication of events and weaknesses.',
-  'A.16.1.1':
-    'Responsibilities and procedures - Management responsibilities and procedures shall ensure a quick, effective, and orderly response to information security incidents.',
-  'A.16.1.2':
-    'Reporting information security events - Information security events shall be reported through appropriate management channels as quickly as possible.',
-  'A.16.1.3':
-    'Reporting information security weaknesses - Employees and contractors shall report observed or suspected information security weaknesses in systems or services.',
-  'A.16.1.4':
-    'Assessment of and decision on information security events - Information security events shall be assessed and classified as incidents when appropriate.',
-  'A.16.1.5':
-    'Response to information security incidents - Information security incidents shall be responded to according to documented procedures.',
-  'A.16.1.6':
-    'Learning from information security incidents - Knowledge gained from analyzing and resolving incidents shall be used to reduce future likelihood or impact.',
-  'A.16.1.7':
-    'Collection of evidence - Procedures shall be defined and applied for identifying, collecting, acquiring, and preserving information that may serve as evidence.',
-  // 'A.17': 'Information security aspects of business continuity management',
-  'A.17.1':
-    'Information security continuity - Embed information security continuity into the organization’s business continuity management systems.',
-  'A.17.1.1':
-    'Planning information security continuity - The organization shall determine its requirements for information security and continuity during adverse situations such as crises or disasters.',
-  'A.17.1.2':
-    'Implementing information security continuity - The organization shall establish, document, implement, and maintain processes, procedures, and controls to ensure required continuity of information security during adverse situations.',
-  'A.17.1.3':
-    'Verify, review and evaluate information security continuity - Information security continuity controls shall be regularly verified to ensure they remain valid and effective during adverse situations.',
-  'A.17.2':
-    'Redundancies - Ensure availability of information processing facilities.',
-  'A.17.2.1':
-    'Availability of information processing facilities - Information processing facilities shall be implemented with sufficient redundancy to meet availability requirements.',
-  // 'A.18': 'Compliance',
-  'A.18.1':
-    'Compliance with legal and contractual requirements - Avoid breaches of legal, statutory, regulatory, or contractual obligations related to information security.',
-  'A.18.1.1':
-    'Identification of applicable legislation and contractual requirements - All relevant legal, regulatory, and contractual requirements shall be identified, documented, and kept up to date.',
-  'A.18.1.2':
-    'Intellectual property rights - Procedures shall ensure compliance with legal, regulatory, and contractual requirements related to intellectual property rights and use of proprietary software.',
-  'A.18.1.3':
-    'Protection of records - Records shall be protected from loss, destruction, falsification, unauthorized access, and unauthorized release in accordance with applicable requirements.',
-  'A.18.1.4':
-    'Privacy and protection of personally identifiable information - Privacy and protection of PII shall be ensured as required by relevant legislation and regulations.',
-  'A.18.1.5':
-    'Regulation of cryptographic controls - Cryptographic controls shall be used in compliance with relevant agreements, legislation, and regulations.',
-  'A.18.2':
-    'Information security reviews - Ensure information security is implemented and operated in accordance with organizational policies and procedures.',
-  'A.18.2.1':
-    'Independent review of information security - The organization’s information security approach shall be independently reviewed at planned intervals or when significant changes occur.',
-  'A.18.2.2':
-    'Compliance with security policies and standards - Managers shall regularly review compliance of information processing and procedures with security policies, standards, and requirements.',
-  'A.18.2.3':
-    'Technical compliance review - Information systems shall be regularly reviewed for compliance with the organization’s information security policies and standards.',
-  // ISO/IEC 27001:2022 Annex A numbering
-  'A.5.17':
-    'Authentication information - Allocation and management of authentication information shall be controlled by a management process, including advising personnel on the appropriate handling of authentication information.',
-  'A.5.18':
-    'Access rights - Access rights to information and other associated assets shall be provisioned, reviewed, modified and removed in accordance with the organization’s topic-specific policy on and rules for access control.',
-  'A.5.24':
-    'Information security incident management planning and preparation - The organization shall plan and prepare for managing information security incidents by defining, establishing and communicating information security incident management processes, roles and responsibilities.',
-  'A.5.30':
-    'ICT readiness for business continuity - ICT readiness shall be planned, implemented, maintained and tested based on business continuity objectives and ICT continuity requirements.',
-  'A.8.9':
-    'Configuration management - Configurations, including security configurations, of hardware, software, services and networks shall be established, documented, implemented, monitored and reviewed.',
-  'A.8.16':
-    'Monitoring activities - Networks, systems and applications shall be monitored for anomalous behaviour and appropriate actions taken to evaluate potential information security incidents.',
-  'A.8.23':
-    'Web filtering - Access to external websites shall be managed to reduce exposure to malicious content.',
+
+/*
+ * This file is generated by scripts/generate-compliance-data.js. Do not edit it
+ * by hand: edit the catalog in wazuh/intelligence-data and regenerate.
+ *
+ * Framework: iso_27001
+ * Edition: 2022
+ * Source: ISO/IEC 27002:2022(E) Information security controls, official preview pages (table of contents), published by ISO/IEC and distributed by ANSI
+ * Controls: 93
+ */
+import { ComplianceRequirement } from './types';
+
+export const iso27001RequirementsFile: Record<string, ComplianceRequirement> = {
+  'A.5.1': {
+    title: 'Policies for information security',
+    description:
+      'The organization keeps a written security policy plus supporting policies on specific topics, all approved by management. The people who must follow them know them, and they are reviewed on a schedule and after major changes.',
+  },
+  'A.5.2': {
+    title: 'Information security roles and responsibilities',
+    description:
+      'Every security task has a named owner. Who does what to protect information, and with what authority, is written down and given to specific people.',
+  },
+  'A.5.3': {
+    title: 'Segregation of duties',
+    description:
+      'Tasks that could conflict, such as requesting and approving the same change, are split between different people. This limits fraud, abuse and mistakes that nobody notices.',
+  },
+  'A.5.4': {
+    title: 'Management responsibilities',
+    description:
+      'Managers require staff and contractors to follow the security policy and procedures, and they lead by example in applying them day to day.',
+  },
+  'A.5.5': {
+    title: 'Contact with authorities',
+    description:
+      'The organization knows which regulators, law enforcement and other public bodies it must contact about security matters, and keeps those contacts current.',
+  },
+  'A.5.6': {
+    title: 'Contact with special interest groups',
+    description:
+      'Security staff stay connected with industry groups, forums and professional associations to share knowledge, receive early warnings and keep their skills up to date.',
+  },
+  'A.5.7': {
+    title: 'Threat intelligence',
+    description:
+      'Information about current and emerging threats is gathered and analysed, and the results are used to adjust defences and security decisions.',
+  },
+  'A.5.8': {
+    title: 'Information security in project management',
+    description:
+      'Security is built into every project from planning to closure, whatever the type of project. Project risks to information are identified and handled as part of the project work.',
+  },
+  'A.5.9': {
+    title: 'Inventory of information and other associated assets',
+    description:
+      'An up-to-date list of information, systems and other assets is maintained, and each item has an owner who is accountable for its protection.',
+  },
+  'A.5.10': {
+    title: 'Acceptable use of information and other associated assets',
+    description:
+      'People know what they may and may not do with company information, devices and other assets. Written rules and handling procedures cover allowed use, and they are applied in daily work.',
+  },
+  'A.5.11': {
+    title: 'Return of assets',
+    description:
+      'When people leave, change role, or a contract or agreement ends, they give back the company devices, data and other assets they hold, and this return is checked.',
+  },
+  'A.5.12': {
+    title: 'Classification of information',
+    description:
+      'Each item of information gets a sensitivity level set by how much harm its disclosure, corruption or loss would cause, plus legal and stakeholder demands. The level then decides how it is protected.',
+  },
+  'A.5.13': {
+    title: 'Labelling of information',
+    description:
+      'Information carries marks that show its classification, applied through agreed procedures, so anyone handling it knows how to treat it.',
+  },
+  'A.5.14': {
+    title: 'Information transfer',
+    description:
+      'Moving information inside the organization or to outside parties, by any channel, follows defined rules, procedures or agreements that keep it protected in transit.',
+  },
+  'A.5.15': {
+    title: 'Access control',
+    description:
+      'Who may reach information and systems, physically and logically, is decided by business and security needs and written into access rules.',
+  },
+  'A.5.16': {
+    title: 'Identity management',
+    description:
+      'Identities of users and systems are created, maintained and retired through a managed lifecycle, so each account maps to one accountable person or process.',
+  },
+  'A.5.17': {
+    title: 'Authentication information',
+    description:
+      'Passwords, keys, tokens and other secrets are issued, changed and revoked through a controlled process, and users are told how to keep them safe.',
+  },
+  'A.5.18': {
+    title: 'Access rights',
+    description:
+      'Each user gets only the permissions their job needs. Permissions are checked on a schedule, updated when someone moves roles, and taken away when they are no longer justified.',
+  },
+  'A.5.19': {
+    title: 'Information security in supplier relationships',
+    description:
+      'Risks that come from using the products and services of suppliers are identified, and processes are in place to keep those risks under control.',
+  },
+  'A.5.20': {
+    title: 'Addressing information security within supplier agreements',
+    description:
+      'Contracts with each supplier state the security requirements that apply to that relationship, so obligations on both sides are clear and enforceable.',
+  },
+  'A.5.21': {
+    title: 'Managing information security in the ICT supply chain',
+    description:
+      'Security risks in the chain of technology products and services, including components that suppliers source from others, are identified and managed.',
+  },
+  'A.5.22': {
+    title: 'Monitoring, review and change management of supplier services',
+    description:
+      'Supplier security practices and service delivery are checked regularly, and changes to supplier services are assessed and controlled before they take effect.',
+  },
+  'A.5.23': {
+    title: 'Information security for use of cloud services',
+    description:
+      "Cloud services are chosen, run and exited under agreed processes that reflect the organization's security needs. This covers shared responsibility with the provider and a plan to move data out safely.",
+  },
+  'A.5.24': {
+    title: 'Information security incident management planning and preparation',
+    description:
+      'Before any incident happens, the organization sets up its incident handling process, names who does what, and tells those people. This lets the team respond fast and consistently when an incident occurs.',
+  },
+  'A.5.25': {
+    title: 'Assessment and decision on information security events',
+    description:
+      'Security events are evaluated to decide whether they count as incidents, so real incidents are recognised early and handled quickly.',
+  },
+  'A.5.26': {
+    title: 'Response to information security incidents',
+    description:
+      'Confirmed incidents are handled by following documented response procedures, from first containment through to full recovery.',
+  },
+  'A.5.27': {
+    title: 'Learning from information security incidents',
+    description:
+      'Lessons from past incidents are fed back into the security controls to reduce the chance or the impact of similar incidents in the future.',
+  },
+  'A.5.28': {
+    title: 'Collection of evidence',
+    description:
+      'When an event may lead to legal or disciplinary action, evidence is gathered and preserved through defined procedures so it stays trustworthy.',
+  },
+  'A.5.29': {
+    title: 'Information security during disruption',
+    description:
+      'Security stays at a suitable level during disruptions, with plans that keep protection in place while the organization recovers.',
+  },
+  'A.5.30': {
+    title: 'ICT readiness for business continuity',
+    description:
+      'Technology services are prepared, tested and kept ready so they can support business continuity objectives during and after a disruption.',
+  },
+  'A.5.31': {
+    title: 'Legal, statutory, regulatory and contractual requirements',
+    description:
+      'The organization keeps a current register of the laws, regulations and contract terms that bear on information security, and records how it plans to comply with each one.',
+  },
+  'A.5.32': {
+    title: 'Intellectual property rights',
+    description:
+      'Procedures protect intellectual property, such as software licences and copyrighted material, and prevent its unlawful use.',
+  },
+  'A.5.33': {
+    title: 'Protection of records',
+    description:
+      'Business records are kept safe from being lost, altered, destroyed or seen by the wrong people for their full retention period.',
+  },
+  'A.5.34': {
+    title: 'Privacy and protection of PII',
+    description:
+      'Personal data is handled in line with privacy laws, regulations and contracts, and the organization can show that it meets those obligations.',
+  },
+  'A.5.35': {
+    title: 'Independent review of information security',
+    description:
+      'An auditor or team not involved in the work checks the security management approach and how it runs in practice. This happens on a set schedule and whenever something important changes.',
+  },
+  'A.5.36': {
+    title:
+      'Compliance with policies, rules and standards for information security',
+    description:
+      'Regular checks confirm that people and systems actually follow the security policy, the topic rules and the agreed standards.',
+  },
+  'A.5.37': {
+    title: 'Documented operating procedures',
+    description:
+      'Step-by-step instructions for running and maintaining systems, such as start-up, backup and recovery, are recorded and kept where the staff who use them can find them.',
+  },
+  'A.6.1': {
+    title: 'Screening',
+    description:
+      'People are screened before they join and again over time where the role calls for it. Checks respect local law and ethics and scale with the job, the data accessed and the risks.',
+  },
+  'A.6.2': {
+    title: 'Terms and conditions of employment',
+    description:
+      'Employment contracts set out the security responsibilities of both the employee and the organization, so each side knows its obligations from the first day.',
+  },
+  'A.6.3': {
+    title: 'Information security awareness, education and training',
+    description:
+      'Everyone who handles company information, including relevant contractors, learns the security basics and the skills their job needs. Content is refreshed regularly as policies, procedures and threats change.',
+  },
+  'A.6.4': {
+    title: 'Disciplinary process',
+    description:
+      'A formal disciplinary process, known to all staff, deals with people who break the security policy and makes consequences predictable and fair.',
+  },
+  'A.6.5': {
+    title: 'Responsibilities after termination or change of employment',
+    description:
+      'Some duties, like keeping company information secret, still apply after someone leaves or moves to another job. Those duties are explained to the person and followed up.',
+  },
+  'A.6.6': {
+    title: 'Confidentiality or non-disclosure agreements',
+    description:
+      'Staff, contractors and partners sign non-disclosure terms that match how sensitive the information they handle is. The terms are kept on record and revisited when needs change or on a periodic basis.',
+  },
+  'A.6.7': {
+    title: 'Remote working',
+    description:
+      'Remote and home workers follow security measures that protect the company information they use outside the office.',
+  },
+  'A.6.8': {
+    title: 'Information security event reporting',
+    description:
+      'Staff have a clear and quick channel to report any security event they observe or suspect, so it reaches the right people in time.',
+  },
+  'A.7.1': {
+    title: 'Physical security perimeters',
+    description:
+      'Areas that hold information and systems are enclosed by defined physical boundaries, such as walls, fences or controlled doors, that match the value of what they protect.',
+  },
+  'A.7.2': {
+    title: 'Physical entry',
+    description:
+      'Entry points and physical access controls, such as badges or locks, ensure that only authorised people get into secure areas.',
+  },
+  'A.7.3': {
+    title: 'Securing offices, rooms and facilities',
+    description:
+      'Offices, rooms and facilities are designed and built with physical protection that fits the sensitivity of the information and equipment they contain.',
+  },
+  'A.7.4': {
+    title: 'Physical security monitoring',
+    description:
+      'Premises are watched continuously, for example with cameras, guards or alarms, to detect unauthorised physical access.',
+  },
+  'A.7.5': {
+    title: 'Protecting against physical and environmental threats',
+    description:
+      'Facilities are protected against natural disasters, fire, flooding, power problems and deliberate physical attacks on the infrastructure.',
+  },
+  'A.7.6': {
+    title: 'Working in secure areas',
+    description:
+      'Specific rules govern how people work inside secure areas, such as supervision of visitors and limits on recording devices, and those rules are applied.',
+  },
+  'A.7.7': {
+    title: 'Clear desk and clear screen',
+    description:
+      'Desks are kept free of papers and removable media, and screens are locked or cleared whenever they are left unattended.',
+  },
+  'A.7.8': {
+    title: 'Equipment siting and protection',
+    description:
+      'Equipment is placed and protected in a way that reduces physical and environmental risks and prevents unauthorised access to it.',
+  },
+  'A.7.9': {
+    title: 'Security of assets off-premises',
+    description:
+      'Laptops and other assets used away from company sites are protected against loss, theft and misuse.',
+  },
+  'A.7.10': {
+    title: 'Storage media',
+    description:
+      'Removable and fixed storage media are tracked from purchase to disposal. Their use, transport and destruction follow the handling rules for the classification of the data they hold.',
+  },
+  'A.7.11': {
+    title: 'Supporting utilities',
+    description:
+      'Systems are shielded from outages of electricity, cooling, water or telecommunications, through measures like backup power and regular checks of these services.',
+  },
+  'A.7.12': {
+    title: 'Cabling security',
+    description:
+      'Power and data cables are routed and protected so they cannot easily be tapped, disrupted or physically damaged.',
+  },
+  'A.7.13': {
+    title: 'Equipment maintenance',
+    description:
+      'Hardware receives upkeep according to supplier guidance and by authorised staff, so faults do not cause data loss, corruption or exposure.',
+  },
+  'A.7.14': {
+    title: 'Secure disposal or re-use of equipment',
+    description:
+      'Before any device with storage is thrown away or reused, staff confirm that licensed programs and sensitive data on it have been wiped or destroyed beyond recovery.',
+  },
+  'A.8.1': {
+    title: 'User endpoint devices',
+    description:
+      'Laptops, phones and other user devices are configured and managed so the company data they hold or can reach stays protected.',
+  },
+  'A.8.2': {
+    title: 'Privileged access rights',
+    description:
+      'Administrator and other privileged accounts are limited to the people who need them, granted only for that need and closely managed.',
+  },
+  'A.8.3': {
+    title: 'Information access restriction',
+    description:
+      'Each user can open only the data and application functions their role allows, as set by the access control policy.',
+  },
+  'A.8.4': {
+    title: 'Access to source code',
+    description:
+      'Only authorised developers and tools can view or change the code base, build tooling and shared libraries. This prevents unauthorised changes, hidden functionality and leaks of intellectual property.',
+  },
+  'A.8.5': {
+    title: 'Secure authentication',
+    description:
+      'Users and systems prove who they are through strong authentication, such as multi-factor login, matched to the sensitivity of what they access.',
+  },
+  'A.8.6': {
+    title: 'Capacity management',
+    description:
+      'Teams watch how much processing, storage, network and staff capacity is used, and plan ahead so resources keep pace with demand.',
+  },
+  'A.8.7': {
+    title: 'Protection against malware',
+    description:
+      'Technical defences against malware are in place on systems and networks, and users are made aware of how malware spreads.',
+  },
+  'A.8.8': {
+    title: 'Management of technical vulnerabilities',
+    description:
+      'The organization tracks newly published weaknesses in the software and hardware it runs, judges how exposed it is to each, and patches or mitigates them in time.',
+  },
+  'A.8.9': {
+    title: 'Configuration management',
+    description:
+      'Systems, applications and network devices run from approved, documented baseline settings, and changes from that baseline are monitored and reviewed.',
+  },
+  'A.8.10': {
+    title: 'Information deletion',
+    description:
+      'Data that has no further business or legal purpose is securely erased from systems, devices and storage media.',
+  },
+  'A.8.11': {
+    title: 'Data masking',
+    description:
+      'Sensitive data is masked or hidden in line with access policies, business needs and legal requirements.',
+  },
+  'A.8.12': {
+    title: 'Data leakage prevention',
+    description:
+      'Measures detect and stop sensitive information from being disclosed or extracted without authorisation from systems, networks and devices.',
+  },
+  'A.8.13': {
+    title: 'Information backup',
+    description:
+      'The organization keeps copies of its data, software and system images as its backup policy sets out, and restores from them on a regular basis to prove the copies work.',
+  },
+  'A.8.14': {
+    title: 'Redundancy of information processing facilities',
+    description:
+      'Processing facilities are built with enough duplicate components and capacity to keep services running when a single part fails.',
+  },
+  'A.8.15': {
+    title: 'Logging',
+    description:
+      'Systems keep records of user actions, errors and security events. Those records are protected from tampering and are reviewed to spot problems.',
+  },
+  'A.8.16': {
+    title: 'Monitoring activities',
+    description:
+      'Teams look for unusual behaviour in network traffic, systems and applications, and investigate alerts to decide whether an incident is under way.',
+  },
+  'A.8.17': {
+    title: 'Clock synchronization',
+    description:
+      'All systems take their time from agreed reference clocks, so timestamps match and events from different systems can be put in the right order.',
+  },
+  'A.8.18': {
+    title: 'Use of privileged utility programs',
+    description:
+      'Utilities that can bypass operating system or application security controls are available to very few authorised administrators, and each use is limited, approved and logged.',
+  },
+  'A.8.19': {
+    title: 'Installation of software on operational systems',
+    description:
+      'Installing software on production systems follows procedures and controls that keep those systems secure and stable.',
+  },
+  'A.8.20': {
+    title: 'Networks security',
+    description:
+      'Network infrastructure, including routers, switches and firewalls, is hardened, administered and supervised so that the data flowing between connected systems stays protected from compromise.',
+  },
+  'A.8.21': {
+    title: 'Security of network services',
+    description:
+      'Each network service, whether run in-house or bought from a provider, has agreed security functions and service levels. These are put in place and tracked so the service keeps meeting them.',
+  },
+  'A.8.22': {
+    title: 'Segregation of networks',
+    description:
+      'Networks are divided into separate zones, for example by function or sensitivity, so users and systems only reach the segments they need.',
+  },
+  'A.8.23': {
+    title: 'Web filtering',
+    description:
+      'Access to external websites is restricted, for example by category or reputation, so users are less exposed to malware, phishing and other harmful content.',
+  },
+  'A.8.24': {
+    title: 'Use of cryptography',
+    description:
+      'The organization decides where encryption and other cryptography are used, and how keys are generated, stored, rotated and destroyed, and then follows those rules.',
+  },
+  'A.8.25': {
+    title: 'Secure development life cycle',
+    description:
+      'Software and systems are developed following secure development rules at every stage of their lifecycle, from design to retirement.',
+  },
+  'A.8.26': {
+    title: 'Application security requirements',
+    description:
+      'Before an application is built or bought, its security needs, such as login, input checks and data protection, are worked out, written into the requirements and signed off.',
+  },
+  'A.8.27': {
+    title: 'Secure system architecture and engineering principles',
+    description:
+      'The organization sets secure design principles, such as defence in depth and least privilege, and every new or changed system follows them. The principles are kept current as threats and technology change.',
+  },
+  'A.8.28': {
+    title: 'Secure coding',
+    description:
+      'Developers write code following secure coding practices, so common weaknesses are not introduced into the software.',
+  },
+  'A.8.29': {
+    title: 'Security testing in development and acceptance',
+    description:
+      'Security tests are planned and run during development, and systems pass security acceptance checks before going live.',
+  },
+  'A.8.30': {
+    title: 'Outsourced development',
+    description:
+      'When software is built by an outside company, the organization sets the security terms, oversees the work and checks the delivered result against its security requirements.',
+  },
+  'A.8.31': {
+    title: 'Separation of development, test and production environments',
+    description:
+      'Code is built and tested in environments kept apart from live systems, so work in progress cannot affect production and each environment has its own protection.',
+  },
+  'A.8.32': {
+    title: 'Change management',
+    description:
+      'Changes to systems and processing facilities go through a formal change management process with review and approval before release.',
+  },
+  'A.8.33': {
+    title: 'Test information',
+    description:
+      'Data used in testing is picked with care and given the same protection as live data. Real personal or confidential data is avoided or masked where possible.',
+  },
+  'A.8.34': {
+    title: 'Protection of information systems during audit testing',
+    description:
+      'Audit work and technical testing on live systems are scoped, scheduled and approved by system owners and management beforehand, so they cause as little disruption as possible.',
+  },
 };

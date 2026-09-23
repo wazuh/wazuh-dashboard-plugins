@@ -14,8 +14,8 @@ import { computeOthersCount, getOthersBuckets } from './compliance-table';
 
 describe('getOthersBuckets', () => {
   const descriptions = {
-    '1.1': 'Known requirement 1.1',
-    '1.2': 'Known requirement 1.2',
+    '1.1': { title: 'Known requirement 1.1' },
+    '1.2': { title: 'Known requirement 1.2' },
   };
 
   it('returns an empty array when every bucket key is known', () => {
@@ -45,8 +45,8 @@ describe('getOthersBuckets', () => {
 
 describe('computeOthersCount', () => {
   const descriptions = {
-    '1.1': 'Known requirement 1.1',
-    '1.2': 'Known requirement 1.2',
+    '1.1': { title: 'Known requirement 1.1' },
+    '1.2': { title: 'Known requirement 1.2' },
   };
 
   it('returns 0 when every bucket key is known', () => {

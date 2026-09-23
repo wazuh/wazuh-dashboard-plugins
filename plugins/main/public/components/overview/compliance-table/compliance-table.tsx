@@ -24,6 +24,7 @@ import { iso27001RequirementsFile } from '../../../../common/compliance-requirem
 import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
 import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
+import { ComplianceRequirement } from '../../../../common/compliance-requirements/types';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT,
@@ -56,7 +57,7 @@ import { compose } from 'redux';
 const COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE = 1000;
 
 function buildComplianceRequirements(
-  requirements: { [key: string]: string },
+  requirements: Record<string, ComplianceRequirement>,
   entriesBySeparator: number = 1,
   separator: string = '.',
 ) {
@@ -87,7 +88,7 @@ function buildComplianceRequirements(
 // Every aggregation bucket whose key isn't one of the known, documented
 // requirement codes for this framework.
 export function getOthersBuckets(
-  descriptions: { [key: string]: string },
+  descriptions: Record<string, ComplianceRequirement>,
   buckets: Array<{ key: string; doc_count: number }>,
 ) {
   const knownCodes = new Set(Object.keys(descriptions));
@@ -96,7 +97,7 @@ export function getOthersBuckets(
 
 // Sums the doc_count of every "Others" bucket (see getOthersBuckets).
 export function computeOthersCount(
-  descriptions: { [key: string]: string },
+  descriptions: Record<string, ComplianceRequirement>,
   buckets: Array<{ key: string; doc_count: number }>,
 ) {
   return getOthersBuckets(descriptions, buckets).reduce(

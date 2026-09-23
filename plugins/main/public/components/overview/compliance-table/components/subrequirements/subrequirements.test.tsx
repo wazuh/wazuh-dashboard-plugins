@@ -21,6 +21,15 @@ import { RequirementFlyout } from '../requirement-flyout';
 const getFacetButtons = wrapper =>
   wrapper.find(EuiPopover).map(popover => popover.prop('button'));
 
+// The tile text sits inside the facet button, wrapped in the tooltip and its
+// ellipsis span: EuiFacetButton > EuiToolTip > span > label.
+const getFacetLabels = wrapper =>
+  getFacetButtons(wrapper).map(
+    button =>
+      React.Children.toArray(button.props.children)[0].props.children.props
+        .children,
+  );
+
 const mockAddFilters = jest.fn();
 const mockUpdateAndNavigateSearchParams = jest.fn();
 
@@ -152,11 +161,52 @@ describe('ComplianceSubrequirements - Show in dashboard / Inspect in findings', 
   });
 });
 
+describe('ComplianceSubrequirements - tile label', () => {
+  const propsWith = descriptions => ({
+    ...baseProps(),
+    complianceObject: { 'A.5.1': ['A.5.1'] },
+    descriptions,
+    selectedRequirements: { 'A.5.1': true },
+  });
+
+  // The definition files keep the title and the description apart; the label
+  // is composed here so both can be used independently elsewhere.
+  it('joins the requirement title and description', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...propsWith({
+          'A.5.1': {
+            title: 'Policies for information security',
+            description:
+              'Information security policy and topic-specific policies.',
+          },
+        })}
+      />,
+    );
+    expect(getFacetLabels(wrapper)).toContain(
+      'A.5.1 - Policies for information security - Information security policy and topic-specific policies.',
+    );
+  });
+
+  it('uses the title alone when the framework publishes no description', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...propsWith({
+          'A.5.1': { title: 'Policies for information security' },
+        })}
+      />,
+    );
+    expect(getFacetLabels(wrapper)).toContain(
+      'A.5.1 - Policies for information security',
+    );
+  });
+});
+
 describe('ComplianceSubrequirements - hover icons on scroll', () => {
   const propsWithOneRequirement = () => ({
     ...baseProps(),
     complianceObject: { '1.1': ['1.1'] },
-    descriptions: { '1.1': 'Some requirement' },
+    descriptions: { '1.1': { title: 'Some requirement' } },
     selectedRequirements: { '1.1': true },
   });
 

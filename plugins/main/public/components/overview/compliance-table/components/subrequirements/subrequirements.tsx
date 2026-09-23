@@ -37,6 +37,7 @@ import {
   WAZUH_MODULES_ID,
 } from '../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+import { getRequirementText } from '../../../../../../common/compliance-requirements/requirement-text';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
@@ -142,7 +143,7 @@ export class ComplianceSubrequirements extends Component {
             (technique
               .toLowerCase()
               .includes(this.state.searchValue.toLowerCase()) ||
-              this.props.descriptions[technique]
+              getRequirementText(this.props.descriptions[technique])
                 .toLowerCase()
                 .includes(this.state.searchValue.toLowerCase()))
           ) {
@@ -156,7 +157,9 @@ export class ComplianceSubrequirements extends Component {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
-                label: `${technique} - ${this.props.descriptions[technique]}`,
+                label: `${technique} - ${getRequirementText(
+                  this.props.descriptions[technique],
+                )}`,
                 quantity,
               });
             }
@@ -245,9 +248,7 @@ export class ComplianceSubrequirements extends Component {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {item.isOthers
-                        ? item.label
-                        : `${item.id} - ${this.props.descriptions[item.id]}`}
+                      {item.label}
                     </span>
                   </EuiToolTip>
 
@@ -417,7 +418,9 @@ export class ComplianceSubrequirements extends Component {
                 ? `Findings whose compliance requirement value does not match any of the known, documented ${
                     WAZUH_MODULES[this.props.section]?.title || ''
                   } requirement identifiers.`
-                : this.props.descriptions[this.state.selectedRequirement]
+                : getRequirementText(
+                    this.props.descriptions[this.state.selectedRequirement],
+                  )
             }
             getRequirementKey={() => {
               return this.getRequirementKey();

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for TSC requirements
- * Copyright (C) 2015-2022 Wazuh, Inc.
+ * Copyright (C) 2015-2026 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -9,47 +9,272 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const tscRequirementsFile = {
-  'A1.1':
-    'The entity maintains, monitors, and evaluates current processing capacity and use of system components (infrastructure, data, and software) to manage capacity demand and to enable the implementation of additional capacity to help meet its objectives.',
-  'A1.2':
-    'The entity authorizes, designs, develops or acquires, implements, operates, approves, maintains, and monitors environmental protections, software, data backup processes, and recovery infrastructure to meet its objectives.',
-  'CC5.1':
-    'The entity selects and develops control activities that contribute to the mitigation of risks to the achievement of objectives to acceptable levels.',
-  'CC5.2':
-    'The entity also selects and develops general control activities over technology to support the achievement of objectives.',
-  'CC6.1':
-    "The entity implements logical access security software, infrastructure, and architectures over protected information assets to protect them from security events to meet the entity's objectives.",
-  'CC6.2':
-    'Prior to issuing system credentials and granting system access, the entity registers and authorizes new internal and external users whose access is administered by the entity. For those users whose access is administered by the entity, user system credentials are removed when user access is no longer authorized.',
-  'CC6.3':
-    'The entity authorizes, modifies, or removes access to data, software, functions, and other protected information assets based on roles, responsibilities, or the system design and changes, giving consideration to the concepts of least privilege and segregation of duties, to meet the entity’s objectives.',
-  'CC6.4':
-    'The entity restricts physical access to facilities and protected information assets (for example, data center facilities, backup media storage, and other sensitive locations) to authorized personnel to meet the entity’s objectives',
-  'CC6.5':
-    'The entity discontinues logical and physical protections over physical assets only after the ability to read or recover data and software from those assets has been diminished and is no longer required to meet the entity’s objectives.',
-  'CC6.6':
-    'The entity implements logical access security measures to protect against threats from sources outside its system boundaries.',
-  'CC6.7':
-    'The entity restricts the transmission, movement, and removal of information to authorized internal and external users and processes, and protects it during transmission, movement, or removal to meet the entity’s objectives.',
-  'CC6.8':
-    'The entity implements controls to prevent or detect and act upon the introduction of unauthorized or malicious software to meet the entity’s objectives.',
-  'CC7.1':
-    'To meet its objectives, the entity uses detection and monitoring procedures to identify (1) changes to configurations that result in the introduction of new vulnerabilities, and (2) susceptibilities to newly discovered vulnerabilities.',
-  'CC7.2':
-    "The entity monitors system components and the operation of those components for anomalies that are indicative of malicious acts, natural disasters, and errors affecting the entity's ability to meet its objectives; anomalies are analyzed to determine whether they represent security events.",
-  'CC7.3':
-    'The entity evaluates security events to determine whether they could or have resulted in a failure of the entity to meet its objectives (security incidents) and, if so, takes actions to prevent or address such failures.',
-  'CC7.4':
-    'The entity responds to identified security incidents by executing a defined incident-response program to understand, contain, remediate, and communicate security incidents, as appropriate.',
-  'CC7.5':
-    'The entity identifies, develops, and implements activities to recover from identified security incidents.',
-  'CC8.1':
-    'The entity authorizes, designs, develops or acquires, configures, documents, tests, approves, and implements changes to infrastructure, data, software, and procedures to meet its objectives',
-  'CC9.1':
-    'The entity identifies, selects, and develops risk mitigation activities for risks arising from potential business disruptions.',
-  'PI1.4':
-    'The entity implements policies and procedures to make available or deliver output completely, accurately, and timely in accordance with specifications to meet the entity’s objectives.',
-  'PI1.5':
-    'The entity implements policies and procedures to store inputs, items in processing, and outputs completely, accurately, and timely in accordance with system specifications to meet the entity’s objectives.',
+
+/*
+ * This file is generated by scripts/generate-compliance-data.js. Do not edit it
+ * by hand: edit the catalog in wazuh/intelligence-data and regenerate.
+ *
+ * Framework: tsc
+ * Edition: 2017 (TSP section 100, version including the March 2020 revisions)
+ * Source: AICPA, TSP section 100, 2017 Trust Services Criteria for Security, Availability, Processing Integrity, Confidentiality, and Privacy (version including the March 2020 revisions)
+ * Controls: 69
+ */
+import { ComplianceRequirement } from './types';
+
+export const tscRequirementsFile: Record<string, ComplianceRequirement> = {
+  'CC1.1': {
+    title:
+      'COSO Principle 1: The entity demonstrates a commitment to integrity and ethical values.',
+  },
+  'CC1.2': {
+    title:
+      'COSO Principle 2: The board of directors demonstrates independence from management and exercises oversight of the development and performance of internal control.',
+  },
+  'CC1.3': {
+    title:
+      'COSO Principle 3: Management establishes, with board oversight, structures, reporting lines, and appropriate authorities and responsibilities in the pursuit of objectives.',
+  },
+  'CC1.4': {
+    title:
+      'COSO Principle 4: The entity demonstrates a commitment to attract, develop, and retain competent individuals in alignment with objectives.',
+  },
+  'CC1.5': {
+    title:
+      'COSO Principle 5: The entity holds individuals accountable for their internal control responsibilities in the pursuit of objectives.',
+  },
+  'CC2.1': {
+    title:
+      'COSO Principle 13: The entity obtains or generates and uses relevant, quality information to support the functioning of internal control.',
+  },
+  'CC2.2': {
+    title:
+      'COSO Principle 14: The entity internally communicates information, including objectives and responsibilities for internal control, necessary to support the functioning of internal control.',
+  },
+  'CC2.3': {
+    title:
+      'COSO Principle 15: The entity communicates with external parties regarding matters affecting the functioning of internal control.',
+  },
+  'CC3.1': {
+    title:
+      'COSO Principle 6: The entity specifies objectives with sufficient clarity to enable the identification and assessment of risks relating to objectives.',
+  },
+  'CC3.2': {
+    title:
+      'COSO Principle 7: The entity identifies risks to the achievement of its objectives across the entity and analyzes risks as a basis for determining how the risks should be managed.',
+  },
+  'CC3.3': {
+    title:
+      'COSO Principle 8: The entity considers the potential for fraud in assessing risks to the achievement of objectives.',
+  },
+  'CC3.4': {
+    title:
+      'COSO Principle 9: The entity identifies and assesses changes that could significantly impact the system of internal control.',
+  },
+  'CC4.1': {
+    title:
+      'COSO Principle 16: The entity selects, develops, and performs ongoing and/or separate evaluations to ascertain whether the components of internal control are present and functioning.',
+  },
+  'CC4.2': {
+    title:
+      'COSO Principle 17: The entity evaluates and communicates internal control deficiencies in a timely manner to those parties responsible for taking corrective action, including senior management and the board of directors, as appropriate.',
+  },
+  'CC5.1': {
+    title:
+      'COSO Principle 10: The entity selects and develops control activities that contribute to the mitigation of risks to the achievement of objectives to acceptable levels.',
+  },
+  'CC5.2': {
+    title:
+      'COSO Principle 11: The entity also selects and develops general control activities over technology to support the achievement of objectives.',
+  },
+  'CC5.3': {
+    title:
+      'COSO Principle 12: The entity deploys control activities through policies that establish what is expected and in procedures that put policies into action.',
+  },
+  'CC6.1': {
+    title:
+      'The entity implements logical access security software, infrastructure, and architectures over protected information assets to protect them from security events to meet the entity’s objectives.',
+  },
+  'CC6.2': {
+    title:
+      'Prior to issuing system credentials and granting system access, the entity registers and authorizes new internal and external users whose access is administered by the entity. For those users whose access is administered by the entity, user system credentials are removed when user access is no longer authorized.',
+  },
+  'CC6.3': {
+    title:
+      'The entity authorizes, modifies, or removes access to data, software, functions, and other protected information assets based on roles, responsibilities, or the system design and changes, giving consideration to the concepts of least privilege and segregation of duties, to meet the entity’s objectives.',
+  },
+  'CC6.4': {
+    title:
+      'The entity restricts physical access to facilities and protected information assets (for example, data center facilities, backup media storage, and other sensitive locations) to authorized personnel to meet the entity’s objectives.',
+  },
+  'CC6.5': {
+    title:
+      'The entity discontinues logical and physical protections over physical assets only after the ability to read or recover data and software from those assets has been diminished and is no longer required to meet the entity’s objectives.',
+  },
+  'CC6.6': {
+    title:
+      'The entity implements logical access security measures to protect against threats from sources outside its system boundaries.',
+  },
+  'CC6.7': {
+    title:
+      'The entity restricts the transmission, movement, and removal of information to authorized internal and external users and processes, and protects it during transmission, movement, or removal to meet the entity’s objectives.',
+  },
+  'CC6.8': {
+    title:
+      'The entity implements controls to prevent or detect and act upon the introduction of unauthorized or malicious software to meet the entity’s objectives.',
+  },
+  'CC7.1': {
+    title:
+      'To meet its objectives, the entity uses detection and monitoring procedures to identify (1) changes to configurations that result in the introduction of new vulnerabilities, and (2) susceptibilities to newly discovered vulnerabilities.',
+  },
+  'CC7.2': {
+    title:
+      'The entity monitors system components and the operation of those components for anomalies that are indicative of malicious acts, natural disasters, and errors affecting the entity’s ability to meet its objectives; anomalies are analyzed to determine whether they represent security events.',
+  },
+  'CC7.3': {
+    title:
+      'The entity evaluates security events to determine whether they could or have resulted in a failure of the entity to meet its objectives (security incidents) and, if so, takes actions to prevent or address such failures.',
+  },
+  'CC7.4': {
+    title:
+      'The entity responds to identified security incidents by executing a defined incident-response program to understand, contain, remediate, and communicate security incidents, as appropriate.',
+  },
+  'CC7.5': {
+    title:
+      'The entity identifies, develops, and implements activities to recover from identified security incidents.',
+  },
+  'CC8.1': {
+    title:
+      'The entity authorizes, designs, develops or acquires, configures, documents, tests, approves, and implements changes to infrastructure, data, software, and procedures to meet its objectives.',
+  },
+  'CC9.1': {
+    title:
+      'The entity identifies, selects, and develops risk mitigation activities for risks arising from potential business disruptions.',
+  },
+  'CC9.2': {
+    title:
+      'The entity assesses and manages risks associated with vendors and business partners.',
+  },
+  'A1.1': {
+    title:
+      'The entity maintains, monitors, and evaluates current processing capacity and use of system components (infrastructure, data, and software) to manage capacity demand and to enable the implementation of additional capacity to help meet its objectives.',
+  },
+  'A1.2': {
+    title:
+      'The entity authorizes, designs, develops or acquires, implements, operates, approves, maintains, and monitors environmental protections, software, data backup processes, and recovery infrastructure to meet its objectives.',
+  },
+  'A1.3': {
+    title:
+      'The entity tests recovery plan procedures supporting system recovery to meet its objectives.',
+  },
+  'C1.1': {
+    title:
+      'The entity identifies and maintains confidential information to meet the entity’s objectives related to confidentiality.',
+  },
+  'C1.2': {
+    title:
+      'The entity disposes of confidential information to meet the entity’s objectives related to confidentiality.',
+  },
+  'PI1.1': {
+    title:
+      'The entity obtains or generates, uses, and communicates relevant, quality information regarding the objectives related to processing, including definitions of data processed and product and service specifications, to support the use of products and services.',
+  },
+  'PI1.2': {
+    title:
+      'The entity implements policies and procedures over system inputs, including controls over completeness and accuracy, to result in products, services, and reporting to meet the entity’s objectives.',
+  },
+  'PI1.3': {
+    title:
+      'The entity implements policies and procedures over system processing to result in products, services, and reporting to meet the entity’s objectives.',
+  },
+  'PI1.4': {
+    title:
+      'The entity implements policies and procedures to make available or deliver output completely, accurately, and timely in accordance with specifications to meet the entity’s objectives.',
+  },
+  'PI1.5': {
+    title:
+      'The entity implements policies and procedures to store inputs, items in processing, and outputs completely, accurately, and timely in accordance with system specifications to meet the entity’s objectives.',
+  },
+  'P1.0': {
+    title:
+      'Privacy Criteria Related to Notice and Communication of Objectives Related to Privacy',
+  },
+  'P1.1': {
+    title:
+      'The entity provides notice to data subjects about its privacy practices to meet the entity’s objectives related to privacy. The notice is updated and communicated to data subjects in a timely manner for changes to the entity’s privacy practices, including changes in the use of personal information, to meet the entity’s objectives related to privacy.',
+  },
+  'P2.0': { title: 'Privacy Criteria Related to Choice and Consent' },
+  'P2.1': {
+    title:
+      'The entity communicates choices available regarding the collection, use, retention, disclosure, and disposal of personal information to the data subjects and the consequences, if any, of each choice. Explicit consent for the collection, use, retention, disclosure, and disposal of personal information is obtained from data subjects or other authorized persons, if required. Such consent is obtained only for the intended purpose of the information to meet the entity’s objectives related to privacy. The entity’s basis for determining implicit consent for the collection, use, retention, disclosure, and disposal of personal information is documented.',
+  },
+  'P3.0': { title: 'Privacy Criteria Related to Collection' },
+  'P3.1': {
+    title:
+      'Personal information is collected consistent with the entity’s objectives related to privacy.',
+  },
+  'P3.2': {
+    title:
+      'For information requiring explicit consent, the entity communicates the need for such consent as well as the consequences of a failure to provide consent for the request for personal information and obtains the consent prior to the collection of the information to meet the entity’s objectives related to privacy.',
+  },
+  'P4.0': { title: 'Privacy Criteria Related to Use, Retention, and Disposal' },
+  'P4.1': {
+    title:
+      'The entity limits the use of personal information to the purposes identified in the entity’s objectives related to privacy.',
+  },
+  'P4.2': {
+    title:
+      'The entity retains personal information consistent with the entity’s objectives related to privacy.',
+  },
+  'P4.3': {
+    title:
+      'The entity securely disposes of personal information to meet the entity’s objectives related to privacy.',
+  },
+  'P5.0': { title: 'Privacy Criteria Related to Access' },
+  'P5.1': {
+    title:
+      'The entity grants identified and authenticated data subjects the ability to access their stored personal information for review and, upon request, provides physical or electronic copies of that information to data subjects to meet the entity’s objectives related to privacy. If access is denied, data subjects are informed of the denial and reason for such denial, as required, to meet the entity’s objectives related to privacy.',
+  },
+  'P5.2': {
+    title:
+      'The entity corrects, amends, or appends personal information based on information provided by data subjects and communicates such information to third parties, as committed or required, to meet the entity’s objectives related to privacy. If a request for correction is denied, data subjects are informed of the denial and reason for such denial to meet the entity’s objectives related to privacy.',
+  },
+  'P6.0': { title: 'Privacy Criteria Related to Disclosure and Notification' },
+  'P6.1': {
+    title:
+      'The entity discloses personal information to third parties with the explicit consent of data subjects and such consent is obtained prior to disclosure to meet the entity’s objectives related to privacy.',
+  },
+  'P6.2': {
+    title:
+      'The entity creates and retains a complete, accurate, and timely record of authorized disclosures of personal information to meet the entity’s objectives related to privacy.',
+  },
+  'P6.3': {
+    title:
+      'The entity creates and retains a complete, accurate, and timely record of detected or reported unauthorized disclosures (including breaches) of personal information to meet the entity’s objectives related to privacy.',
+  },
+  'P6.4': {
+    title:
+      'The entity obtains privacy commitments from vendors and other third parties who have access to personal information to meet the entity’s objectives related to privacy. The entity assesses those parties’ compliance on a periodic and as-needed basis and takes corrective action, if necessary.',
+  },
+  'P6.5': {
+    title:
+      'The entity obtains commitments from vendors and other third parties with access to personal information to notify the entity in the event of actual or suspected unauthorized disclosures of personal information. Such notifications are reported to appropriate personnel and acted on in accordance with established incident-response procedures to meet the entity’s objectives related to privacy.',
+  },
+  'P6.6': {
+    title:
+      'The entity provides notification of breaches and incidents to affected data subjects, regulators, and others to meet the entity’s objectives related to privacy.',
+  },
+  'P6.7': {
+    title:
+      'The entity provides data subjects with an accounting of the personal information held and disclosure of the data subjects’ personal information, upon the data subjects’ request, to meet the entity’s objectives related to privacy.',
+  },
+  'P7.0': { title: 'Privacy Criteria Related to Quality' },
+  'P7.1': {
+    title:
+      'The entity collects and maintains accurate, up-to-date, complete, and relevant personal information to meet the entity’s objectives related to privacy.',
+  },
+  'P8.0': { title: 'Privacy Criteria Related to Monitoring and Enforcement' },
+  'P8.1': {
+    title:
+      'The entity implements a process for receiving, addressing, resolving, and communicating the resolution of inquiries, complaints, and disputes from data subjects and others and periodically monitors compliance to meet the entity’s objectives related to privacy. Corrections and other necessary actions related to identified deficiencies are made or taken in a timely manner.',
+  },
 };
