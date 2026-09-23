@@ -2,6 +2,7 @@
  * @jest-environment node
  */
 import {
+  catalogShapeProblems,
   icuPlaceholders,
   renderFailures,
   scanSourceText,
@@ -141,5 +142,19 @@ describe('renderFailures', () => {
     expect(problems).toHaveLength(2);
     expect(problems[0]).toMatch(/^wazuh\.a\.b\.noOther /);
     expect(problems[1]).toMatch(/^wazuh\.a\.b\.unbalanced /);
+  });
+});
+
+describe('catalogShapeProblems', () => {
+  it('accepts a catalog with messages only', () => {
+    expect(catalogShapeProblems({ messages: { 'wazuh.a.b': 'A' } })).toEqual(
+      [],
+    );
+  });
+
+  it('rejects formats, even when empty', () => {
+    expect(catalogShapeProblems({ formats: {}, messages: {} })).toEqual([
+      'declares `formats`; a plugin catalog holds `messages` only',
+    ]);
   });
 });

@@ -428,6 +428,20 @@ export function renderFailures(entries: Array<[string, string]>): string[] {
 }
 
 /**
+ * Keys of a parsed catalog other than `messages`. The platform replaces `formats` wholesale with the
+ * last catalog that declares it, so a plugin `formats` (even `{}`) breaks the whole locale.
+ */
+export function catalogShapeProblems(
+  catalog: Record<string, unknown>,
+): string[] {
+  return Object.keys(catalog)
+    .filter(key => key !== 'messages')
+    .map(
+      key => `declares \`${key}\`; a plugin catalog holds \`messages\` only`,
+    );
+}
+
+/**
  * Registers the gate's suites for one plugin. Call it at the top level of a test file.
  */
 export function describeI18nStringsGate({
@@ -462,12 +476,12 @@ export function describeI18nStringsGate({
   };
   const sourceMessages = () => sourceScan().messages;
 
-  const readCatalog = (name: string): Record<string, string> => {
-    const parsed = JSON.parse(
-      fs.readFileSync(path.join(translationsDir, name), 'utf8'),
-    ) as { messages?: Record<string, string> };
-    return parsed.messages ?? {};
-  };
+  const parseCatalog = (name: string) =>
+    JSON.parse(fs.readFileSync(path.join(translationsDir, name), 'utf8')) as {
+      messages?: Record<string, string>;
+    };
+  const readCatalog = (name: string): Record<string, string> =>
+    parseCatalog(name).messages ?? {};
 
   describe(`i18n strings (${idPrefix})`, () => {
     it('extracts every message from the plugin source', () => {
@@ -556,6 +570,17 @@ export function describeI18nStringsGate({
       // what actually decides whether a locale loads.
       expect([...(i18nrc().translations ?? [])].sort()).toEqual(
         catalogs.map(name => `translations/${name}`).sort(),
+      );
+    });
+
+    it('keeps every catalog to messages only', () => {
+      assertNoProblems(
+        catalogs.flatMap(name =>
+          catalogShapeProblems(parseCatalog(name)).map(
+            problem => `translations/${name}: ${problem}`,
+          ),
+        ),
+        'Remove the key; the platform catalog for the locale provides it.',
       );
     });
 

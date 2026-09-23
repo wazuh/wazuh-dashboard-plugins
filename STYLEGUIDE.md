@@ -935,4 +935,11 @@ not namespaced, is reused for two messages or is built at runtime, when a messag
 as ICU, or when `.i18nrc.json` and `translations/` disagree with the catalogs the plugin declares.
 Each plugin runs it from `common/i18n-strings.test.ts` as part of `yarn test:jest`.
 
+### Translation catalogs
+
+A catalog (`translations/<locale>.json`) holds `messages` only. The platform replaces `formats`
+with the last catalog that declares it, so a plugin `formats`, even `{}`, breaks the whole locale.
+Each plugin's `.opensearch_dashboards-plugin-helpers.json` packages `.i18nrc.json` and
+`translations/`; without them a built plugin registers no catalog.
+
 [sideeffect]: http://en.wikipedia.org/wiki/Side_effect_(computer_science)
