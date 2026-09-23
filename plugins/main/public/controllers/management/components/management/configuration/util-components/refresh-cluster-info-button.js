@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import { EuiButtonEmpty } from '@elastic/eui';
 
@@ -81,7 +82,9 @@ class WzRefreshClusterInfoButton extends Component {
         onClick={() => this.refreshClusterNodes()}
         isDisabled={this.state.isLoading}
       >
-        Refresh
+        {i18n.translate('wazuh.configuration.refreshClusterInfo.button', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     );
   }

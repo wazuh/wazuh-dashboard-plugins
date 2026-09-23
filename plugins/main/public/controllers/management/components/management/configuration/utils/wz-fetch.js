@@ -10,8 +10,16 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delayAsPromise } from '../../../../../../../common/utils';
+
+// The notices this module shows while a node restarts. The header callout
+// needs to tell them apart to show its spinner, and the text is translated,
+// so it can't match on the copy.
+const restartingNotices = new Set();
+
+export const isRestartingNotice = notice => restartingNotices.has(notice);
 
 /**
  * Fetch full node configuration and extract requested keys.
@@ -43,7 +51,9 @@ export const getFullEndpointConfig = async (
   } catch (error) {
     const errorMsg = await handleError(
       error,
-      'Fetch configuration',
+      i18n.translate('wazuh.configuration.wzFetch.fetchConfigurationLocation', {
+        defaultMessage: 'Fetch configuration',
+      }),
       updateWazuhNotReadyYet,
       node,
     );
@@ -64,8 +74,12 @@ export const extractMessage = error => {
     const isFromAPI =
       origin.includes('/api/request') || origin.includes('/api/csv');
     return isFromAPI
-      ? 'API is not reachable. Reason: timeout.'
-      : 'Server did not respond';
+      ? i18n.translate('wazuh.configuration.wzFetch.apiTimeout', {
+          defaultMessage: 'API is not reachable. Reason: timeout.',
+        })
+      : i18n.translate('wazuh.configuration.wzFetch.serverDidNotRespond', {
+          defaultMessage: 'Server did not respond',
+        });
   }
   if ((((error || {}).data || {}).errorData || {}).message)
     return error.data.errorData.message;
@@ -83,7 +97,12 @@ export const extractMessage = error => {
   if (((error || {}).message || {}).msg) return error.message.msg;
   if (typeof error === 'string') return error;
   if (typeof error === 'object') return JSON.stringify(error);
-  return error || 'Unexpected error';
+  return (
+    error ||
+    i18n.translate('wazuh.configuration.wzFetch.unexpectedError', {
+      defaultMessage: 'Unexpected error',
+    })
+  );
 };
 
 /**
@@ -103,7 +122,11 @@ export const handleError = async (
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      updateWazuhNotReadyYet('Server not ready yet.');
+      updateWazuhNotReadyYet(
+        i18n.translate('wazuh.configuration.wzFetch.serverNotReady', {
+          defaultMessage: 'Server not ready yet.',
+        }),
+      );
       await makePing(updateWazuhNotReadyYet);
       return;
     }
@@ -113,10 +136,20 @@ export const handleError = async (
 
     const hasOrigin = messageIsString && originIsString;
 
-    let text = hasOrigin ? `${message} (${origin})` : message;
+    let text = hasOrigin
+      ? i18n.translate('wazuh.configuration.wzFetch.messageWithOrigin', {
+          defaultMessage: '{message} ({origin})',
+          values: { message, origin },
+        })
+      : message;
 
     if (error.extraMessage) text = error.extraMessage;
-    text = location ? location + '. ' + text : text;
+    text = location
+      ? i18n.translate('wazuh.configuration.wzFetch.messageWithLocation', {
+          defaultMessage: '{location}. {message}',
+          values: { location, message: text },
+        })
+      : text;
 
     return text;
   } catch (error) {
@@ -194,7 +227,11 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    throw new Error('Server could not be recovered.');
+    throw new Error(
+      i18n.translate('wazuh.configuration.wzFetch.serverNotRecovered', {
+        defaultMessage: 'Server could not be recovered.',
+      }),
+    );
   }
 };
 
@@ -217,7 +254,11 @@ export const fetchFile = async selectedNode => {
     let xml = (data || {}).data || false;
 
     if (!xml) {
-      throw new Error('Could not fetch configuration file');
+      throw new Error(
+        i18n.translate('wazuh.configuration.wzFetch.fetchFileError', {
+          defaultMessage: 'Could not fetch configuration file',
+        }),
+      );
     }
 
     xml = xml.replace(/..xml.+\?>/, '');
@@ -237,7 +278,15 @@ export const restartNodeSelected = async (
   updateWazuhNotReadyYet,
 ) => {
   try {
-    updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
+    const notice = i18n.translate(
+      'wazuh.configuration.wzFetch.restartingNode',
+      {
+        defaultMessage: 'Restarting {nodeName}, please wait.',
+        values: { nodeName: selectedNode },
+      },
+    );
+    restartingNotices.add(notice);
+    updateWazuhNotReadyYet(notice);
     await restartNode(selectedNode);
     return await makePing(updateWazuhNotReadyYet);
   } catch (error) {

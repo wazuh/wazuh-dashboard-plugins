@@ -10,48 +10,115 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { hasAgentSupportModule } from '../../../../../react-services/wz-agents';
 import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
 import { docker as dockerApp } from '../../../../../utils/applications';
 
 export default [
   {
-    title: 'Main configurations',
+    title: i18n.translate(
+      'wazuh.configuration.settingsGroups.mainConfigurationsTitle',
+      {
+        defaultMessage: 'Main configurations',
+      },
+    ),
     description: '',
     settings: [
       {
-        name: 'Global Configuration',
-        description: 'Global and remote settings',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.globalConfigurationName',
+          {
+            defaultMessage: 'Global Configuration',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.globalConfigurationDescription',
+          {
+            defaultMessage: 'Global and remote settings',
+          },
+        ),
         goto: 'global-configuration',
         when: 'manager',
       },
       {
-        name: 'Cluster',
-        description: 'Master node configuration',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.clusterName',
+          {
+            defaultMessage: 'Cluster',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.clusterDescription',
+          {
+            defaultMessage: 'Master node configuration',
+          },
+        ),
         goto: 'cluster',
         when: 'manager',
       },
       {
-        name: 'Indexer',
-        description: 'Indexer connection and SSL settings',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.indexerName',
+          {
+            defaultMessage: 'Indexer',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.indexerDescription',
+          {
+            defaultMessage: 'Indexer connection and SSL settings',
+          },
+        ),
         goto: 'indexer',
         when: 'manager',
       },
       {
-        name: 'Registration Service',
-        description: 'Automatic agent registration service',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.registrationServiceName',
+          {
+            defaultMessage: 'Registration Service',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.registrationServiceDescription',
+          {
+            defaultMessage: 'Automatic agent registration service',
+          },
+        ),
         goto: 'registration-service',
         when: 'manager',
       },
       {
-        name: 'Global Configuration',
-        description: 'Logging settings that apply to the agent',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.globalConfigurationAgentName',
+          {
+            defaultMessage: 'Global Configuration',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.globalConfigurationAgentDescription',
+          {
+            defaultMessage: 'Logging settings that apply to the agent',
+          },
+        ),
         goto: 'global-configuration-agent',
         when: 'agent',
       },
       {
-        name: 'Communication',
-        description: 'Settings related to the connection with the manager',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.clientName',
+          {
+            defaultMessage: 'Communication',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.clientDescription',
+          {
+            defaultMessage:
+              'Settings related to the connection with the manager',
+          },
+        ),
         goto: 'client',
         when: 'agent',
       },
@@ -67,46 +134,106 @@ export default [
   },
   {
     // Wazuh: Removed this section for the manager.
-    title: 'Auditing and policy monitoring',
+    title: i18n.translate(
+      'wazuh.configuration.settingsGroups.auditingAndPolicyMonitoringTitle',
+      {
+        defaultMessage: 'Auditing and policy monitoring',
+      },
+    ),
     description: '',
     settings: [
       {
-        name: 'Policy monitoring',
-        description:
-          'Configuration to ensure compliance with security policies, standards, and hardening guides',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.policyMonitoringName',
+          {
+            defaultMessage: 'Policy monitoring',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.policyMonitoringDescription',
+          {
+            defaultMessage:
+              'Configuration to ensure compliance with security policies, standards, and hardening guides',
+          },
+        ),
         goto: 'policy-monitoring',
         when: 'agent',
       },
     ],
   },
   {
-    title: 'System threats and incident response',
+    title: i18n.translate(
+      'wazuh.configuration.settingsGroups.systemThreatsAndIncidentResponseTitle',
+      {
+        defaultMessage: 'System threats and incident response',
+      },
+    ),
     description: '',
     settings: [
       {
-        name: 'Vulnerabilities',
-        description:
-          'Discover what applications are affected by well-known vulnerabilities',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.vulnerabilitiesName',
+          {
+            defaultMessage: 'Vulnerabilities',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.vulnerabilitiesDescription',
+          {
+            defaultMessage:
+              'Discover what applications are affected by well-known vulnerabilities',
+          },
+        ),
         goto: 'vulnerabilities',
         when: 'manager',
       },
       {
         // Wazuh: Removed this section for the manager.
-        name: 'Inventory data',
-        description:
-          'Gather relevant information about system operating system, hardware, networking, and packages',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.inventoryName',
+          {
+            defaultMessage: 'Inventory data',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.inventoryDescription',
+          {
+            defaultMessage:
+              'Gather relevant information about system operating system, hardware, networking, and packages',
+          },
+        ),
         goto: 'inventory',
         when: 'agent',
       },
       {
-        name: 'Commands',
-        description: 'Configuration options of the Command wodle',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.commandsName',
+          {
+            defaultMessage: 'Commands',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.commandsDescription',
+          {
+            defaultMessage: 'Configuration options of the Command wodle',
+          },
+        ),
         goto: 'commands',
         when: 'agent',
       },
       {
-        name: 'Active response',
-        description: 'Active response settings for this agent',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.activeResponseAgentName',
+          {
+            defaultMessage: 'Active response',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.activeResponseAgentDescription',
+          {
+            defaultMessage: 'Active response settings for this agent',
+          },
+        ),
         goto: 'active-response-agent',
         when: 'agent',
       },
@@ -114,20 +241,45 @@ export default [
   },
   {
     // Wazuh: Removed this section for the manager.
-    title: 'Log data analysis',
+    title: i18n.translate(
+      'wazuh.configuration.settingsGroups.logDataAnalysisTitle',
+      {
+        defaultMessage: 'Log data analysis',
+      },
+    ),
     description: '',
     settings: [
       {
-        name: 'Log collection',
-        description:
-          'Log analysis from text files, Windows events or syslog outputs',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.logCollectionName',
+          {
+            defaultMessage: 'Log collection',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.logCollectionDescription',
+          {
+            defaultMessage:
+              'Log analysis from text files, Windows events or syslog outputs',
+          },
+        ),
         goto: 'log-collection',
         when: 'agent',
       },
       {
-        name: 'Integrity monitoring',
-        description:
-          'Identify changes in content, permissions, ownership, and attributes of files',
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.integrityMonitoringName',
+          {
+            defaultMessage: 'Integrity monitoring',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.integrityMonitoringDescription',
+          {
+            defaultMessage:
+              'Identify changes in content, permissions, ownership, and attributes of files',
+          },
+        ),
         goto: 'integrity-monitoring',
         when: 'agent',
       },

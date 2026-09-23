@@ -23,6 +23,7 @@ import {
   EuiPopover,
 } from '@elastic/eui';
 import { AppState } from '../../react-services/app-state';
+import { isRestartingNotice } from '../../controllers/management/components/management/configuration/utils/wz-fetch';
 
 import { connect } from 'react-redux';
 import { getHeaderActionMenuMounter } from '../../kibana-services';
@@ -199,15 +200,14 @@ export const WzMenu = withWindowSize(
             <EuiFlexItem>
               <p></p>
             </EuiFlexItem>
-            {typeof this.props.state.wazuhNotReadyYet === 'string' &&
-              this.props.state.wazuhNotReadyYet.includes('Restarting') && (
-                <EuiFlexItem grow={false}>
-                  <p>
-                    {' '}
-                    <EuiLoadingSpinner size='l' /> &nbsp; &nbsp;{' '}
-                  </p>
-                </EuiFlexItem>
-              )}
+            {isRestartingNotice(this.props.state.wazuhNotReadyYet) && (
+              <EuiFlexItem grow={false}>
+                <p>
+                  {' '}
+                  <EuiLoadingSpinner size='l' /> &nbsp; &nbsp;{' '}
+                </p>
+              </EuiFlexItem>
+            )}
             {this.props.state.wazuhNotReadyYet ===
               'Server could not be recovered.' && (
               <EuiFlexItem grow={false}>
