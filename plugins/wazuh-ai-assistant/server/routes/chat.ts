@@ -48,6 +48,7 @@ import {
   ROUTER_ENABLED,
 } from '../tools/router';
 import { addUsage, toStreamUsage, ZERO_USAGE_TOTALS } from './chat-usage';
+import { withSseKeepalive } from './sse-keepalive';
 import {
   resolveSuggestedDsl,
   SUGGEST_DISCOVER_QUERY_TOOL,
@@ -2365,11 +2366,14 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         );
         nodeStream = Readable.from(
           releaseStreamSlotWhenDone(
-            streamSseFrames(orchestrationEvents, logger),
+            // Keep-alive frames so idle-socket timeouts do not close a long silent turn.
+            withSseKeepalive(streamSseFrames(orchestrationEvents, logger)),
             releaseStreamSlot,
           ),
           { objectMode: false },
         );
+        // However the stream ends (a destroy may skip `aborted$`), stop the provider work with it.
+        nodeStream.once('close', () => controller.abort());
 
         return response.ok({
           headers: {
