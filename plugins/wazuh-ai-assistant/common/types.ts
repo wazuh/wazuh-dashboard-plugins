@@ -512,6 +512,9 @@ export interface ProviderInput {
 
 export interface ProviderTestResult {
   success: boolean;
+  /** Time to the first content token (on failure, until the test gave up). */
   latencyMs: number;
   message?: string;
+  /** No content within `PROVIDER_TEST_TIMEOUT_MS`; the client shows its own translated message. */
+  timedOut?: boolean;
 }
