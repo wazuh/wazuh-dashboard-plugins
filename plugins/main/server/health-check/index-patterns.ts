@@ -416,7 +416,7 @@ export const initializationTaskCreatorIndexPatternBatch = ({
             .join('\n'),
       );
     }
-    return results;
+    return runCtx.taskResult.ok(results);
   },
 });
 

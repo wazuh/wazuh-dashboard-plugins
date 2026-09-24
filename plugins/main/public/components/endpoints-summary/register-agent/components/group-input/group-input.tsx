@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { useState } from 'react';
 import {
   EuiComboBox,
   EuiCallOut,
@@ -10,7 +10,21 @@ import {
 } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
+import { AddNewGroupButton } from '../../../../management/groups/add-new-group-button';
 import './group-input.scss';
+
+interface GroupOption {
+  label: string;
+  id: string;
+}
+
+interface GroupInputProps {
+  value?: GroupOption[];
+  options?: { groups: GroupOption[] };
+  onChange: (event: { target: { value: GroupOption[] } }) => void;
+  /* Called with the created group name, so the wizard can reload its list. */
+  onGroupCreated?: (groupName: string) => void | Promise<void>;
+}
 
 const popoverAgentGroup = (
   <span>
@@ -28,12 +42,29 @@ const popoverAgentGroup = (
   </span>
 );
 
-const GroupInput = ({ value, options, onChange }) => {
+const GroupInput = ({
+  value,
+  options,
+  onChange,
+  onGroupCreated,
+}: GroupInputProps) => {
   const [isPopoverAgentGroup, setIsPopoverAgentGroup] = useState(false);
 
   const onButtonAgentGroup = () =>
     setIsPopoverAgentGroup(isPopoverAgentGroup => !isPopoverAgentGroup);
   const closeAgentGroup = () => setIsPopoverAgentGroup(false);
+
+  /* The group was created to enroll into it, so select it right away. */
+  const handleGroupCreated = async (groupName: string) => {
+    const selection = value ?? [];
+    if (!selection.some(group => group.id === groupName)) {
+      onChange({
+        target: { value: [...selection, { label: groupName, id: groupName }] },
+      });
+    }
+    await onGroupCreated?.(groupName);
+  };
+
   return (
     <>
       <EuiFlexGroup
@@ -70,20 +101,29 @@ const GroupInput = ({ value, options, onChange }) => {
           </EuiPopover>
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiComboBox
-        placeholder={!value?.length ? 'Default' : 'Select group'}
-        options={options?.groups}
-        selectedOptions={value}
-        onChange={group => {
-          onChange({
-            target: { value: group },
-          });
-        }}
-        isDisabled={!options?.groups.length}
-        isClearable={true}
-        data-test-subj='demoComboBox'
-        data-testid='group-input-combobox'
-      />
+      <EuiFlexGroup alignItems='center' responsive={false} gutterSize='s'>
+        <EuiFlexItem grow={false} className='registerAgentGroupsSelector'>
+          <EuiComboBox
+            placeholder={!value?.length ? 'Default' : 'Select group'}
+            options={options?.groups}
+            selectedOptions={value}
+            onChange={selection => {
+              /* The combo returns the option objects it was given, which carry
+              the group id EUI's type does not know about. */
+              onChange({
+                target: { value: selection as GroupOption[] },
+              });
+            }}
+            isDisabled={!options?.groups.length}
+            isClearable={true}
+            data-test-subj='demoComboBox'
+            data-testid='group-input-combobox'
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <AddNewGroupButton onGroupCreated={handleGroupCreated} />
+        </EuiFlexItem>
+      </EuiFlexGroup>
       {!options?.groups.length && (
         <>
           <EuiCallOut

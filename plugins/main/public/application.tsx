@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { I18nProvider } from '@osd/i18n/react';
 import { Application } from './app-router';
 import { Provider } from 'react-redux';
@@ -11,13 +11,13 @@ export async function renderApp(params) {
   */
   await import('./app');
   const deps = { /*coreStart, navigation, */ params /*config */ };
-  ReactDOM.render(
+  const root = createRoot(params.element);
+  root.render(
     <I18nProvider>
       <Provider store={store}>
         <Application {...deps} />
       </Provider>
     </I18nProvider>,
-    params.element,
   );
-  return () => ReactDOM.unmountComponentAtNode(params.element);
+  return () => root.unmount();
 }
