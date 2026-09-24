@@ -1,5 +1,18 @@
 import path from 'path';
+import { i18n } from '@osd/i18n';
 import { formatBytes } from './file-size';
+
+/**
+ * A file size limit as shown in a validation message: in the most meaningful unit, or in bytes.
+ */
+function fileSizeLimit(bytes: number, meaningfulUnit?: boolean): string {
+  return meaningfulUnit
+    ? formatBytes(bytes)
+    : i18n.translate('wazuhCore.settings.validation.bytes', {
+        defaultMessage: '{bytes} bytes',
+        values: { bytes: String(bytes) },
+      });
+}
 
 export class SettingsValidator {
   /**
@@ -24,7 +37,11 @@ export class SettingsValidator {
    * @returns
    */
   static isString(value: unknown): string | undefined {
-    return typeof value === 'string' ? undefined : 'Value is not a string.';
+    return typeof value === 'string'
+      ? undefined
+      : i18n.translate('wazuhCore.settings.validation.notString', {
+          defaultMessage: 'Value is not a string.',
+        });
   }
 
   /**
@@ -33,7 +50,11 @@ export class SettingsValidator {
    * @returns
    */
   static hasNoSpaces(value: string): string | undefined {
-    return /^\S*$/.test(value) ? undefined : 'No whitespaces allowed.';
+    return /^\S*$/.test(value)
+      ? undefined
+      : i18n.translate('wazuhCore.settings.validation.hasSpaces', {
+          defaultMessage: 'No whitespaces allowed.',
+        });
   }
 
   /**
@@ -45,7 +66,10 @@ export class SettingsValidator {
     return (value: string): string | undefined => {
       if (typeof value === 'string') {
         if (value.length < minChars) {
-          return `Value must have at least ${minChars} characters.`;
+          return i18n.translate('wazuhCore.settings.validation.tooShort', {
+            defaultMessage: 'Value must have at least {minChars} characters.',
+            values: { minChars },
+          });
         } else {
           return undefined;
         }
@@ -62,7 +86,10 @@ export class SettingsValidator {
     return (value: string): string | undefined => {
       if (typeof value === 'string') {
         if (value.length > maxChars) {
-          return `Value must have at most ${maxChars} characters.`;
+          return i18n.translate('wazuhCore.settings.validation.tooLong', {
+            defaultMessage: 'Value must have at most {maxChars} characters.',
+            values: { maxChars },
+          });
         } else {
           return undefined;
         }
@@ -78,7 +105,9 @@ export class SettingsValidator {
   static isNotEmptyString(value: string): string | undefined {
     if (typeof value === 'string') {
       if (value.length === 0) {
-        return 'Value can not be empty.';
+        return i18n.translate('wazuhCore.settings.validation.empty', {
+          defaultMessage: 'Value can not be empty.',
+        });
       } else {
         return undefined;
       }
@@ -99,13 +128,24 @@ export class SettingsValidator {
         typeof options.maxLength !== 'undefined' &&
         value.split('\n').some(line => line.length > options.maxLength)
       ) {
-        return `The maximum length of a line is ${options.maxLength} characters.`;
+        return i18n.translate('wazuhCore.settings.validation.lineTooLong', {
+          defaultMessage:
+            'The maximum length of a line is {maxLength} characters.',
+          values: { maxLength: options.maxLength },
+        });
       }
       if (typeof options.minRows !== 'undefined' && lines < options.minRows) {
-        return `The string should have more or ${options.minRows} line/s.`;
+        return i18n.translate('wazuhCore.settings.validation.tooFewLines', {
+          defaultMessage: 'The string should have more or {minRows} line/s.',
+          values: { minRows: options.minRows },
+        });
       }
       if (typeof options.maxRows !== 'undefined' && lines > options.maxRows) {
-        return `The string should have less or equal to ${options.maxRows} line/s.`;
+        return i18n.translate('wazuhCore.settings.validation.tooManyLines', {
+          defaultMessage:
+            'The string should have less or equal to {maxRows} line/s.',
+          values: { maxRows: options.maxRows },
+        });
       }
     };
   }
@@ -120,9 +160,11 @@ export class SettingsValidator {
       return invalidCharacters.some(invalidCharacter =>
         value.includes(invalidCharacter),
       )
-        ? `It can't contain invalid characters: ${invalidCharacters.join(
-            ', ',
-          )}.`
+        ? i18n.translate('wazuhCore.settings.validation.invalidCharacters', {
+            defaultMessage:
+              "It can't contain invalid characters: {characters}.",
+            values: { characters: invalidCharacters.join(', ') },
+          })
         : undefined;
     };
   }
@@ -137,7 +179,10 @@ export class SettingsValidator {
       return invalidStartingCharacters.some(invalidStartingCharacter =>
         value.startsWith(invalidStartingCharacter),
       )
-        ? `It can't start with: ${invalidStartingCharacters.join(', ')}.`
+        ? i18n.translate('wazuhCore.settings.validation.invalidStart', {
+            defaultMessage: "It can't start with: {values}.",
+            values: { values: invalidStartingCharacters.join(', ') },
+          })
         : undefined;
     };
   }
@@ -150,7 +195,10 @@ export class SettingsValidator {
   static noLiteralString(...invalidLiterals: string[]) {
     return function (value: string): string | undefined {
       return invalidLiterals.some(invalidLiteral => value === invalidLiteral)
-        ? `It can't be: ${invalidLiterals.join(', ')}.`
+        ? i18n.translate('wazuhCore.settings.validation.invalidLiteral', {
+            defaultMessage: "It can't be: {values}.",
+            values: { values: invalidLiterals.join(', ') },
+          })
         : undefined;
     };
   }
@@ -163,7 +211,10 @@ export class SettingsValidator {
   static isBoolean(value: string): string | undefined {
     return typeof value === 'boolean'
       ? undefined
-      : 'It should be a boolean. Allowed values: true or false.';
+      : i18n.translate('wazuhCore.settings.validation.notBoolean', {
+          defaultMessage:
+            'It should be a boolean. Allowed values: true or false.',
+        });
   }
 
   /**
@@ -172,7 +223,11 @@ export class SettingsValidator {
    * @returns
    */
   static isNumber(value: string): string | undefined {
-    return typeof value === 'number' ? undefined : 'Value is not a number.';
+    return typeof value === 'number'
+      ? undefined
+      : i18n.translate('wazuhCore.settings.validation.notNumber', {
+          defaultMessage: 'Value is not a number.',
+        });
   }
 
   /**
@@ -185,18 +240,28 @@ export class SettingsValidator {
   ) {
     return function (value: number) {
       if (typeof value !== 'number') {
-        return 'Value is not a number.';
+        return i18n.translate('wazuhCore.settings.validation.notNumber', {
+          defaultMessage: 'Value is not a number.',
+        });
       }
 
       if (options.integer && !Number.isInteger(Number(value))) {
-        return 'Number should be an integer.';
+        return i18n.translate('wazuhCore.settings.validation.notInteger', {
+          defaultMessage: 'Number should be an integer.',
+        });
       }
 
       if (typeof options.min !== 'undefined' && value < options.min) {
-        return `Value should be greater or equal than ${options.min}.`;
+        return i18n.translate('wazuhCore.settings.validation.belowMinimum', {
+          defaultMessage: 'Value should be greater or equal than {min}.',
+          values: { min: options.min },
+        });
       }
       if (typeof options.max !== 'undefined' && value > options.max) {
-        return `Value should be lower or equal than ${options.max}.`;
+        return i18n.translate('wazuhCore.settings.validation.aboveMaximum', {
+          defaultMessage: 'Value should be lower or equal than {max}.',
+          values: { max: options.max },
+        });
       }
     };
   }
@@ -213,7 +278,9 @@ export class SettingsValidator {
       try {
         jsonObject = JSON.parse(value);
       } catch (error) {
-        return "Value can't be parsed. There is some error.";
+        return i18n.translate('wazuhCore.settings.validation.unparsable', {
+          defaultMessage: "Value can't be parsed. There is some error.",
+        });
       }
 
       return validateParsed ? validateParsed(jsonObject) : undefined;
@@ -232,7 +299,9 @@ export class SettingsValidator {
       try {
         items = value.split(',').map(item => item.trim());
       } catch (error) {
-        return "Value can't be parsed. There is some error.";
+        return i18n.translate('wazuhCore.settings.validation.unparsable', {
+          defaultMessage: "Value can't be parsed. There is some error.",
+        });
       }
 
       const validationErrors = items
@@ -254,7 +323,9 @@ export class SettingsValidator {
     return function (value: unknown[]) {
       // Check the JSON is an array
       if (!Array.isArray(value)) {
-        return 'Value is not a valid list.';
+        return i18n.translate('wazuhCore.settings.validation.notList', {
+          defaultMessage: 'Value is not a valid list.',
+        });
       }
 
       return validationElement
@@ -283,7 +354,10 @@ export class SettingsValidator {
     return function (value: any): string | undefined {
       return literals.includes(value)
         ? undefined
-        : `Invalid value. Allowed values: ${literals.map(String).join(', ')}.`;
+        : i18n.translate('wazuhCore.settings.validation.notAllowedValue', {
+            defaultMessage: 'Invalid value. Allowed values: {values}.',
+            values: { values: literals.map(String).join(', ') },
+          });
     };
   }
 
@@ -297,9 +371,14 @@ export class SettingsValidator {
         return;
       }
       if (!extensions.includes(path.extname(options.name))) {
-        return `File extension is invalid. Allowed file extensions: ${extensions.join(
-          ', ',
-        )}.`;
+        return i18n.translate(
+          'wazuhCore.settings.validation.invalidFileExtension',
+          {
+            defaultMessage:
+              'File extension is invalid. Allowed file extensions: {extensions}.',
+            values: { extensions: extensions.join(', ') },
+          },
+        );
       }
     };
 
@@ -321,21 +400,23 @@ export class SettingsValidator {
         typeof options.minBytes !== 'undefined' &&
         value.size <= options.minBytes
       ) {
-        return `File size should be greater or equal than ${
-          options.meaningfulUnit
-            ? formatBytes(options.minBytes)
-            : `${options.minBytes} bytes`
-        }.`;
+        return i18n.translate('wazuhCore.settings.validation.fileTooSmall', {
+          defaultMessage: 'File size should be greater or equal than {limit}.',
+          values: {
+            limit: fileSizeLimit(options.minBytes, options.meaningfulUnit),
+          },
+        });
       }
       if (
         typeof options.maxBytes !== 'undefined' &&
         value.size >= options.maxBytes
       ) {
-        return `File size should be lower or equal than ${
-          options.meaningfulUnit
-            ? formatBytes(options.maxBytes)
-            : `${options.maxBytes} bytes`
-        }.`;
+        return i18n.translate('wazuhCore.settings.validation.fileTooLarge', {
+          defaultMessage: 'File size should be lower or equal than {limit}.',
+          values: {
+            limit: fileSizeLimit(options.maxBytes, options.meaningfulUnit),
+          },
+        });
       }
     };
 
@@ -360,7 +441,13 @@ export class SettingsValidator {
       value.length > 255 ||
       (value.length > 0 && !isFQDNOrHostname.test(value) && !isIPv6.test(value))
     ) {
-      return 'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6';
+      return i18n.translate(
+        'wazuhCore.settings.validation.invalidServerAddress',
+        {
+          defaultMessage:
+            'It should be a valid hostname, FQDN, IPv4 or uncompressed IPv6',
+        },
+      );
     }
     return undefined;
   }
@@ -384,7 +471,12 @@ export class SettingsValidator {
     }
 
     if (value.length > 255) {
-      return 'It should be shorter than 256 characters.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointAddressTooLong',
+        {
+          defaultMessage: 'It should be shorter than 256 characters.',
+        },
+      );
     }
 
     const isFQDNOrHostname =
@@ -401,7 +493,13 @@ export class SettingsValidator {
       extraZones.length > 0 ||
       (zone !== undefined && !/^[\w.-]+$/.test(zone))
     ) {
-      return 'It should carry at most one zone id, written as %25 followed by the interface name.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointAddressZoneId',
+        {
+          defaultMessage:
+            'It should carry at most one zone id, written as %25 followed by the interface name.',
+        },
+      );
     }
 
     if (SettingsValidator.isIPv6(address)) {
@@ -411,15 +509,31 @@ export class SettingsValidator {
     /* A zone id only qualifies an IPv6 address, so anything else carrying one
     is malformed rather than merely unrecognized. */
     if (zone !== undefined) {
-      return 'A zone id can only follow an IPv6 address.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointAddressZoneWithoutIpv6',
+        {
+          defaultMessage: 'A zone id can only follow an IPv6 address.',
+        },
+      );
     }
 
     if (bracketed) {
-      return 'Brackets should only enclose an IPv6 address.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointAddressBrackets',
+        {
+          defaultMessage: 'Brackets should only enclose an IPv6 address.',
+        },
+      );
     }
 
     if (!isFQDNOrHostname.test(address)) {
-      return 'It should be a valid hostname, FQDN, IPv4 or IPv6 address';
+      return i18n.translate(
+        'wazuhCore.settings.validation.invalidEndpointAddress',
+        {
+          defaultMessage:
+            'It should be a valid hostname, FQDN, IPv4 or IPv6 address',
+        },
+      );
     }
 
     return undefined;
@@ -465,13 +579,23 @@ export class SettingsValidator {
     }
 
     if (!/^\d+$/.test(value)) {
-      return 'It should be a number.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointPortNotNumber',
+        {
+          defaultMessage: 'It should be a number.',
+        },
+      );
     }
 
     const port = Number(value);
 
     if (port < 1 || port > 65535) {
-      return 'It should be a port number between 1 and 65535.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointPortOutOfRange',
+        {
+          defaultMessage: 'It should be a port number between 1 and 65535.',
+        },
+      );
     }
 
     return undefined;
@@ -493,21 +617,42 @@ export class SettingsValidator {
     }
 
     if (value.length > 128) {
-      return 'It should be shorter than 129 characters.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointPathTooLong',
+        {
+          defaultMessage: 'It should be shorter than 129 characters.',
+        },
+      );
     }
 
     if (!/^\/?[\w.\-/]*$/.test(value)) {
-      return 'It should only contain letters, numbers, and the characters . _ - /';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointPathInvalidCharacters',
+        {
+          defaultMessage:
+            'It should only contain letters, numbers, and the characters . _ - /',
+        },
+      );
     }
 
     const segments = value.split('/').filter(segment => segment !== '');
 
     if (segments.some(segment => segment === '.' || segment === '..')) {
-      return 'It should not contain the segments . or ..';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointPathRelativeSegment',
+        {
+          defaultMessage: 'It should not contain the segments . or ..',
+        },
+      );
     }
 
     if (/\/{2,}/.test(value)) {
-      return 'It should not contain empty segments.';
+      return i18n.translate(
+        'wazuhCore.settings.validation.endpointPathEmptySegment',
+        {
+          defaultMessage: 'It should not contain empty segments.',
+        },
+      );
     }
 
     return undefined;
