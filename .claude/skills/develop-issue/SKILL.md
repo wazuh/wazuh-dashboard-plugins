@@ -51,6 +51,8 @@ Keep the change scoped to the issue. Respect the architecture and conventions in
   `common/`. Cross-plugin: `public → other/public`, `server → other/server`,
   preferably via `setup()`/`start()` contracts.
 - `filenames-simple` naming (kebab-case), TypeScript, English everywhere.
+- User-facing text you add or touch goes through i18n, following STYLEGUIDE's
+  Internationalization section. The i18n gate in `yarn test:jest` rejects bad ids and messages.
 
 ### 3. Tests (colocated)
 
