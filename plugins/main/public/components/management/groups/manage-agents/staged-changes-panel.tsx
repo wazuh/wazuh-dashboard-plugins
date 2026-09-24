@@ -114,7 +114,7 @@ export const StagedChangesPanel = ({
                       'wazuh.endpointGroups.stagedChanges.stagedSummary',
                       {
                         defaultMessage:
-                          '{total, plural, other {# staged, nothing written yet}}',
+                          '{total, plural, other {{total} staged, nothing written yet}}',
                         values: { total },
                       },
                     )
@@ -164,7 +164,8 @@ export const StagedChangesPanel = ({
                     {i18n.translate(
                       'wazuh.endpointGroups.stagedChanges.addingHeading',
                       {
-                        defaultMessage: '{count, plural, other {Adding #}}',
+                        defaultMessage:
+                          '{count, plural, other {Adding {count}}}',
                         values: { count: adds.length },
                       },
                     )}
@@ -183,7 +184,8 @@ export const StagedChangesPanel = ({
                     {i18n.translate(
                       'wazuh.endpointGroups.stagedChanges.removingHeading',
                       {
-                        defaultMessage: '{count, plural, other {Removing #}}',
+                        defaultMessage:
+                          '{count, plural, other {Removing {count}}}',
                         values: { count: removes.length },
                       },
                     )}
@@ -242,7 +244,8 @@ export const StagedChangesPanel = ({
                 {i18n.translate(
                   'wazuh.endpointGroups.stagedChanges.applyButton',
                   {
-                    defaultMessage: '{total, plural, other {Apply # changes}}',
+                    defaultMessage:
+                      '{total, plural, other {Apply {total} changes}}',
                     values: { total },
                   },
                 )}

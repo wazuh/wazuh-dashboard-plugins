@@ -14,12 +14,13 @@ import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { delayAsPromise } from '../../../../../../../common/utils';
 
-// The notices this module shows while a node restarts. The header callout
-// needs to tell them apart to show its spinner, and the text is translated,
+// The notice this module shows while a node restarts. The header callout
+// needs to tell it apart to show its spinner, and the text is translated,
 // so it can't match on the copy.
-const restartingNotices = new Set();
+let currentRestartingNotice;
 
-export const isRestartingNotice = notice => restartingNotices.has(notice);
+export const isRestartingNotice = notice =>
+  Boolean(notice) && notice === currentRestartingNotice;
 
 /**
  * Fetch full node configuration and extract requested keys.
@@ -285,7 +286,7 @@ export const restartNodeSelected = async (
         values: { nodeName: selectedNode },
       },
     );
-    restartingNotices.add(notice);
+    currentRestartingNotice = notice;
     updateWazuhNotReadyYet(notice);
     await restartNode(selectedNode);
     return await makePing(updateWazuhNotReadyYet);

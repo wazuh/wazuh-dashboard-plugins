@@ -276,13 +276,13 @@ export const ManageAgents = withErrorBoundary(
               'wazuh.endpointGroups.manageAgents.applyPartialResult',
               {
                 defaultMessage:
-                  'Applied {succeededCount} of {total, plural, other {# change(s)}} — {totalFailed} failed, see below',
+                  'Applied {succeededCount} of {total, plural, other {{total} change(s)}} — {totalFailed} failed, see below',
                 values: { succeededCount, total, totalFailed },
               },
             )
           : i18n.translate('wazuh.endpointGroups.manageAgents.applyResult', {
               defaultMessage:
-                'Applied {succeededCount} of {total, plural, other {# change(s)}}',
+                'Applied {succeededCount} of {total, plural, other {{total} change(s)}}',
               values: { succeededCount, total },
             });
 
