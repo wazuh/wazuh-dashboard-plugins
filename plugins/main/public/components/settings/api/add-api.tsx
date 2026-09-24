@@ -5,7 +5,6 @@ import {
   EuiCodeBlock,
   EuiText,
   EuiCode,
-  EuiCallOut,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
@@ -71,30 +70,6 @@ export const AddApi = withErrorBoundary(() => {
               </li>
             ))}
           </ul>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiCallOut
-            title={i18n.translate(
-              'wazuh.dashboardsSettings.addApi.cacheWarningTitle',
-              {
-                defaultMessage: 'Warning',
-              },
-            )}
-            color='warning'
-            iconType='alert'
-          >
-            <p>
-              {i18n.translate(
-                'wazuh.dashboardsSettings.addApi.cacheWarningDescription',
-                {
-                  defaultMessage:
-                    'The changes of the API connections in the configuration file could need some time to take effect due to the cache of configuration.',
-                },
-              )}
-            </p>
-          </EuiCallOut>
         </EuiFlexItem>
       </EuiFlexGroup>
     </>
