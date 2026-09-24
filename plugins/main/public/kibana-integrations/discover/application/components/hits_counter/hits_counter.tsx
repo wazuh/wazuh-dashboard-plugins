@@ -71,7 +71,7 @@ export function HitsCounter({
               {formatNumWithCommas(hits)}
             </strong>{' '}
             <FormattedMessage
-              id='discover.hitsPluralTitle'
+              id='wazuh.common.hitsCounter.hits'
               defaultMessage='{hits, plural, one {hit} other {hits}}'
               values={{
                 hits,
@@ -99,12 +99,15 @@ export function HitsCounter({
               data-test-subj='resetSavedSearch'
               onClick={onResetQuery}
               size='s'
-              aria-label={i18n.translate('discover.reloadSavedSearchButton', {
-                defaultMessage: 'Reset search',
-              })}
+              aria-label={i18n.translate(
+                'wazuh.common.hitsCounter.resetSearchButton',
+                {
+                  defaultMessage: 'Reset search',
+                },
+              )}
             >
               <FormattedMessage
-                id='discover.reloadSavedSearchButton'
+                id='wazuh.common.hitsCounter.resetSearchButton'
                 defaultMessage='Reset search'
               />
             </EuiButtonEmpty>

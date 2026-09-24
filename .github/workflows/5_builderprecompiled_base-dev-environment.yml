@@ -126,6 +126,13 @@ jobs:
           [ "$platform" = "kbn" ] && { docker_env_plugin_platform="KIBANA_VERSION"; };
           [ "$platform" = "osd" ] && { docker_env_plugin_platform="OPENSEARCH_DASHBOARDS_VERSION"; };
 
+          # Every plugin but wazuh-core imports test helpers from it (e.g. the i18n gate in
+          # wazuh-core/test/i18n), so mount it next to the plugin under test.
+          wazuh_core_mount=""
+          if [ "${{ matrix.plugins.container_path }}" != "wazuh-core" ]; then
+            wazuh_core_mount="-v $(pwd)/wazuh/plugins/wazuh-core:/home/node/kbn/plugins/wazuh-core"
+          fi
+
           # Up the environment and run the command
           # GIT_REF selects the wazuh-indexer-plugins reference used to download
           # the indexer resources (known fields, sample data templates). The
@@ -136,6 +143,7 @@ jobs:
             -e GIT_REF=${wazuh_version} \
             -e ${docker_env_plugin_platform}=${combined_version} \
             -v `pwd`/${{ matrix.plugins.path }}:/home/node/kbn/plugins/${{ matrix.plugins.container_path }} \
+            ${wazuh_core_mount} \
             ${{ inputs.docker_run_extra_args }} \
             quay.io/wazuh/${platform}-dev:${combined_version} \
             bash -c '
