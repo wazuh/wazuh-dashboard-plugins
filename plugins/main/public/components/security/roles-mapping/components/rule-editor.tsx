@@ -466,14 +466,15 @@ export const RuleEditor = ({
                         iconType='arrowDown'
                         iconSide='right'
                       >
-                        {i18n.translate(
-                          'wazuh.security.ruleEditor.logicalOperatorButton',
-                          {
-                            defaultMessage:
-                              '{logicalOperator, select, AND {All are true} other {Any are true}}',
-                            values: { logicalOperator },
-                          },
-                        )}
+                        {logicalOperator === 'AND'
+                          ? i18n.translate(
+                              'wazuh.security.ruleEditor.logicalOperatorAnd',
+                              { defaultMessage: 'All are true' },
+                            )
+                          : i18n.translate(
+                              'wazuh.security.ruleEditor.logicalOperatorOr',
+                              { defaultMessage: 'Any are true' },
+                            )}
                       </EuiButtonEmpty>
                     }
                     isOpen={isLogicalPopoverOpen}
