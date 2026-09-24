@@ -159,7 +159,7 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
       );
 
       if (hasAvailable) {
-        return results;
+        return ctx.taskResult.ok(results);
       }
 
       const isCCS = results?.length > 1;
@@ -270,7 +270,7 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           .map((result: { id: string }) => result.id)
           .join(', ')}`,
       );
-      return enabledHosts;
+      return ctx.taskResult.ok(enabledHosts);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);

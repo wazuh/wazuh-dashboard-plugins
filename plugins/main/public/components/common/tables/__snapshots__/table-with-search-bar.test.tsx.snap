@@ -669,7 +669,6 @@ exports[`Table With Search Bar component renders correctly to match the snapshot
       }
       data-test-subj="table-with-search-bar"
       isExpandable={false}
-      itemIdToExpandedRowMap={false}
       items={Array []}
       loading={false}
       noItemsMessage="No items found"

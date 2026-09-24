@@ -1,7 +1,13 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react';
 import { EuiDataGridCellValueElementProps } from '@elastic/eui';
-import { useDataGrid, DataGridProps } from './use-data-grid';
+import { SearchResponse } from '@opensearch-project/opensearch/api/types';
+import {
+  useDataGrid,
+  DataGridProps,
+  DATA_GRID_NON_EUI_PROP_KEYS,
+  toEuiDataGridProps,
+} from './use-data-grid';
 import { DEFAULT_PAGINATION_OPTIONS, MAX_ENTRIES_PER_QUERY } from './constants';
 
 // Mock dependencies
@@ -89,6 +95,26 @@ describe('useDataGrid hook', () => {
     expect(result.current.columns).toHaveLength(2);
     expect(result.current.leadingControlColumns).toBeDefined();
     expect(result.current.leadingControlColumns).toHaveLength(1);
+  });
+
+  it('returns every DATA_GRID_NON_EUI_PROP_KEYS entry, so consumers can strip them all before spreading the result onto EuiDataGrid', () => {
+    const props = createBaseProps();
+    const { result } = renderHook(() => useDataGrid(props));
+
+    DATA_GRID_NON_EUI_PROP_KEYS.forEach(key => {
+      expect(result.current).toHaveProperty(key);
+    });
+  });
+
+  it('toEuiDataGridProps strips every DATA_GRID_NON_EUI_PROP_KEYS entry', () => {
+    const props = createBaseProps();
+    const { result } = renderHook(() => useDataGrid(props));
+
+    const euiProps = toEuiDataGridProps(result.current);
+
+    DATA_GRID_NON_EUI_PROP_KEYS.forEach(key => {
+      expect(euiProps).not.toHaveProperty(key);
+    });
   });
 
   // Pagination tests
@@ -222,6 +248,16 @@ describe('useDataGrid hook', () => {
       const { result } = renderHook(() => useDataGrid(props));
 
       expect(result.current.rowCount).toBe(0);
+    });
+
+    it('should return 0, not NaN, when results is the initial placeholder with no hits property (e.g. useState({} as SearchResponse) before the first fetch resolves)', () => {
+      const props = createBaseProps({
+        results: {} as SearchResponse,
+      });
+      const { result } = renderHook(() => useDataGrid(props));
+
+      expect(result.current.rowCount).toBe(0);
+      expect(Number.isNaN(result.current.rowCount)).toBe(false);
     });
 
     it('should limit rows to MAX_ENTRIES_PER_QUERY', () => {

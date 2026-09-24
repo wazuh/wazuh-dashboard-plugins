@@ -731,25 +731,6 @@ export const serverApis = {
   redirectTo: () => '/settings?tab=api',
 };
 
-const about = {
-  category: 'wz-category-dashboard-management',
-  id: 'about',
-  title: i18n.translate('wz-app-about-title', {
-    defaultMessage: 'About',
-  }),
-  breadcrumbLabel: i18n.translate('wz-app-about-breadcrumbLabel', {
-    defaultMessage: 'About',
-  }),
-  description: i18n.translate('wz-app-about-description', {
-    defaultMessage: 'Show information about App Versions and community links.',
-  }),
-  euiIconType: 'indexRollupApp',
-  order: 10006,
-  showInOverviewApp: false,
-  showInAgentMenu: false,
-  redirectTo: () => '/settings?tab=about',
-};
-
 export const Applications = [
   fileIntegrityMonitoring,
   overview,
@@ -779,7 +760,6 @@ export const Applications = [
   serverApis,
   indexerSettings,
   // sampleData,
-  about,
   ITHygiene,
   activeResponses,
 ].sort((a, b) => {

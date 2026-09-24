@@ -19,12 +19,12 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export function ExportTableCsv({
-  endpoint,
-  totalItems,
-  filters,
-  title,
+  endpoint = '/',
+  totalItems = 0,
+  filters = [],
+  title = '',
   maxRows,
-  isLoading,
+  isLoading = false,
 }) {
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -81,12 +81,3 @@ export function ExportTableCsv({
     </EuiFlexItem>
   );
 }
-
-// Set default props
-ExportTableCsv.defaultProps = {
-  endpoint: '/',
-  totalItems: 0,
-  filters: [],
-  title: '',
-  isLoading: false,
-};

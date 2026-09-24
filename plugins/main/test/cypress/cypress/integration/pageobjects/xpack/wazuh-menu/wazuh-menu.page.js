@@ -17,7 +17,8 @@ export const WAZUH_MENU_PAGE = {
   //endregion Menu
   //region SubMenu
   //region Modules
-  modulesDirectoryLink: '.wz-menu-right-side  div.euiFlexGroup > div > button > span > span',
+  modulesDirectoryLink:
+    '.wz-menu-right-side  div.euiFlexGroup > div > button > span > span',
   securityEventsLink: '[data-test-subj=menuModulesSecurityEventsLink]',
   integrityMonitoringLink: '[data-test-subj=menuModulesFimLink]',
   amazonAwsLink: '[data-test-subj=menuModulesAwsLink]',
@@ -73,7 +74,6 @@ export const WAZUH_MENU_PAGE = {
   settingsConfigurationLink: '[data-test-subj=menuSettingsConfigurationLink]',
   settingsLogsLink: '[data-test-subj=menuSettingsLogsLink]',
   settingsMiscellaneousLink: '[data-test-subj=menuSettingsMiscellaneousLink]',
-  settingsAboutLink: '[data-test-subj=menuSettingsAboutLink]',
   //endregion
   //endregion
 };

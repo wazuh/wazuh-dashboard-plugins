@@ -15,7 +15,7 @@
 // Whenever possible, custom IDs are used for predictable identification.
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
-import type { InitializationTaskRunContext } from '../services';
+import type { InitializationTaskRunContext } from '../types';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type {
   GenericAttributes,
@@ -205,7 +205,7 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
 
         ctx.logger.debug('Saved objects provisioning finished');
 
-        return { status: 'ok' };
+        return ctx.taskResult.ok();
       } catch (error) {
         const message = `Error provisioning saved objects: ${
           error instanceof Error ? error.message : String(error)

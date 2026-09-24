@@ -1,4 +1,5 @@
 import type { Logger } from 'opensearch_dashboards/server';
+import type { TaskResultFactory } from '../../../../src/core/common/healthcheck';
 
 export type TaskExecutionContext =
   | 'internal'
@@ -22,6 +23,7 @@ export interface HealthCheckTaskContext {
 
 export interface PluginTaskRunContext extends HealthCheckTaskContext {
   context: HealthCheckTaskContext;
+  taskResult: TaskResultFactory;
 }
 
 export type InitializationTaskRunContext = PluginTaskRunContext;
