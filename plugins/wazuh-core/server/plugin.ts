@@ -22,6 +22,7 @@ import {
   createDashboardSecurity,
   ServerAPIClient,
   CTIFeedsClient,
+  CertificateValidityClient,
 } from './services';
 import { InitializerConfigProvider } from './services/configuration';
 import { API_USER_STATUS_RUN_AS } from '../common/api-user-status-run-as';
@@ -88,6 +89,11 @@ export class WazuhCorePlugin
 
     this.services.ctiFeedsClient = new CTIFeedsClient(
       this.logger.get('cti-feeds-client'),
+    );
+
+    this.services.certificateValidityClient = new CertificateValidityClient(
+      this.services.serverAPIClient,
+      this.logger.get('certificate-validity-client'),
     );
 
     // Register a property to the context parameter of the endpoint handlers

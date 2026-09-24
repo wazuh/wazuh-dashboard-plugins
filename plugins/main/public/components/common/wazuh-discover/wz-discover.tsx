@@ -21,6 +21,7 @@ import {
   useDataGrid,
   exportSearchToCSV,
   getAllCustomRenders,
+  toEuiDataGridProps,
 } from '../data-grid';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
 import {
@@ -314,7 +315,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                   </EuiFlexItem>
                   <EuiFlexItem>
                     <EuiDataGrid
-                      {...dataGridProps}
+                      {...toEuiDataGridProps(dataGridProps)}
                       className={sideNavDocked ? 'dataGridDockedNav' : ''}
                       toolbarVisibility={{
                         showColumnSelector: { allowHide: false },

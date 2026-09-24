@@ -62,13 +62,17 @@ export const initializeDefaultNotificationChannel = (
           ctx.logger.info(
             'All default notification channels are present and verified',
           );
-        } else {
-          const stillMissing =
-            defaultChannels.length - defaultChannelsFound.length;
-          ctx.logger.warn(
-            `${stillMissing} default notification channels are missing`,
-          );
+
+          return ctx.taskResult.ok();
         }
+
+        const stillMissing =
+          defaultChannels.length - defaultChannelsFound.length;
+        const message = `${stillMissing} default notification channels are missing`;
+
+        ctx.logger.warn(message);
+
+        return ctx.taskResult.warning(message);
       } catch (error: any) {
         const message = `Error verifying default notification channels: ${error.message}`;
         ctx.logger.error(message);

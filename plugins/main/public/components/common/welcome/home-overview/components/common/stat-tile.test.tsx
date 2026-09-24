@@ -28,4 +28,33 @@ describe('StatTile', () => {
       value.compareDocumentPosition(label) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  it('does not trigger a validateDOMNesting warning when value contains block-level content (e.g. RedirectAppLinks)', () => {
+    const consoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
+
+    try {
+      render(
+        <StatTile
+          value={
+            <div>
+              <a href='#'>42</a>
+            </div>
+          }
+          label='Passed'
+          data-test-subj='tile'
+        />,
+      );
+
+      const hasNestingWarning = consoleError.mock.calls.some(args =>
+        args.some(
+          arg => typeof arg === 'string' && arg.includes('validateDOMNesting'),
+        ),
+      );
+      expect(hasNestingWarning).toBe(false);
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
 });

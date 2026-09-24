@@ -1,5 +1,9 @@
 import fs from 'fs';
 import { initializationTaskCreatorIndexPatternBatch } from './index-patterns';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../mocks/health-check-task-context.mock';
 
 describe('initializationTaskCreatorIndexPatternBatch', () => {
   const mockLogger = {
@@ -54,7 +58,7 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
 
     return {
       // Satisfies InitializationTaskRunContext (PluginTaskRunContext)
-      runCtx: { context, logger: mockLogger, services },
+      runCtx: withTaskResult({ context, logger: mockLogger, services }),
       savedObjectsClient,
       uiSettingsClient,
     };
@@ -81,8 +85,10 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
 
     const result = await task.run(runCtx);
 
-    expect(result).toHaveLength(3);
-    expect(result).toEqual(
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('ok');
+    expect(result.data).toHaveLength(3);
+    expect(result.data).toEqual(
       expect.arrayContaining([
         { id: 'pattern-a*', title: 'pattern-a*' },
         { id: 'pattern-b*', title: 'pattern-b*' },
@@ -304,7 +310,9 @@ describe('initializationTaskCreatorIndexPatternBatch', () => {
     });
 
     const result = await task.run(runCtx);
-    expect(result).toEqual([]);
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('ok');
+    expect(result.data).toEqual([]);
   });
 });
 
@@ -381,7 +389,7 @@ describe('initializationTaskCreatorIndexPatternBatch - known fields lazy loading
       ],
     });
 
-    await task.run({ context, logger: mockLogger, services });
+    await task.run(withTaskResult({ context, logger: mockLogger, services }));
 
     expect(readFileSpy).toHaveBeenCalledTimes(1);
     expect(readFileSpy).toHaveBeenCalledWith(
@@ -418,7 +426,7 @@ describe('initializationTaskCreatorIndexPatternBatch - known fields lazy loading
       ],
     });
 
-    await task.run({ context, logger: mockLogger, services });
+    await task.run(withTaskResult({ context, logger: mockLogger, services }));
 
     expect(readFileSpy).not.toHaveBeenCalled();
     expect(savedObjectsClient.create).not.toHaveBeenCalled();

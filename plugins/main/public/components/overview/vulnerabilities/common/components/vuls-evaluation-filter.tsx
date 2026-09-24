@@ -87,6 +87,7 @@ const VulsEvaluationFilter = ({
 
   return (
     <EuiButtonGroup
+      legend='Evaluated / Under evaluation'
       className='button-group-filter'
       type='multi'
       idToSelectedMap={toggleIdToSelectedMap}

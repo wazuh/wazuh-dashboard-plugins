@@ -75,9 +75,9 @@ const schemaMapper = (setting: TPluginSetting) => {
     case EpluginSettingType.number: {
       // add options for min and max
       const numberOptions: NumberOptions = {
+        ...schemaDef,
         min: setting?.options?.number?.min,
         max: setting?.options?.number?.max,
-        validate: validate,
       };
 
       schemaConfig = schema.number(numberOptions);
@@ -113,11 +113,9 @@ export const uiSettingsAdapter = (
       name: setting.title,
       value: setting.defaultValue,
       description: setting.description,
+      // The advanced settings page capitalises the first letter and keeps the rest.
       category: [
-        SettingCategory[setting.category]
-          .split(' ')
-          .map((word, index) => (index === 0 ? word.toLowerCase() : word))
-          .join(''),
+        SettingCategory[setting.category].toLowerCase().replace(/_/gu, ' '),
       ],
       schema: schemaMapper(setting),
     };
