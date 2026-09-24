@@ -39,12 +39,15 @@ import {
   initializationTaskCreatorIndexPatternBatch,
   initializationTaskCreatorServerAPIConnectionCompatibility,
   initializationTaskCreatorServerAPIRunAs,
+  initializationTaskCreatorCertificateValidity,
+  CertificateValidityServices,
   mapFieldsFormat,
 } from './health-check';
 import { initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations } from './health-check';
 import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERNS,
+  HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
@@ -769,6 +772,14 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorServerAPIRunAs({
         taskName: 'server-api:run-as',
         services: plugins.wazuhCore,
+      }),
+    );
+
+    // server API certificate validity
+    core.healthCheck.register(
+      initializationTaskCreatorCertificateValidity({
+        taskName: HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
+        services: plugins.wazuhCore as CertificateValidityServices,
       }),
     );
 

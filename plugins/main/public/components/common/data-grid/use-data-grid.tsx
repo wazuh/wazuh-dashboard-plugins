@@ -12,6 +12,7 @@ import {
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
 import dompurify from 'dompurify';
+import { omit } from 'lodash';
 import {
   PaginationOptions,
   tDataGridColumn,
@@ -44,10 +45,29 @@ export type tDataGridProps = {
 };
 
 export type TDataGridReturn = EuiDataGridProps & {
-  columnsAvailable: string[];
+  columnsAvailable: tDataGridColumn[];
+  setPagination: React.Dispatch<
+    React.SetStateAction<typeof DEFAULT_PAGINATION_OPTIONS>
+  >;
+  dataGridStatePersistenceManager: ReturnType<
+    typeof useDataGridStatePersistenceManager
+  >;
 };
 
-export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
+/* Keys of the useDataGrid() return value that are hook-only extras, not part
+of the EuiDataGridProps contract. Consumers must omit these before spreading
+the return value onto <EuiDataGrid>, or the leftover props land on its
+internal DOM nodes and React warns about unrecognized attributes. */
+export const DATA_GRID_NON_EUI_PROP_KEYS: readonly (keyof TDataGridReturn)[] = [
+  'columnsAvailable',
+  'setPagination',
+  'dataGridStatePersistenceManager',
+];
+
+export const toEuiDataGridProps = (props: TDataGridReturn): EuiDataGridProps =>
+  omit(props, DATA_GRID_NON_EUI_PROP_KEYS) as EuiDataGridProps;
+
+export const useDataGrid = (props: tDataGridProps): TDataGridReturn => {
   const {
     moduleId,
     indexPattern,
@@ -64,7 +84,7 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     localStorageStatePersistenceManager(moduleId);
   /** Rows */
   const [rows, setRows] = useState<any[]>([]);
-  const rowCount = results ? (results?.hits?.total as number) : 0;
+  const rowCount = (results?.hits?.total as number) ?? 0;
 
   /** Sorting **/
   // get default sorting from default columns
@@ -262,5 +282,5 @@ export const useDataGrid = (props: tDataGridProps): EuiDataGridProps => {
     },
     setPagination,
     dataGridStatePersistenceManager,
-  } as TDataGridReturn;
+  };
 };

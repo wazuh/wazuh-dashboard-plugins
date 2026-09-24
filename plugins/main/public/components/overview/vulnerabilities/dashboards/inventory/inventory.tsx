@@ -33,7 +33,10 @@ import { DiscoverNoResults } from '../../common/components/no_results';
 import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 // common components/hooks
 import useSearchBar from '../../../../common/search-bar/use-search-bar';
-import { useDataGrid } from '../../../../common/data-grid/use-data-grid';
+import {
+  useDataGrid,
+  toEuiDataGridProps,
+} from '../../../../common/data-grid/use-data-grid';
 import {
   HideOnErrorInitializatingDataSource,
   PromptErrorInitializatingDataSource,
@@ -264,7 +267,7 @@ const InventoryVulsComponent = () => {
               >
                 <div className='vulsInventoryDataGrid'>
                   <EuiDataGrid
-                    {...dataGridProps}
+                    {...toEuiDataGridProps(dataGridProps)}
                     className={sideNavDocked ? 'dataGridDockedNav' : ''}
                     toolbarVisibility={{
                       showColumnSelector: { allowHide: false },

@@ -1,13 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Export Table Csv component renders correctly to match the snapshot 1`] = `
-<ExportTableCsv
-  endpoint="/"
-  filters={Array []}
-  isLoading={false}
-  title=""
-  totalItems={0}
->
+<ExportTableCsv>
   <EuiFlexItem
     grow={false}
   >

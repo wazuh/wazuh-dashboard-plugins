@@ -65,6 +65,8 @@ function TableWzAPIInner(
     addOnTitle,
     extra,
     setReload,
+    title,
+    downloadCsv = false,
     ...rest
   }: {
     actionButtons?:
@@ -279,10 +281,10 @@ function TableWzAPIInner(
         <EuiFlexItem style={{ minWidth: 0 }}>
           <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-              {rest.title && (
+              {title && (
                 <EuiTitle data-test-subj='table-wz-api-title' size='s'>
                   <h1>
-                    {rest.title}{' '}
+                    {title}{' '}
                     {isLoading ? (
                       <EuiLoadingSpinner size='s' />
                     ) : (
@@ -306,7 +308,7 @@ function TableWzAPIInner(
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
-            {rest.downloadCsv && (
+            {downloadCsv && (
               <>
                 <ExportTableCsv
                   endpoint={rest.endpoint}
@@ -315,11 +317,7 @@ function TableWzAPIInner(
                     ...filters,
                     sort: formatSorting(tableState.sorting),
                   })}
-                  title={
-                    typeof rest.downloadCsv === 'string'
-                      ? rest.downloadCsv
-                      : rest.title
-                  }
+                  title={typeof downloadCsv === 'string' ? downloadCsv : title}
                   maxRows={maxRows}
                   isLoading={isLoading}
                 />
@@ -418,10 +416,3 @@ function TableWzAPIInner(
 
 export const TableWzAPI = forwardRef(TableWzAPIInner);
 TableWzAPI.displayName = 'TableWzAPI';
-
-// Set default props
-TableWzAPI.defaultProps = {
-  title: null,
-  downloadCsv: false,
-  searchBar: false,
-};

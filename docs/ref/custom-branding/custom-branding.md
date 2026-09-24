@@ -64,6 +64,23 @@ systemctl restart wazuh-dashboard
 
 ![Application title](./images/application_title.png)
 
+## Application version
+
+Edit `opensearch_dashboards.yml` to override the version shown on the **About** page and in the top-right help menu badge:
+
+```yml
+opensearchDashboards.branding:
+  applicationVersion: 'v1.0.0-custom'
+```
+
+> When unset, both locations show the real Wazuh dashboard version. The value is rendered exactly as provided (no automatic `v` prefix is added), so include one if desired.
+
+Restart the service after changes:
+
+```bash
+systemctl restart wazuh-dashboard
+```
+
 ## Favicon
 
 Edit `opensearch_dashboards.yml` and set the branding URLs:
@@ -104,6 +121,57 @@ systemctl restart wazuh-dashboard
 ```
 
 ![Login page](./images/login_page_basicauth.png)
+
+## Help menu links
+
+The top-right help menu shows a fixed set of links (Documentation, Slack Channel, Projects on Github, Google Group) that stay visible regardless of the active app. Override the whole list through `opensearch_dashboards.yml`:
+
+```yml
+opensearchDashboards.branding:
+  helpMenuLinks:
+    - label: 'Documentation'
+      link: 'https://documentation.wazuh.com'
+      icon: 'documentation'
+    - label: 'Support'
+      link: 'https://support.example.com'
+      icon: 'help'
+      darkModeIcon: 'help'
+```
+
+- **label**: text shown for the link.
+- **link**: URL the link points to.
+- **icon**: optional EUI icon name or image URL.
+- **darkModeIcon**: optional icon used instead of `icon` when dark mode is enabled.
+
+> Setting `helpMenuLinks` replaces the built-in list entirely — list every link you want visible, including any defaults you want to keep. Leaving it unset keeps the built-in list.
+
+Restart the service after changes:
+
+```bash
+systemctl restart wazuh-dashboard
+```
+
+## About page community links
+
+The **About** page's Community panel shows a configurable set of icons (Slack, Google Groups, Github by default). Override them with the `about.communityLinks` setting:
+
+```yml
+about.communityLinks:
+  - label: 'Slack'
+    link: 'https://wazuh.com/community/join-us-on-slack/'
+    icon: 'logoSlack'
+  - label: 'Github'
+    link: 'https://github.com/wazuh/wazuh-dashboard-plugins'
+    icon: 'logoGithub'
+```
+
+Same `label`/`link`/`icon`/`darkModeIcon` shape as `helpMenuLinks` above. Setting `about.communityLinks: []` hides the Community panel entirely. Leaving it unset keeps the built-in Slack/Google Groups/Github list.
+
+Restart the service after changes:
+
+```bash
+systemctl restart wazuh-dashboard
+```
 
 <!--
 #### Provider authentication
