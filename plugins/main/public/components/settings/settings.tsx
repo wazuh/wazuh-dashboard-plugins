@@ -21,7 +21,6 @@ import { WzConfigurationSettings } from '../settings/configuration';
 // TODO: re-import when the sample data app is enabled again (#8213, #9114).
 // import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { WzIndexerSettings } from '../indexer-settings';
-import { SettingsAbout } from '../settings/about/index';
 import {
   Applications,
   getCurrentAppDefaultTabSearch,
@@ -105,11 +104,6 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
             <div>
               <ApiTable />
             </div>
-          </div>
-        </Route>
-        <Route path='?tab=about'>
-          <div>
-            <SettingsAbout />
           </div>
         </Route>
         <Route path='?tab=indexer_settings'>
