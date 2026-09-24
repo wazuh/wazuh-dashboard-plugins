@@ -126,6 +126,11 @@ Enforced by tooling — run the linter/formatter, don't hand-format:
 - `camelCase`, `eqeqeq`, `no-var`, `curly`, no duplicate imports, `require-await`.
 - English everywhere (code, comments, commits, docs). Full guide:
   [`STYLEGUIDE.md`](STYLEGUIDE.md).
+- User-facing text goes through `i18n.translate` with ids
+  `<osdPluginId>.<area>.<component>.<element>`: no concatenation, escape literal braces with a
+  backslash, never in `server/`. Rules in STYLEGUIDE's
+  [Internationalization](STYLEGUIDE.md#internationalization-i18n) section; `yarn test:jest` runs
+  the i18n gate.
 
 ## Git / PR workflow
 
