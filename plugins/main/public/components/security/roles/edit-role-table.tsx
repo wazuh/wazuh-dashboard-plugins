@@ -7,15 +7,39 @@ import { WzButtonPermissions } from '../../common/permissions/button';
 import { TableBasicManageExpandedItems } from '../../common/tables';
 import { withErrorBoundary } from '../../common/hocs';
 
-const ExpandedTableRow = withErrorBoundary(({ item }) => {
+const PolicyValuesList = ({
+  values,
+  testSubj,
+}: {
+  values: string[];
+  testSubj: string;
+}) => (
+  <ul data-test-subj={testSubj}>
+    {values.map(value => (
+      <li key={value}>{value}</li>
+    ))}
+  </ul>
+);
+
+export const ExpandedTableRow = withErrorBoundary(({ item }) => {
   const listItems = [
     {
       title: 'Actions',
-      description: `${item.policy.actions}`,
+      description: (
+        <PolicyValuesList
+          values={item.policy.actions}
+          testSubj='policyDetailsActions'
+        />
+      ),
     },
     {
       title: 'Resources',
-      description: `${item.policy.resources}`,
+      description: (
+        <PolicyValuesList
+          values={item.policy.resources}
+          testSubj='policyDetailsResources'
+        />
+      ),
     },
     {
       title: 'Effect',
