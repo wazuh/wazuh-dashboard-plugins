@@ -44,6 +44,12 @@ export function describeTurnStatus(status: {
         defaultMessage: 'Writing the answer…',
       });
     }
+    case 'thinking': {
+      // The model is reasoning before it answers. Nothing of the reasoning itself is shown.
+      return i18n.translate('wazuhAiAssistant.chat.turnStatus.thinking', {
+        defaultMessage: 'Thinking…',
+      });
+    }
     default: {
       return status.message;
     }

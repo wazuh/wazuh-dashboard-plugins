@@ -269,8 +269,13 @@ export interface TableSpec {
  * not how many provider round-trips the orchestrator budgeted. `understanding` covers the stage-1
  * routing call, `querying` each tool execution, `writing` the answer round that follows tool
  * results.
+ * `thinking`: a round after routing has started reasoning (at most once per round).
  */
-export type TurnStatusStep = 'understanding' | 'querying' | 'writing';
+export type TurnStatusStep =
+  | 'understanding'
+  | 'querying'
+  | 'writing'
+  | 'thinking';
 
 export interface StreamUsage {
   inputTokens?: number;
