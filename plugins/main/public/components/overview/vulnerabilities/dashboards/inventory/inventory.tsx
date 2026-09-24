@@ -297,11 +297,11 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
                                     ariaLabel: i18n.translate(
-                                      'wazuh.vulnerabilityDetection.inventory.hitsCounter.tooltip.ariaLabel',
+                                      'wazuh.vulnerabilityDetection.inventory.hitsLimitTooltip.ariaLabel',
                                       { defaultMessage: 'Info' },
                                     ),
                                     content: i18n.translate(
-                                      'wazuh.vulnerabilityDetection.inventory.hitsCounter.tooltip.content',
+                                      'wazuh.vulnerabilityDetection.inventory.hitsLimitTooltip.content',
                                       {
                                         defaultMessage:
                                           'The query results has exceeded the limit of {maxEntries} hits. To provide a better experience the table only shows the first {maxEntries} hits.',

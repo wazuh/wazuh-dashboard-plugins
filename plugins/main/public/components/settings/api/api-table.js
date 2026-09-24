@@ -205,11 +205,7 @@ export const ApiTable = compose(
           ErrorHandler.info(
             i18n.translate(
               'wazuh.dashboardsSettings.apiTable.connectionSuccessToast',
-              { defaultMessage: 'Connection success' },
-            ),
-            i18n.translate(
-              'wazuh.dashboardsSettings.apiTable.connectionSuccessToastLocation',
-              { defaultMessage: 'Settings' },
+              { defaultMessage: 'Settings. Connection success' },
             ),
           );
         // WORKAROUND: Update the apiEntries with the modifications of the APIConnection object

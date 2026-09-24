@@ -408,9 +408,9 @@ export class ComplianceSubrequirements extends Component {
                     {i18n.translate(
                       'wazuh.complianceTable.subrequirements.hideNoFindingsLabel',
                       {
-                        defaultMessage: 'Hide requirements with no findings ',
+                        defaultMessage: 'Hide requirements with no findings',
                       },
-                    )}
+                    )}{' '}
                   </span>{' '}
                   &nbsp;
                   <EuiSwitch

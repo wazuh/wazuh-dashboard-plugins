@@ -656,9 +656,9 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
                   {i18n.translate(
                     'wazuh.mitreAttack.techniques.hideTechniquesSwitch.label',
                     {
-                      defaultMessage: 'Hide techniques with no findings ',
+                      defaultMessage: 'Hide techniques with no findings',
                     },
-                  )}
+                  )}{' '}
                 </span>{' '}
                 &nbsp;
                 <EuiSwitch
