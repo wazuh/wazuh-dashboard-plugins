@@ -1,5 +1,6 @@
 {
   "prefix": "wazuhCore",
   "paths": { "wazuhCore": "." },
-  "translations": []
+  "translations": [],
+  "exclude": ["test"]
 }
