@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
 import path from 'path';
 import { version } from '../package.json';
 // import { validate as validateNodeCronInterval } from 'node-cron';
@@ -194,11 +195,25 @@ export const UI_COLOR_AGENT_STATUS = {
 } as const;
 
 export const UI_LABEL_NAME_AGENT_STATUS = {
-  [API_NAME_AGENT_STATUS.ACTIVE]: 'Active',
-  [API_NAME_AGENT_STATUS.DISCONNECTED]: 'Disconnected',
-  [API_NAME_AGENT_STATUS.PENDING]: 'Pending',
-  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: 'Never connected',
-  default: 'Unknown',
+  [API_NAME_AGENT_STATUS.ACTIVE]: i18n.translate(
+    'wazuhCore.agentStatus.label.active',
+    { defaultMessage: 'Active' },
+  ),
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: i18n.translate(
+    'wazuhCore.agentStatus.label.disconnected',
+    { defaultMessage: 'Disconnected' },
+  ),
+  [API_NAME_AGENT_STATUS.PENDING]: i18n.translate(
+    'wazuhCore.agentStatus.label.pending',
+    { defaultMessage: 'Pending' },
+  ),
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: i18n.translate(
+    'wazuhCore.agentStatus.label.neverConnected',
+    { defaultMessage: 'Never connected' },
+  ),
+  default: i18n.translate('wazuhCore.agentStatus.label.unknown', {
+    defaultMessage: 'Unknown',
+  }),
 } as const;
 
 export const UI_ORDER_AGENT_STATUS = [
@@ -213,27 +228,45 @@ export const UI_ORDER_AGENT_STATUS = [
 export const AGENT_STATUS_CODE = [
   {
     STATUS_CODE: 0,
-    STATUS_DESCRIPTION: 'Agent is connected',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuhCore.agentStatus.statusCode.connected',
+      { defaultMessage: 'Agent is connected' },
+    ),
   },
   {
     STATUS_CODE: 1,
-    STATUS_DESCRIPTION: 'Invalid agent version',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuhCore.agentStatus.statusCode.invalidVersion',
+      { defaultMessage: 'Invalid agent version' },
+    ),
   },
   {
     STATUS_CODE: 2,
-    STATUS_DESCRIPTION: 'Error retrieving version',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuhCore.agentStatus.statusCode.versionError',
+      { defaultMessage: 'Error retrieving version' },
+    ),
   },
   {
     STATUS_CODE: 3,
-    STATUS_DESCRIPTION: 'Shutdown message received',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuhCore.agentStatus.statusCode.shutdown',
+      { defaultMessage: 'Shutdown message received' },
+    ),
   },
   {
     STATUS_CODE: 4,
-    STATUS_DESCRIPTION: 'Disconnected because no keepalive received',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuhCore.agentStatus.statusCode.keepaliveTimeout',
+      { defaultMessage: 'Disconnected because no keepalive received' },
+    ),
   },
   {
     STATUS_CODE: 5,
-    STATUS_DESCRIPTION: 'Connection reset by manager',
+    STATUS_DESCRIPTION: i18n.translate(
+      'wazuhCore.agentStatus.statusCode.connectionReset',
+      { defaultMessage: 'Connection reset by manager' },
+    ),
   },
 ];
 
@@ -371,9 +404,16 @@ export interface TPluginSetting {
 
 export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
   'enrollment.dns': {
-    title: 'Enrollment DNS',
-    description:
-      'Specifies the Wazuh registration server, used for the agent enrollment.',
+    title: i18n.translate('wazuhCore.settings.enrollmentDns.title', {
+      defaultMessage: 'Enrollment DNS',
+    }),
+    description: i18n.translate(
+      'wazuhCore.settings.enrollmentDns.description',
+      {
+        defaultMessage:
+          'Specifies the Wazuh registration server, used for the agent enrollment.',
+      },
+    ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
@@ -389,9 +429,16 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
   stays a hostname/FQDN/IP, which a combined value could no longer be checked
   as. The deploy wizard joins the three when it generates the command. */
   'enrollment.port': {
-    title: 'Enrollment port',
-    description:
-      'Specifies the port of the Wazuh registration server, used for the agent enrollment. Leave empty to use the agent default (1517).',
+    title: i18n.translate('wazuhCore.settings.enrollmentPort.title', {
+      defaultMessage: 'Enrollment port',
+    }),
+    description: i18n.translate(
+      'wazuhCore.settings.enrollmentPort.description',
+      {
+        defaultMessage:
+          'Specifies the port of the Wazuh registration server, used for the agent enrollment. Leave empty to use the agent default (1517).',
+      },
+    ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
@@ -402,9 +449,16 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     ),
   },
   'enrollment.path': {
-    title: 'Enrollment path prefix',
-    description:
-      "Specifies the path prefix the agent prepends to every request sent to the Wazuh server. It must match the server's global prefix. Leave empty to use the agent default (/wazuh-manager/).",
+    title: i18n.translate('wazuhCore.settings.enrollmentPath.title', {
+      defaultMessage: 'Enrollment path prefix',
+    }),
+    description: i18n.translate(
+      'wazuhCore.settings.enrollmentPath.description',
+      {
+        defaultMessage:
+          "Specifies the path prefix the agent prepends to every request sent to the Wazuh server. It must match the server's global prefix. Leave empty to use the agent default (/wazuh-manager/).",
+      },
+    ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.text,
@@ -445,8 +499,12 @@ hosts:
       run_as: true`,
   */
   hosts: {
-    title: 'Server hosts',
-    description: 'Configure the API connections.',
+    title: i18n.translate('wazuhCore.settings.hosts.title', {
+      defaultMessage: 'Server hosts',
+    }),
+    description: i18n.translate('wazuhCore.settings.hosts.description', {
+      defaultMessage: 'Configure the API connections.',
+    }),
     source: EConfigurationProviders.INITIALIZER_CONTEXT,
     category: SettingCategory.API_CONNECTION,
     type: EpluginSettingType.objectOf,
@@ -454,8 +512,15 @@ hosts:
     options: {
       objectOf: {
         url: {
-          title: 'URL',
-          description: 'Server URL address',
+          title: i18n.translate('wazuhCore.settings.hosts.url.title', {
+            defaultMessage: 'URL',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.url.description',
+            {
+              defaultMessage: 'Server URL address',
+            },
+          ),
           type: EpluginSettingType.text,
           defaultValue: 'https://localhost',
           validate: SettingsValidator.compose(
@@ -464,8 +529,15 @@ hosts:
           ),
         },
         port: {
-          title: 'Port',
-          description: 'Port',
+          title: i18n.translate('wazuhCore.settings.hosts.port.title', {
+            defaultMessage: 'Port',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.port.description',
+            {
+              defaultMessage: 'Port',
+            },
+          ),
           type: EpluginSettingType.number,
           defaultValue: 55000,
           options: {
@@ -477,8 +549,15 @@ hosts:
           },
         },
         username: {
-          title: 'Username',
-          description: 'Server API username',
+          title: i18n.translate('wazuhCore.settings.hosts.username.title', {
+            defaultMessage: 'Username',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.username.description',
+            {
+              defaultMessage: 'Server API username',
+            },
+          ),
           type: EpluginSettingType.text,
           defaultValue: 'wazuh-wui',
           validate: SettingsValidator.compose(
@@ -489,8 +568,15 @@ hosts:
           ),
         },
         password: {
-          title: 'Password',
-          description: "User's Password",
+          title: i18n.translate('wazuhCore.settings.hosts.password.title', {
+            defaultMessage: 'Password',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.password.description',
+            {
+              defaultMessage: "User's Password",
+            },
+          ),
           type: EpluginSettingType.password,
           defaultValue: 'wazuh-wui',
           validate: SettingsValidator.compose(
@@ -503,8 +589,15 @@ hosts:
           ),
         },
         run_as: {
-          title: 'Run as',
-          description: 'Use the authentication context.',
+          title: i18n.translate('wazuhCore.settings.hosts.runAs.title', {
+            defaultMessage: 'Run as',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.runAs.description',
+            {
+              defaultMessage: 'Use the authentication context.',
+            },
+          ),
           type: EpluginSettingType.switch,
           defaultValue: true,
           options: {
@@ -518,25 +611,46 @@ hosts:
           validate: SettingsValidator.isBoolean,
         },
         key: {
-          title: 'Key',
-          description:
-            'Path to the SSL/TLS private key file for the API connection.',
+          title: i18n.translate('wazuhCore.settings.hosts.key.title', {
+            defaultMessage: 'Key',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.key.description',
+            {
+              defaultMessage:
+                'Path to the SSL/TLS private key file for the API connection.',
+            },
+          ),
           type: EpluginSettingType.text,
           defaultValue: '',
           validate: SettingsValidator.isString,
         },
         cert: {
-          title: 'Certificate',
-          description:
-            'Path to the SSL/TLS certificate file for the API connection.',
+          title: i18n.translate('wazuhCore.settings.hosts.cert.title', {
+            defaultMessage: 'Certificate',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.cert.description',
+            {
+              defaultMessage:
+                'Path to the SSL/TLS certificate file for the API connection.',
+            },
+          ),
           type: EpluginSettingType.text,
           defaultValue: '',
           validate: SettingsValidator.isString,
         },
         ca: {
-          title: 'CA Certificate',
-          description:
-            'Path to the CA certificate file for SSL/TLS verification.',
+          title: i18n.translate('wazuhCore.settings.hosts.ca.title', {
+            defaultMessage: 'CA Certificate',
+          }),
+          description: i18n.translate(
+            'wazuhCore.settings.hosts.ca.description',
+            {
+              defaultMessage:
+                'Path to the CA certificate file for SSL/TLS verification.',
+            },
+          ),
           type: EpluginSettingType.text,
           defaultValue: '',
           validate: SettingsValidator.isString,
@@ -545,8 +659,15 @@ hosts:
     },
   },
   'wazuh.updates.disabled': {
-    title: 'Check updates',
-    description: 'Define if the check updates service is disabled.',
+    title: i18n.translate('wazuhCore.settings.wazuhUpdatesDisabled.title', {
+      defaultMessage: 'Check updates',
+    }),
+    description: i18n.translate(
+      'wazuhCore.settings.wazuhUpdatesDisabled.description',
+      {
+        defaultMessage: 'Define if the check updates service is disabled.',
+      },
+    ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
@@ -592,9 +713,13 @@ hosts:
     }),
   },
   timeout: {
-    title: 'Request timeout',
-    description:
-      'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
+    title: i18n.translate('wazuhCore.settings.timeout.title', {
+      defaultMessage: 'Request timeout',
+    }),
+    description: i18n.translate('wazuhCore.settings.timeout.description', {
+      defaultMessage:
+        'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
+    }),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,
@@ -607,9 +732,16 @@ hosts:
     },
   },
   'reports.csv.maxRows': {
-    title: 'Maximum rows in CSV reports',
-    description:
-      'Maximum number of rows included in CSV reports. Reports exceeding this value will be truncated. Increasing this value above 10,000 rows may cause performance issues — you will also need to raise the "index.max_result_window" setting on your indices.',
+    title: i18n.translate('wazuhCore.settings.reportsCsvMaxRows.title', {
+      defaultMessage: 'Maximum rows in CSV reports',
+    }),
+    description: i18n.translate(
+      'wazuhCore.settings.reportsCsvMaxRows.description',
+      {
+        defaultMessage:
+          'Maximum number of rows included in CSV reports. Reports exceeding this value will be truncated. Increasing this value above 10,000 rows may cause performance issues — you will also need to raise the "index.max_result_window" setting on your indices.',
+      },
+    ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.number,

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiBadge,
@@ -205,7 +206,10 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     } catch {
       setLoading(false);
       setError(
-        'There was an error connecting to the CTI service. Please try again later.',
+        i18n.translate('wazuhCheckUpdates.ctiRegistration.connectionError', {
+          defaultMessage:
+            'There was an error connecting to the CTI service. Please try again later.',
+        }),
       );
     }
   };
@@ -488,10 +492,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             iconType='alert'
             style={{ marginTop: deviceAuth ? 16 : 0, marginBottom: '16px' }}
           >
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.errorMessage'
-              defaultMessage={error}
-            />
+            {error}
           </EuiCallOut>
         )}
       </EuiModalBody>
