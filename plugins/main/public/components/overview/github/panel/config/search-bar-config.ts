@@ -1,3 +1,5 @@
+import { i18n } from '@osd/i18n';
+
 /*
  *   Copyright 2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -17,21 +19,41 @@ export const filtersValues = [
   {
     type: 'multiSelect',
     key: 'user.name',
-    placeholder: 'Actor',
+    placeholder: i18n.translate(
+      'wazuh.github.searchBarFilters.actorPlaceholder',
+      {
+        defaultMessage: 'Actor',
+      },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'organization.name',
-    placeholder: 'Organization',
+    placeholder: i18n.translate(
+      'wazuh.github.searchBarFilters.organizationPlaceholder',
+      {
+        defaultMessage: 'Organization',
+      },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'url.original',
-    placeholder: 'Repository',
+    placeholder: i18n.translate(
+      'wazuh.github.searchBarFilters.repositoryPlaceholder',
+      {
+        defaultMessage: 'Repository',
+      },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'event.action',
-    placeholder: 'Action',
+    placeholder: i18n.translate(
+      'wazuh.github.searchBarFilters.actionPlaceholder',
+      {
+        defaultMessage: 'Action',
+      },
+    ),
   },
 ];

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { getVisStateTable } from '../common/saved-vis/generators';
@@ -59,7 +60,10 @@ export const getVisStateHostsTotalFreeMemoryTable = (
           type: 'max',
           params: {
             field: 'host.memory.usage',
-            customLabel: 'Usage',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.memoryTable.usageLabel',
+              { defaultMessage: 'Usage' },
+            ),
           },
           schema: 'metric',
         },
@@ -73,10 +77,19 @@ export const getVisStateHostsTotalFreeMemoryTable = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Top 5 endpoints by memory usage',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.memoryTable.topEndpointsLabel',
+              { defaultMessage: 'Top 5 endpoints by memory usage' },
+            ),
           },
           schema: 'bucket',
         },
@@ -90,10 +103,19 @@ export const getVisStateHostsTotalFreeMemoryTable = (
             order: 'desc',
             size: 1,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Total memory',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.memoryTable.totalMemoryLabel',
+              { defaultMessage: 'Total memory' },
+            ),
           },
           schema: 'bucket',
         },
@@ -127,7 +149,10 @@ export const getDashboardKPIs = (
           '',
           'it-hygiene-top-operating-system-names',
           {
-            customLabel: 'Operating system families',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.osFamilies.label',
+              { defaultMessage: 'Operating system families' },
+            ),
           },
         ),
       },
@@ -146,15 +171,30 @@ export const getDashboardKPIs = (
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'package.type',
-          'Package types',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.packageTypes.title',
+            { defaultMessage: 'Package types' },
+          ),
           'it-hygiene-system',
           {
             fieldSize: 4,
-            otherBucket: 'Others',
-            metricCustomLabel: 'Package types count',
+            otherBucket: i18n.translate(
+              'wazuh.itHygiene.savedVis.othersBucketLabel',
+              { defaultMessage: 'Others' },
+            ),
+            metricCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.packageTypes.metricLabel',
+              { defaultMessage: 'Package types count' },
+            ),
             valueAxesTitleText: ' ',
-            fieldCustomLabel: 'Package type',
-            seriesLabel: 'Package type',
+            fieldCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.packageTypes.fieldLabel',
+              { defaultMessage: 'Package type' },
+            ),
+            seriesLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.packageTypes.fieldLabel',
+              { defaultMessage: 'Package type' },
+            ),
           },
         ),
       },
@@ -175,7 +215,12 @@ export const getDashboardKPIs = (
           'host.memory.total',
           '',
           'it-hygiene-stat',
-          { customLabel: 'Hosts total memory' },
+          {
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.memoryTable.label',
+              { defaultMessage: 'Hosts total memory' },
+            ),
+          },
         ),
       },
     },

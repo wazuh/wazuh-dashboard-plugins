@@ -32,6 +32,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { statistics } from '../../../../../utils/applications';
+import { i18n } from '@osd/i18n';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
@@ -54,7 +55,9 @@ export class WzStatisticsOverview extends Component {
       // },
       {
         id: 'normalization',
-        name: 'Normalization',
+        name: i18n.translate('wazuh.statistics.overview.normalizationTab', {
+          defaultMessage: 'Normalization',
+        }),
       },
     ];
   }
@@ -64,9 +67,20 @@ export class WzStatisticsOverview extends Component {
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.affected_items.map(item => {
-        return { value: item.name, text: `${item.name} (${item.type})` };
+        return {
+          value: item.name,
+          text: i18n.translate('wazuh.statistics.overview.nodeOption', {
+            defaultMessage: '{name} ({type})',
+            values: { name: item.name, type: item.type },
+          }),
+        };
       });
-      nodes.unshift({ value: 'all', text: 'All' });
+      nodes.unshift({
+        value: 'all',
+        text: i18n.translate('wazuh.statistics.overview.allNodesOption', {
+          defaultMessage: 'All',
+        }),
+      });
       this.setState({
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
@@ -142,7 +156,11 @@ export class WzStatisticsOverview extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>Statistics</h2>
+                    <h2>
+                      {i18n.translate('wazuh.statistics.overview.title', {
+                        defaultMessage: 'Statistics',
+                      })}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -151,7 +169,9 @@ export class WzStatisticsOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color='subdued'>
-                From here you can see daemon statistics.
+                {i18n.translate('wazuh.statistics.overview.description', {
+                  defaultMessage: 'From here you can see daemon statistics.',
+                })}
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

@@ -8,6 +8,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { AvailableUpdates } from '../../../../../../wazuh-check-updates/common/types';
 import { UpdateDetail } from './update-detail';
 import { WzFlyout } from '../../../../components/common/flyouts';
@@ -28,7 +29,10 @@ export const AvailableUpdatesFlyout = ({
           <EuiDescriptionList
             listItems={[
               {
-                title: 'Version',
+                title: i18n.translate(
+                  'wazuh.dashboardsSettings.availableUpdatesFlyout.currentVersionTitle',
+                  { defaultMessage: 'Version' },
+                ),
                 description: updates.current_version as string,
               },
             ]}
@@ -38,15 +42,24 @@ export const AvailableUpdatesFlyout = ({
       <EuiSpacer />
       <UpdateDetail
         update={updates.last_available_major || {}}
-        type='Last available major'
+        type={i18n.translate(
+          'wazuh.dashboardsSettings.availableUpdatesFlyout.lastAvailableMajor',
+          { defaultMessage: 'Last available major' },
+        )}
       />
       <UpdateDetail
         update={updates.last_available_minor || {}}
-        type='Last available minor'
+        type={i18n.translate(
+          'wazuh.dashboardsSettings.availableUpdatesFlyout.lastAvailableMinor',
+          { defaultMessage: 'Last available minor' },
+        )}
       />
       <UpdateDetail
         update={updates.last_available_patch || {}}
-        type='Last available patch'
+        type={i18n.translate(
+          'wazuh.dashboardsSettings.availableUpdatesFlyout.lastAvailablePatch',
+          { defaultMessage: 'Last available patch' },
+        )}
       />
     </>
   );

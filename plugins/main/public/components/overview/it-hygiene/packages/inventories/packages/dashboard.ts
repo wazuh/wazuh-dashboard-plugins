@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
 
@@ -62,7 +63,9 @@ const getVisStateFilter = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
           },
           schema: 'metric',
         },
@@ -76,9 +79,15 @@ const getVisStateFilter = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
             customLabel: label,
           },
           schema: 'bucket',
@@ -94,7 +103,10 @@ const getVisStatePackageArchitectureMetric = (
 ): SavedVis => {
   return {
     id: `it-hygiene-packages-${arch}`,
-    title: `Packages for ${arch} architecture`,
+    title: i18n.translate(
+      'wazuh.itHygiene.packagesDashboard.architecture.title',
+      { defaultMessage: 'Packages for {arch} architecture', values: { arch } },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -142,7 +154,10 @@ const getVisStatePackageArchitectureMetric = (
                   query: `package.architecture: ${arch}`,
                   language: 'kuery',
                 },
-                label: 'Packages Architecture',
+                label: i18n.translate(
+                  'wazuh.itHygiene.packagesDashboard.architecture.filterLabel',
+                  { defaultMessage: 'Packages Architecture' },
+                ),
               },
             ],
           },
@@ -159,7 +174,9 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
       'Vendors',
       indexPatternId,
       '',
-      'Top 5 vendors',
+      i18n.translate('wazuh.itHygiene.packagesDashboard.topVendors.title', {
+        defaultMessage: 'Top 5 vendors',
+      }),
       'package.vendor',
     ),
     getVisStateMetricUniqueCountByField(
@@ -167,20 +184,36 @@ export const getOverviewPackagesPackagesTab = (indexPatternId: string) => {
       'package.name',
       '',
       'it-hygiene-packages',
-      'Unique packages',
+      i18n.translate('wazuh.itHygiene.packagesDashboard.uniquePackages.label', {
+        defaultMessage: 'Unique packages',
+      }),
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'package.type',
-      'Package types',
+      i18n.translate('wazuh.itHygiene.packagesDashboard.packageTypes.title', {
+        defaultMessage: 'Package types',
+      }),
       'it-hygiene-packages',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Package type count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.packagesDashboard.packageTypes.metricLabel',
+          { defaultMessage: 'Package type count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Package type count',
-        fieldCustomLabel: 'Package type',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.packagesDashboard.packageTypes.metricLabel',
+          { defaultMessage: 'Package type count' },
+        ),
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.packagesDashboard.packageTypes.fieldLabel',
+          { defaultMessage: 'Package type' },
+        ),
       },
     ),
   ]);

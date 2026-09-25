@@ -2,15 +2,18 @@ const fs = require('fs');
 const path = require('path');
 const {
   cmmcRequirementsFile,
+  cmmcRequirementsAliases,
 } = require('../../../../common/compliance-requirements/cmmc-requirements');
 const {
   fedrampRequirementsFile,
 } = require('../../../../common/compliance-requirements/fedramp-requirements');
 const {
   gdprRequirementsFile,
+  gdprRequirementsAliases,
 } = require('../../../../common/compliance-requirements/gdpr-requirements');
 const {
   hipaaRequirementsFile,
+  hipaaRequirementsAliases,
 } = require('../../../../common/compliance-requirements/hipaa-requirements');
 const {
   iso27001RequirementsFile,
@@ -30,6 +33,15 @@ const {
 const {
   tscRequirementsFile,
 } = require('../../../../common/compliance-requirements/tsc-requirements');
+
+// The ruleset tags some frameworks in its own notation, which the compliance
+// views resolve through the framework's aliases, so a sample value is valid
+// when it names either a control or an alias.
+const ALIASES = {
+  cmmc: cmmcRequirementsAliases,
+  gdpr: gdprRequirementsAliases,
+  hipaa: hipaaRequirementsAliases,
+};
 
 // Definitions by the compliance field of a finding
 // (`wazuh.rule.compliance.<framework>`).
@@ -104,7 +116,9 @@ describe('sample findings compliance requirements', () => {
         }
 
         for (const requirement of [].concat(requirements)) {
-          if (!DEFINITIONS[framework][requirement]) {
+          const aliases = ALIASES[framework] || {};
+
+          if (!DEFINITIONS[framework][requirement] && !aliases[requirement]) {
             unresolved.push(`${source}: ${framework} "${requirement}"`);
           }
         }

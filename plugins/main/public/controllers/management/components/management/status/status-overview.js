@@ -54,6 +54,7 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { serverStatus } from '../../../../../utils/applications';
+import { i18n } from '@osd/i18n';
 
 import { ClusterOverview } from '../../management/cluster/cluster-overview';
 
@@ -167,7 +168,11 @@ export class WzStatusOverview extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiTitle>
-                        <h2>Status</h2>
+                        <h2>
+                          {i18n.translate('wazuh.serverStatus.overview.title', {
+                            defaultMessage: 'Status',
+                          })}
+                        </h2>
                       </EuiTitle>
                     </EuiFlexItem>
                   </EuiFlexGroup>

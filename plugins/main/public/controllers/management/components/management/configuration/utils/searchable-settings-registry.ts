@@ -11,6 +11,7 @@
  */
 
 import { get } from 'lodash';
+import { i18n } from '@osd/i18n';
 
 import {
   renderValueBooleanYesNo,
@@ -163,9 +164,18 @@ const renderFilters = (value: unknown) => {
         expression?: string;
         ignore_if_missing?: unknown;
       }) =>
-        `${f.field}: ${f.expression}${
-          f.ignore_if_missing ? ' (ignore if missing)' : ''
-        }`,
+        f.ignore_if_missing
+          ? i18n.translate(
+              'wazuh.configuration.settingsRegistry.logCollectionJournaldFilterIgnoreIfMissing',
+              {
+                defaultMessage: '{field}: {expression} (ignore if missing)',
+                values: {
+                  field: String(f.field),
+                  expression: String(f.expression),
+                },
+              },
+            )
+          : `${f.field}: ${f.expression}`,
     )
     .join('; ');
 };
@@ -247,52 +257,102 @@ export const configurationHeaderKey = (
 implementation (each tab imported the same sibling `help-links.js`). */
 const REMOTE_HELP: HelpLink[] = [
   {
-    text: 'Remote daemon reference',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.remoteDaemonReference',
+      {
+        defaultMessage: 'Remote daemon reference',
+      },
+    ),
     href: 'user-manual/manager/reference.html#daemons',
   },
   {
-    text: 'Remote configuration reference',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.remoteConfigurationReference',
+      {
+        defaultMessage: 'Remote configuration reference',
+      },
+    ),
     href: 'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
   },
 ];
 
 const POLICY_MONITORING_HELP: HelpLink[] = [
   {
-    text: 'Malware detection',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.malwareDetection',
+      {
+        defaultMessage: 'Malware detection',
+      },
+    ),
     href: 'user-manual/capabilities/malware-detection/index.html',
   },
   {
-    text: 'Security Configuration Assessment',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.securityConfigurationAssessment',
+      {
+        defaultMessage: 'Security Configuration Assessment',
+      },
+    ),
     href: 'user-manual/capabilities/sec-config-assessment/how-to-configure.html',
   },
   {
-    text: 'Rootcheck reference',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.rootcheckReference',
+      {
+        defaultMessage: 'Rootcheck reference',
+      },
+    ),
     href: 'user-manual/reference/ossec-conf/rootcheck.html',
   },
 ];
 
 const FIM_HELP: HelpLink[] = [
   {
-    text: 'Integrity monitoring documentation',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.integrityMonitoringDocumentation',
+      {
+        defaultMessage: 'Integrity monitoring documentation',
+      },
+    ),
     href: 'user-manual/capabilities/file-integrity/index.html',
   },
   {
-    text: 'Syscheck reference',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.syscheckReference',
+      {
+        defaultMessage: 'Syscheck reference',
+      },
+    ),
     href: 'user-manual/capabilities/file-integrity/how-to-configure-fim.html',
   },
 ];
 
 const LOG_COLLECTION_HELP: HelpLink[] = [
   {
-    text: 'Log data collection documentation',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.logDataCollectionDocumentation',
+      {
+        defaultMessage: 'Log data collection documentation',
+      },
+    ),
     href: 'user-manual/capabilities/log-data-collection/index.html',
   },
   {
-    text: 'Command monitoring',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.commandMonitoring',
+      {
+        defaultMessage: 'Command monitoring',
+      },
+    ),
     href: 'user-manual/capabilities/command-monitoring/index.html',
   },
   {
-    text: 'Localfile reference',
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.localfileReference',
+      {
+        defaultMessage: 'Localfile reference',
+      },
+    ),
     href: 'user-manual/reference/ossec-conf/localfile.html',
   },
 ];
@@ -312,200 +372,509 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
  */
 export const configurationHeaders: Record<string, ConfigurationHeader> = {
   [configurationHeaderKey('registration-service', 'Main settings')]: {
-    title: 'Main settings',
-    description: 'General settings applied to the registration service',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.registrationServiceMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.registrationServiceMainSettingsDescription',
+      {
+        defaultMessage: 'General settings applied to the registration service',
+      },
+    ),
     help: [
       {
-        text: 'Agent enrollment',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.agentEnrollment',
+          {
+            defaultMessage: 'Agent enrollment',
+          },
+        ),
         href: 'user-manual/agent/agent-enrollment/index.html',
       },
       {
-        text: 'Registration service reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.registrationServiceReference',
+          {
+            defaultMessage: 'Registration service reference',
+          },
+        ),
         href: 'user-manual/manager/wazuh-manager-services.html#agent-enrollment-service',
       },
     ],
   },
   [configurationHeaderKey('registration-service', 'SSL settings')]: {
-    title: 'SSL settings',
-    description: 'Applied when the registration service uses SSL certificates',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.registrationServiceSslSettingsTitle',
+      {
+        defaultMessage: 'SSL settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.registrationServiceSslSettingsDescription',
+      {
+        defaultMessage:
+          'Applied when the registration service uses SSL certificates',
+      },
+    ),
   },
   [configurationHeaderKey('cluster', 'Main settings')]: {
-    title: 'Main settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clusterMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
     help: [
       {
-        text: 'Configuring a cluster',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.configuringACluster',
+          {
+            defaultMessage: 'Configuring a cluster',
+          },
+        ),
         href: 'installation-guide/wazuh-server/step-by-step.html#cluster-configuration-for-multi-node-deployment',
       },
       {
-        text: 'Cluster reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.clusterReference',
+          {
+            defaultMessage: 'Cluster reference',
+          },
+        ),
         href: 'user-manual/manager/wazuh-manager-services.html#cluster-service',
       },
     ],
   },
   [configurationHeaderKey('indexer', 'Main settings')]: {
-    title: 'Main settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.indexerMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
     help: [
       {
-        text: 'Indexer configuration',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.indexerConfiguration',
+          {
+            defaultMessage: 'Indexer configuration',
+          },
+        ),
         href: 'user-manual/manager/wazuh-indexer-connector.html',
       },
     ],
   },
   [configurationHeaderKey('indexer', 'SSL settings')]: {
-    title: 'SSL settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.indexerSslSettingsTitle',
+      {
+        defaultMessage: 'SSL settings',
+      },
+    ),
   },
   [configurationHeaderKey('global-configuration', 'Global', 'logging')]: {
-    title: 'Logging settings',
-    description: 'Internal logging configuration for the manager',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationGlobalLoggingTitle',
+      {
+        defaultMessage: 'Logging settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationGlobalLoggingDescription',
+      {
+        defaultMessage: 'Internal logging configuration for the manager',
+      },
+    ),
     help: [
       {
-        text: 'Logging reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.loggingReference',
+          {
+            defaultMessage: 'Logging reference',
+          },
+        ),
         href: 'user-manual/manager/logging.html#configuration',
       },
     ],
   },
   [configurationHeaderKey('global-configuration', 'Global', 'agents')]: {
-    title: 'Agents settings',
-    description: 'Time alert agents settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationGlobalAgentsTitle',
+      {
+        defaultMessage: 'Agents settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationGlobalAgentsDescription',
+      {
+        defaultMessage: 'Time alert agents settings',
+      },
+    ),
     help: [
       {
-        text: 'Agents times reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.agentsTimesReference',
+          {
+            defaultMessage: 'Agents times reference',
+          },
+        ),
         href: 'user-manual/agent/agent-enrollment/agent-life-cycle.html#agent-connection-states',
       },
     ],
   },
   [configurationHeaderKey('global-configuration', 'Remote', 'https')]: {
-    title: 'HTTPS settings',
-    description:
-      'Listener the agents use to communicate with the manager over HTTPS',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationRemoteHttpsTitle',
+      {
+        defaultMessage: 'HTTPS settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationRemoteHttpsDescription',
+      {
+        defaultMessage:
+          'Listener the agents use to communicate with the manager over HTTPS',
+      },
+    ),
     help: REMOTE_HELP,
   },
   [configurationHeaderKey('global-configuration', 'Remote', 'legacy')]: {
-    title: 'Legacy settings',
-    description:
-      'Listener kept for agents that still communicate over the legacy protocol',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationRemoteLegacyTitle',
+      {
+        defaultMessage: 'Legacy settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationRemoteLegacyDescription',
+      {
+        defaultMessage:
+          'Listener kept for agents that still communicate over the legacy protocol',
+      },
+    ),
     help: REMOTE_HELP,
   },
   [configurationHeaderKey('global-configuration', 'Remote', 'agents')]: {
-    title: 'Agents settings',
-    description: 'Settings applied to the agents that connect to this manager',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationRemoteAgentsTitle',
+      {
+        defaultMessage: 'Agents settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationRemoteAgentsDescription',
+      {
+        defaultMessage:
+          'Settings applied to the agents that connect to this manager',
+      },
+    ),
     help: REMOTE_HELP,
   },
   [configurationHeaderKey('global-configuration-agent', 'Main settings')]: {
-    title: 'Main settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.globalConfigurationAgentMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
     // buildHelpLinks(agent) in the original always resolved to just this
     // one link regardless of the agent, so only this one is ported.
     help: [
       {
-        text: 'Logging reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.loggingReference',
+          {
+            defaultMessage: 'Logging reference',
+          },
+        ),
         href: 'user-manual/manager/logging.html#configuration',
       },
     ],
   },
   [configurationHeaderKey('vulnerabilities', 'Main settings')]: {
-    title: 'Main settings',
-    description:
-      'General settings applied to the vulnerability detector and its providers',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.vulnerabilitiesMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.vulnerabilitiesMainSettingsDescription',
+      {
+        defaultMessage:
+          'General settings applied to the vulnerability detector and its providers',
+      },
+    ),
     help: [
       {
-        text: 'Vulnerability detection',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.vulnerabilityDetection',
+          {
+            defaultMessage: 'Vulnerability detection',
+          },
+        ),
         href: 'user-manual/capabilities/vulnerability-detection/index.html',
       },
       {
-        text: 'Vulnerability detector reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.vulnerabilityDetectorReference',
+          {
+            defaultMessage: 'Vulnerability detector reference',
+          },
+        ),
         href: 'user-manual/capabilities/vulnerability-detection/configuring-scans.html',
       },
     ],
   },
   [configurationHeaderKey('policy-monitoring', 'General')]: {
-    title: 'All settings',
-    description: 'General settings for the rootcheck daemon',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.policyMonitoringGeneralTitle',
+      {
+        defaultMessage: 'All settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.policyMonitoringGeneralDescription',
+      {
+        defaultMessage: 'General settings for the rootcheck daemon',
+      },
+    ),
     help: POLICY_MONITORING_HELP,
   },
   [configurationHeaderKey('policy-monitoring', 'SCA')]: {
-    title: 'Security configuration assessment status',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.policyMonitoringScaTitle',
+      {
+        defaultMessage: 'Security configuration assessment status',
+      },
+    ),
     help: POLICY_MONITORING_HELP,
   },
   [configurationHeaderKey('client', 'Main settings')]: {
-    title: 'Main settings',
-    description: 'Basic manager-agent communication settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clientMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clientMainSettingsDescription',
+      {
+        defaultMessage: 'Basic manager-agent communication settings',
+      },
+    ),
     help: [
       {
-        text: 'Checking connection with manager',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.checkingConnectionWithManager',
+          {
+            defaultMessage: 'Checking connection with manager',
+          },
+        ),
         href: 'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
       },
       {
-        text: 'Client reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.clientReference',
+          {
+            defaultMessage: 'Client reference',
+          },
+        ),
         href: 'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
       },
     ],
   },
   [configurationHeaderKey('client', 'Server settings')]: {
-    title: 'Server settings',
-    description: 'Manager the agent connects to',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clientServerSettingsTitle',
+      {
+        defaultMessage: 'Server settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clientServerSettingsDescription',
+      {
+        defaultMessage: 'Manager the agent connects to',
+      },
+    ),
   },
   [configurationHeaderKey('client', 'Batch settings')]: {
-    title: 'Batch settings',
-    description:
-      'These settings determine how the agent batches the events it sends',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clientBatchSettingsTitle',
+      {
+        defaultMessage: 'Batch settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.clientBatchSettingsDescription',
+      {
+        defaultMessage:
+          'These settings determine how the agent batches the events it sends',
+      },
+    ),
   },
   [configurationHeaderKey('active-response-agent', 'Active response settings')]:
     {
-      title: 'Active response settings',
-      description: 'Find here all the Active response settings for this agent',
+      title: i18n.translate(
+        'wazuh.configuration.settingsHeaders.activeResponseAgentActiveResponseSettingsTitle',
+        {
+          defaultMessage: 'Active response settings',
+        },
+      ),
+      description: i18n.translate(
+        'wazuh.configuration.settingsHeaders.activeResponseAgentActiveResponseSettingsDescription',
+        {
+          defaultMessage:
+            'Find here all the Active response settings for this agent',
+        },
+      ),
       help: [
         {
-          text: 'Active response documentation',
+          text: i18n.translate(
+            'wazuh.configuration.settingsHelpLinks.activeResponseDocumentation',
+            {
+              defaultMessage: 'Active response documentation',
+            },
+          ),
           href: 'user-manual/capabilities/active-response/index.html',
         },
         {
-          text: 'Active response reference',
+          text: i18n.translate(
+            'wazuh.configuration.settingsHelpLinks.activeResponseReference',
+            {
+              defaultMessage: 'Active response reference',
+            },
+          ),
           href: 'user-manual/reference/ossec-conf/active-response.html',
         },
       ],
     },
   [configurationHeaderKey('inventory', 'Main settings')]: {
-    title: 'Main settings',
-    description: 'General settings applied to all the scans',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.inventoryMainSettingsTitle',
+      {
+        defaultMessage: 'Main settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.inventoryMainSettingsDescription',
+      {
+        defaultMessage: 'General settings applied to all the scans',
+      },
+    ),
     help: [
       {
-        text: 'System inventory',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.systemInventory',
+          {
+            defaultMessage: 'System inventory',
+          },
+        ),
         href: 'user-manual/capabilities/system-inventory/index.html',
       },
       {
-        text: 'Syscollector module reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.syscollectorModuleReference',
+          {
+            defaultMessage: 'Syscollector module reference',
+          },
+        ),
         href: 'user-manual/capabilities/system-inventory/configuration.html#wazuh-agent-configuration',
       },
     ],
   },
   [configurationHeaderKey('inventory', 'Scan settings')]: {
-    title: 'Scan settings',
-    description: 'Specific inventory scans to collect',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.inventoryScanSettingsTitle',
+      {
+        defaultMessage: 'Scan settings',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.inventoryScanSettingsDescription',
+      {
+        defaultMessage: 'Specific inventory scans to collect',
+      },
+    ),
   },
   [configurationHeaderKey('integrity-monitoring', 'General')]: {
-    title: 'General',
-    description: 'The settings shown below are applied globally',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringGeneralTitle',
+      {
+        defaultMessage: 'General',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringGeneralDescription',
+      {
+        defaultMessage: 'The settings shown below are applied globally',
+      },
+    ),
     help: FIM_HELP,
   },
   [configurationHeaderKey('integrity-monitoring', 'Synchronization')]: {
     // Verbatim original typo -- ported faithfully, not "fixed".
-    title: 'Syncronization',
-    description: 'Database synchronization settings',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringSynchronizationTitle',
+      {
+        defaultMessage: 'Syncronization',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringSynchronizationDescription',
+      {
+        defaultMessage: 'Database synchronization settings',
+      },
+    ),
     help: FIM_HELP,
   },
   [configurationHeaderKey('integrity-monitoring', 'Files limit')]: {
-    title: 'Files limit',
-    description: 'Limit the maximum files in the FIM database',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringFilesLimitTitle',
+      {
+        defaultMessage: 'Files limit',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringFilesLimitDescription',
+      {
+        defaultMessage: 'Limit the maximum files in the FIM database',
+      },
+    ),
     help: FIM_HELP,
   },
   [configurationHeaderKey('integrity-monitoring', 'Registries limit')]: {
-    title: 'Registries limit',
-    description: 'Limit the maximum registries in the FIM database',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringRegistriesLimitTitle',
+      {
+        defaultMessage: 'Registries limit',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringRegistriesLimitDescription',
+      {
+        defaultMessage: 'Limit the maximum registries in the FIM database',
+      },
+    ),
     help: FIM_HELP,
   },
   [configurationHeaderKey('integrity-monitoring', 'Who-data')]: {
-    title: 'Who-data',
-    description: 'Settings for the underlying who-data (Audit) monitoring',
+    title: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringWhoDataTitle',
+      {
+        defaultMessage: 'Who-data',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.integrityMonitoringWhoDataDescription',
+      {
+        defaultMessage:
+          'Settings for the underlying who-data (Audit) monitoring',
+      },
+    ),
     help: FIM_HELP,
   },
 };
@@ -532,51 +901,146 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
  */
 /** The 4 `info` tooltips registration-service's `mainSettings` had. */
 const REGISTRATION_SERVICE_INFO: Partial<Record<string, string>> = {
-  'force.after_registration_time':
-    'Agent replacement only occurs when the time elapsed since registration (in seconds) exceeds this value.',
-  'force.key_mismatch':
-    'Avoid re-registering agents that already have valid keys.',
-  'force.disconnected_time.enabled':
-    'Agent replacement only applies to agents disconnected for longer than the configured duration.',
-  'force.disconnected_time.value':
-    'Number of seconds an agent must be disconnected before it can be replaced.',
+  'force.after_registration_time': i18n.translate(
+    'wazuh.configuration.settingsRegistry.registrationServiceForceAfterRegistrationTimeInfo',
+    {
+      defaultMessage:
+        'Agent replacement only occurs when the time elapsed since registration (in seconds) exceeds this value.',
+    },
+  ),
+  'force.key_mismatch': i18n.translate(
+    'wazuh.configuration.settingsRegistry.registrationServiceForceKeyMismatchInfo',
+    {
+      defaultMessage:
+        'Avoid re-registering agents that already have valid keys.',
+    },
+  ),
+  'force.disconnected_time.enabled': i18n.translate(
+    'wazuh.configuration.settingsRegistry.registrationServiceForceDisconnectedTimeEnabledInfo',
+    {
+      defaultMessage:
+        'Agent replacement only applies to agents disconnected for longer than the configured duration.',
+    },
+  ),
+  'force.disconnected_time.value': i18n.translate(
+    'wazuh.configuration.settingsRegistry.registrationServiceForceDisconnectedTimeValueInfo',
+    {
+      defaultMessage:
+        'Number of seconds an agent must be disconnected before it can be replaced.',
+    },
+  ),
 };
 
 export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Registration Service (manager-only, regular request) ---
   ...(
     [
-      ['disabled', 'Service status', renderValueNoThenEnabled],
-      ['port', 'Listen to connections at port'],
+      [
+        'disabled',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceDisabledLabel',
+          {
+            defaultMessage: 'Service status',
+          },
+        ),
+        renderValueNoThenEnabled,
+      ],
+      [
+        'port',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServicePortLabel',
+          {
+            defaultMessage: 'Listen to connections at port',
+          },
+        ),
+      ],
       [
         'use_source_ip',
-        "Use client's source IP address",
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceUseSourceIpLabel',
+          {
+            defaultMessage: "Use client's source IP address",
+          },
+        ),
         renderValueBooleanYesNo,
       ],
       [
         'use_password',
-        'Use a password to register agents',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceUsePasswordLabel',
+          {
+            defaultMessage: 'Use a password to register agents',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
-      ['purge', 'Purge agents list on removal', renderValueBooleanYesNo],
-      ['limit_maxagents', 'Limit registration to max agents'],
+      [
+        'purge',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServicePurgeLabel',
+          {
+            defaultMessage: 'Purge agents list on removal',
+          },
+        ),
+        renderValueBooleanYesNo,
+      ],
+      [
+        'limit_maxagents',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceLimitMaxagentsLabel',
+          {
+            defaultMessage: 'Limit registration to max agents',
+          },
+        ),
+      ],
       [
         'force.enabled',
-        'Force registration on existing IP',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceForceEnabledLabel',
+          {
+            defaultMessage: 'Force registration on existing IP',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
-      ['force.after_registration_time', 'Min seconds since registration'],
+      [
+        'force.after_registration_time',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceForceAfterRegistrationTimeLabel',
+          {
+            defaultMessage: 'Min seconds since registration',
+          },
+        ),
+      ],
       [
         'force.key_mismatch',
-        'Re-register only on key mismatch',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceForceKeyMismatchLabel',
+          {
+            defaultMessage: 'Re-register only on key mismatch',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
       [
         'force.disconnected_time.enabled',
-        'Replace only disconnected agents',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceForceDisconnectedTimeEnabledLabel',
+          {
+            defaultMessage: 'Replace only disconnected agents',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
-      ['force.disconnected_time.value', 'Seconds an agent is disconnected'],
+      [
+        'force.disconnected_time.value',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceForceDisconnectedTimeValueLabel',
+          {
+            defaultMessage: 'Seconds an agent is disconnected',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `registration-service.${field}`,
@@ -602,19 +1066,69 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     [
       [
         'ssl_verify_host',
-        'Verify host when a CA certificate is specified',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslSslVerifyHostLabel',
+          {
+            defaultMessage: 'Verify host when a CA certificate is specified',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
-      ['ssl_agent_ca', 'Path to the CA certificate used to verify clients'],
+      [
+        'ssl_agent_ca',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslSslAgentCaLabel',
+          {
+            defaultMessage: 'Path to the CA certificate used to verify clients',
+          },
+        ),
+      ],
       [
         'ssl_auto_negotiate',
-        'Auto-select the SSL negotiation method',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslSslAutoNegotiateLabel',
+          {
+            defaultMessage: 'Auto-select the SSL negotiation method',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
-      ['ssl_manager_ca', 'CA certificate location'],
-      ['ssl_manager_cert', 'Server SSL certificate location'],
-      ['ssl_manager_key', 'Server SSL key location'],
-      ['ciphers', 'Use the following SSL ciphers'],
+      [
+        'ssl_manager_ca',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslSslManagerCaLabel',
+          {
+            defaultMessage: 'CA certificate location',
+          },
+        ),
+      ],
+      [
+        'ssl_manager_cert',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslSslManagerCertLabel',
+          {
+            defaultMessage: 'Server SSL certificate location',
+          },
+        ),
+      ],
+      [
+        'ssl_manager_key',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslSslManagerKeyLabel',
+          {
+            defaultMessage: 'Server SSL key location',
+          },
+        ),
+      ],
+      [
+        'ciphers',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.registrationServiceSslCiphersLabel',
+          {
+            defaultMessage: 'Use the following SSL ciphers',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `registration-service.ssl.${field}`,
@@ -637,13 +1151,70 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Cluster (manager-only, full-endpoint) ---
   ...(
     [
-      ['name', 'Cluster name'],
-      ['node_name', 'Node name'],
-      ['node_type', 'Node type'],
-      ['nodes', 'Master node IP address'],
-      ['port', 'Port to listen to cluster communications'],
-      ['bind_addr', 'IP address to listen to cluster communications'],
-      ['hidden', 'Hide cluster information in alerts', renderValueBooleanYesNo],
+      [
+        'name',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterNameLabel',
+          {
+            defaultMessage: 'Cluster name',
+          },
+        ),
+      ],
+      [
+        'node_name',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterNodeNameLabel',
+          {
+            defaultMessage: 'Node name',
+          },
+        ),
+      ],
+      [
+        'node_type',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterNodeTypeLabel',
+          {
+            defaultMessage: 'Node type',
+          },
+        ),
+      ],
+      [
+        'nodes',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterNodesLabel',
+          {
+            defaultMessage: 'Master node IP address',
+          },
+        ),
+      ],
+      [
+        'port',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterPortLabel',
+          {
+            defaultMessage: 'Port to listen to cluster communications',
+          },
+        ),
+      ],
+      [
+        'bind_addr',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterBindAddrLabel',
+          {
+            defaultMessage: 'IP address to listen to cluster communications',
+          },
+        ),
+      ],
+      [
+        'hidden',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clusterHiddenLabel',
+          {
+            defaultMessage: 'Hide cluster information in alerts',
+          },
+        ),
+        renderValueBooleanYesNo,
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `cluster.${field}`,
@@ -662,7 +1233,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Indexer (manager-only, full-endpoint) ---
   {
     id: 'indexer.hosts',
-    label: 'Hosts',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.indexerHostsLabel',
+      {
+        defaultMessage: 'Hosts',
+      },
+    ),
     category: 'Indexer',
     tab: 'Main settings',
     goto: 'indexer',
@@ -674,7 +1250,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'indexer.ssl.certificate_authorities',
-    label: 'Certificate authorities',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.indexerSslCertificateAuthoritiesLabel',
+      {
+        defaultMessage: 'Certificate authorities',
+      },
+    ),
     category: 'Indexer',
     tab: 'SSL settings',
     goto: 'indexer',
@@ -687,7 +1268,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'indexer.ssl.certificate',
-    label: 'Certificate',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.indexerSslCertificateLabel',
+      {
+        defaultMessage: 'Certificate',
+      },
+    ),
     category: 'Indexer',
     tab: 'SSL settings',
     goto: 'indexer',
@@ -700,7 +1286,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'indexer.ssl.key',
-    label: 'Key',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.indexerSslKeyLabel',
+      {
+        defaultMessage: 'Key',
+      },
+    ),
     category: 'Indexer',
     tab: 'SSL settings',
     goto: 'indexer',
@@ -715,7 +1306,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Global Configuration > Global tab (manager, full-endpoint) ---
   {
     id: 'global-configuration.logging.log_format',
-    label: 'Log format',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.globalConfigurationLoggingLogFormatLabel',
+      {
+        defaultMessage: 'Log format',
+      },
+    ),
     category: 'Global Configuration',
     tab: 'Global',
     group: 'logging',
@@ -728,8 +1324,13 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'global-configuration.global.agents_disconnection_time',
-    label:
-      'Time after which the manager considers an agent as disconnected since its last keepalive',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.globalConfigurationGlobalAgentsDisconnectionTimeLabel',
+      {
+        defaultMessage:
+          'Time after which the manager considers an agent as disconnected since its last keepalive',
+      },
+    ),
     category: 'Global Configuration',
     tab: 'Global',
     group: 'agents',
@@ -745,26 +1346,144 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Global Configuration > Remote tab (manager-only, regular request) ---
   ...(
     [
-      ['https.port', 'Port', renderValueOrNoValue],
-      ['https.bind_addr', 'Bind address', renderValueOrNoValue],
-      ['https.global_prefix', 'Global prefix', renderValueOrNoValue],
-      ['https.certificate', 'Certificate', renderValueOrNoValue],
-      ['https.key', 'Key', renderValueOrNoValue],
-      ['legacy.enabled', 'Enabled', renderValueBooleanYesNo],
-      ['legacy.port', 'Port', renderValueOrNoValue],
-      ['legacy.protocol', 'Protocol', renderValueOrNoValue],
-      ['legacy.ipv6', 'IPv6', renderValueBooleanYesNo],
-      ['legacy.local_ip', 'Local IP address', renderValueOrNoValue],
-      ['legacy.queue_size', 'Queue size', renderValueOrNoValue],
-      ['legacy.rids_closing_time', 'RIDs closing time', renderValueOrNoValue],
+      [
+        'https.port',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteHttpsPortLabel',
+          {
+            defaultMessage: 'Port',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'https.bind_addr',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteHttpsBindAddrLabel',
+          {
+            defaultMessage: 'Bind address',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'https.global_prefix',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteHttpsGlobalPrefixLabel',
+          {
+            defaultMessage: 'Global prefix',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'https.certificate',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteHttpsCertificateLabel',
+          {
+            defaultMessage: 'Certificate',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'https.key',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteHttpsKeyLabel',
+          {
+            defaultMessage: 'Key',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'legacy.enabled',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyEnabledLabel',
+          {
+            defaultMessage: 'Enabled',
+          },
+        ),
+        renderValueBooleanYesNo,
+      ],
+      [
+        'legacy.port',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyPortLabel',
+          {
+            defaultMessage: 'Port',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'legacy.protocol',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyProtocolLabel',
+          {
+            defaultMessage: 'Protocol',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'legacy.ipv6',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyIpv6Label',
+          {
+            defaultMessage: 'IPv6',
+          },
+        ),
+        renderValueBooleanYesNo,
+      ],
+      [
+        'legacy.local_ip',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyLocalIpLabel',
+          {
+            defaultMessage: 'Local IP address',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'legacy.queue_size',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyQueueSizeLabel',
+          {
+            defaultMessage: 'Queue size',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'legacy.rids_closing_time',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyRidsClosingTimeLabel',
+          {
+            defaultMessage: 'RIDs closing time',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
       [
         'legacy.connection_overtake_time',
-        'Connection overtake time',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteLegacyConnectionOvertakeTimeLabel',
+          {
+            defaultMessage: 'Connection overtake time',
+          },
+        ),
         renderValueOrNoValue,
       ],
       [
         'agents.allow_higher_versions',
-        'Allow higher versions',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.globalConfigurationRemoteAgentsAllowHigherVersionsLabel',
+          {
+            defaultMessage: 'Allow higher versions',
+          },
+        ),
         renderValueBooleanYesNo,
       ],
     ] as const
@@ -796,7 +1515,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // the manager's Global tab, not a shared/dual-sourced one) ---
   {
     id: 'global-configuration-agent.execd.logging.plain',
-    label: 'Write internal logs in plain text',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.globalConfigurationAgentExecdLoggingPlainLabel',
+      {
+        defaultMessage: 'Write internal logs in plain text',
+      },
+    ),
     category: 'Global Configuration',
     goto: 'global-configuration-agent',
     tab: 'Main settings',
@@ -806,7 +1530,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'global-configuration-agent.execd.logging.json',
-    label: 'Write internal logs in JSON format',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.globalConfigurationAgentExecdLoggingJsonLabel',
+      {
+        defaultMessage: 'Write internal logs in JSON format',
+      },
+    ),
     category: 'Global Configuration',
     goto: 'global-configuration-agent',
     tab: 'Main settings',
@@ -818,7 +1547,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Vulnerabilities (manager-only, wodle inside a shared regular request) ---
   {
     id: 'vulnerabilities.enabled',
-    label: 'Enables the vulnerability detection module',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.vulnerabilitiesEnabledLabel',
+      {
+        defaultMessage: 'Enables the vulnerability detection module',
+      },
+    ),
     category: 'Vulnerabilities',
     goto: 'vulnerabilities',
     tab: 'Main settings',
@@ -836,7 +1570,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'vulnerabilities.feed-update-interval',
-    label: 'Time interval for periodic feed updates',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.vulnerabilitiesFeedUpdateIntervalLabel',
+      {
+        defaultMessage: 'Time interval for periodic feed updates',
+      },
+    ),
     category: 'Vulnerabilities',
     goto: 'vulnerabilities',
     tab: 'Main settings',
@@ -857,18 +1596,95 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     [
       [
         'disabled',
-        'Policy monitoring service status',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringDisabledLabel',
+          {
+            defaultMessage: 'Policy monitoring service status',
+          },
+        ),
         renderValueNoThenEnabled,
       ],
-      ['base_directory', 'Base directory'],
-      ['scanall', 'Scan the entire system'],
-      ['frequency', 'Frequency (in seconds) to run the scan'],
-      ['check_dev', 'Check /dev path'],
-      ['check_if', 'Check network interfaces'],
-      ['check_pids', 'Check processes IDs'],
-      ['check_ports', 'Check network ports'],
-      ['check_sys', 'Check anomalous system objects'],
-      ['skip_nfs', 'Skip scan on CIFS/NFS mounts'],
+      [
+        'base_directory',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringBaseDirectoryLabel',
+          {
+            defaultMessage: 'Base directory',
+          },
+        ),
+      ],
+      [
+        'scanall',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringScanallLabel',
+          {
+            defaultMessage: 'Scan the entire system',
+          },
+        ),
+      ],
+      [
+        'frequency',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringFrequencyLabel',
+          {
+            defaultMessage: 'Frequency (in seconds) to run the scan',
+          },
+        ),
+      ],
+      [
+        'check_dev',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringCheckDevLabel',
+          {
+            defaultMessage: 'Check /dev path',
+          },
+        ),
+      ],
+      [
+        'check_if',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringCheckIfLabel',
+          {
+            defaultMessage: 'Check network interfaces',
+          },
+        ),
+      ],
+      [
+        'check_pids',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringCheckPidsLabel',
+          {
+            defaultMessage: 'Check processes IDs',
+          },
+        ),
+      ],
+      [
+        'check_ports',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringCheckPortsLabel',
+          {
+            defaultMessage: 'Check network ports',
+          },
+        ),
+      ],
+      [
+        'check_sys',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringCheckSysLabel',
+          {
+            defaultMessage: 'Check anomalous system objects',
+          },
+        ),
+      ],
+      [
+        'skip_nfs',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringSkipNfsLabel',
+          {
+            defaultMessage: 'Skip scan on CIFS/NFS mounts',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `policy-monitoring.${field}`,
@@ -887,9 +1703,19 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Ignored',
     goto: 'policy-monitoring',
     appliesTo: 'agent',
-    title: 'Ignored paths',
-    description:
-      'These files and directories are ignored from the rootcheck scan',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.policyMonitoringIgnoreTitle',
+      {
+        defaultMessage: 'Ignored paths',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.policyMonitoringIgnoreDescription',
+      {
+        defaultMessage:
+          'These files and directories are ignored from the rootcheck scan',
+      },
+    ),
     help: POLICY_MONITORING_HELP,
     // A block declared once is reported as a bare value rather than a
     // one-element list, so both shapes must resolve to an array here.
@@ -898,7 +1724,17 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       return Array.isArray(value) ? value : value ? [value] : [];
     },
     itemLabel: item => String(item),
-    itemFields: [{ field: '', label: 'Path' }],
+    itemFields: [
+      {
+        field: '',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringIgnoreItemValueLabel',
+          {
+            defaultMessage: 'Path',
+          },
+        ),
+      },
+    ],
   },
   {
     kind: 'list',
@@ -907,14 +1743,29 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Ignored',
     goto: 'policy-monitoring',
     appliesTo: 'agent',
-    title: 'Ignored path patterns',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.policyMonitoringIgnoreSregexTitle',
+      {
+        defaultMessage: 'Ignored path patterns',
+      },
+    ),
     help: POLICY_MONITORING_HELP,
     agentExtract: content => {
       const value = get(content, 'fim.rootcheck.ignore_sregex');
       return Array.isArray(value) ? value : value ? [value] : [];
     },
     itemLabel: item => String(item),
-    itemFields: [{ field: '', label: 'Sregex' }],
+    itemFields: [
+      {
+        field: '',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringIgnoreSregexItemValueLabel',
+          {
+            defaultMessage: 'Sregex',
+          },
+        ),
+      },
+    ],
   },
 
   // --- Policy monitoring > SCA tab (agent-only, wodle) ---
@@ -922,12 +1773,41 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     [
       [
         'enabled',
-        'Security configuration assessment status',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringScaEnabledLabel',
+          {
+            defaultMessage: 'Security configuration assessment status',
+          },
+        ),
         renderValueYesThenEnabled,
       ],
-      ['interval', 'Interval'],
-      ['scan_on_start', 'Scan on start'],
-      ['skip_nfs', 'Skip nfs'],
+      [
+        'interval',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringScaIntervalLabel',
+          {
+            defaultMessage: 'Interval',
+          },
+        ),
+      ],
+      [
+        'scan_on_start',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringScaScanOnStartLabel',
+          {
+            defaultMessage: 'Scan on start',
+          },
+        ),
+      ],
+      [
+        'skip_nfs',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringScaSkipNfsLabel',
+          {
+            defaultMessage: 'Skip nfs',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `policy-monitoring.sca.${field}`,
@@ -946,7 +1826,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'SCA',
     goto: 'policy-monitoring',
     appliesTo: 'agent',
-    title: 'Policies',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.policyMonitoringScaPoliciesTitle',
+      {
+        defaultMessage: 'Policies',
+      },
+    ),
     // A policy is reported as `{ policy: <path> }`, a bare path string, or
     // (if none are enabled) absent entirely -- see policy-monitoring-sca.js's
     // buildPolicyItems.
@@ -962,23 +1847,69 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       );
     },
     itemLabel: item => (item as { policy?: string })?.policy ?? '',
-    itemFields: [{ field: 'policy', label: 'Name' }],
+    itemFields: [
+      {
+        field: 'policy',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.policyMonitoringScaPoliciesItemPolicyLabel',
+          {
+            defaultMessage: 'Name',
+          },
+        ),
+      },
+    ],
   },
 
   // --- Communication / client (agent-only) ---
   ...(
     [
-      ['remote_conf', 'Remote configuration is enabled'],
+      [
+        'remote_conf',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientRemoteConfLabel',
+          {
+            defaultMessage: 'Remote configuration is enabled',
+          },
+        ),
+      ],
       [
         'auto_restart',
-        'Auto-restart the agent when receiving valid configuration from manager',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientAutoRestartLabel',
+          {
+            defaultMessage:
+              'Auto-restart the agent when receiving valid configuration from manager',
+          },
+        ),
       ],
       [
         'notify_time',
-        'Time (in seconds) between agent checkings to the manager',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientNotifyTimeLabel',
+          {
+            defaultMessage:
+              'Time (in seconds) between agent checkings to the manager',
+          },
+        ),
       ],
-      ['time-reconnect', 'Time (in seconds) before attempting to reconnect'],
-      ['config-profile', 'Configuration profiles'],
+      [
+        'time-reconnect',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientTimeReconnectLabel',
+          {
+            defaultMessage: 'Time (in seconds) before attempting to reconnect',
+          },
+        ),
+      ],
+      [
+        'config-profile',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientConfigProfileLabel',
+          {
+            defaultMessage: 'Configuration profiles',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label]) => ({
     id: `client.${field}`,
@@ -991,7 +1922,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   })),
   {
     id: 'client.endpoint',
-    label: 'Endpoint',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.clientEndpointLabel',
+      {
+        defaultMessage: 'Endpoint',
+      },
+    ),
     category: 'Communication',
     tab: 'Server settings',
     goto: 'client',
@@ -1016,8 +1952,24 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   ...(
     [
-      ['size', 'Maximum size of a batch'],
-      ['interval', 'Maximum time to wait before sending a batch'],
+      [
+        'size',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientBatchSizeLabel',
+          {
+            defaultMessage: 'Maximum size of a batch',
+          },
+        ),
+      ],
+      [
+        'interval',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.clientBatchIntervalLabel',
+          {
+            defaultMessage: 'Maximum time to wait before sending a batch',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label]) => ({
     id: `client.batch.${field}`,
@@ -1033,13 +1985,44 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Active response (agent-only; no configuration-settings.js row today) ---
   ...(
     [
-      ['disabled', 'Active response status', renderValueNoThenEnabled],
+      [
+        'disabled',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.activeResponseAgentDisabledLabel',
+          {
+            defaultMessage: 'Active response status',
+          },
+        ),
+        renderValueNoThenEnabled,
+      ],
       [
         'repeated_offenders',
-        'List of timeouts (in minutes) for repeated offenders',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.activeResponseAgentRepeatedOffendersLabel',
+          {
+            defaultMessage:
+              'List of timeouts (in minutes) for repeated offenders',
+          },
+        ),
       ],
-      ['ca_store', 'Use the following list of root CA certificates'],
-      ['ca_verification', 'Validate WPKs using root CA certificate'],
+      [
+        'ca_store',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.activeResponseAgentCaStoreLabel',
+          {
+            defaultMessage: 'Use the following list of root CA certificates',
+          },
+        ),
+      ],
+      [
+        'ca_verification',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.activeResponseAgentCaVerificationLabel',
+          {
+            defaultMessage: 'Validate WPKs using root CA certificate',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `active-response-agent.${field}`,
@@ -1055,9 +2038,34 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Inventory data (agent-only) ---
   ...(
     [
-      ['disabled', 'Syscollector integration status', renderValueNoThenEnabled],
-      ['interval', 'Interval between system scans'],
-      ['scan-on-start', 'Scan on start'],
+      [
+        'disabled',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryDisabledLabel',
+          {
+            defaultMessage: 'Syscollector integration status',
+          },
+        ),
+        renderValueNoThenEnabled,
+      ],
+      [
+        'interval',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryIntervalLabel',
+          {
+            defaultMessage: 'Interval between system scans',
+          },
+        ),
+      ],
+      [
+        'scan-on-start',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanOnStartLabel',
+          {
+            defaultMessage: 'Scan on start',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `inventory.${field}`,
@@ -1071,18 +2079,114 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   })),
   ...(
     [
-      ['hardware', 'Scan hardware info'],
-      ['processes', 'Scan current processes'],
-      ['os', 'Scan operating system info'],
-      ['packages', 'Scan installed packages'],
-      ['network', 'Scan network interfaces'],
-      ['ports', 'Scan listening network ports'],
-      ['ports_all', 'Scan all network ports'],
-      ['groups', 'Scan groups'],
-      ['users', 'Scan users'],
-      ['services', 'Scan services'],
-      ['browser_extensions', 'Scan browser extensions'],
-      ['sync_max_eps', 'Maximum event reporting throughput'],
+      [
+        'hardware',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanHardwareLabel',
+          {
+            defaultMessage: 'Scan hardware info',
+          },
+        ),
+      ],
+      [
+        'processes',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanProcessesLabel',
+          {
+            defaultMessage: 'Scan current processes',
+          },
+        ),
+      ],
+      [
+        'os',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanOsLabel',
+          {
+            defaultMessage: 'Scan operating system info',
+          },
+        ),
+      ],
+      [
+        'packages',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanPackagesLabel',
+          {
+            defaultMessage: 'Scan installed packages',
+          },
+        ),
+      ],
+      [
+        'network',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanNetworkLabel',
+          {
+            defaultMessage: 'Scan network interfaces',
+          },
+        ),
+      ],
+      [
+        'ports',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanPortsLabel',
+          {
+            defaultMessage: 'Scan listening network ports',
+          },
+        ),
+      ],
+      [
+        'ports_all',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanPortsAllLabel',
+          {
+            defaultMessage: 'Scan all network ports',
+          },
+        ),
+      ],
+      [
+        'groups',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanGroupsLabel',
+          {
+            defaultMessage: 'Scan groups',
+          },
+        ),
+      ],
+      [
+        'users',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanUsersLabel',
+          {
+            defaultMessage: 'Scan users',
+          },
+        ),
+      ],
+      [
+        'services',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanServicesLabel',
+          {
+            defaultMessage: 'Scan services',
+          },
+        ),
+      ],
+      [
+        'browser_extensions',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanBrowserExtensionsLabel',
+          {
+            defaultMessage: 'Scan browser extensions',
+          },
+        ),
+      ],
+      [
+        'sync_max_eps',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.inventoryScanSyncMaxEpsLabel',
+          {
+            defaultMessage: 'Maximum event reporting throughput',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label]) => ({
     id: `inventory.scan.${field}`,
@@ -1097,30 +2201,156 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   // --- Integrity monitoring: fixed-field tabs (agent-only) ---
   ...(
     [
-      ['disabled', 'Integrity monitoring status', renderValueNoThenEnabled],
-      ['frequency', 'Interval (in seconds) to run the integrity scan'],
-      ['scan_time', 'Time of day to run integrity scans', renderValueOrNoValue],
       [
-        'scan_day',
-        'Day of the week to run integrity scans',
+        'disabled',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralDisabledLabel',
+          {
+            defaultMessage: 'Integrity monitoring status',
+          },
+        ),
+        renderValueNoThenEnabled,
+      ],
+      [
+        'frequency',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralFrequencyLabel',
+          {
+            defaultMessage: 'Interval (in seconds) to run the integrity scan',
+          },
+        ),
+      ],
+      [
+        'scan_time',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralScanTimeLabel',
+          {
+            defaultMessage: 'Time of day to run integrity scans',
+          },
+        ),
         renderValueOrNoValue,
       ],
-      ['scan_on_start', 'Scan on start'],
-      ['skip_nfs', 'Skip scan on CIFS/NFS mounts'],
-      ['skip_dev', 'Skip scan of /dev directory'],
-      ['skip_sys', 'Skip scan of /sys directory'],
-      ['skip_proc', 'Skip scan of /proc directory'],
-      ['remove_old_diff', 'Remove old local snapshots', renderValueOrYes],
-      ['restart_audit', 'Restart the Audit daemon'],
+      [
+        'scan_day',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralScanDayLabel',
+          {
+            defaultMessage: 'Day of the week to run integrity scans',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'scan_on_start',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralScanOnStartLabel',
+          {
+            defaultMessage: 'Scan on start',
+          },
+        ),
+      ],
+      [
+        'skip_nfs',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralSkipNfsLabel',
+          {
+            defaultMessage: 'Skip scan on CIFS/NFS mounts',
+          },
+        ),
+      ],
+      [
+        'skip_dev',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralSkipDevLabel',
+          {
+            defaultMessage: 'Skip scan of /dev directory',
+          },
+        ),
+      ],
+      [
+        'skip_sys',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralSkipSysLabel',
+          {
+            defaultMessage: 'Skip scan of /sys directory',
+          },
+        ),
+      ],
+      [
+        'skip_proc',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralSkipProcLabel',
+          {
+            defaultMessage: 'Skip scan of /proc directory',
+          },
+        ),
+      ],
+      [
+        'remove_old_diff',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralRemoveOldDiffLabel',
+          {
+            defaultMessage: 'Remove old local snapshots',
+          },
+        ),
+        renderValueOrYes,
+      ],
+      [
+        'restart_audit',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralRestartAuditLabel',
+          {
+            defaultMessage: 'Restart the Audit daemon',
+          },
+        ),
+      ],
       [
         'windows_audit_interval',
-        "Interval (in seconds) to check directories' SACLs",
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralWindowsAuditIntervalLabel',
+          {
+            defaultMessage: "Interval (in seconds) to check directories' SACLs",
+          },
+        ),
         renderValueOrDefault('300'),
       ],
-      ['prefilter_cmd', 'Command to prevent prelinking', renderValueOrNoValue],
-      ['max_eps', 'Maximum event reporting throughput'],
-      ['process_priority', 'Process priority'],
-      ['database', 'Database type'],
+      [
+        'prefilter_cmd',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralPrefilterCmdLabel',
+          {
+            defaultMessage: 'Command to prevent prelinking',
+          },
+        ),
+        renderValueOrNoValue,
+      ],
+      [
+        'max_eps',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralMaxEpsLabel',
+          {
+            defaultMessage: 'Maximum event reporting throughput',
+          },
+        ),
+      ],
+      [
+        'process_priority',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralProcessPriorityLabel',
+          {
+            defaultMessage: 'Process priority',
+          },
+        ),
+      ],
+      [
+        'database',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringGeneralDatabaseLabel',
+          {
+            defaultMessage: 'Database type',
+          },
+        ),
+      ],
       // `auto_ignore`/`alert_new_files` are manager-only (`when: 'manager'`
       // in integrity-monitoring-general.js) and deliberately omitted here.
     ] as const
@@ -1136,13 +2366,70 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   })),
   ...(
     [
-      ['enabled', 'Synchronization status', renderValueYesThenEnabled],
-      ['max_interval', 'Maximum interval (in seconds) between every sync'],
-      ['interval', 'Interval (in seconds) between every sync'],
-      ['response_timeout', 'Response timeout (in seconds)'],
-      ['queue_size', 'Queue size of the manager responses'],
-      ['max_eps', 'Maximum message throughput'],
-      ['thread_pool', 'Number of threads'],
+      [
+        'enabled',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationEnabledLabel',
+          {
+            defaultMessage: 'Synchronization status',
+          },
+        ),
+        renderValueYesThenEnabled,
+      ],
+      [
+        'max_interval',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationMaxIntervalLabel',
+          {
+            defaultMessage: 'Maximum interval (in seconds) between every sync',
+          },
+        ),
+      ],
+      [
+        'interval',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationIntervalLabel',
+          {
+            defaultMessage: 'Interval (in seconds) between every sync',
+          },
+        ),
+      ],
+      [
+        'response_timeout',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationResponseTimeoutLabel',
+          {
+            defaultMessage: 'Response timeout (in seconds)',
+          },
+        ),
+      ],
+      [
+        'queue_size',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationQueueSizeLabel',
+          {
+            defaultMessage: 'Queue size of the manager responses',
+          },
+        ),
+      ],
+      [
+        'max_eps',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationMaxEpsLabel',
+          {
+            defaultMessage: 'Maximum message throughput',
+          },
+        ),
+      ],
+      [
+        'thread_pool',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringSynchronizationThreadPoolLabel',
+          {
+            defaultMessage: 'Number of threads',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label, render]) => ({
     id: `integrity-monitoring.synchronization.${field}`,
@@ -1156,7 +2443,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   })),
   {
     id: 'integrity-monitoring.file-limit.enabled',
-    label: 'File limit status',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringFileLimitEnabledLabel',
+      {
+        defaultMessage: 'File limit status',
+      },
+    ),
     category: 'Integrity monitoring',
     tab: 'Files limit',
     goto: 'integrity-monitoring',
@@ -1166,7 +2458,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'integrity-monitoring.file-limit.entries',
-    label: 'Maximum number of files to monitor',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringFileLimitEntriesLabel',
+      {
+        defaultMessage: 'Maximum number of files to monitor',
+      },
+    ),
     category: 'Integrity monitoring',
     tab: 'Files limit',
     goto: 'integrity-monitoring',
@@ -1175,7 +2472,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'integrity-monitoring.registry-limit.enabled',
-    label: 'Registry limit status',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryLimitEnabledLabel',
+      {
+        defaultMessage: 'Registry limit status',
+      },
+    ),
     category: 'Integrity monitoring',
     tab: 'Registries limit',
     goto: 'integrity-monitoring',
@@ -1186,7 +2488,12 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   {
     id: 'integrity-monitoring.registry-limit.entries',
-    label: 'Maximum number of registries values to monitor',
+    label: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryLimitEntriesLabel',
+      {
+        defaultMessage: 'Maximum number of registries values to monitor',
+      },
+    ),
     category: 'Integrity monitoring',
     tab: 'Registries limit',
     goto: 'integrity-monitoring',
@@ -1196,10 +2503,42 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   },
   ...(
     [
-      ['restart_audit', 'Restart audit'],
-      ['startup_healthcheck', 'Startup healthcheck'],
-      ['provider', 'Provider'],
-      ['queue_size', 'Queue size'],
+      [
+        'restart_audit',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataRestartAuditLabel',
+          {
+            defaultMessage: 'Restart audit',
+          },
+        ),
+      ],
+      [
+        'startup_healthcheck',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataStartupHealthcheckLabel',
+          {
+            defaultMessage: 'Startup healthcheck',
+          },
+        ),
+      ],
+      [
+        'provider',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataProviderLabel',
+          {
+            defaultMessage: 'Provider',
+          },
+        ),
+      ],
+      [
+        'queue_size',
+        i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataQueueSizeLabel',
+          {
+            defaultMessage: 'Queue size',
+          },
+        ),
+      ],
     ] as const
   ).map(([field, label]) => ({
     id: `integrity-monitoring.who-data.${field}`,
@@ -1218,12 +2557,32 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'No diff',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
-    title: 'No diff directories',
-    description: "These files won't have their diff calculated",
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringNodiffTitle',
+      {
+        defaultMessage: 'No diff directories',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringNodiffDescription',
+      {
+        defaultMessage: "These files won't have their diff calculated",
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.nodiff',
     itemLabel: item => String(item),
-    itemFields: [{ field: '', label: 'Path' }],
+    itemFields: [
+      {
+        field: '',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringNodiffItemValueLabel',
+          {
+            defaultMessage: 'Path',
+          },
+        ),
+      },
+    ],
   },
   {
     kind: 'list',
@@ -1232,13 +2591,33 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Ignored',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
-    title: 'Ignored paths',
-    description:
-      'These files and directories are ignored from the integrity scan',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringIgnoreTitle',
+      {
+        defaultMessage: 'Ignored paths',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringIgnoreDescription',
+      {
+        defaultMessage:
+          'These files and directories are ignored from the integrity scan',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.ignore',
     itemLabel: item => String(item),
-    itemFields: [{ field: '', label: 'Path' }],
+    itemFields: [
+      {
+        field: '',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringIgnoreItemValueLabel',
+          {
+            defaultMessage: 'Path',
+          },
+        ),
+      },
+    ],
   },
   {
     kind: 'list',
@@ -1247,11 +2626,26 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Ignored',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
-    title: 'Ignored path patterns',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringIgnoreSregexTitle',
+      {
+        defaultMessage: 'Ignored path patterns',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.ignore_sregex',
     itemLabel: item => String(item),
-    itemFields: [{ field: '', label: 'Sregex' }],
+    itemFields: [
+      {
+        field: '',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringIgnoreSregexItemValueLabel',
+          {
+            defaultMessage: 'Sregex',
+          },
+        ),
+      },
+    ],
   },
   {
     kind: 'list',
@@ -1261,15 +2655,41 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
     platform: 'windows',
-    title: 'Ignored registry entries',
-    description:
-      'A list of registry entries that will be ignored (Windows only)',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreTitle',
+      {
+        defaultMessage: 'Ignored registry entries',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreDescription',
+      {
+        defaultMessage:
+          'A list of registry entries that will be ignored (Windows only)',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.registry_ignore',
     itemLabel: item => (item as { entry?: string })?.entry ?? '',
     itemFields: [
-      { field: 'entry', label: 'Entry' },
-      { field: 'arch', label: 'Arch' },
+      {
+        field: 'entry',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreItemEntryLabel',
+          {
+            defaultMessage: 'Entry',
+          },
+        ),
+      },
+      {
+        field: 'arch',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreItemArchLabel',
+          {
+            defaultMessage: 'Arch',
+          },
+        ),
+      },
     ],
   },
   {
@@ -1280,15 +2700,41 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
     platform: 'windows',
-    title: 'Ignored registry entry patterns',
-    description:
-      'A list of registry entry patterns that will be ignored (Windows only)',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreSregexTitle',
+      {
+        defaultMessage: 'Ignored registry entry patterns',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreSregexDescription',
+      {
+        defaultMessage:
+          'A list of registry entry patterns that will be ignored (Windows only)',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.registry_ignore_sregex',
     itemLabel: item => (item as { entry?: string })?.entry ?? '',
     itemFields: [
-      { field: 'entry', label: 'Entry Sregex' },
-      { field: 'arch', label: 'Arch' },
+      {
+        field: 'entry',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreSregexItemEntryLabel',
+          {
+            defaultMessage: 'Entry Sregex',
+          },
+        ),
+      },
+      {
+        field: 'arch',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryIgnoreSregexItemArchLabel',
+          {
+            defaultMessage: 'Arch',
+          },
+        ),
+      },
     ],
   },
   {
@@ -1299,13 +2745,33 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
     platform: 'not-windows',
-    title: 'Who-data audit keys',
-    description:
-      'Server will include in its FIM baseline those events being monitored by Audit using audit_key.',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataAuditKeyTitle',
+      {
+        defaultMessage: 'Who-data audit keys',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataAuditKeyDescription',
+      {
+        defaultMessage:
+          'Server will include in its FIM baseline those events being monitored by Audit using audit_key.',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.whodata.audit_key',
     itemLabel: item => String(item),
-    itemFields: [{ field: '', label: 'Key' }],
+    itemFields: [
+      {
+        field: '',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringWhoDataAuditKeyItemValueLabel',
+          {
+            defaultMessage: 'Key',
+          },
+        ),
+      },
+    ],
   },
   {
     kind: 'list',
@@ -1314,89 +2780,206 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Monitored',
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
-    title: 'Monitored directories',
-    description: 'These directories are included on the integrity scan',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesTitle',
+      {
+        defaultMessage: 'Monitored directories',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesDescription',
+      {
+        defaultMessage: 'These directories are included on the integrity scan',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.directories',
     itemLabel: item => (item as { dir?: string })?.dir ?? '',
     itemFields: [
-      { field: 'dir', label: 'Selected item' },
+      {
+        field: 'dir',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemDirLabel',
+          {
+            defaultMessage: 'Selected item',
+          },
+        ),
+      },
       {
         field: 'opts',
-        label: 'Enable realtime monitoring',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemRealtimeLabel',
+          {
+            defaultMessage: 'Enable realtime monitoring',
+          },
+        ),
         render: renderOptsIncludes('realtime'),
       },
       {
         field: 'opts',
-        label: 'Enable auditing (who-data)',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckWhodataLabel',
+          {
+            defaultMessage: 'Enable auditing (who-data)',
+          },
+        ),
         render: renderOptsIncludes('check_whodata'),
       },
       {
         field: 'opts',
-        label: 'Report file changes',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemReportChangesLabel',
+          {
+            defaultMessage: 'Report file changes',
+          },
+        ),
         render: renderOptsIncludes('report_changes'),
       },
       {
         field: 'opts',
-        label: 'Perform all checksums',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckAllLabel',
+          {
+            defaultMessage: 'Perform all checksums',
+          },
+        ),
         render: renderOptsIncludes('check_all'),
       },
       {
         field: 'opts',
-        label: 'Check sums (MD5 & SHA1)',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckSumLabel',
+          {
+            defaultMessage: 'Check sums (MD5 & SHA1)',
+          },
+        ),
         render: renderOptsIncludes('check_sum'),
       },
       {
         field: 'opts',
-        label: 'Check MD5 sum',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckMd5sumLabel',
+          {
+            defaultMessage: 'Check MD5 sum',
+          },
+        ),
         render: renderOptsIncludes('check_md5sum'),
       },
       {
         field: 'opts',
-        label: 'Check SHA1 sum',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckSha1sumLabel',
+          {
+            defaultMessage: 'Check SHA1 sum',
+          },
+        ),
         render: renderOptsIncludes('check_sha1sum'),
       },
       {
         field: 'opts',
-        label: 'Check SHA256 sum',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckSha256sumLabel',
+          {
+            defaultMessage: 'Check SHA256 sum',
+          },
+        ),
         render: renderOptsIncludes('check_sha256sum'),
       },
       {
         field: 'opts',
-        label: 'Check files size',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckSizeLabel',
+          {
+            defaultMessage: 'Check files size',
+          },
+        ),
         render: renderOptsIncludes('check_size'),
       },
       {
         field: 'opts',
-        label: 'Check files owner',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckOwnerLabel',
+          {
+            defaultMessage: 'Check files owner',
+          },
+        ),
         render: renderOptsIncludes('check_owner'),
       },
       {
         field: 'opts',
-        label: 'Check files groups',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckGroupLabel',
+          {
+            defaultMessage: 'Check files groups',
+          },
+        ),
         render: renderOptsIncludes('check_group'),
       },
       {
         field: 'opts',
-        label: 'Check files permissions',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckPermLabel',
+          {
+            defaultMessage: 'Check files permissions',
+          },
+        ),
         render: renderOptsIncludes('check_perm'),
       },
       {
         field: 'opts',
-        label: 'Check files modification time',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckMtimeLabel',
+          {
+            defaultMessage: 'Check files modification time',
+          },
+        ),
         render: renderOptsIncludes('check_mtime'),
       },
       {
         field: 'opts',
-        label: 'Check files inodes',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemCheckInodeLabel',
+          {
+            defaultMessage: 'Check files inodes',
+          },
+        ),
         render: renderOptsIncludes('check_inode'),
       },
-      { field: 'restrict', label: 'Restrict to files containing this string' },
-      { field: 'tags', label: 'Custom tags for alerts' },
-      { field: 'recursion_level', label: 'Recursion level' },
+      {
+        field: 'restrict',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemRestrictLabel',
+          {
+            defaultMessage: 'Restrict to files containing this string',
+          },
+        ),
+      },
+      {
+        field: 'tags',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemTagsLabel',
+          {
+            defaultMessage: 'Custom tags for alerts',
+          },
+        ),
+      },
+      {
+        field: 'recursion_level',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemRecursionLevelLabel',
+          {
+            defaultMessage: 'Recursion level',
+          },
+        ),
+      },
       {
         field: 'opts',
-        label: 'Follow symbolic link',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringDirectoriesItemFollowSymbolicLinkLabel',
+          {
+            defaultMessage: 'Follow symbolic link',
+          },
+        ),
         render: renderOptsIncludes('follow_symbolic_link'),
       },
     ],
@@ -1409,15 +2992,41 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     goto: 'integrity-monitoring',
     appliesTo: 'agent',
     platform: 'windows',
-    title: 'Monitored registry entries',
-    description:
-      'A list of registry entries that will be monitored (Windows only)',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryTitle',
+      {
+        defaultMessage: 'Monitored registry entries',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryDescription',
+      {
+        defaultMessage:
+          'A list of registry entries that will be monitored (Windows only)',
+      },
+    ),
     help: FIM_HELP,
     agentPath: 'fim.syscheck.registry',
     itemLabel: item => (item as { entry?: string })?.entry ?? '',
     itemFields: [
-      { field: 'entry', label: 'Entry' },
-      { field: 'arch', label: 'Arch' },
+      {
+        field: 'entry',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryItemEntryLabel',
+          {
+            defaultMessage: 'Entry',
+          },
+        ),
+      },
+      {
+        field: 'arch',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.integrityMonitoringRegistryItemArchLabel',
+          {
+            defaultMessage: 'Arch',
+          },
+        ),
+      },
     ],
   },
 
@@ -1428,11 +3037,26 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     category: 'Commands',
     goto: 'commands',
     appliesTo: 'agent',
-    title: 'Command definitions',
-    description: 'Find here all the currently defined commands',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.commandsCommandTitle',
+      {
+        defaultMessage: 'Command definitions',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.commandsCommandDescription',
+      {
+        defaultMessage: 'Find here all the currently defined commands',
+      },
+    ),
     help: [
       {
-        text: 'Command module reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.commandModuleReference',
+          {
+            defaultMessage: 'Command module reference',
+          },
+        ),
         href: 'user-manual/capabilities/command-monitoring/configuration.html',
       },
     ],
@@ -1451,17 +3075,105 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       // NOTE: commands.js's own `disabled` entry is missing its `render:`
       // key too (`renderValueNoThenEnabled` is never actually wired) --
       // ported faithfully rather than "fixed" as a side effect of this change.
-      { field: 'disabled', label: 'Command status' },
-      { field: 'tag', label: 'Command name' },
-      { field: 'command', label: 'Command to execute' },
-      { field: 'interval', label: 'Interval between executions' },
-      { field: 'run_on_start', label: 'Run on start' },
-      { field: 'ignore_output', label: 'Ignore command output' },
-      { field: 'timeout', label: 'Timeout (in seconds) to wait for execution' },
-      { field: 'verify_md5', label: 'Verify MD5 sum' },
-      { field: 'verify_sha1', label: 'Verify SHA1 sum' },
-      { field: 'verify_sha256', label: 'Verify SHA256 sum' },
-      { field: 'skip_verification', label: 'Ignore checksum verification' },
+      {
+        field: 'disabled',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemDisabledLabel',
+          {
+            defaultMessage: 'Command status',
+          },
+        ),
+      },
+      {
+        field: 'tag',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemTagLabel',
+          {
+            defaultMessage: 'Command name',
+          },
+        ),
+      },
+      {
+        field: 'command',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemCommandLabel',
+          {
+            defaultMessage: 'Command to execute',
+          },
+        ),
+      },
+      {
+        field: 'interval',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemIntervalLabel',
+          {
+            defaultMessage: 'Interval between executions',
+          },
+        ),
+      },
+      {
+        field: 'run_on_start',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemRunOnStartLabel',
+          {
+            defaultMessage: 'Run on start',
+          },
+        ),
+      },
+      {
+        field: 'ignore_output',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemIgnoreOutputLabel',
+          {
+            defaultMessage: 'Ignore command output',
+          },
+        ),
+      },
+      {
+        field: 'timeout',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemTimeoutLabel',
+          {
+            defaultMessage: 'Timeout (in seconds) to wait for execution',
+          },
+        ),
+      },
+      {
+        field: 'verify_md5',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemVerifyMd5Label',
+          {
+            defaultMessage: 'Verify MD5 sum',
+          },
+        ),
+      },
+      {
+        field: 'verify_sha1',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemVerifySha1Label',
+          {
+            defaultMessage: 'Verify SHA1 sum',
+          },
+        ),
+      },
+      {
+        field: 'verify_sha256',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemVerifySha256Label',
+          {
+            defaultMessage: 'Verify SHA256 sum',
+          },
+        ),
+      },
+      {
+        field: 'skip_verification',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.commandsCommandItemSkipVerificationLabel',
+          {
+            defaultMessage: 'Ignore checksum verification',
+          },
+        ),
+      },
     ],
   },
 
@@ -1474,8 +3186,18 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Logs',
     goto: 'log-collection',
     appliesTo: 'agent',
-    title: 'Logs files',
-    description: 'List of log files that will be analyzed',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionLogsTitle',
+      {
+        defaultMessage: 'Logs files',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionLogsDescription',
+      {
+        defaultMessage: 'List of log files that will be analyzed',
+      },
+    ),
     help: LOG_COLLECTION_HELP,
     agentExtract: localfileBucket(item => typeof item.file !== 'undefined'),
     itemLabel: item => {
@@ -1494,42 +3216,96 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       );
     },
     itemFields: [
-      { field: 'logformat', label: 'Log format' },
-      { field: 'file', label: 'Log location', render: renderValueOrNoValue },
+      {
+        field: 'logformat',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemLogformatLabel',
+          {
+            defaultMessage: 'Log format',
+          },
+        ),
+      },
+      {
+        field: 'file',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemFileLabel',
+          {
+            defaultMessage: 'Log location',
+          },
+        ),
+        render: renderValueOrNoValue,
+      },
       {
         field: 'only-future-events',
-        label: 'Only receive logs occured after start',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemOnlyFutureEventsLabel',
+          {
+            defaultMessage: 'Only receive logs occured after start',
+          },
+        ),
       },
       {
         field: 'reconnect_time',
-        label:
-          'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemReconnectTimeLabel',
+          {
+            defaultMessage:
+              'Time in seconds to try to reconnect with Windows Event Channel when it has fallen',
+          },
+        ),
       },
       {
         field: 'query',
-        label: 'Filter logs using this XPATH query',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemQueryLabel',
+          {
+            defaultMessage: 'Filter logs using this XPATH query',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       // NOTE: log-collection-logs.js labels this the same as
       // `only-future-events` -- ported faithfully.
       {
         field: 'labels',
-        label: 'Only receive logs occured after start',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemLabelsLabel',
+          {
+            defaultMessage: 'Only receive logs occured after start',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'target',
-        label: 'Redirect output to this socket',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemTargetLabel',
+          {
+            defaultMessage: 'Redirect output to this socket',
+          },
+        ),
         render: renderLogCollectionTarget,
       },
       {
         field: 'ignore',
-        label: 'If the expression matches, the log will be ignored',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemIgnoreLabel',
+          {
+            defaultMessage:
+              'If the expression matches, the log will be ignored',
+          },
+        ),
         render: renderArrayObjectField,
       },
       {
         field: 'restrict',
-        label: 'The log will only be processed if the expression matches',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionLogsItemRestrictLabel',
+          {
+            defaultMessage:
+              'The log will only be processed if the expression matches',
+          },
+        ),
         render: renderArrayObjectField,
       },
     ],
@@ -1542,8 +3318,18 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     goto: 'log-collection',
     appliesTo: 'agent',
     platform: 'windows',
-    title: 'Windows events logs',
-    description: 'List of Windows logs that will be processed',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsTitle',
+      {
+        defaultMessage: 'Windows events logs',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsDescription',
+      {
+        defaultMessage: 'List of Windows logs that will be processed',
+      },
+    ),
     help: LOG_COLLECTION_HELP,
     agentExtract: localfileBucket(
       item =>
@@ -1562,17 +3348,53 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
         : `${localfile.channel} (${localfile.logformat})`;
     },
     itemFields: [
-      { field: 'logformat', label: 'Log format' },
-      { field: 'channel', label: 'Channel', render: renderValueOrNoValue },
-      { field: 'query', label: 'Query', render: renderQueryValue },
+      {
+        field: 'logformat',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsItemLogformatLabel',
+          {
+            defaultMessage: 'Log format',
+          },
+        ),
+      },
+      {
+        field: 'channel',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsItemChannelLabel',
+          {
+            defaultMessage: 'Channel',
+          },
+        ),
+        render: renderValueOrNoValue,
+      },
+      {
+        field: 'query',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsItemQueryLabel',
+          {
+            defaultMessage: 'Query',
+          },
+        ),
+        render: renderQueryValue,
+      },
       {
         field: 'only-future-events',
-        label: 'Only future events',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsItemOnlyFutureEventsLabel',
+          {
+            defaultMessage: 'Only future events',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'reconnect_time',
-        label: 'Reconnect Time',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionWindowsEventsItemReconnectTimeLabel',
+          {
+            defaultMessage: 'Reconnect Time',
+          },
+        ),
         render: renderValueOrNoValue,
       },
     ],
@@ -1584,8 +3406,18 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'macOS Events',
     goto: 'log-collection',
     appliesTo: 'agent',
-    title: 'macOS events logs',
-    description: 'List of macOS logs that will be processed',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionMacosEventsTitle',
+      {
+        defaultMessage: 'macOS events logs',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionMacosEventsDescription',
+      {
+        defaultMessage: 'List of macOS logs that will be processed',
+      },
+    ),
     help: LOG_COLLECTION_HELP,
     agentExtract: localfileBucket(item => item.logformat === 'macos'),
     itemLabel: item => {
@@ -1595,26 +3427,63 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       )}`;
     },
     itemFields: [
-      { field: 'logformat', label: 'Log format' },
-      { field: 'query', label: 'Query value', render: renderQueryValue },
+      {
+        field: 'logformat',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionMacosEventsItemLogformatLabel',
+          {
+            defaultMessage: 'Log format',
+          },
+        ),
+      },
+      {
+        field: 'query',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionMacosEventsItemQueryLabel',
+          {
+            defaultMessage: 'Query value',
+          },
+        ),
+        render: renderQueryValue,
+      },
       {
         field: 'query.level',
-        label: 'Query level',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionMacosEventsItemQueryLevelLabel',
+          {
+            defaultMessage: 'Query level',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'query.type',
-        label: 'Query type',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionMacosEventsItemQueryTypeLabel',
+          {
+            defaultMessage: 'Query type',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'ignore_binaries',
-        label: 'Ignore binaries',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionMacosEventsItemIgnoreBinariesLabel',
+          {
+            defaultMessage: 'Ignore binaries',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'only-future-events',
-        label: 'Only future events',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionMacosEventsItemOnlyFutureEventsLabel',
+          {
+            defaultMessage: 'Only future events',
+          },
+        ),
         render: renderValueOrNoValue,
       },
     ],
@@ -1626,8 +3495,18 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Journald',
     goto: 'log-collection',
     appliesTo: 'agent',
-    title: 'Journald events logs',
-    description: 'List of journald logs that will be processed',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionJournaldTitle',
+      {
+        defaultMessage: 'Journald events logs',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionJournaldDescription',
+      {
+        defaultMessage: 'List of journald logs that will be processed',
+      },
+    ),
     help: LOG_COLLECTION_HELP,
     agentExtract: localfileBucket(item => item.logformat === 'journald'),
     itemLabel: item => {
@@ -1637,22 +3516,51 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       )}`;
     },
     itemFields: [
-      { field: 'logformat', label: 'Log format' },
+      {
+        field: 'logformat',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionJournaldItemLogformatLabel',
+          {
+            defaultMessage: 'Log format',
+          },
+        ),
+      },
       {
         field: 'only-future-events',
-        label: 'Only future events',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionJournaldItemOnlyFutureEventsLabel',
+          {
+            defaultMessage: 'Only future events',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'filters_disabled',
-        label: 'Filters Disabled',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionJournaldItemFiltersDisabledLabel',
+          {
+            defaultMessage: 'Filters Disabled',
+          },
+        ),
         render: renderValueOrDefault('true'),
       },
       {
         field: 'filters',
-        label: 'Filters',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionJournaldItemFiltersLabel',
+          {
+            defaultMessage: 'Filters',
+          },
+        ),
         render: renderFilters,
-        info: 'The configuration filters within the same group are processed with an AND logic operator. Whereas the different filter groups are processed with an OR like logic operator.',
+        info: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionJournaldItemFiltersInfo',
+          {
+            defaultMessage:
+              'The configuration filters within the same group are processed with an AND logic operator. Whereas the different filter groups are processed with an OR like logic operator.',
+          },
+        ),
       },
     ],
   },
@@ -1663,9 +3571,19 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Commands',
     goto: 'log-collection',
     appliesTo: 'agent',
-    title: 'Command monitoring',
-    description:
-      'All output from these commands will be read as one or more log messages depending on whether command or full_command is used',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionCommandsTitle',
+      {
+        defaultMessage: 'Command monitoring',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionCommandsDescription',
+      {
+        defaultMessage:
+          'All output from these commands will be read as one or more log messages depending on whether command or full_command is used',
+      },
+    ),
     help: LOG_COLLECTION_HELP,
     agentExtract: localfileBucket(
       item => item.logformat === 'command' || item.logformat === 'full_command',
@@ -1686,21 +3604,53 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       );
     },
     itemFields: [
-      { field: 'logformat', label: 'Log format' },
+      {
+        field: 'logformat',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionCommandsItemLogformatLabel',
+          {
+            defaultMessage: 'Log format',
+          },
+        ),
+      },
       {
         field: 'command',
-        label: 'Run this command',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionCommandsItemCommandLabel',
+          {
+            defaultMessage: 'Run this command',
+          },
+        ),
         render: renderValueOrNoValue,
       },
-      { field: 'alias', label: 'Command alias', render: renderValueOrNoValue },
+      {
+        field: 'alias',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionCommandsItemAliasLabel',
+          {
+            defaultMessage: 'Command alias',
+          },
+        ),
+        render: renderValueOrNoValue,
+      },
       {
         field: 'frequency',
-        label: 'Interval between command executions',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionCommandsItemFrequencyLabel',
+          {
+            defaultMessage: 'Interval between command executions',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'target',
-        label: 'Redirect output to this socket',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionCommandsItemTargetLabel',
+          {
+            defaultMessage: 'Redirect output to this socket',
+          },
+        ),
         render: renderLogCollectionTarget,
       },
     ],
@@ -1712,15 +3662,35 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     tab: 'Sockets',
     goto: 'log-collection',
     appliesTo: 'agent',
-    title: 'Output sockets',
-    description: 'Define custom outputs to send log data',
+    title: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionSocketsTitle',
+      {
+        defaultMessage: 'Output sockets',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.configuration.settingsRegistry.logCollectionSocketsDescription',
+      {
+        defaultMessage: 'Define custom outputs to send log data',
+      },
+    ),
     help: [
       {
-        text: 'Using multiple outputs',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.usingMultipleOutputs',
+          {
+            defaultMessage: 'Using multiple outputs',
+          },
+        ),
         href: 'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
       },
       {
-        text: 'Socket reference',
+        text: i18n.translate(
+          'wazuh.configuration.settingsHelpLinks.socketReference',
+          {
+            defaultMessage: 'Socket reference',
+          },
+        ),
         href: 'user-manual/reference/ossec-conf/socket.html',
       },
     ],
@@ -1734,20 +3704,44 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     },
     itemLabel: item => (item as { name?: string })?.name ?? '',
     itemFields: [
-      { field: 'name', label: 'Socket name', render: renderValueOrNoValue },
+      {
+        field: 'name',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionSocketsItemNameLabel',
+          {
+            defaultMessage: 'Socket name',
+          },
+        ),
+        render: renderValueOrNoValue,
+      },
       {
         field: 'location',
-        label: 'Socket location',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionSocketsItemLocationLabel',
+          {
+            defaultMessage: 'Socket location',
+          },
+        ),
         render: renderValueOrNoValue,
       },
       {
         field: 'mode',
-        label: 'UNIX socket protocol',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionSocketsItemModeLabel',
+          {
+            defaultMessage: 'UNIX socket protocol',
+          },
+        ),
         render: renderValueOrDefault('udp'),
       },
       {
         field: 'prefix',
-        label: 'Prefix to place before the message',
+        label: i18n.translate(
+          'wazuh.configuration.settingsRegistry.logCollectionSocketsItemPrefixLabel',
+          {
+            defaultMessage: 'Prefix to place before the message',
+          },
+        ),
         render: renderValueOrNoValue,
       },
     ],

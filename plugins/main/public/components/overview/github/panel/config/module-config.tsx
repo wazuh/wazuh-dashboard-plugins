@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { Main, Drilldown } from '../views';
 import {
@@ -30,7 +31,9 @@ export const ModuleConfig = {
   'user.name': {
     component: props => (
       <Drilldown
-        title={'Actor Activity'}
+        title={i18n.translate('wazuh.github.drilldown.actorActivityTitle', {
+          defaultMessage: 'Actor Activity',
+        })}
         {...{ ...DrilldownConfigActor(props), ...props }}
       />
     ),
@@ -38,7 +41,12 @@ export const ModuleConfig = {
   'organization.name': {
     component: props => (
       <Drilldown
-        title={'Organization Activity'}
+        title={i18n.translate(
+          'wazuh.github.drilldown.organizationActivityTitle',
+          {
+            defaultMessage: 'Organization Activity',
+          },
+        )}
         {...{ ...DrilldownConfigOrganization(props), ...props }}
       />
     ),
@@ -46,7 +54,12 @@ export const ModuleConfig = {
   'url.original': {
     component: props => (
       <Drilldown
-        title={'Repository Activity'}
+        title={i18n.translate(
+          'wazuh.github.drilldown.repositoryActivityTitle',
+          {
+            defaultMessage: 'Repository Activity',
+          },
+        )}
         {...{ ...DrilldownConfigRepository(props), ...props }}
       />
     ),
@@ -54,7 +67,9 @@ export const ModuleConfig = {
   'event.action': {
     component: props => (
       <Drilldown
-        title={'Action Activity'}
+        title={i18n.translate('wazuh.github.drilldown.actionActivityTitle', {
+          defaultMessage: 'Action Activity',
+        })}
         {...{ ...DrilldownConfigAction(props), ...props }}
       />
     ),

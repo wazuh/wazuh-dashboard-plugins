@@ -22,6 +22,7 @@ import {
   EuiFacetGroup,
   EuiToolTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { requirementsName } from '../../requirement-name';
 import { getRequirementCodes } from '../../../../../../common/compliance-requirements/requirement-codes';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
@@ -93,8 +94,14 @@ export class ComplianceRequirements extends Component {
           })
           .map(facet => {
             let iconNode;
-            const name =
-              requirementsName[facet.label] || `Requirement ${facet.label}`;
+            const requirementLabel = i18n.translate(
+              'wazuh.complianceTable.requirementsPanel.facetLabel',
+              {
+                defaultMessage: 'Requirement {requirement}',
+                values: { requirement: facet.label },
+              },
+            );
+            const name = requirementsName[facet.label] || requirementLabel;
             return (
               <EuiFacetButton
                 key={'Requirement ' + facet.id}
@@ -120,7 +127,7 @@ export class ComplianceRequirements extends Component {
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    Requirement {facet.label}
+                    {requirementLabel}
                   </span>
                 </EuiToolTip>
               </EuiFacetButton>
@@ -150,10 +157,20 @@ export class ComplianceRequirements extends Component {
     const panels = [
       {
         id: 0,
-        title: 'Options',
+        title: i18n.translate(
+          'wazuh.complianceTable.requirementsPanel.optionsTitle',
+          {
+            defaultMessage: 'Options',
+          },
+        ),
         items: [
           {
-            name: 'Select all',
+            name: i18n.translate(
+              'wazuh.complianceTable.requirementsPanel.selectAll',
+              {
+                defaultMessage: 'Select all',
+              },
+            ),
             icon: <EuiIcon type='check' size='m' />,
             onClick: () => {
               this.closePopover();
@@ -161,7 +178,12 @@ export class ComplianceRequirements extends Component {
             },
           },
           {
-            name: 'Unselect all',
+            name: i18n.translate(
+              'wazuh.complianceTable.requirementsPanel.unselectAll',
+              {
+                defaultMessage: 'Unselect all',
+              },
+            ),
             icon: <EuiIcon type='cross' size='m' />,
             onClick: () => {
               this.closePopover();

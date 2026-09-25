@@ -12,6 +12,7 @@
 
 import React from 'react';
 import moment from 'moment-timezone';
+import { i18n } from '@osd/i18n';
 import { EuiBadge, EuiToolTip } from '@elastic/eui';
 
 import { formatUIDate } from '../../../../../../react-services/time-service';
@@ -40,16 +41,29 @@ export const AgentReportBadge = ({ modifiedAt }: AgentReportBadgeProps) => {
       position='left'
       content={
         <>
-          <p>Sent by the agent on {formatUIDate(modifiedAt)}.</p>
           <p>
-            Agents report on a set interval, so a change made since then appears
-            after the next report.
+            {i18n.translate('wazuh.configuration.agentReportBadge.sentOn', {
+              defaultMessage: 'Sent by the agent on {date}.',
+              values: { date: formatUIDate(modifiedAt) },
+            })}
+          </p>
+          <p>
+            {i18n.translate(
+              'wazuh.configuration.agentReportBadge.reportInterval',
+              {
+                defaultMessage:
+                  'Agents report on a set interval, so a change made since then appears after the next report.',
+              },
+            )}
           </p>
         </>
       }
     >
       <EuiBadge color='hollow' iconType='clock'>
-        {`Reported ${moment(modifiedAt).fromNow()}`}
+        {i18n.translate('wazuh.configuration.agentReportBadge.reported', {
+          defaultMessage: 'Reported {relativeTime}',
+          values: { relativeTime: moment(modifiedAt).fromNow() },
+        })}
       </EuiBadge>
     </EuiToolTip>
   );

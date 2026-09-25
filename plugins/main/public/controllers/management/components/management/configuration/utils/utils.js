@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { normalizeConfigBoolean } from '../../../../../../../common/services/configuration-value';
 
 /**
@@ -117,19 +118,33 @@ export const renderValueOrNo = renderValueOrDefault('no');
  */
 export const renderValueOrYes = renderValueOrDefault('yes');
 
+const renderEnabledLabel = () =>
+  i18n.translate('wazuh.configuration.valueRenderers.enabled', {
+    defaultMessage: 'enabled',
+  });
+
+const renderDisabledLabel = () =>
+  i18n.translate('wazuh.configuration.valueRenderers.disabled', {
+    defaultMessage: 'disabled',
+  });
+
 /**
  * Return 'enabled' if value = 'no', or 'disabled'
  * @param {value} value Value
  */
 export const renderValueNoThenEnabled = value =>
-  normalizeConfigBoolean(value) === false ? 'enabled' : 'disabled';
+  normalizeConfigBoolean(value) === false
+    ? renderEnabledLabel()
+    : renderDisabledLabel();
 
 /**
  * Return 'enabled' if value = 'yes', or 'disabled'
  * @param {value} value Value
  */
 export const renderValueYesThenEnabled = value =>
-  normalizeConfigBoolean(value) === true ? 'enabled' : 'disabled';
+  normalizeConfigBoolean(value) === true
+    ? renderEnabledLabel()
+    : renderDisabledLabel();
 
 /**
  * Render a boolean-ish configuration value as the UI's 'yes'/'no' vocabulary.

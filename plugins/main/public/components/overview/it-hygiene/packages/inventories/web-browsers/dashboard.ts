@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 
@@ -6,16 +7,32 @@ export const getOverviewBrowserExtensionsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'browser.name',
-      'Top 5 browsers',
+      i18n.translate(
+        'wazuh.itHygiene.browserExtensionsDashboard.topBrowsers.title',
+        { defaultMessage: 'Top 5 browsers' },
+      ),
       'it-hygiene-browsers-name',
-      { customLabel: 'Browsers' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.browserExtensionsDashboard.topBrowsers.fieldLabel',
+          { defaultMessage: 'Browsers' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.name',
-      'Top 5 packages',
+      i18n.translate(
+        'wazuh.itHygiene.browserExtensionsDashboard.topPackages.title',
+        { defaultMessage: 'Top 5 packages' },
+      ),
       'it-hygiene-packages-name',
-      { customLabel: 'Packages' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.browserExtensionsDashboard.topPackages.fieldLabel',
+          { defaultMessage: 'Packages' },
+        ),
+      },
     ),
   ]);
 };

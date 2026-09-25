@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
@@ -7,31 +8,60 @@ export const getOverviewNetworksNetworksTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.type',
-      'Network types',
+      i18n.translate('wazuh.itHygiene.addressesDashboard.networkTypes.title', {
+        defaultMessage: 'Network types',
+      }),
       'it-hygiene-networks',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Network type count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.addressesDashboard.networkTypes.metricLabel',
+          { defaultMessage: 'Network type count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Type',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.addressesDashboard.networkTypes.fieldLabel',
+          { defaultMessage: 'Type' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'Type',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.addressesDashboard.networkTypes.fieldLabel',
+          { defaultMessage: 'Type' },
+        ),
       },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'network.ip',
-      'Top 5 networks',
+      i18n.translate('wazuh.itHygiene.addressesDashboard.topNetworks.title', {
+        defaultMessage: 'Top 5 networks',
+      }),
       'it-hygiene-networks',
-      { customLabel: 'Network IP' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.addressesDashboard.topNetworks.fieldLabel',
+          { defaultMessage: 'Network IP' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'interface.name',
-      'Top 5 interface names',
+      i18n.translate(
+        'wazuh.itHygiene.addressesDashboard.topInterfaceNames.title',
+        { defaultMessage: 'Top 5 interface names' },
+      ),
       'it-hygiene-networks',
-      { customLabel: 'Interface name' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.addressesDashboard.topInterfaceNames.fieldLabel',
+          { defaultMessage: 'Interface name' },
+        ),
+      },
     ),
   ]);
 };

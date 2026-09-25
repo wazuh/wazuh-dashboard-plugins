@@ -32,9 +32,10 @@ const DEFINITION_FILES = {
   tsc: 'tsc-requirements.ts',
 };
 
-// A top-level entry of a definition object: two spaces of indentation, then a
-// single-quoted identifier. Deeper keys (title, description) are not matched.
-const REQUIREMENT_ID = /^ {2}'((?:[^'\\]|\\.)*)':/gm;
+// A control of a definition file: two spaces of indentation, a single-quoted
+// identifier, then the object holding its title. Deeper keys (title,
+// description) and the string-valued entries of the alias map do not match.
+const REQUIREMENT_ID = /^ {2}'((?:[^'\\]|\\.)*)': \{/gm;
 
 let requirementIdsCache = null;
 
