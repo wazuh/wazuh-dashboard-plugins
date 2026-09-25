@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { getVisStateMetricUniqueCountByField } from '../../../common/saved-vis/generators';
 import {
@@ -10,16 +11,27 @@ export const getOverviewUsersGroupsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'group.name',
-      'Top 5 groups',
+      i18n.translate('wazuh.itHygiene.groupsDashboard.topGroups.title', {
+        defaultMessage: 'Top 5 groups',
+      }),
       'it-hygiene-groups',
-      { fieldCustomLabel: 'Groups' },
+      {
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.groupsDashboard.topGroups.fieldLabel',
+          { defaultMessage: 'Groups' },
+        ),
+      },
     ),
     getVisStateMetricUniqueCountByField(
       indexPatternId,
       'group.name',
-      'Unique groups',
+      i18n.translate('wazuh.itHygiene.groupsDashboard.uniqueGroups.title', {
+        defaultMessage: 'Unique groups',
+      }),
       'it-hygiene-groups-unique-count',
-      'Unique groups',
+      i18n.translate('wazuh.itHygiene.groupsDashboard.uniqueGroups.label', {
+        defaultMessage: 'Unique groups',
+      }),
     ),
   ]);
 };

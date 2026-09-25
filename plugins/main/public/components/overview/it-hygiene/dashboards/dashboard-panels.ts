@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { getVisStateHistogramBy } from '../common/saved-vis/generators';
@@ -13,7 +14,10 @@ import {
 const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-processes-by-interface-state',
-    title: 'Top processes by interface state',
+    title: i18n.translate(
+      'wazuh.itHygiene.overviewDashboard.processesByInterfaceState.title',
+      { defaultMessage: 'Top processes by interface state' },
+    ),
     type: 'histogram',
     params: {
       addLegend: true,
@@ -49,7 +53,9 @@ const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
         {
           data: {
             id: '1',
-            label: 'Count',
+            label: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
@@ -87,7 +93,9 @@ const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
           show: true,
           style: {},
           title: {
-            text: 'Count',
+            text: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
           },
           type: 'value',
         },
@@ -127,9 +135,15 @@ const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
           },
           schema: 'segment',
         },
@@ -143,9 +157,15 @@ const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
           },
           schema: 'group',
         },
@@ -157,7 +177,10 @@ const getVisStateProcessesByInterfaceState = (indexPatternId: string) => {
 const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-agent-remote-port-by-remote-ip',
-    title: 'Top 5 remote ports by remote IP',
+    title: i18n.translate(
+      'wazuh.itHygiene.overviewDashboard.remotePortsByRemoteIp.title',
+      { defaultMessage: 'Top 5 remote ports by remote IP' },
+    ),
     type: 'pie',
     params: {
       type: 'pie',
@@ -206,9 +229,15 @@ const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
           },
           schema: 'segment',
         },
@@ -222,9 +251,15 @@ const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
           },
           schema: 'segment',
         },
@@ -236,7 +271,13 @@ const getVisStateAgentRemotePortByRemoteIP = (indexPatternId: string) => {
 const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
   return {
     id: 'it-hygiene-used-memory-percentage',
-    title: 'Min and max observer ingress interface name network metrics',
+    title: i18n.translate(
+      'wazuh.itHygiene.overviewDashboard.networkMetrics.title',
+      {
+        defaultMessage:
+          'Min and max observer ingress interface name network metrics',
+      },
+    ),
     type: 'horizontal_bar',
     params: {
       addLegend: true,
@@ -271,7 +312,10 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
         {
           data: {
             id: '1',
-            label: 'Min network metric',
+            label: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.networkMetrics.minLabel',
+              { defaultMessage: 'Min network metric' },
+            ),
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
@@ -284,7 +328,10 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
         {
           data: {
             id: '3',
-            label: 'Max network metric',
+            label: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.networkMetrics.maxLabel',
+              { defaultMessage: 'Max network metric' },
+            ),
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
@@ -322,7 +369,10 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           show: true,
           style: {},
           title: {
-            text: 'Network metrics',
+            text: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.networkMetrics.axisTitle',
+              { defaultMessage: 'Network metrics' },
+            ),
           },
           type: 'value',
         },
@@ -349,7 +399,10 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           enabled: true,
           id: '1',
           params: {
-            customLabel: 'Min network metric',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.networkMetrics.minLabel',
+              { defaultMessage: 'Min network metric' },
+            ),
             field: 'network.metric',
           },
           schema: 'metric',
@@ -359,14 +412,23 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           enabled: true,
           id: '2',
           params: {
-            customLabel: 'Observer ingress interface name',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.networkMetrics.interfaceLabel',
+              { defaultMessage: 'Observer ingress interface name' },
+            ),
             field: 'interface.name',
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
             order: 'asc',
             orderBy: '1',
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             size: 5,
           },
           schema: 'segment',
@@ -376,7 +438,10 @@ const getVisStateUsedMemoryByPercentage = (indexPatternId: string) => {
           enabled: true,
           id: '3',
           params: {
-            customLabel: 'Max network metric',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.networkMetrics.maxLabel',
+              { defaultMessage: 'Max network metric' },
+            ),
             field: 'network.metric',
           },
           schema: 'metric',
@@ -409,15 +474,27 @@ const getOverviewDashboardPanels = (
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'destination.port',
-          'Top 5 destination ports',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topDestinationPorts.title',
+            { defaultMessage: 'Top 5 destination ports' },
+          ),
           'it-hygiene-dashboard-top-destination-ports',
           {
             fieldSize: 5,
-            metricCustomLabel: 'Top ports count',
+            metricCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.metricLabel',
+              { defaultMessage: 'Top ports count' },
+            ),
             valueAxesTitleText: ' ',
-            seriesLabel: 'Top ports',
+            seriesLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
             seriesMode: 'normal',
-            fieldCustomLabel: 'Top ports',
+            fieldCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
             searchFilter: [
               PatternDataSourceFilterManager.createFilter(
                 FILTER_OPERATOR.EXISTS,
@@ -450,15 +527,27 @@ const getOverviewDashboardPanels = (
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'source.port',
-          'Top 5 source ports',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topSourcePorts.title',
+            { defaultMessage: 'Top 5 source ports' },
+          ),
           'it-hygiene-top-operating-system-names',
           {
             fieldSize: 5,
-            metricCustomLabel: 'Top ports count',
+            metricCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.metricLabel',
+              { defaultMessage: 'Top ports count' },
+            ),
             valueAxesTitleText: ' ',
-            seriesLabel: 'Top ports',
+            seriesLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
             seriesMode: 'normal',
-            fieldCustomLabel: 'Top ports',
+            fieldCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
           },
         ),
       },
@@ -477,7 +566,10 @@ const getOverviewDashboardPanels = (
         savedVis: getVisStateHistogramBy(
           indexPatternId,
           'process.start',
-          'Processes start time',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.processesStartTime.title',
+            { defaultMessage: 'Processes start time' },
+          ),
           'it-hygiene-processes',
           'h',
           { addLegend: false, customLabel: ' ', valueAxesTitleText: '' },
@@ -509,15 +601,27 @@ const getAgentDashboardPanels = (
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'destination.port',
-          'Top 5 destination ports',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topDestinationPorts.title',
+            { defaultMessage: 'Top 5 destination ports' },
+          ),
           'it-hygiene-dashboard-top-destination-ports-agent',
           {
             fieldSize: 5,
-            metricCustomLabel: 'Top ports count',
+            metricCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.metricLabel',
+              { defaultMessage: 'Top ports count' },
+            ),
             valueAxesTitleText: ' ',
-            seriesLabel: 'Top ports',
+            seriesLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
             seriesMode: 'normal',
-            fieldCustomLabel: 'Top ports',
+            fieldCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
             searchFilter: [
               PatternDataSourceFilterManager.createFilter(
                 FILTER_OPERATOR.EXISTS,
@@ -550,15 +654,27 @@ const getAgentDashboardPanels = (
         savedVis: getVisStateHorizontalBarSplitSeries(
           indexPatternId,
           'source.port',
-          'Top 5 source ports',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topSourcePorts.title',
+            { defaultMessage: 'Top 5 source ports' },
+          ),
           'it-hygiene-top-operating-system-names',
           {
             fieldSize: 5,
-            metricCustomLabel: 'Top ports count',
+            metricCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.metricLabel',
+              { defaultMessage: 'Top ports count' },
+            ),
             valueAxesTitleText: ' ',
-            seriesLabel: 'Top ports',
+            seriesLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
             seriesMode: 'normal',
-            fieldCustomLabel: 'Top ports',
+            fieldCustomLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPorts.label',
+              { defaultMessage: 'Top ports' },
+            ),
           },
         ),
       },
@@ -577,7 +693,10 @@ const getAgentDashboardPanels = (
         savedVis: getVisStateHistogramBy(
           indexPatternId,
           'process.start',
-          'Processes start time',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.processesStartTime.title',
+            { defaultMessage: 'Processes start time' },
+          ),
           'it-hygiene-processes',
           'h',
           { addLegend: false, customLabel: ' ', valueAxesTitleText: '' },

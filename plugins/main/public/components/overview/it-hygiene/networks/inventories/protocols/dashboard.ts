@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
 import {
@@ -47,7 +48,10 @@ const getVisStateNetworkMetricsMinMax = (indexPatternId: string): SavedVis => {
           type: 'min',
           params: {
             field: 'network.metric',
-            customLabel: 'Min network metric',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.protocolsDashboard.networkMetrics.minLabel',
+              { defaultMessage: 'Min network metric' },
+            ),
           },
           schema: 'metric',
         },
@@ -57,7 +61,10 @@ const getVisStateNetworkMetricsMinMax = (indexPatternId: string): SavedVis => {
           type: 'max',
           params: {
             field: 'network.metric',
-            customLabel: 'Max network metric',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.protocolsDashboard.networkMetrics.maxLabel',
+              { defaultMessage: 'Max network metric' },
+            ),
           },
           schema: 'metric',
         },
@@ -71,32 +78,60 @@ export const getOverviewNetworksProtocolsTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.type',
-      'Network types',
+      i18n.translate('wazuh.itHygiene.protocolsDashboard.networkTypes.title', {
+        defaultMessage: 'Network types',
+      }),
       'it-hygiene-protocols',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Network type count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.protocolsDashboard.networkTypes.metricLabel',
+          { defaultMessage: 'Network type count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Type',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.protocolsDashboard.networkTypes.fieldLabel',
+          { defaultMessage: 'Type' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'Type',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.protocolsDashboard.networkTypes.fieldLabel',
+          { defaultMessage: 'Type' },
+        ),
       },
     ),
     getVisStateNetworkMetricsMinMax(indexPatternId),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.dhcp',
-      'DHCP enabled',
+      i18n.translate('wazuh.itHygiene.protocolsDashboard.dhcpEnabled.title', {
+        defaultMessage: 'DHCP enabled',
+      }),
       'it-hygiene-protocols',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Network DHCP count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.protocolsDashboard.dhcpEnabled.metricLabel',
+          { defaultMessage: 'Network DHCP count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'DHCP enabled',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.protocolsDashboard.dhcpEnabled.title',
+          { defaultMessage: 'DHCP enabled' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'DHCP enabled',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.protocolsDashboard.dhcpEnabled.title',
+          { defaultMessage: 'DHCP enabled' },
+        ),
       },
     ),
   ]);

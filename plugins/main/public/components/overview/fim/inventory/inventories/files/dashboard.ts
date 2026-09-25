@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import {
   getVisStateHorizontalBarSplitSeries,
   getVisStateTable,
@@ -8,20 +9,50 @@ export const getDashboard = (indexPatternId: string) => {
   return buildDashboardKPIPanels([
     getVisStateTable(indexPatternId, 'file.path', '', 'fim-files-inventory', {
       size: 5,
-      fieldCustomLabel: 'Top 5 file paths',
+      fieldCustomLabel: i18n.translate(
+        'wazuh.fileIntegrityMonitoring.filesDashboard.topFilePathsLabel',
+        {
+          defaultMessage: 'Top 5 file paths',
+        },
+      ),
     }),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'file.owner',
-      'File owners',
+      i18n.translate(
+        'wazuh.fileIntegrityMonitoring.filesDashboard.fileOwnersTitle',
+        {
+          defaultMessage: 'File owners',
+        },
+      ),
       'fim-files-inventory',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'File owner count',
+        otherBucket: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.filesDashboard.othersBucketLabel',
+          {
+            defaultMessage: 'Others',
+          },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.filesDashboard.fileOwnerCountMetricLabel',
+          {
+            defaultMessage: 'File owner count',
+          },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'File owner count',
-        fieldCustomLabel: 'File owner',
+        seriesLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.filesDashboard.fileOwnerCountSeriesLabel',
+          {
+            defaultMessage: 'File owner count',
+          },
+        ),
+        fieldCustomLabel: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.filesDashboard.fileOwnerLabel',
+          {
+            defaultMessage: 'File owner',
+          },
+        ),
       },
     ),
   ]);

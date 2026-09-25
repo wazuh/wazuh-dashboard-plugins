@@ -22,6 +22,8 @@ import {
   EuiFlexItem,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { getToasts } from '../../kibana-services';
 import { isSecurityAnalyticsSettingDisabled } from '../../utils/security-analytics-config';
 import { GenericRequest } from '../../react-services';
@@ -70,7 +72,12 @@ export const WzIndexerSettings: React.FC = () => {
     } catch (error: any) {
       setSavedSettings(null);
       setDraftSettings(null);
-      setLoadError(error?.message || 'Error fetching settings.');
+      setLoadError(
+        error?.message ||
+          i18n.translate('wazuh.indexerSettings.form.fetchError', {
+            defaultMessage: 'Error fetching settings.',
+          }),
+      );
     } finally {
       setLoading(false);
     }
@@ -127,9 +134,18 @@ export const WzIndexerSettings: React.FC = () => {
       await GenericRequest.request('PUT', '/indexer/settings', draftSettings);
 
       setSavedSettings(draftSettings);
-      getToasts().addSuccess('Settings updated successfully.');
+      getToasts().addSuccess(
+        i18n.translate('wazuh.indexerSettings.form.saveSuccessToast', {
+          defaultMessage: 'Settings updated successfully.',
+        }),
+      );
     } catch (error: any) {
-      getToasts().addDanger(error?.message || 'Error updating settings.');
+      getToasts().addDanger(
+        error?.message ||
+          i18n.translate('wazuh.indexerSettings.form.saveErrorToast', {
+            defaultMessage: 'Error updating settings.',
+          }),
+      );
     } finally {
       setSaving(false);
     }
@@ -142,8 +158,18 @@ export const WzIndexerSettings: React.FC = () => {
       await GenericRequest.request('POST', '/api/cti-feeds/update');
       getToasts().add({
         color: 'success',
-        title: 'CTI update requested',
-        text: 'The update has been requested successfully',
+        title: i18n.translate(
+          'wazuh.indexerSettings.ctiUpdate.successToastTitle',
+          {
+            defaultMessage: 'CTI update requested',
+          },
+        ),
+        text: i18n.translate(
+          'wazuh.indexerSettings.ctiUpdate.successToastText',
+          {
+            defaultMessage: 'The update has been requested successfully',
+          },
+        ),
         toastLifeTimeMs: 5000,
       });
     } catch (error) {
@@ -154,7 +180,9 @@ export const WzIndexerSettings: React.FC = () => {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error updating CTI feeds',
+          title: i18n.translate('wazuh.indexerSettings.ctiUpdate.errorTitle', {
+            defaultMessage: 'Error updating CTI feeds',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -172,7 +200,11 @@ export const WzIndexerSettings: React.FC = () => {
         gutterSize='s'
       >
         <EuiFlexItem grow={false}>
-          <p>You have unsaved changes</p>
+          <p>
+            {i18n.translate('wazuh.indexerSettings.bottomBar.unsavedChanges', {
+              defaultMessage: 'You have unsaved changes',
+            })}
+          </p>
         </EuiFlexItem>
         <EuiFlexItem />
         <EuiFlexItem grow={false}>
@@ -182,7 +214,9 @@ export const WzIndexerSettings: React.FC = () => {
             iconType='cross'
             onClick={cancelChanges}
           >
-            Cancel changes
+            {i18n.translate('wazuh.indexerSettings.bottomBar.cancelButton', {
+              defaultMessage: 'Cancel changes',
+            })}
           </EuiButtonEmpty>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
@@ -195,7 +229,9 @@ export const WzIndexerSettings: React.FC = () => {
             isLoading={saving}
             disabled={saving}
           >
-            Save changes
+            {i18n.translate('wazuh.indexerSettings.bottomBar.saveButton', {
+              defaultMessage: 'Save changes',
+            })}
           </EuiButton>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -207,7 +243,11 @@ export const WzIndexerSettings: React.FC = () => {
       <EuiPageBody>
         <EuiPanel paddingSize='l'>
           <EuiTitle size='l'>
-            <h2>Settings</h2>
+            <h2>
+              {i18n.translate('wazuh.indexerSettings.page.title', {
+                defaultMessage: 'Settings',
+              })}
+            </h2>
           </EuiTitle>
 
           <EuiSpacer size='m' />
@@ -221,11 +261,17 @@ export const WzIndexerSettings: React.FC = () => {
             >
               <EuiLoadingSpinner size='s' />
               <EuiSpacer size='xs' />
-              <EuiText color='subdued'>Loading settings...</EuiText>
+              <EuiText color='subdued'>
+                {i18n.translate('wazuh.indexerSettings.page.loading', {
+                  defaultMessage: 'Loading settings...',
+                })}
+              </EuiText>
             </EuiPanel>
           ) : loadError ? (
             <EuiCallOut
-              title='Could not load indexer settings'
+              title={i18n.translate('wazuh.indexerSettings.loadError.title', {
+                defaultMessage: 'Could not load indexer settings',
+              })}
               color='danger'
               iconType='error'
               data-test-subj='indexerSettings-loadError'
@@ -238,7 +284,9 @@ export const WzIndexerSettings: React.FC = () => {
                 iconType='refresh'
                 onClick={fetchSettings}
               >
-                Retry
+                {i18n.translate('wazuh.indexerSettings.loadError.retryButton', {
+                  defaultMessage: 'Retry',
+                })}
               </EuiButton>
             </EuiCallOut>
           ) : draftSettings ? (
@@ -253,11 +301,25 @@ export const WzIndexerSettings: React.FC = () => {
                     <EuiDescribedFormGroup
                       fullWidth
                       id='indexer-settings-enable-raw-events-group'
-                      title={<span>Enable raw events</span>}
+                      title={
+                        <span>
+                          {i18n.translate(
+                            'wazuh.indexerSettings.rawEvents.title',
+                            {
+                              defaultMessage: 'Enable raw events',
+                            },
+                          )}
+                        </span>
+                      }
                       description={
                         <div>
-                          Enables indexing of raw events into the{' '}
-                          <strong>wazuh-events-raw-v5</strong> indices.
+                          <FormattedMessage
+                            id='wazuh.indexerSettings.rawEvents.description'
+                            defaultMessage='Enables indexing of raw events into the {indexName} indices.'
+                            values={{
+                              indexName: <strong>wazuh-events-raw-v5</strong>,
+                            }}
+                          />
                         </div>
                       }
                       descriptionFlexItemProps={{
@@ -267,7 +329,10 @@ export const WzIndexerSettings: React.FC = () => {
                     >
                       <EngineSwitch
                         field='index_raw_events'
-                        ariaLabel='Enable raw events'
+                        ariaLabel={i18n.translate(
+                          'wazuh.indexerSettings.rawEvents.switchAriaLabel',
+                          { defaultMessage: 'Enable raw events' },
+                        )}
                         engine={draftSettings.engine}
                         updateEngine={updateEngine}
                         saving={saving}
@@ -285,11 +350,34 @@ export const WzIndexerSettings: React.FC = () => {
                   <EuiDescribedFormGroup
                     fullWidth
                     id='indexer-settings-enable-raw-events-group'
-                    title={<span>Update CTI content feeds</span>}
+                    title={
+                      <span>
+                        {i18n.translate(
+                          'wazuh.indexerSettings.ctiUpdate.title',
+                          {
+                            defaultMessage: 'Update CTI content feeds',
+                          },
+                        )}
+                      </span>
+                    }
                     description={
                       <div>
-                        Triggers an update of threat intelligence content from{' '}
-                        <strong>subscribed CTI</strong> feeds.
+                        <FormattedMessage
+                          id='wazuh.indexerSettings.ctiUpdate.description'
+                          defaultMessage='Triggers an update of threat intelligence content from {subscribedCti} feeds.'
+                          values={{
+                            subscribedCti: (
+                              <strong>
+                                {i18n.translate(
+                                  'wazuh.indexerSettings.ctiUpdate.subscribedCti',
+                                  {
+                                    defaultMessage: 'subscribed CTI',
+                                  },
+                                )}
+                              </strong>
+                            ),
+                          }}
+                        />
                       </div>
                     }
                     descriptionFlexItemProps={{
@@ -304,7 +392,12 @@ export const WzIndexerSettings: React.FC = () => {
                       iconType='refresh'
                       style={{ width: 'fit-content' }}
                     >
-                      Update CTI content
+                      {i18n.translate(
+                        'wazuh.indexerSettings.ctiUpdate.button',
+                        {
+                          defaultMessage: 'Update CTI content',
+                        },
+                      )}
                     </EuiButton>
                   </EuiDescribedFormGroup>
                 </EuiPanel>

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
   createIndexPatternReferences,
@@ -10,7 +11,10 @@ export const getVisStateNetworkAveragePriorityMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-average-priority-of-routes',
-    title: 'Monitor the average priority of routes',
+    title: i18n.translate(
+      'wazuh.itHygiene.networksDashboard.averageRoutePriority.title',
+      { defaultMessage: 'Monitor the average priority of routes' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -44,7 +48,10 @@ export const getVisStateNetworkAveragePriorityMetric = (
           type: 'avg',
           params: {
             field: 'network.metric',
-            customLabel: 'Average priority of routes',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.networksDashboard.averageRoutePriority.label',
+              { defaultMessage: 'Average priority of routes' },
+            ),
           },
           schema: 'metric',
         },
@@ -58,7 +65,10 @@ export const getVisStateDHCPEnabledInterfacesMetric = (
 ): SavedVis => {
   return {
     id: 'it-hygiene-network-interfaces-with-dhcp-enabled',
-    title: 'Interfaces with DHCP enabled',
+    title: i18n.translate(
+      'wazuh.itHygiene.networksDashboard.dhcpEnabledInterfaces.title',
+      { defaultMessage: 'Interfaces with DHCP enabled' },
+    ),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -91,7 +101,10 @@ export const getVisStateDHCPEnabledInterfacesMetric = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'enabled',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.networksDashboard.dhcpEnabledInterfaces.label',
+              { defaultMessage: 'enabled' },
+            ),
           },
           schema: 'metric',
         },
@@ -106,7 +119,10 @@ export const getVisStateDHCPEnabledInterfacesMetric = (
                   query: 'network.dhcp:true',
                   language: 'kuery',
                 },
-                label: 'DHCP',
+                label: i18n.translate(
+                  'wazuh.itHygiene.networksDashboard.dhcpEnabledInterfaces.filterLabel',
+                  { defaultMessage: 'DHCP' },
+                ),
               },
             ],
           },

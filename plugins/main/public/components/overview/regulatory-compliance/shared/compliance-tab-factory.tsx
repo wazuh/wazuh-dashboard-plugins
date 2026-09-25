@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { ComplianceTable } from '../../compliance-table';
 import { WazuhDiscover } from '../../../common/wazuh-discover/wz-discover';
 import { ButtonExploreAgent } from '../../../wz-agent-selector/button-explore-agent';
@@ -41,7 +42,9 @@ export const buildStandardComplianceTabs = ({
     },
     {
       id: 'controls',
-      name: 'Controls',
+      name: i18n.translate('wazuh.regulatoryCompliance.tabs.controls', {
+        defaultMessage: 'Controls',
+      }),
       buttons: [ButtonExploreAgent],
       component: (props: any) => (
         <ComplianceTable {...props} section={section} DataSource={dataSource} />
