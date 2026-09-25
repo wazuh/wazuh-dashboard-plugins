@@ -148,7 +148,7 @@ class WzGroupAgentsTable extends Component {
                   NavigationService.getInstance().navigateToApp(
                     endpointSummary.id,
                     {
-                      path: `#/agents?agent=${item.id}`,
+                      path: `#/agents?tab=welcome&agent=${item.id}`,
                     },
                   );
                 }}
