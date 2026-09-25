@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
 
 /**
@@ -15,9 +16,6 @@ export interface ClassifiedQueryError {
   kind: QueryErrorKind;
   message: string;
 }
-
-const PERMISSION_DENIED_MESSAGE =
-  "You don't have permission to view this data.";
 
 function getHttpStatus(error: unknown): number | undefined {
   const err = error as {
@@ -54,7 +52,9 @@ export function describeError(error: unknown): string {
       return data.message;
     }
   }
-  return 'Unknown error';
+  return i18n.translate('wazuh.common.homeOverviewQueryError.unknownError', {
+    defaultMessage: 'Unknown error',
+  });
 }
 
 export function classifyQueryError(error: unknown): ClassifiedQueryError {
@@ -62,7 +62,13 @@ export function classifyQueryError(error: unknown): ClassifiedQueryError {
     return { kind: 'index-pattern-missing', message: describeError(error) };
   }
   if (getHttpStatus(error) === 403) {
-    return { kind: 'permission-denied', message: PERMISSION_DENIED_MESSAGE };
+    return {
+      kind: 'permission-denied',
+      message: i18n.translate(
+        'wazuh.common.homeOverviewQueryError.permissionDenied',
+        { defaultMessage: "You don't have permission to view this data." },
+      ),
+    };
   }
   return { kind: 'unknown', message: describeError(error) };
 }

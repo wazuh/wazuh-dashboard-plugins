@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiIcon, EuiToolTip } from '@elastic/eui';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { VALUE_PLACEHOLDER } from '../../lib/constants';
@@ -14,7 +15,12 @@ export interface TabNumberProps {
 export const ErrorValuePlaceholder: React.FC<{
   tooltip?: string;
   color?: 'danger' | 'warning';
-}> = ({ tooltip = 'Could not load data', color = 'danger' }) => (
+}> = ({
+  tooltip = i18n.translate('wazuh.common.homeOverviewWidget.loadError', {
+    defaultMessage: 'Could not load data',
+  }),
+  color = 'danger',
+}) => (
   <EuiToolTip position='top' content={tooltip}>
     <span className='tab-num' style={{ color: UI_COLOR_STATUS[color] }}>
       {VALUE_PLACEHOLDER} <EuiIcon type='alert' size='s' color={color} />

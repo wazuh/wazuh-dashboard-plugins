@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { FindingsDataSourceRepository } from '../../data-source/pattern/events/findings-data-source-repository';
 import { getPlugins } from '../../../../kibana-services';
 import { getDashboardPanels } from './dashboard_panels';
@@ -48,8 +49,13 @@ const FindingsDashboard = compose(
           from: timeFilter.from,
           to: timeFilter.to,
         },
-        title: 'Findings count evolution',
-        description: 'Dashboard of Findings count evolution',
+        title: i18n.translate('wazuh.common.agentWelcomeFindingsCount.title', {
+          defaultMessage: 'Findings count evolution',
+        }),
+        description: i18n.translate(
+          'wazuh.common.agentWelcomeFindingsCount.dashboardDescription',
+          { defaultMessage: 'Dashboard of Findings count evolution' },
+        ),
         refreshConfig: {
           pause: false,
           value: 15,
@@ -67,7 +73,11 @@ export const FindingsCount = () => {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup gutterSize='none'>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Findings count evolution</Typography>
+          <Typography level='section'>
+            {i18n.translate('wazuh.common.agentWelcomeFindingsCount.title', {
+              defaultMessage: 'Findings count evolution',
+            })}
+          </Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiSpacer size='m' />

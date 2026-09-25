@@ -79,16 +79,56 @@ const getDataDrivenGroups = (): QuickAccessGroup[] =>
  */
 const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   id: 'security-analytics',
-  label: 'Ruleset management',
+  label: i18n.translate(
+    'wazuh.common.homeOverviewQuickAccess.rulesetManagementGroup',
+    { defaultMessage: 'Ruleset management' },
+  ),
   icon: 'securityAnalyticsApp',
   order: 550,
   items: [
-    { id: 'rules', title: 'Rules', getHref: getRulesUrl },
-    { id: 'decoders', title: 'Decoders', getHref: getDecodersUrl },
-    { id: 'detectors', title: 'Detectors', getHref: getDetectorsUrl },
-    { id: 'integrations', title: 'Integrations', getHref: getIntegrationsUrl },
-    { id: 'kvdbs', title: 'KVDBs', getHref: getKvdbsUrl },
-    { id: 'filters', title: 'Filters', getHref: getFiltersUrl },
+    {
+      id: 'rules',
+      title: i18n.translate('wazuh.common.homeOverviewQuickAccess.rules', {
+        defaultMessage: 'Rules',
+      }),
+      getHref: getRulesUrl,
+    },
+    {
+      id: 'decoders',
+      title: i18n.translate('wazuh.common.homeOverviewQuickAccess.decoders', {
+        defaultMessage: 'Decoders',
+      }),
+      getHref: getDecodersUrl,
+    },
+    {
+      id: 'detectors',
+      title: i18n.translate('wazuh.common.homeOverviewQuickAccess.detectors', {
+        defaultMessage: 'Detectors',
+      }),
+      getHref: getDetectorsUrl,
+    },
+    {
+      id: 'integrations',
+      title: i18n.translate(
+        'wazuh.common.homeOverviewQuickAccess.integrations',
+        { defaultMessage: 'Integrations' },
+      ),
+      getHref: getIntegrationsUrl,
+    },
+    {
+      id: 'kvdbs',
+      title: i18n.translate('wazuh.common.homeOverviewQuickAccess.kvdbs', {
+        defaultMessage: 'KVDBs',
+      }),
+      getHref: getKvdbsUrl,
+    },
+    {
+      id: 'filters',
+      title: i18n.translate('wazuh.common.homeOverviewQuickAccess.filters', {
+        defaultMessage: 'Filters',
+      }),
+      getHref: getFiltersUrl,
+    },
   ],
 };
 
@@ -112,7 +152,9 @@ export const QuickAccessMenu: React.FC = () => {
           onClick={() => setIsOpen(open => !open)}
           data-test-subj='quick-access-menu-button'
         >
-          Quick access
+          {i18n.translate('wazuh.common.homeOverviewQuickAccess.title', {
+            defaultMessage: 'Quick access',
+          })}
         </EuiButtonEmpty>
       }
       isOpen={isOpen}
@@ -131,7 +173,11 @@ export const QuickAccessMenu: React.FC = () => {
               justifyContent='spaceBetween'
               responsive={false}
             >
-              <EuiFlexItem grow={false}>Quick access</EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {i18n.translate('wazuh.common.homeOverviewQuickAccess.title', {
+                  defaultMessage: 'Quick access',
+                })}
+              </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 {/*
                  * Home's entry point to the AI Assistant, which lives in the separate
@@ -147,7 +193,7 @@ export const QuickAccessMenu: React.FC = () => {
                 >
                   <EuiIcon type='machineLearningApp' size='s' />{' '}
                   {i18n.translate(
-                    'wazuh.homeOverview.quickAccess.aiAssistant',
+                    'wazuh.common.homeOverviewQuickAccess.aiAssistant',
                     {
                       defaultMessage: 'AI Assistant',
                     },

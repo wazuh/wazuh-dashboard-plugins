@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useState, forwardRef } from 'react';
 import { EuiBasicTable, EuiBasicTableProps, EuiButtonIcon } from '@elastic/eui';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
@@ -120,7 +121,17 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
                     causing the expanded row does not change its display state. */
                             toggleExpandedRow(item);
                           }}
-                          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                          aria-label={
+                            isExpanded
+                              ? i18n.translate(
+                                  'wazuh.common.tables.collapseRowAriaLabel',
+                                  { defaultMessage: 'Collapse' },
+                                )
+                              : i18n.translate(
+                                  'wazuh.common.tables.expandRowAriaLabel',
+                                  { defaultMessage: 'Expand' },
+                                )
+                          }
                           iconType={isExpanded ? 'arrowUp' : 'arrowDown'}
                         />
                       );
@@ -145,7 +156,17 @@ export const TableBasicManageExpandedItems: React.FunctionComponent<TableBasicMa
                     causing the expanded row does not change its display state. */
                             toggleExpandedRow(item);
                           }}
-                          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                          aria-label={
+                            isExpanded
+                              ? i18n.translate(
+                                  'wazuh.common.tables.collapseRowAriaLabel',
+                                  { defaultMessage: 'Collapse' },
+                                )
+                              : i18n.translate(
+                                  'wazuh.common.tables.expandRowAriaLabel',
+                                  { defaultMessage: 'Expand' },
+                                )
+                          }
                           iconType={isExpanded ? 'arrowUp' : 'arrowDown'}
                         />
                       );

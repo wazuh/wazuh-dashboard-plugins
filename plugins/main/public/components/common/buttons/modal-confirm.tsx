@@ -10,11 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { i18n } from '@osd/i18n';
 
 import {
   EuiOverlayMask,
   EuiOutsideClickDetector,
-  EuiConfirmModal
+  EuiConfirmModal,
 } from '@elastic/eui';
 
 import { withButtonOpenOnClick } from '../hocs';
@@ -22,50 +23,75 @@ import { WzButton } from './button';
 import { WzButtonPermissions } from '../permissions/button';
 
 export const WzButtonOpenOnClick = withButtonOpenOnClick(WzButton);
-export const WzButtonPermissionsOpenOnClick = withButtonOpenOnClick(WzButtonPermissions);
+export const WzButtonPermissionsOpenOnClick =
+  withButtonOpenOnClick(WzButtonPermissions);
 
-interface WzButtonModalConfirmProps{
-  onConfirm: (ev) => void
-  onCancel?: (ev) => void
-  modalTitle: string
-  modalConfirmText?: string
-  modalCancelText?: string
-  modalProps: any
-  [key: string]: any
-};
+interface WzButtonModalConfirmProps {
+  onConfirm: (ev) => void;
+  onCancel?: (ev) => void;
+  modalTitle: string;
+  modalConfirmText?: string;
+  modalCancelText?: string;
+  modalProps: any;
+  [key: string]: any;
+}
 
-const renderModal = ({onConfirm, onCancel, modalTitle, modalConfirmText, modalCancelText, modalProps }) => ({close}) => {
-  const onModalConfirm = (ev) => {
-    close(ev);
-    onConfirm && onConfirm();
+const renderModal =
+  ({
+    onConfirm,
+    onCancel,
+    modalTitle,
+    modalConfirmText,
+    modalCancelText,
+    modalProps,
+  }) =>
+  ({ close }) => {
+    const onModalConfirm = ev => {
+      close(ev);
+      onConfirm && onConfirm();
+    };
+    const onModalCancel = ev => {
+      close(ev);
+      onCancel && onCancel();
+    };
+    return (
+      <EuiOverlayMask>
+        <EuiOutsideClickDetector onOutsideClick={close}>
+          <EuiConfirmModal
+            title={modalTitle}
+            onCancel={onModalCancel}
+            onConfirm={onModalConfirm}
+            cancelButtonText={modalCancelText}
+            confirmButtonText={modalConfirmText}
+            defaultFocusedButton={modalProps.defaultFocusedButton || 'confirm'}
+            {...modalProps}
+          ></EuiConfirmModal>
+        </EuiOutsideClickDetector>
+      </EuiOverlayMask>
+    );
   };
-  const onModalCancel = (ev) => {
-    close(ev);
-    onCancel && onCancel();
-  };
-  return (
-    <EuiOverlayMask>
-      <EuiOutsideClickDetector onOutsideClick={close}>
-        <EuiConfirmModal
-          title={modalTitle}
-          onCancel={onModalCancel}
-          onConfirm={onModalConfirm}
-          cancelButtonText={modalCancelText}
-          confirmButtonText={modalConfirmText}
-          defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
-          {...modalProps}
-        >
-        </EuiConfirmModal>
-      </EuiOutsideClickDetector>
-    </EuiOverlayMask>
-  )
-};
 
-export const WzButtonModalConfirm: React.FunctionComponent<WzButtonModalConfirmProps> = ({onConfirm, onCancel, modalTitle, modalConfirmText = 'Confirm', modalCancelText = 'Cancel', modalProps = {}, ...rest }) => {
+export const WzButtonModalConfirm: React.FunctionComponent<
+  WzButtonModalConfirmProps
+> = ({
+  onConfirm,
+  onCancel,
+  modalTitle,
+  modalConfirmText = i18n.translate(
+    'wazuh.common.buttonModalConfirm.confirmButton',
+    { defaultMessage: 'Confirm' },
+  ),
+  modalCancelText = i18n.translate(
+    'wazuh.common.buttonModalConfirm.cancelButton',
+    { defaultMessage: 'Cancel' },
+  ),
+  modalProps = {},
+  ...rest
+}) => {
   return (
     <WzButtonOpenOnClick
       {...rest}
-      render={({close}) => {
+      render={({ close }) => {
         const onModalConfirm = () => {
           close();
           onConfirm && onConfirm();
@@ -83,24 +109,47 @@ export const WzButtonModalConfirm: React.FunctionComponent<WzButtonModalConfirmP
                 onConfirm={onModalConfirm}
                 cancelButtonText={modalCancelText}
                 confirmButtonText={modalConfirmText}
-                defaultFocusedButton={modalProps.defaultFocusedButton || "confirm"}
+                defaultFocusedButton={
+                  modalProps.defaultFocusedButton || 'confirm'
+                }
                 {...modalProps}
-              >
-              </EuiConfirmModal>
+              ></EuiConfirmModal>
             </EuiOutsideClickDetector>
           </EuiOverlayMask>
-        )
+        );
       }}
     />
-  )
+  );
 };
 
-export const WzButtonPermissionsModalConfirm: React.FunctionComponent<WzButtonModalConfirmProps> = ({onConfirm, onCancel, modalTitle, modalConfirmText = 'Confirm', modalCancelText = 'Cancel', modalProps = {}, ...rest }) => {
+export const WzButtonPermissionsModalConfirm: React.FunctionComponent<
+  WzButtonModalConfirmProps
+> = ({
+  onConfirm,
+  onCancel,
+  modalTitle,
+  modalConfirmText = i18n.translate(
+    'wazuh.common.buttonModalConfirm.confirmButton',
+    { defaultMessage: 'Confirm' },
+  ),
+  modalCancelText = i18n.translate(
+    'wazuh.common.buttonModalConfirm.cancelButton',
+    { defaultMessage: 'Cancel' },
+  ),
+  modalProps = {},
+  ...rest
+}) => {
   return (
     <WzButtonPermissionsOpenOnClick
       {...rest}
-      render={renderModal({onConfirm, onCancel, modalTitle, modalConfirmText, modalCancelText, modalProps })}
+      render={renderModal({
+        onConfirm,
+        onCancel,
+        modalTitle,
+        modalConfirmText,
+        modalCancelText,
+        modalProps,
+      })}
     />
-  )
+  );
 };
-

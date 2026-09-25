@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -83,7 +84,13 @@ export const RegulatoryComplianceBadges: React.FC<
                     <EuiFlexItem grow={false}>
                       <EuiToolTip
                         position='top'
-                        content='Distinct controls implicated, last 24 hours'
+                        content={i18n.translate(
+                          'wazuh.common.homeOverviewRegulatoryCompliance.controlsBadgeTooltip',
+                          {
+                            defaultMessage:
+                              'Distinct controls implicated, last 24 hours',
+                          },
+                        )}
                       >
                         <EuiNotificationBadge
                           color={count ? 'accent' : 'subdued'}

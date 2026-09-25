@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import {
@@ -42,8 +43,17 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={agents.status}
             errorLabel={agents.error?.message}
             isPermissionDenied={agents.error?.kind === 'permission-denied'}
-            title='Agents by status'
-            titleLink={{ href: getAgentsUrl(), destination: 'Agents' }}
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSection.agentsByStatusTitle',
+              { defaultMessage: 'Agents by status' },
+            )}
+            titleLink={{
+              href: getAgentsUrl(),
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewSection.agentsDestination',
+                { defaultMessage: 'Agents' },
+              ),
+            }}
             centerBody
             data-test-subj='home-overview-agents'
           >
@@ -61,11 +71,20 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
             status={findings.status}
             errorLabel={findings.error?.message}
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title='Findings'
-            caption='Last 24 hours'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSection.findingsTitle',
+              { defaultMessage: 'Findings' },
+            )}
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionLast24Hours',
+              { defaultMessage: 'Last 24 hours' },
+            )}
             titleLink={{
               href: getThreatHuntingUrl(),
-              destination: 'Threat Hunting',
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewSection.threatHuntingDestination',
+                { defaultMessage: 'Threat Hunting' },
+              ),
             }}
             centerBody
             data-test-subj='home-overview-findings-severity'
@@ -80,7 +99,13 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                   )
                 }
                 getTooltip={band =>
-                  `Click to see ${FINDING_SEVERITY_FIELD}: ${band}`
+                  i18n.translate(
+                    'wazuh.common.homeOverviewSection.findingsSeverityTooltip',
+                    {
+                      defaultMessage: 'Click to see {field}: {band}',
+                      values: { field: FINDING_SEVERITY_FIELD, band },
+                    },
+                  )
                 }
               />
             )}
@@ -99,16 +124,31 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title='MITRE ATT&CK top tactics'
-            caption='Last 24 hours'
-            titleLink={{ href: getMitreUrl(), destination: 'MITRE ATT&CK' }}
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSection.mitreTopTacticsTitle',
+              { defaultMessage: 'MITRE ATT&CK top tactics' },
+            )}
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionLast24Hours',
+              { defaultMessage: 'Last 24 hours' },
+            )}
+            titleLink={{
+              href: getMitreUrl(),
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewSection.mitreDestination',
+                { defaultMessage: 'MITRE ATT&CK' },
+              ),
+            }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-mitre-tactics'
           >
             {findings.data && (
               <BarList
                 items={findings.data.topTactics}
-                emptyMessage='No MITRE ATT&CK tactics observed'
+                emptyMessage={i18n.translate(
+                  'wazuh.common.homeOverviewSection.mitreNoTactics',
+                  { defaultMessage: 'No MITRE ATT&CK tactics observed' },
+                )}
                 getHref={item =>
                   getMitreFrameworkTacticUrl(item, findings.indexPatternId)
                 }

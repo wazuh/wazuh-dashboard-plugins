@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useState } from 'react';
 import { EuiComboBox } from '@elastic/eui';
 import { useAsyncActionRunOnStart } from '../../hooks';
@@ -37,7 +38,10 @@ export const WzSearchBarManagedFilterComboBoxAsync = withWrapComponent(
 
     return (
       <EuiComboBox
-        placeholder='Search'
+        placeholder={i18n.translate(
+          'wazuh.common.searchBar.managedFilterPlaceholder',
+          { defaultMessage: 'Search' },
+        )}
         async
         options={options}
         selectedOptions={selectedOptions}

@@ -13,6 +13,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { EuiProgress, EuiText, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 export const withUserLogged = WrappedComponent => props => {
   const withUserLogged = useSelector(
@@ -23,7 +24,11 @@ export const withUserLogged = WrappedComponent => props => {
     <WrappedComponent {...props} />
   ) : (
     <div className='withUserLogged'>
-      <EuiText className='subdued-color'>Loading ...</EuiText>
+      <EuiText className='subdued-color'>
+        {i18n.translate('wazuh.common.withUserLogged.loading', {
+          defaultMessage: 'Loading ...',
+        })}
+      </EuiText>
       <EuiSpacer size='s' />
       <EuiProgress
         className='withUserLogged-loader'

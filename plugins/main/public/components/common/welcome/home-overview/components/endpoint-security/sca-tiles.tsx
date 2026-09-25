@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiLink } from '@elastic/eui';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -25,21 +26,27 @@ interface ScaTileDef {
 const TILES: ScaTileDef[] = [
   {
     key: 'passed',
-    label: 'Passed',
+    label: i18n.translate('wazuh.common.homeOverviewScaTiles.passed', {
+      defaultMessage: 'Passed',
+    }),
     color: HOME_OVERVIEW_COLOR.success,
     status: CheckResult.Passed,
     testSubj: 'sca-tile-passed',
   },
   {
     key: 'failed',
-    label: 'Failed',
+    label: i18n.translate('wazuh.common.homeOverviewScaTiles.failed', {
+      defaultMessage: 'Failed',
+    }),
     color: HOME_OVERVIEW_COLOR.failed,
     status: CheckResult.Failed,
     testSubj: 'sca-tile-failed',
   },
   {
     key: 'notApplicable',
-    label: 'N/A',
+    label: i18n.translate('wazuh.common.homeOverviewScaTiles.notApplicable', {
+      defaultMessage: 'N/A',
+    }),
     color: HOME_OVERVIEW_COLOR.info,
     status: CheckResult.NotApplicable,
     testSubj: 'sca-tile-not-applicable',

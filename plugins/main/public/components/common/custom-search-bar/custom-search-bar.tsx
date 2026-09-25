@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useState, useEffect, HTMLAttributes } from 'react';
 import {
   Filter,
@@ -283,7 +284,10 @@ export const CustomSearchBar = ({
                 )}
                 <div>
                   <EuiSwitch
-                    label='Advanced filters'
+                    label={i18n.translate(
+                      'wazuh.common.customSearchBar.advancedFiltersSwitch',
+                      { defaultMessage: 'Advanced filters' },
+                    )}
                     checked={avancedFiltersState}
                     onChange={() => changeSwitch()}
                   />
@@ -310,7 +314,9 @@ const QueryPopover = ({ query }) => {
           isDisabled={!query}
           onClick={() => setIsOpen(state => !state)}
         >
-          Query
+          {i18n.translate('wazuh.common.customSearchBar.queryButton', {
+            defaultMessage: 'Query',
+          })}
         </EuiButtonEmpty>
       }
       isOpen={isOpen}

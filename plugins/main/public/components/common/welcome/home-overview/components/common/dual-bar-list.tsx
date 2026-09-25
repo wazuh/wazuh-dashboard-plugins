@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 import { decimalFormat } from '../../../utils/helpers';
@@ -58,10 +59,22 @@ export const DualBarList: React.FC<DualBarListProps> = ({
         style={{ marginBottom: 10 }}
       >
         <EuiFlexItem grow={false}>
-          <LegendItem color={HOME_OVERVIEW_COLOR.success} label='Passed' />
+          <LegendItem
+            color={HOME_OVERVIEW_COLOR.success}
+            label={i18n.translate(
+              'wazuh.common.homeOverviewDualBarList.passedLegend',
+              { defaultMessage: 'Passed' },
+            )}
+          />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <LegendItem color={HOME_OVERVIEW_COLOR.failed} label='Failed' />
+          <LegendItem
+            color={HOME_OVERVIEW_COLOR.failed}
+            label={i18n.translate(
+              'wazuh.common.homeOverviewDualBarList.failedLegend',
+              { defaultMessage: 'Failed' },
+            )}
+          />
         </EuiFlexItem>
       </EuiFlexGroup>
       <div

@@ -12,6 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../react-services/wz-request';
 import { formatUIDate } from '../../../../react-services/time-service';
 import { Agent } from '../../../endpoints-summary/types';
@@ -57,21 +58,30 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
-          label: 'Status',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.status', {
+            defaultMessage: 'Status',
+          }),
           style: { maxWidth: 150 },
           condensed: true,
         },
         {
           key: 'version',
           value: agent.version,
-          label: 'Version',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.version', {
+            defaultMessage: 'Version',
+          }),
           style: { maxWidth: 150 },
           condensed: true,
         },
         {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
-          label: 'Operating system',
+          label: i18n.translate(
+            'wazuh.common.agentWelcomeInfo.operatingSystem',
+            {
+              defaultMessage: 'Operating system',
+            },
+          ),
           style: { maxWidth: 200 },
         },
       ];
@@ -86,13 +96,17 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           key: RibbonItemLabel.AGENT_STATUS,
           value: agent,
-          label: 'Status',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.status', {
+            defaultMessage: 'Status',
+          }),
           condensed: true,
         },
         {
           key: 'ip',
           value: agent.ip,
-          label: 'IP address',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.ipAddress', {
+            defaultMessage: 'IP address',
+          }),
           style: {
             // IPv4: maxWidth: 100
             // IPv6: maxWidth: 150
@@ -103,19 +117,28 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           key: 'version',
           value: agent.version,
-          label: 'Version',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.version', {
+            defaultMessage: 'Version',
+          }),
           condensed: true,
         },
         {
           key: RibbonItemLabel.GROUPS,
           value: agent.group,
-          label: 'Group',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.group', {
+            defaultMessage: 'Group',
+          }),
           condensed: true,
         },
         {
           key: RibbonItemLabel.OPERATING_SYSTEM,
           value: agent,
-          label: 'Operating system',
+          label: i18n.translate(
+            'wazuh.common.agentWelcomeInfo.operatingSystem',
+            {
+              defaultMessage: 'Operating system',
+            },
+          ),
           render: (value: Agent, forceTheme?: 'dark') => (
             <EuiFlexGroup
               responsive={false}
@@ -133,13 +156,20 @@ export class AgentInfo extends Component<AgentInfoProps> {
         {
           key: 'registration-date',
           value: formatUIDate(agent.dateAdd),
-          label: 'Registration date',
+          label: i18n.translate(
+            'wazuh.common.agentWelcomeInfo.registrationDate',
+            {
+              defaultMessage: 'Registration date',
+            },
+          ),
           style: { minWidth: 165 },
         },
         {
           key: 'last-keep-alive',
           value: formatUIDate(agent.lastKeepAlive),
-          label: 'Last keep alive',
+          label: i18n.translate('wazuh.common.agentWelcomeInfo.lastKeepAlive', {
+            defaultMessage: 'Last keep alive',
+          }),
           style: { minWidth: 165 },
         },
       ];

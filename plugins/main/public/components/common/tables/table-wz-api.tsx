@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { ReactNode, useCallback, useState, forwardRef } from 'react';
 import {
   EuiTitle,
@@ -263,7 +264,9 @@ function TableWzAPIInner(
         isLoading={isLoading}
         isDisabled={isLoading}
       >
-        Refresh
+        {i18n.translate('wazuh.common.tableWzApi.refreshButton', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     </EuiFlexItem>
   );
@@ -327,7 +330,13 @@ function TableWzAPIInner(
             {renderActionButtons(postActionButtons, filters)}
             {rest.showFieldSelector && (
               <EuiFlexItem grow={false}>
-                <EuiToolTip content='Select visible fields' position='left'>
+                <EuiToolTip
+                  content={i18n.translate(
+                    'wazuh.common.tableWzApi.selectVisibleFieldsTooltip',
+                    { defaultMessage: 'Select visible fields' },
+                  )}
+                  position='left'
+                >
                   <EuiButtonEmpty
                     onClick={() => setIsOpenFieldSelector(state => !state)}
                   >
