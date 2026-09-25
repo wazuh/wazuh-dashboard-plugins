@@ -39,6 +39,7 @@ import {
   EuiAccordion,
   EuiAvatar,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { formatUIDate } from '../../../../react-services';
 import {
   CaseComment,
@@ -56,29 +57,104 @@ import {
 import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
 
 const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
-  { value: 'active', text: 'Active' },
-  { value: 'acknowledged', text: 'Acknowledged' },
-  { value: 'completed', text: 'Completed' },
-  { value: 'audit', text: 'Audit' },
-  { value: 'error', text: 'Error' },
-  { value: 'deleted', text: 'Deleted' },
+  {
+    value: 'active',
+    text: i18n.translate('wazuh.common.caseManagementStatus.active', {
+      defaultMessage: 'Active',
+    }),
+  },
+  {
+    value: 'acknowledged',
+    text: i18n.translate('wazuh.common.caseManagementStatus.acknowledged', {
+      defaultMessage: 'Acknowledged',
+    }),
+  },
+  {
+    value: 'completed',
+    text: i18n.translate('wazuh.common.caseManagementStatus.completed', {
+      defaultMessage: 'Completed',
+    }),
+  },
+  {
+    value: 'audit',
+    text: i18n.translate('wazuh.common.caseManagementStatus.audit', {
+      defaultMessage: 'Audit',
+    }),
+  },
+  {
+    value: 'error',
+    text: i18n.translate('wazuh.common.caseManagementStatus.error', {
+      defaultMessage: 'Error',
+    }),
+  },
+  {
+    value: 'deleted',
+    text: i18n.translate('wazuh.common.caseManagementStatus.deleted', {
+      defaultMessage: 'Deleted',
+    }),
+  },
 ];
 
 const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
-  { value: 'informational', text: 'Informational' },
-  { value: 'low', text: 'Low' },
-  { value: 'medium', text: 'Medium' },
-  { value: 'high', text: 'High' },
-  { value: 'critical', text: 'Critical' },
+  {
+    value: 'informational',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.informational', {
+      defaultMessage: 'Informational',
+    }),
+  },
+  {
+    value: 'low',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.low', {
+      defaultMessage: 'Low',
+    }),
+  },
+  {
+    value: 'medium',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.medium', {
+      defaultMessage: 'Medium',
+    }),
+  },
+  {
+    value: 'high',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.high', {
+      defaultMessage: 'High',
+    }),
+  },
+  {
+    value: 'critical',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.critical', {
+      defaultMessage: 'Critical',
+    }),
+  },
 ];
 
 const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
   [
     { value: '', text: '—' },
-    { value: 'urgent', text: 'Urgent' },
-    { value: 'high', text: 'High' },
-    { value: 'medium', text: 'Medium' },
-    { value: 'low', text: 'Low' },
+    {
+      value: 'urgent',
+      text: i18n.translate('wazuh.common.caseManagementPriority.urgent', {
+        defaultMessage: 'Urgent',
+      }),
+    },
+    {
+      value: 'high',
+      text: i18n.translate('wazuh.common.caseManagementPriority.high', {
+        defaultMessage: 'High',
+      }),
+    },
+    {
+      value: 'medium',
+      text: i18n.translate('wazuh.common.caseManagementPriority.medium', {
+        defaultMessage: 'Medium',
+      }),
+    },
+    {
+      value: 'low',
+      text: i18n.translate('wazuh.common.caseManagementPriority.low', {
+        defaultMessage: 'Low',
+      }),
+    },
   ];
 
 const CASE_TLP_OPTIONS: Array<{ value: CaseTLP | ''; text: string }> = [
@@ -293,11 +369,16 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     return (
       <div style={{ padding: '16px' }}>
         <EuiCallOut
-          title='Could not load the case data'
+          title={i18n.translate(
+            'wazuh.common.caseManagementTab.loadErrorTitle',
+            { defaultMessage: 'Could not load the case data' },
+          )}
           color='danger'
           iconType='alert'
         >
-          Reopen the document details to retry.
+          {i18n.translate('wazuh.common.caseManagementTab.loadErrorBody', {
+            defaultMessage: 'Reopen the document details to retry.',
+          })}
         </EuiCallOut>
       </div>
     );
@@ -311,14 +392,21 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       id='case-comments-accordion'
       buttonContent={
         <EuiTitle size='xxs'>
-          <h4>{`Comments (${comments.length}/${MAX_CASE_COMMENTS})`}</h4>
+          <h4>
+            {i18n.translate('wazuh.common.caseManagementTab.commentsTitle', {
+              defaultMessage: 'Comments ({count}/{max})',
+              values: { count: comments.length, max: MAX_CASE_COMMENTS },
+            })}
+          </h4>
         </EuiTitle>
       }
     >
       <EuiSpacer size='l' />
       {!comments.length ? (
         <EuiText size='s' color='subdued'>
-          No comments yet.
+          {i18n.translate('wazuh.common.caseManagementTab.noComments', {
+            defaultMessage: 'No comments yet.',
+          })}
         </EuiText>
       ) : (
         <EuiCommentList>
@@ -342,7 +430,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     <EuiToolTip
                       content={formatUIDate(comment.updated_at as string)}
                     >
-                      <em>Edited</em>
+                      <em>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementTab.commentEdited',
+                          { defaultMessage: 'Edited' },
+                        )}
+                      </em>
                     </EuiToolTip>
                   </>
                 )}
@@ -365,11 +458,19 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       responsive={false}
                     >
                       <EuiFlexItem grow={false}>
-                        <EuiToolTip content='Edit comment'>
+                        <EuiToolTip
+                          content={i18n.translate(
+                            'wazuh.common.caseManagementTab.editCommentTooltip',
+                            { defaultMessage: 'Edit comment' },
+                          )}
+                        >
                           <EuiButtonIcon
                             iconType='pencil'
                             color='text'
-                            aria-label='Edit comment'
+                            aria-label={i18n.translate(
+                              'wazuh.common.caseManagementTab.editCommentAriaLabel',
+                              { defaultMessage: 'Edit comment' },
+                            )}
                             isDisabled={
                               isSaving ||
                               isCleaning ||
@@ -386,11 +487,19 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                         </EuiToolTip>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiToolTip content='Delete comment'>
+                        <EuiToolTip
+                          content={i18n.translate(
+                            'wazuh.common.caseManagementTab.deleteCommentTooltip',
+                            { defaultMessage: 'Delete comment' },
+                          )}
+                        >
                           <EuiButtonIcon
                             iconType='trash'
                             color='danger'
-                            aria-label='Delete comment'
+                            aria-label={i18n.translate(
+                              'wazuh.common.caseManagementTab.deleteCommentAriaLabel',
+                              { defaultMessage: 'Delete comment' },
+                            )}
                             isDisabled={
                               isSaving ||
                               isCleaning ||
@@ -418,7 +527,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       fullWidth
                       resize='vertical'
                       disabled={isSavingComment}
-                      aria-label='Edit comment text'
+                      aria-label={i18n.translate(
+                        'wazuh.common.caseManagementTab.editCommentTextAriaLabel',
+                        { defaultMessage: 'Edit comment text' },
+                      )}
                     />
                     <EuiSpacer size='xs' />
                     <EuiFlexGroup
@@ -427,21 +539,37 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       responsive={false}
                     >
                       <EuiFlexItem grow={false}>
-                        <EuiToolTip content='Cancel'>
+                        <EuiToolTip
+                          content={i18n.translate(
+                            'wazuh.common.caseManagementTab.cancelCommentEditTooltip',
+                            { defaultMessage: 'Cancel' },
+                          )}
+                        >
                           <EuiButtonIcon
                             iconType='cross'
                             color='danger'
-                            aria-label='Cancel comment edit'
+                            aria-label={i18n.translate(
+                              'wazuh.common.caseManagementTab.cancelCommentEditAriaLabel',
+                              { defaultMessage: 'Cancel comment edit' },
+                            )}
                             isDisabled={isSavingComment}
                             onClick={stopEditingComment}
                           />
                         </EuiToolTip>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiToolTip content='Save comment'>
+                        <EuiToolTip
+                          content={i18n.translate(
+                            'wazuh.common.caseManagementTab.saveCommentTooltip',
+                            { defaultMessage: 'Save comment' },
+                          )}
+                        >
                           <EuiButtonIcon
                             iconType='check'
-                            aria-label='Save comment'
+                            aria-label={i18n.translate(
+                              'wazuh.common.caseManagementTab.saveCommentAriaLabel',
+                              { defaultMessage: 'Save comment' },
+                            )}
                             isDisabled={
                               !editingCommentDraft.trim() ||
                               isSaving ||
@@ -479,12 +607,16 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
   const summaryItems = [
     {
-      title: 'Title',
+      title: i18n.translate('wazuh.common.caseManagementSummary.title', {
+        defaultMessage: 'Title',
+      }),
       description: title || '—',
       fullWidth: true,
     },
     {
-      title: 'Description',
+      title: i18n.translate('wazuh.common.caseManagementSummary.description', {
+        defaultMessage: 'Description',
+      }),
       description: description ? (
         <EuiText size='s' style={{ textAlign: 'justify' }}>
           {description}
@@ -498,7 +630,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
   const shortItems = [
     {
-      title: 'Severity',
+      title: i18n.translate('wazuh.common.caseManagementSummary.severity', {
+        defaultMessage: 'Severity',
+      }),
       description: severity ? (
         <EuiBadge color={SEVERITY_BADGE_COLOR[severity]}>
           {optionText(CASE_SEVERITY_OPTIONS, severity)}
@@ -508,7 +642,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       ),
     },
     {
-      title: 'Priority',
+      title: i18n.translate('wazuh.common.caseManagementSummary.priority', {
+        defaultMessage: 'Priority',
+      }),
       description: priority ? (
         <EuiBadge color={PRIORITY_BADGE_COLOR[priority]}>
           {optionText(CASE_PRIORITY_OPTIONS, priority)}
@@ -518,7 +654,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
       ),
     },
     {
-      title: 'TLP',
+      title: i18n.translate('wazuh.common.caseManagementSummary.tlp', {
+        defaultMessage: 'TLP',
+      }),
       description: tlp ? (
         <EuiBadge color={TLP_BADGE_COLOR[tlp]}>{tlp}</EuiBadge>
       ) : (
@@ -528,7 +666,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   ];
 
   const tagsItem = {
-    title: 'Tags',
+    title: i18n.translate('wazuh.common.caseManagementSummary.tags', {
+      defaultMessage: 'Tags',
+    }),
     description: tags.length
       ? tags.map(tag => (
           <EuiBadge key={tag.label} color='hollow'>
@@ -543,7 +683,9 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     ...(!isNewCase
       ? [
           {
-            title: 'User',
+            title: i18n.translate('wazuh.common.caseManagementSummary.user', {
+              defaultMessage: 'User',
+            }),
             description: caseUsername || '—',
           },
         ]
@@ -551,7 +693,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     ...(existingCreatedAt
       ? [
           {
-            title: 'Created at',
+            title: i18n.translate(
+              'wazuh.common.caseManagementSummary.createdAt',
+              { defaultMessage: 'Created at' },
+            ),
             description: formatUIDate(existingCreatedAt),
           },
         ]
@@ -559,7 +704,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     ...(existingUpdatedAt
       ? [
           {
-            title: 'Updated at',
+            title: i18n.translate(
+              'wazuh.common.caseManagementSummary.updatedAt',
+              { defaultMessage: 'Updated at' },
+            ),
             description: formatUIDate(existingUpdatedAt),
           },
         ]
@@ -572,15 +720,27 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <EuiOverlayMask>
           <EuiOutsideClickDetector onOutsideClick={closeCleanModal}>
             <EuiConfirmModal
-              title='Clean case'
+              title={i18n.translate(
+                'wazuh.common.caseManagementCleanModal.title',
+                { defaultMessage: 'Clean case' },
+              )}
               onCancel={closeCleanModal}
               onConfirm={confirmClean}
-              cancelButtonText='Cancel'
-              confirmButtonText='Clean'
+              cancelButtonText={i18n.translate(
+                'wazuh.common.caseManagementCleanModal.cancelButton',
+                { defaultMessage: 'Cancel' },
+              )}
+              confirmButtonText={i18n.translate(
+                'wazuh.common.caseManagementCleanModal.confirmButton',
+                { defaultMessage: 'Clean' },
+              )}
               buttonColor='danger'
               defaultFocusedButton='confirm'
             >
-              This action removes the case data from the finding.
+              {i18n.translate('wazuh.common.caseManagementCleanModal.body', {
+                defaultMessage:
+                  'This action removes the case data from the finding.',
+              })}
             </EuiConfirmModal>
           </EuiOutsideClickDetector>
         </EuiOverlayMask>
@@ -590,15 +750,27 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         <EuiOverlayMask>
           <EuiOutsideClickDetector onOutsideClick={closeDeleteCommentModal}>
             <EuiConfirmModal
-              title='Delete comment'
+              title={i18n.translate(
+                'wazuh.common.caseManagementDeleteCommentModal.title',
+                { defaultMessage: 'Delete comment' },
+              )}
               onCancel={closeDeleteCommentModal}
               onConfirm={confirmDeleteComment}
-              cancelButtonText='Cancel'
-              confirmButtonText='Delete'
+              cancelButtonText={i18n.translate(
+                'wazuh.common.caseManagementDeleteCommentModal.cancelButton',
+                { defaultMessage: 'Cancel' },
+              )}
+              confirmButtonText={i18n.translate(
+                'wazuh.common.caseManagementDeleteCommentModal.confirmButton',
+                { defaultMessage: 'Delete' },
+              )}
               buttonColor='danger'
               defaultFocusedButton='confirm'
             >
-              This action cannot be undone.
+              {i18n.translate(
+                'wazuh.common.caseManagementDeleteCommentModal.body',
+                { defaultMessage: 'This action cannot be undone.' },
+              )}
             </EuiConfirmModal>
           </EuiOutsideClickDetector>
         </EuiOverlayMask>
@@ -611,7 +783,11 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             <EuiFlexGroup alignItems='center' gutterSize='s'>
               <EuiFlexItem grow={false}>
                 <EuiTitle size='xs'>
-                  <h3>Case management</h3>
+                  <h3>
+                    {i18n.translate('wazuh.common.caseManagementTab.title', {
+                      defaultMessage: 'Case management',
+                    })}
+                  </h3>
                 </EuiTitle>
               </EuiFlexItem>
               {status && (
@@ -624,7 +800,15 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               {isNewCase && (
                 <EuiFlexItem grow={false}>
                   <EuiText size='s' color='subdued'>
-                    <em>No case data yet. Fill in the form to create one.</em>
+                    <em>
+                      {i18n.translate(
+                        'wazuh.common.caseManagementTab.noCaseData',
+                        {
+                          defaultMessage:
+                            'No case data yet. Fill in the form to create one.',
+                        },
+                      )}
+                    </em>
                   </EuiText>
                 </EuiFlexItem>
               )}
@@ -640,7 +824,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     onClick={() => setIsEditing(true)}
                     disabled={isSaving || isCleaning}
                   >
-                    Edit
+                    {i18n.translate(
+                      'wazuh.common.caseManagementTab.editButton',
+                      { defaultMessage: 'Edit' },
+                    )}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               )}
@@ -654,7 +841,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     disabled={isSaving || isCleaning || isSavingComment}
                     isLoading={isCleaning}
                   >
-                    Clean
+                    {i18n.translate(
+                      'wazuh.common.caseManagementTab.cleanButton',
+                      { defaultMessage: 'Clean' },
+                    )}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               )}
@@ -689,19 +879,31 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
             <EuiForm component='form'>
               <EuiFormRow
                 fullWidth
-                label='Title *'
-                helpText='Short summary of this case.'
+                label={i18n.translate(
+                  'wazuh.common.caseManagementForm.titleLabel',
+                  { defaultMessage: 'Title *' },
+                )}
+                helpText={i18n.translate(
+                  'wazuh.common.caseManagementForm.titleHelpText',
+                  { defaultMessage: 'Short summary of this case.' },
+                )}
               >
                 <EuiFieldText
                   fullWidth
-                  placeholder='Case title…'
+                  placeholder={i18n.translate(
+                    'wazuh.common.caseManagementForm.titlePlaceholder',
+                    { defaultMessage: 'Case title…' },
+                  )}
                   value={title}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setTitle(e.target.value)
                   }
                   disabled={isSaving || isCleaning}
                   maxLength={1024}
-                  aria-label='Case title'
+                  aria-label={i18n.translate(
+                    'wazuh.common.caseManagementForm.titleAriaLabel',
+                    { defaultMessage: 'Case title' },
+                  )}
                 />
               </EuiFormRow>
 
@@ -709,12 +911,21 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
               <EuiFormRow
                 fullWidth
-                label='Description'
-                helpText='Detailed description of this case.'
+                label={i18n.translate(
+                  'wazuh.common.caseManagementForm.descriptionLabel',
+                  { defaultMessage: 'Description' },
+                )}
+                helpText={i18n.translate(
+                  'wazuh.common.caseManagementForm.descriptionHelpText',
+                  { defaultMessage: 'Detailed description of this case.' },
+                )}
               >
                 <EuiTextArea
                   fullWidth
-                  placeholder='Describe the case…'
+                  placeholder={i18n.translate(
+                    'wazuh.common.caseManagementForm.descriptionPlaceholder',
+                    { defaultMessage: 'Describe the case…' },
+                  )}
                   value={description}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                     setDescription(e.target.value)
@@ -722,7 +933,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   disabled={isSaving || isCleaning}
                   rows={3}
                   resize='vertical'
-                  aria-label='Case description'
+                  aria-label={i18n.translate(
+                    'wazuh.common.caseManagementForm.descriptionAriaLabel',
+                    { defaultMessage: 'Case description' },
+                  )}
                 />
               </EuiFormRow>
 
@@ -732,8 +946,17 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label='Status *'
-                    helpText='Current lifecycle status of this finding.'
+                    label={i18n.translate(
+                      'wazuh.common.caseManagementForm.statusLabel',
+                      { defaultMessage: 'Status *' },
+                    )}
+                    helpText={i18n.translate(
+                      'wazuh.common.caseManagementForm.statusHelpText',
+                      {
+                        defaultMessage:
+                          'Current lifecycle status of this finding.',
+                      },
+                    )}
                   >
                     <EuiSelect
                       fullWidth
@@ -744,15 +967,24 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       }
                       disabled={isSaving || isCleaning}
                       hasNoInitialSelection={isNewCase && !status}
-                      aria-label='Case status'
+                      aria-label={i18n.translate(
+                        'wazuh.common.caseManagementForm.statusAriaLabel',
+                        { defaultMessage: 'Case status' },
+                      )}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label='Severity *'
-                    helpText='Impact severity of this case.'
+                    label={i18n.translate(
+                      'wazuh.common.caseManagementForm.severityLabel',
+                      { defaultMessage: 'Severity *' },
+                    )}
+                    helpText={i18n.translate(
+                      'wazuh.common.caseManagementForm.severityHelpText',
+                      { defaultMessage: 'Impact severity of this case.' },
+                    )}
                   >
                     <EuiSelect
                       fullWidth
@@ -763,7 +995,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       }
                       disabled={isSaving || isCleaning}
                       hasNoInitialSelection={!severity}
-                      aria-label='Case severity'
+                      aria-label={i18n.translate(
+                        'wazuh.common.caseManagementForm.severityAriaLabel',
+                        { defaultMessage: 'Case severity' },
+                      )}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -775,8 +1010,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label='Priority'
-                    helpText='Triage priority of this case.'
+                    label={i18n.translate(
+                      'wazuh.common.caseManagementForm.priorityLabel',
+                      { defaultMessage: 'Priority' },
+                    )}
+                    helpText={i18n.translate(
+                      'wazuh.common.caseManagementForm.priorityHelpText',
+                      { defaultMessage: 'Triage priority of this case.' },
+                    )}
                   >
                     <EuiSelect
                       fullWidth
@@ -786,15 +1027,26 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                         setPriority(e.target.value as CasePriority | '')
                       }
                       disabled={isSaving || isCleaning}
-                      aria-label='Case priority'
+                      aria-label={i18n.translate(
+                        'wazuh.common.caseManagementForm.priorityAriaLabel',
+                        { defaultMessage: 'Case priority' },
+                      )}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label='TLP'
-                    helpText='Traffic Light Protocol sharing level.'
+                    label={i18n.translate(
+                      'wazuh.common.caseManagementForm.tlpLabel',
+                      { defaultMessage: 'TLP' },
+                    )}
+                    helpText={i18n.translate(
+                      'wazuh.common.caseManagementForm.tlpHelpText',
+                      {
+                        defaultMessage: 'Traffic Light Protocol sharing level.',
+                      },
+                    )}
                   >
                     <EuiSelect
                       fullWidth
@@ -804,7 +1056,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                         setTlp(e.target.value as CaseTLP | '')
                       }
                       disabled={isSaving || isCleaning}
-                      aria-label='Case TLP'
+                      aria-label={i18n.translate(
+                        'wazuh.common.caseManagementForm.tlpAriaLabel',
+                        { defaultMessage: 'Case TLP' },
+                      )}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -814,18 +1069,33 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
 
               <EuiFormRow
                 fullWidth
-                label='Tags'
-                helpText='Type a tag name and press Enter to add it.'
+                label={i18n.translate(
+                  'wazuh.common.caseManagementForm.tagsLabel',
+                  { defaultMessage: 'Tags' },
+                )}
+                helpText={i18n.translate(
+                  'wazuh.common.caseManagementForm.tagsHelpText',
+                  {
+                    defaultMessage:
+                      'Type a tag name and press Enter to add it.',
+                  },
+                )}
               >
                 <EuiComboBox
                   fullWidth
                   noSuggestions
-                  placeholder='Add tags…'
+                  placeholder={i18n.translate(
+                    'wazuh.common.caseManagementForm.tagsPlaceholder',
+                    { defaultMessage: 'Add tags…' },
+                  )}
                   selectedOptions={tags}
                   onCreateOption={handleTagCreate}
                   onChange={setTags}
                   isDisabled={isSaving || isCleaning}
-                  aria-label='Case tags'
+                  aria-label={i18n.translate(
+                    'wazuh.common.caseManagementForm.tagsAriaLabel',
+                    { defaultMessage: 'Case tags' },
+                  )}
                 />
               </EuiFormRow>
 
@@ -842,7 +1112,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     disabled={isSaving || isCleaning}
                     size='s'
                   >
-                    Cancel
+                    {i18n.translate(
+                      'wazuh.common.caseManagementForm.cancelButton',
+                      { defaultMessage: 'Cancel' },
+                    )}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
@@ -854,7 +1127,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     disabled={isSaving || isCleaning || !isDirty}
                     size='s'
                   >
-                    Reset
+                    {i18n.translate(
+                      'wazuh.common.caseManagementForm.resetButton',
+                      { defaultMessage: 'Reset' },
+                    )}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
@@ -876,7 +1152,15 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       editingCommentKey !== undefined
                     }
                   >
-                    {isNewCase ? 'Create case' : 'Update case'}
+                    {isNewCase
+                      ? i18n.translate(
+                          'wazuh.common.caseManagementForm.createButton',
+                          { defaultMessage: 'Create case' },
+                        )
+                      : i18n.translate(
+                          'wazuh.common.caseManagementForm.updateButton',
+                          { defaultMessage: 'Update case' },
+                        )}
                   </EuiButton>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -893,16 +1177,34 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
           <EuiSpacer size='s' />
           <EuiFormRow
             fullWidth
-            label='New comment'
+            label={i18n.translate(
+              'wazuh.common.caseManagementComment.newCommentLabel',
+              { defaultMessage: 'New comment' },
+            )}
             helpText={
               commentLimitReached
-                ? `Comment limit reached (${MAX_CASE_COMMENTS}).`
-                : 'The comment is added with your username.'
+                ? i18n.translate(
+                    'wazuh.common.caseManagementComment.limitReached',
+                    {
+                      defaultMessage: 'Comment limit reached ({max}).',
+                      values: { max: MAX_CASE_COMMENTS },
+                    },
+                  )
+                : i18n.translate(
+                    'wazuh.common.caseManagementComment.helpText',
+                    {
+                      defaultMessage:
+                        'The comment is added with your username.',
+                    },
+                  )
             }
           >
             <EuiTextArea
               fullWidth
-              placeholder='Write a comment…'
+              placeholder={i18n.translate(
+                'wazuh.common.caseManagementComment.placeholder',
+                { defaultMessage: 'Write a comment…' },
+              )}
               value={newComment}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setNewComment(e.target.value)
@@ -912,7 +1214,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               }
               rows={3}
               resize='vertical'
-              aria-label='New case comment'
+              aria-label={i18n.translate(
+                'wazuh.common.caseManagementComment.ariaLabel',
+                { defaultMessage: 'New case comment' },
+              )}
             />
           </EuiFormRow>
           <EuiSpacer size='s' />
@@ -933,7 +1238,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   isCleaning
                 }
               >
-                Add comment
+                {i18n.translate(
+                  'wazuh.common.caseManagementComment.addButton',
+                  { defaultMessage: 'Add comment' },
+                )}
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>

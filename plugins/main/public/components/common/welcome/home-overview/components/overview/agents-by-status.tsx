@@ -1,5 +1,7 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiEmptyPrompt, EuiText } from '@elastic/eui';
+import { FormattedMessage } from '@osd/i18n/react';
 import { AgentStatus } from '../../interfaces/types';
 import {
   formatValueSafely,
@@ -42,9 +44,18 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
       <EuiEmptyPrompt
         body={
           <p>
-            This instance has no agents registered.
+            {i18n.translate(
+              'wazuh.common.homeOverviewAgentsByStatus.noAgents',
+              { defaultMessage: 'This instance has no agents registered.' },
+            )}
             <br />
-            Please deploy agents to begin monitoring your endpoints.
+            {i18n.translate(
+              'wazuh.common.homeOverviewAgentsByStatus.deployAgentsHint',
+              {
+                defaultMessage:
+                  'Please deploy agents to begin monitoring your endpoints.',
+              },
+            )}
           </p>
         }
         actions={
@@ -56,7 +67,10 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
             href={deployAgentUrl}
             data-test-subj='agents-by-status-deploy'
           >
-            Deploy new agent
+            {i18n.translate(
+              'wazuh.common.homeOverviewAgentsByStatus.deployAgentButton',
+              { defaultMessage: 'Deploy new agent' },
+            )}
           </WzButtonPermissions>
         }
       />
@@ -78,10 +92,22 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
       segments={segments}
       headline={
         <EuiText size='s'>
-          <strong className='tab-num'>{formatValueSafely(data.active)}</strong>{' '}
-          of{' '}
-          <strong className='tab-num'>{formatValueSafely(data.total)}</strong>{' '}
-          agents active
+          <FormattedMessage
+            id='wazuh.common.homeOverviewAgentsByStatus.activeHeadline'
+            defaultMessage='{active} of {total} agents active'
+            values={{
+              active: (
+                <strong className='tab-num'>
+                  {formatValueSafely(data.active)}
+                </strong>
+              ),
+              total: (
+                <strong className='tab-num'>
+                  {formatValueSafely(data.total)}
+                </strong>
+              ),
+            }}
+          />
         </EuiText>
       }
       data-test-subj='agents-by-status'

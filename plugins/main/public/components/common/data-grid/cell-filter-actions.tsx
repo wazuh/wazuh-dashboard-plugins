@@ -25,13 +25,19 @@ export const filterIsAction = (
     columnId: field,
     Component,
   }: EuiDataGridColumnCellActionProps) => {
-    const filterForValueText = i18n.translate('discover.filterForValue', {
-      defaultMessage: 'Filter for value',
-    });
-    const filterForValueLabel = i18n.translate('discover.filterForValueLabel', {
-      defaultMessage: 'Filter for value: {value}',
-      values: { value: field },
-    });
+    const filterForValueText = i18n.translate(
+      'wazuh.common.dataGrid.filterForValue',
+      {
+        defaultMessage: 'Filter for value',
+      },
+    );
+    const filterForValueLabel = i18n.translate(
+      'wazuh.common.dataGrid.filterForValueAriaLabel',
+      {
+        defaultMessage: 'Filter for value: {value}',
+        values: { value: field },
+      },
+    );
 
     const handleClick = () => {
       const row = rows[rowIndex % pageSize];
@@ -71,13 +77,19 @@ export const filterIsNotAction =
     columnId: field,
     Component,
   }: EuiDataGridColumnCellActionProps) => {
-    const filterOutValueText = i18n.translate('discover.filterOutValue', {
-      defaultMessage: 'Filter out value',
-    });
-    const filterOutValueLabel = i18n.translate('discover.filterOutValueLabel', {
-      defaultMessage: 'Filter out value: {value}',
-      values: { value: field },
-    });
+    const filterOutValueText = i18n.translate(
+      'wazuh.common.dataGrid.filterOutValue',
+      {
+        defaultMessage: 'Filter out value',
+      },
+    );
+    const filterOutValueLabel = i18n.translate(
+      'wazuh.common.dataGrid.filterOutValueAriaLabel',
+      {
+        defaultMessage: 'Filter out value: {value}',
+        values: { value: field },
+      },
+    );
 
     const handleClick = () => {
       const row = rows[rowIndex % pageSize];

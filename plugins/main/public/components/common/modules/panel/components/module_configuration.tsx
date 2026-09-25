@@ -24,6 +24,7 @@ import {
   EuiAccordion,
   EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../../react-services';
 import { connect } from 'react-redux';
 import { useAsyncAction } from '../../../hooks';
@@ -140,7 +141,12 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
             error: {
               error: error,
               message: error.message || error,
-              title: 'Module Unavailable',
+              title: i18n.translate(
+                'wazuh.common.moduleConfiguration.error.title',
+                {
+                  defaultMessage: 'Module Unavailable',
+                },
+              ),
             },
           };
           getErrorOrchestrator().handleError(options);
@@ -166,7 +172,9 @@ export const PanelModuleConfiguration: FunctionalComponent<{ h: string }> =
               </EuiTitle>
               <EuiTitle size='xs'>
                 <h5 className='module-panel-configuration-subtitle'>
-                  Module configuration
+                  {i18n.translate('wazuh.common.moduleConfiguration.subtitle', {
+                    defaultMessage: 'Module configuration',
+                  })}
                 </h5>
               </EuiTitle>
             </EuiFlexItem>
@@ -199,7 +207,12 @@ const ConfigurationWrapper = compose(
     ({ error }) => (
       <EuiCallOut
         className='office-stats-callout-warning'
-        title='Error fetching the module configuration'
+        title={i18n.translate(
+          'wazuh.common.moduleConfiguration.fetchError.title',
+          {
+            defaultMessage: 'Error fetching the module configuration',
+          },
+        )}
         color='danger'
         iconType='alert'
       >
@@ -212,7 +225,12 @@ const ConfigurationWrapper = compose(
     () => (
       <EuiCallOut
         className='office-stats-callout-warning'
-        title='This agent has not reported its configuration.'
+        title={i18n.translate(
+          'wazuh.common.moduleConfiguration.notReported.title',
+          {
+            defaultMessage: 'This agent has not reported its configuration.',
+          },
+        )}
         color='warning'
         iconType='alert'
       />
@@ -223,11 +241,23 @@ const ConfigurationWrapper = compose(
     ({ moduleTitle }) => (
       <EuiCallOut
         className='office-stats-callout-warning'
-        title='No agent is selected'
+        title={i18n.translate(
+          'wazuh.common.moduleConfiguration.noAgentSelected.title',
+          {
+            defaultMessage: 'No agent is selected',
+          },
+        )}
         color='warning'
         iconType='alert'
       >
-        {`Select an agent to see its ${moduleTitle} configuration.`}
+        {i18n.translate(
+          'wazuh.common.moduleConfiguration.noAgentSelected.body',
+          {
+            defaultMessage:
+              'Select an agent to see its {moduleTitle} configuration.',
+            values: { moduleTitle },
+          },
+        )}
       </EuiCallOut>
     ),
   ),
@@ -236,7 +266,14 @@ const ConfigurationWrapper = compose(
     ({ moduleTitle, documentationPath }) => (
       <EuiCallOut
         className='office-stats-callout-warning'
-        title={`The ${moduleTitle} module is not configured on this agent`}
+        title={i18n.translate(
+          'wazuh.common.moduleConfiguration.notConfigured.title',
+          {
+            defaultMessage:
+              'The {moduleTitle} module is not configured on this agent',
+            values: { moduleTitle },
+          },
+        )}
         color='warning'
         iconType='alert'
       >
@@ -246,7 +283,12 @@ const ConfigurationWrapper = compose(
             target='_blank'
             external
           >
-            Check the documentation
+            {i18n.translate(
+              'wazuh.common.moduleConfiguration.notConfigured.documentationLink',
+              {
+                defaultMessage: 'Check the documentation',
+              },
+            )}
           </EuiLink>
         ) : null}
       </EuiCallOut>

@@ -17,6 +17,7 @@ import {
   EuiConfirmModal,
   EuiOverlayMask,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
@@ -77,7 +78,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         return;
       }
       ErrorHandler.info(
-        'Role was successfully updated with the selected policies',
+        i18n.translate('wazuh.security.editPolicy.updateSuccess', {
+          defaultMessage:
+            'Role was successfully updated with the selected policies',
+        }),
       );
       closeFlyout(true);
     } catch (error) {
@@ -191,11 +195,17 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const effectOptions = [
     {
       value: 'allow',
-      inputDisplay: 'Allow',
+      inputDisplay: i18n.translate(
+        'wazuh.security.editPolicy.effectOptions.allow',
+        { defaultMessage: 'Allow' },
+      ),
     },
     {
       value: 'deny',
-      inputDisplay: 'Deny',
+      inputDisplay: i18n.translate(
+        'wazuh.security.editPolicy.effectOptions.deny',
+        { defaultMessage: 'Deny' },
+      ),
     },
   ];
 
@@ -220,7 +230,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const actionsColumns = [
     {
       field: 'action',
-      name: 'Actions',
+      name: i18n.translate(
+        'wazuh.security.editPolicy.actionsTable.columns.action',
+        { defaultMessage: 'Actions' },
+      ),
       sortable: true,
       truncateText: true,
     },
@@ -228,8 +241,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       name: '',
       actions: [
         {
-          name: 'Remove',
-          description: 'Remove this action',
+          name: i18n.translate(
+            'wazuh.security.editPolicy.actionsTable.removeAction.name',
+            { defaultMessage: 'Remove' },
+          ),
+          description: i18n.translate(
+            'wazuh.security.editPolicy.actionsTable.removeAction.description',
+            { defaultMessage: 'Remove this action' },
+          ),
           type: 'icon',
           enabled: () => !isReserved,
           color: 'danger',
@@ -243,7 +262,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
   const resourcesColumns = [
     {
       field: 'resource',
-      name: 'Resources',
+      name: i18n.translate(
+        'wazuh.security.editPolicy.resourcesTable.columns.resource',
+        { defaultMessage: 'Resources' },
+      ),
       sortable: true,
       truncateText: true,
     },
@@ -251,8 +273,14 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
       name: '',
       actions: [
         {
-          name: 'Remove',
-          description: 'Remove this resource',
+          name: i18n.translate(
+            'wazuh.security.editPolicy.resourcesTable.removeAction.name',
+            { defaultMessage: 'Remove' },
+          ),
+          description: i18n.translate(
+            'wazuh.security.editPolicy.resourcesTable.removeAction.description',
+            { defaultMessage: 'Remove this resource' },
+          ),
           type: 'icon',
           color: 'danger',
           enabled: () => !isReserved,
@@ -300,17 +328,32 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.security.editPolicy.unsavedChangesModal.title',
+            { defaultMessage: 'Unsubmitted changes' },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText='Yes, do it'
+          cancelButtonText={i18n.translate(
+            'wazuh.security.editPolicy.unsavedChangesModal.cancelButton',
+            { defaultMessage: "No, don't do it" },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.editPolicy.unsavedChangesModal.confirmButton',
+            { defaultMessage: 'Yes, do it' },
+          )}
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.security.editPolicy.unsavedChangesModal.body',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -340,16 +383,31 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
             <h2>
-              Edit policy {policy.name}&nbsp;&nbsp;
-              {isReserved && <EuiBadge color='primary'>Reserved</EuiBadge>}
+              {i18n.translate('wazuh.security.editPolicy.title', {
+                defaultMessage: 'Edit policy {policyName}',
+                values: { policyName: policy.name },
+              })}
+              &nbsp;&nbsp;
+              {isReserved && (
+                <EuiBadge color='primary'>
+                  {i18n.translate('wazuh.security.editPolicy.reservedBadge', {
+                    defaultMessage: 'Reserved',
+                  })}
+                </EuiBadge>
+              )}
             </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Policy name'
-              helpText='Introduce a name for this new policy.'
+              label={i18n.translate('wazuh.security.editPolicy.nameLabel', {
+                defaultMessage: 'Policy name',
+              })}
+              helpText={i18n.translate(
+                'wazuh.security.editPolicy.nameHelpText',
+                { defaultMessage: 'Introduce a name for this new policy.' },
+              )}
             >
               <EuiFieldText
                 placeholder=''
@@ -364,8 +422,17 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label='Action'
-                  helpText='Set an action where the policy will be carried out.'
+                  label={i18n.translate(
+                    'wazuh.security.editPolicy.actionLabel',
+                    { defaultMessage: 'Action' },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.security.editPolicy.actionHelpText',
+                    {
+                      defaultMessage:
+                        'Set an action where the policy will be carried out.',
+                    },
+                  )}
                 >
                   <EuiSuperSelect
                     options={actions}
@@ -385,7 +452,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     iconType='plusInCircle'
                     disabled={!actionValue || isReserved}
                   >
-                    Add
+                    {i18n.translate(
+                      'wazuh.security.editPolicy.addActionButton',
+                      { defaultMessage: 'Add' },
+                    )}
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -407,8 +477,17 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiFormRow
-                  label='Resource'
-                  helpText='Select the resource to which this policy is directed.'
+                  label={i18n.translate(
+                    'wazuh.security.editPolicy.resourceLabel',
+                    { defaultMessage: 'Resource' },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.security.editPolicy.resourceHelpText',
+                    {
+                      defaultMessage:
+                        'Select the resource to which this policy is directed.',
+                    },
+                  )}
                 >
                   <EuiSuperSelect
                     options={resources}
@@ -422,8 +501,17 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiFormRow
-                  label='Resource identifier'
-                  helpText='Introduce the resource identifier. Type * for all.'
+                  label={i18n.translate(
+                    'wazuh.security.editPolicy.resourceIdentifierLabel',
+                    { defaultMessage: 'Resource identifier' },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.security.editPolicy.resourceIdentifierHelpText',
+                    {
+                      defaultMessage:
+                        'Introduce the resource identifier. Type * for all.',
+                    },
+                  )}
                 >
                   <EuiFieldText
                     placeholder={getIdentifier()}
@@ -440,7 +528,10 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
                     iconType='plusInCircle'
                     disabled={!resourceIdentifierValue || isReserved}
                   >
-                    Add
+                    {i18n.translate(
+                      'wazuh.security.editPolicy.addResourceButton',
+                      { defaultMessage: 'Add' },
+                    )}
                   </EuiButton>
                 </EuiFormRow>
               </EuiFlexItem>
@@ -459,7 +550,15 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
               </>
             )}
             <EuiSpacer></EuiSpacer>
-            <EuiFormRow label='Select an effect' helpText='Select an effect.'>
+            <EuiFormRow
+              label={i18n.translate('wazuh.security.editPolicy.effectLabel', {
+                defaultMessage: 'Select an effect',
+              })}
+              helpText={i18n.translate(
+                'wazuh.security.editPolicy.effectHelpText',
+                { defaultMessage: 'Select an effect.' },
+              )}
+            >
               <EuiSuperSelect
                 options={effectOptions}
                 valueOfSelected={effectValue}
@@ -479,7 +578,9 @@ export const EditPolicyFlyout = ({ policy, closeFlyout }) => {
               onClick={updatePolicy}
               fill
             >
-              Apply
+              {i18n.translate('wazuh.security.editPolicy.applyButton', {
+                defaultMessage: 'Apply',
+              })}
             </WzButtonPermissions>
           </EuiForm>
         </EuiFlyoutBody>

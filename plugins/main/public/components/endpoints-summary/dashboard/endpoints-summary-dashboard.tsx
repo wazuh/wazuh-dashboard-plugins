@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { getAgentsInfo } from '../services/get-agents-info';
 import DonutCard from './components/donut-card';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { useService } from '../../common/hooks/use-service';
 
 interface EndpointsSummaryDashboardProps {
@@ -27,7 +28,10 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
     <EuiFlexGroup gutterSize='m' responsive={false} wrap>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Agents by Status'
+          betaBadgeLabel={i18n.translate(
+            'wazuh.endpointsSummary.endpointsSummaryDashboard.agentsByStatus',
+            { defaultMessage: 'Agents by Status' },
+          )}
           onClickLabel={filterAgentByStatus}
           data={data?.statusData}
           isLoading={isLoading}
@@ -35,7 +39,10 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
       </EuiFlexItem>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Top 5 OS'
+          betaBadgeLabel={i18n.translate(
+            'wazuh.endpointsSummary.endpointsSummaryDashboard.topOs',
+            { defaultMessage: 'Top 5 OS' },
+          )}
           onClickLabel={filterAgentByOS}
           data={data?.osData}
           isLoading={isLoading}
@@ -43,7 +50,10 @@ export const EndpointsSummaryDashboard: FC<EndpointsSummaryDashboardProps> = ({
       </EuiFlexItem>
       <EuiFlexItem>
         <DonutCard
-          betaBadgeLabel='Top 5 groups'
+          betaBadgeLabel={i18n.translate(
+            'wazuh.endpointsSummary.endpointsSummaryDashboard.topGroups',
+            { defaultMessage: 'Top 5 groups' },
+          )}
           onClickLabel={filterAgentByGroup}
           data={data?.groupsData}
           isLoading={isLoading}

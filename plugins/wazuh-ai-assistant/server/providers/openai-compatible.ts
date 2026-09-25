@@ -11,6 +11,7 @@ import { describeError } from '../../common/errors';
 import {
   ChatStreamOptions,
   ProviderAdapter,
+  ProviderStreamEvent,
   describeConnectionError,
   trimTrailingSlash,
 } from './types';
@@ -96,7 +97,7 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     messages: ChatMessage[],
     signal: AbortSignal,
     options?: ChatStreamOptions,
-  ): AsyncIterable<StreamEvent> {
+  ): AsyncIterable<ProviderStreamEvent> {
     const url = `${trimTrailingSlash(config.baseUrl)}/chat/completions`;
 
     // Fetch-time SSRF guard -- see server/providers/url-guard.ts for the full policy and
@@ -193,6 +194,8 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
     // `content` at all — never appended alongside a working answer.
     let sawContent = false;
     let reasoningBuffer = '';
+    // One content-free `reasoning_started` per call, on the first reasoning chunk before content.
+    let reasoningSignalled = false;
     // Set once the `finish_reason === 'tool_calls'` branch below has finalized and yielded this
     // call's tool calls. Existing solely so the LATER exits (the terminal `usage` frame requested
     // by `stream_options.include_usage`, or `[DONE]`) know two things without re-touching
@@ -301,6 +304,8 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
               // above); kept on the type so a future, more elaborate treatment doesn't have to
               // rediscover the wire shape.
               reasoning?: string;
+              // DeepSeek/vLLM's name for the channel; only its presence is read.
+              reasoning_content?: string;
               channel?: string;
               tool_calls?: Array<{
                 index?: number;
@@ -345,6 +350,14 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
         }
         if (choice?.delta?.reasoning) {
           reasoningBuffer += choice.delta.reasoning;
+        }
+        if (
+          !reasoningSignalled &&
+          !sawContent &&
+          (choice?.delta?.reasoning || choice?.delta?.reasoning_content)
+        ) {
+          reasoningSignalled = true;
+          yield { type: 'reasoning_started' };
         }
         // Vendor passthrough (generic -- see `ChatMessage.vendorExtras`'s doc comment): any key on
         // `choice.delta` this adapter doesn't otherwise recognize is captured verbatim and merged

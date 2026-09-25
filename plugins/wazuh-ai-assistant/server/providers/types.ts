@@ -28,6 +28,10 @@ export interface ChatStreamOptions {
   temperature?: number;
 }
 
+/** Adapter output: the wire events plus `reasoning_started`, a server-only, content-free signal
+ * (at most once per call) that chat.ts maps to the "thinking" status. */
+export type ProviderStreamEvent = StreamEvent | { type: 'reasoning_started' };
+
 /**
  * Every provider adapter turns a canonical ChatMessage[] into a canonical StreamEvent stream.
  * Adapters must never buffer the full upstream response: read the body as it arrives and yield
@@ -39,7 +43,7 @@ export interface ProviderAdapter {
     messages: ChatMessage[],
     signal: AbortSignal,
     options?: ChatStreamOptions,
-  ): AsyncIterable<StreamEvent>;
+  ): AsyncIterable<ProviderStreamEvent>;
 
   /**
    * Transport capability, not access control: declares whether this adapter's `chatStream` does

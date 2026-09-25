@@ -11,14 +11,23 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiEmptyPrompt } from '@elastic/eui';
 
 export const PromptNoActiveAgentWithoutSelect = () => {
   return (
     <EuiEmptyPrompt
       iconType='watchesApp'
-      title={<h2>{`Agent is not active`}</h2>}
-      body='This section is only available for active agents.'
+      title={
+        <h2>
+          {i18n.translate('wazuh.endpointsSummary.promptNoActiveAgent.title', {
+            defaultMessage: 'Agent is not active',
+          })}
+        </h2>
+      }
+      body={i18n.translate('wazuh.endpointsSummary.promptNoActiveAgent.body', {
+        defaultMessage: 'This section is only available for active agents.',
+      })}
     />
   );
 };

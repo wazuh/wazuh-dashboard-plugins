@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiPanel,
   EuiFlexGroup,
@@ -74,7 +75,15 @@ const VulsPanelContentInitiation = compose(
     const value =
       severityStats?.find(v => v.key.toUpperCase() === severity.toUpperCase())
         ?.doc_count || '0';
-    return value ? `${formatUINumber(value)} ${severity}` : '0';
+    return value
+      ? i18n.translate(
+          'wazuh.common.agentWelcomeVulnerabilities.severityCount',
+          {
+            defaultMessage: '{count} {severity}',
+            values: { count: formatUINumber(value), severity },
+          },
+        )
+      : '0';
   };
   const renderSeverityStats = (severity, index) => {
     const severityLabel = severities[severity].label;
@@ -140,11 +149,23 @@ const VulsPanel = ({ agent }) => {
     <EuiPanel paddingSize='m'>
       <EuiFlexGroup className='wz-section-sca-euiFlexGroup' responsive={false}>
         <EuiFlexItem grow={false}>
-          <Typography level='section'>Vulnerability Detection</Typography>
+          <Typography level='section'>
+            {i18n.translate('wazuh.common.agentWelcomeVulnerabilities.title', {
+              defaultMessage: 'Vulnerability Detection',
+            })}
+          </Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <RedirectAppLinks application={getCore().application}>
-            <EuiToolTip position='top' content='Open Vulnerability Detection'>
+            <EuiToolTip
+              position='top'
+              content={i18n.translate(
+                'wazuh.common.agentWelcomeVulnerabilities.openApp',
+                {
+                  defaultMessage: 'Open Vulnerability Detection',
+                },
+              )}
+            >
               <EuiButtonIcon
                 iconType='popout'
                 color='primary'
@@ -152,7 +173,12 @@ const VulsPanel = ({ agent }) => {
                 href={NavigationService.getInstance().getAppURL(
                   vulnerabilityDetection.id,
                 )}
-                aria-label='Open Vulnerability Detection'
+                aria-label={i18n.translate(
+                  'wazuh.common.agentWelcomeVulnerabilities.openApp',
+                  {
+                    defaultMessage: 'Open Vulnerability Detection',
+                  },
+                )}
               />
             </EuiToolTip>
           </RedirectAppLinks>

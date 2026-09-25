@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import {
   DistributionBar,
@@ -44,7 +45,13 @@ export const ThreatTypeComposition: React.FC<ThreatTypeCompositionProps> = ({
     count: item.count,
     color: PALETTE[index % PALETTE.length],
     // The raw term, so the indexed value stays recoverable from the UI.
-    tooltip: `${item.key}: ${formatUINumber(item.count)}`,
+    tooltip: i18n.translate(
+      'wazuh.common.homeOverviewDistributionBar.segmentTooltip',
+      {
+        defaultMessage: '{label}: {count}',
+        values: { label: item.key, count: formatUINumber(item.count) },
+      },
+    ),
   }));
 
   return (
@@ -58,8 +65,18 @@ export const ThreatTypeComposition: React.FC<ThreatTypeCompositionProps> = ({
     >
       <DistributionBar
         segments={segments}
-        headline={segments.length > 0 ? 'Top IOCs by threat type' : undefined}
-        emptyMessage='No threat types in the catalog'
+        headline={
+          segments.length > 0
+            ? i18n.translate(
+                'wazuh.common.homeOverviewThreatCatalog.topThreatTypes',
+                { defaultMessage: 'Top IOCs by threat type' },
+              )
+            : undefined
+        }
+        emptyMessage={i18n.translate(
+          'wazuh.common.homeOverviewThreatCatalog.noThreatTypes',
+          { defaultMessage: 'No threat types in the catalog' },
+        )}
         data-test-subj='threat-catalog-threat-types'
       />
     </WidgetGroupBody>

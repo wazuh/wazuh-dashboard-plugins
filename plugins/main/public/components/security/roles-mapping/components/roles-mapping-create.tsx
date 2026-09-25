@@ -15,6 +15,7 @@ import {
   EuiOutsideClickDetector,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { RuleEditor } from './rule-editor';
 import RulesServices from '../../rules/services';
@@ -62,7 +63,11 @@ export const RolesMappingCreate = ({
           async role => await RolesServices.AddRoleRules(role, [newRule.id]),
         ),
       );
-      ErrorHandler.info('Role mapping was successfully created');
+      ErrorHandler.info(
+        i18n.translate('wazuh.security.rolesMappingCreate.createSuccess', {
+          defaultMessage: 'Role mapping was successfully created',
+        }),
+      );
     } catch (error) {
       const options = {
         context: `${RolesMappingCreate.name}.createRule`,
@@ -86,18 +91,33 @@ export const RolesMappingCreate = ({
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.security.rolesMappingCreate.unsavedChangesModal.title',
+            { defaultMessage: 'Unsubmitted changes' },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
             setHasChanges(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText='Yes, do it'
+          cancelButtonText={i18n.translate(
+            'wazuh.security.rolesMappingCreate.unsavedChangesModal.cancelButton',
+            { defaultMessage: "No, don't do it" },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.rolesMappingCreate.unsavedChangesModal.confirmButton',
+            { defaultMessage: 'Yes, do it' },
+          )}
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.security.rolesMappingCreate.unsavedChangesModal.body',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -125,31 +145,60 @@ export const RolesMappingCreate = ({
       <WzFlyout flyoutProps={{ className: 'wzApp' }} onClose={onClose}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
-            <h2>Create new role mapping &nbsp;</h2>
+            <h2>
+              {i18n.translate('wazuh.security.rolesMappingCreate.title', {
+                defaultMessage: 'Create new role mapping',
+              })}{' '}
+              &nbsp;
+            </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiFormRow
-              label='Role mapping name'
+              label={i18n.translate(
+                'wazuh.security.rolesMappingCreate.nameLabel',
+                { defaultMessage: 'Role mapping name' },
+              )}
               isInvalid={false}
-              error={'Please provide a role mapping name'}
-              helpText='Introduce a name for this role mapping.'
+              error={i18n.translate(
+                'wazuh.security.rolesMappingCreate.nameError',
+                { defaultMessage: 'Please provide a role mapping name' },
+              )}
+              helpText={i18n.translate(
+                'wazuh.security.rolesMappingCreate.nameHelpText',
+                { defaultMessage: 'Introduce a name for this role mapping.' },
+              )}
             >
               <EuiFieldText
-                placeholder='Role name'
+                placeholder={i18n.translate(
+                  'wazuh.security.rolesMappingCreate.namePlaceholder',
+                  { defaultMessage: 'Role name' },
+                )}
                 value={ruleName}
                 onChange={e => setRuleName(e.target.value)}
               />
             </EuiFormRow>
             <EuiFormRow
-              label='Roles'
+              label={i18n.translate(
+                'wazuh.security.rolesMappingCreate.rolesLabel',
+                { defaultMessage: 'Roles' },
+              )}
               isInvalid={false}
-              error={'At least one role must be selected.'}
-              helpText='Assign roles to your users.'
+              error={i18n.translate(
+                'wazuh.security.rolesMappingCreate.rolesError',
+                { defaultMessage: 'At least one role must be selected.' },
+              )}
+              helpText={i18n.translate(
+                'wazuh.security.rolesMappingCreate.rolesHelpText',
+                { defaultMessage: 'Assign roles to your users.' },
+              )}
             >
               <EuiComboBox
-                placeholder='Select roles'
+                placeholder={i18n.translate(
+                  'wazuh.security.rolesMappingCreate.rolesPlaceholder',
+                  { defaultMessage: 'Select roles' },
+                )}
                 options={getRolesList()}
                 isDisabled={false}
                 selectedOptions={selectedRoles}

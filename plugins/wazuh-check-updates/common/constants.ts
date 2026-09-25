@@ -1,3 +1,5 @@
+import { i18n } from '@osd/i18n';
+
 export const PLUGIN_ID = 'wazuhCheckUpdates';
 export const PLUGIN_NAME = 'wazuh_check_updates';
 
@@ -43,9 +45,14 @@ export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
  */
 export const CTI_REGISTRATION_COMPLETED_BODY = { success: true } as const;
 
-/** Shown as `message` and in the success modal (i18n `successDetail` default). */
-export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
-  'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.';
+/** Shown as the `message` of a successful registration status. */
+export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
+  'wazuhCheckUpdates.ctiRegistration.successStatusMessage',
+  {
+    defaultMessage:
+      'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.',
+  },
+);
 
 /** Wazuh Cloud portal / product URL. Uses `#` in the UI until set. */
 export const WAZUH_CLOUD_PORTAL_HREF = '';

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import {
   EuiButtonEmpty,
@@ -53,10 +54,20 @@ const DiscoverDataGridAdditionalControls = (
         tooltip={
           totalHits && totalHits > maxEntriesPerQuery
             ? {
-                ariaLabel: 'Info',
-                content: `The query results exceeded the limit of ${formatNumWithCommas(
-                  maxEntriesPerQuery,
-                )} hits. Please refine your search.`,
+                ariaLabel: i18n.translate(
+                  'wazuh.common.wazuhDiscover.hitsLimitInfoAriaLabel',
+                  { defaultMessage: 'Info' },
+                ),
+                content: i18n.translate(
+                  'wazuh.common.wazuhDiscover.hitsLimitRefineTooltip',
+                  {
+                    defaultMessage:
+                      'The query results exceeded the limit of {maxEntries} hits. Please refine your search.',
+                    values: {
+                      maxEntries: formatNumWithCommas(maxEntriesPerQuery),
+                    },
+                  },
+                ),
                 iconType: 'iInCircle',
                 position: 'top',
               }
@@ -86,7 +97,9 @@ const DiscoverDataGridAdditionalControls = (
         className='euiDataGrid__controlBtn'
         onClick={onHandleExportResults}
       >
-        Export Formatted
+        {i18n.translate('wazuh.common.wazuhDiscover.exportFormattedButton', {
+          defaultMessage: 'Export Formatted',
+        })}
       </EuiButtonEmpty>
 
       <RestoreStateColumnsButton

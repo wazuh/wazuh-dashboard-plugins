@@ -45,7 +45,7 @@ export const DiscoverNoResults = ({ message }: Props) => {
           title={
             message ?? (
               <FormattedMessage
-                id='discover.noResults.searchExamples.noResultsMatchSearchCriteriaTitle'
+                id='wazuh.fileIntegrityMonitoring.noResults.title'
                 defaultMessage='No results match your search criteria'
               />
             )

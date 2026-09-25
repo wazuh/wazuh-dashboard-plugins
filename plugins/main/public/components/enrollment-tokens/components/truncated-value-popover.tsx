@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useState } from 'react';
 import {
   EuiButtonIcon,
@@ -44,7 +45,15 @@ export const TruncatedValuePopover = ({
       <EuiFlexItem className='wz-truncated-value-popover-wrapper'>
         <EuiPopover
           button={
-            <EuiToolTip content='Click to view the full value' position='top'>
+            <EuiToolTip
+              content={i18n.translate(
+                'wazuh.enrollmentTokens.truncatedValuePopover.viewFullValueTooltip',
+                {
+                  defaultMessage: 'Click to view the full value',
+                },
+              )}
+              position='top'
+            >
               <code
                 className='wz-truncated-value-popover'
                 onClick={() => setIsPopoverOpen(true)}
@@ -63,12 +72,25 @@ export const TruncatedValuePopover = ({
         </EuiPopover>
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
-        <EuiCopy textToCopy={value} beforeMessage='Copy to clipboard'>
+        <EuiCopy
+          textToCopy={value}
+          beforeMessage={i18n.translate(
+            'wazuh.enrollmentTokens.truncatedValuePopover.copyTooltip',
+            {
+              defaultMessage: 'Copy to clipboard',
+            },
+          )}
+        >
           {copy => (
             <EuiButtonIcon
               iconType='copy'
               color='text'
-              aria-label='Copy value'
+              aria-label={i18n.translate(
+                'wazuh.enrollmentTokens.truncatedValuePopover.copyAriaLabel',
+                {
+                  defaultMessage: 'Copy value',
+                },
+              )}
               onClick={copy}
             />
           )}

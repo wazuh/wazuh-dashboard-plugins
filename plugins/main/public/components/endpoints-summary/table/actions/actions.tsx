@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { API_NAME_AGENT_STATUS } from '../../../../../common/constants';
 import { Agent } from '../../types';
 import NavigationService from '../../../../react-services/navigation-service';
@@ -23,19 +24,33 @@ export const agentsTableActions = (
 ) => [
   {
     name: (agent: Agent) => {
-      const name = 'View agent details';
+      const name = i18n.translate(
+        'wazuh.endpointsSummary.agentActions.viewAgentDetails',
+        { defaultMessage: 'View agent details' },
+      );
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
         return name;
       }
 
       return (
-        <EuiToolTip content='Since the agent never connected, it is not possible to access its details'>
+        <EuiToolTip
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentActions.viewAgentDetailsNeverConnectedTooltip',
+            {
+              defaultMessage:
+                'Since the agent never connected, it is not possible to access its details',
+            },
+          )}
+        >
           <span>{name}</span>
         </EuiToolTip>
       );
     },
-    description: 'View agent details',
+    description: i18n.translate(
+      'wazuh.endpointsSummary.agentActions.viewAgentDetailsDescription',
+      { defaultMessage: 'View agent details' },
+    ),
     icon: 'eye',
     type: 'icon',
     isPrimary: true,
@@ -49,19 +64,33 @@ export const agentsTableActions = (
   },
   {
     name: (agent: Agent) => {
-      const name = 'Agent configuration';
+      const name = i18n.translate(
+        'wazuh.endpointsSummary.agentActions.agentConfiguration',
+        { defaultMessage: 'Agent configuration' },
+      );
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
         return name;
       }
 
       return (
-        <EuiToolTip content='Since the agent never connected, it is not possible to access its configuration'>
+        <EuiToolTip
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentActions.agentConfigurationNeverConnectedTooltip',
+            {
+              defaultMessage:
+                'Since the agent never connected, it is not possible to access its configuration',
+            },
+          )}
+        >
           <span>{name}</span>
         </EuiToolTip>
       );
     },
-    description: 'Agent configuration',
+    description: i18n.translate(
+      'wazuh.endpointsSummary.agentActions.agentConfigurationDescription',
+      { defaultMessage: 'Agent configuration' },
+    ),
     icon: 'wrench',
     type: 'icon',
     onClick: (agent: Agent) =>
@@ -73,8 +102,13 @@ export const agentsTableActions = (
     'data-test-subj': 'action-configuration',
   },
   {
-    name: 'Edit groups',
-    description: 'Edit groups',
+    name: i18n.translate('wazuh.endpointsSummary.agentActions.editGroups', {
+      defaultMessage: 'Edit groups',
+    }),
+    description: i18n.translate(
+      'wazuh.endpointsSummary.agentActions.editGroupsDescription',
+      { defaultMessage: 'Edit groups' },
+    ),
     icon: 'pencil',
     type: 'icon',
     onClick: (agent: Agent) => {
@@ -89,22 +123,38 @@ export const agentsTableActions = (
       const isOutdated = isVersionLower(agent.version, apiVersion);
 
       if (agent.status === API_NAME_AGENT_STATUS.ACTIVE && isOutdated) {
-        return 'Upgrade';
+        return i18n.translate('wazuh.endpointsSummary.agentActions.upgrade', {
+          defaultMessage: 'Upgrade',
+        });
       }
 
       return (
         <EuiToolTip
           content={
             agent.status !== API_NAME_AGENT_STATUS.ACTIVE
-              ? 'Agent is not active'
-              : 'Agent is up to date'
+              ? i18n.translate(
+                  'wazuh.endpointsSummary.agentActions.upgradeNotActiveTooltip',
+                  { defaultMessage: 'Agent is not active' },
+                )
+              : i18n.translate(
+                  'wazuh.endpointsSummary.agentActions.upgradeUpToDateTooltip',
+                  { defaultMessage: 'Agent is up to date' },
+                )
           }
         >
-          <span>Upgrade</span>
+          <span>
+            {i18n.translate(
+              'wazuh.endpointsSummary.agentActions.upgradeDisabled',
+              { defaultMessage: 'Upgrade' },
+            )}
+          </span>
         </EuiToolTip>
       );
     },
-    description: 'Upgrade',
+    description: i18n.translate(
+      'wazuh.endpointsSummary.agentActions.upgradeDescription',
+      { defaultMessage: 'Upgrade' },
+    ),
     icon: 'package',
     type: 'icon',
     onClick: (agent: Agent) => {
@@ -119,19 +169,33 @@ export const agentsTableActions = (
   },
   {
     name: (agent: Agent) => {
-      const name = 'Scan vulnerabilities';
+      const name = i18n.translate(
+        'wazuh.endpointsSummary.agentActions.scanVulnerabilities',
+        { defaultMessage: 'Scan vulnerabilities' },
+      );
 
       if (agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED) {
         return name;
       }
 
       return (
-        <EuiToolTip content='Since the agent never connected, there is no inventory to scan'>
+        <EuiToolTip
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentActions.scanVulnerabilitiesNeverConnectedTooltip',
+            {
+              defaultMessage:
+                'Since the agent never connected, there is no inventory to scan',
+            },
+          )}
+        >
           <span>{name}</span>
         </EuiToolTip>
       );
     },
-    description: 'Scan vulnerabilities',
+    description: i18n.translate(
+      'wazuh.endpointsSummary.agentActions.scanVulnerabilitiesDescription',
+      { defaultMessage: 'Scan vulnerabilities' },
+    ),
     icon: 'search',
     type: 'icon',
     onClick: (agent: Agent) => {
@@ -143,8 +207,13 @@ export const agentsTableActions = (
       agent.status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED,
   },
   {
-    name: 'Remove',
-    description: 'Remove',
+    name: i18n.translate('wazuh.endpointsSummary.agentActions.remove', {
+      defaultMessage: 'Remove',
+    }),
+    description: i18n.translate(
+      'wazuh.endpointsSummary.agentActions.removeDescription',
+      { defaultMessage: 'Remove' },
+    ),
     icon: 'trash',
     type: 'icon',
     onClick: (agent: Agent) => {

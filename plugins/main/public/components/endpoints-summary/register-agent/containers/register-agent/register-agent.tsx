@@ -11,6 +11,7 @@ import {
   EuiToolTip,
   EuiButtonIcon,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { ErrorHandler } from '../../../../../react-services/error-management';
@@ -61,7 +62,11 @@ export const RegisterAgent = compose(
       text: endpointSummary.breadcrumbLabel,
       href: `#${endpointSummary.redirectTo()}`,
     },
-    { text: 'Deploy new agent' },
+    {
+      text: i18n.translate('wazuh.endpointsSummary.registerAgent.breadcrumb', {
+        defaultMessage: 'Deploy new agent',
+      }),
+    },
   ]),
   withUserAuthorizationPrompt([
     [{ action: 'agent:create', resource: '*:*:*' }],
@@ -111,6 +116,13 @@ export const RegisterAgent = compose(
       ErrorHandler.handleError(error, options);
     }
   };
+
+  const sslVerificationLabel = i18n.translate(
+    'wazuh.endpointsSummary.registerAgent.sslVerificationLabel',
+    {
+      defaultMessage: 'Verify the manager certificate',
+    },
+  );
 
   const initialFields: FormConfiguration = {
     operatingSystemSelection: {
@@ -185,11 +197,11 @@ export const RegisterAgent = compose(
         switch: {
           values: {
             enabled: {
-              label: 'Verify the manager certificate',
+              label: sslVerificationLabel,
               value: true,
             },
             disabled: {
-              label: 'Verify the manager certificate',
+              label: sslVerificationLabel,
               value: false,
             },
           },
@@ -300,10 +312,20 @@ export const RegisterAgent = compose(
                       <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
                         <EuiToolTip
                           position='right'
-                          content={`Back to Endpoints`}
+                          content={i18n.translate(
+                            'wazuh.endpointsSummary.registerAgent.backTooltip',
+                            {
+                              defaultMessage: 'Back to Endpoints',
+                            },
+                          )}
                         >
                           <EuiButtonIcon
-                            aria-label='Back'
+                            aria-label={i18n.translate(
+                              'wazuh.endpointsSummary.registerAgent.backAriaLabel',
+                              {
+                                defaultMessage: 'Back',
+                              },
+                            )}
                             style={{ marginTop: 4 }}
                             color='primary'
                             iconSize='l'
@@ -314,7 +336,14 @@ export const RegisterAgent = compose(
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiTitle size='s'>
-                          <h1>Deploy new agent</h1>
+                          <h1>
+                            {i18n.translate(
+                              'wazuh.endpointsSummary.registerAgent.title',
+                              {
+                                defaultMessage: 'Deploy new agent',
+                              },
+                            )}
+                          </h1>
                         </EuiTitle>
                       </EuiFlexItem>
                     </EuiFlexGroup>
