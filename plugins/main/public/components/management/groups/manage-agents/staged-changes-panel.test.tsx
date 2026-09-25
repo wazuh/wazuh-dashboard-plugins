@@ -15,7 +15,10 @@ describe('StagedChangesPanel', () => {
       />,
     );
 
-    expect(wrapper.text()).toContain('Nothing staged yet');
+    expect(wrapper.text()).toContain(
+      "Nothing staged yet. Select a row's checkbox in the table to stage it",
+    );
+    expect(wrapper.text()).not.toContain('Click a row');
     expect(
       wrapper
         .find('button[data-test-subj="discardAllButton"]')
@@ -196,6 +199,23 @@ describe('StagedChangesPanel', () => {
 
     wrapper.find('button[data-test-subj="discardAllButton"]').simulate('click');
     expect(onDiscardAll).toHaveBeenCalled();
+  });
+
+  it('uses the singular for a single staged change', () => {
+    const wrapper = mount(
+      <StagedChangesPanel
+        adds={[{ id: '014', name: 'srv-web-014.corp' }]}
+        removes={[]}
+        memberTotal={1}
+        onUnstage={jest.fn()}
+        onDiscardAll={jest.fn()}
+        onApply={jest.fn()}
+      />,
+    );
+
+    expect(
+      wrapper.find('button[data-test-subj="applyChangesButton"]').text(),
+    ).toBe('Apply 1 change');
   });
 
   it('prints large counts without digit grouping', () => {

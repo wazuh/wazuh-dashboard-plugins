@@ -144,7 +144,7 @@ export const StagedChangesPanel = ({
                     'wazuh.endpointGroups.stagedChanges.emptyState',
                     {
                       defaultMessage:
-                        'Nothing staged yet. Click a row in the table to stage it for adding or removing.',
+                        "Nothing staged yet. Select a row's checkbox in the table to stage it for adding or removing.",
                     },
                   )}
                 </EuiText>
@@ -245,7 +245,7 @@ export const StagedChangesPanel = ({
                   'wazuh.endpointGroups.stagedChanges.applyButton',
                   {
                     defaultMessage:
-                      '{total, plural, other {Apply {total} changes}}',
+                      '{total, plural, one {Apply {total} change} other {Apply {total} changes}}',
                     values: { total },
                   },
                 )}
