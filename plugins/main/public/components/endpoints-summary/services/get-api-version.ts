@@ -3,6 +3,7 @@ import {
   UILogLevel,
 } from './../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -44,8 +45,11 @@ export const getWazuhAPIVersion = async (context: string) => {
         error: error,
         //@ts-expect-error
         message: error.message || error,
-        //@ts-expect-error
-        title: `Could not get the Wazuh version: ${error.message || error}`,
+        title: i18n.translate('wazuh.endpointsSummary.apiVersion.errorTitle', {
+          defaultMessage: 'Could not get the Wazuh version: {error}',
+          //@ts-expect-error
+          values: { error: error.message || error },
+        }),
       },
     };
     getErrorOrchestrator().handleError(options);

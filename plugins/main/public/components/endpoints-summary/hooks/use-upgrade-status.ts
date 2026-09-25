@@ -4,6 +4,7 @@ import {
   AGENT_UPGRADE_STATUS_POLL_TIMEOUT_MS,
 } from '../../../../common/constants';
 import { getAgentVersion } from '../../../../common/services/wz-agent';
+import { i18n } from '@osd/i18n';
 import { getToasts } from '../../../kibana-services';
 import { getAgentsService } from '../services';
 import { upgradeStatusState } from '../services/upgrade-status-state';
@@ -76,11 +77,28 @@ export const useUpgradeStatus = (
           upgradeStatusState.removeAgents(upgradedIds);
           getToasts().add({
             color: 'success',
-            title: 'Upgrade agent',
+            title: i18n.translate(
+              'wazuh.endpointsSummary.upgradeStatus.successToastTitle',
+              { defaultMessage: 'Upgrade agent' },
+            ),
             text:
               upgradedIds.length === 1
-                ? `Agent ${upgradedIds[0]} was upgraded successfully`
-                : `${upgradedIds.length} agents were upgraded successfully`,
+                ? i18n.translate(
+                    'wazuh.endpointsSummary.upgradeStatus.successToastTextSingle',
+                    {
+                      defaultMessage:
+                        'Agent {agentId} was upgraded successfully',
+                      values: { agentId: upgradedIds[0] },
+                    },
+                  )
+                : i18n.translate(
+                    'wazuh.endpointsSummary.upgradeStatus.successToastTextMultiple',
+                    {
+                      defaultMessage:
+                        '{count} agents were upgraded successfully',
+                      values: { count: upgradedIds.length },
+                    },
+                  ),
             toastLifeTimeMs: 5000,
           });
           reloadAgentsRef.current();

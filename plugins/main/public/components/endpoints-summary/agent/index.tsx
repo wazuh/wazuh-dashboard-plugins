@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
@@ -51,23 +53,34 @@ export const AgentView = compose(
       <>
         <PromptNoSelectedAgent
           body={
-            <>
-              You need to select an agent or return to
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  className='eui-textCenter'
-                  aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
-                  onClick={() =>
-                    NavigationService.getInstance().navigate(
-                      SECTIONS.AGENTS_PREVIEW,
-                    )
-                  }
-                >
-                  Endpoint summary
-                </EuiLink>
-              </RedirectAppLinks>
-            </>
+            <FormattedMessage
+              id='wazuh.endpointsSummary.agentView.noSelectedAgentBody'
+              defaultMessage='You need to select an agent or return to{endpointSummaryLink}'
+              values={{
+                endpointSummaryLink: (
+                  <RedirectAppLinks application={getCore().application}>
+                    <EuiLink
+                      className='eui-textCenter'
+                      aria-label={i18n.translate(
+                        'wazuh.endpointsSummary.agentView.endpointSummaryLinkAriaLabel',
+                        { defaultMessage: 'go to Endpoint summary' },
+                      )}
+                      href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
+                      onClick={() =>
+                        NavigationService.getInstance().navigate(
+                          SECTIONS.AGENTS_PREVIEW,
+                        )
+                      }
+                    >
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.agentView.endpointSummaryLink',
+                        { defaultMessage: 'Endpoint summary' },
+                      )}
+                    </EuiLink>
+                  </RedirectAppLinks>
+                ),
+              }}
+            />
           }
         />
       </>

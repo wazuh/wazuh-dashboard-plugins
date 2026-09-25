@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { EnrollmentTokenSummary } from '../../../services/enrollment-tokens';
 
 /* A `max_uses` of 0 is the manager's way of saying unlimited, so it is spelled
@@ -19,4 +20,14 @@ running out, which is what this column is read for. */
 export const formatEnrollmentsUsage = (
   token: Pick<EnrollmentTokenSummary, 'uses' | 'max_uses'>,
 ): string =>
-  token.max_uses ? `${token.uses ?? 0} / ${token.max_uses}` : 'Unlimited';
+  token.max_uses
+    ? i18n.translate('wazuh.enrollmentTokens.formatEnrollmentsUsage.limited', {
+        defaultMessage: '{uses} / {maxUses}',
+        values: { uses: token.uses ?? 0, maxUses: token.max_uses },
+      })
+    : i18n.translate(
+        'wazuh.enrollmentTokens.formatEnrollmentsUsage.unlimited',
+        {
+          defaultMessage: 'Unlimited',
+        },
+      );
