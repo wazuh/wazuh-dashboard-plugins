@@ -15,15 +15,32 @@ import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
-import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
-import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
+import {
+  gdprRequirementsAliases,
+  gdprRequirementsFile,
+} from '../../../../common/compliance-requirements/gdpr-requirements';
+import {
+  hipaaRequirementsAliases,
+  hipaaRequirementsFile,
+} from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { nist171RequirementsFile } from '../../../../common/compliance-requirements/nist-171-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
 import { iso27001RequirementsFile } from '../../../../common/compliance-requirements/iso27001-requirements';
-import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
+import {
+  cmmcRequirementsAliases,
+  cmmcRequirementsFile,
+} from '../../../../common/compliance-requirements/cmmc-requirements';
 import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
+import { ComplianceRequirement } from '../../../../common/compliance-requirements/types';
+import {
+  deriveDottedParent,
+  deriveGdprArticle,
+  deriveHipaaCitation,
+  indexRequirementCodes,
+  RequirementResolver,
+} from '../../../../common/compliance-requirements/requirement-codes';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT,
@@ -56,19 +73,63 @@ import { compose } from 'redux';
 // unknown) instead of silently truncating at the top N by count.
 const COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE = 1000;
 
+// HIPAA identifiers name a standard and, under it, its implementation
+// specifications: 164.312(a)(1) is the "Access control" standard and
+// 164.312(a)(2)(i-iv) are its specifications. The standard is the unit a
+// compliance state is assessed against, so every specification groups under it.
+const HIPAA_STANDARD = /^(\d+\.\d+\([a-z]\))/;
+
+function getHipaaStandard(requirement: string) {
+  return HIPAA_STANDARD.exec(requirement)?.[1] || requirement;
+}
+
+// GDPR is not written as a control framework: its hierarchy is chapter,
+// article, paragraph and point, and the article is the unit a compliance state
+// is cited and assessed against. The chapter is the only grouping the
+// Regulation itself defines, and the article number determines it.
+const GDPR_CHAPTERS: Array<{ chapter: string; upTo: number }> = [
+  { chapter: 'I', upTo: 4 },
+  { chapter: 'II', upTo: 11 },
+  { chapter: 'III', upTo: 23 },
+  { chapter: 'IV', upTo: 43 },
+  { chapter: 'V', upTo: 50 },
+  { chapter: 'VI', upTo: 59 },
+  { chapter: 'VII', upTo: 76 },
+  { chapter: 'VIII', upTo: 84 },
+  { chapter: 'IX', upTo: 91 },
+  { chapter: 'X', upTo: 93 },
+  { chapter: 'XI', upTo: 99 },
+];
+
+function getGdprChapter(requirement: string) {
+  const article = Number(requirement.replace(/\D/g, ''));
+  const chapter = GDPR_CHAPTERS.find(({ upTo }) => article <= upTo);
+
+  return chapter && article ? chapter.chapter : requirement;
+}
+
+// A NIS2 requirement is an article of the Directive, or one of the points of
+// Article 21(2), which is the article the cybersecurity risk-management
+// measures live in. A point is assessed as part of its article.
+function getNis2Group(requirement: string) {
+  return requirement.split('.')[0];
+}
+
 function buildComplianceRequirements(
-  requirements: { [key: string]: string },
+  requirements: Record<string, ComplianceRequirement>,
   entriesBySeparator: number = 1,
   separator: string = '.',
+  getGroup?: (requirement: string) => string,
 ) {
   const complianceRequirements = {};
   const selectedRequirements = {};
 
   Object.keys(requirements).forEach(item => {
     const _splitItem = item.split(separator);
-    const currentRequirement = _splitItem
-      .slice(0, entriesBySeparator)
-      .join(separator);
+    const currentRequirement = getGroup
+      ? getGroup(item)
+      : _splitItem.slice(0, entriesBySeparator).join(separator);
+
     if (complianceRequirements[currentRequirement]) {
       complianceRequirements[currentRequirement].push(item);
     } else {
@@ -85,120 +146,214 @@ function buildComplianceRequirements(
   };
 }
 
-// Every aggregation bucket whose key isn't one of the known, documented
-// requirement codes for this framework.
-export function getOthersBuckets(
-  descriptions: { [key: string]: string },
-  buckets: Array<{ key: string; doc_count: number }>,
-) {
-  const knownCodes = new Set(Object.keys(descriptions));
-  return buckets.filter(bucket => !knownCodes.has(bucket.key));
-}
-
-// Sums the doc_count of every "Others" bucket (see getOthersBuckets).
+// Findings whose compliance value is not one of the framework's documented
+// requirements. A finding tagged with more than one unknown value is counted
+// once per value, as the tooltip of the tile says.
 export function computeOthersCount(
-  descriptions: { [key: string]: string },
-  buckets: Array<{ key: string; doc_count: number }>,
+  unknownBuckets: Array<{ key: string; doc_count: number }>,
 ) {
-  return getOthersBuckets(descriptions, buckets).reduce(
-    (sum, bucket) => sum + bucket.doc_count,
-    0,
-  );
+  return unknownBuckets.reduce((sum, bucket) => sum + bucket.doc_count, 0);
 }
 
-function buildComplianceObject({ section }) {
+interface RequirementsData {
+  // Buckets of the terms aggregation over the compliance field.
+  buckets: Array<{ key: string; doc_count: number }>;
+  // Buckets whose code no requirement of the framework claims.
+  unknownBuckets: Array<{ key: string; doc_count: number }>;
+  // Codes each requirement is written with in the findings searched.
+  codesByRequirement: Record<string, string[]>;
+  // Findings of each requirement, counted over all of its codes.
+  counts: Record<string, number>;
+}
+
+const EMPTY_REQUIREMENTS_DATA: RequirementsData = {
+  buckets: [],
+  unknownBuckets: [],
+  codesByRequirement: {},
+  counts: {},
+};
+
+interface FrameworkDefinition {
+  requirements: Record<string, ComplianceRequirement>;
+  // Grouping of the left panel: the number of segments of the identifier that
+  // name the group and their separator, or the rule that derives it.
+  entriesBySeparator?: number;
+  separator?: string;
+  getGroup?: (requirement: string) => string;
+  resolver: RequirementResolver;
+}
+
+// How each framework names its requirements, groups them, and resolves the
+// compliance tag values the Wazuh ruleset writes for them.
+const FRAMEWORKS: Record<string, FrameworkDefinition> = {
+  [WAZUH_MODULES_ID.PCI_DSS]: {
+    requirements: pciRequirementsFile,
+    entriesBySeparator: 1,
+    separator: '.',
+    resolver: {},
+  },
+  [WAZUH_MODULES_ID.GDPR]: {
+    requirements: gdprRequirementsFile,
+    getGroup: getGdprChapter,
+    resolver: {
+      aliases: gdprRequirementsAliases,
+      derive: deriveGdprArticle,
+    },
+  },
+  [WAZUH_MODULES_ID.HIPAA]: {
+    requirements: hipaaRequirementsFile,
+    getGroup: getHipaaStandard,
+    resolver: {
+      aliases: hipaaRequirementsAliases,
+      derive: deriveHipaaCitation(hipaaRequirementsFile),
+    },
+  },
+  [WAZUH_MODULES_ID.NIST_800_53]: {
+    requirements: nistRequirementsFile,
+    entriesBySeparator: 1,
+    separator: '-',
+    resolver: {},
+  },
+  [WAZUH_MODULES_ID.NIST_800_171]: {
+    requirements: nist171RequirementsFile,
+    entriesBySeparator: 2,
+    separator: '.',
+    resolver: {},
+  },
+  [WAZUH_MODULES_ID.TSC]: {
+    requirements: tscRequirementsFile,
+    entriesBySeparator: 1,
+    separator: '.',
+    resolver: {},
+  },
+  [WAZUH_MODULES_ID.ISO_27001]: {
+    requirements: iso27001RequirementsFile,
+    entriesBySeparator: 2,
+    separator: '.',
+    resolver: {},
+  },
+  [WAZUH_MODULES_ID.CMMC]: {
+    requirements: cmmcRequirementsFile,
+    entriesBySeparator: 1,
+    separator: '.',
+    resolver: { aliases: cmmcRequirementsAliases },
+  },
+  [WAZUH_MODULES_ID.NIS2]: {
+    requirements: nis2RequirementsFile,
+    getGroup: getNis2Group,
+    // The ruleset cites paragraphs and points of an article the Directive
+    // does not number as requirements of their own.
+    resolver: { derive: deriveDottedParent(nis2RequirementsFile) },
+  },
+  [WAZUH_MODULES_ID.FEDRAMP]: {
+    requirements: fedrampRequirementsFile,
+    // A FedRAMP identifier is a NIST 800-53 one, so it groups by family.
+    entriesBySeparator: 1,
+    separator: '-',
+    resolver: {},
+  },
+};
+
+export function getFrameworkDefinition(section: string) {
+  return FRAMEWORKS[section];
+}
+
+/**
+ * Filter that selects the findings of one requirement.
+ *
+ * The findings name the requirement with the codes the search returned for it,
+ * which are the identifier of the standard, the compliance tags of the Wazuh
+ * ruleset, or both. A requirement the ruleset only ever writes in its own
+ * notation is never named by the identifier of its standard, so filtering by
+ * that identifier would select nothing.
+ * @param field compliance field of the framework
+ * @param codes codes the findings carry for the requirement
+ * @param indexPatternId index pattern of the data source
+ * @returns the filters to apply, empty when there is no code
+ */
+export function buildRequirementFilter(
+  field: string,
+  codes: string[],
+  indexPatternId?: string,
+) {
+  const [code] = codes;
+
+  if (!code) {
+    return [];
+  }
+
+  if (codes.length > 1) {
+    return [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_ONE_OF,
+        field,
+        codes,
+        indexPatternId,
+        DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+      ),
+    ] as tFilter[];
+  }
+
+  return [
+    {
+      meta: {
+        index: indexPatternId,
+        negate: false,
+        disabled: false,
+        alias: null,
+        type: 'phrase',
+        key: field,
+        value: code,
+        params: {
+          query: code,
+          type: 'phrase',
+        },
+        controlledBy:
+          DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+      },
+      query: {
+        match: {
+          [field]: {
+            query: code,
+            type: 'phrase',
+          },
+        },
+      },
+      $state: {
+        store: 'appState',
+      },
+    } as tFilter,
+  ];
+}
+
+export function buildComplianceObject({ section }) {
+  const empty = {
+    complianceObject: {},
+    selectedRequirements: {},
+    descriptions: {},
+    resolver: {} as RequirementResolver,
+  };
+
   try {
-    let complianceRequirements = {};
-    let descriptions = {};
-    let selectedRequirements = {}; // all enabled by default
-    if (section === WAZUH_MODULES_ID.PCI_DSS) {
-      const r = buildComplianceRequirements(pciRequirementsFile, 1, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-    if (section === WAZUH_MODULES_ID.GDPR) {
-      const r = buildComplianceRequirements(gdprRequirementsFile, 1, '_');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
+    const definition = getFrameworkDefinition(section);
+
+    if (!definition) {
+      return empty;
     }
 
-    if (section === WAZUH_MODULES_ID.HIPAA) {
-      const r = buildComplianceRequirements(hipaaRequirementsFile, 3, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-
-    if (section === WAZUH_MODULES_ID.NIST_800_53) {
-      const r = buildComplianceRequirements(nistRequirementsFile, 1, '-');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-    if (section === WAZUH_MODULES_ID.NIST_800_171) {
-      const r = buildComplianceRequirements(nist171RequirementsFile, 2, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-    if (section === WAZUH_MODULES_ID.TSC) {
-      const r = buildComplianceRequirements(tscRequirementsFile, 1, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-
-    if (section === WAZUH_MODULES_ID.ISO_27001) {
-      const r = buildComplianceRequirements(iso27001RequirementsFile, 2, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-
-    if (section === WAZUH_MODULES_ID.CMMC) {
-      const r = buildComplianceRequirements(cmmcRequirementsFile, 1, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
-
-    if (section === WAZUH_MODULES_ID.NIS2) {
-      descriptions = nis2RequirementsFile;
-      Object.keys(nis2RequirementsFile).forEach(item => {
-        const parts = item.split('.');
-        let currentRequirement: string;
-
-        // All Art. 23 reporting obligations in one group
-        if (parts[0] === '23') {
-          currentRequirement = '23';
-        } else if (parts.length >= 3 && isNaN(Number(parts[2]))) {
-          currentRequirement = parts.slice(0, 3).join('.');
-        } else {
-          currentRequirement = parts.slice(0, 2).join('.');
-        }
-        if (complianceRequirements[currentRequirement]) {
-          complianceRequirements[currentRequirement].push(item);
-        } else {
-          selectedRequirements[currentRequirement] = true;
-          complianceRequirements[currentRequirement] = [];
-          complianceRequirements[currentRequirement].push(item);
-        }
-      }); // forEach
-    }
-
-    if (section === WAZUH_MODULES_ID.FEDRAMP) {
-      const r = buildComplianceRequirements(fedrampRequirementsFile, 2, '.');
-      complianceRequirements = r.complianceRequirements;
-      descriptions = r.descriptions;
-      selectedRequirements = r.selectedRequirements;
-    }
+    const { complianceRequirements, descriptions, selectedRequirements } =
+      buildComplianceRequirements(
+        definition.requirements,
+        definition.entriesBySeparator,
+        definition.separator,
+        definition.getGroup,
+      );
 
     return {
       complianceObject: complianceRequirements,
       selectedRequirements,
       descriptions,
+      resolver: definition.resolver,
     };
   } catch (error) {
     const options = {
@@ -220,6 +375,10 @@ function buildComplianceObject({ section }) {
       },
     };
     getErrorOrchestrator().handleError(options);
+
+    // The caller destructures the result, so an empty compliance object is
+    // returned instead of nothing when the build fails.
+    return empty;
   }
 }
 
@@ -248,44 +407,8 @@ export const ComplianceTable = compose(
     descriptions: {},
     complianceObject: {},
     selectedRequirements: {},
+    resolver: {},
   });
-
-  const getRegulatoryComplianceRequirementFilter = (
-    key: string,
-    value: string,
-  ) => {
-    if (!value) return [];
-    return [
-      {
-        meta: {
-          index: dataSource.dataSource?.indexPattern.id,
-          negate: false,
-          disabled: false,
-          alias: null,
-          type: 'phrase',
-          key: key,
-          value: value,
-          params: {
-            query: value,
-            type: 'phrase',
-          },
-          controlledBy:
-            DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
-        },
-        query: {
-          match: {
-            [key]: {
-              query: value,
-              type: 'phrase',
-            },
-          },
-        },
-        $state: {
-          store: 'appState',
-        },
-      } as tFilter,
-    ];
-  };
 
   const getRequirementsCount = async ({
     section,
@@ -306,22 +429,79 @@ export const ComplianceTable = compose(
         [WAZUH_MODULES_ID.PCI_DSS]: 'wazuh.rule.compliance.pci_dss',
         [WAZUH_MODULES_ID.TSC]: 'wazuh.rule.compliance.tsc',
       };
-      const aggs = {
-        tactics: {
-          terms: {
-            field: mapFieldAgg[section],
-            size: COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE,
-          },
-        },
+      const field = mapFieldAgg[section];
+      const { requirements, resolver } = {
+        requirements: getFrameworkDefinition(section)?.requirements || {},
+        resolver: getFrameworkDefinition(section)?.resolver || {},
       };
 
       const data = await fetchData({
-        aggs,
+        aggs: {
+          tactics: {
+            terms: {
+              field,
+              size: COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE,
+            },
+          },
+        },
         query,
         dateRange: dateRange,
       });
 
-      return data?.aggregations?.tactics?.buckets || [];
+      const buckets = data?.aggregations?.tactics?.buckets || [];
+      const { codesByRequirement, unknownBuckets } = indexRequirementCodes(
+        buckets,
+        requirements,
+        resolver,
+      );
+
+      // A finding carries every code of the requirement it meets, and a terms
+      // aggregation puts it in one bucket per code, so the buckets of a
+      // requirement written in more than one notation cannot be added up
+      // without counting that finding once per code. Those requirements are
+      // counted again, one filter each, which counts every finding once.
+      const counts = {};
+      const ambiguous = [...codesByRequirement.entries()].filter(
+        ([, codes]) => codes.length > 1,
+      );
+
+      for (const [requirement, codes] of codesByRequirement.entries()) {
+        counts[requirement] = buckets.find(
+          bucket => bucket.key === codes[0],
+        )?.doc_count;
+      }
+
+      if (ambiguous.length) {
+        const exact = await fetchData({
+          aggs: {
+            requirements: {
+              filters: {
+                filters: Object.fromEntries(
+                  ambiguous.map(([requirement, codes]) => [
+                    requirement,
+                    { terms: { [field]: codes } },
+                  ]),
+                ),
+              },
+            },
+          },
+          query,
+          dateRange: dateRange,
+        });
+
+        for (const [requirement, bucket] of Object.entries(
+          exact?.aggregations?.requirements?.buckets || {},
+        )) {
+          counts[requirement] = (bucket as { doc_count: number }).doc_count;
+        }
+      }
+
+      return {
+        buckets,
+        unknownBuckets,
+        codesByRequirement: Object.fromEntries(codesByRequirement),
+        counts,
+      };
     } catch (error) {
       const options = {
         context: 'buildComplianceObject',
@@ -341,6 +521,10 @@ export const ComplianceTable = compose(
         },
       };
       getErrorOrchestrator().handleError(options);
+
+      // The result is read by the panels, so a failed search gives them an
+      // empty one instead of nothing.
+      return EMPTY_REQUIREMENTS_DATA;
     }
   };
 
@@ -351,6 +535,23 @@ export const ComplianceTable = compose(
     { from: dateRangeFrom, to: dateRangeTo },
   ]);
 
+  // useAsyncAction types its data as null, so the search result is named here.
+  const requirementsData: RequirementsData =
+    (action.data as RequirementsData | null) || EMPTY_REQUIREMENTS_DATA;
+
+  const getRegulatoryComplianceRequirementFilter = (
+    key: string,
+    value: string,
+  ) => {
+    if (!value) return [];
+
+    return buildRequirementFilter(
+      key,
+      requirementsData.codesByRequirement[value] || [value],
+      dataSource.dataSource?.indexPattern.id,
+    );
+  };
+
   // Findings whose compliance requirement value includes at least one code
   // that isn't part of the known, documented list for this framework. Built
   // from the exact same aggregation buckets that drive `othersCount` below
@@ -360,10 +561,9 @@ export const ComplianceTable = compose(
   // contributes to `othersCount` - keeping the flyout table and the tile's
   // badge count consistent.
   const getRegulatoryComplianceOtherRequirementsFilter = (key: string) => {
-    const unknownValues = getOthersBuckets(
-      complianceData.descriptions,
-      action.data || [],
-    ).map(bucket => bucket.key);
+    const unknownValues = requirementsData.unknownBuckets.map(
+      bucket => bucket.key,
+    );
     if (!unknownValues.length) {
       return [];
     }
@@ -380,27 +580,26 @@ export const ComplianceTable = compose(
   };
 
   const othersCount = useMemo(
-    () =>
-      Object.keys(complianceData.descriptions).length
-        ? computeOthersCount(complianceData.descriptions, action.data || [])
-        : 0,
-    [action.data, complianceData.descriptions],
+    () => computeOthersCount(requirementsData.unknownBuckets),
+    [requirementsData],
   );
 
   const othersBuckets = useMemo(
-    () =>
-      Object.keys(complianceData.descriptions).length
-        ? getOthersBuckets(complianceData.descriptions, action.data || [])
-        : [],
-    [action.data, complianceData.descriptions],
+    () => requirementsData.unknownBuckets,
+    [requirementsData],
   );
 
   useEffect(() => {
-    const { descriptions, complianceObject, selectedRequirements } =
+    const { descriptions, complianceObject, selectedRequirements, resolver } =
       buildComplianceObject({
         section: props.section,
       });
-    setComplianceData({ descriptions, complianceObject, selectedRequirements });
+    setComplianceData({
+      descriptions,
+      complianceObject,
+      selectedRequirements,
+      resolver,
+    });
   }, []);
 
   useEffect(() => {
@@ -468,7 +667,7 @@ export const ComplianceTable = compose(
                             selectedRequirements,
                           }))
                         }
-                        requirementsCount={action.data || []}
+                        requirementCounts={requirementsData.counts}
                         loadingAlerts={action.running}
                         {...complianceData}
                       />
@@ -476,7 +675,8 @@ export const ComplianceTable = compose(
                     <EuiFlexItem style={{ width: '15%' }}>
                       <ComplianceSubrequirements
                         section={props.section}
-                        requirementsCount={action.data || []}
+                        requirementCounts={requirementsData.counts}
+                        requirementCodes={requirementsData.codesByRequirement}
                         loadingAlerts={action.running}
                         fetchFilters={dataSource.fetchFilters}
                         getRegulatoryComplianceRequirementFilter={
