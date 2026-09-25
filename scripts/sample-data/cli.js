@@ -256,7 +256,12 @@ function handleResult(result) {
         `cli_sample_data_insert_${date}.log`,
       );
 
-      ensureIndicesExist(docsArray, config, logPath, getDatasetTemplate);
+      try {
+        ensureIndicesExist(docsArray, config, logPath, getDatasetTemplate);
+      } catch (error) {
+        console.error(error.message);
+        process.exit(1);
+      }
 
       const batches = batch(docsArray, INSERT_BATCH_SIZE);
       const allFailed = [];
