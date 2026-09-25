@@ -8,21 +8,45 @@ import { WzButtonPermissions } from '../../common/permissions/button';
 import { TableBasicManageExpandedItems } from '../../common/tables';
 import { withErrorBoundary } from '../../common/hocs';
 
-const ExpandedTableRow = withErrorBoundary(({ item }) => {
+const PolicyValuesList = ({
+  values,
+  testSubj,
+}: {
+  values: string[];
+  testSubj: string;
+}) => (
+  <ul data-test-subj={testSubj}>
+    {values.map(value => (
+      <li key={value}>{value}</li>
+    ))}
+  </ul>
+);
+
+export const ExpandedTableRow = withErrorBoundary(({ item }) => {
   const listItems = [
     {
       title: i18n.translate(
         'wazuh.security.editRoleTable.policyDetails.actions',
         { defaultMessage: 'Actions' },
       ),
-      description: `${item.policy.actions}`,
+      description: (
+        <PolicyValuesList
+          values={item.policy.actions}
+          testSubj='policyDetailsActions'
+        />
+      ),
     },
     {
       title: i18n.translate(
         'wazuh.security.editRoleTable.policyDetails.resources',
         { defaultMessage: 'Resources' },
       ),
-      description: `${item.policy.resources}`,
+      description: (
+        <PolicyValuesList
+          values={item.policy.resources}
+          testSubj='policyDetailsResources'
+        />
+      ),
     },
     {
       title: i18n.translate(
