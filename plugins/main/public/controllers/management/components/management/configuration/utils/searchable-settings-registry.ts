@@ -3072,9 +3072,6 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       return command.tag || command.command || '';
     },
     itemFields: [
-      // NOTE: commands.js's own `disabled` entry is missing its `render:`
-      // key too (`renderValueNoThenEnabled` is never actually wired) --
-      // ported faithfully rather than "fixed" as a side effect of this change.
       {
         field: 'disabled',
         label: i18n.translate(
@@ -3083,6 +3080,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Command status',
           },
         ),
+        render: renderValueNoThenEnabled,
       },
       {
         field: 'tag',
