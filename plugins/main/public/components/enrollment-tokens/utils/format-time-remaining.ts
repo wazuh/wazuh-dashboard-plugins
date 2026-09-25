@@ -40,8 +40,6 @@ const roundToLargestUnit = (durationMs: number): RoundedDuration => {
 /* One whole message per unit and direction, so a translation can inflect the
 unit and place it around the amount as its language needs. */
 const formatTimeLeft = ({ unit, amount }: RoundedDuration): string => {
-  const values = { amount };
-
   switch (unit) {
     case 'day':
       return i18n.translate(
@@ -49,7 +47,7 @@ const formatTimeLeft = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {{amount} day left} other {{amount} days left}}',
-          values,
+          values: { amount },
         },
       );
     case 'hour':
@@ -58,7 +56,7 @@ const formatTimeLeft = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {{amount} hour left} other {{amount} hours left}}',
-          values,
+          values: { amount },
         },
       );
     case 'minute':
@@ -67,7 +65,7 @@ const formatTimeLeft = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {{amount} minute left} other {{amount} minutes left}}',
-          values,
+          values: { amount },
         },
       );
     default:
@@ -76,15 +74,13 @@ const formatTimeLeft = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {{amount} second left} other {{amount} seconds left}}',
-          values,
+          values: { amount },
         },
       );
   }
 };
 
 const formatExpiredAgo = ({ unit, amount }: RoundedDuration): string => {
-  const values = { amount };
-
   switch (unit) {
     case 'day':
       return i18n.translate(
@@ -92,7 +88,7 @@ const formatExpiredAgo = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {Expired {amount} day ago} other {Expired {amount} days ago}}',
-          values,
+          values: { amount },
         },
       );
     case 'hour':
@@ -101,7 +97,7 @@ const formatExpiredAgo = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {Expired {amount} hour ago} other {Expired {amount} hours ago}}',
-          values,
+          values: { amount },
         },
       );
     case 'minute':
@@ -110,7 +106,7 @@ const formatExpiredAgo = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {Expired {amount} minute ago} other {Expired {amount} minutes ago}}',
-          values,
+          values: { amount },
         },
       );
     default:
@@ -119,7 +115,7 @@ const formatExpiredAgo = ({ unit, amount }: RoundedDuration): string => {
         {
           defaultMessage:
             '{amount, plural, one {Expired {amount} second ago} other {Expired {amount} seconds ago}}',
-          values,
+          values: { amount },
         },
       );
   }
