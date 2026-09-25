@@ -48,7 +48,7 @@ const DEFINITIONS = {
 describe('findings-regulatory-compliance requirement-ids', () => {
   // The identifiers are read from the definition source, so a change of shape
   // there has to fail here rather than silently generate unknown values.
-  it('reads exactly the identifiers every definition file exports', () => {
+  it('reads exactly the controls every definition file exports', () => {
     const requirementIds = getRequirementIds();
 
     expect(Object.keys(requirementIds).sort()).toEqual(
@@ -56,10 +56,19 @@ describe('findings-regulatory-compliance requirement-ids', () => {
     );
 
     for (const [framework, definition] of Object.entries(DEFINITIONS)) {
-      expect(requirementIds[framework].sort()).toEqual(
+      expect(requirementIds[framework].ids.sort()).toEqual(
         Object.keys(definition).sort(),
       );
     }
+  });
+
+  it('reads the ruleset compliance tags of each control', () => {
+    const { hipaa } = getRequirementIds();
+
+    expect(hipaa.aliasesByRequirement['164.312(e)(1)'].sort()).toEqual([
+      '164.312.e',
+      '164.312.e.1',
+    ]);
   });
 });
 
@@ -72,23 +81,49 @@ describe('findings-regulatory-compliance generateDocument', () => {
     );
   });
 
-  it('only tags requirements the definitions resolve', () => {
+  // A document names a requirement either with the identifier of the standard
+  // or with a compliance tag of the ruleset, as real findings do.
+  it('only tags codes that resolve to a documented requirement', () => {
+    const { hipaa, gdpr, cmmc } = getRequirementIds();
+    const aliases = { hipaa, gdpr, cmmc };
+    const isAlias = (framework, code) =>
+      Object.values(aliases[framework]?.aliasesByRequirement || {}).some(
+        codes => codes.includes(code),
+      );
+
     for (let index = 0; index < 200; index++) {
       const { compliance } = generateDocument({ index }).wazuh.rule;
 
-      for (const [framework, requirements] of Object.entries(compliance)) {
-        expect(requirements.length).toBeGreaterThan(0);
+      for (const [framework, codes] of Object.entries(compliance)) {
+        expect(codes.length).toBeGreaterThan(0);
 
-        for (const requirement of requirements) {
-          expect(DEFINITIONS[framework][requirement]).toBeDefined();
+        for (const code of codes) {
+          expect(
+            Boolean(DEFINITIONS[framework][code]) || isAlias(framework, code),
+          ).toBe(true);
         }
       }
     }
   });
 
+  it('writes the ruleset notation as well as the standard identifiers', () => {
+    const dotted = [];
+
+    for (let index = 0; index < 200; index++) {
+      dotted.push(
+        ...generateDocument({ index }).wazuh.rule.compliance.hipaa.filter(
+          code => !code.includes('('),
+        ),
+      );
+    }
+
+    expect(dotted.length).toBeGreaterThan(0);
+  });
+
   // Generating as many documents as a framework defines has to reach every one
   // of its requirements, so a full run leaves no requirement without findings.
   it('covers every requirement of a framework over a full run', () => {
+    // NIS2 declares no alias, so its codes are the requirements themselves.
     const nis2Requirements = Object.keys(nis2RequirementsFile);
     const covered = new Set();
 

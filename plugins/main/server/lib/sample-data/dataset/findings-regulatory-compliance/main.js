@@ -14,6 +14,21 @@ const MAX_REQUIREMENTS_PER_FRAMEWORK = 3;
 const RULE_LEVELS = ['low', 'medium', 'high', 'critical'];
 
 /**
+ * Pick the code a document carries for a requirement: the identifier of the
+ * standard, or one of the Wazuh ruleset compliance tags aliased to it. The
+ * ruleset writes its own notation for some frameworks, so a dataset that only
+ * held the standard's identifiers would never exercise that path.
+ * @param {string} requirement identifier of the requirement
+ * @param {Object} aliasesByRequirement ruleset tags of each requirement
+ * @returns {string} the code to tag
+ */
+function selectCode(requirement, aliasesByRequirement) {
+  const codes = [requirement, ...(aliasesByRequirement[requirement] || [])];
+
+  return random.choice(codes);
+}
+
+/**
  * Select the requirements of one framework for a document.
  *
  * The first one walks the framework's requirements in order, so generating as
@@ -24,7 +39,7 @@ const RULE_LEVELS = ['low', 'medium', 'high', 'critical'];
  * @param {number} position ordinal of the document being generated
  * @returns {Array<string>} the requirements to tag
  */
-function selectRequirements(requirementIds, position) {
+function selectRequirements(requirementIds, position, aliasesByRequirement) {
   const selected = [requirementIds[position % requirementIds.length]];
   const additional = random.int(0, MAX_REQUIREMENTS_PER_FRAMEWORK - 1);
 
@@ -36,7 +51,9 @@ function selectRequirements(requirementIds, position) {
     }
   }
 
-  return selected;
+  return selected.map(requirement =>
+    selectCode(requirement, aliasesByRequirement),
+  );
 }
 
 /**
@@ -46,10 +63,12 @@ function selectRequirements(requirementIds, position) {
  */
 function generateCompliance(position) {
   return Object.fromEntries(
-    Object.entries(getRequirementIds()).map(([framework, requirementIds]) => [
-      framework,
-      selectRequirements(requirementIds, position),
-    ]),
+    Object.entries(getRequirementIds()).map(
+      ([framework, { ids, aliasesByRequirement }]) => [
+        framework,
+        selectRequirements(ids, position, aliasesByRequirement),
+      ],
+    ),
   );
 }
 

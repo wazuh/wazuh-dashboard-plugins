@@ -60,7 +60,7 @@ const baseProps = () => ({
   complianceObject: {},
   descriptions: {},
   selectedRequirements: {},
-  requirementsCount: [],
+  requirementCounts: {},
   loadingAlerts: false,
   othersCount: 7,
   fetchFilters: [],
@@ -203,33 +203,22 @@ describe('ComplianceSubrequirements - tile label', () => {
 });
 
 describe('ComplianceSubrequirements - requirement count', () => {
-  // The same requirement can be tagged in the standard's notation or in the
-  // ruleset's, so its tile has to add up the buckets of both.
-  it('adds the buckets of the requirement and of its aliases', () => {
+  // The count of a requirement is resolved server side over every code it is
+  // written with, so the tile shows it as given instead of adding buckets up.
+  it('shows the count resolved for the requirement', () => {
     const wrapper = shallow(
       <ComplianceSubrequirements
         {...baseProps()}
         complianceObject={{ '164.312(e)(1)': ['164.312(e)(1)'] }}
         descriptions={{ '164.312(e)(1)': { title: 'Transmission security' } }}
         selectedRequirements={{ '164.312(e)(1)': true }}
-        aliases={{
-          '164.312.e': '164.312(e)(1)',
-          '164.312.e.1': '164.312(e)(1)',
-          '164.312.b': '164.312(b)',
-        }}
-        requirementsCount={[
-          { key: '164.312(e)(1)', doc_count: 3 },
-          { key: '164.312.e', doc_count: 5 },
-          { key: '164.312.e.1', doc_count: 7 },
-          { key: '164.312.b', doc_count: 11 },
-        ]}
+        requirementCounts={{ '164.312(e)(1)': 1207 }}
       />,
     );
 
-    const quantities = getFacetButtons(wrapper).map(
-      button => button.props.quantity,
-    );
-    expect(quantities).toContain(15);
+    expect(
+      getFacetButtons(wrapper).map(button => button.props.quantity),
+    ).toContain(1207);
   });
 });
 

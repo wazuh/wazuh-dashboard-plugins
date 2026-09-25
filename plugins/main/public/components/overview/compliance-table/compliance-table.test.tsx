@@ -12,99 +12,50 @@
 /* eslint-disable camelcase */
 import {
   computeOthersCount,
-  getOthersBuckets,
   buildComplianceObject,
+  getFrameworkDefinition,
 } from './compliance-table';
 import { WAZUH_MODULES_ID } from '../../../../common/constants';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
 
-describe('getOthersBuckets', () => {
-  const descriptions = {
-    '1.1': { title: 'Known requirement 1.1' },
-    '1.2': { title: 'Known requirement 1.2' },
-  };
-
-  it('returns an empty array when every bucket key is known', () => {
-    const buckets = [
-      { key: '1.1', doc_count: 5 },
-      { key: '1.2', doc_count: 3 },
-    ];
-    expect(getOthersBuckets(descriptions, buckets)).toEqual([]);
-  });
-
-  it('returns only the buckets whose key is not known, including mixed known/unknown data', () => {
-    const buckets = [
-      { key: '1.1', doc_count: 5 },
-      { key: 'unknown-code-a', doc_count: 2 },
-      { key: 'unknown-code-b', doc_count: 7 },
-    ];
-    expect(getOthersBuckets(descriptions, buckets)).toEqual([
-      { key: 'unknown-code-a', doc_count: 2 },
-      { key: 'unknown-code-b', doc_count: 7 },
-    ]);
-  });
-
-  it('returns an empty array for an empty bucket list', () => {
-    expect(getOthersBuckets(descriptions, [])).toEqual([]);
-  });
-
-  // A finding can name a requirement with the ruleset's own compliance tag
-  // instead of the standard's identifier; that is a known code, not an "Other".
-  it('treats a bucket keyed by an alias as known', () => {
-    const buckets = [
-      { key: '1.1.legacy', doc_count: 4 },
-      { key: 'unknown-code', doc_count: 2 },
-    ];
+describe('computeOthersCount', () => {
+  it('totals the findings of the codes no requirement claims', () => {
     expect(
-      getOthersBuckets(descriptions, buckets, { '1.1.legacy': '1.1' }),
-    ).toEqual([{ key: 'unknown-code', doc_count: 2 }]);
+      computeOthersCount([
+        { key: 'unknown-a', doc_count: 2 },
+        { key: 'unknown-b', doc_count: 7 },
+      ]),
+    ).toBe(9);
+  });
+
+  it('returns 0 when every code is known', () => {
+    expect(computeOthersCount([])).toBe(0);
   });
 });
 
-describe('computeOthersCount', () => {
-  const descriptions = {
-    '1.1': { title: 'Known requirement 1.1' },
-    '1.2': { title: 'Known requirement 1.2' },
-  };
+describe('getFrameworkDefinition', () => {
+  // A FedRAMP identifier is a NIST 800-53 one (AC-2(1)) and holds no dot, so
+  // splitting it on dots gave one group per control.
+  it('groups FedRAMP by control family, like NIST 800-53', () => {
+    const fedramp = getFrameworkDefinition(WAZUH_MODULES_ID.FEDRAMP);
+    const nist = getFrameworkDefinition(WAZUH_MODULES_ID.NIST_800_53);
 
-  it('returns 0 when every bucket key is known', () => {
-    const buckets = [
-      { key: '1.1', doc_count: 5 },
-      { key: '1.2', doc_count: 3 },
-    ];
-    expect(computeOthersCount(descriptions, buckets)).toBe(0);
+    expect([fedramp.entriesBySeparator, fedramp.separator]).toEqual([1, '-']);
+    expect([nist.entriesBySeparator, nist.separator]).toEqual([1, '-']);
   });
 
-  it('sums doc_count for every bucket key that is not known', () => {
-    const buckets = [
-      { key: '1.1', doc_count: 5 },
-      { key: 'unknown-code-a', doc_count: 2 },
-      { key: 'unknown-code-b', doc_count: 7 },
-    ];
-    expect(computeOthersCount(descriptions, buckets)).toBe(9);
-  });
+  it('resolves the ruleset notation of every framework that has one', () => {
+    for (const section of [
+      WAZUH_MODULES_ID.GDPR,
+      WAZUH_MODULES_ID.HIPAA,
+      WAZUH_MODULES_ID.CMMC,
+      WAZUH_MODULES_ID.NIS2,
+    ]) {
+      const { resolver } = getFrameworkDefinition(section);
 
-  it('sums doc_count across only-unknown buckets', () => {
-    const buckets = [
-      { key: 'unknown-code-a', doc_count: 2 },
-      { key: 'unknown-code-b', doc_count: 7 },
-    ];
-    expect(computeOthersCount(descriptions, buckets)).toBe(9);
-  });
-
-  it('returns 0 for an empty bucket list', () => {
-    expect(computeOthersCount(descriptions, [])).toBe(0);
-  });
-
-  it('does not count buckets keyed by an alias', () => {
-    const buckets = [
-      { key: '1.1.legacy', doc_count: 4 },
-      { key: 'unknown-code', doc_count: 2 },
-    ];
-    expect(
-      computeOthersCount(descriptions, buckets, { '1.1.legacy': '1.1' }),
-    ).toBe(2);
+      expect(resolver.aliases || resolver.derive).toBeDefined();
+    }
   });
 });
 

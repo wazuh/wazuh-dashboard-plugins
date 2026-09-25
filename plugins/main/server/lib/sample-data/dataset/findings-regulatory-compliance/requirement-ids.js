@@ -37,13 +37,18 @@ const DEFINITION_FILES = {
 // description) and the string-valued entries of the alias map do not match.
 const REQUIREMENT_ID = /^ {2}'((?:[^'\\]|\\.)*)': \{/gm;
 
+// An alias entry of a definition file: the compliance tag value the Wazuh
+// ruleset writes, and the control it names.
+const REQUIREMENT_ALIAS = /^ {2}'((?:[^'\\]|\\.)*)': '((?:[^'\\]|\\.)*)',$/gm;
+
 let requirementIdsCache = null;
 
 /**
  * Read the requirement identifiers of one framework
  * @param {string} framework
  * @param {string} file
- * @returns {Array<string>} identifiers, in definition order, without duplicates
+ * @returns {Object} the control identifiers of the framework, and the ruleset
+ * compliance tag values aliased to them
  */
 function readRequirementIds(framework, file) {
   const filePath = path.join(DEFINITIONS_DIRECTORY, file);
@@ -55,6 +60,12 @@ function readRequirementIds(framework, file) {
       ),
     ),
   ];
+  const aliases = Object.fromEntries(
+    [...content.matchAll(REQUIREMENT_ALIAS)].map(([, alias, id]) => [
+      alias.replace(/\\(.)/g, '$1'),
+      id.replace(/\\(.)/g, '$1'),
+    ]),
+  );
 
   if (!ids.length) {
     throw new Error(
@@ -63,12 +74,19 @@ function readRequirementIds(framework, file) {
     );
   }
 
-  return ids;
+  const aliasesByRequirement = {};
+
+  for (const [alias, id] of Object.entries(aliases)) {
+    aliasesByRequirement[id] = [...(aliasesByRequirement[id] || []), alias];
+  }
+
+  return { ids, aliasesByRequirement };
 }
 
 /**
- * Get the requirement identifiers of every framework, read once and cached
- * @returns {Object} identifiers by compliance field
+ * Get the requirement identifiers and aliases of every framework, read once
+ * and cached
+ * @returns {Object} {ids, aliases} by compliance field
  */
 function getRequirementIds() {
   if (!requirementIdsCache) {

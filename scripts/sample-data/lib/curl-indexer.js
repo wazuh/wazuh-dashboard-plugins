@@ -236,8 +236,14 @@ function ensureIndicesExist(entries, config, logPath, getTemplate) {
         );
       }
     } else {
-      console.error(
-        `No template.json found for dataset '${entry.dataset}'. Index ${idx} will be created by the indexer with dynamic mapping.`,
+      // Same reason as a failed creation: an index the indexer builds by
+      // dynamic mapping turns the compliance and other keyword fields into
+      // text, and the dashboard cannot aggregate them.
+      throw new Error(
+        `No template.json found for dataset '${entry.dataset}'. Nothing was ` +
+          `inserted: index ${idx} would be created by dynamic mapping, which ` +
+          'does not work in the dashboard. Run yarn generate:indexer-resources ' +
+          'to fetch the dataset templates.',
       );
     }
   }
