@@ -13,6 +13,7 @@
 import {
   computeOthersCount,
   buildComplianceObject,
+  buildRequirementFilter,
   getFrameworkDefinition,
 } from './compliance-table';
 import { WAZUH_MODULES_ID } from '../../../../common/constants';
@@ -107,5 +108,46 @@ describe('buildComplianceObject grouping', () => {
     expect(Object.values(complianceObject).flat().sort()).toEqual(
       Object.keys(hipaaRequirementsFile).sort(),
     );
+  });
+});
+
+describe('buildRequirementFilter', () => {
+  const field = 'wazuh.rule.compliance.hipaa';
+
+  // The ruleset writes HIPAA in its own notation, so the findings of a
+  // requirement can carry no occurrence of the identifier of the standard.
+  // Filtering by that identifier would open a view with no findings at all,
+  // while the tile counts the ones carrying the ruleset code.
+  it('filters by the code the findings carry, not by the requirement', () => {
+    const [filter] = buildRequirementFilter(
+      field,
+      ['164.308.a.1.ii.D'],
+      'index-pattern',
+    );
+
+    expect(filter.query).toEqual({
+      match: {
+        [field]: { query: '164.308.a.1.ii.D', type: 'phrase' },
+      },
+    });
+    expect(filter.meta.value).toBe('164.308.a.1.ii.D');
+  });
+
+  it('accepts every code when a requirement is written in more than one', () => {
+    const [filter] = buildRequirementFilter(
+      field,
+      ['164.312(e)(1)', '164.312.e', '164.312.e.1'],
+      'index-pattern',
+    );
+
+    expect(filter.meta.params).toEqual([
+      '164.312(e)(1)',
+      '164.312.e',
+      '164.312.e.1',
+    ]);
+  });
+
+  it('returns no filter when the requirement has no code', () => {
+    expect(buildRequirementFilter(field, [], 'index-pattern')).toEqual([]);
   });
 });

@@ -161,6 +161,42 @@ describe('ComplianceSubrequirements - Show in dashboard / Inspect in findings', 
   });
 });
 
+describe('ComplianceSubrequirements - Inspect links with ruleset codes', () => {
+  // Same reason as the flyout: the findings of a HIPAA requirement can carry
+  // only the compliance tag of the ruleset, never the CFR citation.
+  it('filters by the code the findings carry', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...baseProps()}
+        section='hipaa'
+        complianceObject={{ '164.308(a)': ['164.308(a)(1)(ii)(D)'] }}
+        descriptions={{
+          '164.308(a)(1)(ii)(D)': {
+            title: 'Information system activity review',
+          },
+        }}
+        selectedRequirements={{ '164.308(a)': true }}
+        requirementCounts={{ '164.308(a)(1)(ii)(D)': 31 }}
+        requirementCodes={{ '164.308(a)(1)(ii)(D)': ['164.308.a.1.ii.D'] }}
+      />,
+    );
+
+    wrapper
+      .instance()
+      .openDiscover({ stopPropagation: jest.fn() }, '164.308(a)(1)(ii)(D)');
+
+    expect(mockAddFilters).toHaveBeenCalledWith([
+      expect.objectContaining({
+        query: {
+          match_phrase: {
+            'wazuh.rule.compliance.hipaa': '164.308.a.1.ii.D',
+          },
+        },
+      }),
+    ]);
+  });
+});
+
 describe('ComplianceSubrequirements - tile label', () => {
   const propsWith = descriptions => ({
     ...baseProps(),

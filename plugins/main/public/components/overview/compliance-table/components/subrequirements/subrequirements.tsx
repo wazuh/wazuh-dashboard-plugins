@@ -92,6 +92,7 @@ export class ComplianceSubrequirements extends Component {
     const values = this.props.requirementCodes?.[filter.value] || [
       filter.value,
     ];
+    const [value] = values;
     const newFilter =
       values.length > 1
         ? PatternDataSourceFilterManager.createFilter(
@@ -104,12 +105,12 @@ export class ComplianceSubrequirements extends Component {
             meta: {
               disabled: false,
               key: filter.key,
-              params: { query: filter.value },
+              params: { query: value },
               type: 'phrase',
               negate: filter.negate || false,
               index: this.props.indexPatternId,
             },
-            query: { match_phrase: { [filter.key]: filter.value } },
+            query: { match_phrase: { [filter.key]: value } },
             $state: { store: 'appState' },
           };
     filterManager.addFilters([newFilter]);

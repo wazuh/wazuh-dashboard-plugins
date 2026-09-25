@@ -258,6 +258,74 @@ export function getFrameworkDefinition(section: string) {
   return FRAMEWORKS[section];
 }
 
+/**
+ * Filter that selects the findings of one requirement.
+ *
+ * The findings name the requirement with the codes the search returned for it,
+ * which are the identifier of the standard, the compliance tags of the Wazuh
+ * ruleset, or both. A requirement the ruleset only ever writes in its own
+ * notation is never named by the identifier of its standard, so filtering by
+ * that identifier would select nothing.
+ * @param field compliance field of the framework
+ * @param codes codes the findings carry for the requirement
+ * @param indexPatternId index pattern of the data source
+ * @returns the filters to apply, empty when there is no code
+ */
+export function buildRequirementFilter(
+  field: string,
+  codes: string[],
+  indexPatternId?: string,
+) {
+  const [code] = codes;
+
+  if (!code) {
+    return [];
+  }
+
+  if (codes.length > 1) {
+    return [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS_ONE_OF,
+        field,
+        codes,
+        indexPatternId,
+        DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+      ),
+    ] as tFilter[];
+  }
+
+  return [
+    {
+      meta: {
+        index: indexPatternId,
+        negate: false,
+        disabled: false,
+        alias: null,
+        type: 'phrase',
+        key: field,
+        value: code,
+        params: {
+          query: code,
+          type: 'phrase',
+        },
+        controlledBy:
+          DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+      },
+      query: {
+        match: {
+          [field]: {
+            query: code,
+            type: 'phrase',
+          },
+        },
+      },
+      $state: {
+        store: 'appState',
+      },
+    } as tFilter,
+  ];
+}
+
 export function buildComplianceObject({ section }) {
   const empty = {
     complianceObject: {},
@@ -477,52 +545,11 @@ export const ComplianceTable = compose(
   ) => {
     if (!value) return [];
 
-    // A finding can name the requirement in the standard's notation or in the
-    // ruleset's, so the filter has to accept every code of the requirement.
-    const codes = requirementsData.codesByRequirement[value] || [value];
-
-    if (codes.length > 1) {
-      return [
-        PatternDataSourceFilterManager.createFilter(
-          FILTER_OPERATOR.IS_ONE_OF,
-          key,
-          codes,
-          dataSource.dataSource?.indexPattern.id,
-          DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
-        ),
-      ] as tFilter[];
-    }
-
-    return [
-      {
-        meta: {
-          index: dataSource.dataSource?.indexPattern.id,
-          negate: false,
-          disabled: false,
-          alias: null,
-          type: 'phrase',
-          key: key,
-          value: value,
-          params: {
-            query: value,
-            type: 'phrase',
-          },
-          controlledBy:
-            DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
-        },
-        query: {
-          match: {
-            [key]: {
-              query: value,
-              type: 'phrase',
-            },
-          },
-        },
-        $state: {
-          store: 'appState',
-        },
-      } as tFilter,
-    ];
+    return buildRequirementFilter(
+      key,
+      requirementsData.codesByRequirement[value] || [value],
+      dataSource.dataSource?.indexPattern.id,
+    );
   };
 
   // Findings whose compliance requirement value includes at least one code
