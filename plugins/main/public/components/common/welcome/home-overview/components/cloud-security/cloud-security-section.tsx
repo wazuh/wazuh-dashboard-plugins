@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { SectionHeader } from '../common';
 import {
@@ -14,8 +15,16 @@ const CloudSecuritySectionComponent: React.FC<CloudSecuritySectionProps> = ({
 }) => (
   <div>
     <SectionHeader
-      title='Cloud security'
-      description='Reach your cloud and SaaS integrations from the Overview.'
+      title={i18n.translate('wazuh.common.homeOverviewCloudSecurity.title', {
+        defaultMessage: 'Cloud security',
+      })}
+      description={i18n.translate(
+        'wazuh.common.homeOverviewCloudSecurity.description',
+        {
+          defaultMessage:
+            'Reach your cloud and SaaS integrations from the Overview.',
+        },
+      )}
     />
     <CloudSecurityCards findings={findings} />
   </div>

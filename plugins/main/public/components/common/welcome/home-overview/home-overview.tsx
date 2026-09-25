@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiPage, EuiPageBody, EuiSpacer } from '@elastic/eui';
 import { SectionHeader } from './components/common';
 import { QuickAccessMenu } from './components/quick-access';
@@ -37,8 +38,13 @@ const HomeOverviewBody: React.FC = () => {
   return (
     <>
       <SectionHeader
-        title='Overview'
-        description='Fleet health, findings, and MITRE ATT&CK activity across your environment.'
+        title={i18n.translate('wazuh.common.homeOverview.title', {
+          defaultMessage: 'Overview',
+        })}
+        description={i18n.translate('wazuh.common.homeOverview.description', {
+          defaultMessage:
+            'Fleet health, findings, and MITRE ATT&CK activity across your environment.',
+        })}
         actions={<QuickAccessMenu />}
       />
       <OverviewSection findings={findings} />

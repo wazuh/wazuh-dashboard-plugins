@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { SectionHeader, WidgetGroup } from '../common';
@@ -46,18 +47,36 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   return (
     <div ref={sectionRef}>
       <SectionHeader
-        title='Threat intelligence feed'
-        description='What the platform is detecting with — detection content and knowledge base.'
+        title={i18n.translate(
+          'wazuh.common.homeOverviewThreatIntelFeed.title',
+          { defaultMessage: 'Threat intelligence feed' },
+        )}
+        description={i18n.translate(
+          'wazuh.common.homeOverviewThreatIntelFeed.description',
+          {
+            defaultMessage:
+              'What the platform is detecting with — detection content and knowledge base.',
+          },
+        )}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem grow={3}>
           <WidgetGroup
             status='available'
-            title='Ruleset management'
-            caption='Current state'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewThreatIntelFeed.rulesetManagementTitle',
+              { defaultMessage: 'Ruleset management' },
+            )}
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionCurrentState',
+              { defaultMessage: 'Current state' },
+            )}
             titleLink={{
               href: getIntegrationsUrl(),
-              destination: 'Ruleset Management',
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewThreatIntelFeed.rulesetManagementDestination',
+                { defaultMessage: 'Ruleset Management' },
+              ),
             }}
             centerBody
             data-test-subj='home-overview-security-analytics'
@@ -75,8 +94,14 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
         <EuiFlexItem grow={2}>
           <WidgetGroup
             status='available'
-            title='Threat catalog'
-            caption='Current state'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewThreatIntelFeed.threatCatalogTitle',
+              { defaultMessage: 'Threat catalog' },
+            )}
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionCurrentState',
+              { defaultMessage: 'Current state' },
+            )}
             data-test-subj='home-overview-threat-catalog'
           >
             <ThreatCatalogTiles iocs={iocs} />

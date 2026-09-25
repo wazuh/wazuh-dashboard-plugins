@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   EuiFieldSearch,
@@ -205,7 +206,12 @@ export const MultiSelectInput: React.FC<MultiSelectProps> = ({
                   isInvalid={isInvalid}
                   isClearable={true}
                   append={
-                    <EuiToolTip content='Add filter'>
+                    <EuiToolTip
+                      content={i18n.translate(
+                        'wazuh.common.customSearchBar.addFilterTooltip',
+                        { defaultMessage: 'Add filter' },
+                      )}
+                    >
                       <EuiButtonIcon
                         iconType='plusInCircle'
                         color='primary'

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useMemo, useState } from 'react';
 import { EuiFlexItem, EuiCodeBlock, EuiTabbedContent } from '@elastic/eui';
 import {
@@ -80,7 +81,9 @@ export const DocumentViewTableAndJson = ({
     const baseTabs: DocumentViewTableAndJsonPropsAdditionalTabsObject = [
       {
         id: 'table',
-        name: 'Table',
+        name: i18n.translate('wazuh.common.wazuhDiscover.tableTab', {
+          defaultMessage: 'Table',
+        }),
         content: (
           <DocViewer
             {...docViewerProps}
@@ -94,10 +97,15 @@ export const DocumentViewTableAndJson = ({
       },
       {
         id: 'json',
-        name: 'JSON',
+        name: i18n.translate('wazuh.common.wazuhDiscover.jsonTab', {
+          defaultMessage: 'JSON',
+        }),
         content: (
           <EuiCodeBlock
-            aria-label={'Document details'}
+            aria-label={i18n.translate(
+              'wazuh.common.wazuhDiscover.jsonCodeBlockAriaLabel',
+              { defaultMessage: 'Document details' },
+            )}
             language='json'
             isCopyable
             paddingSize='s'

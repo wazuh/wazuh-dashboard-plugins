@@ -1,9 +1,12 @@
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
+import { i18n } from '@osd/i18n';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 
 const getVisStateEventsCountEvolution = (indexPatternId: string) => ({
   id: 'App-Agents-Welcome-Events-Evolution',
-  title: 'Events count evolution',
+  title: i18n.translate('wazuh.common.agentWelcomeEventsCount.title', {
+    defaultMessage: 'Events count evolution',
+  }),
   type: 'line',
   params: {
     type: 'line',
@@ -30,7 +33,11 @@ const getVisStateEventsCountEvolution = (indexPatternId: string) => ({
         style: {},
         scale: { type: 'linear', mode: 'normal' },
         labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-        title: { text: 'Count' },
+        title: {
+          text: i18n.translate('wazuh.common.agentWelcomeEventsCount.count', {
+            defaultMessage: 'Count',
+          }),
+        },
       },
     ],
     seriesParams: [
@@ -38,7 +45,12 @@ const getVisStateEventsCountEvolution = (indexPatternId: string) => ({
         show: true,
         type: 'line',
         mode: 'normal',
-        data: { label: 'Count', id: '1' },
+        data: {
+          label: i18n.translate('wazuh.common.agentWelcomeEventsCount.count', {
+            defaultMessage: 'Count',
+          }),
+          id: '1',
+        },
         valueAxis: 'ValueAxis-1',
         drawLinesBetweenPoints: true,
         lineWidth: 2,
@@ -66,7 +78,9 @@ const getVisStateEventsCountEvolution = (indexPatternId: string) => ({
           accessor: 0,
           format: { id: 'number' },
           params: {},
-          label: 'Count',
+          label: i18n.translate('wazuh.common.agentWelcomeEventsCount.count', {
+            defaultMessage: 'Count',
+          }),
           aggType: 'count',
         },
       ],

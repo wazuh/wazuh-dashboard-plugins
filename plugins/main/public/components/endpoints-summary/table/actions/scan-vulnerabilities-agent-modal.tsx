@@ -15,6 +15,7 @@ import {
   EuiCallOut,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -35,10 +36,23 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
   ({ agent, onClose, reloadAgents }: ScanVulnerabilitiesAgentModalProps) => {
     const getScanErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate(
+          'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.unknownError',
+          { defaultMessage: 'Unknown error' },
+        );
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to scan the vulnerabilities of this agent. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.noPermissionsError',
+          {
+            defaultMessage:
+              'No permissions to scan the vulnerabilities of this agent. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -56,8 +70,18 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
         if (affectedItems?.includes(agent.id)) {
           getToasts().add({
             color: 'success',
-            title: 'Scan vulnerabilities',
-            text: `Scan requested for agent: ${agent.name} (${agent.id})`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.successToastTitle',
+              { defaultMessage: 'Scan vulnerabilities' },
+            ),
+            text: i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.successToastText',
+              {
+                defaultMessage:
+                  'Scan requested for agent: {agentName} ({agentId})',
+                values: { agentName: agent.name, agentId: agent.id },
+              },
+            ),
             toastLifeTimeMs: 3000,
           });
         } else {
@@ -65,7 +89,10 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
           const errorMessage =
             failedItem?.error?.message ||
             response?.data?.message ||
-            'The scan was not queued';
+            i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.notQueuedError',
+              { defaultMessage: 'The scan was not queued' },
+            );
 
           throw new Error(errorMessage);
         }
@@ -81,7 +108,10 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not request the vulnerabilities scan`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.errorTitle',
+              { defaultMessage: 'Could not request the vulnerabilities scan' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -98,7 +128,12 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Scan vulnerabilities</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.title',
+              { defaultMessage: 'Scan vulnerabilities' },
+            )}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
@@ -107,7 +142,12 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
               <EuiFlexGroup gutterSize='m'>
                 <EuiFlexItem>
                   <EuiDescriptionList compressed>
-                    <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                    <EuiDescriptionListTitle>
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.agentIdLabel',
+                        { defaultMessage: 'Agent ID' },
+                      )}
+                    </EuiDescriptionListTitle>
                     <EuiDescriptionListDescription>
                       {agent.id}
                     </EuiDescriptionListDescription>
@@ -116,7 +156,10 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
                 <EuiFlexItem>
                   <EuiDescriptionList compressed>
                     <EuiDescriptionListTitle>
-                      Agent name
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.agentNameLabel',
+                        { defaultMessage: 'Agent name' },
+                      )}
                     </EuiDescriptionListTitle>
                     <EuiDescriptionListDescription>
                       {agent.name}
@@ -129,23 +172,40 @@ export const ScanVulnerabilitiesAgentModal = compose(withErrorBoundary)(
           <EuiSpacer />
           <EuiCallOut
             iconType='iInCircle'
-            title='An on-demand vulnerability scan will be requested for this agent'
+            title={i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.calloutTitle',
+              {
+                defaultMessage:
+                  'An on-demand vulnerability scan will be requested for this agent',
+              },
+            )}
           >
-            The scan uses the inventory already synchronized to the indexer, so
-            it does not require the agent to be active. The request can be
-            rejected if the vulnerability detection module is not ready or its
-            queue is full.
+            {i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.calloutDescription',
+              {
+                defaultMessage:
+                  'The scan uses the inventory already synchronized to the indexer, so it does not require the agent to be active. The request can be rejected if the vulnerability detection module is not ready or its queue is full.',
+              },
+            )}
           </EuiCallOut>
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.cancelButton',
+              { defaultMessage: 'Cancel' },
+            )}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={() => action.run(agent)}
             fill
             isLoading={action.running}
           >
-            Scan
+            {i18n.translate(
+              'wazuh.endpointsSummary.scanVulnerabilitiesAgentModal.scanButton',
+              { defaultMessage: 'Scan' },
+            )}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { EuiButtonEmpty, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { UseFormReturn } from '../../../../common/form/types';
 
 type FormField = UseFormReturn['fields'][string] | undefined;
@@ -50,7 +51,13 @@ const AdvancedOptions = ({ fields, children }: AdvancedOptionsProps) => {
         aria-expanded={isOpen}
         onClick={() => setIsOpen(open => !open)}
       >
-        {isOpen ? 'Hide advanced options' : 'View advanced options'}
+        {isOpen
+          ? i18n.translate('wazuh.endpointsSummary.advancedOptions.hide', {
+              defaultMessage: 'Hide advanced options',
+            })
+          : i18n.translate('wazuh.endpointsSummary.advancedOptions.view', {
+              defaultMessage: 'View advanced options',
+            })}
       </EuiButtonEmpty>
       {isOpen ? (
         <>

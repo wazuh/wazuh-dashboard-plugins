@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useEffect, useMemo, useState } from 'react';
 import { IntlProvider } from 'react-intl';
 import {
@@ -139,7 +140,10 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
         } catch (error) {
           const searchError = ErrorFactory.create(HttpError, {
             error,
-            message: 'Error downloading csv report',
+            message: i18n.translate(
+              'wazuh.common.wazuhDiscover.exportCsvError',
+              { defaultMessage: 'Error downloading csv report' },
+            ),
           });
           ErrorHandler.handleError(searchError);
         } finally {
@@ -162,12 +166,22 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
                     results?.hits?.total &&
                     results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                          ariaLabel: 'Info',
-                          content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits.`,
+                          ariaLabel: i18n.translate(
+                            'wazuh.common.wazuhDiscover.hitsLimitInfoAriaLabel',
+                            { defaultMessage: 'Info' },
+                          ),
+                          content: i18n.translate(
+                            'wazuh.common.wazuhDiscover.hitsLimitShownTooltip',
+                            {
+                              defaultMessage:
+                                'The query results has exceeded the limit of {maxEntries} hits. To provide a better experience the table only shows the first {maxEntries} hits.',
+                              values: {
+                                maxEntries: formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                ),
+                              },
+                            },
+                          ),
                           iconType: 'iInCircle',
                           position: 'top',
                         }
@@ -186,7 +200,10 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
                   className='euiDataGrid__controlBtn'
                   onClick={onClickExportResults}
                 >
-                  Export Formatted
+                  {i18n.translate(
+                    'wazuh.common.wazuhDiscover.exportFormattedButton',
+                    { defaultMessage: 'Export Formatted' },
+                  )}
                 </EuiButtonEmpty>
 
                 <RestoreStateColumnsButton
@@ -324,7 +341,10 @@ export const useTableDataGridFetch = ({
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect details';
+    const inspectHintMsg = i18n.translate(
+      'wazuh.common.wazuhDiscover.inspectDetails',
+      { defaultMessage: 'Inspect details' },
+    );
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -372,7 +392,9 @@ export const useTableDataGridFetch = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
+            defaultMessage: 'Error fetching data',
+          }),
         });
         ErrorHandler.handleError(searchError);
       });
@@ -461,7 +483,10 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     searchBarProps,
     isDataSourceLoading,
     tableDefaultColumns,
-    inspectDetailsTitle = 'Details',
+    inspectDetailsTitle = i18n.translate(
+      'wazuh.common.wazuhDiscover.detailsTitle',
+      { defaultMessage: 'Details' },
+    ),
     additionalDocumentDetailsTabs = [],
     displayOnlyNoResultsCalloutOnNoResults,
     title,
@@ -554,7 +579,10 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
     fingerprint,
     autoRefreshFingerprint,
     tableDefaultColumns,
-    inspectDetailsTitle = 'Details',
+    inspectDetailsTitle = i18n.translate(
+      'wazuh.common.wazuhDiscover.detailsTitle',
+      { defaultMessage: 'Details' },
+    ),
     additionalDocumentDetailsTabs = [],
     displayOnlyNoResultsCalloutOnNoResults,
     title,
@@ -643,7 +671,9 @@ export const DocumentDetails = withWrapComponent(({ children }) => (
 );
 
 export const FlyoutDocumentDetails = ({
-  title = 'Details',
+  title = i18n.translate('wazuh.common.wazuhDiscover.detailsTitle', {
+    defaultMessage: 'Details',
+  }),
   children,
   onClose,
 }) => (

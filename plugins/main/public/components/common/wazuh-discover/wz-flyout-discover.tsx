@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   EuiFlexGroup,
@@ -151,10 +152,22 @@ const WazuhFlyoutDiscoverComponentRender = compose(
                     results?.hits?.total &&
                     results?.hits?.total > MAX_ENTRIES_PER_QUERY
                       ? {
-                          ariaLabel: 'Info',
-                          content: `The query results exceeded the limit of ${formatNumWithCommas(
-                            MAX_ENTRIES_PER_QUERY,
-                          )} hits. Please refine your search.`,
+                          ariaLabel: i18n.translate(
+                            'wazuh.common.wazuhDiscover.hitsLimitInfoAriaLabel',
+                            { defaultMessage: 'Info' },
+                          ),
+                          content: i18n.translate(
+                            'wazuh.common.wazuhDiscover.hitsLimitRefineTooltip',
+                            {
+                              defaultMessage:
+                                'The query results exceeded the limit of {maxEntries} hits. Please refine your search.',
+                              values: {
+                                maxEntries: formatNumWithCommas(
+                                  MAX_ENTRIES_PER_QUERY,
+                                ),
+                              },
+                            },
+                          ),
                           iconType: 'iInCircle',
                           position: 'top',
                         }
@@ -311,7 +324,9 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
+            defaultMessage: 'Error fetching data',
+          }),
         });
         ErrorHandler.handleError(searchError);
       });

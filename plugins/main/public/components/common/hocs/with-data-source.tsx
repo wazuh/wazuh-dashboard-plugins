@@ -1,5 +1,7 @@
 import React, { useCallback } from 'react';
 import { EuiEmptyPrompt, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { withGuard } from './withGuard';
 import { compose } from 'redux';
 import { get } from 'lodash';
@@ -35,16 +37,30 @@ export const PromptErrorDataSourceServerAPIContextFilter = ({
       body={
         isCCS ? (
           <p>
-            Filter could not be created because no server API is selected. Make
-            sure a server API is available and choose one in the selector.
+            {i18n.translate(
+              'wazuh.common.withDataSource.serverApiContextFilterError.ccsBody',
+              {
+                defaultMessage:
+                  'Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.',
+              },
+            )}
           </p>
         ) : (
           <p>
-            Filter could not be created because no server API is selected. Go to{' '}
-            <EuiLink href={SERVER_APIS_APP_PATH}>
-              Dashboard Management &gt; Server API
-            </EuiLink>{' '}
-            to verify the connection.
+            <FormattedMessage
+              id='wazuh.common.withDataSource.serverApiContextFilterError.body'
+              defaultMessage='Filter could not be created because no server API is selected. Go to {serverApiLink} to verify the connection.'
+              values={{
+                serverApiLink: (
+                  <EuiLink href={SERVER_APIS_APP_PATH}>
+                    {i18n.translate(
+                      'wazuh.common.withDataSource.serverApiContextFilterError.serverApiLink',
+                      { defaultMessage: 'Dashboard Management > Server API' },
+                    )}
+                  </EuiLink>
+                ),
+              }}
+            />
           </p>
         )
       }
@@ -62,9 +78,13 @@ export const PromptErrorDataSourceAlertsSelect = ({
       iconType='alert'
       body={
         <p>
-          No index pattern selected for alerts. Make sure a compatible index
-          pattern exists and select it. This wasn’t applied correctly or needs
-          to be re‑selected.
+          {i18n.translate(
+            'wazuh.common.withDataSource.alertsSelectError.body',
+            {
+              defaultMessage:
+                'No index pattern selected for alerts. Make sure a compatible index pattern exists and select it. This wasn’t applied correctly or needs to be re‑selected.',
+            },
+          )}
         </p>
       }
     />
@@ -76,18 +96,27 @@ export const PromptErrorDataSourceNotFound = ({
 }: {
   error: ErrorDataSourceNotFound;
 }) => {
-  const indexPatternSelectionMessage = [
-    error.details.indexPatternId ? `id: ${error.details.indexPatternId}` : null,
-    error.details.indexPatternTitle
-      ? `title: ${error.details.indexPatternTitle}`
-      : null,
-  ]
-    .filter(Boolean)
-    .join(' or ');
+  const { indexPatternId, indexPatternTitle } = error.details;
+  let selection = 'none';
+  if (indexPatternId && indexPatternTitle) {
+    selection = 'idAndTitle';
+  } else if (indexPatternId) {
+    selection = 'id';
+  } else if (indexPatternTitle) {
+    selection = 'title';
+  }
+  const notFoundMessage = i18n.translate(
+    'wazuh.common.withDataSource.indexPatternNotFoundError.body',
+    {
+      defaultMessage:
+        '{selection, select, idAndTitle {Index pattern [id: {id} or title: {title}] not found} id {Index pattern [id: {id}] not found} title {Index pattern [title: {title}] not found} other {Index pattern [] not found}}',
+      values: { selection, id: indexPatternId, title: indexPatternTitle },
+    },
+  );
   return (
     <EuiEmptyPrompt
       iconType='alert'
-      body={<p>Index pattern [{indexPatternSelectionMessage}] not found</p>}
+      body={<p>{notFoundMessage}</p>}
       actions={
         <RedirectAppLinks application={getCore().application}>
           <EuiLink
@@ -98,7 +127,10 @@ export const PromptErrorDataSourceNotFound = ({
               path: '/opensearch-dashboards/indexPatterns',
             })}
           >
-            Manage index patterns
+            {i18n.translate(
+              'wazuh.common.withDataSource.indexPatternNotFoundError.manageIndexPatternsLink',
+              { defaultMessage: 'Manage index patterns' },
+            )}
           </EuiLink>
         </RedirectAppLinks>
       }
@@ -133,7 +165,16 @@ export const PromptErrorInitializatingDataSource = ({
   return (
     <EuiEmptyPrompt
       iconType='alert'
-      title={<h2>Something was wrong</h2>}
+      title={
+        <h2>
+          {i18n.translate(
+            'wazuh.common.withDataSource.initializationError.title',
+            {
+              defaultMessage: 'Something was wrong',
+            },
+          )}
+        </h2>
+      }
       body={<>{typeof body === 'string' && <p>{body}</p>}</>}
     />
   );

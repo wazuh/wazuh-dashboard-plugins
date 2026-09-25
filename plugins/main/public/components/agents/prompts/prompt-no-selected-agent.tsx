@@ -11,6 +11,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import { PromptSelectAgent } from './';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 
@@ -19,5 +20,13 @@ export const PromptNoSelectedAgent = ({ body }) => {
     const pinnedAgentManager = new PinnedAgentManager();
     pinnedAgentManager.syncPinnedAgentSources();
   }, []);
-  return <PromptSelectAgent body={body} title="No agent is selected" />;
+  return (
+    <PromptSelectAgent
+      body={body}
+      title={i18n.translate(
+        'wazuh.endpointsSummary.promptNoSelectedAgent.title',
+        { defaultMessage: 'No agent is selected' },
+      )}
+    />
+  );
 };

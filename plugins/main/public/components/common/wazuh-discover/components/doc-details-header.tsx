@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiTitle, EuiLink } from '@elastic/eui';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -7,7 +8,9 @@ import NavigationService from '../../../../react-services/navigation-service';
 const DocDetailsHeader = ({
   doc,
   indexPattern,
-  title = 'Document Details',
+  title = i18n.translate('wazuh.common.wazuhDiscover.documentDetailsTitle', {
+    defaultMessage: 'Document Details',
+  }),
 }) => {
   return (
     <EuiFlexGroup>
@@ -28,7 +31,10 @@ const DocDetailsHeader = ({
                 rel='noopener noreferrer'
                 external
               >
-                View surrounding documents
+                {i18n.translate(
+                  'wazuh.common.wazuhDiscover.viewSurroundingDocumentsLink',
+                  { defaultMessage: 'View surrounding documents' },
+                )}
               </EuiLink>
             </RedirectAppLinks>
           </EuiFlexItem>
@@ -42,7 +48,10 @@ const DocDetailsHeader = ({
                 rel='noopener noreferrer'
                 external
               >
-                View single document
+                {i18n.translate(
+                  'wazuh.common.wazuhDiscover.viewSingleDocumentLink',
+                  { defaultMessage: 'View single document' },
+                )}
               </EuiLink>
             </RedirectAppLinks>
           </EuiFlexItem>

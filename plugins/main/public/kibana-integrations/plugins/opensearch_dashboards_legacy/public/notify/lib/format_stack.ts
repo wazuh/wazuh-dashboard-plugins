@@ -33,7 +33,7 @@ import { i18n } from '@osd/i18n';
 // browsers format Error.stack differently; always include message
 export function formatStack(err: Record<string, any>) {
   if (err.stack && err.stack.indexOf(err.message) === -1) {
-    return i18n.translate('opensearch_dashboards_legacy.notify.toaster.errorMessage', {
+    return i18n.translate('wazuh.core.errorToast.errorStack', {
       defaultMessage: `Error: {errorMessage}
       {errorStack}`,
       values: {

@@ -12,6 +12,7 @@ import {
   EuiText,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -50,10 +51,23 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
   }: ScanVulnerabilitiesAgentsModalProps) => {
     const getScanErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate(
+          'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.unknownError',
+          { defaultMessage: 'Unknown error' },
+        );
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to scan the vulnerabilities of one or more selected agents. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.noPermissionsError',
+          {
+            defaultMessage:
+              'No permissions to scan the vulnerabilities of one or more selected agents. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -87,7 +101,10 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: error.message || error,
-            title: `Could not get agents data`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.getAgentsErrorTitle',
+              { defaultMessage: 'Could not get agents data' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -144,7 +161,13 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not request the vulnerabilities scan of the agents`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.scanErrorTitle',
+              {
+                defaultMessage:
+                  'Could not request the vulnerabilities scan of the agents',
+              },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -160,11 +183,22 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The scan will be requested for all agents that match the filters set in the list'
+              title={i18n.translate(
+                'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.allAgentsWarning',
+                {
+                  defaultMessage:
+                    'The scan will be requested for all agents that match the filters set in the list',
+                },
+              )}
             />
           </EuiFormRow>
         ) : (
-          <EuiFormRow label='Selected agents'>
+          <EuiFormRow
+            label={i18n.translate(
+              'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.selectedAgentsLabel',
+              { defaultMessage: 'Selected agents' },
+            )}
+          >
             <EuiText>{selectedAgents.length}</EuiText>
           </EuiFormRow>
         )}
@@ -175,7 +209,10 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
       <EuiModal onClose={onClose}>
         <EuiModalHeader>
           <EuiModalHeaderTitle>
-            Scan vulnerabilities of agents
+            {i18n.translate(
+              'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.title',
+              { defaultMessage: 'Scan vulnerabilities of agents' },
+            )}
           </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
@@ -194,9 +231,17 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.cancelButton',
+                  { defaultMessage: 'Cancel' },
+                )}
+              </EuiButtonEmpty>
               <EuiButton onClick={handleOnSave} fill>
-                Scan
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.scanButton',
+                  { defaultMessage: 'Scan' },
+                )}
               </EuiButton>
             </>
           ) : (
@@ -207,7 +252,10 @@ export const ScanVulnerabilitiesAgentsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+              {i18n.translate(
+                'wazuh.endpointsSummary.bulkScanVulnerabilitiesModal.closeButton',
+                { defaultMessage: 'Close' },
+              )}
             </EuiButton>
           )}
         </EuiModalFooter>

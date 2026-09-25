@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { EuiBasicTable, EuiBadge } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzAPIUtils } from '../../../react-services/wz-api-utils';
@@ -54,7 +55,11 @@ export const PoliciesTable = ({
         // Workaround for tooltip problem does not disappear
         // when deleting a policy if the following policy is a reserved policy
         setPoliciesState([]);
-        ErrorHandler.info('Policy was successfully deleted');
+        ErrorHandler.info(
+          i18n.translate('wazuh.security.policiesTable.deleteSuccess', {
+            defaultMessage: 'Policy was successfully deleted',
+          }),
+        );
         await updatePolicies();
       } catch (error) {
         const options = {
@@ -76,20 +81,26 @@ export const PoliciesTable = ({
   const columns = [
     {
       field: 'id',
-      name: 'ID',
+      name: i18n.translate('wazuh.security.policiesTable.columns.id', {
+        defaultMessage: 'ID',
+      }),
       width: '75',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'name',
-      name: 'Name',
+      name: i18n.translate('wazuh.security.policiesTable.columns.name', {
+        defaultMessage: 'Name',
+      }),
       sortable: true,
       truncateText: true,
     },
     {
       field: 'policy.actions',
-      name: 'Actions',
+      name: i18n.translate('wazuh.security.policiesTable.columns.actions', {
+        defaultMessage: 'Actions',
+      }),
       render: actions => {
         return (actions || []).sort((a, b) => a.localeCompare(b)).join(', ');
       },
@@ -97,21 +108,31 @@ export const PoliciesTable = ({
     },
     {
       field: 'policy.resources',
-      name: 'Resources',
+      name: i18n.translate('wazuh.security.policiesTable.columns.resources', {
+        defaultMessage: 'Resources',
+      }),
       truncateText: true,
     },
     {
       field: 'policy.effect',
-      name: 'Effect',
+      name: i18n.translate('wazuh.security.policiesTable.columns.effect', {
+        defaultMessage: 'Effect',
+      }),
       truncateText: true,
     },
     {
       field: 'id',
-      name: 'Status',
+      name: i18n.translate('wazuh.security.policiesTable.columns.status', {
+        defaultMessage: 'Status',
+      }),
       render: item => {
         return (
           WzAPIUtils.isReservedID(item) && (
-            <EuiBadge color='primary'>Reserved</EuiBadge>
+            <EuiBadge color='primary'>
+              {i18n.translate('wazuh.security.policiesTable.reservedBadge', {
+                defaultMessage: 'Reserved',
+              })}
+            </EuiBadge>
           )
         );
       },
@@ -121,7 +142,9 @@ export const PoliciesTable = ({
     {
       align: 'right',
       width: '70',
-      name: 'Actions',
+      name: i18n.translate('wazuh.security.policiesTable.columns.rowActions', {
+        defaultMessage: 'Actions',
+      }),
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -131,17 +154,32 @@ export const PoliciesTable = ({
             ]}
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
-                ? "Reserved policies can't be deleted"
-                : 'Delete policy',
+                ? i18n.translate(
+                    'wazuh.security.policiesTable.deleteReservedTooltip',
+                    { defaultMessage: "Reserved policies can't be deleted" },
+                  )
+                : i18n.translate('wazuh.security.policiesTable.deleteTooltip', {
+                    defaultMessage: 'Delete policy',
+                  }),
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
-            modalTitle={`Do you want to delete the ${item.name} policy?`}
+            modalTitle={i18n.translate(
+              'wazuh.security.policiesTable.deleteModalTitle',
+              {
+                defaultMessage:
+                  'Do you want to delete the {policyName} policy?',
+                values: { policyName: item.name },
+              },
+            )}
             onConfirm={confirmDeletePolicy(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete policy'
+            aria-label={i18n.translate(
+              'wazuh.security.policiesTable.deleteAriaLabel',
+              { defaultMessage: 'Delete policy' },
+            )}
           />
         </div>
       ),

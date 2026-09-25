@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent } from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
+import { i18n } from '@osd/i18n';
 import classNames from 'classnames';
 import {
   EuiPopover,
@@ -67,7 +68,7 @@ export const DataGridVisibleColumnsSelector = ({
           onClick={() => setIsOpen(!isOpen)}
         >
           <FormattedMessage
-            id='wz.discover.availableFields'
+            id='wazuh.common.wazuhDiscover.availableFields'
             defaultMessage='{availableColumns} available fields'
             values={{ availableColumns: availableColumns?.length ?? 0 }}
           />
@@ -76,7 +77,7 @@ export const DataGridVisibleColumnsSelector = ({
               position='top'
               content={
                 <FormattedMessage
-                  id='wz.discover.availableFields.warningTooltip'
+                  id='wazuh.common.wazuhDiscover.availableFieldsLimitTooltip'
                   defaultMessage='The number of columns exceeds the limit of {maxAvailableColumns}. Only the first {maxAvailableColumns} columns are displayed but you can still search on all columns.'
                   values={{ maxAvailableColumns }}
                 />
@@ -85,7 +86,10 @@ export const DataGridVisibleColumnsSelector = ({
               <EuiIcon
                 className='wz-margin-left-4'
                 type='iInCircle'
-                aria-label='Info'
+                aria-label={i18n.translate(
+                  'wazuh.common.wazuhDiscover.columnsSelector.infoAriaLabel',
+                  { defaultMessage: 'Info' },
+                )}
               />
             </EuiToolTip>
           )}
@@ -96,8 +100,14 @@ export const DataGridVisibleColumnsSelector = ({
         <EuiFieldText
           fullWidth
           compressed
-          placeholder='Search'
-          aria-label='Search columns'
+          placeholder={i18n.translate(
+            'wazuh.common.wazuhDiscover.columnsSelector.searchPlaceholder',
+            { defaultMessage: 'Search' },
+          )}
+          aria-label={i18n.translate(
+            'wazuh.common.wazuhDiscover.columnsSelector.searchAriaLabel',
+            { defaultMessage: 'Search columns' },
+          )}
           value={searchValue}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             setSearchValue(e.currentTarget.value)

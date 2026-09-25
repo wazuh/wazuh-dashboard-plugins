@@ -11,6 +11,7 @@ import {
 import {
   API_PATHS,
   MANAGER_SESSION_EXPIRED_COPY,
+  PROVIDER_TEST_TIMEOUT_MS,
   PROVIDER_TYPES,
 } from '../../common/constants';
 import { ProviderConfig, ProviderSummary } from '../../common/types';
@@ -589,8 +590,8 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
     }, logger),
   );
 
-  // Minimal connectivity test: send a one-line "say ok" prompt through the real adapter and
-  // measure round-trip latency, without exposing the API key back to the browser.
+  // Minimal connectivity test: send a one-line "say ok" prompt through the real adapter and report
+  // the time to the FIRST content token (the test stops there), without exposing the API key.
   router.post(
     {
       path: API_PATHS.PROVIDER_TEST(`{id}`),
@@ -658,9 +659,14 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       }
       const adapter = getProviderAdapter(config.type);
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
+      let timedOut = false;
+      const timeout = setTimeout(() => {
+        timedOut = true;
+        controller.abort();
+      }, PROVIDER_TEST_TIMEOUT_MS);
       const startedAt = Date.now();
       let success = false;
+      let latencyMs = 0;
       let message = '';
       try {
         for await (const event of adapter.chatStream(
@@ -669,7 +675,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
           controller.signal,
         )) {
           if (event.type === 'delta') {
+            latencyMs = Date.now() - startedAt;
             success = true;
+            controller.abort();
+            break;
           } else if (event.type === 'error') {
             message = event.message;
           } else if (event.type === 'done') {
@@ -681,15 +690,24 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       } finally {
         clearTimeout(timeout);
       }
-      const latencyMs = Date.now() - startedAt;
-      if (!success && !message) {
-        message = 'Provider returned no content.';
+      if (!success) {
+        latencyMs = Date.now() - startedAt;
+        if (timedOut) {
+          message = `No content within ${PROVIDER_TEST_TIMEOUT_MS / 1000} s.`;
+        } else if (!message) {
+          message = 'Provider returned no content.';
+        }
       }
       logger.debug(
         `wazuhAiAssistant: provider test for ${config.id} -> success=${success}`,
       );
       return response.ok({
-        body: { success, latencyMs, message: success ? undefined : message },
+        body: {
+          success,
+          latencyMs,
+          message: success ? undefined : message,
+          timedOut: !success && timedOut,
+        },
       });
     }, logger),
   );

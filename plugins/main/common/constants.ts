@@ -646,7 +646,6 @@ export enum WAZUH_MENU_SETTINGS_SECTIONS_ID {
   CONFIGURATION = 'configuration',
   LOGS = 'logs',
   MISCELLANEOUS = 'miscellaneous',
-  ABOUT = 'about',
 }
 
 export const DATA_SOURCE_FILTER_CONTROLLED_EXCLUDE_SERVER =
@@ -1022,6 +1021,15 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERN_AGENT_STATS =
   'index-pattern:agent-stats';
 
 export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
+
+export const HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY =
+  'server-api:certificate-validity';
+
+// Certificate validity health check
+export const CERTIFICATE_EXPIRY_WARNING_SETTING =
+  'healthCheckCertificateExpiryWarningDays';
+export const CERTIFICATE_EXPIRY_CRITICAL_SETTING =
+  'healthCheckCertificateExpiryCriticalDays';
 
 export const INDEX_PATTERN_EVENTS_REQUIRED_FIELDS = [
   FIELD_TIMESTAMP,
