@@ -8,6 +8,7 @@ import {
   EuiSpacer,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ErrorHandler } from '../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../common/buttons';
@@ -57,7 +58,11 @@ export const RolesTable = ({
         // Workaround for tooltip problem does not disappear
         // when deleting a role if the following role is a reserved role
         setRolesState([]);
-        ErrorHandler.info('Role was successfully deleted');
+        ErrorHandler.info(
+          i18n.translate('wazuh.security.rolesTable.deleteSuccess', {
+            defaultMessage: 'Role was successfully deleted',
+          }),
+        );
         await updateRoles();
       } catch (error) {
         const options = {
@@ -79,21 +84,27 @@ export const RolesTable = ({
   const columns = [
     {
       field: 'id',
-      name: 'ID',
+      name: i18n.translate('wazuh.security.rolesTable.columns.id', {
+        defaultMessage: 'ID',
+      }),
       width: '75',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'name',
-      name: 'Name',
+      name: i18n.translate('wazuh.security.rolesTable.columns.name', {
+        defaultMessage: 'Name',
+      }),
       width: '200',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'policies',
-      name: 'Policies',
+      name: i18n.translate('wazuh.security.rolesTable.columns.policies', {
+        defaultMessage: 'Policies',
+      }),
       render: policies => {
         return (
           (policiesData && (
@@ -108,17 +119,32 @@ export const RolesTable = ({
                         position='top'
                         content={
                           <div>
-                            <b>Actions</b>
+                            <b>
+                              {i18n.translate(
+                                'wazuh.security.rolesTable.policyTooltip.actions',
+                                { defaultMessage: 'Actions' },
+                              )}
+                            </b>
                             <p>
                               {((data.policy || {}).actions || []).join(', ')}
                             </p>
                             <EuiSpacer size='s' />
-                            <b>Resources</b>
+                            <b>
+                              {i18n.translate(
+                                'wazuh.security.rolesTable.policyTooltip.resources',
+                                { defaultMessage: 'Resources' },
+                              )}
+                            </b>
                             <p>
                               {((data.policy || {}).resources || []).join(', ')}
                             </p>
                             <EuiSpacer size='s' />
-                            <b>Effect</b>
+                            <b>
+                              {i18n.translate(
+                                'wazuh.security.rolesTable.policyTooltip.effect',
+                                { defaultMessage: 'Effect' },
+                              )}
+                            </b>
                             <p>{(data.policy || {}).effect}</p>
                           </div>
                         }
@@ -126,7 +152,13 @@ export const RolesTable = ({
                         <EuiBadge
                           color='hollow'
                           onClick={() => {}}
-                          onClickAriaLabel={`${data.name} policy`}
+                          onClickAriaLabel={i18n.translate(
+                            'wazuh.security.rolesTable.policyBadgeAriaLabel',
+                            {
+                              defaultMessage: '{policyName} policy',
+                              values: { policyName: data.name },
+                            },
+                          )}
                           title={null}
                         >
                           {data.name}
@@ -143,11 +175,17 @@ export const RolesTable = ({
     },
     {
       field: 'id',
-      name: 'Status',
+      name: i18n.translate('wazuh.security.rolesTable.columns.status', {
+        defaultMessage: 'Status',
+      }),
       render: item => {
         return (
           WzAPIUtils.isReservedID(item) && (
-            <EuiBadge color='primary'>Reserved</EuiBadge>
+            <EuiBadge color='primary'>
+              {i18n.translate('wazuh.security.rolesTable.reservedBadge', {
+                defaultMessage: 'Reserved',
+              })}
+            </EuiBadge>
           )
         );
       },
@@ -157,7 +195,9 @@ export const RolesTable = ({
     {
       align: 'right',
       width: '70',
-      name: 'Actions',
+      name: i18n.translate('wazuh.security.rolesTable.columns.actions', {
+        defaultMessage: 'Actions',
+      }),
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -167,17 +207,31 @@ export const RolesTable = ({
             ]}
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
-                ? "Reserved roles can't be deleted"
-                : 'Delete role',
+                ? i18n.translate(
+                    'wazuh.security.rolesTable.deleteReservedTooltip',
+                    { defaultMessage: "Reserved roles can't be deleted" },
+                  )
+                : i18n.translate('wazuh.security.rolesTable.deleteTooltip', {
+                    defaultMessage: 'Delete role',
+                  }),
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
-            modalTitle={`Do you want to delete the ${item.name} role?`}
+            modalTitle={i18n.translate(
+              'wazuh.security.rolesTable.deleteModalTitle',
+              {
+                defaultMessage: 'Do you want to delete the {roleName} role?',
+                values: { roleName: item.name },
+              },
+            )}
             onConfirm={onConfirmDeleteRole(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete role'
+            aria-label={i18n.translate(
+              'wazuh.security.rolesTable.deleteAriaLabel',
+              { defaultMessage: 'Delete role' },
+            )}
           />
         </div>
       ),

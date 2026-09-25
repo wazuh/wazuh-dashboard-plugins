@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -44,7 +45,10 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
             <EuiBetaBadge
               color='subdued'
               label={`${title}`}
-              aria-label={`${title} section`}
+              aria-label={i18n.translate(
+                'wazuh.common.homeOverviewSectionHeader.ariaLabel',
+                { defaultMessage: '{title} section', values: { title } },
+              )}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>

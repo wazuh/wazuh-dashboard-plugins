@@ -17,6 +17,7 @@ import {
   EuiDescriptionListDescription,
   EuiIconTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -55,10 +56,22 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
 
     const getUpgradeErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate(
+          'wazuh.endpointsSummary.upgradeAgentModal.unknownError',
+          { defaultMessage: 'Unknown error' },
+        );
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to upgrade this agent. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.upgradeAgentModal.noPermissionsError',
+          {
+            defaultMessage: 'No permissions to upgrade this agent. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -90,8 +103,14 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         }
         showToast(
           'success',
-          'Upgrade agent',
-          'Upgrade request sent successfully',
+          i18n.translate(
+            'wazuh.endpointsSummary.upgradeAgentModal.successToastTitle',
+            { defaultMessage: 'Upgrade agent' },
+          ),
+          i18n.translate(
+            'wazuh.endpointsSummary.upgradeAgentModal.successToastText',
+            { defaultMessage: 'Upgrade request sent successfully' },
+          ),
         );
         reloadAgents();
       } catch (error: any) {
@@ -104,7 +123,10 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not upgrade agent`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.upgradeAgentModal.errorTitle',
+              { defaultMessage: 'Could not upgrade agent' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -125,7 +147,12 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
             <EuiFlexGroup gutterSize='m'>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.upgradeAgentModal.agentIdLabel',
+                      { defaultMessage: 'Agent ID' },
+                    )}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.id}
                   </EuiDescriptionListDescription>
@@ -133,7 +160,12 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.upgradeAgentModal.agentNameLabel',
+                      { defaultMessage: 'Agent name' },
+                    )}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.name}
                   </EuiDescriptionListDescription>
@@ -146,7 +178,10 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
                   <EuiDescriptionListTitle>
-                    Agent version
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.upgradeAgentModal.agentVersionLabel',
+                      { defaultMessage: 'Agent version' },
+                    )}
                   </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.version}
@@ -155,7 +190,12 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>OS</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.upgradeAgentModal.osLabel',
+                      { defaultMessage: 'OS' },
+                    )}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.os.name}
                   </EuiDescriptionListDescription>
@@ -168,14 +208,28 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
               <EuiFormRow
                 label={
                   <span>
-                    Package type{' '}
-                    <EuiIconTip content="Specify the package type, as the manager can't determine it automatically for the OS platform" />
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.upgradeAgentModal.packageTypeLabel',
+                      { defaultMessage: 'Package type' },
+                    )}{' '}
+                    <EuiIconTip
+                      content={i18n.translate(
+                        'wazuh.endpointsSummary.upgradeAgentModal.packageTypeTooltip',
+                        {
+                          defaultMessage:
+                            "Specify the package type, as the manager can't determine it automatically for the OS platform",
+                        },
+                      )}
+                    />
                   </span>
                 }
                 isInvalid={!packageType}
               >
                 <EuiSelect
-                  placeholder='Packege type'
+                  placeholder={i18n.translate(
+                    'wazuh.endpointsSummary.upgradeAgentModal.packageTypePlaceholder',
+                    { defaultMessage: 'Packege type' },
+                  )}
                   value={packageType}
                   options={[
                     { value: 'deb', text: 'DEB' },
@@ -199,20 +253,32 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Upgrade agent</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpointsSummary.upgradeAgentModal.title', {
+              defaultMessage: 'Upgrade agent',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>{form}</EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {i18n.translate(
+              'wazuh.endpointsSummary.upgradeAgentModal.cancelButton',
+              { defaultMessage: 'Cancel' },
+            )}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={handleOnSave}
             fill
             isLoading={isLoading}
             disabled={showPackageSelector && !packageType}
           >
-            Upgrade
+            {i18n.translate(
+              'wazuh.endpointsSummary.upgradeAgentModal.upgradeButton',
+              { defaultMessage: 'Upgrade' },
+            )}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

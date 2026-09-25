@@ -269,8 +269,13 @@ export interface TableSpec {
  * not how many provider round-trips the orchestrator budgeted. `understanding` covers the stage-1
  * routing call, `querying` each tool execution, `writing` the answer round that follows tool
  * results.
+ * `thinking`: a round after routing has started reasoning (at most once per round).
  */
-export type TurnStatusStep = 'understanding' | 'querying' | 'writing';
+export type TurnStatusStep =
+  | 'understanding'
+  | 'querying'
+  | 'writing'
+  | 'thinking';
 
 export interface StreamUsage {
   inputTokens?: number;
@@ -507,6 +512,9 @@ export interface ProviderInput {
 
 export interface ProviderTestResult {
   success: boolean;
+  /** Time to the first content token (on failure, until the test gave up). */
   latencyMs: number;
   message?: string;
+  /** No content within `PROVIDER_TEST_TIMEOUT_MS`; the client shows its own translated message. */
+  timedOut?: boolean;
 }

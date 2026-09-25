@@ -15,6 +15,7 @@ import {
   EuiCallOut,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -35,10 +36,21 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
   ({ agent, onClose, reloadAgents }: RemoveAgentModalProps) => {
     const getDeleteErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate('wazuh.endpointsSummary.removeAgentModal.unknownError', {
+          defaultMessage: 'Unknown error',
+        });
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to remove this agent. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.removeAgentModal.noPermissionsError',
+          {
+            defaultMessage: 'No permissions to remove this agent. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -51,8 +63,17 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
         if (response?.data?.data?.affected_items.includes(agent.id)) {
           getToasts().add({
             color: 'success',
-            title: 'Remove agent',
-            text: `Removed agent: ${agent.name} (${agent.id})`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.removeAgentModal.successToastTitle',
+              { defaultMessage: 'Remove agent' },
+            ),
+            text: i18n.translate(
+              'wazuh.endpointsSummary.removeAgentModal.successToastText',
+              {
+                defaultMessage: 'Removed agent: {agentName} ({agentId})',
+                values: { agentName: agent.name, agentId: agent.id },
+              },
+            ),
             toastLifeTimeMs: 3000,
           });
         }
@@ -68,7 +89,10 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not remove agent`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.removeAgentModal.errorTitle',
+              { defaultMessage: 'Could not remove agent' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -85,7 +109,11 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Remove agent</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpointsSummary.removeAgentModal.title', {
+              defaultMessage: 'Remove agent',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>
@@ -94,7 +122,12 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
               <EuiFlexGroup gutterSize='m'>
                 <EuiFlexItem>
                   <EuiDescriptionList compressed>
-                    <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                    <EuiDescriptionListTitle>
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.removeAgentModal.agentIdLabel',
+                        { defaultMessage: 'Agent ID' },
+                      )}
+                    </EuiDescriptionListTitle>
                     <EuiDescriptionListDescription>
                       {agent.id}
                     </EuiDescriptionListDescription>
@@ -103,7 +136,10 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
                 <EuiFlexItem>
                   <EuiDescriptionList compressed>
                     <EuiDescriptionListTitle>
-                      Agent name
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.removeAgentModal.agentNameLabel',
+                        { defaultMessage: 'Agent name' },
+                      )}
                     </EuiDescriptionListTitle>
                     <EuiDescriptionListDescription>
                       {agent.name}
@@ -115,20 +151,33 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           </EuiFlexGroup>
           <EuiSpacer />
           <EuiCallOut color='warning'>
-            If the selected agent is still active and auto-enrollment is
-            enabled, they will automatically register again after deletion.
+            {i18n.translate(
+              'wazuh.endpointsSummary.removeAgentModal.autoEnrollmentWarning',
+              {
+                defaultMessage:
+                  'If the selected agent is still active and auto-enrollment is enabled, they will automatically register again after deletion.',
+              },
+            )}
           </EuiCallOut>
         </EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {i18n.translate(
+              'wazuh.endpointsSummary.removeAgentModal.cancelButton',
+              { defaultMessage: 'Cancel' },
+            )}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={() => action.run(agent)}
             fill
             isLoading={action.running}
             color='danger'
           >
-            Remove
+            {i18n.translate(
+              'wazuh.endpointsSummary.removeAgentModal.removeButton',
+              { defaultMessage: 'Remove' },
+            )}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

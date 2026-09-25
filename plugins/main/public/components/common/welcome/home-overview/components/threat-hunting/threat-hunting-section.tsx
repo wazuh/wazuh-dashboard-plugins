@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { getCore } from '../../../../../../kibana-services';
@@ -40,8 +41,16 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
   return (
     <div>
       <SectionHeader
-        title='Threat hunting'
-        description='Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.'
+        title={i18n.translate('wazuh.common.homeOverviewThreatHunting.title', {
+          defaultMessage: 'Threat hunting',
+        })}
+        description={i18n.translate(
+          'wazuh.common.homeOverviewThreatHunting.description',
+          {
+            defaultMessage:
+              'Hunt for threats, map activity to MITRE ATT&CK, and detect known vulnerabilities.',
+          },
+        )}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem>
@@ -52,9 +61,15 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title='MITRE ATT&CK'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewThreatHunting.mitreTitle',
+              { defaultMessage: 'MITRE ATT&CK' },
+            )}
             titleLink={{ href: getMitreUrl() }}
-            caption='Last 24 hours'
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionLast24Hours',
+              { defaultMessage: 'Last 24 hours' },
+            )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-techniques'
           >
@@ -64,14 +79,23 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   textAlign='center'
                   reverse
                   value={<TabNumber value={findings.data.techniquesCount} />}
-                  label='Techniques observed'
+                  label={i18n.translate(
+                    'wazuh.common.homeOverviewThreatHunting.techniquesObserved',
+                    { defaultMessage: 'Techniques observed' },
+                  )}
                   data-test-subj='techniques-hero'
                 />
                 <EuiSpacer size='s' />
                 <BarList
-                  title='Top 5 techniques'
+                  title={i18n.translate(
+                    'wazuh.common.homeOverviewThreatHunting.topTechniques',
+                    { defaultMessage: 'Top 5 techniques' },
+                  )}
                   items={findings.data.topTechniques}
-                  emptyMessage='No techniques observed'
+                  emptyMessage={i18n.translate(
+                    'wazuh.common.homeOverviewThreatHunting.noTechniques',
+                    { defaultMessage: 'No techniques observed' },
+                  )}
                   getHref={item =>
                     getMitreFindingsByTechniqueUrl(
                       item,
@@ -92,9 +116,15 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
               findings.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={findings.error?.kind === 'permission-denied'}
-            title='Threat Hunting'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewThreatHunting.findingsTitle',
+              { defaultMessage: 'Threat Hunting' },
+            )}
             titleLink={{ href: getThreatHuntingUrl() }}
-            caption='Last 24 hours'
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionLast24Hours',
+              { defaultMessage: 'Last 24 hours' },
+            )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-threat-hunting-findings'
           >
@@ -115,7 +145,10 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                       </EuiLink>
                     </RedirectAppLinks>
                   }
-                  label='Total findings'
+                  label={i18n.translate(
+                    'wazuh.common.homeOverviewThreatHunting.totalFindings',
+                    { defaultMessage: 'Total findings' },
+                  )}
                   data-test-subj='total-findings-hero'
                 />
                 <EuiSpacer size='s' />
@@ -134,9 +167,15 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
             isPermissionDenied={
               vulnerabilities.error?.kind === 'permission-denied'
             }
-            title='Vulnerability Detection'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewThreatHunting.vulnerabilitiesTitle',
+              { defaultMessage: 'Vulnerability Detection' },
+            )}
             titleLink={{ href: getVulnerabilityDetectionUrl() }}
-            caption='Current state'
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionCurrentState',
+              { defaultMessage: 'Current state' },
+            )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-vulnerabilities'
           >
@@ -151,7 +190,15 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                       vulnerabilities.indexPatternId,
                     )
                   }
-                  getTooltip={band => `Click to see vulnerabilities: ${band}`}
+                  getTooltip={band =>
+                    i18n.translate(
+                      'wazuh.common.homeOverviewThreatHunting.vulnerabilitySeverityTooltip',
+                      {
+                        defaultMessage: 'Click to see vulnerabilities: {band}',
+                        values: { band },
+                      },
+                    )
+                  }
                 />
                 <EuiSpacer size='s' />
                 <TopPackagesTable items={vulnerabilities.data.byPackage} />

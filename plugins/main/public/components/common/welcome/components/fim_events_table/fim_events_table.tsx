@@ -13,6 +13,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiBasicTable,
   EuiFlexItem,
@@ -39,10 +40,22 @@ export function FimEventsTable({ agent }) {
         <EuiFlexItem>
           <EuiFlexGroup responsive={false}>
             <EuiFlexItem>
-              <Typography level='section'>FIM: Recent files</Typography>
+              <Typography level='section'>
+                {i18n.translate('wazuh.common.agentWelcomeFimTable.title', {
+                  defaultMessage: 'FIM: Recent files',
+                })}
+              </Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiToolTip position='top' content='Open FIM'>
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.common.agentWelcomeFimTable.openApp',
+                  {
+                    defaultMessage: 'Open FIM',
+                  },
+                )}
+              >
                 <RedirectAppLinks application={getCore().application}>
                   <EuiButtonIcon
                     iconType='popout'
@@ -51,7 +64,12 @@ export function FimEventsTable({ agent }) {
                     href={NavigationService.getInstance().getAppURL(
                       fileIntegrityMonitoring.id,
                     )}
-                    aria-label='Open FIM'
+                    aria-label={i18n.translate(
+                      'wazuh.common.agentWelcomeFimTable.openApp',
+                      {
+                        defaultMessage: 'Open FIM',
+                      },
+                    )}
                   />
                 </RedirectAppLinks>
               </EuiToolTip>
@@ -118,7 +136,10 @@ const FimTableDataSource = withDataSourceFetch({
       sorting={{ sort }}
       onChange={e => setSort(e.sort)}
       itemId='fim-alerts'
-      noItemsMessage='No recent documents'
+      noItemsMessage={i18n.translate(
+        'wazuh.common.agentWelcomeFimTable.noItems',
+        { defaultMessage: 'No recent documents' },
+      )}
     />
   );
 });
@@ -148,25 +169,42 @@ function navigateToFim(agent) {
 const columns = [
   {
     field: '_source.file.mtime',
-    name: 'Modified time',
+    name: i18n.translate(
+      'wazuh.common.agentWelcomeFimTable.columns.modifiedTime',
+      {
+        defaultMessage: 'Modified time',
+      },
+    ),
     sortable: true,
     width: '300px',
     render: formatUIDate,
   },
   {
     field: '_source.file.path',
-    name: 'File path',
+    name: i18n.translate('wazuh.common.agentWelcomeFimTable.columns.filePath', {
+      defaultMessage: 'File path',
+    }),
     sortable: true,
     truncateText: true,
   },
   {
     field: '_source.file.owner',
-    name: 'File owner',
+    name: i18n.translate(
+      'wazuh.common.agentWelcomeFimTable.columns.fileOwner',
+      {
+        defaultMessage: 'File owner',
+      },
+    ),
     sortable: true,
   },
   {
     field: '_source.file.uid',
-    name: 'File user ID',
+    name: i18n.translate(
+      'wazuh.common.agentWelcomeFimTable.columns.fileUserId',
+      {
+        defaultMessage: 'File user ID',
+      },
+    ),
     sortable: true,
     truncateText: true,
   },

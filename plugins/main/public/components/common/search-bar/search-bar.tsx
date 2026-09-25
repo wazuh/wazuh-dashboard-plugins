@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { getPlugins } from '../../../kibana-services';
 import './search-bar.scss';
@@ -77,7 +78,9 @@ export const WzSearchBar = ({
                       iconType='refresh'
                       onClick={onManualRefresh}
                     >
-                      Refresh
+                      {i18n.translate('wazuh.common.searchBar.refreshButton', {
+                        defaultMessage: 'Refresh',
+                      })}
                     </EuiButton>
                   </EuiFlexItem>
                 ) : null}

@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useState } from 'react';
 import {
   EuiConfirmModal,
@@ -38,11 +39,21 @@ interface PurgeEnrollmentTokensProps {
 const PURGE_OPTIONS = [
   {
     id: 'dead',
-    label: 'Dead tokens only',
+    label: i18n.translate(
+      'wazuh.enrollmentTokens.purgeEnrollmentTokens.deadOption',
+      {
+        defaultMessage: 'Dead tokens only',
+      },
+    ),
   },
   {
     id: 'all',
-    label: 'Every token, the usable ones included',
+    label: i18n.translate(
+      'wazuh.enrollmentTokens.purgeEnrollmentTokens.allOption',
+      {
+        defaultMessage: 'Every token, the usable ones included',
+      },
+    ),
   },
 ];
 
@@ -60,9 +71,14 @@ export const PurgeEnrollmentTokens = ({
 
       setIsModalVisible(false);
       ErrorHandler.info(
-        purged.length === 1
-          ? '1 enrollment token was purged'
-          : `${purged.length} enrollment tokens were purged`,
+        i18n.translate(
+          'wazuh.enrollmentTokens.purgeEnrollmentTokens.successToast',
+          {
+            defaultMessage:
+              '{count, plural, one {{count} enrollment token was purged} other {{count} enrollment tokens were purged}}',
+            values: { count: purged.length },
+          },
+        ),
       );
       onPurged();
     } catch (error) {
@@ -91,16 +107,36 @@ export const PurgeEnrollmentTokens = ({
         color='danger'
         onClick={() => setIsModalVisible(true)}
       >
-        Purge tokens
+        {i18n.translate(
+          'wazuh.enrollmentTokens.purgeEnrollmentTokens.openButton',
+          {
+            defaultMessage: 'Purge tokens',
+          },
+        )}
       </WzButtonPermissions>
       {isModalVisible && (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Purge enrollment tokens'
+            title={i18n.translate(
+              'wazuh.enrollmentTokens.purgeEnrollmentTokens.modalTitle',
+              {
+                defaultMessage: 'Purge enrollment tokens',
+              },
+            )}
             onCancel={() => setIsModalVisible(false)}
             onConfirm={onConfirm}
-            cancelButtonText='Cancel'
-            confirmButtonText='Purge'
+            cancelButtonText={i18n.translate(
+              'wazuh.enrollmentTokens.purgeEnrollmentTokens.cancelButton',
+              {
+                defaultMessage: 'Cancel',
+              },
+            )}
+            confirmButtonText={i18n.translate(
+              'wazuh.enrollmentTokens.purgeEnrollmentTokens.confirmButton',
+              {
+                defaultMessage: 'Purge',
+              },
+            )}
             confirmButtonDisabled={isPurging}
             isLoading={isPurging}
             buttonColor='danger'
@@ -108,9 +144,13 @@ export const PurgeEnrollmentTokens = ({
           >
             <EuiText size='s'>
               <p>
-                Purging removes the tokens from the manager store. This is not
-                the same as revoking one: a revoked token stays in the listing,
-                a purged one is gone.
+                {i18n.translate(
+                  'wazuh.enrollmentTokens.purgeEnrollmentTokens.modalBody',
+                  {
+                    defaultMessage:
+                      'Purging removes the tokens from the manager store. This is not the same as revoking one: a revoked token stays in the listing, a purged one is gone.',
+                  },
+                )}
               </p>
             </EuiText>
             <EuiSpacer size='m' />
@@ -122,9 +162,14 @@ export const PurgeEnrollmentTokens = ({
             />
             <EuiSpacer size='s' />
             <EuiText size='xs' color='subdued'>
-              {status === 'dead'
-                ? 'Only the tokens that can no longer authorise an enrollment are removed: revoked, expired or out of uses. A usable token is never touched.'
-                : 'The store is emptied. Agents that have not enrolled yet with a token still in use will no longer be able to.'}
+              {i18n.translate(
+                'wazuh.enrollmentTokens.purgeEnrollmentTokens.statusHelp',
+                {
+                  defaultMessage:
+                    '{status, select, dead {Only the tokens that can no longer authorise an enrollment are removed: revoked, expired or out of uses. A usable token is never touched.} other {The store is emptied. Agents that have not enrolled yet with a token still in use will no longer be able to.}}',
+                  values: { status },
+                },
+              )}
             </EuiText>
           </EuiConfirmModal>
         </EuiOverlayMask>

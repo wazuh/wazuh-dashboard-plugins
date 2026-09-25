@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import {
   EuiButtonEmpty,
@@ -57,7 +58,12 @@ export const EnrollmentTokenDetailsFlyout = ({
       <EuiFlyoutHeader hasBorder={false}>
         <EuiTitle size='m'>
           <h2 id='enrollmentTokenDetailsFlyoutTitle'>
-            Enrollment token details
+            {i18n.translate(
+              'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.title',
+              {
+                defaultMessage: 'Enrollment token details',
+              },
+            )}
           </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
@@ -71,7 +77,12 @@ export const EnrollmentTokenDetailsFlyout = ({
           type='row'
           listItems={[
             {
-              title: 'ID',
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.idLabel',
+                {
+                  defaultMessage: 'ID',
+                },
+              ),
               description: token.id ? (
                 <TruncatedValueTooltip value={token.id} />
               ) : (
@@ -79,7 +90,12 @@ export const EnrollmentTokenDetailsFlyout = ({
               ),
             },
             {
-              title: 'Address',
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.addressLabel',
+                {
+                  defaultMessage: 'Address',
+                },
+              ),
               description: token.address ? (
                 <TruncatedValueTooltip value={token.address} />
               ) : (
@@ -90,7 +106,12 @@ export const EnrollmentTokenDetailsFlyout = ({
               /* Prose, not an opaque identifier: it is shown whole, wrapped
               over as many lines as it takes, rather than cut to one line with
               the rest behind a tooltip. */
-              title: 'Description',
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.descriptionLabel',
+                {
+                  defaultMessage: 'Description',
+                },
+              ),
               description: token.description ? (
                 <span className='wz-enrollment-token-description'>
                   {token.description}
@@ -100,25 +121,74 @@ export const EnrollmentTokenDetailsFlyout = ({
               ),
             },
             {
-              title: 'Status',
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.statusLabel',
+                {
+                  defaultMessage: 'Status',
+                },
+              ),
               description: <EuiHealth color={color}>{label}</EuiHealth>,
             },
-            { title: 'Created', description: formatUIDate(token.created) },
-            { title: 'Expires', description: formatUIDate(token.expires) },
             {
-              title: 'Enrollments',
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.createdLabel',
+                {
+                  defaultMessage: 'Created',
+                },
+              ),
+              description: formatUIDate(token.created),
+            },
+            {
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.expiresLabel',
+                {
+                  defaultMessage: 'Expires',
+                },
+              ),
+              description: formatUIDate(token.expires),
+            },
+            {
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.enrollmentsLabel',
+                {
+                  defaultMessage: 'Enrollments',
+                },
+              ),
               description: formatEnrollmentsUsage(token),
             },
             {
-              title: 'Credential',
-              description: token.credential === false ? 'No' : 'Yes',
+              title: i18n.translate(
+                'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.credentialLabel',
+                {
+                  defaultMessage: 'Credential',
+                },
+              ),
+              description:
+                token.credential === false
+                  ? i18n.translate(
+                      'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.credentialNo',
+                      {
+                        defaultMessage: 'No',
+                      },
+                    )
+                  : i18n.translate(
+                      'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.credentialYes',
+                      {
+                        defaultMessage: 'Yes',
+                      },
+                    ),
             },
           ]}
         />
       </EuiFlyoutBody>
       <EuiFlyoutFooter>
         <EuiButtonEmpty iconType='cross' onClick={onClose} flush='left'>
-          Close
+          {i18n.translate(
+            'wazuh.enrollmentTokens.enrollmentTokenDetailsFlyout.closeButton',
+            {
+              defaultMessage: 'Close',
+            },
+          )}
         </EuiButtonEmpty>
       </EuiFlyoutFooter>
     </WzFlyout>

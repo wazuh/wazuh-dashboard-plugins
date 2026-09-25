@@ -1,3 +1,5 @@
+import { i18n } from '@osd/i18n';
+import { PROVIDER_TEST_TIMEOUT_MS } from '../../../common/constants';
 import { ProviderTestResult } from '../../../common/types';
 
 export type ProviderTestOutcome =
@@ -9,11 +11,24 @@ const DEFAULT_FAILURE_MESSAGE = 'Connection failed.';
 const DEFAULT_COULD_NOT_VERIFY_MESSAGE =
   'Could not verify the provider status.';
 
+/** From this time to first response on, a passing test is shown as "Slow" instead of "OK". */
+export const SLOW_TEST_LATENCY_MS = 5_000;
+
 export function outcomeFromTestResult(
   result: ProviderTestResult,
 ): ProviderTestOutcome {
   if (result.success) {
     return { status: 'ok', latencyMs: result.latencyMs };
+  }
+  if (result.timedOut) {
+    return {
+      status: 'failed',
+      message: i18n.translate('wazuhAiAssistant.settings.testTimedOut', {
+        defaultMessage:
+          'No response within {seconds} s. Reasoning models can take a long time to start answering.',
+        values: { seconds: PROVIDER_TEST_TIMEOUT_MS / 1000 },
+      }),
+    };
   }
   return {
     status: 'failed',

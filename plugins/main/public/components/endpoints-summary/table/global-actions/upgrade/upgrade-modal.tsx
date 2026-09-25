@@ -12,6 +12,7 @@ import {
   EuiText,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -48,10 +49,22 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
   }: UpgradeAgentsModalProps) => {
     const getUpgradeErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate('wazuh.endpointsSummary.bulkUpgradeModal.unknownError', {
+          defaultMessage: 'Unknown error',
+        });
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to upgrade one or more selected agents. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.bulkUpgradeModal.noPermissionsError',
+          {
+            defaultMessage:
+              'No permissions to upgrade one or more selected agents. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -85,7 +98,10 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: error.message || error,
-            title: `Could not get agents data`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkUpgradeModal.getAgentsErrorTitle',
+              { defaultMessage: 'Could not get agents data' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -155,7 +171,10 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not upgrade agents`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkUpgradeModal.upgradeErrorTitle',
+              { defaultMessage: 'Could not upgrade agents' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -171,11 +190,22 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The changes will be applied to all agents that match the filters set in the list'
+              title={i18n.translate(
+                'wazuh.endpointsSummary.bulkUpgradeModal.allAgentsWarning',
+                {
+                  defaultMessage:
+                    'The changes will be applied to all agents that match the filters set in the list',
+                },
+              )}
             />
           </EuiFormRow>
         ) : (
-          <EuiFormRow label='Selected agents'>
+          <EuiFormRow
+            label={i18n.translate(
+              'wazuh.endpointsSummary.bulkUpgradeModal.selectedAgentsLabel',
+              { defaultMessage: 'Selected agents' },
+            )}
+          >
             <EuiText>{selectedAgents.length}</EuiText>
           </EuiFormRow>
         )}
@@ -185,7 +215,11 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
     return (
       <EuiModal onClose={onClose}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Upgrade agents</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpointsSummary.bulkUpgradeModal.title', {
+              defaultMessage: 'Upgrade agents',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
           {!isResultVisible ? (
@@ -203,9 +237,17 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkUpgradeModal.cancelButton',
+                  { defaultMessage: 'Cancel' },
+                )}
+              </EuiButtonEmpty>
               <EuiButton onClick={handleOnSave} fill>
-                Upgrade
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkUpgradeModal.upgradeButton',
+                  { defaultMessage: 'Upgrade' },
+                )}
               </EuiButton>
             </>
           ) : (
@@ -216,7 +258,10 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+              {i18n.translate(
+                'wazuh.endpointsSummary.bulkUpgradeModal.closeButton',
+                { defaultMessage: 'Close' },
+              )}
             </EuiButton>
           )}
         </EuiModalFooter>

@@ -17,6 +17,7 @@ import {
   EuiDescriptionListDescription,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
@@ -58,7 +59,10 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
         error: {
           error: errorGroups,
           message: errorGroups.message || errorGroups,
-          title: `Could not get groups`,
+          title: i18n.translate(
+            'wazuh.endpointsSummary.editGroupsModal.getGroupsErrorTitle',
+            { defaultMessage: 'Could not get groups' },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -80,10 +84,22 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
 
     const getEditGroupsErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate('wazuh.endpointsSummary.editGroupsModal.unknownError', {
+          defaultMessage: 'Unknown error',
+        });
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to edit this agent groups. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.editGroupsModal.noPermissionsError',
+          {
+            defaultMessage:
+              'No permissions to edit this agent groups. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -116,7 +132,17 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
             agentId: agent.id,
             groupIds: removedGroups,
           }));
-        showToast('success', 'Edit agent groups', 'Groups saved successfully');
+        showToast(
+          'success',
+          i18n.translate(
+            'wazuh.endpointsSummary.editGroupsModal.successToastTitle',
+            { defaultMessage: 'Edit agent groups' },
+          ),
+          i18n.translate(
+            'wazuh.endpointsSummary.editGroupsModal.successToastText',
+            { defaultMessage: 'Groups saved successfully' },
+          ),
+        );
         reloadAgents();
       } catch (error: any) {
         const errorMessage = getEditGroupsErrorMessage(error);
@@ -128,7 +154,10 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not save agent groups`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.editGroupsModal.saveErrorTitle',
+              { defaultMessage: 'Could not save agent groups' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -145,7 +174,12 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
             <EuiFlexGroup gutterSize='m'>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent ID</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.editGroupsModal.agentIdLabel',
+                      { defaultMessage: 'Agent ID' },
+                    )}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.id}
                   </EuiDescriptionListDescription>
@@ -153,7 +187,12 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiDescriptionList compressed>
-                  <EuiDescriptionListTitle>Agent name</EuiDescriptionListTitle>
+                  <EuiDescriptionListTitle>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.editGroupsModal.agentNameLabel',
+                      { defaultMessage: 'Agent name' },
+                    )}
+                  </EuiDescriptionListTitle>
                   <EuiDescriptionListDescription>
                     {agent.name}
                   </EuiDescriptionListDescription>
@@ -163,12 +202,23 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow
-              label='Groups'
+              label={i18n.translate(
+                'wazuh.endpointsSummary.editGroupsModal.groupsLabel',
+                { defaultMessage: 'Groups' },
+              )}
               isInvalid={!selectedGroups?.length}
-              error={['You must add at least one group']}
+              error={[
+                i18n.translate(
+                  'wazuh.endpointsSummary.editGroupsModal.groupsRequiredError',
+                  { defaultMessage: 'You must add at least one group' },
+                ),
+              ]}
             >
               <EuiComboBox
-                placeholder='Select groups'
+                placeholder={i18n.translate(
+                  'wazuh.endpointsSummary.editGroupsModal.groupsPlaceholder',
+                  { defaultMessage: 'Select groups' },
+                )}
                 options={groups?.map(group => ({ label: group })) || []}
                 selectedOptions={selectedGroups}
                 onChange={selectedGroups => setSelectedGroups(selectedGroups)}
@@ -180,13 +230,22 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
               <EuiCallOut
                 color='danger'
                 iconType='alert'
-                title='Could not load groups. Check your permissions.'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.editGroupsModal.loadGroupsErrorCallout',
+                  {
+                    defaultMessage:
+                      'Could not load groups. Check your permissions.',
+                  },
+                )}
               />
             ) : !isGroupsLoading && !groups?.length ? (
               <EuiCallOut
                 color='warning'
                 iconType='iInCircle'
-                title='No groups available.'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.editGroupsModal.noGroupsCallout',
+                  { defaultMessage: 'No groups available.' },
+                )}
               />
             ) : null}
           </EuiFlexItem>
@@ -202,20 +261,32 @@ export const EditAgentGroupsModal = compose(withErrorBoundary)(
         }}
       >
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Edit agent groups</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpointsSummary.editGroupsModal.title', {
+              defaultMessage: 'Edit agent groups',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
 
         <EuiModalBody>{form}</EuiModalBody>
 
         <EuiModalFooter>
-          <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+          <EuiButtonEmpty onClick={onClose}>
+            {i18n.translate(
+              'wazuh.endpointsSummary.editGroupsModal.cancelButton',
+              { defaultMessage: 'Cancel' },
+            )}
+          </EuiButtonEmpty>
           <EuiButton
             onClick={handleOnSave}
             fill
             isLoading={isSaving}
             disabled={isGroupsLoading || !selectedGroups?.length}
           >
-            Save
+            {i18n.translate(
+              'wazuh.endpointsSummary.editGroupsModal.saveButton',
+              { defaultMessage: 'Save' },
+            )}
           </EuiButton>
         </EuiModalFooter>
       </EuiModal>

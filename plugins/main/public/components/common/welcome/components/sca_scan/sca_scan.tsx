@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -51,13 +52,23 @@ const ScaScanHeader = ({ agent }) => {
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
           <Typography level='card'>
-            Security Configuration Assessment
+            {i18n.translate('wazuh.common.agentWelcomeScaScan.title', {
+              defaultMessage: 'Security Configuration Assessment',
+            })}
           </Typography>
         </RedirectAppLinks>
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
         <RedirectAppLinks application={getCore().application}>
-          <EuiToolTip position='top' content='Open SCA Scans'>
+          <EuiToolTip
+            position='top'
+            content={i18n.translate(
+              'wazuh.common.agentWelcomeScaScan.openApp',
+              {
+                defaultMessage: 'Open SCA Scans',
+              },
+            )}
+          >
             <EuiButtonIcon
               iconType='popout'
               color='primary'
@@ -68,7 +79,12 @@ const ScaScanHeader = ({ agent }) => {
               href={NavigationService.getInstance().getAppURL(
                 configurationAssessment.id,
               )}
-              aria-label='Open SCA Scans'
+              aria-label={i18n.translate(
+                'wazuh.common.agentWelcomeScaScan.openApp',
+                {
+                  defaultMessage: 'Open SCA Scans',
+                },
+              )}
             />
           </EuiToolTip>
         </RedirectAppLinks>
@@ -99,7 +115,9 @@ const ScaScanTable = ({ dataSourceAction }) => {
   const columnsPolicies = [
     {
       field: 'name',
-      name: 'Policy',
+      name: i18n.translate('wazuh.common.agentWelcomeScaScan.columns.policy', {
+        defaultMessage: 'Policy',
+      }),
       width: '40%',
       sortable: true,
     },
@@ -117,7 +135,9 @@ const ScaScanTable = ({ dataSourceAction }) => {
     },
     {
       field: 'score',
-      name: 'Score',
+      name: i18n.translate('wazuh.common.agentWelcomeScaScan.columns.score', {
+        defaultMessage: 'Score',
+      }),
       width: '10%',
       sortable: true,
       render: score => {
@@ -131,10 +151,22 @@ const ScaScanTable = ({ dataSourceAction }) => {
     <>
       <EuiFlexGroup alignItems='center' gutterSize='s'>
         <EuiFlexItem grow={false} responsive={false}>
-          <Typography level='metric'>Checks by policies</Typography>
+          <Typography level='metric'>
+            {i18n.translate(
+              'wazuh.common.agentWelcomeScaScan.checksByPolicies',
+              {
+                defaultMessage: 'Checks by policies',
+              },
+            )}
+          </Typography>
         </EuiFlexItem>
         <EuiFlexItem grow={false} responsive={false}>
-          <Typography level='metric'>(top {TOP_POLICIES_SIZE})</Typography>
+          <Typography level='metric'>
+            {i18n.translate('wazuh.common.agentWelcomeScaScan.topPolicies', {
+              defaultMessage: '(top {size})',
+              values: { size: TOP_POLICIES_SIZE },
+            })}
+          </Typography>
         </EuiFlexItem>
       </EuiFlexGroup>
 
@@ -167,11 +199,25 @@ const ScaScanNoData = () => {
     <>
       <EuiEmptyPrompt
         iconType='visVega'
-        title={<h4>You don't have SCA scans in this agent.</h4>}
+        title={
+          <h4>
+            {i18n.translate('wazuh.common.agentWelcomeScaScan.noDataTitle', {
+              defaultMessage: "You don't have SCA scans in this agent.",
+            })}
+          </h4>
+        }
         titleSize={TypographySize({ level: 'prompt' })}
         body={
           <>
-            <p>Check your agent settings to generate scans.</p>
+            <p>
+              {i18n.translate(
+                'wazuh.common.agentWelcomeScaScan.noDataMessage',
+                {
+                  defaultMessage:
+                    'Check your agent settings to generate scans.',
+                },
+              )}
+            </p>
           </>
         }
       />

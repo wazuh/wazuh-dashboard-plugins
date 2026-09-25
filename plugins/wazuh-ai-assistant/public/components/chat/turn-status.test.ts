@@ -13,6 +13,9 @@ describe('describeTurnStatus', () => {
     expect(
       describeTurnStatus({ message: 'Writing the answer…', step: 'writing' }),
     ).toBe('Writing the answer…');
+    expect(describeTurnStatus({ message: 'Thinking…', step: 'thinking' })).toBe(
+      'Thinking…',
+    );
   });
 
   it('names the tool a querying step is running, and stays generic when none was reported', () => {

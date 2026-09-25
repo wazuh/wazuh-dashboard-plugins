@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { DocumentViewTableAndJsonPropsAdditionalTabs } from '../../wazuh-discover/components/document-view-table-and-json';
 import { CaseManagementTab } from './case-management-tab';
 
@@ -27,7 +28,9 @@ export const caseManagementDocumentDetailsTabs: DocumentViewTableAndJsonPropsAdd
   ({ document, onDocumentMutated }) => [
     {
       id: 'case-management',
-      name: 'Case',
+      name: i18n.translate('wazuh.common.documentDetails.caseTab', {
+        defaultMessage: 'Case',
+      }),
       guardUnsavedChanges: true,
       content: (
         <CaseManagementTab

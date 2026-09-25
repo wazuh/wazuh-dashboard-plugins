@@ -7,6 +7,7 @@ import {
   EuiFlexItem,
   EuiBasicTableColumn,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
@@ -48,7 +49,11 @@ export const UsersTable = ({
         // Workaround for tooltip problem does not disappear
         // when deleting a user if the following user is a reserved user
         setUserState([]);
-        ErrorHandler.info('User was successfully deleted');
+        ErrorHandler.info(
+          i18n.translate('wazuh.security.usersTable.deleteSuccess', {
+            defaultMessage: 'User was successfully deleted',
+          }),
+        );
         onSave();
       } catch (error) {
         const options = {
@@ -70,20 +75,26 @@ export const UsersTable = ({
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'username',
-      name: 'User',
+      name: i18n.translate('wazuh.security.usersTable.columns.user', {
+        defaultMessage: 'User',
+      }),
       sortable: true,
       truncateText: true,
     },
     {
       field: 'allow_run_as',
-      name: 'Allow run as ',
+      name: i18n.translate('wazuh.security.usersTable.columns.allowRunAs', {
+        defaultMessage: 'Allow run as ',
+      }),
       // Not sortable: the Server API only allows sorting /security/users by
       // `username` and `id`. Any other field is rejected with a bad request.
       truncateText: true,
     },
     {
       field: 'roles',
-      name: 'Roles',
+      name: i18n.translate('wazuh.security.usersTable.columns.roles', {
+        defaultMessage: 'Roles',
+      }),
       dataType: 'boolean',
       render: userRoles => {
         if (rolesLoading) {
@@ -107,7 +118,9 @@ export const UsersTable = ({
     {
       align: 'right',
       width: '70',
-      name: 'Actions',
+      name: i18n.translate('wazuh.security.usersTable.columns.actions', {
+        defaultMessage: 'Actions',
+      }),
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -117,19 +130,39 @@ export const UsersTable = ({
             ]}
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
-                ? "Reserved users can't be deleted"
-                : 'Delete user',
+                ? i18n.translate(
+                    'wazuh.security.usersTable.deleteReservedTooltip',
+                    { defaultMessage: "Reserved users can't be deleted" },
+                  )
+                : i18n.translate('wazuh.security.usersTable.deleteTooltip', {
+                    defaultMessage: 'Delete user',
+                  }),
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
-            modalTitle={`Do you want to delete ${item.username} user?`}
+            modalTitle={i18n.translate(
+              'wazuh.security.usersTable.deleteModalTitle',
+              {
+                defaultMessage: 'Do you want to delete {username} user?',
+                values: { username: item.username },
+              },
+            )}
             onConfirm={onConfirmDeleteUser(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete user'
-            modalCancelText='Cancel'
-            modalConfirmText='Confirm'
+            aria-label={i18n.translate(
+              'wazuh.security.usersTable.deleteAriaLabel',
+              { defaultMessage: 'Delete user' },
+            )}
+            modalCancelText={i18n.translate(
+              'wazuh.security.usersTable.deleteModalCancel',
+              { defaultMessage: 'Cancel' },
+            )}
+            modalConfirmText={i18n.translate(
+              'wazuh.security.usersTable.deleteModalConfirm',
+              { defaultMessage: 'Confirm' },
+            )}
           />
         </div>
       ),
