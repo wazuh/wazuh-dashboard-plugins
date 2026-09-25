@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { Filter } from 'src/plugins/data/common';
 import { STYLE } from '../../../components/overview/it-hygiene/common/saved-vis/constants';
 import {
@@ -251,7 +252,10 @@ export const getVisStateHorizontalBarByField = (
           type: 'histogram',
           mode: 'normal',
           data: {
-            label: 'Count',
+            label: i18n.translate(
+              'wazuh.common.visualizationGenerators.countLabel',
+              { defaultMessage: 'Count' },
+            ),
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -573,7 +577,10 @@ export const getVisStateTable = (
     fieldCustomLabel,
     otherBucket,
     missingBucket,
-    metricCustomLabel = 'Count',
+    metricCustomLabel = i18n.translate(
+      'wazuh.common.visualizationGenerators.countLabel',
+      { defaultMessage: 'Count' },
+    ),
     filters = [],
   } = options;
   return {

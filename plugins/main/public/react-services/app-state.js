@@ -23,6 +23,7 @@ import { BehaviorSubject } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 import { Cookies } from 'react-cookie';
 import { isEqual } from 'lodash';
+import { i18n } from '@osd/i18n';
 
 /* WORKAROUND: this defines the cookies object in case it doesn't exist that is used by
 the selectedServerAPI$ observable */
@@ -58,7 +59,10 @@ export class AppState {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error get cluster info`,
+          title: i18n.translate('wazuh.core.appState.getClusterInfoError', {
+            defaultMessage: '{errorName}: Error get cluster info',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -88,7 +92,10 @@ export class AppState {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error set cluster info`,
+          title: i18n.translate('wazuh.core.appState.setClusterInfoError', {
+            defaultMessage: '{errorName}: Error set cluster info',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -116,7 +123,10 @@ export class AppState {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error set createdAt date`,
+          title: i18n.translate('wazuh.core.appState.setCreatedAtError', {
+            defaultMessage: '{errorName}: Error set createdAt date',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -141,7 +151,10 @@ export class AppState {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error get createdAt date`,
+          title: i18n.translate('wazuh.core.appState.getCreatedAtError', {
+            defaultMessage: '{errorName}: Error get createdAt date',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -204,7 +217,10 @@ export class AppState {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error set current API`,
+          title: i18n.translate('wazuh.core.appState.setCurrentApiError', {
+            defaultMessage: '{errorName}: Error set current API',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -320,7 +336,9 @@ export class AppState {
       getToasts().add({
         color: 'success',
         title: 'CSV',
-        text: 'Your download should begin automatically...',
+        text: i18n.translate('wazuh.core.appState.downloadCsvStarted', {
+          defaultMessage: 'Your download should begin automatically...',
+        }),
         toastLifeTimeMs: 4000,
       });
       const currentApi = JSON.parse(this.getCurrentAPI()).id;
@@ -336,7 +354,10 @@ export class AppState {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error generating CSV`,
+          title: i18n.translate('wazuh.core.appState.downloadCsvError', {
+            defaultMessage: '{errorName}: Error generating CSV',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);

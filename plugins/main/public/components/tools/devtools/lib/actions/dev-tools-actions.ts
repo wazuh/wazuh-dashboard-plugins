@@ -63,8 +63,9 @@ export class DevToolsActions {
     }
 
     return {
+      // `error` holds a code, so its fallback stays as is
       error: errorPayload || 'Unknown',
-      message: message || 'Unknown error',
+      message: message || MESSAGES.UNKNOWN_ERROR,
     };
   }
 

@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import {
   EuiOverlayMask,
@@ -36,7 +37,11 @@ const WzAgentSelector = props => {
           initialFocus='[name=popswitch]'
         >
           <EuiModalHeader>
-            <EuiModalHeaderTitle>Explore agent</EuiModalHeaderTitle>
+            <EuiModalHeaderTitle>
+              {i18n.translate('wazuh.core.agentSelector.modalTitle', {
+                defaultMessage: 'Explore agent',
+              })}
+            </EuiModalHeaderTitle>
           </EuiModalHeader>
           <EuiModalBody>
             <AgentSelectionTable closeAgentModal={closeAgentModal} />
