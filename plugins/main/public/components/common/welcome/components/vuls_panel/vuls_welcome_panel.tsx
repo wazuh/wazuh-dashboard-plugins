@@ -31,6 +31,27 @@ import { withVulnerabilitiesStateDataSource } from '../../../../../components/ov
 import { formatUINumber } from '../../../../../react-services/format-number';
 import { Typography } from '../../../typography/typography';
 
+/* `severities[key].label` is the `vulnerability.severity` value, used for the
+filter and to match the aggregation buckets, so it stays untranslated. This is
+the text the user reads. */
+const SEVERITY_DISPLAY_LABELS: Record<keyof typeof severities, string> = {
+  low: i18n.translate('wazuh.common.agentWelcomeVulnerabilities.severity.low', {
+    defaultMessage: 'Low',
+  }),
+  medium: i18n.translate(
+    'wazuh.common.agentWelcomeVulnerabilities.severity.medium',
+    { defaultMessage: 'Medium' },
+  ),
+  high: i18n.translate(
+    'wazuh.common.agentWelcomeVulnerabilities.severity.high',
+    { defaultMessage: 'High' },
+  ),
+  critical: i18n.translate(
+    'wazuh.common.agentWelcomeVulnerabilities.severity.critical',
+    { defaultMessage: 'Critical' },
+  ),
+};
+
 const VulsPanelContentInitiation = compose(
   withDataSourceFetch({
     DataSource: VulnerabilitiesDataSource,
@@ -71,16 +92,20 @@ const VulsPanelContentInitiation = compose(
   const { dataSource } = dataSourceInitiation;
   const { severity: severityStats = [], package: topPackagesData = [] } =
     dataSourceAction?.data || {};
-  const getSeverityValue = severity => {
+  const getSeverityValue = (severityValue, severityDisplayLabel) => {
     const value =
-      severityStats?.find(v => v.key.toUpperCase() === severity.toUpperCase())
-        ?.doc_count || '0';
+      severityStats?.find(
+        v => v.key.toUpperCase() === severityValue.toUpperCase(),
+      )?.doc_count || '0';
     return value
       ? i18n.translate(
           'wazuh.common.agentWelcomeVulnerabilities.severityCount',
           {
             defaultMessage: '{count} {severity}',
-            values: { count: formatUINumber(value), severity },
+            values: {
+              count: formatUINumber(value),
+              severity: severityDisplayLabel,
+            },
           },
         )
       : '0';
@@ -108,7 +133,10 @@ const VulsPanelContentInitiation = compose(
                 style={{ color: severityColor }}
               >
                 <VulsSeverityStat
-                  value={`${getSeverityValue(severityLabel)}`}
+                  value={`${getSeverityValue(
+                    severityLabel,
+                    SEVERITY_DISPLAY_LABELS[severity],
+                  )}`}
                   color={severityColor}
                   isLoading={dataSourceAction.running}
                   textAlign='left'

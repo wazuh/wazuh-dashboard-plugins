@@ -19,4 +19,13 @@ export const MESSAGES = {
     'wazuh.devTools.console.insufficientPermissionsStatus',
     { defaultMessage: 'Forbidden: insufficient permissions' },
   ),
+  API_TIMEOUT: i18n.translate('wazuh.devTools.console.apiTimeout', {
+    defaultMessage: 'API is not reachable. Reason: timeout.',
+  }),
+  UNKNOWN_ERROR: i18n.translate('wazuh.devTools.console.unknownError', {
+    defaultMessage: 'Unknown error',
+  }),
+  EMPTY_ERROR: i18n.translate('wazuh.devTools.console.emptyError', {
+    defaultMessage: 'Empty',
+  }),
 } as const;
