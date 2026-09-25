@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { IntlProvider } from 'react-intl';
+import { i18n } from '@osd/i18n';
+import { I18nProvider } from '@osd/i18n/react';
 import {
   EuiDataGrid,
   EuiPageTemplate,
@@ -110,7 +111,12 @@ const InventoryVulsComponent = () => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect vulnerability details';
+    const inspectHintMsg = i18n.translate(
+      'wazuh.vulnerabilityDetection.inventory.inspectButton.tooltip',
+      {
+        defaultMessage: 'Inspect vulnerability details',
+      },
+    );
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -154,7 +160,12 @@ const InventoryVulsComponent = () => {
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
         error,
-        message: 'Error downloading csv report',
+        message: i18n.translate(
+          'wazuh.vulnerabilityDetection.inventory.errorDownloadingCsv',
+          {
+            defaultMessage: 'Error downloading csv report',
+          },
+        ),
       });
       ErrorHandler.handleError(searchError);
     } finally {
@@ -174,7 +185,12 @@ const InventoryVulsComponent = () => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: i18n.translate(
+            'wazuh.vulnerabilityDetection.inventory.errorFetchingData',
+            {
+              defaultMessage: 'Error fetching data',
+            },
+          ),
         });
         ErrorHandler.handleError(searchError);
       });
@@ -194,7 +210,7 @@ const InventoryVulsComponent = () => {
   const closeFlyoutHandler = () => setInspectedHit(undefined);
 
   return (
-    <IntlProvider locale='en'>
+    <I18nProvider>
       <>
         <ModuleEnabledCheck />
         {/* TODO: Using a page template wrapping these components causes different y render position
@@ -280,12 +296,22 @@ const InventoryVulsComponent = () => {
                               results?.hits?.total &&
                               results?.hits?.total > MAX_ENTRIES_PER_QUERY
                                 ? {
-                                    ariaLabel: 'Info',
-                                    content: `The query results has exceeded the limit of ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits. To provide a better experience the table only shows the first ${formatNumWithCommas(
-                                      MAX_ENTRIES_PER_QUERY,
-                                    )} hits.`,
+                                    ariaLabel: i18n.translate(
+                                      'wazuh.vulnerabilityDetection.inventory.hitsLimitTooltip.ariaLabel',
+                                      { defaultMessage: 'Info' },
+                                    ),
+                                    content: i18n.translate(
+                                      'wazuh.vulnerabilityDetection.inventory.hitsLimitTooltip.content',
+                                      {
+                                        defaultMessage:
+                                          'The query results has exceeded the limit of {maxEntries} hits. To provide a better experience the table only shows the first {maxEntries} hits.',
+                                        values: {
+                                          maxEntries: formatNumWithCommas(
+                                            MAX_ENTRIES_PER_QUERY,
+                                          ),
+                                        },
+                                      },
+                                    ),
                                     iconType: 'iInCircle',
                                     position: 'top',
                                   }
@@ -304,7 +330,12 @@ const InventoryVulsComponent = () => {
                             className='euiDataGrid__controlBtn'
                             onClick={onClickExportResults}
                           >
-                            Export Formatted
+                            {i18n.translate(
+                              'wazuh.vulnerabilityDetection.inventory.exportFormattedButton',
+                              {
+                                defaultMessage: 'Export Formatted',
+                              },
+                            )}
                           </EuiButtonEmpty>
 
                           <RestoreStateColumnsButton
@@ -328,7 +359,14 @@ const InventoryVulsComponent = () => {
               <EuiFlyout onClose={closeFlyoutHandler} size='m'>
                 <EuiFlyoutHeader>
                   <EuiTitle>
-                    <h2>Vulnerability details</h2>
+                    <h2>
+                      {i18n.translate(
+                        'wazuh.vulnerabilityDetection.inventory.detailsFlyout.title',
+                        {
+                          defaultMessage: 'Vulnerability details',
+                        },
+                      )}
+                    </h2>
                   </EuiTitle>
                 </EuiFlyoutHeader>
                 <EuiFlyoutBody>
@@ -352,7 +390,7 @@ const InventoryVulsComponent = () => {
           {error && <PromptErrorInitializatingDataSource error={error} />}
         </EuiPageTemplate>
       </>
-    </IntlProvider>
+    </I18nProvider>
   );
 };
 

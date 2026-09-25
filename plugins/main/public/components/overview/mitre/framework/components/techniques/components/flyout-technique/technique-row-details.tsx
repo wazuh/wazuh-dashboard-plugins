@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiCodeBlock, EuiFlexGroup, EuiTabbedContent } from '@elastic/eui';
 import { useDocViewer } from '../../../../../../../common/doc-viewer/use-doc-viewer';
 import DocViewer from '../../../../../../../common/doc-viewer/doc-viewer';
@@ -59,7 +60,12 @@ const TechniqueRowDetails = ({
         tabs={[
           {
             id: 'table',
-            name: 'Table',
+            name: i18n.translate(
+              'wazuh.mitreAttack.techniqueRowDetails.tabs.table',
+              {
+                defaultMessage: 'Table',
+              },
+            ),
             content: (
               <>
                 <DocViewer
@@ -75,7 +81,10 @@ const TechniqueRowDetails = ({
             name: 'JSON',
             content: (
               <EuiCodeBlock
-                aria-label={'Document details'}
+                aria-label={i18n.translate(
+                  'wazuh.mitreAttack.techniqueRowDetails.json.ariaLabel',
+                  { defaultMessage: 'Document details' },
+                )}
                 language='json'
                 isCopyable
                 paddingSize='s'

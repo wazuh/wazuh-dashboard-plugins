@@ -1,17 +1,28 @@
+import { i18n } from '@osd/i18n';
+
 export default [
   {
     type: 'multiSelect',
     key: 'user.name',
-    placeholder: 'Name',
+    placeholder: i18n.translate(
+      'wazuh.itHygiene.usersFilters.name.placeholder',
+      { defaultMessage: 'Name' },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'user.groups',
-    placeholder: 'Group',
+    placeholder: i18n.translate(
+      'wazuh.itHygiene.usersFilters.group.placeholder',
+      { defaultMessage: 'Group' },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'user.shell',
-    placeholder: 'Shell',
+    placeholder: i18n.translate(
+      'wazuh.itHygiene.usersFilters.shell.placeholder',
+      { defaultMessage: 'Shell' },
+    ),
   },
 ];

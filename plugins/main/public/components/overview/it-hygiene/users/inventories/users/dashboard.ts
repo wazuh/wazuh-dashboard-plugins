@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { STYLE } from '../../../common/saved-vis/constants';
 import {
@@ -13,7 +14,9 @@ import { SavedVis } from '../../../common/types';
 const getVisStateUniqueUsersMetric = (indexPatternId: string): SavedVis => {
   return {
     id: 'it-hygiene-users-unique-count',
-    title: 'Unique users',
+    title: i18n.translate('wazuh.itHygiene.usersDashboard.uniqueUsers.title', {
+      defaultMessage: 'Unique users',
+    }),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -47,7 +50,10 @@ const getVisStateUniqueUsersMetric = (indexPatternId: string): SavedVis => {
           type: 'cardinality',
           params: {
             field: 'user.name',
-            customLabel: 'Unique users',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.usersDashboard.uniqueUsers.label',
+              { defaultMessage: 'Unique users' },
+            ),
           },
           schema: 'metric',
         },
@@ -61,23 +67,44 @@ export const getOverviewUsersUsersTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.name',
-      'Top 5 users',
+      i18n.translate('wazuh.itHygiene.usersDashboard.topUsers.title', {
+        defaultMessage: 'Top 5 users',
+      }),
       'it-hygiene-users',
-      { fieldCustomLabel: 'Users' },
+      {
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.usersDashboard.topUsers.fieldLabel',
+          { defaultMessage: 'Users' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.groups',
-      'Top 5 user groups',
+      i18n.translate('wazuh.itHygiene.usersDashboard.topUserGroups.title', {
+        defaultMessage: 'Top 5 user groups',
+      }),
       'it-hygiene-users',
-      { fieldCustomLabel: 'User groups' },
+      {
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.usersDashboard.topUserGroups.fieldLabel',
+          { defaultMessage: 'User groups' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'user.shell',
-      'Top 5 user shells',
+      i18n.translate('wazuh.itHygiene.usersDashboard.topUserShells.title', {
+        defaultMessage: 'Top 5 user shells',
+      }),
       'it-hygiene-users',
-      { fieldCustomLabel: 'User shells' },
+      {
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.usersDashboard.topUserShells.fieldLabel',
+          { defaultMessage: 'User shells' },
+        ),
+      },
     ),
   ]);
 };

@@ -45,6 +45,7 @@ import {
   tFilter,
 } from '../../common/data-source';
 import { LoadingSearchbarProgress } from '../../common/loading-searchbar-progress/loading-searchbar-progress';
+import { i18n } from '@osd/i18n';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
@@ -209,7 +210,13 @@ function buildComplianceObject({ section }) {
       error: {
         error: error,
         message: error.message || error,
-        title: `Compliance (${section}) data could not be fetched`,
+        title: i18n.translate(
+          'wazuh.complianceTable.errors.buildComplianceTitle',
+          {
+            defaultMessage: 'Compliance ({section}) data could not be fetched',
+            values: { section },
+          },
+        ),
       },
     };
     getErrorOrchestrator().handleError(options);
@@ -325,7 +332,12 @@ export const ComplianceTable = compose(
         error: {
           error: error,
           message: error.message || error,
-          title: `Alerts could not be fetched:`,
+          title: i18n.translate(
+            'wazuh.complianceTable.errors.fetchAlertsTitle',
+            {
+              defaultMessage: 'Alerts could not be fetched:',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);

@@ -11,30 +11,41 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, {useCallback, useState} from 'react';
-import { 
-  EuiTitle,
-  EuiSpacer
-} from '@elastic/eui';
+import React, { useCallback, useState } from 'react';
+import { i18n } from '@osd/i18n';
+import { EuiTitle, EuiSpacer } from '@elastic/eui';
 import { ModuleMitreAttackIntelligenceAllResourcesSearchResults } from './all_resources_search_results';
 import { ModuleMitreAttackIntelligenceFlyout } from './resource_detail_flyout';
 
-export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) => {
+export const ModuleMitreAttackIntelligenceAllResources = ({
+  results,
+  loading,
+}) => {
   const [details, setDetails] = useState(null);
 
-  const selectResource = useCallback((item) => {
+  const selectResource = useCallback(item => {
     setDetails(item);
-  },[]);
+  }, []);
 
   const closeFlyout = useCallback(() => {
     setDetails(null);
-  },[]);
+  }, []);
 
   return (
     <>
-      <EuiTitle><h1>Search results</h1></EuiTitle>
+      <EuiTitle>
+        <h1>
+          {i18n.translate('wazuh.mitreAttack.intelligenceSearchResults.title', {
+            defaultMessage: 'Search results',
+          })}
+        </h1>
+      </EuiTitle>
       <EuiSpacer />
-      <ModuleMitreAttackIntelligenceAllResourcesSearchResults results={results} loading={loading} onSelectResource={selectResource}/> 
+      <ModuleMitreAttackIntelligenceAllResourcesSearchResults
+        results={results}
+        loading={loading}
+        onSelectResource={selectResource}
+      />
 
       {details && (
         <ModuleMitreAttackIntelligenceFlyout
@@ -44,5 +55,5 @@ export const ModuleMitreAttackIntelligenceAllResources = ({ results, loading }) 
         />
       )}
     </>
-  )
+  );
 };

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from 'src/plugins/dashboard/public/application';
 import { STYLE } from './constants';
 import {
@@ -51,9 +52,19 @@ export const getVisStatePieByField = (
             order: orderAggregation,
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              {
+                defaultMessage: 'Other',
+              },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              {
+                defaultMessage: 'Missing',
+              },
+            ),
           },
           schema: 'segment',
         },
@@ -111,9 +122,19 @@ export const getVisStateDonutByField = (
             order: orderAggregation,
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              {
+                defaultMessage: 'Other',
+              },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              {
+                defaultMessage: 'Missing',
+              },
+            ),
           },
           schema: 'segment',
         },
@@ -199,7 +220,9 @@ export const getVisStateHorizontalBarByField = (
           type: 'histogram',
           mode: 'normal',
           data: {
-            label: 'Count',
+            label: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -245,9 +268,19 @@ export const getVisStateHorizontalBarByField = (
             order: orderAggregation,
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              {
+                defaultMessage: 'Other',
+              },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              {
+                defaultMessage: 'Missing',
+              },
+            ),
             customLabel,
             ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
@@ -345,7 +378,9 @@ export const getVisStateHistogramBy = (
   const {
     addLegend = true,
     customLabel = '',
-    valueAxesTitleText = 'Count',
+    valueAxesTitleText = i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+      defaultMessage: 'Count',
+    }),
   } = options;
   return {
     id: `${visIDPrefix}-${field}`,
@@ -403,7 +438,9 @@ export const getVisStateHistogramBy = (
           type: 'area',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
             id: '1',
           },
           drawLinesBetweenPoints: true,
@@ -516,7 +553,9 @@ export const getVisStateTable = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
           },
           schema: 'metric',
         },
@@ -530,9 +569,19 @@ export const getVisStateTable = (
             order: 'desc',
             size,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              {
+                defaultMessage: 'Other',
+              },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              {
+                defaultMessage: 'Missing',
+              },
+            ),
             customLabel,
             ...(excludeTerm ? { json: `{"exclude":"${excludeTerm}"}` } : {}),
           },
@@ -570,7 +619,17 @@ export const getVisStateMetric = (
     useRanges = false,
     style = STYLE,
     aggsQuery = [],
-    metricAgg = { type: 'count', params: { customLabel: 'checks' } },
+    metricAgg = {
+      type: 'count',
+      params: {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.savedVis.metric.checksLabel',
+          {
+            defaultMessage: 'checks',
+          },
+        ),
+      },
+    },
     colors = {},
   } = options;
 
