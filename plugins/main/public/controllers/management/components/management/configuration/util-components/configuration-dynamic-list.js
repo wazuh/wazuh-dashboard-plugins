@@ -12,6 +12,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 import { EuiText } from '@elastic/eui';
 
 import WzConfigurationSettingsHeader from './configuration-settings-header';
@@ -40,7 +41,9 @@ const WzConfigurationDynamicList = ({ list, items, query }) => {
         help={list.help}
       >
         <EuiText size='s' color='subdued'>
-          Nothing configured yet.
+          {i18n.translate('wazuh.configuration.dynamicList.nothingConfigured', {
+            defaultMessage: 'Nothing configured yet.',
+          })}
         </EuiText>
       </WzConfigurationSettingsHeader>
     );

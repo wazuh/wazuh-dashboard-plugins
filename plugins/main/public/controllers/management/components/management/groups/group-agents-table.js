@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiCallOut, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -50,21 +51,27 @@ class WzGroupAgentsTable extends Component {
     this.columns = [
       {
         field: 'id',
-        name: 'Id',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.idColumn', {
+          defaultMessage: 'Id',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
       },
       {
         field: 'name',
-        name: 'Name',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.nameColumn', {
+          defaultMessage: 'Name',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
       },
       {
         field: 'ip',
-        name: 'IP address',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.ipColumn', {
+          defaultMessage: 'IP address',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
@@ -72,7 +79,9 @@ class WzGroupAgentsTable extends Component {
       {
         field: 'os.name,os.version',
         composeField: ['os.name', 'os.version'],
-        name: 'Operating system',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.osColumn', {
+          defaultMessage: 'Operating system',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
@@ -80,14 +89,18 @@ class WzGroupAgentsTable extends Component {
       },
       {
         field: 'version',
-        name: 'Version',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.versionColumn', {
+          defaultMessage: 'Version',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
       },
       {
         field: 'status',
-        name: 'Status',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.statusColumn', {
+          defaultMessage: 'Status',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
@@ -100,7 +113,9 @@ class WzGroupAgentsTable extends Component {
         ),
       },
       {
-        name: 'Actions',
+        name: i18n.translate('wazuh.endpointGroups.agentsTable.actionsColumn', {
+          defaultMessage: 'Actions',
+        }),
         align: 'left',
         searchable: false,
         render: item => {
@@ -117,8 +132,17 @@ class WzGroupAgentsTable extends Component {
                     })),
                   ],
                 ]}
-                tooltip={{ position: 'top', content: 'Go to the agent' }}
-                aria-label='Go to the agent'
+                tooltip={{
+                  position: 'top',
+                  content: i18n.translate(
+                    'wazuh.endpointGroups.agentsTable.goToAgentTooltip',
+                    { defaultMessage: 'Go to the agent' },
+                  ),
+                }}
+                aria-label={i18n.translate(
+                  'wazuh.endpointGroups.agentsTable.goToAgentAriaLabel',
+                  { defaultMessage: 'Go to the agent' },
+                )}
                 iconType='eye'
                 onClick={async () => {
                   NavigationService.getInstance().navigateToApp(
@@ -147,18 +171,29 @@ class WzGroupAgentsTable extends Component {
                   ]}
                   tooltip={{
                     position: 'top',
-                    content: 'Remove agent from this group',
+                    content: i18n.translate(
+                      'wazuh.endpointGroups.agentsTable.removeAgentTooltip',
+                      { defaultMessage: 'Remove agent from this group' },
+                    ),
                   }}
-                  aria-label='Remove agent from this group'
+                  aria-label={i18n.translate(
+                    'wazuh.endpointGroups.agentsTable.removeAgentAriaLabel',
+                    { defaultMessage: 'Remove agent from this group' },
+                  )}
                   iconType='trash'
                   onConfirm={async () => {
                     this.removeItems([item]);
                   }}
                   color='danger'
                   isDisabled={item.name === 'default'}
-                  modalTitle={`Remove ${
-                    item.file || item.name
-                  } agent from this group?`}
+                  modalTitle={i18n.translate(
+                    'wazuh.endpointGroups.agentsTable.removeAgentModalTitle',
+                    {
+                      defaultMessage:
+                        'Remove {agentName} agent from this group?',
+                      values: { agentName: item.file || item.name },
+                    },
+                  )}
                   modalProps={{
                     buttonColor: 'danger',
                   }}
@@ -173,16 +208,55 @@ class WzGroupAgentsTable extends Component {
     this.searchBar = {
       wql: {
         suggestionFields: [
-          { label: 'id', description: `filter by ID` },
-          { label: 'ip', description: `filter by IP address` },
-          { label: 'name', description: `filter by Name` },
-          { label: 'os.name', description: `filter by Operating system name` },
+          {
+            label: 'id',
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterById',
+              { defaultMessage: 'filter by ID' },
+            ),
+          },
+          {
+            label: 'ip',
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterByIp',
+              { defaultMessage: 'filter by IP address' },
+            ),
+          },
+          {
+            label: 'name',
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterByName',
+              { defaultMessage: 'filter by Name' },
+            ),
+          },
+          {
+            label: 'os.name',
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterByOsName',
+              { defaultMessage: 'filter by Operating system name' },
+            ),
+          },
           {
             label: 'os.version',
-            description: `filter by Operating system version`,
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterByOsVersion',
+              { defaultMessage: 'filter by Operating system version' },
+            ),
           },
-          { label: 'status', description: `filter by Status` },
-          { label: 'version', description: `filter by Version` },
+          {
+            label: 'status',
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterByStatus',
+              { defaultMessage: 'filter by Status' },
+            ),
+          },
+          {
+            label: 'version',
+            description: i18n.translate(
+              'wazuh.endpointGroups.agentsTable.filterByVersion',
+              { defaultMessage: 'filter by Version' },
+            ),
+          },
         ],
       },
     };
@@ -213,8 +287,13 @@ class WzGroupAgentsTable extends Component {
     if (!error) {
       return (
         <TableWzAPI
-          title='Agents'
-          description='From here you can list and manage your agents'
+          title={i18n.translate('wazuh.endpointGroups.agentsTable.title', {
+            defaultMessage: 'Agents',
+          })}
+          description={i18n.translate(
+            'wazuh.endpointGroups.agentsTable.description',
+            { defaultMessage: 'From here you can list and manage your agents' },
+          )}
           tableColumns={this.columns}
           tableInitialSortingField='id'
           endpoint={`/groups/${groupName}/agents`}
@@ -285,7 +364,16 @@ class WzGroupAgentsTable extends Component {
       this.props.updateIsProcessing(true);
       this.props.updateLoadingStatus(false);
       this.props.updateReload();
-      this.showToast('success', 'Success', 'Deleted successfully', 3000);
+      this.showToast(
+        'success',
+        i18n.translate('wazuh.endpointGroups.agentsTable.removeSuccessTitle', {
+          defaultMessage: 'Success',
+        }),
+        i18n.translate('wazuh.endpointGroups.agentsTable.removeSuccessText', {
+          defaultMessage: 'Deleted successfully',
+        }),
+        3000,
+      );
     } catch (error) {
       const options = {
         context: `${WzGroupAgentsTable.name}.removeItems`,

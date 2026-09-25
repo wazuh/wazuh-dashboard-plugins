@@ -36,6 +36,7 @@ import { WzButtonPermissions } from '../../../../../components/common/permission
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
+import { i18n } from '@osd/i18n';
 
 class WzStatusActionButtons extends Component {
   _isMounted = false;
@@ -71,7 +72,9 @@ class WzStatusActionButtons extends Component {
       this.setState({ isRestarting: false });
       this.showToast(
         'success',
-        'Restarting cluster, it will take up to 30 seconds.',
+        i18n.translate('wazuh.serverStatus.actionButtons.restartingToast', {
+          defaultMessage: 'Restarting cluster, it will take up to 30 seconds.',
+        }),
         3000,
       );
     } catch (error) {
@@ -83,7 +86,13 @@ class WzStatusActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error restarting cluster`,
+          title: i18n.translate(
+            'wazuh.serverStatus.actionButtons.restartError',
+            {
+              defaultMessage: '{errorName}: Error restarting cluster',
+              values: { errorName: error.name },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -142,7 +151,13 @@ class WzStatusActionButtons extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Node ${node} is down`,
+          title: i18n.translate(
+            'wazuh.serverStatus.actionButtons.nodeDownError',
+            {
+              defaultMessage: '{errorName}: Node {node} is down',
+              values: { errorName: error.name, node },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -175,7 +190,10 @@ class WzStatusActionButtons extends Component {
     for (const node of listNodes) {
       options.push({
         value: node.name,
-        text: `${node.name} (${node.type})`,
+        text: i18n.translate('wazuh.serverStatus.actionButtons.nodeOption', {
+          defaultMessage: '{name} ({type})',
+          values: { name: node.name, type: node.type },
+        }),
       });
     }
     return options;
@@ -199,7 +217,10 @@ class WzStatusActionButtons extends Component {
           value={selectedNode}
           onChange={this.changeNode}
           disabled={isLoading || this.state.isRestarting}
-          aria-label='Select node'
+          aria-label={i18n.translate(
+            'wazuh.serverStatus.actionButtons.selectNodeAriaLabel',
+            { defaultMessage: 'Select node' },
+          )}
         />
       </EuiFlexItem>
     ) : null;
@@ -219,7 +240,9 @@ class WzStatusActionButtons extends Component {
         isDisabled={isLoading}
         isLoading={this.state.isRestarting}
       >
-        {'Restart cluster'}
+        {i18n.translate('wazuh.serverStatus.actionButtons.restartButton', {
+          defaultMessage: 'Restart cluster',
+        })}
       </WzButtonPermissions>
     );
 
@@ -229,14 +252,23 @@ class WzStatusActionButtons extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Cluster will be restarted'
+            title={i18n.translate(
+              'wazuh.serverStatus.actionButtons.restartModalTitle',
+              { defaultMessage: 'Cluster will be restarted' },
+            )}
             onCancel={this.closeModal}
             onConfirm={() => {
               this.restartCluster();
               this.setState({ isModalVisible: false });
             }}
-            cancelButtonText='Cancel'
-            confirmButtonText='Confirm'
+            cancelButtonText={i18n.translate(
+              'wazuh.serverStatus.actionButtons.restartModalCancel',
+              { defaultMessage: 'Cancel' },
+            )}
+            confirmButtonText={i18n.translate(
+              'wazuh.serverStatus.actionButtons.restartModalConfirm',
+              { defaultMessage: 'Confirm' },
+            )}
             defaultFocusedButton='cancel'
           ></EuiConfirmModal>
         </EuiOverlayMask>

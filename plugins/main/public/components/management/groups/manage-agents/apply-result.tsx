@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiCallOut,
   EuiFlexGroup,
@@ -27,11 +28,27 @@ const errorsTable = (errors: ErrorAgent[]) => (
     items={errors}
     tableLayout='auto'
     columns={[
-      { field: 'error.code', name: 'Code', align: 'left', width: '100px' },
-      { field: 'error.message', name: 'Error', align: 'left' },
+      {
+        field: 'error.code',
+        name: i18n.translate('wazuh.endpointGroups.applyResult.codeColumn', {
+          defaultMessage: 'Code',
+        }),
+        align: 'left',
+        width: '100px',
+      },
+      {
+        field: 'error.message',
+        name: i18n.translate('wazuh.endpointGroups.applyResult.errorColumn', {
+          defaultMessage: 'Error',
+        }),
+        align: 'left',
+      },
       {
         field: 'id',
-        name: 'Agent IDs',
+        name: i18n.translate(
+          'wazuh.endpointGroups.applyResult.agentIdsColumn',
+          { defaultMessage: 'Agent IDs' },
+        ),
         align: 'left',
         render: (ids: string[]) => ids.join(', '),
       },
@@ -58,7 +75,11 @@ export const ApplyResultView = ({
           <EuiLoadingSpinner size='m' />
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
-          <EuiText size='s'>Applying changes&hellip;</EuiText>
+          <EuiText size='s'>
+            {i18n.translate('wazuh.endpointGroups.applyResult.applying', {
+              defaultMessage: 'Applying changes…',
+            })}
+          </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
     );
@@ -76,7 +97,10 @@ export const ApplyResultView = ({
           <EuiFlexItem grow={false}>
             <EuiButtonIcon
               data-test-subj='applyResultDismiss'
-              aria-label='Dismiss'
+              aria-label={i18n.translate(
+                'wazuh.endpointGroups.applyResult.dismissAriaLabel',
+                { defaultMessage: 'Dismiss' },
+              )}
               iconType='cross'
               onClick={onDismiss}
             />

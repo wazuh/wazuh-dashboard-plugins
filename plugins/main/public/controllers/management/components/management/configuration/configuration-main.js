@@ -15,6 +15,7 @@ import {
   withGlobalBreadcrumb,
 } from '../../../../../components/common/hocs';
 import { compose } from 'redux';
+import { i18n } from '@osd/i18n';
 import { endpointSummary, settings } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { SECTIONS } from '../../../../../sections';
@@ -41,7 +42,14 @@ export default compose(
         }),
       },
       { agent },
-      { text: 'Configuration' },
+      {
+        text: i18n.translate(
+          'wazuh.configuration.configurationMain.breadcrumb',
+          {
+            defaultMessage: 'Configuration',
+          },
+        ),
+      },
     ];
     document.querySelector('#breadcrumbNoTitle')?.setAttribute('title', '');
     return breadcrumb;

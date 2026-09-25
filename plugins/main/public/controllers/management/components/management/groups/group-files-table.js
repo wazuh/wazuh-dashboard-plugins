@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { i18n } from '@osd/i18n';
 import { connect } from 'react-redux';
 
 import {
@@ -37,8 +38,20 @@ class WzGroupFilesTable extends Component {
     this.searchBar = {
       wql: {
         suggestionsFields: [
-          { label: 'filename', description: 'filter by filename' },
-          { label: 'hash', description: 'filter by hash' },
+          {
+            label: 'filename',
+            description: i18n.translate(
+              'wazuh.endpointGroups.filesTable.filterByFilename',
+              { defaultMessage: 'filter by filename' },
+            ),
+          },
+          {
+            label: 'hash',
+            description: i18n.translate(
+              'wazuh.endpointGroups.filesTable.filterByHash',
+              { defaultMessage: 'filter by hash' },
+            ),
+          },
         ],
       },
     };
@@ -52,9 +65,16 @@ class WzGroupFilesTable extends Component {
 
     return (
       <TableWzAPI
-        title='Files'
-        description='From here you can list and see your group files, also, you can
-        edit the group configuration'
+        title={i18n.translate('wazuh.endpointGroups.filesTable.title', {
+          defaultMessage: 'Files',
+        })}
+        description={i18n.translate(
+          'wazuh.endpointGroups.filesTable.description',
+          {
+            defaultMessage:
+              'From here you can list and see your group files, also, you can edit the group configuration',
+          },
+        )}
         tableColumns={columns}
         tableInitialSortingField='filename'
         endpoint={`/groups/${groupName}/files`}

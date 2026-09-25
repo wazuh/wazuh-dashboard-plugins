@@ -10,6 +10,7 @@ import {
 } from '@elastic/eui';
 import '../dashboard/cluster_dashboard.scss';
 import { formatUINumber } from '../../../../react-services/format-number';
+import { i18n } from '@osd/i18n';
 
 interface OverviewCardsProps {
   goAgents: () => void;
@@ -47,7 +48,14 @@ export const OverviewCards = ({
               >
                 <EuiFlexItem grow={false}>
                   <EuiTitle>
-                    <h2>Details</h2>
+                    <h2>
+                      {i18n.translate(
+                        'wazuh.cluster.overviewCards.detailsTitle',
+                        {
+                          defaultMessage: 'Details',
+                        },
+                      )}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
@@ -57,7 +65,12 @@ export const OverviewCards = ({
                     onClick={goConfiguration}
                     iconType='visPie'
                   >
-                    View Overview
+                    {i18n.translate(
+                      'wazuh.cluster.overviewCards.viewOverviewButton',
+                      {
+                        defaultMessage: 'View Overview',
+                      },
+                    )}
                   </EuiButtonEmpty>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -68,11 +81,21 @@ export const OverviewCards = ({
               compressed
               listItems={[
                 {
-                  title: 'IP address',
+                  title: i18n.translate(
+                    'wazuh.cluster.overviewCards.ipAddressLabel',
+                    {
+                      defaultMessage: 'IP address',
+                    },
+                  ),
                   description: configuration?.nodes[0] || '-',
                 },
                 {
-                  title: 'Version',
+                  title: i18n.translate(
+                    'wazuh.cluster.overviewCards.versionLabel',
+                    {
+                      defaultMessage: 'Version',
+                    },
+                  ),
                   description: version ?? '-',
                 },
               ]}
@@ -90,7 +113,14 @@ export const OverviewCards = ({
             textAlign='left'
             title={
               <EuiTitle>
-                <h2>Information</h2>
+                <h2>
+                  {i18n.translate(
+                    'wazuh.cluster.overviewCards.informationTitle',
+                    {
+                      defaultMessage: 'Information',
+                    },
+                  )}
+                </h2>
               </EuiTitle>
             }
           >
@@ -99,10 +129,18 @@ export const OverviewCards = ({
               compressed
               listItems={[
                 {
-                  title: 'Nodes',
+                  title: i18n.translate(
+                    'wazuh.cluster.overviewCards.nodesLabel',
+                    {
+                      defaultMessage: 'Nodes',
+                    },
+                  ),
                   description: (
                     <EuiToolTip
-                      content='Click to open the list of nodes'
+                      content={i18n.translate(
+                        'wazuh.cluster.overviewCards.nodesTooltip',
+                        { defaultMessage: 'Click to open the list of nodes' },
+                      )}
                       position='right'
                     >
                       <EuiButtonEmpty
@@ -117,10 +155,18 @@ export const OverviewCards = ({
                   ),
                 },
                 {
-                  title: 'Agents',
+                  title: i18n.translate(
+                    'wazuh.cluster.overviewCards.agentsLabel',
+                    {
+                      defaultMessage: 'Agents',
+                    },
+                  ),
                   description: (
                     <EuiToolTip
-                      content='Click to open the list of agents'
+                      content={i18n.translate(
+                        'wazuh.cluster.overviewCards.agentsTooltip',
+                        { defaultMessage: 'Click to open the list of agents' },
+                      )}
                       position='right'
                     >
                       <EuiButtonEmpty

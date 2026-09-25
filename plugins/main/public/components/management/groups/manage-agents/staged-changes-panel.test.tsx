@@ -197,4 +197,31 @@ describe('StagedChangesPanel', () => {
     wrapper.find('button[data-test-subj="discardAllButton"]').simulate('click');
     expect(onDiscardAll).toHaveBeenCalled();
   });
+
+  it('prints large counts without digit grouping', () => {
+    const agents = (count: number, prefix: string) =>
+      Array.from({ length: count }, (_, i) => ({
+        id: `${prefix}${i}`,
+        name: `${prefix}-agent-${i}`,
+      }));
+    const wrapper = mount(
+      <StagedChangesPanel
+        adds={agents(1000, 'a')}
+        removes={agents(234, 'r')}
+        memberTotal={5000}
+        onUnstage={jest.fn()}
+        onDiscardAll={jest.fn()}
+        onApply={jest.fn()}
+      />,
+    );
+
+    const text = wrapper.text();
+    expect(text).toContain('Adding 1000');
+    expect(text).toContain('Removing 234');
+    expect(text).toContain('1234 staged, nothing written yet');
+    expect(
+      wrapper.find('button[data-test-subj="applyChangesButton"]').text(),
+    ).toBe('Apply 1234 changes');
+    expect(text).not.toMatch(/\d,\d{3}/);
+  });
 });
