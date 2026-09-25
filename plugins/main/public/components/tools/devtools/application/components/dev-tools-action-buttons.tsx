@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiFlexGroup, EuiIcon } from '@elastic/eui';
 import { DEV_TOOLS_BUTTONS } from '../../constants';
+import { i18n } from '@osd/i18n';
 
 interface DevToolsActionButtonsProps {
   onSendRequestButton: () => void;
@@ -18,7 +19,9 @@ const DevToolsActionButtons = ({
       <EuiIcon
         type='play'
         onClick={() => onSendRequestButton()}
-        title='Send request'
+        title={i18n.translate('wazuh.devTools.editor.sendRequest', {
+          defaultMessage: 'Send request',
+        })}
         id={DEV_TOOLS_BUTTONS.PLAY_BUTTON_ID}
         color='success'
       />

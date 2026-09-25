@@ -9,52 +9,58 @@ import {
   office365,
   vulnerabilityDetection,
 } from '../../utils/applications';
+import { i18n } from '@osd/i18n';
 
-export const sampleSecurityInformationApplication = [
-  fileIntegrityMonitoring.title,
-  amazonWebServices.title,
-  office365.title,
-  googleCloud.title,
-  github.title,
-  microsoftGraphAPI.title,
-  'authorization',
-  'ssh',
-  'web',
-].join(', ');
-
-export const sampleThreatDetectionApplication = [
-  vulnerabilityDetection.title,
-  docker.title,
-  mitreAttack.title,
-].join(', ');
-
-export const sampleMalwareDetection = ['malware', 'VirusTotal', 'YARA'].join(
-  ', ',
+export const sampleSecurityInformationApplication = i18n.translate(
+  'wazuh.sampleData.categories.securityInformation.sources',
+  {
+    defaultMessage:
+      '{fileIntegrityMonitoring}, {amazonWebServices}, {office365}, {googleCloud}, {github}, {microsoftGraphApi}, authorization, ssh, web',
+    values: {
+      fileIntegrityMonitoring: fileIntegrityMonitoring.title,
+      amazonWebServices: amazonWebServices.title,
+      office365: office365.title,
+      googleCloud: googleCloud.title,
+      github: github.title,
+      microsoftGraphApi: microsoftGraphAPI.title,
+    },
+  },
 );
 
-export const sampleFileIntegrityMonitoring = ['files', 'registries'].join(', ');
+export const sampleThreatDetectionApplication = i18n.translate(
+  'wazuh.sampleData.categories.threatDetection.sources',
+  {
+    defaultMessage: '{vulnerabilityDetection}, {docker}, {mitreAttack}',
+    values: {
+      vulnerabilityDetection: vulnerabilityDetection.title,
+      docker: docker.title,
+      mitreAttack: mitreAttack.title,
+    },
+  },
+);
 
-export const sampleSecurityConfigurationAssessment = [
-  'states of SCA',
-  'checks',
-  'policies',
-].join(', ');
+export const sampleMalwareDetection = i18n.translate(
+  'wazuh.sampleData.categories.malwareDetection.sources',
+  { defaultMessage: 'malware, VirusTotal, YARA' },
+);
 
-export const sampleInventory = [
-  'groups',
-  'hardware',
-  'hotfixes',
-  'interfaces',
-  'networks',
-  'packages',
-  'ports',
-  'processes',
-  'protocols',
-  'system',
-  'users',
-  'services',
-  'browser extensions',
-].join(', ');
+export const sampleFileIntegrityMonitoring = i18n.translate(
+  'wazuh.sampleData.categories.fileIntegrityMonitoring.sources',
+  { defaultMessage: 'files, registries' },
+);
+
+export const sampleSecurityConfigurationAssessment = i18n.translate(
+  'wazuh.sampleData.categories.configurationAssessment.sources',
+  { defaultMessage: 'states of SCA, checks, policies' },
+);
+
+export const sampleInventory = i18n.translate(
+  'wazuh.sampleData.categories.systemInventory.sources',
+  {
+    defaultMessage:
+      'groups, hardware, hotfixes, interfaces, networks, packages, ports, processes, protocols, system, users, services, browser extensions',
+  },
+);
 
 /**
  * Creates an object by pairing each entry of the keys array with the value

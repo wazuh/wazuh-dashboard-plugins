@@ -13,6 +13,7 @@ import { WzMisc } from '../factories/misc';
 import { getHttp, getWazuhCorePlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
+import { i18n } from '@osd/i18n';
 
 export class ApiCheck {
   static async checkStored(data, idChanged = false) {
@@ -52,7 +53,13 @@ export class ApiCheck {
         return (err || {}).message || false
           ? Promise.reject(this.returnErrorInstance(err, err.message))
           : Promise.reject(
-              this.returnErrorInstance(err, err || 'Server did not respond'),
+              this.returnErrorInstance(
+                err,
+                err ||
+                  i18n.translate('wazuh.core.request.serverDidNotRespond', {
+                    defaultMessage: 'Server did not respond',
+                  }),
+              ),
             );
       }
     }
@@ -93,7 +100,13 @@ export class ApiCheck {
         return (err || {}).message || false
           ? Promise.reject(this.returnErrorInstance(err, err.message))
           : Promise.reject(
-              this.returnErrorInstance(err, err || 'Server did not respond'),
+              this.returnErrorInstance(
+                err,
+                err ||
+                  i18n.translate('wazuh.core.request.serverDidNotRespond', {
+                    defaultMessage: 'Server did not respond',
+                  }),
+              ),
             );
       }
     }
