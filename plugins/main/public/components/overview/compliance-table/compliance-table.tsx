@@ -15,16 +15,26 @@ import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components';
 import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
-import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
-import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
+import {
+  gdprRequirementsAliases,
+  gdprRequirementsFile,
+} from '../../../../common/compliance-requirements/gdpr-requirements';
+import {
+  hipaaRequirementsAliases,
+  hipaaRequirementsFile,
+} from '../../../../common/compliance-requirements/hipaa-requirements';
 import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
 import { nist171RequirementsFile } from '../../../../common/compliance-requirements/nist-171-requirements';
 import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
 import { iso27001RequirementsFile } from '../../../../common/compliance-requirements/iso27001-requirements';
-import { cmmcRequirementsFile } from '../../../../common/compliance-requirements/cmmc-requirements';
+import {
+  cmmcRequirementsAliases,
+  cmmcRequirementsFile,
+} from '../../../../common/compliance-requirements/cmmc-requirements';
 import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
 import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
 import { ComplianceRequirement } from '../../../../common/compliance-requirements/types';
+import { getRequirementCodes } from '../../../../common/compliance-requirements/requirement-codes';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT,
@@ -56,19 +66,56 @@ import { compose } from 'redux';
 // unknown) instead of silently truncating at the top N by count.
 const COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE = 1000;
 
+// HIPAA identifiers name a standard and, under it, its implementation
+// specifications: 164.312(a)(1) is the "Access control" standard and
+// 164.312(a)(2)(i-iv) are its specifications. The standard is the unit a
+// compliance state is assessed against, so every specification groups under it.
+const HIPAA_STANDARD = /^(\d+\.\d+\([a-z]\))/;
+
+function getHipaaStandard(requirement: string) {
+  return HIPAA_STANDARD.exec(requirement)?.[1] || requirement;
+}
+
+// GDPR is not written as a control framework: its hierarchy is chapter,
+// article, paragraph and point, and the article is the unit a compliance state
+// is cited and assessed against. The chapter is the only grouping the
+// Regulation itself defines, and the article number determines it.
+const GDPR_CHAPTERS: Array<{ chapter: string; upTo: number }> = [
+  { chapter: 'I', upTo: 4 },
+  { chapter: 'II', upTo: 11 },
+  { chapter: 'III', upTo: 23 },
+  { chapter: 'IV', upTo: 43 },
+  { chapter: 'V', upTo: 50 },
+  { chapter: 'VI', upTo: 59 },
+  { chapter: 'VII', upTo: 76 },
+  { chapter: 'VIII', upTo: 84 },
+  { chapter: 'IX', upTo: 91 },
+  { chapter: 'X', upTo: 93 },
+  { chapter: 'XI', upTo: 99 },
+];
+
+function getGdprChapter(requirement: string) {
+  const article = Number(requirement.replace(/\D/g, ''));
+  const chapter = GDPR_CHAPTERS.find(({ upTo }) => article <= upTo);
+
+  return chapter && article ? chapter.chapter : requirement;
+}
+
 function buildComplianceRequirements(
   requirements: Record<string, ComplianceRequirement>,
   entriesBySeparator: number = 1,
   separator: string = '.',
+  getGroup?: (requirement: string) => string,
 ) {
   const complianceRequirements = {};
   const selectedRequirements = {};
 
   Object.keys(requirements).forEach(item => {
     const _splitItem = item.split(separator);
-    const currentRequirement = _splitItem
-      .slice(0, entriesBySeparator)
-      .join(separator);
+    const currentRequirement = getGroup
+      ? getGroup(item)
+      : _splitItem.slice(0, entriesBySeparator).join(separator);
+
     if (complianceRequirements[currentRequirement]) {
       complianceRequirements[currentRequirement].push(item);
     } else {
@@ -86,12 +133,17 @@ function buildComplianceRequirements(
 }
 
 // Every aggregation bucket whose key isn't one of the known, documented
-// requirement codes for this framework.
+// requirement codes for this framework. A code the ruleset writes in its own
+// notation is known through the framework's aliases.
 export function getOthersBuckets(
   descriptions: Record<string, ComplianceRequirement>,
   buckets: Array<{ key: string; doc_count: number }>,
+  aliases: Record<string, string> = {},
 ) {
-  const knownCodes = new Set(Object.keys(descriptions));
+  const knownCodes = new Set([
+    ...Object.keys(descriptions),
+    ...Object.keys(aliases),
+  ]);
   return buckets.filter(bucket => !knownCodes.has(bucket.key));
 }
 
@@ -99,18 +151,20 @@ export function getOthersBuckets(
 export function computeOthersCount(
   descriptions: Record<string, ComplianceRequirement>,
   buckets: Array<{ key: string; doc_count: number }>,
+  aliases: Record<string, string> = {},
 ) {
-  return getOthersBuckets(descriptions, buckets).reduce(
+  return getOthersBuckets(descriptions, buckets, aliases).reduce(
     (sum, bucket) => sum + bucket.doc_count,
     0,
   );
 }
 
-function buildComplianceObject({ section }) {
+export function buildComplianceObject({ section }) {
   try {
     let complianceRequirements = {};
     let descriptions = {};
     let selectedRequirements = {}; // all enabled by default
+    let aliases = {};
     if (section === WAZUH_MODULES_ID.PCI_DSS) {
       const r = buildComplianceRequirements(pciRequirementsFile, 1, '.');
       complianceRequirements = r.complianceRequirements;
@@ -118,17 +172,29 @@ function buildComplianceObject({ section }) {
       selectedRequirements = r.selectedRequirements;
     }
     if (section === WAZUH_MODULES_ID.GDPR) {
-      const r = buildComplianceRequirements(gdprRequirementsFile, 1, '_');
+      const r = buildComplianceRequirements(
+        gdprRequirementsFile,
+        1,
+        '_',
+        getGdprChapter,
+      );
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
+      aliases = gdprRequirementsAliases;
     }
 
     if (section === WAZUH_MODULES_ID.HIPAA) {
-      const r = buildComplianceRequirements(hipaaRequirementsFile, 3, '.');
+      const r = buildComplianceRequirements(
+        hipaaRequirementsFile,
+        3,
+        '.',
+        getHipaaStandard,
+      );
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
+      aliases = hipaaRequirementsAliases;
     }
 
     if (section === WAZUH_MODULES_ID.NIST_800_53) {
@@ -162,6 +228,7 @@ function buildComplianceObject({ section }) {
       complianceRequirements = r.complianceRequirements;
       descriptions = r.descriptions;
       selectedRequirements = r.selectedRequirements;
+      aliases = cmmcRequirementsAliases;
     }
 
     if (section === WAZUH_MODULES_ID.NIS2) {
@@ -199,6 +266,7 @@ function buildComplianceObject({ section }) {
       complianceObject: complianceRequirements,
       selectedRequirements,
       descriptions,
+      aliases,
     };
   } catch (error) {
     const options = {
@@ -214,6 +282,15 @@ function buildComplianceObject({ section }) {
       },
     };
     getErrorOrchestrator().handleError(options);
+
+    // The caller destructures the result, so an empty compliance object is
+    // returned instead of nothing when the build fails.
+    return {
+      complianceObject: {},
+      selectedRequirements: {},
+      descriptions: {},
+      aliases: {},
+    };
   }
 }
 
@@ -242,6 +319,7 @@ export const ComplianceTable = compose(
     descriptions: {},
     complianceObject: {},
     selectedRequirements: {},
+    aliases: {},
   });
 
   const getRegulatoryComplianceRequirementFilter = (
@@ -249,6 +327,23 @@ export const ComplianceTable = compose(
     value: string,
   ) => {
     if (!value) return [];
+
+    // A finding can name the requirement in the standard's notation or in the
+    // ruleset's, so the filter has to accept every code of the requirement.
+    const codes = getRequirementCodes(value, complianceData.aliases);
+
+    if (codes.length > 1) {
+      return [
+        PatternDataSourceFilterManager.createFilter(
+          FILTER_OPERATOR.IS_ONE_OF,
+          key,
+          codes,
+          dataSource.dataSource?.indexPattern.id,
+          DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
+        ),
+      ] as tFilter[];
+    }
+
     return [
       {
         meta: {
@@ -352,6 +447,7 @@ export const ComplianceTable = compose(
     const unknownValues = getOthersBuckets(
       complianceData.descriptions,
       action.data || [],
+      complianceData.aliases,
     ).map(bucket => bucket.key);
     if (!unknownValues.length) {
       return [];
@@ -371,25 +467,38 @@ export const ComplianceTable = compose(
   const othersCount = useMemo(
     () =>
       Object.keys(complianceData.descriptions).length
-        ? computeOthersCount(complianceData.descriptions, action.data || [])
+        ? computeOthersCount(
+            complianceData.descriptions,
+            action.data || [],
+            complianceData.aliases,
+          )
         : 0,
-    [action.data, complianceData.descriptions],
+    [action.data, complianceData.descriptions, complianceData.aliases],
   );
 
   const othersBuckets = useMemo(
     () =>
       Object.keys(complianceData.descriptions).length
-        ? getOthersBuckets(complianceData.descriptions, action.data || [])
+        ? getOthersBuckets(
+            complianceData.descriptions,
+            action.data || [],
+            complianceData.aliases,
+          )
         : [],
-    [action.data, complianceData.descriptions],
+    [action.data, complianceData.descriptions, complianceData.aliases],
   );
 
   useEffect(() => {
-    const { descriptions, complianceObject, selectedRequirements } =
+    const { descriptions, complianceObject, selectedRequirements, aliases } =
       buildComplianceObject({
         section: props.section,
       });
-    setComplianceData({ descriptions, complianceObject, selectedRequirements });
+    setComplianceData({
+      descriptions,
+      complianceObject,
+      selectedRequirements,
+      aliases,
+    });
   }, []);
 
   useEffect(() => {

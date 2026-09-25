@@ -18,7 +18,7 @@
  */
 import { ComplianceRequirement } from './types';
 
-const controls: Record<string, ComplianceRequirement> = {
+export const hipaaRequirementsFile: Record<string, ComplianceRequirement> = {
   '164.308(a)(1)(i)': {
     title: 'Security management process',
     description:
@@ -342,9 +342,10 @@ const controls: Record<string, ComplianceRequirement> = {
 
 /*
  * Bridge from the compliance tag values the Wazuh ruleset uses to the control
- * identifiers above. Both notations resolve to the same requirement.
+ * identifiers above. A finding tagged with an alias counts for the control it
+ * names; the alias itself is not a requirement of the framework.
  */
-const aliases: Record<string, string> = {
+export const hipaaRequirementsAliases: Record<string, string> = {
   '164.308.a.1.ii.A': '164.308(a)(1)(ii)(A)',
   '164.308.a.1.ii.D': '164.308(a)(1)(ii)(D)',
   '164.308.a.3': '164.308(a)(3)(i)',
@@ -375,11 +376,4 @@ const aliases: Record<string, string> = {
   '164.312.e.2.i': '164.312(e)(2)(i)',
   '164.312.e.2.ii': '164.312(e)(2)(ii)',
   '164.316.b.1': '164.316(b)(1)',
-};
-
-export const hipaaRequirementsFile: Record<string, ComplianceRequirement> = {
-  ...controls,
-  ...Object.fromEntries(
-    Object.entries(aliases).map(([alias, id]) => [alias, controls[id]]),
-  ),
 };

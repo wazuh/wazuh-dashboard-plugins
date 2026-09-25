@@ -38,6 +38,7 @@ import {
 } from '../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 import { getRequirementText } from '../../../../../../common/compliance-requirements/requirement-text';
+import { getRequirementCodes } from '../../../../../../common/compliance-requirements/requirement-codes';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
@@ -49,7 +50,7 @@ export class ComplianceSubrequirements extends Component {
   _isMount = false;
   state: {};
 
-  props!: {};
+  props!: { aliases?: Record<string, string> };
 
   constructor(props) {
     super(props);
@@ -147,9 +148,18 @@ export class ComplianceSubrequirements extends Component {
                 .toLowerCase()
                 .includes(this.state.searchValue.toLowerCase()))
           ) {
-            const quantity =
-              (requirementsCount.find(item => item.key === technique) || {})
-                .doc_count || 0;
+            // Findings can name the requirement in the standard's notation or
+            // in the ruleset's, so every bucket of the requirement counts.
+            const quantity = getRequirementCodes(
+              technique,
+              this.props.aliases,
+            ).reduce(
+              (total, code) =>
+                total +
+                ((requirementsCount.find(item => item.key === code) || {})
+                  .doc_count || 0),
+              0,
+            );
             if (
               !this.state.hideAlerts ||
               (this.state.hideAlerts && quantity > 0)

@@ -23,6 +23,7 @@ import {
   EuiToolTip,
 } from '@elastic/eui';
 import { requirementsName } from '../../requirement-name';
+import { getRequirementCodes } from '../../../../../../common/compliance-requirements/requirement-codes';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 
 export class ComplianceRequirements extends Component {
@@ -31,7 +32,7 @@ export class ComplianceRequirements extends Component {
     isPopoverOpen: boolean;
   };
 
-  props!: {};
+  props!: { aliases?: Record<string, string> };
 
   constructor(props) {
     super(props);
@@ -58,12 +59,15 @@ export class ComplianceRequirements extends Component {
     const requirementList: Array<any> = requirementIds.map(item => {
       let quantity = 0;
       this.props.complianceObject[item].forEach(subitem => {
-        quantity +=
-          (
-            requirementsCount.find(
-              requirement => requirement.key === subitem,
-            ) || {}
-          ).doc_count || 0;
+        // A requirement can be tagged in the standard's notation or in the
+        // ruleset's, so the group adds up the buckets of both.
+        getRequirementCodes(subitem, this.props.aliases).forEach(code => {
+          quantity +=
+            (
+              requirementsCount.find(requirement => requirement.key === code) ||
+              {}
+            ).doc_count || 0;
+        });
       });
       return {
         id: item,

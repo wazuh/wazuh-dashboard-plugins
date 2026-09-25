@@ -18,7 +18,7 @@
  */
 import { ComplianceRequirement } from './types';
 
-const controls: Record<string, ComplianceRequirement> = {
+export const cmmcRequirementsFile: Record<string, ComplianceRequirement> = {
   'AC.L1-b.1.i': {
     title:
       'Limit information system access to authorized users, processes acting on behalf of authorized users, or devices (including other information systems).',
@@ -563,20 +563,14 @@ const controls: Record<string, ComplianceRequirement> = {
 
 /*
  * Bridge from the compliance tag values the Wazuh ruleset uses to the control
- * identifiers above. Both notations resolve to the same requirement.
+ * identifiers above. A finding tagged with an alias counts for the control it
+ * names; the alias itself is not a requirement of the framework.
  */
-const aliases: Record<string, string> = {
+export const cmmcRequirementsAliases: Record<string, string> = {
   'AC.L1-3.1.1': 'AC.L1-b.1.i',
   'AC.L1-3.1.2': 'AC.L1-b.1.ii',
   'AC.L1-3.1.3': 'AC.L2-3.1.3',
   'IA.L1-3.5.1': 'IA.L1-b.1.v',
   'SC.L1-3.13.1': 'SC.L1-b.1.x',
   'SC.L1-3.13.8': 'SC.L2-3.13.8',
-};
-
-export const cmmcRequirementsFile: Record<string, ComplianceRequirement> = {
-  ...controls,
-  ...Object.fromEntries(
-    Object.entries(aliases).map(([alias, id]) => [alias, controls[id]]),
-  ),
 };
