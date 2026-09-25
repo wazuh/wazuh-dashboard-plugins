@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { AggTable } from '../../../../common/modules/panel';
 import { EuiFlexItem } from '@elastic/eui';
@@ -37,9 +38,13 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.width}>
                 <AggTable
-                  tableTitle='Actors'
+                  tableTitle={i18n.translate('wazuh.github.actorsTable.title', {
+                    defaultMessage: 'Actors',
+                  })}
                   aggTerm='user.name'
-                  aggLabel='Actor'
+                  aggLabel={i18n.translate('wazuh.github.actorsTable.column', {
+                    defaultMessage: 'Actor',
+                  })}
                   maxRows={5}
                   onRowClick={props.onRowClick}
                   searchParams={searchParams}
@@ -52,9 +57,19 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.width}>
                 <AggTable
-                  tableTitle='Organizations'
+                  tableTitle={i18n.translate(
+                    'wazuh.github.organizationsTable.title',
+                    {
+                      defaultMessage: 'Organizations',
+                    },
+                  )}
                   aggTerm='organization.name'
-                  aggLabel='Organization'
+                  aggLabel={i18n.translate(
+                    'wazuh.github.organizationsTable.column',
+                    {
+                      defaultMessage: 'Organization',
+                    },
+                  )}
                   maxRows={5}
                   onRowClick={props.onRowClick}
                   searchParams={searchParams}
@@ -71,9 +86,19 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.width}>
                 <AggTable
-                  tableTitle='Repositories'
+                  tableTitle={i18n.translate(
+                    'wazuh.github.repositoriesTable.title',
+                    {
+                      defaultMessage: 'Repositories',
+                    },
+                  )}
                   aggTerm='url.original'
-                  aggLabel='Repository'
+                  aggLabel={i18n.translate(
+                    'wazuh.github.repositoriesTable.column',
+                    {
+                      defaultMessage: 'Repository',
+                    },
+                  )}
                   maxRows={5}
                   onRowClick={props.onRowClick}
                   searchParams={searchParams}
@@ -86,9 +111,16 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.width}>
                 <AggTable
-                  tableTitle='Actions'
+                  tableTitle={i18n.translate(
+                    'wazuh.github.actionsTable.title',
+                    {
+                      defaultMessage: 'Actions',
+                    },
+                  )}
                   aggTerm='event.action'
-                  aggLabel='Action'
+                  aggLabel={i18n.translate('wazuh.github.actionsTable.column', {
+                    defaultMessage: 'Action',
+                  })}
                   maxRows={5}
                   onRowClick={props.onRowClick}
                   searchParams={searchParams}

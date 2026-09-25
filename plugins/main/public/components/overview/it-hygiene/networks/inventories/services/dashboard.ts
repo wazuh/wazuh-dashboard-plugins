@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import { getVisStateHorizontalBarByField } from '../../../common/saved-vis/generators';
 import { getVisStateHorizontalBarSplitSeries } from '../../../../../../services/visualizations';
@@ -7,38 +8,72 @@ export const getOverviewProcessesPortTab = (indexPatternId: string) => {
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'source.port',
-      'Top 5 source ports',
+      i18n.translate(
+        'wazuh.itHygiene.listenersDashboard.topSourcePorts.title',
+        { defaultMessage: 'Top 5 source ports' },
+      ),
       'it-hygiene-ports',
       {
         fieldSize: 5,
-        metricCustomLabel: 'Top ports count',
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.topSourcePorts.metricLabel',
+          { defaultMessage: 'Top ports count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Top ports',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.topSourcePorts.fieldLabel',
+          { defaultMessage: 'Top ports' },
+        ),
         seriesMode: 'normal',
-        fieldCustomLabel: 'Top ports',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.topSourcePorts.fieldLabel',
+          { defaultMessage: 'Top ports' },
+        ),
       },
     ),
     getVisStateHorizontalBarSplitSeries(
       indexPatternId,
       'network.transport',
-      'Transport protocols',
+      i18n.translate(
+        'wazuh.itHygiene.listenersDashboard.transportProtocols.title',
+        { defaultMessage: 'Transport protocols' },
+      ),
       'it-hygiene-ports',
       {
         fieldSize: 4,
-        otherBucket: 'Others',
-        metricCustomLabel: 'Transport protocols count',
+        otherBucket: i18n.translate(
+          'wazuh.itHygiene.savedVis.othersBucketLabel',
+          { defaultMessage: 'Others' },
+        ),
+        metricCustomLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.transportProtocols.metricLabel',
+          { defaultMessage: 'Transport protocols count' },
+        ),
         valueAxesTitleText: ' ',
-        seriesLabel: 'Transport protocols',
+        seriesLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.transportProtocols.title',
+          { defaultMessage: 'Transport protocols' },
+        ),
         seriesMode: 'stacked',
-        fieldCustomLabel: 'Transport protocols',
+        fieldCustomLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.transportProtocols.title',
+          { defaultMessage: 'Transport protocols' },
+        ),
       },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'process.name',
-      'Top 5 processes',
+      i18n.translate('wazuh.itHygiene.listenersDashboard.topProcesses.title', {
+        defaultMessage: 'Top 5 processes',
+      }),
       'it-hygiene-ports',
-      { customLabel: 'Processes' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.listenersDashboard.topProcesses.fieldLabel',
+          { defaultMessage: 'Processes' },
+        ),
+      },
     ),
   ]);
 };

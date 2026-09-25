@@ -25,6 +25,7 @@ import {
   EuiBadge,
   EuiNotificationBadge,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { AppState } from '../../../../../react-services/app-state';
 import { requirementGoal } from '../../requirement-goal';
 import { getUiSettings } from '../../../../../kibana-services';
@@ -129,15 +130,41 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
-          displayAsText: 'Time',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnTime',
+            {
+              defaultMessage: 'Time',
+            },
+          ),
           render: value => formatUIDate(value),
         },
         {
           id: this.props.getRequirementKey(),
-          displayAsText: 'Requirement(s)',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnRequirements',
+            {
+              defaultMessage: 'Requirement(s)',
+            },
+          ),
         },
-        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.integration.decoders', displayAsText: 'Decoders' },
+        {
+          id: 'wazuh.integration.name',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnIntegration',
+            {
+              defaultMessage: 'Integration',
+            },
+          ),
+        },
+        {
+          id: 'wazuh.integration.decoders',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnDecoders',
+            {
+              defaultMessage: 'Decoders',
+            },
+          ),
+        },
       ];
 
       const columnsWithoutAgent = [
@@ -145,25 +172,61 @@ export const RequirementFlyout = connect(mapStateToProps)(
           id: '@timestamp',
           isSortable: true,
           defaultSortDirection: 'desc',
-          displayAsText: 'Time',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnTime',
+            {
+              defaultMessage: 'Time',
+            },
+          ),
           width: 140,
           render: value => formatUIDate(value),
         },
         {
           id: 'wazuh.agent.id',
-          displayAsText: 'Agent',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnAgent',
+            {
+              defaultMessage: 'Agent',
+            },
+          ),
           width: 70,
         },
         {
           id: 'wazuh.agent.name',
-          displayAsText: 'Agent name',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnAgentName',
+            {
+              defaultMessage: 'Agent name',
+            },
+          ),
         },
         {
           id: this.props.getRequirementKey(),
-          displayAsText: 'Requirement',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnRequirement',
+            {
+              defaultMessage: 'Requirement',
+            },
+          ),
         },
-        { id: 'wazuh.integration.name', displayAsText: 'Integration' },
-        { id: 'wazuh.rule.title', displayAsText: 'Rule title' },
+        {
+          id: 'wazuh.integration.name',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnIntegration',
+            {
+              defaultMessage: 'Integration',
+            },
+          ),
+        },
+        {
+          id: 'wazuh.rule.title',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnRuleTitle',
+            {
+              defaultMessage: 'Rule title',
+            },
+          ),
+        },
       ];
       const agentId = this.props.currentAgentData?.id;
       return agentId
@@ -245,7 +308,14 @@ export const RequirementFlyout = connect(mapStateToProps)(
             id={'details'}
             buttonContent={
               <EuiTitle size='s'>
-                <h3>Details</h3>
+                <h3>
+                  {i18n.translate(
+                    'wazuh.complianceTable.requirementFlyout.detailsTitle',
+                    {
+                      defaultMessage: 'Details',
+                    },
+                  )}
+                </h3>
               </EuiTitle>
             }
             paddingSize='xs'
@@ -265,7 +335,14 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   </EuiFlexItem>
                   <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                     <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
-                      <p style={{ fontWeight: 500, marginBottom: 2 }}>Goals</p>
+                      <p style={{ fontWeight: 500, marginBottom: 2 }}>
+                        {i18n.translate(
+                          'wazuh.complianceTable.requirementFlyout.goalsTitle',
+                          {
+                            defaultMessage: 'Goals',
+                          },
+                        )}
+                      </p>
 
                       <p>{requirementGoal[currentReq]}</p>
                     </EuiText>
@@ -285,7 +362,12 @@ export const RequirementFlyout = connect(mapStateToProps)(
                 <EuiFlexItem style={{ marginLeft: 2 }} grow={true}>
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
                     <p style={{ fontWeight: 500, marginBottom: 2 }}>
-                      Requirement description
+                      {i18n.translate(
+                        'wazuh.complianceTable.requirementFlyout.requirementDescriptionTitle',
+                        {
+                          defaultMessage: 'Requirement description',
+                        },
+                      )}
                     </p>
 
                     <p>{this.props.description}</p>
@@ -298,7 +380,12 @@ export const RequirementFlyout = connect(mapStateToProps)(
                   <EuiSpacer size='s' />
                   <EuiText style={{ marginLeft: 8, fontSize: 14 }}>
                     <p style={{ fontWeight: 500, marginBottom: 2 }}>
-                      Unknown requirement values
+                      {i18n.translate(
+                        'wazuh.complianceTable.requirementFlyout.unknownValuesTitle',
+                        {
+                          defaultMessage: 'Unknown requirement values',
+                        },
+                      )}
                     </p>
                   </EuiText>
                   <EuiSpacer size='xs' />
@@ -314,8 +401,21 @@ export const RequirementFlyout = connect(mapStateToProps)(
                               position='top'
                               content={
                                 isSelected
-                                  ? `Remove filter by ${bucket.key}`
-                                  : `Filter by ${bucket.key}`
+                                  ? i18n.translate(
+                                      'wazuh.complianceTable.requirementFlyout.removeFilterTooltip',
+                                      {
+                                        defaultMessage:
+                                          'Remove filter by {value}',
+                                        values: { value: bucket.key },
+                                      },
+                                    )
+                                  : i18n.translate(
+                                      'wazuh.complianceTable.requirementFlyout.filterByTooltip',
+                                      {
+                                        defaultMessage: 'Filter by {value}',
+                                        values: { value: bucket.key },
+                                      },
+                                    )
                               }
                             >
                               <EuiBadge
@@ -324,7 +424,13 @@ export const RequirementFlyout = connect(mapStateToProps)(
                                 onClick={() =>
                                   this.onOtherValueChipClick(bucket.key)
                                 }
-                                onClickAriaLabel={`Filter by ${bucket.key}`}
+                                onClickAriaLabel={i18n.translate(
+                                  'wazuh.complianceTable.requirementFlyout.filterByTooltip',
+                                  {
+                                    defaultMessage: 'Filter by {value}',
+                                    values: { value: bucket.key },
+                                  },
+                                )}
                               >
                                 {bucket.key}
                               </EuiBadge>
@@ -348,14 +454,28 @@ export const RequirementFlyout = connect(mapStateToProps)(
             buttonContent={
               <EuiTitle size='s'>
                 <h3>
-                  Recent events
+                  {i18n.translate(
+                    'wazuh.complianceTable.requirementFlyout.recentEventsTitle',
+                    {
+                      defaultMessage: 'Recent events',
+                    },
+                  )}
                   {!this.props.isOthers &&
                     this.props.view !== TAB_VIEW_ID_EVENTS && (
                       <span style={{ marginLeft: 16 }}>
                         <span>
                           <EuiToolTip
                             position='top'
-                            content={`Show ${currentRequirement} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                            content={i18n.translate(
+                              'wazuh.complianceTable.requirementFlyout.showInDashboardTooltip',
+                              {
+                                defaultMessage: 'Show {requirement} in {view}',
+                                values: {
+                                  requirement: currentRequirement,
+                                  view: TAB_VIEW_NAME_DASHBOARD,
+                                },
+                              },
+                            )}
                           >
                             <EuiIcon
                               onMouseDown={e => {
@@ -369,7 +489,17 @@ export const RequirementFlyout = connect(mapStateToProps)(
                           </EuiToolTip>
                           <EuiToolTip
                             position='top'
-                            content={`Inspect ${currentRequirement} in ${TAB_VIEW_NAME_EVENTS}`}
+                            content={i18n.translate(
+                              'wazuh.complianceTable.requirementFlyout.inspectInEventsTooltip',
+                              {
+                                defaultMessage:
+                                  'Inspect {requirement} in {view}',
+                                values: {
+                                  requirement: currentRequirement,
+                                  view: TAB_VIEW_NAME_EVENTS,
+                                },
+                              },
+                            )}
                           >
                             <EuiIcon
                               onMouseDown={e => {

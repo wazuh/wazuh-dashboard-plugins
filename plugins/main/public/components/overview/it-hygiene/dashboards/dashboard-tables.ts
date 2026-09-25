@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { getVisStateTable } from '../common/saved-vis/generators';
@@ -53,7 +54,9 @@ const getVisStateFilter = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: i18n.translate('wazuh.itHygiene.savedVis.countLabel', {
+              defaultMessage: 'Count',
+            }),
           },
           schema: 'metric',
         },
@@ -67,9 +70,15 @@ const getVisStateFilter = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.itHygiene.savedVis.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
             customLabel: label,
           },
           schema: 'bucket',
@@ -101,10 +110,16 @@ export const getDashboardTables = (
         savedVis: getVisStateTable(
           indexPatternId,
           'package.name',
-          'Top 5 installed packages',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topPackages.title',
+            { defaultMessage: 'Top 5 installed packages' },
+          ),
           'it-hygiene-top-packages',
           {
-            customLabel: 'Top 5 installed packages',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topPackages.title',
+              { defaultMessage: 'Top 5 installed packages' },
+            ),
           },
         ),
       },
@@ -123,10 +138,16 @@ export const getDashboardTables = (
         savedVis: getVisStateTable(
           indexPatternId,
           'process.name',
-          'Top 5 running processes',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topProcesses.title',
+            { defaultMessage: 'Top 5 running processes' },
+          ),
           'it-hygiene-top-processes',
           {
-            customLabel: 'Top 5 running processes',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topProcesses.title',
+              { defaultMessage: 'Top 5 running processes' },
+            ),
             filter: [
               {
                 $state: {
@@ -164,10 +185,16 @@ export const getDashboardTables = (
         savedVis: getVisStateTable(
           indexPatternId,
           'host.os.name',
-          'Top 5 operating systems',
+          i18n.translate(
+            'wazuh.itHygiene.overviewDashboard.topOperatingSystems.title',
+            { defaultMessage: 'Top 5 operating systems' },
+          ),
           'it-hygiene-top-operating-system-names',
           {
-            customLabel: 'Top 5 operating systems',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topOperatingSystems.title',
+              { defaultMessage: 'Top 5 operating systems' },
+            ),
           },
         ),
       },
@@ -186,10 +213,15 @@ export const getDashboardTables = (
         savedVis: getVisStateTable(
           indexPatternId,
           'host.cpu.name',
-          'Top 5 CPUs',
+          i18n.translate('wazuh.itHygiene.overviewDashboard.topCpus.title', {
+            defaultMessage: 'Top 5 CPUs',
+          }),
           'it-hygiene-stat',
           {
-            customLabel: 'Top 5 host CPUs',
+            customLabel: i18n.translate(
+              'wazuh.itHygiene.overviewDashboard.topCpus.label',
+              { defaultMessage: 'Top 5 host CPUs' },
+            ),
           },
         ),
       },

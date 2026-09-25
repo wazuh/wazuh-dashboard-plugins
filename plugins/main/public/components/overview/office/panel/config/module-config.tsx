@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { OfficeBody, OfficeDrilldown } from '../views';
 import {
@@ -33,7 +34,9 @@ export const ModuleConfig = {
   'user.name': {
     component: props => (
       <OfficeDrilldown
-        title={'User Activity'}
+        title={i18n.translate('wazuh.office365.drilldown.userActivityTitle', {
+          defaultMessage: 'User Activity',
+        })}
         {...{ ...drilldownUserConfig(props), ...props }}
       />
     ),
@@ -41,7 +44,12 @@ export const ModuleConfig = {
   'client.ip': {
     component: props => (
       <OfficeDrilldown
-        title={'Client IP address'}
+        title={i18n.translate(
+          'wazuh.office365.drilldown.clientIpAddressTitle',
+          {
+            defaultMessage: 'Client IP address',
+          },
+        )}
         {...{ ...drilldownIPConfig(props), ...props }}
       />
     ),
@@ -49,7 +57,9 @@ export const ModuleConfig = {
   'event.action': {
     component: props => (
       <OfficeDrilldown
-        title={'Operation'}
+        title={i18n.translate('wazuh.office365.drilldown.operationTitle', {
+          defaultMessage: 'Operation',
+        })}
         {...{ ...drilldownOperationsConfig(props), ...props }}
       />
     ),
@@ -57,7 +67,9 @@ export const ModuleConfig = {
   'event.type': {
     component: props => (
       <OfficeDrilldown
-        title={'Event Type'}
+        title={i18n.translate('wazuh.office365.drilldown.eventTypeTitle', {
+          defaultMessage: 'Event Type',
+        })}
         {...{ ...drilldownRulesConfig(props), ...props }}
       />
     ),

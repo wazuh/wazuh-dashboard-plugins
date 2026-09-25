@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getPlugins } from '../../../../kibana-services';
+import { i18n } from '@osd/i18n';
 import { I18nProvider } from '@osd/i18n/react';
 import useSearchBar from '../../../common/search-bar/use-search-bar';
 import {
@@ -93,8 +94,13 @@ export const DashboardTabsPanels = ({
   const [selectedSubTab, setSelectedSubTab] = useState<string>('global');
 
   const infoMessage: Record<string, string> = {
-    remoted:
-      'Statistics are cumulative, this means that the information shown is since the data exists. Comms metrics only refer to 4.x agents.',
+    remoted: i18n.translate(
+      'wazuh.statistics.dashboardTabs.remotedInfoCallout',
+      {
+        defaultMessage:
+          'Statistics are cumulative, this means that the information shown is since the data exists. Comms metrics only refer to 4.x agents.',
+      },
+    ),
   };
 
   const { searchBarProps, fingerprint, autoRefreshFingerprint } = useSearchBar({
@@ -122,7 +128,12 @@ export const DashboardTabsPanels = ({
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: i18n.translate(
+            'wazuh.statistics.dashboardTabs.fetchDataError',
+            {
+              defaultMessage: 'Error fetching data',
+            },
+          ),
         });
         ErrorHandler.handleError(searchError);
       });
@@ -182,10 +193,29 @@ export const DashboardTabsPanels = ({
                 buttonSize='s'
                 isFullWidth={false}
                 color='primary'
-                legend='Normalization view'
+                legend={i18n.translate(
+                  'wazuh.statistics.dashboardTabs.normalizationViewLegend',
+                  {
+                    defaultMessage: 'Normalization view',
+                  },
+                )}
                 options={[
-                  { id: 'global', label: 'Global' },
-                  { id: 'per-space-metrics', label: 'Per-Space' },
+                  {
+                    id: 'global',
+                    label: i18n.translate(
+                      'wazuh.statistics.dashboardTabs.normalizationViewGlobal',
+                      {
+                        defaultMessage: 'Global',
+                      },
+                    ),
+                  },
+                  {
+                    id: 'per-space-metrics',
+                    label: i18n.translate(
+                      'wazuh.statistics.dashboardTabs.normalizationViewPerSpace',
+                      { defaultMessage: 'Per-Space' },
+                    ),
+                  },
                 ]}
                 idSelected={selectedSubTab}
                 onChange={id => setSelectedSubTab(id)}
@@ -205,7 +235,12 @@ export const DashboardTabsPanels = ({
                     options={clusterNodes}
                     value={clusterNodeSelected}
                     onChange={onSelectNode}
-                    aria-label='Select node'
+                    aria-label={i18n.translate(
+                      'wazuh.statistics.dashboardTabs.selectNodeAriaLabel',
+                      {
+                        defaultMessage: 'Select node',
+                      },
+                    )}
                   />
                 </EuiFlexItem>
               )}

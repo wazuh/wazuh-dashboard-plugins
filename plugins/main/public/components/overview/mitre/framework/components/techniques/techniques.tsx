@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFacetButton,
   EuiFlexGroup,
@@ -179,7 +180,12 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre alerts could not be fetched`,
+          title: i18n.translate(
+            'wazuh.mitreAttack.techniques.errorFetchingAlerts',
+            {
+              defaultMessage: 'Mitre alerts could not be fetched',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -191,24 +197,44 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     return [
       {
         id: 0,
-        title: 'Actions',
+        title: i18n.translate(
+          'wazuh.mitreAttack.techniques.actionsMenu.title',
+          {
+            defaultMessage: 'Actions',
+          },
+        ),
         items: [
           {
-            name: 'Filter for value',
+            name: i18n.translate(
+              'wazuh.mitreAttack.techniques.actionsMenu.filterForValue',
+              {
+                defaultMessage: 'Filter for value',
+              },
+            ),
             icon: <EuiIcon type='magnifyWithPlus' size='m' />,
             onClick: () => {
               closeActionsMenu();
             },
           },
           {
-            name: 'Filter out value',
+            name: i18n.translate(
+              'wazuh.mitreAttack.techniques.actionsMenu.filterOutValue',
+              {
+                defaultMessage: 'Filter out value',
+              },
+            ),
             icon: <EuiIcon type='magnifyWithMinus' size='m' />,
             onClick: () => {
               closeActionsMenu();
             },
           },
           {
-            name: 'View technique details',
+            name: i18n.translate(
+              'wazuh.mitreAttack.techniques.actionsMenu.viewTechniqueDetails',
+              {
+                defaultMessage: 'View technique details',
+              },
+            ),
             icon: <EuiIcon type='filebeatApp' size='m' />,
             onClick: () => {
               closeActionsMenu();
@@ -245,7 +271,12 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre techniques could not be fetched`,
+          title: i18n.translate(
+            'wazuh.mitreAttack.techniques.errorFetchingTechniques',
+            {
+              defaultMessage: 'Mitre techniques could not be fetched',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -381,7 +412,13 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     const tacticsToRenderOrdered = tacticsToRender
       .sort((a, b) => b.quantity - a.quantity)
       .map((item, idx) => {
-        const tooltipContent = `View details of ${item.label} (${item.id})`;
+        const tooltipContent = i18n.translate(
+          'wazuh.mitreAttack.techniques.facet.viewDetailsTooltip',
+          {
+            defaultMessage: 'View details of {label} ({id})',
+            values: { label: item.label, id: item.id },
+          },
+        );
         const toolTipAnchorClass =
           'wz-display-inline-grid' +
           (state.hover === item.id ? ' wz-mitre-width' : ' ');
@@ -432,7 +469,16 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
                     <span style={{ float: 'right', position: 'fixed' }}>
                       <EuiToolTip
                         position='top'
-                        content={`Show ${item.id} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                        content={i18n.translate(
+                          'wazuh.mitreAttack.techniques.facet.showInDashboardTooltip',
+                          {
+                            defaultMessage: 'Show {id} in {tabName}',
+                            values: {
+                              id: item.id,
+                              tabName: TAB_VIEW_NAME_DASHBOARD,
+                            },
+                          },
+                        )}
                       >
                         <EuiIcon
                           onClick={e => {
@@ -446,7 +492,16 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
                       &nbsp;
                       <EuiToolTip
                         position='top'
-                        content={`Inspect ${item.id} in ${TAB_VIEW_NAME_EVENTS}`}
+                        content={i18n.translate(
+                          'wazuh.mitreAttack.techniques.facet.inspectInEventsTooltip',
+                          {
+                            defaultMessage: 'Inspect {id} in {tabName}',
+                            values: {
+                              id: item.id,
+                              tabName: TAB_VIEW_NAME_EVENTS,
+                            },
+                          },
+                        )}
                       >
                         <EuiIcon
                           onClick={e => {
@@ -499,7 +554,9 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     } else {
       return (
         <EuiCallOut
-          title='There are no results.'
+          title={i18n.translate('wazuh.mitreAttack.techniques.noResults', {
+            defaultMessage: 'There are no results.',
+          })}
           iconType='help'
           color='warning'
         ></EuiCallOut>
@@ -583,7 +640,11 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       <EuiFlexGroup>
         <EuiFlexItem grow={true}>
           <EuiTitle size='m'>
-            <h1>Techniques</h1>
+            <h1>
+              {i18n.translate('wazuh.mitreAttack.techniques.title', {
+                defaultMessage: 'Techniques',
+              })}
+            </h1>
           </EuiTitle>
         </EuiFlexItem>
 
@@ -591,7 +652,15 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiText grow={false}>
-                <span>Hide techniques with no findings </span> &nbsp;
+                <span>
+                  {i18n.translate(
+                    'wazuh.mitreAttack.techniques.hideTechniquesSwitch.label',
+                    {
+                      defaultMessage: 'Hide techniques with no findings',
+                    },
+                  )}{' '}
+                </span>{' '}
+                &nbsp;
                 <EuiSwitch
                   label=''
                   checked={state.hideAlerts}
@@ -606,11 +675,21 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
       <WzFieldSearchDelay
         fullWidth={true}
-        placeholder='Filter techniques of selected tactic/s'
+        placeholder={i18n.translate(
+          'wazuh.mitreAttack.techniques.search.placeholder',
+          {
+            defaultMessage: 'Filter techniques of selected tactic/s',
+          },
+        )}
         onChange={onChange}
         onSearch={onSearch}
         isClearable={true}
-        aria-label='Use aria labels when no actual label is in use'
+        aria-label={i18n.translate(
+          'wazuh.mitreAttack.techniques.search.ariaLabel',
+          {
+            defaultMessage: 'Use aria labels when no actual label is in use',
+          },
+        )}
       />
       <EuiSpacer size='s' />
 

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { buildDashboardKPIPanels } from '../../../common/create-dashboard-panels-kpis';
 import {
   getVisStateHorizontalBarByField,
@@ -9,16 +10,31 @@ export const getOverviewPackagesHotfixesTab = (indexPatternId: string) => {
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
-      'Most common KBs',
+      i18n.translate('wazuh.itHygiene.hotfixesDashboard.mostCommonKbs.title', {
+        defaultMessage: 'Most common KBs',
+      }),
       'it-hygiene-hotfixes',
-      { customLabel: 'KBs' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.hotfixesDashboard.kbs.fieldLabel',
+          { defaultMessage: 'KBs' },
+        ),
+      },
     ),
     getVisStateHorizontalBarByField(
       indexPatternId,
       'package.hotfix.name',
-      'Least common KBs',
+      i18n.translate('wazuh.itHygiene.hotfixesDashboard.leastCommonKbs.title', {
+        defaultMessage: 'Least common KBs',
+      }),
       'it-hygiene-hotfixes',
-      { customLabel: 'KBs', orderAggregation: 'asc' },
+      {
+        customLabel: i18n.translate(
+          'wazuh.itHygiene.hotfixesDashboard.kbs.fieldLabel',
+          { defaultMessage: 'KBs' },
+        ),
+        orderAggregation: 'asc',
+      },
     ),
   ]);
 };

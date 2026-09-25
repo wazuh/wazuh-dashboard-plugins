@@ -22,6 +22,7 @@ type backToTopType = () => void;
 
 interface referencesTableType {
   referencesName: string;
+  referencesLabel?: string;
   referencesArray: Array<string>;
   columns: any;
   backToTop: backToTopType;
@@ -29,6 +30,7 @@ interface referencesTableType {
 
 export const ReferencesTable = ({
   referencesName,
+  referencesLabel,
   referencesArray,
   columns,
   backToTop,
@@ -99,6 +101,7 @@ export const ReferencesTable = ({
       id=''
       className='events-accordion'
       buttonContent={
+        referencesLabel ??
         referencesName.charAt(0).toUpperCase() + referencesName.slice(1)
       }
       paddingSize='none'
