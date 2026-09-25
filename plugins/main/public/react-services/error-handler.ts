@@ -14,6 +14,7 @@ import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
 import { CheckDaemonsStatus } from './check-daemons-status';
+import { i18n } from '@osd/i18n';
 
 interface IHistoryItem {
   text: string;
@@ -40,8 +41,12 @@ export class ErrorHandler {
       const isFromAPI =
         origin.includes('/api/request') || origin.includes('/api/csv');
       return isFromAPI
-        ? 'API is not reachable. Reason: timeout.'
-        : 'Server did not respond';
+        ? i18n.translate('wazuh.core.request.apiTimeout', {
+            defaultMessage: 'API is not reachable. Reason: timeout.',
+          })
+        : i18n.translate('wazuh.core.request.serverDidNotRespond', {
+            defaultMessage: 'Server did not respond',
+          });
     }
 
     if ((((error || {}).response || {}).data || {}).message) {
@@ -80,7 +85,12 @@ export class ErrorHandler {
     if (typeof error === 'object' && error !== null) {
       return JSON.stringify(error);
     }
-    return error || 'Unexpected error';
+    return (
+      error ||
+      i18n.translate('wazuh.core.request.unexpectedError', {
+        defaultMessage: 'Unexpected error',
+      })
+    );
   }
 
   /**
@@ -150,7 +160,11 @@ export class ErrorHandler {
     const message = ErrorHandler.extractMessage(error);
     const messageIsString = typeof message === 'string';
     if (messageIsString && message.includes('ERROR3099')) {
-      const updateNotReadyYet = updateWazuhNotReadyYet('Server not ready yet.');
+      const updateNotReadyYet = updateWazuhNotReadyYet(
+        i18n.translate('wazuh.core.serverNotReadyCallout.notReady', {
+          defaultMessage: 'Server not ready yet.',
+        }),
+      );
       store.dispatch(updateNotReadyYet);
       CheckDaemonsStatus.makePing().catch(error => {});
       return;

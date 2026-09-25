@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  *
  */
+import { i18n } from '@osd/i18n';
 import React, { Component } from 'react';
 import {
   EuiPage,
@@ -43,10 +44,17 @@ export class WzSampleDataProvider extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>Sample data</h2>
+                  <h2>
+                    {i18n.translate('wazuh.sampleData.page.title', {
+                      defaultMessage: 'Sample data',
+                    })}
+                  </h2>
                 </EuiTitle>
                 <EuiText color='subdued'>
-                  Add sample data with events to the modules
+                  {i18n.translate('wazuh.sampleData.page.description', {
+                    defaultMessage:
+                      'Add sample data with events to the modules',
+                  })}
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>

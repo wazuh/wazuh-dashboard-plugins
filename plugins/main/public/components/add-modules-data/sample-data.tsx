@@ -51,6 +51,7 @@ import {
   sampleThreatDetectionApplication,
 } from './helper';
 import { GenericRequest } from '../../react-services';
+import { i18n } from '@osd/i18n';
 
 export default class WzSampleData extends Component {
   categories: {
@@ -72,69 +73,156 @@ export default class WzSampleData extends Component {
     this.generateAlertsParams = {}; // extra params to add to generateAlerts function in server
     this.categories = [
       {
-        title: 'Sample security information',
-        description: `Sample data, visualizations and dashboards for
-        security information (${sampleSecurityInformationApplication}).`,
+        title: i18n.translate(
+          'wazuh.sampleData.categories.securityInformation.title',
+          { defaultMessage: 'Sample security information' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.securityInformation.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for security information ({sources}).',
+            values: { sources: sampleSecurityInformationApplication },
+          },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
       },
       {
-        title: `Sample ${malwareDetection.title.toLowerCase()}`,
-        description: `Sample data, visualizations and dashboards for
-        events of ${malwareDetection.title} (${sampleMalwareDetection}).`,
+        title: i18n.translate(
+          'wazuh.sampleData.categories.malwareDetection.title',
+          {
+            defaultMessage: 'Sample {moduleTitle}',
+            values: { moduleTitle: malwareDetection.title.toLowerCase() },
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.malwareDetection.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for events of {moduleTitle} ({sources}).',
+            values: {
+              moduleTitle: malwareDetection.title,
+              sources: sampleMalwareDetection,
+            },
+          },
+        ),
         image: '',
         categorySampleDataIndex:
           WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
       },
       {
-        title: 'Sample threat detection and response',
-        description: `Sample data, visualizations and dashboards for
-        threat events of detection and response (${sampleThreatDetectionApplication}).`,
+        title: i18n.translate(
+          'wazuh.sampleData.categories.threatDetection.title',
+          { defaultMessage: 'Sample threat detection and response' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.threatDetection.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for threat events of detection and response ({sources}).',
+            values: { sources: sampleThreatDetectionApplication },
+          },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
       },
       {
-        title: 'Sample file integrity monitoring inventory',
-        description: `Sample data, visualizations and dashboards for file integrity monitoring inventory (${sampleFileIntegrityMonitoring}).`,
+        title: i18n.translate(
+          'wazuh.sampleData.categories.fileIntegrityMonitoring.title',
+          { defaultMessage: 'Sample file integrity monitoring inventory' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.fileIntegrityMonitoring.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for file integrity monitoring inventory ({sources}).',
+            values: { sources: sampleFileIntegrityMonitoring },
+          },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_FILE_INTEGRITY_MONITORING,
       },
       {
-        title: 'Sample security configuration assessment',
-        description: `Sample data, visualizations and dashboards for
-        security configuration assessment (${sampleSecurityConfigurationAssessment}).`,
+        title: i18n.translate(
+          'wazuh.sampleData.categories.configurationAssessment.title',
+          { defaultMessage: 'Sample security configuration assessment' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.configurationAssessment.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for security configuration assessment ({sources}).',
+            values: { sources: sampleSecurityConfigurationAssessment },
+          },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
       },
       {
-        title: 'Sample system inventory',
-        description: `Sample data, visualizations and dashboards for
-        system inventory (${sampleInventory}).`,
+        title: i18n.translate(
+          'wazuh.sampleData.categories.systemInventory.title',
+          { defaultMessage: 'Sample system inventory' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.systemInventory.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for system inventory ({sources}).',
+            values: { sources: sampleInventory },
+          },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_INVENTORY_AGENT,
       },
       {
-        title: 'Sample vulnerability detection inventory',
-        description:
-          'Sample data, visualizations and dashboards for vulnerabilities inventory.',
+        title: i18n.translate(
+          'wazuh.sampleData.categories.vulnerabilities.title',
+          { defaultMessage: 'Sample vulnerability detection inventory' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.vulnerabilities.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for vulnerabilities inventory.',
+          },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_VULNERABILITIES,
       },
       {
-        title: 'Sample agents monitoring',
-        description: 'Sample data for agents monitoring.',
+        title: i18n.translate(
+          'wazuh.sampleData.categories.agentsMonitoring.title',
+          { defaultMessage: 'Sample agents monitoring' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.agentsMonitoring.description',
+          { defaultMessage: 'Sample data for agents monitoring.' },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_METRICS_AGENTS,
       },
       {
-        title: 'Sample server statistics',
-        description: 'Sample data for server statistics.',
+        title: i18n.translate(
+          'wazuh.sampleData.categories.serverStatistics.title',
+          { defaultMessage: 'Sample server statistics' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.serverStatistics.description',
+          { defaultMessage: 'Sample data for server statistics.' },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_METRICS_COMMS,
       },
       {
-        title: 'Sample agent statistics',
-        description: 'Sample data for the endpoint statistics.',
+        title: i18n.translate(
+          'wazuh.sampleData.categories.agentStatistics.title',
+          { defaultMessage: 'Sample agent statistics' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.agentStatistics.description',
+          { defaultMessage: 'Sample data for the endpoint statistics.' },
+        ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_AGENT_STATS,
       },
@@ -181,7 +269,10 @@ export default class WzSampleData extends Component {
 
       if (!clusterName) {
         throw new Error(
-          'The data related to the server API context could not be obtained. This is required when adding sample data to match the server API context.',
+          i18n.translate('wazuh.sampleData.check.missingClusterError', {
+            defaultMessage:
+              'The data related to the server API context could not be obtained. This is required when adding sample data to match the server API context.',
+          }),
         );
       }
 
@@ -199,7 +290,10 @@ export default class WzSampleData extends Component {
 
       if (!this.generateAlertsParams.api_id) {
         throw new Error(
-          'The server API is not selected. Select it using the server API selector.',
+          i18n.translate('wazuh.sampleData.check.missingApiError', {
+            defaultMessage:
+              'The server API is not selected. Select it using the server API selector.',
+          }),
         );
       }
     } catch (error) {
@@ -210,7 +304,9 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error checking sample data',
+          title: i18n.translate('wazuh.sampleData.check.errorTitle', {
+            defaultMessage: 'Error checking sample data',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -244,8 +340,13 @@ export default class WzSampleData extends Component {
       );
       this.showToast(
         'success',
-        `${category.title} sample data added`,
-        'Date range for sample data is now-7 days ago',
+        i18n.translate('wazuh.sampleData.add.successTitle', {
+          defaultMessage: '{category} sample data added',
+          values: { category: category.title },
+        }),
+        i18n.translate('wazuh.sampleData.add.successText', {
+          defaultMessage: 'Date range for sample data is now-7 days ago',
+        }),
         5000,
       );
       this.setState({
@@ -263,7 +364,9 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error trying to add sample data',
+          title: i18n.translate('wazuh.sampleData.add.errorTitle', {
+            defaultMessage: 'Error trying to add sample data',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -299,8 +402,14 @@ export default class WzSampleData extends Component {
         deleteResponse.errors.forEach(error =>
           this.showToast(
             'danger',
-            `Failed to remove index: ${error.index}`,
-            `Error: ${error.message}`,
+            i18n.translate('wazuh.sampleData.remove.indexErrorTitle', {
+              defaultMessage: 'Failed to remove index: {index}',
+              values: { index: error.index },
+            }),
+            i18n.translate('wazuh.sampleData.remove.indexErrorText', {
+              defaultMessage: 'Error: {message}',
+              values: { message: error.message },
+            }),
             5000,
           ),
         );
@@ -308,7 +417,10 @@ export default class WzSampleData extends Component {
         if (deleteResponse.indices.length > 0) {
           this.showToast(
             'success',
-            `Successfully removed ${deleteResponse.indices.length} indices`,
+            i18n.translate('wazuh.sampleData.remove.partialSuccessTitle', {
+              defaultMessage: 'Successfully removed {count} indices',
+              values: { count: deleteResponse.indices.length },
+            }),
             deleteResponse.indices.join(', '),
             5000,
           );
@@ -316,8 +428,13 @@ export default class WzSampleData extends Component {
       } else {
         this.showToast(
           'success',
-          `${category.title} sample data removed`,
-          'All indices were successfully deleted',
+          i18n.translate('wazuh.sampleData.remove.successTitle', {
+            defaultMessage: '{category} sample data removed',
+            values: { category: category.title },
+          }),
+          i18n.translate('wazuh.sampleData.remove.successText', {
+            defaultMessage: 'All indices were successfully deleted',
+          }),
           4000,
         );
       }
@@ -329,7 +446,9 @@ export default class WzSampleData extends Component {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error trying to delete sample data',
+          title: i18n.translate('wazuh.sampleData.remove.errorTitle', {
+            defaultMessage: 'Error trying to delete sample data',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -351,7 +470,13 @@ export default class WzSampleData extends Component {
           title={category.title}
           description={category.description}
           image={category.image}
-          betaBadgeLabel={exists ? 'Installed' : undefined}
+          betaBadgeLabel={
+            exists
+              ? i18n.translate('wazuh.sampleData.card.installedBadge', {
+                  defaultMessage: 'Installed',
+                })
+              : undefined
+          }
           footer={
             <EuiFlexGroup justifyContent='flexEnd'>
               <EuiFlexItem grow={false}>
@@ -361,7 +486,13 @@ export default class WzSampleData extends Component {
                     administrator
                     onClick={() => this.removeSampleData(category)}
                   >
-                    {(removeDataLoading && 'Removing data') || 'Remove data'}
+                    {(removeDataLoading &&
+                      i18n.translate('wazuh.sampleData.card.removingButton', {
+                        defaultMessage: 'Removing data',
+                      })) ||
+                      i18n.translate('wazuh.sampleData.card.removeButton', {
+                        defaultMessage: 'Remove data',
+                      })}
                   </WzButtonPermissions>
                 )) || (
                   <WzButtonPermissions
@@ -369,7 +500,13 @@ export default class WzSampleData extends Component {
                     administrator
                     onClick={() => this.addSampleData(category)}
                   >
-                    {(addDataLoading && 'Adding data') || 'Add data'}
+                    {(addDataLoading &&
+                      i18n.translate('wazuh.sampleData.card.addingButton', {
+                        defaultMessage: 'Adding data',
+                      })) ||
+                      i18n.translate('wazuh.sampleData.card.addButton', {
+                        defaultMessage: 'Add data',
+                      })}
                   </WzButtonPermissions>
                 )}
               </EuiFlexItem>
@@ -383,7 +520,10 @@ export default class WzSampleData extends Component {
     return (
       <>
         <EuiCallOut
-          title='These actions require permissions on the managed indices.'
+          title={i18n.translate('wazuh.sampleData.permissionsCallout.title', {
+            defaultMessage:
+              'These actions require permissions on the managed indices.',
+          })}
           iconType='iInCircle'
         />
         <EuiSpacer />

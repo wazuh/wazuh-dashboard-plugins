@@ -675,9 +675,17 @@ hosts:
     validate: SettingsValidator.isBoolean,
   },
   healthCheckCertificateExpiryWarningDays: {
-    title: 'Certificate expiration warning',
-    description:
-      'Days before a server certificate expires at which the health check reports a warning.',
+    title: i18n.translate(
+      'wazuhCore.settings.healthCheckCertificateExpiryWarningDays.title',
+      { defaultMessage: 'Certificate expiration warning' },
+    ),
+    description: i18n.translate(
+      'wazuhCore.settings.healthCheckCertificateExpiryWarningDays.description',
+      {
+        defaultMessage:
+          'Days before a server certificate expires at which the health check reports a warning.',
+      },
+    ),
     source: EConfigurationProviders.INITIALIZER_CONTEXT,
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.number,
@@ -694,9 +702,17 @@ hosts:
     }),
   },
   healthCheckCertificateExpiryCriticalDays: {
-    title: 'Certificate expiration error',
-    description:
-      'Days before a server certificate expires at which the health check reports an error. Must be lower than the warning value.',
+    title: i18n.translate(
+      'wazuhCore.settings.healthCheckCertificateExpiryCriticalDays.title',
+      { defaultMessage: 'Certificate expiration error' },
+    ),
+    description: i18n.translate(
+      'wazuhCore.settings.healthCheckCertificateExpiryCriticalDays.description',
+      {
+        defaultMessage:
+          'Days before a server certificate expires at which the health check reports an error. Must be lower than the warning value.',
+      },
+    ),
     source: EConfigurationProviders.INITIALIZER_CONTEXT,
     category: SettingCategory.HEALTH_CHECK,
     type: EpluginSettingType.number,

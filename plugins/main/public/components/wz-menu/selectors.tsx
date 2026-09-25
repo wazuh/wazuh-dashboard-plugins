@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiIconTip } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 /**
  * Container component for selectors in the menu.
@@ -41,7 +42,10 @@ export const SelectorLabel = ({
         <EuiFlexItem grow={false}>
           <EuiIconTip
             anchorClassName='wz-agent-icon-tip'
-            aria-label='Error'
+            aria-label={i18n.translate(
+              'wazuh.core.menu.selectorErrorAriaLabel',
+              { defaultMessage: 'Error' },
+            )}
             size='m'
             type='alert'
             color='danger'

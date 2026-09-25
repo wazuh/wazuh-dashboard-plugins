@@ -7,9 +7,14 @@ export type ProviderTestOutcome =
   | { status: 'failed'; message: string }
   | { status: 'could-not-verify'; message: string };
 
-const DEFAULT_FAILURE_MESSAGE = 'Connection failed.';
-const DEFAULT_COULD_NOT_VERIFY_MESSAGE =
-  'Could not verify the provider status.';
+const DEFAULT_FAILURE_MESSAGE = i18n.translate(
+  'wazuhAiAssistant.settings.testFailureUnknown',
+  { defaultMessage: 'Connection failed.' },
+);
+const DEFAULT_COULD_NOT_VERIFY_MESSAGE = i18n.translate(
+  'wazuhAiAssistant.settings.testCouldNotVerify',
+  { defaultMessage: 'Could not verify the provider status.' },
+);
 
 /** From this time to first response on, a passing test is shown as "Slow" instead of "OK". */
 export const SLOW_TEST_LATENCY_MS = 5_000;

@@ -19,6 +19,7 @@ import { UI_LOGGER_LEVELS } from '../../common/constants';
 import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import { getWazuhCorePlugin } from '../kibana-services';
+import { i18n } from '@osd/i18n';
 
 /**
  * Retunrs the wazuh app config
@@ -38,7 +39,9 @@ export const loadAppConfig = async () => {
       error: {
         error: error,
         message: error.message || error,
-        title: 'Error getting configuration, using default values.',
+        title: i18n.translate('wazuh.core.appConfig.loadErrorTitle', {
+          defaultMessage: 'Error getting configuration, using default values.',
+        }),
       },
     };
     getErrorOrchestrator().handleError(options);

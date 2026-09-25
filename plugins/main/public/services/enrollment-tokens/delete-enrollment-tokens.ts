@@ -14,6 +14,7 @@ import { WzRequest } from '../../react-services/wz-request';
 import IApiResponse from '../../react-services/interfaces/api-response.interface';
 import { ENROLLMENT_TOKENS_ENDPOINT } from './constants';
 import { EnrollmentTokenPurgeStatus } from './types';
+import { i18n } from '@osd/i18n';
 
 /* The API answers a partial failure with a 200 whose `failed_items` carry the
 reason, so the response has to be read rather than only awaited: without this
@@ -50,7 +51,9 @@ export const revokeEnrollmentToken = async (
 
   return affectedItemsOrThrow(
     response,
-    'The enrollment token could not be revoked.',
+    i18n.translate('wazuh.enrollmentTokens.service.revokeError', {
+      defaultMessage: 'The enrollment token could not be revoked.',
+    }),
   );
 };
 
@@ -74,6 +77,8 @@ export const purgeEnrollmentTokens = async (
 
   return affectedItemsOrThrow(
     response,
-    'The enrollment tokens could not be purged.',
+    i18n.translate('wazuh.enrollmentTokens.service.purgeError', {
+      defaultMessage: 'The enrollment tokens could not be purged.',
+    }),
   );
 };

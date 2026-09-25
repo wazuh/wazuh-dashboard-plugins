@@ -26,16 +26,25 @@ import { BehaviorSubject } from 'rxjs';
 import { first, distinctUntilChanged } from 'rxjs/operators';
 import { throttle } from 'lodash';
 import store from '../redux/store';
+import { i18n } from '@osd/i18n';
 
 const MESSAGES = {
-  NO_API_AVAILABLE_CCS:
-    'No API hosts available to connect. Ensure all configured hosts fulfill the connection and compatibility requirements. Run the health check to update the check status and refresh the page.',
-  NO_API_AVAILABLE:
-    'The API host is not available. Verify the connection and compatibility in Dashboard Management > Server API. Run the health check to update the check status and refresh the page.',
-  NO_API_SELECTED_CCS:
-    'There is no selected server API. Ensure a server API is selected and is online.',
-  NO_API_SELECTED:
-    'There is no selected server API. Go to Dashboard Management > Server API to verify the connection.',
+  NO_API_AVAILABLE_CCS: i18n.translate('wazuh.core.request.noApiAvailableCcs', {
+    defaultMessage:
+      'No API hosts available to connect. Ensure all configured hosts fulfill the connection and compatibility requirements. Run the health check to update the check status and refresh the page.',
+  }),
+  NO_API_AVAILABLE: i18n.translate('wazuh.core.request.noApiAvailable', {
+    defaultMessage:
+      'The API host is not available. Verify the connection and compatibility in Dashboard Management > Server API. Run the health check to update the check status and refresh the page.',
+  }),
+  NO_API_SELECTED_CCS: i18n.translate('wazuh.core.request.noApiSelectedCcs', {
+    defaultMessage:
+      'There is no selected server API. Ensure a server API is selected and is online.',
+  }),
+  NO_API_SELECTED: i18n.translate('wazuh.core.request.noApiSelected', {
+    defaultMessage:
+      'There is no selected server API. Go to Dashboard Management > Server API to verify the connection.',
+  }),
 };
 
 // throttle to avoid multiple toasts
@@ -331,8 +340,21 @@ export class WzRequest {
             const wzMisc = new WzMisc();
             wzMisc.setApiIsDown(true);
             this.serverAPIAvailable$.next(false);
-            const title = `API with ID [${currentApi.id}] is not available.`;
-            const text = `This could indicate a problem reaching the configured Manager API. Cause: ${error.message}`;
+            const title = i18n.translate(
+              'wazuh.core.request.apiNotAvailableTitle',
+              {
+                defaultMessage: 'API with ID [{apiId}] is not available.',
+                values: { apiId: currentApi.id },
+              },
+            );
+            const text = i18n.translate(
+              'wazuh.core.request.apiNotAvailableText',
+              {
+                defaultMessage:
+                  'This could indicate a problem reaching the configured Manager API. Cause: {cause}',
+                values: { cause: error.message },
+              },
+            );
 
             displayAPINotAvailableToast({ title, text });
 
@@ -370,7 +392,12 @@ export class WzRequest {
       return errorMessage
         ? Promise.reject(this.returnErrorInstance(error, errorMessage))
         : Promise.reject(
-            this.returnErrorInstance(error, 'Server did not respond'),
+            this.returnErrorInstance(
+              error,
+              i18n.translate('wazuh.core.request.serverDidNotRespond', {
+                defaultMessage: 'Server did not respond',
+              }),
+            ),
           );
     }
   }
@@ -440,7 +467,11 @@ export class WzRequest {
         const failed_ids =
           ((((response.data || {}).data || {}).failed_items || [])[0] || {})
             .id || {};
-        const message = (response.data || {}).message || 'Unexpected error';
+        const message =
+          (response.data || {}).message ||
+          i18n.translate('wazuh.core.request.unexpectedError', {
+            defaultMessage: 'Unexpected error',
+          });
         const errorMessage = `${message} (${error.code}) - ${error.message} ${
           failed_ids && failed_ids.length > 1
             ? ` Affected ids: ${failed_ids} `
