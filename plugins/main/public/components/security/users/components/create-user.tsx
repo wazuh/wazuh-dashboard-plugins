@@ -15,6 +15,7 @@ import {
   EuiPanel,
   EuiConfirmModal,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -98,39 +99,80 @@ export const CreateUser = ({ closeFlyout }) => {
 
   const validations = {
     userName: [
-      { fn: () => (userName.trim() === '' ? 'The user name is required' : '') },
+      {
+        fn: () =>
+          userName.trim() === ''
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.userNameRequired',
+                { defaultMessage: 'The user name is required' },
+              )
+            : '',
+      },
       {
         fn: () =>
           userName.trim().includes(' ')
-            ? 'The user name cannot contain spaces'
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.userNameSpaces',
+                { defaultMessage: 'The user name cannot contain spaces' },
+              )
             : '',
       },
       {
         fn: () =>
           !userName.match(/^.{4,20}$/)
-            ? 'The user name must contain a length between 4 and 20 characters.'
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.userNameLength',
+                {
+                  defaultMessage:
+                    'The user name must contain a length between 4 and 20 characters.',
+                },
+              )
             : '',
       },
     ],
     password: [
-      { fn: () => (password === '' ? 'The password is required' : '') },
+      {
+        fn: () =>
+          password === ''
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.passwordRequired',
+                { defaultMessage: 'The password is required' },
+              )
+            : '',
+      },
       {
         fn: () =>
           !password.match(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,64}$/,
           )
-            ? 'The password must contain a length between 12 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.'
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.passwordComplexity',
+                {
+                  defaultMessage:
+                    'The password must contain a length between 12 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.',
+                },
+              )
             : '',
       },
     ],
     confirmPassword: [
       {
         fn: () =>
-          confirmPassword === '' ? 'The confirm password is required' : '',
+          confirmPassword === ''
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.confirmPasswordRequired',
+                { defaultMessage: 'The confirm password is required' },
+              )
+            : '',
       },
       {
         fn: () =>
-          confirmPassword !== password ? `Passwords don't match.` : '',
+          confirmPassword !== password
+            ? i18n.translate(
+                'wazuh.security.createUser.validation.passwordsMismatch',
+                { defaultMessage: "Passwords don't match." },
+              )
+            : '',
       },
     ],
   };
@@ -155,7 +197,11 @@ export const CreateUser = ({ closeFlyout }) => {
 
   const editUser = async () => {
     if (!isValidForm()) {
-      ErrorHandler.warning('Please resolve the incorrect fields.');
+      ErrorHandler.warning(
+        i18n.translate('wazuh.security.createUser.invalidFormWarning', {
+          defaultMessage: 'Please resolve the incorrect fields.',
+        }),
+      );
       return;
     }
 
@@ -173,7 +219,11 @@ export const CreateUser = ({ closeFlyout }) => {
       if (allowRunAsData)
         await UsersServices.UpdateAllowRunAs(user.id, allowRunAsData);
 
-      ErrorHandler.info('User was successfully created');
+      ErrorHandler.info(
+        i18n.translate('wazuh.security.createUser.createSuccess', {
+          defaultMessage: 'User was successfully created',
+        }),
+      );
       closeFlyout(true);
     } catch (error) {
       const options = {
@@ -225,18 +275,33 @@ export const CreateUser = ({ closeFlyout }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.security.createUser.unsavedChangesModal.title',
+            { defaultMessage: 'Unsubmitted changes' },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
             setHasChanges(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText='Yes, do it'
+          cancelButtonText={i18n.translate(
+            'wazuh.security.createUser.unsavedChangesModal.cancelButton',
+            { defaultMessage: "No, don't do it" },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.createUser.unsavedChangesModal.confirmButton',
+            { defaultMessage: 'Yes, do it' },
+          )}
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.security.createUser.unsavedChangesModal.body',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -266,24 +331,41 @@ export const CreateUser = ({ closeFlyout }) => {
       <WzFlyout onClose={onClose} flyoutProps={{ className: 'wzApp' }}>
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
-            <h2>Create new user</h2>
+            <h2>
+              {i18n.translate('wazuh.security.createUser.title', {
+                defaultMessage: 'Create new user',
+              })}
+            </h2>
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>User data</h2>
+                <h2>
+                  {i18n.translate('wazuh.security.createUser.userDataTitle', {
+                    defaultMessage: 'User data',
+                  })}
+                </h2>
               </EuiTitle>
               <EuiSpacer />
               <EuiFormRow
-                label='User name'
+                label={i18n.translate(
+                  'wazuh.security.createUser.userNameLabel',
+                  { defaultMessage: 'User name' },
+                )}
                 isInvalid={!!formErrors.userName}
                 error={formErrors.userName}
-                helpText='Introduce the user name for the user.'
+                helpText={i18n.translate(
+                  'wazuh.security.createUser.userNameHelpText',
+                  { defaultMessage: 'Introduce the user name for the user.' },
+                )}
               >
                 <EuiFieldText
-                  placeholder='User name'
+                  placeholder={i18n.translate(
+                    'wazuh.security.createUser.userNamePlaceholder',
+                    { defaultMessage: 'User name' },
+                  )}
                   value={userName}
                   onChange={e => onChangeUserName(e)}
                   aria-label=''
@@ -291,13 +373,22 @@ export const CreateUser = ({ closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiFormRow
-                label='Password'
+                label={i18n.translate(
+                  'wazuh.security.createUser.passwordLabel',
+                  { defaultMessage: 'Password' },
+                )}
                 isInvalid={!!formErrors.password}
                 error={formErrors.password}
-                helpText='Introduce a new password for the user.'
+                helpText={i18n.translate(
+                  'wazuh.security.createUser.passwordHelpText',
+                  { defaultMessage: 'Introduce a new password for the user.' },
+                )}
               >
                 <EuiFieldPassword
-                  placeholder='Password'
+                  placeholder={i18n.translate(
+                    'wazuh.security.createUser.passwordPlaceholder',
+                    { defaultMessage: 'Password' },
+                  )}
                   value={password}
                   onChange={e => onChangePassword(e)}
                   aria-label=''
@@ -305,13 +396,22 @@ export const CreateUser = ({ closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiFormRow
-                label='Confirm Password'
+                label={i18n.translate(
+                  'wazuh.security.createUser.confirmPasswordLabel',
+                  { defaultMessage: 'Confirm Password' },
+                )}
                 isInvalid={!!formErrors.confirmPassword}
                 error={formErrors.confirmPassword}
-                helpText='Confirm the new password.'
+                helpText={i18n.translate(
+                  'wazuh.security.createUser.confirmPasswordHelpText',
+                  { defaultMessage: 'Confirm the new password.' },
+                )}
               >
                 <EuiFieldPassword
-                  placeholder='Confirm Password'
+                  placeholder={i18n.translate(
+                    'wazuh.security.createUser.confirmPasswordPlaceholder',
+                    { defaultMessage: 'Confirm Password' },
+                  )}
                   value={confirmPassword}
                   onChange={e => onChangeConfirmPassword(e)}
                   aria-label=''
@@ -319,12 +419,21 @@ export const CreateUser = ({ closeFlyout }) => {
                 />
               </EuiFormRow>
               <EuiFormRow
-                label='Allow run as'
-                helpText='Set if the user is able to use run as'
+                label={i18n.translate(
+                  'wazuh.security.createUser.allowRunAsLabel',
+                  { defaultMessage: 'Allow run as' },
+                )}
+                helpText={i18n.translate(
+                  'wazuh.security.createUser.allowRunAsHelpText',
+                  { defaultMessage: 'Set if the user is able to use run as' },
+                )}
               >
                 <WzButtonPermissions
                   buttonType='switch'
-                  label='Allow run as'
+                  label={i18n.translate(
+                    'wazuh.security.createUser.allowRunAsSwitchLabel',
+                    { defaultMessage: 'Allow run as' },
+                  )}
                   showLabel={false}
                   checked={allowRunAs}
                   permissions={[
@@ -338,11 +447,24 @@ export const CreateUser = ({ closeFlyout }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>User roles</h2>
+                <h2>
+                  {i18n.translate('wazuh.security.createUser.userRolesTitle', {
+                    defaultMessage: 'User roles',
+                  })}
+                </h2>
               </EuiTitle>
-              <EuiFormRow label='' helpText='Assign roles to the selected user'>
+              <EuiFormRow
+                label=''
+                helpText={i18n.translate(
+                  'wazuh.security.createUser.rolesHelpText',
+                  { defaultMessage: 'Assign roles to the selected user' },
+                )}
+              >
                 <EuiComboBox
-                  placeholder='Select roles'
+                  placeholder={i18n.translate(
+                    'wazuh.security.createUser.rolesPlaceholder',
+                    { defaultMessage: 'Select roles' },
+                  )}
                   options={rolesOptions}
                   selectedOptions={selectedRoles}
                   isLoading={rolesLoading || isLoading}
@@ -371,7 +493,9 @@ export const CreateUser = ({ closeFlyout }) => {
                   onClick={editUser}
                   isDisabled={!showApply}
                 >
-                  Apply
+                  {i18n.translate('wazuh.security.createUser.applyButton', {
+                    defaultMessage: 'Apply',
+                  })}
                 </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>

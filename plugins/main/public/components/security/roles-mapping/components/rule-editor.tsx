@@ -20,6 +20,7 @@ import {
   EuiComboBoxOptionOption,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import {
   getJsonFromRule,
   decodeJsonRule,
@@ -183,7 +184,12 @@ export const RuleEditor = ({
         <Fragment key={`rule_${idx}`}>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiFormRow label='User field'>
+              <EuiFormRow
+                label={i18n.translate(
+                  'wazuh.security.ruleEditor.userFieldLabel',
+                  { defaultMessage: 'User field' },
+                )}
+              >
                 <EuiFieldText
                   disabled={isLoading || isReserved}
                   placeholder=''
@@ -194,19 +200,34 @@ export const RuleEditor = ({
               </EuiFormRow>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              <EuiFormRow label='Search operation'>
+              <EuiFormRow
+                label={i18n.translate(
+                  'wazuh.security.ruleEditor.searchOperationLabel',
+                  { defaultMessage: 'Search operation' },
+                )}
+              >
                 <EuiSelect
                   disabled={isLoading || isReserved}
                   id='selectDocExample'
                   options={searchOperationOptions}
                   value={item.searchOperation}
                   onChange={e => onSelectorChange(e, idx)}
-                  aria-label='Use aria labels when no actual label is in use'
+                  aria-label={i18n.translate(
+                    'wazuh.security.ruleEditor.searchOperationAriaLabel',
+                    {
+                      defaultMessage:
+                        'Use aria labels when no actual label is in use',
+                    },
+                  )}
                 />
               </EuiFormRow>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiFormRow label='Value'>
+              <EuiFormRow
+                label={i18n.translate('wazuh.security.ruleEditor.valueLabel', {
+                  defaultMessage: 'Value',
+                })}
+              >
                 <EuiFieldText
                   disabled={isLoading || isReserved}
                   placeholder=''
@@ -222,7 +243,10 @@ export const RuleEditor = ({
                 onClick={() => removeRule(idx)}
                 iconType='trash'
                 color='danger'
-                aria-label='Remove rule'
+                aria-label={i18n.translate(
+                  'wazuh.security.ruleEditor.removeRuleAriaLabel',
+                  { defaultMessage: 'Remove rule' },
+                )}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -269,21 +293,31 @@ export const RuleEditor = ({
       return (
         <EuiToolTip
           position='top'
-          content="Current rule can't be edited using visual editor"
+          content={i18n.translate(
+            'wazuh.security.ruleEditor.visualEditorUnavailableTooltip',
+            {
+              defaultMessage:
+                "Current rule can't be edited using visual editor",
+            },
+          )}
         >
           <EuiButtonEmpty
             color='primary'
             isDisabled={hasWrongFormat}
             onClick={() => openVisualEditor()}
           >
-            Switch to visual editor
+            {i18n.translate('wazuh.security.ruleEditor.switchToVisualEditor', {
+              defaultMessage: 'Switch to visual editor',
+            })}
           </EuiButtonEmpty>
         </EuiToolTip>
       );
     } else {
       return (
         <EuiButtonEmpty color='primary' onClick={() => openVisualEditor()}>
-          Switch to visual editor
+          {i18n.translate('wazuh.security.ruleEditor.switchToVisualEditor', {
+            defaultMessage: 'Switch to visual editor',
+          })}
         </EuiButtonEmpty>
       );
     }
@@ -330,12 +364,21 @@ export const RuleEditor = ({
     <>
       <EuiPanel>
         <EuiTitle>
-          <h1>Mapping rules</h1>
+          <h1>
+            {i18n.translate('wazuh.security.ruleEditor.title', {
+              defaultMessage: 'Mapping rules',
+            })}
+          </h1>
         </EuiTitle>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText>
-              <span>Assign roles to users who match these rules. </span>
+              <span>
+                {i18n.translate('wazuh.security.ruleEditor.description', {
+                  defaultMessage:
+                    'Assign roles to users who match these rules.',
+                })}{' '}
+              </span>
               <EuiLink
                 href={webDocumentationLink(
                   'user-manual/user-administration/rbac.html',
@@ -344,7 +387,9 @@ export const RuleEditor = ({
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                Learn more
+                {i18n.translate('wazuh.security.ruleEditor.learnMoreLink', {
+                  defaultMessage: 'Learn more',
+                })}
               </EuiLink>
             </EuiText>
           </EuiFlexItem>
@@ -362,19 +407,39 @@ export const RuleEditor = ({
                   mode='json'
                   onChange={onChangeRuleJson}
                   wrapEnabled
-                  aria-label='Code Editor'
+                  aria-label={i18n.translate(
+                    'wazuh.security.ruleEditor.codeEditorAriaLabel',
+                    { defaultMessage: 'Code Editor' },
+                  )}
                 />
               )) || (
                 <Fragment>
                   <EuiTitle size='s'>
-                    <h2>Map internal users</h2>
+                    <h2>
+                      {i18n.translate(
+                        'wazuh.security.ruleEditor.internalUsersTitle',
+                        { defaultMessage: 'Map internal users' },
+                      )}
+                    </h2>
                   </EuiTitle>
                   <EuiFormRow
-                    label='Internal users'
-                    helpText='Assign internal users to the selected role mapping'
+                    label={i18n.translate(
+                      'wazuh.security.ruleEditor.internalUsersLabel',
+                      { defaultMessage: 'Internal users' },
+                    )}
+                    helpText={i18n.translate(
+                      'wazuh.security.ruleEditor.internalUsersHelpText',
+                      {
+                        defaultMessage:
+                          'Assign internal users to the selected role mapping',
+                      },
+                    )}
                   >
                     <EuiComboBox
-                      placeholder='Select internal users'
+                      placeholder={i18n.translate(
+                        'wazuh.security.ruleEditor.internalUsersPlaceholder',
+                        { defaultMessage: 'Select internal users' },
+                      )}
                       options={internalUsersOptions}
                       selectedOptions={selectedUsers}
                       isLoading={isLoading}
@@ -385,7 +450,12 @@ export const RuleEditor = ({
                   </EuiFormRow>
                   <EuiSpacer />
                   <EuiTitle size='s'>
-                    <h2>Custom rules</h2>
+                    <h2>
+                      {i18n.translate(
+                        'wazuh.security.ruleEditor.customRulesTitle',
+                        { defaultMessage: 'Custom rules' },
+                      )}
+                    </h2>
                   </EuiTitle>
                   <EuiPopover
                     ownFocus
@@ -397,8 +467,14 @@ export const RuleEditor = ({
                         iconSide='right'
                       >
                         {logicalOperator === 'AND'
-                          ? 'All are true'
-                          : 'Any are true'}
+                          ? i18n.translate(
+                              'wazuh.security.ruleEditor.logicalOperatorAnd',
+                              { defaultMessage: 'All are true' },
+                            )
+                          : i18n.translate(
+                              'wazuh.security.ruleEditor.logicalOperatorOr',
+                              { defaultMessage: 'Any are true' },
+                            )}
                       </EuiButtonEmpty>
                     }
                     isOpen={isLogicalPopoverOpen}
@@ -416,7 +492,10 @@ export const RuleEditor = ({
                             {logicalOperator === 'AND' && (
                               <EuiIcon type='check' />
                             )}
-                            All are true
+                            {i18n.translate(
+                              'wazuh.security.ruleEditor.logicalOperatorAnd',
+                              { defaultMessage: 'All are true' },
+                            )}
                           </EuiButtonEmpty>
                         </EuiFlexItem>
                       </EuiFlexGroup>
@@ -430,7 +509,10 @@ export const RuleEditor = ({
                             {logicalOperator === 'OR' && (
                               <EuiIcon type='check' />
                             )}
-                            Any are true
+                            {i18n.translate(
+                              'wazuh.security.ruleEditor.logicalOperatorOr',
+                              { defaultMessage: 'Any are true' },
+                            )}
                           </EuiButtonEmpty>
                         </EuiFlexItem>
                       </EuiFlexGroup>
@@ -443,7 +525,9 @@ export const RuleEditor = ({
                     color='primary'
                     onClick={() => addNewRule()}
                   >
-                    Add new rule
+                    {i18n.translate('wazuh.security.ruleEditor.addRuleButton', {
+                      defaultMessage: 'Add new rule',
+                    })}
                   </EuiButtonEmpty>
                 </Fragment>
               )}
@@ -454,7 +538,10 @@ export const RuleEditor = ({
           <EuiFlexItem grow={false}>
             {(isJsonEditor && getSwitchVisualButton()) || (
               <EuiButtonEmpty color='primary' onClick={() => openJsonEditor()}>
-                Switch to JSON editor
+                {i18n.translate(
+                  'wazuh.security.ruleEditor.switchToJsonEditor',
+                  { defaultMessage: 'Switch to JSON editor' },
+                )}
               </EuiButtonEmpty>
             )}
           </EuiFlexItem>
@@ -471,7 +558,9 @@ export const RuleEditor = ({
             fill
             onClick={() => saveRule()}
           >
-            Save role mapping
+            {i18n.translate('wazuh.security.ruleEditor.saveButton', {
+              defaultMessage: 'Save role mapping',
+            })}
           </WzButtonPermissions>
         </EuiFlexItem>
       </EuiFlexGroup>
