@@ -68,6 +68,28 @@ export const errorMarkdownProcessingPlugins: EuiMarkdownFormatProps['processingP
   ];
 
 /**
+ * `processingPluginList` for a finished assistant answer, which is model output built from tool
+ * results that can carry attacker-influenced text. Rendering the `img` node as `null` drops every
+ * markdown image form at the render layer, so no answer text can produce a live `<img>` (an
+ * uncontrolled, no-click outbound fetch) — coverage a per-form string regex cannot guarantee.
+ */
+export const assistantAnswerProcessingPlugins: EuiMarkdownFormatProps['processingPluginList'] =
+  [
+    remarkRehypePlugin,
+    rehypeSlugPlugin,
+    [
+      rehype2react,
+      {
+        ...rehype2reactOptions,
+        components: {
+          ...rehype2reactOptions.components,
+          img: () => null,
+        },
+      },
+    ],
+  ];
+
+/**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
  * bubble, and on its own (message-list.tsx) for a question whose answer never arrived at all — a
  * reload or a navigation mid-answer kills the page before anything can mark the assistant message,
@@ -306,17 +328,10 @@ function formatTimestamp(epochMs: number): string {
  * bundles — can interpret raw inline HTML. An assistant answer is analytical prose; it has no
  * legitimate need to embed a remote image or a raw HTML element.
  *
- * EUI does expose `getDefaultEuiMarkdownProcessingPlugins`/`parsingPluginList` overrides for
- * exactly this kind of restriction, and that is the preferred fix — but this plugin is bundled
- * against whichever `@elastic/eui` version the host `wazuh-dashboard` platform ships (not a
- * version pinned in this repo), and that version cannot be resolved or exercised from this
- * worktree (no installed `node_modules`, no way to run a real render to confirm the plugin-list
- * shape holds for the bundled version). Rather than hard-code an internal EUI plugin API this
- * plugin cannot verify against its actual runtime, this sanitizes the STRING before it reaches
- * `EuiMarkdownFormat`, the same "mechanical, version-independent guarantee" already used for the
- * markdown-table backstop (see server/tools/markdown-table-filter.ts's doc comment). Fenced code
- * blocks and inline code spans are left untouched, so a literal `<img>` or `![]()` a user is
- * reading about in a code sample still displays as written.
+ * Markdown images are handled at the render layer by `assistantAnswerProcessingPlugins` (the `img`
+ * node renders as `null`), so this string-level defense covers the rest: it strips raw HTML tags and
+ * drops non-http(s) link targets, keeping the label. Fenced code blocks and inline code spans are
+ * left untouched, so a literal `<img>` in a code sample still displays as written.
  */
 export function sanitizeAssistantMarkdown(content: string): string {
   // Split on fenced code blocks (```...```) and inline code spans (`...`); the capturing group
@@ -333,11 +348,6 @@ export function sanitizeAssistantMarkdown(content: string): string {
 function sanitizeProseSegment(segment: string): string {
   return (
     segment
-      // Markdown images (inline and reference-style) — strip entirely rather than degrading to a
-      // link, since a bare URL the model copied from tool data is exactly the kind of attacker-
-      // influenced text this guards against too.
-      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-      .replace(/!\[[^\]]*\]\[[^\]]*\]/g, '')
       // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
       // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
       // matches and passes through untouched.
@@ -616,11 +626,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div className={PROSE_MEASURE_CLASS}>
           <EuiText size='s'>
-            {/* sanitizeAssistantMarkdown: the finished answer is model output built
-                  from tool results that can carry attacker-influenced text — see that
-                  function's doc comment for why this runs here instead of an EUI
-                  processingPluginList override. */}
-            <EuiMarkdownFormat>{sanitizedContent}</EuiMarkdownFormat>
+            <EuiMarkdownFormat
+              processingPluginList={assistantAnswerProcessingPlugins}
+            >
+              {sanitizedContent}
+            </EuiMarkdownFormat>
           </EuiText>
         </div>
       )}

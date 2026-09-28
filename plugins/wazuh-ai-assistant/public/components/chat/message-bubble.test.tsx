@@ -750,19 +750,6 @@ describe('MessageBubble', () => {
 });
 
 describe('sanitizeAssistantMarkdown', () => {
-  it('strips inline Markdown image syntax, including the URL', () => {
-    const out = sanitizeAssistantMarkdown(
-      'before ![alt](http://evil.example/x) after',
-    );
-    expect(out).not.toContain('![');
-    expect(out).not.toContain('evil.example');
-  });
-
-  it('strips reference-style Markdown image syntax', () => {
-    const out = sanitizeAssistantMarkdown('before ![alt][ref] after');
-    expect(out).not.toContain('![');
-  });
-
   it('strips raw HTML tags (open, close, self-closing)', () => {
     const out = sanitizeAssistantMarkdown(
       '<img src=x onerror=alert(1)> and <div>text</div> and <br/>',
@@ -808,6 +795,28 @@ describe('sanitizeAssistantMarkdown', () => {
     expect(out).toContain('click me');
     expect(out).not.toContain('[rel]');
     expect(out).toContain('rel');
+  });
+});
+
+describe('MessageBubble — assistant answer image safety', () => {
+  it('renders no <img> for any image form in a finished assistant answer', () => {
+    const content = [
+      '![plain](http://evil.example/1)',
+      '![x\\]y](http://evil.example/2)',
+      '![x[y]z](http://evil.example/3)',
+      '![alt][ref]',
+      'See ![short]\n\n[ref]: http://evil.example/4',
+      'a \\` ![bt](http://evil.example/5) `code`',
+    ].join('\n\n');
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({ role: 'assistant', content })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+    expect(container.querySelectorAll('img')).toHaveLength(0);
   });
 });
 
