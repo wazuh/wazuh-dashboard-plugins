@@ -205,9 +205,9 @@ describe('ComplianceSubrequirements - tile label', () => {
     selectedRequirements: { 'A.5.1': true },
   });
 
-  // The definition files keep the title and the description apart; the label
-  // is composed here so both can be used independently elsewhere.
-  it('joins the requirement title and description', () => {
+  // The title is the short name of the requirement; its full text, the
+  // description, is left for the flyout.
+  it('joins the identifier and the title, without the description', () => {
     const wrapper = shallow(
       <ComplianceSubrequirements
         {...propsWith({
@@ -215,26 +215,68 @@ describe('ComplianceSubrequirements - tile label', () => {
             title: 'Policies for information security',
             description:
               'Information security policy and topic-specific policies.',
+            category: 'Organizational controls',
           },
-        })}
-      />,
-    );
-    expect(getFacetLabels(wrapper)).toContain(
-      'A.5.1 - Policies for information security - Information security policy and topic-specific policies.',
-    );
-  });
-
-  it('uses the title alone when the framework publishes no description', () => {
-    const wrapper = shallow(
-      <ComplianceSubrequirements
-        {...propsWith({
-          'A.5.1': { title: 'Policies for information security' },
         })}
       />,
     );
     expect(getFacetLabels(wrapper)).toContain(
       'A.5.1 - Policies for information security',
     );
+  });
+
+  it('falls back to the description when the requirement has no title', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...propsWith({
+          'A.5.1': {
+            description: 'Incident handling',
+            category: 'Organizational controls',
+          },
+        })}
+      />,
+    );
+    expect(getFacetLabels(wrapper)).toContain('A.5.1 - Incident handling');
+  });
+});
+
+describe('ComplianceSubrequirements - requirement flyout', () => {
+  const openFlyout = requirement => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...baseProps()}
+        complianceObject={{ 'A.5.1': ['A.5.1'] }}
+        descriptions={{ 'A.5.1': requirement }}
+        selectedRequirements={{ 'A.5.1': true }}
+        requirementCounts={{ 'A.5.1': 3 }}
+      />,
+    );
+    wrapper.instance().showFlyout('A.5.1');
+    wrapper.update();
+    return wrapper.find(RequirementFlyout);
+  };
+
+  it('names the requirement by its title and shows its description', () => {
+    const flyout = openFlyout({
+      title: 'Policies for information security',
+      description: 'Information security policy and topic-specific policies.',
+      category: 'Organizational controls',
+    });
+    expect(flyout.prop('title')).toBe(
+      'Requirement A.5.1 - Policies for information security',
+    );
+    expect(flyout.prop('description')).toBe(
+      'Information security policy and topic-specific policies.',
+    );
+  });
+
+  it('names the requirement by its identifier alone when it has no title', () => {
+    const flyout = openFlyout({
+      description: 'Incident handling',
+      category: 'Organizational controls',
+    });
+    expect(flyout.prop('title')).toBe('Requirement A.5.1');
+    expect(flyout.prop('description')).toBe('Incident handling');
   });
 });
 

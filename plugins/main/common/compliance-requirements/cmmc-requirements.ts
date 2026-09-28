@@ -12,6 +12,7 @@
 
 /*
  * Framework: cmmc
+ * Catalog version: 1.0.0
  * Edition: 32 CFR Part 170 (CMMC Program final rule), Levels 1-3
  * Source: eCFR (Office of the Federal Register / GPO), 32 CFR Part 170 - CMMC Program, with 48 CFR 52.204-21 and the NIST SP 800-171 Rev 2 requirements CSV that the rule adopts; all three artifacts are listed in index.json
  * Controls: 149
@@ -20,544 +21,874 @@ import { ComplianceRequirement } from './types';
 
 export const cmmcRequirementsFile: Record<string, ComplianceRequirement> = {
   'AC.L1-b.1.i': {
-    title:
+    title: 'Authorized Access Control [FCI Data]',
+    description:
       'Limit information system access to authorized users, processes acting on behalf of authorized users, or devices (including other information systems).',
+    category: 'Access Control',
   },
   'AC.L1-b.1.ii': {
-    title:
+    title: 'Transaction & Function Control [FCI Data]',
+    description:
       'Limit information system access to the types of transactions and functions that authorized users are permitted to execute.',
+    category: 'Access Control',
   },
   'AC.L1-b.1.iii': {
-    title:
+    title: 'External Connections [FCI Data]',
+    description:
       'Verify and control/limit connections to and use of external information systems.',
+    category: 'Access Control',
   },
   'AC.L1-b.1.iv': {
-    title:
+    title: 'Control Public Information [FCI Data]',
+    description:
       'Control information posted or processed on publicly accessible information systems.',
+    category: 'Access Control',
   },
   'IA.L1-b.1.v': {
-    title:
+    title: 'Identification [FCI Data]',
+    description:
       'Identify information system users, processes acting on behalf of users, or devices.',
+    category: 'Identification and Authentication',
   },
   'IA.L1-b.1.vi': {
-    title:
+    title: 'Authentication [FCI Data]',
+    description:
       'Authenticate (or verify) the identities of those users, processes, or devices, as a prerequisite to allowing access to organizational information systems.',
+    category: 'Identification and Authentication',
   },
   'MP.L1-b.1.vii': {
-    title:
+    title: 'Media Disposal [FCI Data]',
+    description:
       'Sanitize or destroy information system media containing Federal Contract Information before disposal or release for reuse.',
+    category: 'Media Protection',
   },
   'PE.L1-b.1.viii': {
-    title:
+    title: 'Limit Physical Access [FCI Data]',
+    description:
       'Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.',
+    category: 'Physical Protection',
   },
   'PE.L1-b.1.ix': {
-    title:
+    title: 'Manage Visitors & Physical Access [FCI Data]',
+    description:
       'Escort visitors and monitor visitor activity; maintain audit logs of physical access; and control and manage physical access devices.',
+    category: 'Physical Protection',
   },
   'SC.L1-b.1.x': {
-    title:
+    title: 'Boundary Protection [FCI Data]',
+    description:
       'Monitor, control, and protect organizational communications ( i.e., information transmitted or received by organizational information systems) at the external boundaries and key internal boundaries of the information systems.',
+    category: 'System and Communications Protection',
   },
   'SC.L1-b.1.xi': {
-    title:
+    title: 'Public-Access System Separation [FCI Data]',
+    description:
       'Implement subnetworks for publicly accessible system components that are physically or logically separated from internal networks.',
+    category: 'System and Communications Protection',
   },
   'SI.L1-b.1.xii': {
-    title:
+    title: 'Flaw Remediation [FCI Data]',
+    description:
       'Identify, report, and correct information and information system flaws in a timely manner.',
+    category: 'System and Information Integrity',
   },
   'SI.L1-b.1.xiii': {
-    title:
+    title: 'Malicious Code Protection [FCI Data]',
+    description:
       'Provide protection from malicious code at appropriate locations within organizational information systems.',
+    category: 'System and Information Integrity',
   },
   'SI.L1-b.1.xiv': {
-    title:
+    title: 'Update Malicious Code Protection [FCI Data]',
+    description:
       'Update malicious code protection mechanisms when new releases are available.',
+    category: 'System and Information Integrity',
   },
   'SI.L1-b.1.xv': {
-    title:
+    title: 'System & File Scanning [FCI Data]',
+    description:
       'Perform periodic scans of the information system and real-time scans of files from external sources as files are downloaded, opened, or executed.',
+    category: 'System and Information Integrity',
   },
   'AC.L2-3.1.1': {
-    title:
+    title: 'Authorized Access Control [CUI Data]',
+    description:
       'Limit system access to authorized users, processes acting on behalf of authorized users, and devices (including other systems).',
+    category: 'Access Control',
   },
   'AC.L2-3.1.2': {
-    title:
+    title: 'Transaction & Function Control [CUI Data]',
+    description:
       'Limit system access to the types of transactions and functions that authorized users are permitted to execute.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.3': {
-    title:
+    title: 'Control CUI Flow',
+    description:
       'Control the flow of CUI in accordance with approved authorizations.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.4': {
-    title:
+    title: 'Separation of Duties',
+    description:
       'Separate the duties of individuals to reduce the risk of malevolent activity without collusion.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.5': {
-    title:
+    title: 'Least Privilege',
+    description:
       'Employ the principle of least privilege, including for specific security functions and privileged accounts.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.6': {
-    title:
+    title: 'Non-Privileged Account Use',
+    description:
       'Use non-privileged accounts or roles when accessing nonsecurity functions',
+    category: 'Access Control',
   },
   'AC.L2-3.1.7': {
-    title:
+    title: 'Privileged Functions',
+    description:
       'Prevent non-privileged users from executing privileged functions and capture the execution of such functions in audit logs.',
+    category: 'Access Control',
   },
-  'AC.L2-3.1.8': { title: 'Limit unsuccessful logon attempts.' },
+  'AC.L2-3.1.8': {
+    title: 'Unsuccessful Logon Attempts',
+    description: 'Limit unsuccessful logon attempts.',
+    category: 'Access Control',
+  },
   'AC.L2-3.1.9': {
-    title:
+    title: 'Privacy & Security Notices',
+    description:
       'Provide privacy and security notices consistent with applicable CUI rules.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.10': {
-    title:
+    title: 'Session Lock',
+    description:
       'Use session lock with pattern-hiding displays to prevent access and viewing of data after a period of inactivity',
+    category: 'Access Control',
   },
   'AC.L2-3.1.11': {
-    title:
+    title: 'Session Termination',
+    description:
       'Terminate (automatically) a user session after a defined condition.',
+    category: 'Access Control',
   },
-  'AC.L2-3.1.12': { title: 'Monitor and control remote access sessions.' },
+  'AC.L2-3.1.12': {
+    title: 'Control Remote Access',
+    description: 'Monitor and control remote access sessions.',
+    category: 'Access Control',
+  },
   'AC.L2-3.1.13': {
-    title:
+    title: 'Remote Access Confidentiality',
+    description:
       'Employ cryptographic mechanisms to protect the confidentiality of remote access sessions.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.14': {
-    title: 'Route remote access via managed access control points.',
+    title: 'Remote Access Routing',
+    description: 'Route remote access via managed access control points.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.15': {
-    title:
+    title: 'Privileged Remote Access',
+    description:
       'Authorize remote execution of privileged commands and remote access to security-relevant information.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.16': {
-    title: 'Authorize wireless access prior to allowing such connections',
+    title: 'Wireless Access Authorization',
+    description: 'Authorize wireless access prior to allowing such connections',
+    category: 'Access Control',
   },
   'AC.L2-3.1.17': {
-    title: 'Protect wireless access using authentication and encryption',
+    title: 'Wireless Access Protection',
+    description: 'Protect wireless access using authentication and encryption',
+    category: 'Access Control',
   },
-  'AC.L2-3.1.18': { title: 'Control connection of mobile devices.' },
+  'AC.L2-3.1.18': {
+    title: 'Mobile Device Connection',
+    description: 'Control connection of mobile devices.',
+    category: 'Access Control',
+  },
   'AC.L2-3.1.19': {
-    title: 'Encrypt CUI on mobile devices and mobile computing platforms.[23]',
+    title: 'Encrypt CUI on Mobile',
+    description:
+      'Encrypt CUI on mobile devices and mobile computing platforms.[23]',
+    category: 'Access Control',
   },
   'AC.L2-3.1.20': {
-    title:
+    title: 'External Connections [CUI Data]',
+    description:
       'Verify and control/limit connections to and use of external systems.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.21': {
-    title: 'Limit use of portable storage devices on external systems.',
+    title: 'Portable Storage Use',
+    description: 'Limit use of portable storage devices on external systems.',
+    category: 'Access Control',
   },
   'AC.L2-3.1.22': {
-    title: 'Control CUI posted or processed on publicly accessible systems.',
+    title: 'Control Public Information [CUI Data]',
+    description:
+      'Control CUI posted or processed on publicly accessible systems.',
+    category: 'Access Control',
   },
   'AT.L2-3.2.1': {
-    title:
+    title: 'Role-Based Risk Awareness',
+    description:
       'Ensure that managers, systems administrators, and users of organizational systems are made aware of the security risks associated with their activities and of the applicable policies, standards, and procedures related to the security of those systems.',
+    category: 'Awareness and Training',
   },
   'AT.L2-3.2.2': {
-    title:
+    title: 'Role-Based Training',
+    description:
       'Ensure that personnel are trained to carry out their assigned information security-related duties and responsibilities.',
+    category: 'Awareness and Training',
   },
   'AT.L2-3.2.3': {
-    title:
+    title: 'Insider Threat Awareness',
+    description:
       'Provide security awareness training on recognizing and reporting potential indicators of insider threat.',
+    category: 'Awareness and Training',
   },
   'AU.L2-3.3.1': {
-    title:
+    title: 'System Auditing',
+    description:
       'Create and retain system audit logs and records to the extent needed to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity',
+    category: 'Audit and Accountability',
   },
   'AU.L2-3.3.2': {
-    title:
+    title: 'User Accountability',
+    description:
       'Ensure that the actions of individual system users can be uniquely traced to those users, so they can be held accountable for their actions.',
+    category: 'Audit and Accountability',
   },
-  'AU.L2-3.3.3': { title: 'Review and update logged events.' },
+  'AU.L2-3.3.3': {
+    title: 'Event Review',
+    description: 'Review and update logged events.',
+    category: 'Audit and Accountability',
+  },
   'AU.L2-3.3.4': {
-    title: 'Alert in the event of an audit logging process failure.',
+    title: 'Audit Failure Alerting',
+    description: 'Alert in the event of an audit logging process failure.',
+    category: 'Audit and Accountability',
   },
   'AU.L2-3.3.5': {
-    title:
+    title: 'Audit Correlation',
+    description:
       'Correlate audit record review, analysis, and reporting processes for investigation and response to indications of unlawful, unauthorized, suspicious, or unusual activity.',
+    category: 'Audit and Accountability',
   },
   'AU.L2-3.3.6': {
-    title:
+    title: 'Reduction & Reporting',
+    description:
       'Provide audit record reduction and report generation to support on-demand analysis and reporting.',
+    category: 'Audit and Accountability',
   },
   'AU.L2-3.3.7': {
-    title:
+    title: 'Authoritative Time Source',
+    description:
       'Provide a system capability that compares and synchronizes internal system clocks with an authoritative source to generate time stamps for audit records',
+    category: 'Audit and Accountability',
   },
   'AU.L2-3.3.8': {
-    title:
+    title: 'Audit Protection',
+    description:
       'Protect audit information and audit logging tools from unauthorized access, modification, and deletion.',
+    category: 'Audit and Accountability',
   },
   'AU.L2-3.3.9': {
-    title:
+    title: 'Audit Management',
+    description:
       'Limit management of audit logging functionality to a subset of privileged users.',
+    category: 'Audit and Accountability',
   },
   'CM.L2-3.4.1': {
-    title:
+    title: 'System Baselining',
+    description:
       'Establish and maintain baseline configurations and inventories of organizational systems (including hardware, software, firmware, and documentation) throughout the respective system development life cycles.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.2': {
-    title:
+    title: 'Security Configuration Enforcement',
+    description:
       'Establish and enforce security configuration settings for information technology products employed in organizational systems.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.3': {
-    title:
+    title: 'System Change Management',
+    description:
       'Track, review, approve or disapprove, and log changes to organizational systems.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.4': {
-    title: 'Analyze the security impact of changes prior to implementation.',
+    title: 'Security Impact Analysis',
+    description:
+      'Analyze the security impact of changes prior to implementation.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.5': {
-    title:
+    title: 'Access Restrictions for Change',
+    description:
       'Define, document, approve, and enforce physical and logical access restrictions associated with changes to organizational systems.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.6': {
-    title:
+    title: 'Least Functionality',
+    description:
       'Employ the principle of least functionality by configuring organizational systems to provide only essential capabilities.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.7': {
-    title:
+    title: 'Nonessential Functionality',
+    description:
       'Restrict, disable, or prevent the use of nonessential programs, functions, ports, protocols, and services.',
+    category: 'Configuration Management',
   },
   'CM.L2-3.4.8': {
-    title:
+    title: 'Application Execution Policy',
+    description:
       'Apply deny-by-exception (blacklisting) policy to prevent the use of unauthorized software or deny-all, permit-by-exception (whitelisting) policy to allow the execution of authorized software.',
+    category: 'Configuration Management',
   },
-  'CM.L2-3.4.9': { title: 'Control and monitor user-installed software.' },
+  'CM.L2-3.4.9': {
+    title: 'User-Installed Software',
+    description: 'Control and monitor user-installed software.',
+    category: 'Configuration Management',
+  },
   'IA.L2-3.5.1': {
-    title:
+    title: 'Identification [CUI Data]',
+    description:
       'Identify system users, processes acting on behalf of users, and devices.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.2': {
-    title:
+    title: 'Authentication [CUI Data]',
+    description:
       'Authenticate (or verify) the identities of users, processes, or devices, as a prerequisite to allowing access to organizational systems.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.3': {
-    title:
+    title: 'Multifactor Authentication',
+    description:
       'Use multifactor authentication for local and network access to privileged accounts and for network access to non-privileged accounts.[24] [25].',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.4': {
-    title:
+    title: 'Replay-Resistant Authentication',
+    description:
       'Employ replay-resistant authentication mechanisms for network access to privileged and non-privileged accounts.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.5': {
-    title: 'Prevent reuse of identifiers for a defined period.',
+    title: 'Identifier Reuse',
+    description: 'Prevent reuse of identifiers for a defined period.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.6': {
-    title: 'Disable identifiers after a defined period of inactivity.',
+    title: 'Identifier Handling',
+    description: 'Disable identifiers after a defined period of inactivity.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.7': {
-    title:
+    title: 'Password Complexity',
+    description:
       'Enforce a minimum password complexity and change of characters when new passwords are created.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.8': {
-    title: 'Prohibit password reuse for a specified number of generations.',
+    title: 'Password Reuse',
+    description:
+      'Prohibit password reuse for a specified number of generations.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.9': {
-    title:
+    title: 'Temporary Passwords',
+    description:
       'Allow temporary password use for system logons with an immediate change to a permanent password.',
+    category: 'Identification and Authentication',
   },
   'IA.L2-3.5.10': {
-    title: 'Store and transmit only cryptographically-protected passwords.',
+    title: 'Cryptographically-Protected Passwords',
+    description:
+      'Store and transmit only cryptographically-protected passwords.',
+    category: 'Identification and Authentication',
   },
-  'IA.L2-3.5.11': { title: 'Obscure feedback of authentication information' },
+  'IA.L2-3.5.11': {
+    title: 'Obscure Feedback',
+    description: 'Obscure feedback of authentication information',
+    category: 'Identification and Authentication',
+  },
   'IR.L2-3.6.1': {
-    title:
+    title: 'Incident Handling',
+    description:
       'Establish an operational incident-handling capability for organizational systems that includes preparation, detection, analysis, containment, recovery, and user response activities.',
+    category: 'Incident response',
   },
   'IR.L2-3.6.2': {
-    title:
+    title: 'Incident Reporting',
+    description:
       'Track, document, and report incidents to designated officials and/or authorities both internal and external to the organization.',
+    category: 'Incident response',
   },
   'IR.L2-3.6.3': {
-    title: 'Test the organizational incident response capability.',
+    title: 'Incident Response Testing',
+    description: 'Test the organizational incident response capability.',
+    category: 'Incident response',
   },
   'MA.L2-3.7.1': {
-    title: 'Perform maintenance on organizational systems.[26].',
+    title: 'Perform Maintenance',
+    description: 'Perform maintenance on organizational systems.[26].',
+    category: 'Maintenance',
   },
   'MA.L2-3.7.2': {
-    title:
+    title: 'System Maintenance Control',
+    description:
       'Provide controls on the tools, techniques, mechanisms, and personnel used to conduct system maintenance.',
+    category: 'Maintenance',
   },
   'MA.L2-3.7.3': {
-    title:
+    title: 'Equipment Sanitization',
+    description:
       'Ensure equipment removed for off-site maintenance is sanitized of any CUI.',
+    category: 'Maintenance',
   },
   'MA.L2-3.7.4': {
-    title:
+    title: 'Media Inspection',
+    description:
       'Check media containing diagnostic and test programs for malicious code before the media are used in organizational systems.',
+    category: 'Maintenance',
   },
   'MA.L2-3.7.5': {
-    title:
+    title: 'Nonlocal Maintenance',
+    description:
       'Require multifactor authentication to establish nonlocal maintenance sessions via external network connections and terminate such connections when nonlocal maintenance is complete.',
+    category: 'Maintenance',
   },
   'MA.L2-3.7.6': {
-    title:
+    title: 'Maintenance Personnel',
+    description:
       'Supervise the maintenance activities of maintenance personnel without required access authorization.',
+    category: 'Maintenance',
   },
   'MP.L2-3.8.1': {
-    title:
+    title: 'Media Protection',
+    description:
       'Protect (i.e., physically control and securely store) system media containing CUI, both paper and digital.',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.2': {
-    title: 'Limit access to CUI on system media to authorized users',
+    title: 'Media Access',
+    description: 'Limit access to CUI on system media to authorized users',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.3': {
-    title:
+    title: 'Media Disposal [CUI Data]',
+    description:
       'Sanitize or destroy system media containing CUI before disposal or release for reuse.',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.4': {
-    title:
+    title: 'Media Markings',
+    description:
       'Mark media with necessary CUI markings and distribution limitations.[27]',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.5': {
-    title:
+    title: 'Media Accountability',
+    description:
       'Control access to media containing CUI and maintain accountability for media during transport outside of controlled areas.',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.6': {
-    title:
+    title: 'Portable Storage Encryption',
+    description:
       'Implement cryptographic mechanisms to protect the confidentiality of CUI stored on digital media during transport unless otherwise protected by alternative physical safeguards.',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.7': {
-    title: 'Control the use of removable media on system components.',
+    title: 'Removable Media',
+    description: 'Control the use of removable media on system components.',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.8': {
-    title:
+    title: 'Shared Media',
+    description:
       'Prohibit the use of portable storage devices when such devices have no identifiable owner.',
+    category: 'Media Protection',
   },
   'MP.L2-3.8.9': {
-    title: 'Protect the confidentiality of backup CUI at storage locations.',
+    title: 'Protect Backups',
+    description:
+      'Protect the confidentiality of backup CUI at storage locations.',
+    category: 'Media Protection',
   },
   'PS.L2-3.9.1': {
-    title:
+    title: 'Screen Individuals',
+    description:
       'Screen individuals prior to authorizing access to organizational systems containing CUI.',
+    category: 'Personnel Security',
   },
   'PS.L2-3.9.2': {
-    title:
+    title: 'Personnel Actions',
+    description:
       'Ensure that organizational systems containing CUI are protected during and after personnel actions such as terminations and transfers',
+    category: 'Personnel Security',
   },
   'PE.L2-3.10.1': {
-    title:
+    title: 'Limit Physical Access [CUI Data]',
+    description:
       'Limit physical access to organizational systems, equipment, and the respective operating environments to authorized individuals.',
+    category: 'Physical Protection',
   },
   'PE.L2-3.10.2': {
-    title:
+    title: 'Monitor Facility',
+    description:
       'Protect and monitor the physical facility and support infrastructure for organizational systems.',
+    category: 'Physical Protection',
   },
-  'PE.L2-3.10.3': { title: 'Escort visitors and monitor visitor activity.' },
-  'PE.L2-3.10.4': { title: 'Maintain audit logs of physical access.' },
-  'PE.L2-3.10.5': { title: 'Control and manage physical access devices.' },
+  'PE.L2-3.10.3': {
+    title: 'Escort Visitors [CUI Data]',
+    description: 'Escort visitors and monitor visitor activity.',
+    category: 'Physical Protection',
+  },
+  'PE.L2-3.10.4': {
+    title: 'Physical Access Logs [CUI Data]',
+    description: 'Maintain audit logs of physical access.',
+    category: 'Physical Protection',
+  },
+  'PE.L2-3.10.5': {
+    title: 'Manage Physical Access [CUI Data]',
+    description: 'Control and manage physical access devices.',
+    category: 'Physical Protection',
+  },
   'PE.L2-3.10.6': {
-    title: 'Enforce safeguarding measures for CUI at alternate work sites.',
+    title: 'Alternative Work Sites',
+    description:
+      'Enforce safeguarding measures for CUI at alternate work sites.',
+    category: 'Physical Protection',
   },
   'RA.L2-3.11.1': {
-    title:
+    title: 'Risk Assessments',
+    description:
       'Periodically assess the risk to organizational operations (including mission, functions, image, or reputation), organizational assets, and individuals, resulting from the operation of organizational systems and the associated processing, storage, or transmission of CUI',
+    category: 'Risk Assessment',
   },
   'RA.L2-3.11.2': {
-    title:
+    title: 'Vulnerability Scan',
+    description:
       'Scan for vulnerabilities in organizational systems and applications periodically and when new vulnerabilities affecting those systems and applications are identified.',
+    category: 'Risk Assessment',
   },
   'RA.L2-3.11.3': {
-    title: 'Remediate vulnerabilities in accordance with risk assessments.',
+    title: 'Vulnerability Remediation',
+    description:
+      'Remediate vulnerabilities in accordance with risk assessments.',
+    category: 'Risk Assessment',
   },
   'CA.L2-3.12.1': {
-    title:
+    title: 'Security Control Assessment',
+    description:
       'Periodically assess the security controls in organizational systems to determine if the controls are effective in their application.',
+    category: 'Security Assessment',
   },
   'CA.L2-3.12.2': {
-    title:
+    title: 'Operational Plan of Action',
+    description:
       'Develop and implement plans of action designed to correct deficiencies and reduce or eliminate vulnerabilities in organizational systems.',
+    category: 'Security Assessment',
   },
   'CA.L2-3.12.3': {
-    title:
+    title: 'Security Control Monitoring',
+    description:
       'Monitor security controls on an ongoing basis to ensure the continued effectiveness of the controls.',
+    category: 'Security Assessment',
   },
   'CA.L2-3.12.4': {
-    title:
+    title: 'System Security Plan',
+    description:
       'Develop, document, and periodically update system security plans that describe system boundaries, system environments of operation, how security requirements are implemented, and the relationships with or connections to other systems.[28]',
+    category: 'Security Assessment',
   },
   'SC.L2-3.13.1': {
-    title:
+    title: 'Boundary Protection [CUI Data]',
+    description:
       'Monitor, control, and protect communications (i.e., information transmitted or received by organizational systems) at the external boundaries and key internal boundaries of organizational systems.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.2': {
-    title:
+    title: 'Security Engineering',
+    description:
       'Employ architectural designs, software development techniques, and systems engineering principles that promote effective information security within organizational systems.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.3': {
-    title: 'Separate user functionality from system management functionality.',
+    title: 'Role Separation',
+    description:
+      'Separate user functionality from system management functionality.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.4': {
-    title:
+    title: 'Shared Resource Control',
+    description:
       'Prevent unauthorized and unintended information transfer via shared system resources.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.5': {
-    title:
+    title: 'Public-Access System Separation [CUI Data]',
+    description:
       'Implement subnetworks for publicly accessible system components that are physically or logically separated from internal networks.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.6': {
-    title:
+    title: 'Network Communication by Exception',
+    description:
       'Deny network communications traffic by default and allow network communications traffic by exception (i.e., deny all, permit by exception).',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.7': {
-    title:
+    title: 'Split Tunneling',
+    description:
       'Prevent remote devices from simultaneously establishing non-remote connections with organizational systems and communicating via some other connection to resources in external networks (i.e., split tunneling).',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.8': {
-    title:
+    title: 'Data in Transit',
+    description:
       'Implement cryptographic mechanisms to prevent unauthorized disclosure of CUI during transmission unless otherwise protected by alternative physical safeguards.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.9': {
-    title:
+    title: 'Connections Termination',
+    description:
       'Terminate network connections associated with communications sessions at the end of the sessions or after a defined period of inactivity.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.10': {
-    title:
+    title: 'Key Management',
+    description:
       'Establish and manage cryptographic keys for cryptography employed in organizational systems.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.11': {
-    title:
+    title: 'CUI Encryption',
+    description:
       'Employ FIPS-validated cryptography when used to protect the confidentiality of CUI.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.12': {
-    title:
+    title: 'Collaborative Device Control',
+    description:
       'Prohibit remote activation of collaborative computing devices and provide indication of devices in use to users present at the device.[29].',
+    category: 'System and Communications Protection',
   },
-  'SC.L2-3.13.13': { title: 'Control and monitor the use of mobile code.' },
+  'SC.L2-3.13.13': {
+    title: 'Mobile Code',
+    description: 'Control and monitor the use of mobile code.',
+    category: 'System and Communications Protection',
+  },
   'SC.L2-3.13.14': {
-    title:
+    title: 'Voice over Internet Protocol',
+    description:
       'Control and monitor the use of Voice over Internet Protocol (VoIP) technologies.',
+    category: 'System and Communications Protection',
   },
   'SC.L2-3.13.15': {
-    title: 'Protect the authenticity of communications sessions.',
+    title: 'Communications Authenticity',
+    description: 'Protect the authenticity of communications sessions.',
+    category: 'System and Communications Protection',
   },
-  'SC.L2-3.13.16': { title: 'Protect the confidentiality of CUI at rest.' },
+  'SC.L2-3.13.16': {
+    title: 'Data at Rest',
+    description: 'Protect the confidentiality of CUI at rest.',
+    category: 'System and Communications Protection',
+  },
   'SI.L2-3.14.1': {
-    title: 'Identify, report, and correct system flaws in a timely manner.',
+    title: 'Flaw Remediation [CUI Data]',
+    description:
+      'Identify, report, and correct system flaws in a timely manner.',
+    category: 'System and Information Integrity',
   },
   'SI.L2-3.14.2': {
-    title:
+    title: 'Malicious Code Protection [CUI Data]',
+    description:
       'Provide protection from malicious code at designated locations within organizational systems.',
+    category: 'System and Information Integrity',
   },
   'SI.L2-3.14.3': {
-    title:
+    title: 'Security Alerts & Advisories',
+    description:
       'Monitor system security alerts and advisories and take action in response.',
+    category: 'System and Information Integrity',
   },
   'SI.L2-3.14.4': {
-    title:
+    title: 'Update Malicious Code Protection [CUI Data]',
+    description:
       'Update malicious code protection mechanisms when new releases are available.',
+    category: 'System and Information Integrity',
   },
   'SI.L2-3.14.5': {
-    title:
+    title: 'System & File Scanning [CUI Data]',
+    description:
       'Perform periodic scans of organizational systems and real-time scans of files from external sources as files are downloaded, opened, or executed.',
+    category: 'System and Information Integrity',
   },
   'SI.L2-3.14.6': {
-    title:
+    title: 'Monitor Communications for Attacks',
+    description:
       'Monitor organizational systems, including inbound and outbound communications traffic, to detect attacks and indicators of potential attacks.',
+    category: 'System and Information Integrity',
   },
   'SI.L2-3.14.7': {
-    title: 'Identify unauthorized use of organizational systems.',
+    title: 'Identify Unauthorized Use',
+    description: 'Identify unauthorized use of organizational systems.',
+    category: 'System and Information Integrity',
   },
   'AC.L3-3.1.2e': {
-    title:
+    title: 'Organizationally Controlled Assets',
+    description:
       'Restrict access to systems and system components to only those information resources that are owned, provisioned, or issued by the organization.',
+    category: 'Access Control',
   },
   'AC.L3-3.1.3e': {
-    title:
+    title: 'Secured Information Transfer',
+    description:
       'Employ secure information transfer solutions to control information flows between security domains on connected systems.',
+    category: 'Access Control',
   },
   'AT.L3-3.2.1e': {
-    title:
+    title: 'Advanced Threat Awareness',
+    description:
       'Provide awareness training upon initial hire, following a significant cyber event, and at least annually , focused on recognizing and responding to threats from social engineering, advanced persistent threat actors, breaches, and suspicious behaviors; update the training at least annually or when there are significant changes to the threat.',
+    category: 'Awareness and Training',
   },
   'AT.L3-3.2.2e': {
-    title:
+    title: 'Practical Training Exercises',
+    description:
       'Include practical exercises in awareness training for all users, tailored by roles, to include general users, users with specialized roles, and privileged users, that are aligned with current threat scenarios and provide feedback to individuals involved in the training and their supervisors.',
+    category: 'Awareness and Training',
   },
   'CM.L3-3.4.1e': {
-    title:
+    title: 'Authoritative Repository',
+    description:
       'Establish and maintain an authoritative source and repository to provide a trusted source and accountability for approved and implemented system components.',
+    category: 'Configuration Management',
   },
   'CM.L3-3.4.2e': {
-    title:
+    title: 'Automated Detection & Remediation',
+    description:
       'Employ automated mechanisms to detect misconfigured or unauthorized system components; after detection, remove the components or place the components in a quarantine or remediation network to facilitate patching, re-configuration, or other mitigations.',
+    category: 'Configuration Management',
   },
   'CM.L3-3.4.3e': {
-    title:
+    title: 'Automated Inventory',
+    description:
       'Employ automated discovery and management tools to maintain an up-to-date, complete, accurate, and readily available inventory of system components.',
+    category: 'Configuration Management',
   },
   'IA.L3-3.5.1e': {
-    title:
+    title: 'Bidirectional Authentication',
+    description:
       'Identify and authenticate systems and system components, where possible, before establishing a network connection using bidirectional authentication that is cryptographically based and replay resistant.',
+    category: 'Identification and Authentication',
   },
   'IA.L3-3.5.3e': {
-    title:
+    title: 'Block Untrusted Assets',
+    description:
       'Employ automated or manual/procedural mechanisms to prohibit system components from connecting to organizational systems unless the components are known, authenticated, in a properly configured state, or in a trust profile.',
+    category: 'Identification and Authentication',
   },
   'IR.L3-3.6.1e': {
-    title:
+    title: 'Security Operations Center',
+    description:
       'Establish and maintain a security operations center capability that operates 24/7, with allowance for remote/on-call staff.',
+    category: 'Incident response',
   },
   'IR.L3-3.6.2e': {
-    title:
+    title: 'Cyber Incident Response Team',
+    description:
       'Establish and maintain a cyber-incident response team that can be deployed by the organization within 24 hours.',
+    category: 'Incident response',
   },
   'PS.L3-3.9.2e': {
-    title:
+    title: 'Adverse Information',
+    description:
       'Ensure that organizational systems are protected if adverse information develops or is obtained about individuals with access to CUI.',
+    category: 'Personnel Security',
   },
   'RA.L3-3.11.1e': {
-    title:
+    title: 'Threat-Informed Risk Assessment',
+    description:
       'Employ threat intelligence, at a minimum from open or commercial sources, and any DoD-provided sources, as part of a risk assessment to guide and inform the development of organizational systems, security architectures, selection of security solutions, monitoring, threat hunting, and response and recovery activities.',
+    category: 'Risk Assessment',
   },
   'RA.L3-3.11.2e': {
-    title:
+    title: 'Threat Hunting',
+    description:
       'Conduct cyber threat hunting activities on an on-going aperiodic basis or when indications warrant, to search for indicators of compromise in organizational systems and detect, track, and disrupt threats that evade existing controls.',
+    category: 'Risk Assessment',
   },
   'RA.L3-3.11.3e': {
-    title:
+    title: 'Advanced Risk Identification',
+    description:
       'Employ advanced automation and analytics capabilities in support of analysts to predict and identify risks to organizations, systems, and system components.',
+    category: 'Risk Assessment',
   },
   'RA.L3-3.11.4e': {
-    title:
+    title: 'Security Solution Rationale',
+    description:
       'Document or reference in the system security plan the security solution selected, the rationale for the security solution, and the risk determination.',
+    category: 'Risk Assessment',
   },
   'RA.L3-3.11.5e': {
-    title:
+    title: 'Security Solution Effectiveness',
+    description:
       'Assess the effectiveness of security solutions at least annually or upon receipt of relevant cyber threat information, or in response to a relevant cyber incident, to address anticipated risk to organizational systems and the organization based on current and accumulated threat intelligence.',
+    category: 'Risk Assessment',
   },
   'RA.L3-3.11.6e': {
-    title:
+    title: 'Supply Chain Risk Response',
+    description:
       'Assess, respond to, and monitor supply chain risks associated with organizational systems and system components.',
+    category: 'Risk Assessment',
   },
   'RA.L3-3.11.7e': {
-    title:
+    title: 'Supply Chain Risk Plan',
+    description:
       'Develop a plan for managing supply chain risks associated with organizational systems and system components; update the plan at least annually, and upon receipt of relevant cyber threat information, or in response to a relevant cyber incident.',
+    category: 'Risk Assessment',
   },
   'CA.L3-3.12.1e': {
-    title:
+    title: 'Penetration Testing',
+    description:
       'Conduct penetration testing at least annually or when significant security changes are made to the system, leveraging automated scanning tools and ad hoc tests using subject matter experts.',
+    category: 'Security Assessment',
   },
   'SC.L3-3.13.4e': {
-    title:
+    title: 'Isolation',
+    description:
       'Employ physical isolation techniques or logical isolation techniques or both in organizational systems and system components.',
+    category: 'System and Communications Protection',
   },
   'SI.L3-3.14.1e': {
-    title:
+    title: 'Integrity Verification',
+    description:
       'Verify the integrity of security critical and essential software using root of trust mechanisms or cryptographic signatures.',
+    category: 'System and Information Integrity',
   },
   'SI.L3-3.14.3e': {
-    title:
+    title: 'Specialized Asset Security',
+    description:
       'Ensure that specialized assets including IoT, IIoT, OT, GFE, Restricted Information Systems, and test equipment are included in the scope of the specified enhanced security requirements or are segregated in purpose-specific networks.',
+    category: 'System and Information Integrity',
   },
   'SI.L3-3.14.6e': {
-    title:
+    title: 'Threat-Guided Intrusion Detection',
+    description:
       'Use threat indicator information and effective mitigations obtained from, at a minimum, open or commercial sources, and any DoD-provided sources, to guide and inform intrusion detection and threat hunting.',
+    category: 'System and Information Integrity',
   },
 };
 

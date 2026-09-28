@@ -28,7 +28,13 @@ import {
 import { nis2RequirementsFile } from './nis2-requirements';
 
 describe('resolveRequirement', () => {
-  const requirements = { 'A.5.1': { title: 'Policies' } };
+  const requirements = {
+    'A.5.1': {
+      title: 'Policies',
+      description: 'Policies for information security.',
+      category: 'Organizational controls',
+    },
+  };
 
   it('resolves a requirement named by its own identifier', () => {
     expect(resolveRequirement('A.5.1', requirements)).toBe('A.5.1');
@@ -137,7 +143,13 @@ describe('deriveDottedParent', () => {
 });
 
 describe('indexRequirementCodes', () => {
-  const requirements = { 'Article 32': { title: 'Security of processing' } };
+  const requirements = {
+    'Article 32': {
+      title: 'Security of processing',
+      description: 'Implement appropriate technical measures.',
+      category: 'Chapter IV',
+    },
+  };
   const resolver = { derive: deriveGdprArticle };
 
   it('groups every code of a requirement together', () => {
