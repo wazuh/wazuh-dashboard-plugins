@@ -429,7 +429,8 @@ Test Wazuh manager API connectivity:
 
 ```bash
 # From dashboard server
-curl -k -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD https://localhost:55000/
+TOKEN=$(curl -sk -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD -X POST "https://localhost:55000/security/user/authenticate?raw=true")
+curl -sk -H "Authorization: Bearer $TOKEN" https://localhost:55000/
 ```
 
 Expected response:
@@ -544,7 +545,8 @@ Wazuh API is not reachable
 2. **Test API manually**:
 
    ```bash
-   curl -k -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD https://localhost:55000/
+   TOKEN=$(curl -sk -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD -X POST "https://localhost:55000/security/user/authenticate?raw=true")
+   curl -sk -H "Authorization: Bearer $TOKEN" https://localhost:55000/
    ```
 
 3. **Check manager firewall**:
