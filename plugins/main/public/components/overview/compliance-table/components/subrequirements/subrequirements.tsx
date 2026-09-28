@@ -28,6 +28,10 @@ import {
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { RequirementFlyout } from '../requirement-flyout';
+import {
+  PatternDataSourceFilterManager,
+  FILTER_OPERATOR,
+} from '../../../../common/data-source';
 import { getDataPlugin } from '../../../../../kibana-services';
 import NavigationService from '../../../../../react-services/navigation-service';
 import {
@@ -38,6 +42,7 @@ import {
   WAZUH_MODULES_ID,
 } from '../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+import { getRequirementText } from '../../../../../../common/compliance-requirements/requirement-text';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
@@ -54,7 +59,10 @@ export class ComplianceSubrequirements extends Component {
   _isMount = false;
   state: {};
 
-  props!: {};
+  props!: {
+    requirementCounts?: Record<string, number>;
+    requirementCodes?: Record<string, string[]>;
+  };
 
   constructor(props) {
     super(props);
@@ -78,20 +86,33 @@ export class ComplianceSubrequirements extends Component {
    */
   addFilter(filter) {
     const { filterManager } = getDataPlugin().query;
-    const matchPhrase = {};
-    matchPhrase[filter.key] = filter.value;
-    const newFilter = {
-      meta: {
-        disabled: false,
-        key: filter.key,
-        params: { query: filter.value },
-        type: 'phrase',
-        negate: filter.negate || false,
-        index: this.props.indexPatternId,
-      },
-      query: { match_phrase: matchPhrase },
-      $state: { store: 'appState' },
-    };
+    // The ruleset can name the requirement in its own notation, so the filter
+    // accepts every code of the requirement, like the flyout does. Otherwise
+    // the view it opens holds fewer findings than the tile counts.
+    const values = this.props.requirementCodes?.[filter.value] || [
+      filter.value,
+    ];
+    const [value] = values;
+    const newFilter =
+      values.length > 1
+        ? PatternDataSourceFilterManager.createFilter(
+            FILTER_OPERATOR.IS_ONE_OF,
+            filter.key,
+            values,
+            this.props.indexPatternId,
+          )
+        : {
+            meta: {
+              disabled: false,
+              key: filter.key,
+              params: { query: value },
+              type: 'phrase',
+              negate: filter.negate || false,
+              index: this.props.indexPatternId,
+            },
+            query: { match_phrase: { [filter.key]: value } },
+            $state: { store: 'appState' },
+          };
     filterManager.addFilters([newFilter]);
   }
 
@@ -135,7 +156,7 @@ export class ComplianceSubrequirements extends Component {
 
   renderFacet() {
     const { complianceObject } = this.props;
-    const { requirementsCount } = this.props;
+    const requirementCounts = this.props.requirementCounts || {};
     const tacticsToRender: Array<any> = [];
     const showTechniques = {};
 
@@ -145,16 +166,19 @@ export class ComplianceSubrequirements extends Component {
         currentTechniques.forEach((technique, idx) => {
           if (
             !showTechniques[technique] &&
+            // Matched against the identifier and the title only: the
+            // description holds the full text of an article, where a common
+            // word matches nearly every requirement.
             (technique
               .toLowerCase()
               .includes(this.state.searchValue.toLowerCase()) ||
-              this.props.descriptions[technique]
+              (this.props.descriptions[technique]?.title || '')
                 .toLowerCase()
                 .includes(this.state.searchValue.toLowerCase()))
           ) {
-            const quantity =
-              (requirementsCount.find(item => item.key === technique) || {})
-                .doc_count || 0;
+            // Counted over every code of the requirement, so a finding that
+            // carries several of them counts once.
+            const quantity = requirementCounts[technique] || 0;
             if (
               !this.state.hideAlerts ||
               (this.state.hideAlerts && quantity > 0)
@@ -162,7 +186,9 @@ export class ComplianceSubrequirements extends Component {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
-                label: `${technique} - ${this.props.descriptions[technique]}`,
+                label: `${technique} - ${getRequirementText(
+                  this.props.descriptions[technique],
+                )}`,
                 quantity,
               });
             }
@@ -267,9 +293,7 @@ export class ComplianceSubrequirements extends Component {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {item.isOthers
-                        ? item.label
-                        : `${item.id} - ${this.props.descriptions[item.id]}`}
+                      {item.label}
                     </span>
                   </EuiToolTip>
 
@@ -461,7 +485,7 @@ export class ComplianceSubrequirements extends Component {
               />
             </EuiFlexItem>
           ) : (
-            this.props.requirementsCount && this.renderFacet()
+            this.renderFacet()
           )}
         </div>
 
@@ -503,7 +527,9 @@ export class ComplianceSubrequirements extends Component {
                       },
                     },
                   )
-                : this.props.descriptions[this.state.selectedRequirement]
+                : getRequirementText(
+                    this.props.descriptions[this.state.selectedRequirement],
+                  )
             }
             getRequirementKey={() => {
               return this.getRequirementKey();

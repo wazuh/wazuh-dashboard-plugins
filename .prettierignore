@@ -1,3 +1,6 @@
 # The style guide shows "bad" examples on purpose; formatting its code blocks would rewrite them
 # into the "good" form they are contrasted with.
 STYLEGUIDE.md
+
+# Sample-data datasets are NDJSON (one document per line), which Prettier cannot parse as JSON.
+plugins/main/server/lib/sample-data/dataset/**/*.json

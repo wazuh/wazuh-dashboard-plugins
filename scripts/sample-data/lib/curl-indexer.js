@@ -63,6 +63,58 @@ function checkIndexExists(indexName, config) {
 }
 
 /**
+ * Finds an index template registered in the indexer that governs an index name
+ * and creates data streams.
+ *
+ * The indexer rejects a plain index creation for such a name ("use create data
+ * stream api instead"), and it does not need one: writing to the name creates
+ * the data stream with that template's mappings, which is what the dashboard
+ * expects.
+ * @param {string} indexName index the documents are going to be written to
+ * @param {Object} config object with the configuration: SERVER_ADDRESS, USERNAME, PASSWORD
+ * @returns {string|null} name of the matching data stream template, null if there is none
+ */
+function findDataStreamTemplate(indexName, config) {
+  const { SERVER_ADDRESS, USERNAME, PASSWORD } = config;
+
+  const result = spawnSync(
+    'curl',
+    [
+      '-s',
+      '-k',
+      '-u',
+      `${USERNAME}:${PASSWORD}`,
+      `${SERVER_ADDRESS}/_index_template`,
+    ],
+    { encoding: 'utf-8', maxBuffer: 1024 * 1024 * 20 },
+  );
+
+  if (result.error) {
+    return null;
+  }
+
+  try {
+    const { index_templates: templates = [] } = JSON.parse(result.stdout);
+
+    const match = templates.find(
+      ({ index_template: template }) =>
+        template.data_stream &&
+        (template.index_patterns || []).some(pattern =>
+          new RegExp(
+            `^${pattern
+              .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+              .replace(/\*/g, '.*')}$`,
+          ).test(indexName),
+        ),
+    );
+
+    return match ? match.name : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Creates an index using the settings/mappings declared in a dataset's
  * template.json, so the index schema matches what the dashboard expects
  * instead of relying on dynamic mapping.
@@ -77,6 +129,15 @@ function createIndex(indexName, templateBody, config, logPath) {
   const url = `${SERVER_ADDRESS}/${indexName}`;
   const body = JSON.stringify(templateBody);
 
+  // The body goes in a file, not in an argument: a findings template is over
+  // 300 KB and Linux caps a single argument at 128 KB, so passing it with -d
+  // fails with E2BIG before curl runs.
+  const tmpFile = path.join(
+    os.tmpdir(),
+    `wazuh-sample-data-index-${Date.now()}.json`,
+  );
+  fs.writeFileSync(tmpFile, body);
+
   const curlArgs = [
     '-s',
     '-k',
@@ -87,8 +148,8 @@ function createIndex(indexName, templateBody, config, logPath) {
     url,
     '-H',
     'Content-Type: application/json',
-    '-d',
-    body,
+    '--data-binary',
+    `@${tmpFile}`,
   ];
 
   log(logPath, `\nCreating index ${indexName} from template.json\n`);
@@ -98,6 +159,8 @@ function createIndex(indexName, templateBody, config, logPath) {
     encoding: 'utf-8',
     maxBuffer: 1024 * 1024 * 20,
   });
+
+  fs.unlinkSync(tmpFile);
 
   if (result.error) {
     console.error(`Error creating index ${indexName}:`, result.error.message);
@@ -150,12 +213,37 @@ function ensureIndicesExist(entries, config, logPath, getTemplate) {
       continue;
     }
 
+    const dataStreamTemplate = findDataStreamTemplate(idx, config);
+    if (dataStreamTemplate) {
+      console.error(
+        `Index ${idx} is governed by the data stream template ${dataStreamTemplate}. ` +
+          'The indexer creates it with that template on the first write.',
+      );
+      continue;
+    }
+
     const templateBody = entry.dataset && getTemplate(entry.dataset);
     if (templateBody) {
-      createIndex(idx, templateBody, config, logPath);
+      // Inserting into an index the indexer then creates by dynamic mapping
+      // gives the dashboard an index it cannot aggregate (compliance and
+      // other keyword fields come out as text), so stop instead.
+      if (!createIndex(idx, templateBody, config, logPath)) {
+        throw new Error(
+          `Index ${idx} could not be created from the template of dataset ` +
+            `'${entry.dataset}'. Nothing was inserted: an index created by ` +
+            'dynamic mapping instead of the template does not work in the ' +
+            `dashboard. See ${logPath} for the response.`,
+        );
+      }
     } else {
-      console.error(
-        `No template.json found for dataset '${entry.dataset}'. Index ${idx} will be created by the indexer with dynamic mapping.`,
+      // Same reason as a failed creation: an index the indexer builds by
+      // dynamic mapping turns the compliance and other keyword fields into
+      // text, and the dashboard cannot aggregate them.
+      throw new Error(
+        `No template.json found for dataset '${entry.dataset}'. Nothing was ` +
+          `inserted: index ${idx} would be created by dynamic mapping, which ` +
+          'does not work in the dashboard. Run yarn generate:indexer-resources ' +
+          'to fetch the dataset templates.',
       );
     }
   }
@@ -291,6 +379,7 @@ module.exports = {
   redactCurlArgs,
   checkIndexExists,
   createIndex,
+  findDataStreamTemplate,
   ensureIndicesExist,
   insertData,
   validateConfig,

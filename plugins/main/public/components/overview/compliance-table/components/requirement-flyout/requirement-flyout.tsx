@@ -370,7 +370,11 @@ export const RequirementFlyout = connect(mapStateToProps)(
                       )}
                     </p>
 
-                    <p>{this.props.description}</p>
+                    {/* The published text of a requirement carries its own
+                        paragraph and list breaks, which a <p> would collapse. */}
+                    <p style={{ whiteSpace: 'pre-line' }}>
+                      {this.props.description}
+                    </p>
                   </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>

@@ -32,7 +32,11 @@ export class ComplianceRequirements extends Component {
     isPopoverOpen: boolean;
   };
 
-  props!: {};
+  props!: {
+    requirementCounts?: Record<string, number>;
+    descriptions?: Record<string, { title: string }>;
+    section?: string;
+  };
 
   constructor(props) {
     super(props);
@@ -52,19 +56,14 @@ export class ComplianceRequirements extends Component {
   }
 
   getRequirementsList() {
-    const requirementsCount = this.props.requirementsCount || [];
-
-    const { selectedRequirements } = this.props;
+    const requirementCounts = this.props.requirementCounts || {};
     const requirementIds = Object.keys(this.props.complianceObject);
     const requirementList: Array<any> = requirementIds.map(item => {
       let quantity = 0;
+      // Each requirement is already counted over every code it is written
+      // with; a group totals the requirements it holds.
       this.props.complianceObject[item].forEach(subitem => {
-        quantity +=
-          (
-            requirementsCount.find(
-              requirement => requirement.key === subitem,
-            ) || {}
-          ).doc_count || 0;
+        quantity += requirementCounts[subitem] || 0;
       });
       return {
         id: item,
@@ -97,7 +96,14 @@ export class ComplianceRequirements extends Component {
                 values: { requirement: facet.label },
               },
             );
-            const name = requirementsName[facet.label] || requirementLabel;
+            // A group is named by its framework, or, where the group is a
+            // requirement of its own (a NIS2 article holds the points of its
+            // paragraphs), by the title the standard gives that requirement.
+            const ownTitle = this.props.descriptions?.[facet.label]?.title;
+            const name =
+              requirementsName[this.props.section]?.[facet.label] ||
+              (ownTitle && `${facet.label} - ${ownTitle}`) ||
+              requirementLabel;
             return (
               <EuiFacetButton
                 key={'Requirement ' + facet.id}
