@@ -23,6 +23,12 @@ sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-key
   add wazuh_ai_assistant.encryptionKey
 ```
 
+The packages generate this key into the keystore (32 random bytes, base64) on a fresh install and
+at every service start when neither the keystore nor `opensearch_dashboards.yml` defines it. They
+never generate it on upgrade and never replace an existing key, because the key is required to
+decrypt the API keys already stored. Set it manually only for installations from sources, or to
+use a key of your own. See [Credentials](../../getting-started/credentials.md#ai-assistant-encryption-key).
+
 With no `encryptionKey` set, saving a provider API key is rejected — the Settings form warns
 before submit and the HTTP API refuses the write — and a warning is logged at startup. Providers
 that need no API key can still be saved. Plaintext API keys are never stored, read, or managed: a

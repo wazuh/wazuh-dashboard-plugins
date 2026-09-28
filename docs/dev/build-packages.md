@@ -25,6 +25,8 @@ Ensure that these dependencies are installed on the system.
   - `brotli`
   - `curl`
   - `jq`
+- **Network access** to `raw.githubusercontent.com`, to download the shared credentials library (see
+  [Credentials resolver](#credentials-resolver)).
 
 ### Generating zip packages
 
@@ -209,6 +211,49 @@ cd ../wazuh-dashboard/dev-tools/build-packages/
 ```
 
 The script generates the package in the `output` folder of the same directory where it is located. To see the generated package, run the command: `ls output`.
+
+### Credentials resolver
+
+The package includes the credential resolver described in
+[Credentials](../ref/getting-started/credentials.md). It has two halves, and only one of them lives
+in the `wazuh-dashboard` repository:
+
+- `dev-tools/build-packages/credentials/resolve-credentials.sh`: the dashboard-specific half. It is
+  installed as `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`). Its
+  [README](https://github.com/wazuh/wazuh-dashboard/blob/5.0.0/dev-tools/build-packages/credentials/README.md)
+  documents the modes and the internals.
+- `wazuh-credentials.sh`: the shared half (credentials file format, locking, path validation, CA
+  handling), common to the indexer, the manager and the dashboard. It is owned by
+  [wazuh-installation-assistant](https://github.com/wazuh/wazuh-installation-assistant) under
+  `credentials_lib/`, and is **downloaded at build time** into `lib/wazuh-credentials.sh`
+  (`root:wazuh-dashboard 0640`). It is not committed to `wazuh-dashboard`, so the copies used by
+  the three components cannot drift apart.
+
+`build-packages.sh` downloads the library from
+`https://raw.githubusercontent.com/wazuh/wazuh-installation-assistant/<ref>/credentials_lib/wazuh-credentials.sh`,
+trying these refs in order and using the first one that exists:
+
+1. `WAZUH_CREDENTIALS_LIB_REF`, when set.
+2. The tag being built (`GITHUB_REF_NAME` when `GITHUB_REF_TYPE=tag`, else
+   `git describe --tags --exact-match`). A tag build tries **only** this ref after the override, so
+   a release never falls back to a branch that keeps moving.
+3. The branch being built. A feature branch that does not exist in wazuh-installation-assistant is
+   skipped.
+4. The version branch (for example `5.0.0`), then the version tag (for example `v5.0.0`).
+
+| Variable                       | Description                                                           |
+| ------------------------------ | --------------------------------------------------------------------- |
+| `WAZUH_CREDENTIALS_LIB_REF`    | Git ref of wazuh-installation-assistant to download the library from. |
+| `WAZUH_CREDENTIALS_LIB_SHA256` | Expected SHA-256 of the downloaded library. Checked when set.         |
+
+A failed download or a checksum mismatch fails the build. There is no bundled fallback.
+
+For example, to build against a specific library ref and pin its checksum, replace `<REF>` and
+`<SHA256>`:
+
+```bash
+WAZUH_CREDENTIALS_LIB_REF=<REF> WAZUH_CREDENTIALS_LIB_SHA256=<SHA256> ./build-packages.sh ...
+```
 
 ### Generating commit SHA
 

@@ -38,7 +38,7 @@ cp /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearc
 
 3. Download the new package and install it.
 
-See the [Package Download](getting-started/packages.md#package-download) section for available repositories and download instructions.
+See the [Package Download](getting-started/packages.md#download-packages) section for available repositories and download instructions.
 
 **Debian-based:**
 
@@ -66,11 +66,16 @@ If the configuration file was replaced when the package was installed, follow th
 
 4.1. Manually reapply any configuration changes to the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file. Ensure that the values of `server.ssl.key` and `server.ssl.certificate` match the files located in `/etc/wazuh-dashboard/certs/`.
 
-4.2. Ensure the value of `uiSettings.overrides.defaultRoute` in the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file is set to `/app/wz-home` as shown below:
+4.2. The packaged `opensearch_dashboards.yml` no longer sets `wazuh_core.hosts.default.password`: the package stores that password in the keystore. If you replaced the file and the keystore has no `wazuh_core.hosts.default.password` entry, add `WAZUH_MANAGER_WUI_PASSWORD` to `/etc/wazuh/credentials.env` before starting the service, or keep the setting in your file. Otherwise the service refuses to start and names the missing key. See [Credentials](getting-started/credentials.md#upgrades-and-removal).
+
+4.3. Ensure the value of `uiSettings.overrides.defaultRoute` in the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file is set to `/app/wz-home` as shown below:
 
 ```yaml
 uiSettings.overrides.defaultRoute: /app/wz-home
 ```
+
+The upgrade keeps the keystore entries, the AI Assistant encryption key and the TLS certificates as
+they are. It does not issue certificates or generate new secrets.
 
 5. Restart the Wazuh dashboard:
 

@@ -43,8 +43,8 @@ Supported Linux distributions:
 
 Required packages (automatically installed with Wazuh dashboard):
 
-- **Debian/Ubuntu**: `tar`, `curl`, `libcap2-bin`
-- **RHEL/CentOS**: `libcap`
+- **Debian/Ubuntu**: `tar`, `curl`, `libcap2-bin`, `openssl`
+- **RHEL/CentOS**: `libcap`, `openssl`, `diffutils`, `util-linux`
 
 ## Network requirements
 
@@ -63,7 +63,7 @@ Ensure the following ports are accessible:
 
 ### TLS/SSL certificates
 
-- Valid TLS certificates for HTTPS communication
+- Valid TLS certificates for HTTPS communication. A fresh install issues them from the shared Wazuh root CA; see [Credentials](credentials.md#certificates)
 - Certificate files must be readable by the `wazuh-dashboard` user
 
 ## Component requirements
@@ -75,10 +75,12 @@ The Wazuh dashboard depends on:
 - Version compatibility: OpenSearch 2.x (check `package.json` for exact version)
 - Connection type: HTTPS with TLS certificate verification
 - Required permissions: Read and write access to Wazuh indices
+- The password of the `kibanaserver` account (`WAZUH_INDEXER_KIBANASERVER_PASSWORD`)
 
 ### Wazuh manager API
 
 - Version compatibility: Wazuh 5.x
+- The password of the `wazuh-wui` account (`WAZUH_MANAGER_WUI_PASSWORD`)
 - API user with appropriate permissions for:
   - Agent management
   - Configuration queries
