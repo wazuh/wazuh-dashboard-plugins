@@ -107,23 +107,22 @@ export const StagedChangesPanel = ({
                 </strong>
               </EuiText>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiText size='xs' color='subdued'>
-                {hasPending
-                  ? i18n.translate(
-                      'wazuh.endpointGroups.stagedChanges.stagedSummary',
-                      {
-                        defaultMessage:
-                          '{total, plural, other {{total} staged, nothing written yet}}',
-                        values: { total },
-                      },
-                    )
-                  : i18n.translate(
-                      'wazuh.endpointGroups.stagedChanges.nothingWritten',
-                      { defaultMessage: 'nothing written yet' },
-                    )}
-              </EuiText>
-            </EuiFlexItem>
+            {/* Only while something is staged: an empty panel also follows a
+                successful Apply, where "nothing written" would be false. */}
+            {hasPending ? (
+              <EuiFlexItem grow={false}>
+                <EuiText size='xs' color='subdued'>
+                  {i18n.translate(
+                    'wazuh.endpointGroups.stagedChanges.stagedSummary',
+                    {
+                      defaultMessage:
+                        '{total, plural, other {{total} staged, nothing written yet}}',
+                      values: { total },
+                    },
+                  )}
+                </EuiText>
+              </EuiFlexItem>
+            ) : null}
           </EuiFlexGroup>
         </EuiFlexItem>
 
