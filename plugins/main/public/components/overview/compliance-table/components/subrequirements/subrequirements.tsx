@@ -42,7 +42,10 @@ import {
   WAZUH_MODULES_ID,
 } from '../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
-import { getRequirementText } from '../../../../../../common/compliance-requirements/requirement-text';
+import {
+  getRequirementLabel,
+  getRequirementName,
+} from '../../../../../../common/compliance-requirements/requirement-text';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
@@ -166,13 +169,13 @@ export class ComplianceSubrequirements extends Component {
         currentTechniques.forEach((technique, idx) => {
           if (
             !showTechniques[technique] &&
-            // Matched against the identifier and the title only: the
-            // description holds the full text of an article, where a common
-            // word matches nearly every requirement.
+            // Matched against the identifier and the name shown on the tile
+            // only: the description of a titled requirement holds its full
+            // text, where a common word matches nearly every requirement.
             (technique
               .toLowerCase()
               .includes(this.state.searchValue.toLowerCase()) ||
-              (this.props.descriptions[technique]?.title || '')
+              getRequirementName(this.props.descriptions[technique])
                 .toLowerCase()
                 .includes(this.state.searchValue.toLowerCase()))
           ) {
@@ -186,9 +189,10 @@ export class ComplianceSubrequirements extends Component {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
-                label: `${technique} - ${getRequirementText(
+                label: getRequirementLabel(
+                  technique,
                   this.props.descriptions[technique],
-                )}`,
+                ),
                 quantity,
               });
             }
@@ -410,7 +414,29 @@ export class ComplianceSubrequirements extends Component {
     });
   }
 
+  getFlyoutTitle(requirement) {
+    // The title is the short name of the requirement, when it has one.
+    return requirement?.title
+      ? i18n.translate(
+          'wazuh.complianceTable.subrequirements.flyoutTitleWithName',
+          {
+            defaultMessage: 'Requirement {requirement} - {title}',
+            values: {
+              requirement: this.state.selectedRequirement,
+              title: requirement.title,
+            },
+          },
+        )
+      : i18n.translate('wazuh.complianceTable.subrequirements.flyoutTitle', {
+          defaultMessage: 'Requirement {requirement}',
+          values: { requirement: this.state.selectedRequirement },
+        });
+  }
+
   render() {
+    const selectedRequirement =
+      this.props.descriptions[this.state.selectedRequirement];
+
     return (
       <div style={{ padding: 10 }}>
         <EuiFlexGroup>
@@ -500,13 +526,7 @@ export class ComplianceSubrequirements extends Component {
                       defaultMessage: 'Other requirements',
                     },
                   )
-                : i18n.translate(
-                    'wazuh.complianceTable.subrequirements.flyoutTitle',
-                    {
-                      defaultMessage: 'Requirement {requirement}',
-                      values: { requirement: this.state.selectedRequirement },
-                    },
-                  )
+                : this.getFlyoutTitle(selectedRequirement)
             }
             isOthers={this.state.isOthersSelected}
             othersBuckets={
@@ -527,9 +547,7 @@ export class ComplianceSubrequirements extends Component {
                       },
                     },
                   )
-                : getRequirementText(
-                    this.props.descriptions[this.state.selectedRequirement],
-                  )
+                : selectedRequirement?.description || ''
             }
             getRequirementKey={() => {
               return this.getRequirementKey();

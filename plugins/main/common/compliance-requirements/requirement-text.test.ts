@@ -9,33 +9,47 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { getRequirementText } from './requirement-text';
+import { getRequirementLabel, getRequirementName } from './requirement-text';
 
-describe('getRequirementText', () => {
-  it('joins the title and the description when both exist', () => {
+describe('getRequirementLabel', () => {
+  it('joins the identifier and the title', () => {
     expect(
-      getRequirementText({
-        title: 'Security of processing',
-        description: 'Implement appropriate technical measures.',
+      getRequirementLabel('3.1.10', {
+        title: 'Session Lock',
+        description:
+          'Use session lock with pattern-hiding displays to prevent access and viewing of data after a period of inactivity.',
+        category: 'Access Control',
       }),
-    ).toBe(
-      'Security of processing - Implement appropriate technical measures.',
-    );
+    ).toBe('3.1.10 - Session Lock');
   });
 
-  it('returns the title alone when the framework publishes no description', () => {
-    expect(getRequirementText({ title: 'Account Management' })).toBe(
-      'Account Management',
-    );
-  });
-
-  it('returns the title alone when the description is empty', () => {
+  it('falls back to the description when the requirement has no title', () => {
     expect(
-      getRequirementText({ title: 'Account Management', description: '' }),
-    ).toBe('Account Management');
+      getRequirementLabel('21.2.b', {
+        description: 'Incident handling',
+        category:
+          'CHAPTER IV - CYBERSECURITY RISK-MANAGEMENT MEASURES AND REPORTING OBLIGATIONS',
+      }),
+    ).toBe('21.2.b - Incident handling');
+  });
+
+  it('returns the identifier alone for an unknown requirement', () => {
+    expect(getRequirementLabel('9.9.9', undefined)).toBe('9.9.9');
+  });
+});
+
+describe('getRequirementName', () => {
+  it('prefers the title over the description', () => {
+    expect(
+      getRequirementName({
+        title: 'Session Lock',
+        description: 'Use session lock with pattern-hiding displays.',
+        category: 'Access Control',
+      }),
+    ).toBe('Session Lock');
   });
 
   it('returns an empty string for an unknown requirement', () => {
-    expect(getRequirementText(undefined)).toBe('');
+    expect(getRequirementName(undefined)).toBe('');
   });
 });

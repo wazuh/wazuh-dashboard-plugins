@@ -14,12 +14,14 @@
  * A control of a regulatory compliance framework, as the definition files in
  * this directory hold it.
  *
- * `title` is the control name or requirement statement, verbatim from the
- * standard body. `description` is the control text beyond the title, and only
- * exists for the frameworks whose source publishes one: for PCI DSS, TSC, CMMC
- * and NIST 800-171 the title already is the full official text.
+ * `description` is the full text of the control: the publisher's text, or
+ * Wazuh-written text for ISO 27001 and PCI DSS; for a withdrawn control, its
+ * withdrawal statement. `title` is the short name of the control, absent when
+ * it has none (the points of NIS2 Article 21(2)). `category` is the grouping
+ * the framework puts the control in (domain, family, section or chapter).
  */
 export interface ComplianceRequirement {
-  title: string;
-  description?: string;
+  title?: string;
+  description: string;
+  category: string;
 }
