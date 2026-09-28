@@ -2,6 +2,48 @@
 
 ## Errors
 
+### The Wazuh dashboard service does not start
+
+Before the dashboard starts, the service runs `resolve-credentials --prestart`, which resolves the
+`kibanaserver` and `wazuh-wui` passwords into the keystore. If a password is missing or invalid, the
+service refuses to start and the journal names the key:
+
+```
+resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-wui account)
+resolve-credentials:         set it in /etc/wazuh/credentials.env, or install wazuh-manager on this host first
+```
+
+1. Read the journal:
+
+```
+journalctl -u wazuh-dashboard -n 50
+```
+
+2. Set the missing key in `/etc/wazuh/credentials.env` (`WAZUH_INDEXER_KIBANASERVER_PASSWORD` or
+   `WAZUH_MANAGER_WUI_PASSWORD`), or correct the value reported as `INVALID`.
+3. If the journal reports `REFUSED /etc/wazuh/credentials.env`, fix its ownership and mode: the file
+   must be `root:root 0600`, and `/etc/wazuh` must not be group- or world-writable.
+4. Start the service again. If systemd reports that the start limit was hit, run
+   `systemctl reset-failed wazuh-dashboard` first.
+
+If the service does not start because a certificate file is missing, check that
+`/etc/wazuh-dashboard/certs/` holds `dashboard.pem`, `dashboard-key.pem` and `root-ca.pem`.
+Certificates are issued only on a fresh install; the installation output says why they could not be
+issued.
+
+See [Credentials](../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
+
+### Authentication errors (401) with the indexer or the server API
+
+The start check validates that the passwords are present and well formed, not that they are
+correct. A password that is present but wrong fails at runtime with a `401`. This happens when the
+password of `kibanaserver` or `wazuh-wui` changed after the dashboard stored it in its keystore:
+editing `/etc/wazuh/credentials.env` afterwards has no effect, because the keystore entry takes
+precedence.
+
+Update the keystore entry (`opensearch.password` or `wazuh_core.hosts.default.password`) and restart
+the dashboard, as described in [Rotation](../ref/getting-started/credentials.md#rotation).
+
 ### Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.
 
 This means the filter related to the selected server API (`cluster.name` in the alerts case or `wazuh.cluster.name` in the inventories data) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
