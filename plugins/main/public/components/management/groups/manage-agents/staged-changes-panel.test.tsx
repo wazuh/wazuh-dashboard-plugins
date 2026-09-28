@@ -19,6 +19,9 @@ describe('StagedChangesPanel', () => {
       "Nothing staged yet. Select a row's checkbox in the table to stage it",
     );
     expect(wrapper.text()).not.toContain('Click a row');
+    // Nothing staged also follows a successful Apply, so the header must not
+    // claim that nothing was written.
+    expect(wrapper.text()).not.toContain('nothing written yet');
     expect(
       wrapper
         .find('button[data-test-subj="discardAllButton"]')
