@@ -10,6 +10,7 @@ To get started with the Wazuh dashboard, follow these steps in order:
 1. **[Requirements](requirements.md)** - Verify your system meets the hardware, platform, and network requirements
 2. **[Packages](packages.md)** - Learn about available package formats and distribution methods
 3. **[Installation](installation.md)** - Follow step-by-step installation instructions
+4. **[Credentials](credentials.md)** - Understand how the packages resolve passwords and TLS certificates
 
 ## What you'll need
 
@@ -18,7 +19,7 @@ Before installing:
 - A supported Linux distribution (Debian/Ubuntu/RHEL/CentOS/Fedora)
 - Minimum 4 GB RAM and 2 CPU cores (8 GB RAM and 4+ cores recommended for production)
 - Network access to Wazuh indexer and Wazuh manager API
-- TLS/SSL certificates for HTTPS communication
+- The `kibanaserver` and `wazuh-wui` passwords, when the indexer or the manager runs on another host (see [Credentials](credentials.md))
 - Root or sudo privileges
 
 See [Requirements](requirements.md) for detailed specifications.
@@ -91,6 +92,7 @@ If you encounter issues during installation or setup:
 - Review log files at `/var/log/wazuh-dashboard/`
 - Verify network connectivity to indexer and manager
 - Ensure certificates are properly configured
+- If the service does not start, see [When the dashboard does not start](credentials.md#when-the-dashboard-does-not-start)
 
 ## Support
 

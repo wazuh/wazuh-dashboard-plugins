@@ -87,14 +87,16 @@ const CreateEnrollmentTokenFlyoutContent = ({
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
     },
+    /* Offered from the same settings the deploy wizard reads, so a token
+    minted here points the agent at the same endpoint as one minted there. */
     port: {
       type: 'text',
-      initialValue: '',
+      initialValue: configuration['enrollment.port'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPort,
     },
     prefix: {
       type: 'text',
-      initialValue: '',
+      initialValue: configuration['enrollment.path'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointPathPrefix,
     },
     ttl: {

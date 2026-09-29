@@ -44,13 +44,13 @@ Before starting the migration:
 1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**
 2. Click **Export all**
 3. Save the exported `.ndjson` file to a safe location
-4. Alternatively, use the API:
+4. Alternatively, use the API. Replace `<ADMIN_PASSWORD>` with the password of the 4.x `admin` user:
 
    ```bash
    curl -X POST "https://localhost:5601/api/saved_objects/_export" \
      -H "osd-xsrf: true" \
      -H "Content-Type: application/json" \
-     -u admin:admin \
+     -u admin:<ADMIN_PASSWORD> \
      -d '{"type": ["dashboard", "visualization", "search", "index-pattern"]}' \
      -o saved-objects-backup-$(date +%Y%m%d).ndjson
    ```
@@ -232,7 +232,7 @@ sudo yum install wazuh-indexer-5.0.0-1  # RHEL/CentOS
 sudo systemctl restart wazuh-indexer
 
 # Verify indexer health
-curl -k -u admin:admin https://localhost:9200/_cluster/health?pretty
+curl -k -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD https://localhost:9200/_cluster/health?pretty
 ```
 
 #### 1.2 Upgrade Wazuh manager (second)
@@ -288,7 +288,12 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
    opensearch.ssl.verificationMode: certificate
    ```
 
-3. **Add Wazuh API configuration** (migrated from wazuh.yml):
+3. **Add Wazuh API configuration** (migrated from wazuh.yml).
+
+   The 5.x packages store the `wazuh-wui` password of the `default` host in the keystore, from
+   `WAZUH_MANAGER_WUI_PASSWORD` in `/etc/wazuh/credentials.env`. Omit `password` for that host, or
+   set it here: a value in `opensearch_dashboards.yml` takes precedence and is never overridden. See
+   [Credentials](getting-started/credentials.md).
 
    ```yaml
    wazuh_core.hosts:
@@ -296,7 +301,6 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
        url: https://localhost
        port: 55000
        username: wazuh-wui
-       password: wazuh-wui
        run_as: false
    ```
 
@@ -349,7 +353,7 @@ opensearchDashboards.branding.mark:
 opensearchDashboards.branding.applicationTitle: 'Custom Security Dashboard'
 ```
 
-See [Custom Branding](custom-branding.md) for complete guide.
+See [Custom Branding](custom-branding/custom-branding.md) for complete guide.
 
 ### Step 3: Update file permissions
 
@@ -425,7 +429,8 @@ Test Wazuh manager API connectivity:
 
 ```bash
 # From dashboard server
-curl -k -u wazuh-wui:wazuh-wui https://localhost:55000/
+TOKEN=$(curl -sk -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD -X POST "https://localhost:55000/security/user/authenticate?raw=true")
+curl -sk -H "Authorization: Bearer $TOKEN" https://localhost:55000/
 ```
 
 Expected response:
@@ -485,6 +490,10 @@ Verify agent appears in dashboard under **Agents**.
 
 ### Issue 1: Dashboard fails to start
 
+If the service does not start at all and the journal shows `resolve-credentials: MISSING ...`,
+supply the named password in `/etc/wazuh/credentials.env`. See
+[When the dashboard does not start](getting-started/credentials.md#when-the-dashboard-does-not-start).
+
 **Symptoms**:
 
 ```
@@ -497,7 +506,7 @@ Verify agent appears in dashboard under **Agents**.
 
    ```bash
    sudo systemctl status wazuh-indexer
-   curl -k -u admin:admin https://localhost:9200/
+   curl -k -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD https://localhost:9200/
    ```
 
 2. **Check certificate paths**:
@@ -536,7 +545,8 @@ Wazuh API is not reachable
 2. **Test API manually**:
 
    ```bash
-   curl -k -u wazuh-wui:wazuh-wui https://localhost:55000/
+   TOKEN=$(curl -sk -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD -X POST "https://localhost:55000/security/user/authenticate?raw=true")
+   curl -sk -H "Authorization: Bearer $TOKEN" https://localhost:55000/
    ```
 
 3. **Check manager firewall**:
@@ -570,7 +580,7 @@ Wazuh API is not reachable
    curl -X POST "https://localhost:5601/api/saved_objects/index-pattern/wazuh-events" \
      -H "osd-xsrf: true" \
      -H "Content-Type: application/json" \
-     -u admin:admin \
+     -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD \
      -d '{
        "attributes": {
          "title": "wazuh-events*",
@@ -645,7 +655,7 @@ See [Custom Branding](./custom-branding/custom-branding.md).
 
    ```bash
    curl -X POST "https://localhost:9200/wazuh-events*/_forcemerge?max_num_segments=1" \
-     -u admin:admin -k
+     -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD -k
    ```
 
 3. **Review resource allocation**:

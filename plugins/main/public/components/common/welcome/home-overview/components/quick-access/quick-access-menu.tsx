@@ -13,6 +13,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import useObservable from 'react-use/lib/useObservable';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../../../kibana-services';
 import { Applications, Categories } from '../../../../../../utils/applications';
@@ -25,6 +26,7 @@ import {
   getKvdbsUrl,
   getFiltersUrl,
   getAiAssistantUrl,
+  isAiAssistantRegistered,
 } from '../../utils/navigation';
 
 interface QuickAccessItem {
@@ -132,6 +134,39 @@ const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   ],
 };
 
+const NO_APPLICATIONS: ReadonlyMap<string, unknown> = new Map();
+
+/**
+ * Home's entry point to the AI Assistant, which lives in the separate `wazuh-ai-assistant` plugin
+ * (see `getAiAssistantUrl`). It sits in the popover title rather than in the group grid because
+ * the assistant is not one of the `Applications`/category-driven groups — it is a single shortcut,
+ * not a content type. `RedirectAppLinks` (wrapping the popover) turns the `href` into an in-app
+ * `navigateToApp`, same as the group items. Renders nothing when the app is not registered
+ * (plugin disabled or not installed), since its URL would open "Application Not Found".
+ */
+const AiAssistantLink: React.FC = () => {
+  const applications = useObservable(
+    getCore().application.applications$,
+    NO_APPLICATIONS,
+  );
+  if (!isAiAssistantRegistered(applications)) {
+    return null;
+  }
+  return (
+    <EuiFlexItem grow={false}>
+      <EuiLink
+        href={getAiAssistantUrl()}
+        data-test-subj='quick-access-ai-assistant-link'
+      >
+        <EuiIcon type='machineLearningApp' size='s' />{' '}
+        {i18n.translate('wazuh.common.homeOverviewQuickAccess.aiAssistant', {
+          defaultMessage: 'AI Assistant',
+        })}
+      </EuiLink>
+    </EuiFlexItem>
+  );
+};
+
 export const QuickAccessMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const groups = useMemo(
@@ -178,28 +213,7 @@ export const QuickAccessMenu: React.FC = () => {
                   defaultMessage: 'Quick access',
                 })}
               </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {/*
-                 * Home's entry point to the AI Assistant, which lives in the separate
-                 * `wazuh-ai-assistant` plugin (see `getAiAssistantUrl`). It sits in the popover
-                 * title rather than in the group grid below because the assistant is not one of
-                 * the `Applications`/category-driven groups — it is a single shortcut, not a
-                 * content type. `RedirectAppLinks` (wrapping this subtree) turns the `href` into
-                 * an in-app `navigateToApp`, same as the group items.
-                 */}
-                <EuiLink
-                  href={getAiAssistantUrl()}
-                  data-test-subj='quick-access-ai-assistant-link'
-                >
-                  <EuiIcon type='machineLearningApp' size='s' />{' '}
-                  {i18n.translate(
-                    'wazuh.common.homeOverviewQuickAccess.aiAssistant',
-                    {
-                      defaultMessage: 'AI Assistant',
-                    },
-                  )}
-                </EuiLink>
-              </EuiFlexItem>
+              <AiAssistantLink />
             </EuiFlexGroup>
           </EuiPopoverTitle>
           <EuiFlexGrid columns={2} style={{ width: 420 }}>

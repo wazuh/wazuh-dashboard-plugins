@@ -8,6 +8,7 @@ This guide focuses on the assets managed by the Wazuh dashboard itself.
 - Dashboard NodeJS options: `/etc/wazuh-dashboard/node.options`
 - Dashboard keystore: `/etc/wazuh-dashboard/opensearch_dashboards.keystore`
 - TLS certificates: `/etc/wazuh-dashboard/certs/`
+- Shared Wazuh root CA, when this host created it: `/etc/wazuh/ca/` (see [Credentials](getting-started/credentials.md#certificates)). It is shared with the other Wazuh components on the host, and its private key can issue certificates they trust.
 - Saved objects exported from the UI (dashboards, visualizations, index patterns)
 - Custom assets
 
@@ -32,6 +33,12 @@ rsync -aREz \
 /etc/wazuh-dashboard/certs/ \
 $backup_folder
 ```
+
+> **Note:** The keystore holds the `kibanaserver` and `wazuh-wui` passwords and the AI Assistant
+> encryption key (`wazuh_ai_assistant.encryptionKey`). Without that key, the provider API keys
+> stored by the AI Assistant cannot be decrypted, so keep the keystore backup as protected as the
+> passwords themselves. `/etc/wazuh/credentials.env` does not need to be backed up for the
+> dashboard: once the passwords are in the keystore, the dashboard does not read it again.
 
 3. Export the saved objects
 
@@ -99,7 +106,13 @@ chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/node.options
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.keystore
 chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
+chmod 500 /etc/wazuh-dashboard/certs
+chmod 400 /etc/wazuh-dashboard/certs/*
 ```
+
+The restored keystore entries take precedence over `/etc/wazuh/credentials.env`, so the dashboard
+uses the restored passwords. If the passwords changed since the backup, update them as described in
+[Rotation](getting-started/credentials.md#rotation).
 
 4. Restore the custom assets files
 
