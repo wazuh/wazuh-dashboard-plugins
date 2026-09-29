@@ -3689,6 +3689,37 @@ describe('ChatPage — a failed turn stays visible after the next question', () 
     expect(screen.getByText('Ask again')).toBeInTheDocument();
   });
 
+  it('renders no <img> for an image in the error text, in the banner or the expanded reason', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('any agents down?');
+    stream.push({
+      type: 'error',
+      message:
+        'Provider responded with HTTP 500: boom ![e](http://evil.example/provider-error)',
+    });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('Show reason'));
+
+    // Banner and expanded reason both show the text around the image.
+    expect(
+      screen.getAllByText('Provider responded with HTTP 500: boom', {
+        exact: false,
+      }),
+    ).toHaveLength(2);
+    expect(document.querySelectorAll('img[src*="evil.example"]')).toHaveLength(
+      0,
+    );
+  });
+
   it('re-asks the failed turn’s own question, appended as a new turn', async () => {
     const stream = createControllableStream();
     mockStreamChat.mockImplementation(
