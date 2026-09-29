@@ -1,3 +1,4 @@
+/** @jest-environment node */
 // To launch this file
 // yarn test:jest --testEnvironment node --verbose server/routes/wazuh-api-http-status.test.ts
 import { Router } from '../../../../src/core/server/http/router/router';
@@ -6,7 +7,11 @@ import { loggingSystemMock } from '../../../../src/core/server/logging/logging_s
 import { ByteSizeValue } from '@osd/config-schema';
 import supertest from 'supertest';
 import { WazuhApiRoutes } from './wazuh-api';
-import { HTTP_STATUS_CODES } from '../../common/constants';
+import {
+  HTTP_STATUS_CODES,
+  WAZUH_QUEUE_MAX_JOBS,
+} from '../../common/constants';
+import { addJobToQueue, queue } from '../start/queue';
 
 const loggingService = loggingSystemMock.create();
 const logger = loggingService.get();
@@ -14,7 +19,7 @@ const mockApiRequest = jest.fn();
 const context = {
   wazuh: {
     security: {
-      getCurrentUser: () => 'wazuh',
+      getCurrentUser: jest.fn().mockResolvedValue({ username: 'wazuh' }),
     },
     logger: {
       debug: jest.fn(),
@@ -183,6 +188,65 @@ describe('[endpoint] POST /api/request - upstream API error status mapping', () 
       .expect(HTTP_STATUS_CODES.UNAUTHORIZED);
 
     expect(response.body.message).toContain('status code 401');
+  });
+});
+
+describe('[endpoint] POST /api/request - delayed requests', () => {
+  beforeEach(() => {
+    queue.splice(0);
+    mockApiRequest.mockReset();
+  });
+
+  const restart = (body: object) =>
+    supertest(innerServer.listener)
+      .post('/api/request')
+      .set('Cookie', 'wz-api=default')
+      .send({ method: 'PUT', path: '/cluster/restart', body, id: 'default' });
+
+  it.each([-1, 1.5, '15000', 60001, {}])(
+    'rejects the delay %p with a 400 and queues nothing',
+    async delay => {
+      const response = await restart({ delay }).expect(
+        HTTP_STATUS_CODES.BAD_REQUEST,
+      );
+
+      expect(response.body.message).toContain('3015');
+      expect(queue).toHaveLength(0);
+      expect(mockApiRequest).not.toHaveBeenCalled();
+    },
+  );
+
+  it('queues a valid delay without calling the API and strips it from the data', async () => {
+    const response = await restart({ delay: 15000, other: 'x' }).expect(
+      HTTP_STATUS_CODES.OK,
+    );
+
+    expect(response.body).toEqual({ error: 0, message: 'Success' });
+    expect(mockApiRequest).not.toHaveBeenCalled();
+    expect(queue).toHaveLength(1);
+
+    await queue[0].run(context);
+
+    expect(mockApiRequest).toHaveBeenCalledTimes(1);
+    expect(mockApiRequest.mock.calls[0][2]).toMatchObject({ other: 'x' });
+    expect(mockApiRequest.mock.calls[0][2]).not.toHaveProperty('delay');
+  });
+
+  it('responds 429 when the queue is full', async () => {
+    for (let i = 0; i < WAZUH_QUEUE_MAX_JOBS; i++) {
+      addJobToQueue({
+        startAt: new Date(Date.now() + 15000),
+        owner: `user-${i}`,
+        run: jest.fn(),
+      });
+    }
+
+    const response = await restart({ delay: 15000 }).expect(
+      HTTP_STATUS_CODES.TOO_MANY_REQUESTS,
+    );
+
+    expect(response.body.message).toContain('3017');
+    expect(queue).toHaveLength(WAZUH_QUEUE_MAX_JOBS);
   });
 });
 
