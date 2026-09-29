@@ -69,6 +69,14 @@ export const WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH =
 export const WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH =
   '/_plugins/_setup/ai_assistant/providers';
 
+/** `POST` creates a session; `PUT`/`PATCH`/`DELETE {this path}/{id}` replace its transcript, rename
+ * or delete it. The caller's role holds no index-level `write` on
+ * `CONVERSATION_SESSIONS_INDEX_ALIAS`, so mutations go through this endpoint, authorized by the
+ * `plugin:wazuh/ai_assistant/session/write` cluster permission. The indexer stamps the owner and
+ * ignores any `user`/timestamp fields in the body. */
+export const WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH =
+  '/_plugins/_setup/ai_assistant/sessions';
+
 /** Namespacing label bound into the AAD of every provider API key's ciphertext
  * (server/crypto/api-key-cipher.ts's `buildAad`) — kept as its own named constant purely so that
  * derivation can't silently drift if this string is ever referenced from a second place. Its
