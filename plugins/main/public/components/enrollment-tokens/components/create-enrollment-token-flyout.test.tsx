@@ -6,9 +6,13 @@ import { createEnrollmentToken } from '../../../services/enrollment-tokens';
 
 type AppConfigState = { appConfig: { data: Record<string, string> } };
 
+/* The plugin settings the flyout reads its defaults from. Reset before each
+test so only the tests that set them see prefilled fields. */
+let mockAppConfig: Record<string, string> = {};
+
 jest.mock('react-redux', () => ({
   useSelector: (selector: (state: AppConfigState) => unknown) =>
-    selector({ appConfig: { data: {} } }),
+    selector({ appConfig: { data: mockAppConfig } }),
 }));
 
 jest.mock('../../../kibana-services', () => ({
@@ -77,6 +81,7 @@ const mint = async () => {
 };
 
 beforeEach(() => {
+  mockAppConfig = {};
   createToken.mockReset();
   createToken.mockResolvedValue({
     token: 'abc',
@@ -134,6 +139,72 @@ describe('CreateEnrollmentTokenFlyout', () => {
     expect(request).toEqual(
       expect.objectContaining({ embedCa: true, noCredential: false }),
     );
+  });
+
+  describe('endpoint defaults', () => {
+    const portInput = () => screen.getByPlaceholderText('1517');
+    const prefixInput = () => screen.getByPlaceholderText('/wazuh-manager/');
+
+    const create = async () => {
+      fireEvent.click(
+        screen.getByText('Create').closest('button') as HTMLElement,
+      );
+      await waitFor(() => expect(createToken).toHaveBeenCalled());
+      return createToken.mock.calls[0][0];
+    };
+
+    /* The deploy wizard reads the same three settings, so a token minted here
+    has to point the agent at the same endpoint as one minted there. */
+    it('offers the address, port and prefix from the enrollment settings', async () => {
+      mockAppConfig = {
+        'enrollment.dns': 'manager.example.com',
+        'enrollment.port': '443',
+        'enrollment.path': '/wazuh-manager/',
+      };
+      renderFlyout();
+
+      expect(
+        screen.getByPlaceholderText('wazuh-manager.example.com'),
+      ).toHaveValue('manager.example.com');
+      expect(portInput()).toHaveValue('443');
+      expect(prefixInput()).toHaveValue('/wazuh-manager/');
+
+      const request = await create();
+      expect(request).toEqual(
+        expect.objectContaining({
+          address: 'manager.example.com',
+          port: '443',
+          prefix: '/wazuh-manager/',
+        }),
+      );
+    });
+
+    it('leaves the port and prefix empty while the settings are unset', async () => {
+      renderFlyout();
+
+      expect(portInput()).toHaveValue('');
+      expect(prefixInput()).toHaveValue('');
+
+      const request = await mint();
+      expect(request).toEqual(
+        expect.objectContaining({ port: '', prefix: '' }),
+      );
+    });
+
+    /* Values the form was offered with are not the user's work, so they must
+    not count as unsaved changes. */
+    it('closes without asking when only the defaults are filled', () => {
+      mockAppConfig = {
+        'enrollment.dns': 'manager.example.com',
+        'enrollment.port': '443',
+        'enrollment.path': '/wazuh-manager/',
+      };
+      const onClose = renderFlyout();
+
+      closeFlyout();
+      expect(confirmationIsOpen()).toBe(false);
+      expect(onClose).toHaveBeenCalledWith(false);
+    });
   });
 
   /* A half-filled form is work that closing the flyout would throw away, and
