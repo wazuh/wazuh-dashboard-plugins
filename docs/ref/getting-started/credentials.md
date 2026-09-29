@@ -144,7 +144,9 @@ sudo apt-get install wazuh-dashboard
 
 That trap is why the file, not the command line, is the recommended way to supply a value. For the
 service start, the unit also reads `/etc/default/wazuh-dashboard` (Debian-based) and
-`/etc/sysconfig/wazuh-dashboard` (RPM-based).
+`/etc/sysconfig/wazuh-dashboard` (RPM-based). The packages install `/etc/default/wazuh-dashboard`
+as `root:wazuh-dashboard 0640`, because root reads it at every start: edit it as root. Passwords
+set there keep working.
 
 ## Installing and starting
 

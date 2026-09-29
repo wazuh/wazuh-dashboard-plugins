@@ -32,3 +32,7 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 - Keep packages up to date with Wazuh releases.
 - Restrict who can access **Dashboard management** features.
 - Review saved objects and notifications channels for sensitive data.
+- Do not give the `wazuh-dashboard` user ownership of `/usr/share/wazuh-dashboard/` or
+  `/etc/default/wazuh-dashboard`. Root runs code from the first and reads the second at every
+  start, so the packages install them as `root:root` and `root:wazuh-dashboard 0640`. Only
+  `/usr/share/wazuh-dashboard/data/` belongs to the service user.

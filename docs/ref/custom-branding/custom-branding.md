@@ -210,12 +210,13 @@ opensearchDashboards.branding:
     darkModeUrl: '/ui/custom-logo.png'
 ```
 
-> The files should have the permissions of the Wazuh dashboard server user.
+> The installation directory is owned by `root`. The images must be readable by the Wazuh dashboard server user, but not owned by it.
 
-From the root of the Wazuh dashboard installation, run the following command to set the correct ownership for the images:
+From the root of the Wazuh dashboard installation, run the following commands to set the correct ownership and permissions for the images:
 
 ```bash
-chown wazuh-dashboard:wazuh-dashboard src/core/server/core_app/assets/custom-logo.png
+chown root:root src/core/server/core_app/assets/custom-logo.png
+chmod 644 src/core/server/core_app/assets/custom-logo.png
 ```
 
 After placing the images and updating the configuration, restart the Wazuh dashboard service to apply the changes.
