@@ -19,3 +19,23 @@ export function getHttpErrorStatus(error: unknown): number | undefined {
   const status = (response as { status?: unknown }).status;
   return typeof status === 'number' ? status : undefined;
 }
+
+/**
+ * Duck-types the server's own explanation off an error thrown by OSD's `HttpSetup`: the routes
+ * answer failures as `{ message }`, which the client exposes as `error.body.message`. Blank or
+ * non-string values count as absent, so callers can tell "the server said something" from "only the
+ * generic status text is available" (`error.message` is just "Forbidden" for a 403).
+ */
+export function getHttpErrorBodyMessage(error: unknown): string | undefined {
+  if (!error || typeof error !== 'object') {
+    return undefined;
+  }
+  const body = (error as { body?: unknown }).body;
+  if (!body || typeof body !== 'object') {
+    return undefined;
+  }
+  const message = (body as { message?: unknown }).message;
+  return typeof message === 'string' && message.trim().length > 0
+    ? message
+    : undefined;
+}

@@ -1,5 +1,6 @@
 import { i18n } from '@osd/i18n';
 import { PROVIDER_TEST_TIMEOUT_MS } from '../../../common/constants';
+import { getHttpErrorBodyMessage } from '../../../common/http-status';
 import { ProviderTestResult } from '../../../common/types';
 
 export type ProviderTestOutcome =
@@ -68,14 +69,9 @@ export function isEndpointBlockedError(message: string | null): boolean {
 }
 
 export function describeHttpError(error: unknown, fallback: string): string {
-  if (error && typeof error === 'object') {
-    const body = (error as { body?: unknown }).body;
-    if (body && typeof body === 'object') {
-      const message = (body as { message?: unknown }).message;
-      if (typeof message === 'string' && message.trim().length > 0) {
-        return message;
-      }
-    }
+  const bodyMessage = getHttpErrorBodyMessage(error);
+  if (bodyMessage) {
+    return bodyMessage;
   }
   if (error instanceof Error && error.message) {
     return error.message;
