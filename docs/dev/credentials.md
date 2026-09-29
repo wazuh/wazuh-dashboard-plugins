@@ -27,21 +27,21 @@ and the variables that control it.
 
 `resolve-credentials` takes one of four modes:
 
-| Mode         | Called from                                          | Does                                                                                                                                           | Exit status                                |
-| ------------ | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| `--install`  | DEB `postinst` / RPM `%post` on a fresh install      | Resolves the passwords, generates the AI Assistant key, issues the certificates, creates `/etc/wazuh` and an empty `credentials.env` if absent | always `0`                                 |
-| `--upgrade`  | DEB `postinst` / RPM `%post` on an upgrade           | Resolves only what the keystore lacks; no key generation, no certificates                                                                      | always `0`                                 |
-| `--prestart` | `ExecStartPre=+` in the unit, `start()` in SysV init | Runs the password order again, generates the AI Assistant key if absent                                                                        | `1` naming every missing or invalid key    |
-| `--clear`    | image builds only; nothing in the product calls it   | Removes the keystore entries, the AI Assistant key, the certificates, and a shared CA with its private key                                     | non-zero if something could not be removed |
+| Mode         | Called from                                          | Does                                                                                                                                                              | Exit status                                                                                    |
+| ------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `--install`  | DEB `postinst` / RPM `%post` on a fresh install      | Resolves the passwords, generates the AI Assistant key, issues the certificates, creates `/etc/wazuh` and an empty `credentials.env` if absent                    | always `0`                                                                                     |
+| `--upgrade`  | DEB `postinst` / RPM `%post` on an upgrade           | Resolves only what the keystore lacks; no key generation, no certificates                                                                                         | always `0`                                                                                     |
+| `--prestart` | `ExecStartPre=+` in the unit, `start()` in SysV init | Runs the password order again, generates the AI Assistant key if absent                                                                                           | `1` naming every missing or invalid key                                                        |
+| `--clear`    | image builds only; nothing in the product calls it   | Removes the keystore entries, the AI Assistant key, the certificates, leftover `certs/.stage.*` directories, and the shared CA only when this dashboard minted it | `1` when not run as root, while the dashboard is running, or if something could not be removed |
 
 The maintainer scripts call `--install` or `--upgrade` with `|| true`. A maintainer script that
 aborts leaves the package half-configured, breaks `apt install -f` and fails image builds, so the
 installer never fails and never checks whether the dashboard can run.
 
-Unlike the indexer, the dashboard keeps no "initialized" marker. Its equivalent of step 0 is the
-keystore entry itself: once both entries exist, every later run finds them and writes nothing. The
-start step therefore re-runs the whole order at every start, which is what lets a dashboard
-installed before the indexer or the manager pick up their keys later.
+Unlike the indexer, the dashboard keeps no "initialized" marker for its credentials. Its equivalent
+of step 0 is the keystore entry itself: once both entries exist, every later run finds them and
+writes nothing. The start step therefore re-runs the whole order at every start, which is what lets
+a dashboard installed before the indexer or the manager pick up their keys later.
 
 ## Why the configuration file is checked first
 
@@ -90,6 +90,20 @@ by the service user, the leaf is issued in a root-only `0700` staging directory 
 directory inodes, and each file is published with `ln -T` (which never follows or replaces a name),
 key first.
 
+When the install mints the shared CA, it records that with a mint marker,
+`.wazuh-dashboard-bootstrap-ca` (`0600 root:root`), in the CA directory. The marker is the only
+thing that lets `--clear` delete the CA and its private key later. A private key on disk cannot
+answer that question: an operator who stages their own signing CA leaves exactly the same files.
+
+- It is written under the shared lock, in the same step as the mint, and only when the CA was absent
+  before and has a private key after. A CA that was reused or staged never gets one.
+- `--clear` checks only that the marker exists, not that the CA beside it is the one minted. A CA
+  staged over a minted one keeps the old marker, so the operator must delete it.
+- A failed write is logged but does not fail the install. Without the marker `--clear` keeps the CA,
+  which is the safe direction.
+- The name is the dashboard's own, as the manager uses `.wazuh-manager-bootstrap-ca`: each component
+  removes only a CA it minted itself.
+
 The default subject alternative names are the node name, the FQDN (`hostname -f`) and every
 global-scope address reported by `ip -o addr show`. `WAZUH_DASHBOARD_CERT_SANS` replaces that list.
 Loopback is always appended.
@@ -113,6 +127,16 @@ The ownership is set in three places, which must agree: `debian/rules` (`overrid
 the DEB `postinst` (after its recursive `chown` of the installation directory), and the RPM spec's
 `%files`. **Adding a file that root executes or sources from the product tree means adding it to
 all three.**
+
+A certificate pair staged before the package is installed, by the installation assistant or by an
+operator, is owned by `root`: the service user does not exist yet. The resolver keeps an existing
+pair exactly as it finds it and never changes its owner, and the service reads it after dropping
+privileges. So the packages give `certs/` to the service user **before** the resolver runs: the DEB
+`postinst` with its recursive `chown` of `/etc/wazuh-dashboard`, and the RPM `%post` with
+`chown -R -P wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs`, which never follows a
+symlink and skips a `certs/` that is itself one. Both change the owner only, so a staged `0400` pair
+stays readable by its new owner, and both run on upgrades too. **Keep that step before the resolver
+in both packages**, or a staged pair fails at start with `EACCES`.
 
 The `+` in `ExecStartPre=+` is required. Without it the step inherits `User=wazuh-dashboard`, cannot
 read the `0600 root:root` credentials file, and fails quietly.

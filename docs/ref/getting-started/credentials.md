@@ -242,14 +242,18 @@ to replace out of band, and a pair you replaced must survive every upgrade.
 Which flow applies depends on what is in `$WAZUH_CA_DIR`, which defaults to `/etc/wazuh/ca`. There is
 no mode flag: the signal is whether a private key sits beside the anchor.
 
-| In the CA directory | Pair already in `certs/` | Result                                                                             |
-| ------------------- | ------------------------ | ---------------------------------------------------------------------------------- |
-| nothing             | no                       | mint a bootstrap CA (`root-ca.pem` and `root-ca.key`), then issue the pair from it |
-| anchor + key        | no                       | issue the pair from the CA found                                                   |
-| anchor only         | no                       | install `root-ca.pem`; **nothing issued**                                          |
-| anything            | yes, complete            | keep the pair as it is, after checking it                                          |
-| anything            | one of the two files     | **nothing issued**: a partial pair is refused, not completed                       |
-| nothing             | yes                      | no CA is minted, since its anchor would not match the pair                         |
+| In the CA directory | Pair already in `certs/` | Result                                                                                                    |
+| ------------------- | ------------------------ | --------------------------------------------------------------------------------------------------------- |
+| nothing             | no                       | mint a bootstrap CA (`root-ca.pem` and `root-ca.key`) and record that it did, then issue the pair from it |
+| anchor + key        | no                       | issue the pair from the CA found                                                                          |
+| anchor only         | no                       | install `root-ca.pem`; **nothing issued**                                                                 |
+| anything            | yes, complete            | keep the pair as it is, after checking it                                                                 |
+| anything            | one of the two files     | **nothing issued**: a partial pair is refused, not completed                                              |
+| nothing             | yes                      | no CA is minted, since its anchor would not match the pair                                                |
+
+When the install mints the bootstrap CA, it also creates `.wazuh-dashboard-bootstrap-ca` in the CA
+directory. That marker is what lets [`--clear`](#container-images) remove the CA later; `--clear`
+never removes a CA without it.
 
 An existing `certs/root-ca.pem` is kept, even when it is not the shared CA. A new `certs/` directory
 gets the layout `wazuh-certs-tool` produces: `0500`, files `0400`, owned by
@@ -306,6 +310,12 @@ all issue the dashboard's certificates outside the host. Place the pair and the 
 nothing, or afterwards, overwriting the pair it issued. Nothing checks them again after that. See
 [Deploying certificates](installation.md#deploying-certificates).
 
+The service reads the pair as `wazuh-dashboard`, so the files must be owned by that user. Files
+placed before installing are owned by `root`, because the user does not exist yet: the package
+changes the owner of `/etc/wazuh-dashboard/certs/` to `wazuh-dashboard:wazuh-dashboard` before it
+looks at them, on both DEB and RPM, and keeps their modes. Files placed after installing need that
+ownership set by hand.
+
 A bootstrap CA is local to the host that minted it and can be thrown away. It trusts only itself: a
 dashboard issued from it does not trust an indexer issued from a different CA. In a multi-host
 deployment, either stage the same CA in `/etc/wazuh/ca` on every host before installing, or
@@ -320,6 +330,18 @@ sudo install -m 0400 -o root -g root root-ca.key /etc/wazuh/ca/root-ca.key
 
 On a host that must not sign, stage only `root-ca.pem` (no key) and provide the dashboard pair
 yourself. A host that never receives the CA private key cannot leak it.
+
+A CA you stage, with or without its key, is not removed by [`--clear`](#container-images), which
+deletes only a CA the dashboard minted and marked with `.wazuh-dashboard-bootstrap-ca`. When you
+stage a CA over one the dashboard minted, delete that marker too, or `--clear` removes your CA and
+its private key:
+
+```bash
+sudo rm -f /etc/wazuh/ca/.wazuh-dashboard-bootstrap-ca
+```
+
+Removing the package can still delete it with the rest of `/etc/wazuh`: see
+[Upgrades and removal](#upgrades-and-removal).
 
 ## Container images
 
@@ -341,8 +363,14 @@ start. It is idempotent, so a restarted container that already resolved is a no-
 
 `--clear` removes the `opensearch.username`, `opensearch.password` and
 `wazuh_core.hosts.default.password` keystore entries, the AI Assistant key, the dashboard
-certificates, and the shared CA when it has a private key. A CA without a private key was issued
-elsewhere and is kept. `--clear` refuses to run while the dashboard is running.
+certificates, and any staging directory an interrupted install left in `certs/`. It removes the
+shared CA only when this dashboard minted it, as recorded by `.wazuh-dashboard-bootstrap-ca` in the
+CA directory, and removes that marker with it. Any other CA is kept, and the output says why: one
+with a private key but no marker was staged by you, and one without a private key was issued
+elsewhere.
+
+`--clear` must run as root and exits `1` otherwise. It also refuses to run while the dashboard is
+running.
 
 ## Upgrades and removal
 

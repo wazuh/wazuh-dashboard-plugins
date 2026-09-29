@@ -31,6 +31,16 @@ If the service does not start because a certificate file is missing, check that
 Certificates are issued only on a fresh install; the installation output says why they could not be
 issued.
 
+If the journal shows
+`EACCES: permission denied, open '/etc/wazuh-dashboard/certs/dashboard-key.pem'`, the certificate
+files are not owned by the service user. This happens with a pair copied into `certs/` as `root`
+after the package was installed, or with an older package that did not give `certs/` to the service
+user. Give them to the service user and start the service again:
+
+```bash
+chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
+```
+
 See [Credentials](../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
 
 ### Authentication errors (401) with the indexer or the server API
