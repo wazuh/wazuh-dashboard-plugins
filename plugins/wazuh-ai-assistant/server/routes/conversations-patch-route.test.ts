@@ -4,7 +4,10 @@ import supertest from 'supertest';
 import { Router } from '../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../src/core/server/logging/logging_system.mock';
-import { API_PATHS } from '../../common/constants';
+import {
+  API_PATHS,
+  WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH,
+} from '../../common/constants';
 import { registerConversationRoutes } from './conversations';
 
 /**
@@ -19,7 +22,7 @@ import { registerConversationRoutes } from './conversations';
  * a wrong status code, not just as a change to an internal helper's return value.
  *
  * `context.core.opensearch.client.asCurrentUser` is mocked directly (there is no real OpenSearch
- * here) -- `search` backs `findConversationHit`, `index` backs `updateConversation`
+ * here) -- `search` backs `findConversationHit`, `transport.request` backs `renameConversation`
  * (conversation-store.ts). `context.wazuh.security.getCurrentUser` backs `resolveOwner`
  * (server/identity.ts).
  */
@@ -29,8 +32,7 @@ const port = 11005; // distinct from update-user-preferences.test.ts's 11004
 
 const mockGetCurrentUser = jest.fn();
 const mockSearch = jest.fn();
-const mockIndex = jest.fn();
-const mockDelete = jest.fn();
+const mockTransportRequest = jest.fn();
 
 const context = {
   wazuh: { security: { getCurrentUser: mockGetCurrentUser } },
@@ -39,8 +41,7 @@ const context = {
       client: {
         asCurrentUser: {
           search: mockSearch,
-          index: mockIndex,
-          delete: mockDelete,
+          transport: { request: mockTransportRequest },
         },
       },
     },
@@ -139,7 +140,14 @@ describe(`[endpoint] PATCH ${API_PATHS.CONVERSATION_BY_ID(':id')}`, () => {
   test('renames when the caller owns the conversation, and returns a fresh version', async () => {
     mockGetCurrentUser.mockResolvedValue({ username: 'alice' });
     mockSearch.mockResolvedValue(searchResponseWithHit());
-    mockIndex.mockResolvedValue({ body: { _seq_no: 4, _primary_term: 1 } });
+    mockTransportRequest.mockResolvedValue({
+      body: {
+        id: 'conv-1',
+        title: 'New title',
+        updated_at: STORED_DOCUMENT.updated_at,
+        version: '4:1',
+      },
+    });
 
     const response = await supertest(innerServer.listener)
       .patch(API_PATHS.CONVERSATION_BY_ID('conv-1'))
@@ -150,6 +158,11 @@ describe(`[endpoint] PATCH ${API_PATHS.CONVERSATION_BY_ID(':id')}`, () => {
     expect(response.body.version).toBe('4:1');
     // m9: rename must not bump updated_at / move the row between date groups.
     expect(response.body.updatedAt).toBe(STORED_DOCUMENT.updated_at);
+    expect(mockTransportRequest).toHaveBeenCalledWith({
+      method: 'PATCH',
+      path: `${WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH}/conv-1`,
+      body: { title: 'New title' },
+    });
     // The owner filter is exercised, not skipped: search was actually called with this user.
     expect(mockSearch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -180,7 +193,7 @@ describe(`[endpoint] PATCH ${API_PATHS.CONVERSATION_BY_ID(':id')}`, () => {
       .expect(404);
 
     expect(response.body.title).not.toBe('New title');
-    expect(mockIndex).not.toHaveBeenCalled();
+    expect(mockTransportRequest).not.toHaveBeenCalled();
   });
 
   test('returns 403 (fail-closed), never 200, when the identity cannot be resolved', async () => {
@@ -194,7 +207,7 @@ describe(`[endpoint] PATCH ${API_PATHS.CONVERSATION_BY_ID(':id')}`, () => {
     expect(response.body.message).toMatch(/identity/i);
     // Fails closed before ever touching storage -- neither the lookup nor the write ran.
     expect(mockSearch).not.toHaveBeenCalled();
-    expect(mockIndex).not.toHaveBeenCalled();
+    expect(mockTransportRequest).not.toHaveBeenCalled();
   });
 
   test('rejects an empty/whitespace-only title with a 400, never reaching storage', async () => {
@@ -206,6 +219,58 @@ describe(`[endpoint] PATCH ${API_PATHS.CONVERSATION_BY_ID(':id')}`, () => {
       .send({ title: '   ' })
       .expect(400);
 
-    expect(mockIndex).not.toHaveBeenCalled();
+    expect(mockTransportRequest).not.toHaveBeenCalled();
+  });
+
+  test('returns 404 when the endpoint reports the conversation vanished after the lookup', async () => {
+    mockGetCurrentUser.mockResolvedValue({ username: 'alice' });
+    mockSearch.mockResolvedValue(searchResponseWithHit());
+    mockTransportRequest.mockRejectedValue(
+      Object.assign(new Error('not found'), { statusCode: 404 }),
+    );
+
+    await supertest(innerServer.listener)
+      .patch(API_PATHS.CONVERSATION_BY_ID('conv-1'))
+      .send({ title: 'New title' })
+      .expect(404);
+  });
+
+  test('returns 409 when the endpoint reports a concurrent write', async () => {
+    mockGetCurrentUser.mockResolvedValue({ username: 'alice' });
+    mockSearch.mockResolvedValue(searchResponseWithHit());
+    mockTransportRequest.mockRejectedValue(
+      Object.assign(new Error('version conflict'), { statusCode: 409 }),
+    );
+
+    const response = await supertest(innerServer.listener)
+      .patch(API_PATHS.CONVERSATION_BY_ID('conv-1'))
+      .send({ title: 'New title' })
+      .expect(409);
+
+    expect(response.body.message).toBe(
+      'Conversation was updated by another session since you last loaded it. Refresh and retry.',
+    );
+  });
+
+  test('surfaces an indexer 403 with the missing-permission message', async () => {
+    mockGetCurrentUser.mockResolvedValue({ username: 'alice' });
+    mockSearch.mockResolvedValue(searchResponseWithHit());
+    mockTransportRequest.mockRejectedValue(
+      Object.assign(
+        new Error(
+          'no permissions for [cluster:admin/ai_assistant/session/write] and User [name=alice]',
+        ),
+        { statusCode: 403 },
+      ),
+    );
+
+    const response = await supertest(innerServer.listener)
+      .patch(API_PATHS.CONVERSATION_BY_ID('conv-1'))
+      .send({ title: 'New title' })
+      .expect(403);
+
+    expect(response.body.message).toContain(
+      'Missing indexer permission: cluster:admin/ai_assistant/session/write',
+    );
   });
 });

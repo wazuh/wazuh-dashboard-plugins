@@ -357,9 +357,12 @@ See [Custom Branding](custom-branding/custom-branding.md) for complete guide.
 
 ### Step 3: Update file permissions
 
+Do not change the ownership of `/usr/share/wazuh-dashboard/`. The package installs it as
+`root:root`, with only `data/` owned by `wazuh-dashboard`, because root runs code from that tree at
+every start. Giving it to the service user would let that account run code as root.
+
 ```bash
 # Ensure correct ownership
-sudo chown -R wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/
 sudo chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/
 sudo chown -R wazuh-dashboard:wazuh-dashboard /var/lib/wazuh-dashboard/
 

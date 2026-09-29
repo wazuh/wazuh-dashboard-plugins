@@ -43,14 +43,16 @@ The Wazuh dashboard package includes:
 
 ### Installation paths
 
-- **Application files**: `/usr/share/wazuh-dashboard/`
+- **Application files**: `/usr/share/wazuh-dashboard/` (`root:root`)
 - **Configuration files**: `/etc/wazuh-dashboard/`
-- **Data directory**: `/var/lib/wazuh-dashboard/`
+- **Data directory**: `/usr/share/wazuh-dashboard/data/` (`wazuh-dashboard:wazuh-dashboard 0750`, the
+  only part of the installation directory the service user owns)
 - **Log files**: `/var/log/wazuh-dashboard/`
 - **Plugin directory**: `/usr/share/wazuh-dashboard/plugins/`
 - **Certificates**: `/etc/wazuh-dashboard/certs/` (issued on a fresh install, see [Credentials](credentials.md#certificates))
 - **Credential resolver**: `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`)
-- **Shared credentials library**: `/usr/share/wazuh-dashboard/lib/wazuh-credentials.sh`
+- **Shared credentials library**: `/usr/share/wazuh-dashboard/lib/wazuh-credentials.sh` (`root:root 0644`)
+- **Service environment file**: `/etc/default/wazuh-dashboard` (`root:wazuh-dashboard 0640`)
 - **Shared credentials file**: `/etc/wazuh/credentials.env` (created by the first Wazuh package on the host, not shipped)
 
 ### System integration

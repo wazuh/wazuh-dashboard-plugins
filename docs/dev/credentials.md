@@ -110,23 +110,47 @@ Loopback is always appended.
 
 ## File ownership
 
-Root runs `bin/resolve-credentials` from the maintainer scripts and from `ExecStartPre=+`, and it
-sources `lib/wazuh-credentials.sh`. A service account able to rewrite either file could have root
-run its own code, so both are root-owned:
+Root runs `bin/resolve-credentials` from the maintainer scripts and from `ExecStartPre=+` or the
+SysV init script, it sources `lib/wazuh-credentials.sh`, and it reads
+`/etc/default/wazuh-dashboard`, which systemd passes through `EnvironmentFile=` and the SysV script
+sources with `.`. A service account able to change any of them could have root run its own code: by
+rewriting a file, by renaming a directory above it (or `node/bin/node`) and putting its own in its
+place, or by setting `PATH`, `NODE_OPTIONS` or `LD_PRELOAD` in the environment file.
+`Restart=always` would let it trigger that on demand. So the whole installation directory is
+root-owned:
 
-| Path                       | Owner                  | Mode   |
-| -------------------------- | ---------------------- | ------ |
-| `bin/resolve-credentials`  | `root:root`            | `0750` |
-| `lib/`                     | `root:wazuh-dashboard` | `0750` |
-| `lib/wazuh-credentials.sh` | `root:wazuh-dashboard` | `0640` |
+| Path                                                             | Owner                             | Mode                 |
+| ---------------------------------------------------------------- | --------------------------------- | -------------------- |
+| `/usr/share/wazuh-dashboard` (directories / executables / files) | `root:root`                       | `0755`/`0755`/`0644` |
+| `VERSION.json`                                                   | `root:root`                       | `0444`               |
+| `bin/resolve-credentials`                                        | `root:root`                       | `0750`               |
+| `lib/`                                                           | `root:root`                       | `0755`               |
+| `lib/wazuh-credentials.sh`                                       | `root:root`                       | `0644`               |
+| `data/`                                                          | `wazuh-dashboard:wazuh-dashboard` | `0750`               |
+| `/etc/default/wazuh-dashboard`                                   | `root:wazuh-dashboard`            | `0640`               |
 
-`lib/` must stay readable by the service group: at startup, the OpenSearch Dashboards i18n loader
-lists every top-level directory of the installation root and exits on `EACCES`.
+`data/` is the only directory the service user writes under the installation root: the dashboard
+stores its UUID there at runtime. `/etc/wazuh-dashboard` keeps its `wazuh-dashboard` ownership.
+`lib/` must stay readable by the service user: at startup, the dashboard's i18n loader lists every
+top-level directory of the installation root and exits on `EACCES`.
 
 The ownership is set in three places, which must agree: `debian/rules` (`override_dh_fixperms`),
-the DEB `postinst` (after its recursive `chown` of the installation directory), and the RPM spec's
-`%files`. **Adding a file that root executes or sources from the product tree means adding it to
-all three.**
+the DEB `postinst` (which chowns the installation directory to `root:root` on every `configure`,
+then hands `data/` back to the service user), and the RPM spec's `%files`. An upgrade keeps an
+existing configuration file's owner, so `postinst` and the spec's `%post` also reset
+`/etc/default/wazuh-dashboard` to `root:wazuh-dashboard 0640`. **Adding a file that root executes
+or sources from the product tree means adding it to all three.**
+
+When it runs as root, the resolver also refuses to let the environment choose what it runs:
+
+- It sets a fixed `PATH` (`/usr/sbin:/usr/bin:/sbin:/bin`) and unsets `LD_PRELOAD`,
+  `LD_LIBRARY_PATH` and `NODE_OPTIONS` before anything else.
+- It reads `wazuh-credentials.sh` from `<installation directory>/lib/` only; when the file is
+  missing it exits `2` naming the expected path. There is no environment override and no fallback
+  to a copy next to the script. `-H <dir>` points it at another installation tree.
+- It runs `node` as the service user through `runuser`, both for the
+  `opensearch_dashboards.yml` check and for the check that a value is stored verbatim in the
+  keystore.
 
 A certificate pair staged before the package is installed, by the installation assistant or by an
 operator, is owned by `root`: the service user does not exist yet. The resolver keeps an existing

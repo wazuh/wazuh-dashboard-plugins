@@ -226,7 +226,7 @@ in the `wazuh-dashboard` repository:
   handling), common to the indexer, the manager and the dashboard. It is owned by
   [wazuh-installation-assistant](https://github.com/wazuh/wazuh-installation-assistant) under
   `credentials_lib/`, and is **downloaded at build time** into `lib/wazuh-credentials.sh`
-  (`root:wazuh-dashboard 0640`). It is not committed to `wazuh-dashboard`, so the copies used by
+  (`root:root 0644`). It is not committed to `wazuh-dashboard`, so the copies used by
   the three components cannot drift apart.
 
 `build-packages.sh` downloads the library from

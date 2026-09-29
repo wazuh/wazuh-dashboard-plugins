@@ -50,6 +50,10 @@ import {
 import { addUsage, toStreamUsage, ZERO_USAGE_TOTALS } from './chat-usage';
 import { withSseKeepalive } from './sse-keepalive';
 import {
+  isPermissionDeniedError,
+  withInternalErrorHandling,
+} from './route-helpers';
+import {
   resolveSuggestedDsl,
   SUGGEST_DISCOVER_QUERY_TOOL,
   validateSuggestDiscoverQueryArgs,
@@ -2228,16 +2232,22 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         }),
       },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
       const { providerId, messages } = request.body;
 
       // Reads go through the internal user (server/settings/ai-providers-client.ts's `get`) — see
       // that class's doc comment for why: the underlying endpoint requires
       // `plugin:wazuh/ai_assistant/settings/read`, but any authenticated dashboard user must be
       // able to chat with whichever provider they select.
+      // A permission denial is rethrown so the wrapper answers 403; any other failure is "unknown".
       const stored = await context.wazuh_ai_assistant.aiProviders
         .get(context, providerId)
-        .catch(() => undefined);
+        .catch(error => {
+          if (isPermissionDeniedError(error)) {
+            throw error;
+          }
+          return undefined;
+        });
       if (!stored) {
         logger.error(`wazuhAiAssistant: unknown provider ${providerId}`);
         return response.notFound({
@@ -2404,7 +2414,7 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         releaseStreamSlot();
         throw error;
       }
-    },
+    }, logger),
   );
 }
 

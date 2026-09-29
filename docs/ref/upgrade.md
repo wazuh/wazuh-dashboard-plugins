@@ -122,11 +122,11 @@ You can now access the Wazuh dashboard via: `https://<DASHBOARD_IP_ADDRESS>`.
 >
 >   In the output, plugins that require an update will be labeled as "outdated".
 >
-> - Remove the outdated plugins and reinstall the latest version replacing `<PLUGIN_NAME>` with the name of the plugin:
+> - Remove the outdated plugins and reinstall the latest version replacing `<PLUGIN_NAME>` with the name of the plugin. Run these commands as root: the plugin directory is owned by `root`, so the `wazuh-dashboard` user cannot write to it.
 >
 >   ```bash
->   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove <PLUGIN_NAME>
->   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install <PLUGIN_NAME>
+>   sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin remove <PLUGIN_NAME>
+>   sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin install <PLUGIN_NAME>
 >   ```
 
 7. Check the upgrade status
