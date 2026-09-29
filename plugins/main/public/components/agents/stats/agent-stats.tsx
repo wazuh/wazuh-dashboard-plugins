@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import semver from 'semver';
 import { get } from 'lodash';
 import {
@@ -67,17 +68,23 @@ import {
 const tableColumns = [
   {
     field: 'location',
-    name: 'Location',
+    name: i18n.translate('wazuh.endpointsSummary.agentStats.columns.location', {
+      defaultMessage: 'Location',
+    }),
     sortable: true,
   },
   {
     field: 'events',
-    name: 'Events',
+    name: i18n.translate('wazuh.endpointsSummary.agentStats.columns.events', {
+      defaultMessage: 'Events',
+    }),
     sortable: true,
   },
   {
     field: 'bytes',
-    name: 'Bytes',
+    name: i18n.translate('wazuh.endpointsSummary.agentStats.columns.bytes', {
+      defaultMessage: 'Bytes',
+    }),
     sortable: true,
   },
 ];
@@ -141,30 +148,52 @@ const statsAgents: {
 }[] = [
   {
     key: 'status',
-    title: 'Status',
+    title: i18n.translate('wazuh.endpointsSummary.agentStats.ribbon.status', {
+      defaultMessage: 'Status',
+    }),
     path: 'agent.status',
   },
   {
     key: 'messages_count',
-    title: 'Messages count',
+    title: i18n.translate(
+      'wazuh.endpointsSummary.agentStats.ribbon.messagesCount',
+      {
+        defaultMessage: 'Messages count',
+      },
+    ),
     path: 'agent.messages.count',
     render: formatUINumber,
   },
   {
     key: 'tasks_dispatched',
-    title: 'Tasks dispatched',
+    title: i18n.translate(
+      'wazuh.endpointsSummary.agentStats.ribbon.tasksDispatched',
+      {
+        defaultMessage: 'Tasks dispatched',
+      },
+    ),
     path: 'agent.tasks.dispatched.total',
     render: formatUINumber,
   },
   {
     key: 'tasks_failed',
-    title: 'Tasks failed',
+    title: i18n.translate(
+      'wazuh.endpointsSummary.agentStats.ribbon.tasksFailed',
+      {
+        defaultMessage: 'Tasks failed',
+      },
+    ),
     path: 'agent.tasks.failed.total',
     render: formatUINumber,
   },
   {
     key: 'last_keepalive',
-    title: 'Last keep alive',
+    title: i18n.translate(
+      'wazuh.endpointsSummary.agentStats.ribbon.lastKeepAlive',
+      {
+        defaultMessage: 'Last keep alive',
+      },
+    ),
     path: 'agent.last_keepalive',
     render: formatUIDate,
   },
@@ -181,7 +210,9 @@ export const MainAgentStats = compose(
     },
     { agent },
     {
-      text: 'Stats',
+      text: i18n.translate('wazuh.endpointsSummary.agentStats.breadcrumb', {
+        defaultMessage: 'Stats',
+      }),
     },
   ]),
   withUserAuthorizationPrompt(({ agent }) => [
@@ -202,9 +233,7 @@ export const MainAgentStats = compose(
       const { raw } = getAgentVersion(agent.version);
       return semver.lt(raw, '4.2.0');
     },
-    () => (
-      <PromptAgentFeatureVersion version='equal or higher version than 4.2.0' />
-    ),
+    () => <PromptAgentFeatureVersion version='4.2.0' />,
   ),
 )(AgentStats);
 
@@ -251,16 +280,31 @@ const AgentStatsBody = withDataSourceInitiated({})(
         {!settled.statistics ? (
           <EuiEmptyPrompt
             iconType='watchesApp'
-            title={<h2>No statistics reported</h2>}
+            title={
+              <h2>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentStats.noStatisticsTitle',
+                  { defaultMessage: 'No statistics reported' },
+                )}
+              </h2>
+            }
             body={
               <p>
-                Statistics are not available for this agent. Confirm that
-                statistics collection is enabled in its configuration file.
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentStats.noStatisticsBody',
+                  {
+                    defaultMessage:
+                      'Statistics are not available for this agent. Confirm that statistics collection is enabled in its configuration file.',
+                  },
+                )}
               </p>
             }
             actions={
               <EuiButton color='primary' fill onClick={openAgentSelector}>
-                Select agent
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentStats.selectAgentButton',
+                  { defaultMessage: 'Select agent' },
+                )}
               </EuiButton>
             }
           />
@@ -282,7 +326,10 @@ const AgentStatsBody = withDataSourceInitiated({})(
                 <AgentStatTable
                   columns={tableColumns}
                   loading={false}
-                  title='Global'
+                  title={i18n.translate(
+                    'wazuh.endpointsSummary.agentStats.globalTableTitle',
+                    { defaultMessage: 'Global' },
+                  )}
                   start={settled.statistics?.logcollector?.global?.start}
                   end={settled.statistics?.logcollector?.global?.end}
                   items={toList(
@@ -295,7 +342,10 @@ const AgentStatsBody = withDataSourceInitiated({})(
                 <AgentStatTable
                   columns={tableColumns}
                   loading={false}
-                  title='Interval'
+                  title={i18n.translate(
+                    'wazuh.endpointsSummary.agentStats.intervalTableTitle',
+                    { defaultMessage: 'Interval' },
+                  )}
                   start={settled.statistics?.logcollector?.interval?.start}
                   end={settled.statistics?.logcollector?.interval?.end}
                   items={toList(

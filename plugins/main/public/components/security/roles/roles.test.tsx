@@ -1,6 +1,6 @@
 /* eslint-disable camelcase -- Wazuh Server API response fixtures use snake_case */
 import React from 'react';
-import { act, render, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { Roles } from './roles';
 import { WzRequest } from '../../../react-services/wz-request';
 
@@ -26,6 +26,7 @@ jest.mock('@elastic/eui', () => ({
   ),
   EuiPageContentBody: ({ children }: MockNode) => <div>{children}</div>,
   EuiTitle: ({ children }: MockNode) => <div>{children}</div>,
+  EuiText: ({ children }: MockNode) => <div>{children}</div>,
 }));
 jest.mock('./roles-table', () => ({
   RolesTable: (props: CapturedRolesTableProps) => {
@@ -69,6 +70,14 @@ describe('Roles', () => {
     for (const key of Object.keys(mockRolesTableProps)) {
       delete mockRolesTableProps[key as keyof CapturedRolesTableProps];
     }
+  });
+
+  it('shows a description clarifying these roles belong to the Wazuh manager API', () => {
+    render(<Roles />);
+
+    expect(
+      screen.getByText(/Manage the roles of the manager API/),
+    ).toBeTruthy();
   });
 
   it('requests the first page sorted by id ascending by default', async () => {

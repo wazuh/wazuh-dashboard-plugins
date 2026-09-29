@@ -6,11 +6,15 @@ import {
   EuiButtonEmpty,
   EuiSwitch,
   EuiLink,
+  EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import React, { Fragment, useEffect, useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
 import { EnhancedFieldConfiguration } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
+import AdvancedOptions from '../advanced-options/advanced-options';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import {
@@ -49,17 +53,27 @@ const EndpointDefaultHint = ({ children }: { children: React.ReactNode }) => (
 
 const popoverServerAddress = (
   <span>
-    Learn about{' '}
-    <EuiLink
-      href={webDocumentationLink(
-        'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
-        PLUGIN_VERSION_SHORT,
-      )}
-      target='_blank'
-      rel='noopener noreferrer'
-    >
-      Server address.
-    </EuiLink>
+    <FormattedMessage
+      id='wazuh.endpointsSummary.serverAddress.learnAbout'
+      defaultMessage='Learn about {documentationLink}'
+      values={{
+        documentationLink: (
+          <EuiLink
+            href={webDocumentationLink(
+              'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+              PLUGIN_VERSION_SHORT,
+            )}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            {i18n.translate(
+              'wazuh.endpointsSummary.serverAddress.documentationLink',
+              { defaultMessage: 'Server address.' },
+            )}
+          </EuiLink>
+        ),
+      }}
+    />
   </span>
 );
 
@@ -98,7 +112,10 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
     } catch (error) {
       ErrorHandler.handleError(error, {
         message: error.message,
-        title: 'Error saving the server endpoint configuration',
+        title: i18n.translate(
+          'wazuh.endpointsSummary.serverAddress.saveErrorTitle',
+          { defaultMessage: 'Error saving the server endpoint configuration' },
+        ),
       });
       setRememberServerAddress(false);
     }
@@ -148,7 +165,12 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                   gutterSize='s'
                 >
                   <EuiFlexItem grow={false}>
-                    <span className='registerAgentLabels'>Server address</span>
+                    <span className='registerAgentLabels'>
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.serverAddress.addressLabel',
+                        { defaultMessage: 'Server address' },
+                      )}
+                    </span>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiPopover
@@ -175,53 +197,104 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             fullWidth={false}
-            placeholder='IP address or FQDN'
+            placeholder={i18n.translate(
+              'wazuh.endpointsSummary.serverAddress.addressPlaceholder',
+              { defaultMessage: 'IP address or FQDN' },
+            )}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiFlexGroup wrap>
-        <EuiFlexItem grow={true}>
-          <InputForm
-            {...serverPort}
-            label={
-              <span className='registerAgentLabels'>
-                {`Port - `}
-                <em>optional</em>
-              </span>
-            }
-            footer={
-              <EndpointDefaultHint>
-                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PORT} default will be used`}
-              </EndpointDefaultHint>
-            }
-            fullWidth={false}
-            placeholder={AGENT_ENDPOINT_DEFAULT_PORT}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem grow={true}>
-          <InputForm
-            {...serverPath}
-            label={
-              <span className='registerAgentLabels'>
-                {`Path prefix - `}
-                <em>optional</em>
-              </span>
-            }
-            footer={
-              <EndpointDefaultHint>
-                {`If left empty, ${AGENT_ENDPOINT_DEFAULT_PATH} default will be used`}
-              </EndpointDefaultHint>
-            }
-            fullWidth={false}
-            placeholder={AGENT_ENDPOINT_DEFAULT_PATH}
-          />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      <EuiSpacer size='m' />
+      {/* The port and the path prefix are optional and rarely changed, so they
+      are folded away and the step is just the address until the operator asks
+      for them. */}
+      <AdvancedOptions fields={[serverPort, serverPath]}>
+        <EuiFlexGroup wrap>
+          <EuiFlexItem grow={true} className='registerAgentFormColumn'>
+            <InputForm
+              {...serverPort}
+              label={
+                <span className='registerAgentLabels'>
+                  <FormattedMessage
+                    id='wazuh.endpointsSummary.serverAddress.portLabel'
+                    defaultMessage='Port - {optional}'
+                    values={{
+                      optional: (
+                        <em>
+                          {i18n.translate(
+                            'wazuh.endpointsSummary.serverAddress.portOptional',
+                            { defaultMessage: 'optional' },
+                          )}
+                        </em>
+                      ),
+                    }}
+                  />
+                </span>
+              }
+              footer={
+                <EndpointDefaultHint>
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.serverAddress.portDefaultHint',
+                    {
+                      defaultMessage:
+                        'If left empty, {defaultPort} default will be used',
+                      values: { defaultPort: AGENT_ENDPOINT_DEFAULT_PORT },
+                    },
+                  )}
+                </EndpointDefaultHint>
+              }
+              fullWidth={false}
+              placeholder={AGENT_ENDPOINT_DEFAULT_PORT}
+            />
+          </EuiFlexItem>
+          <EuiFlexItem grow={true} className='registerAgentFormColumn'>
+            <InputForm
+              {...serverPath}
+              label={
+                <span className='registerAgentLabels'>
+                  <FormattedMessage
+                    id='wazuh.endpointsSummary.serverAddress.pathLabel'
+                    defaultMessage='Path prefix - {optional}'
+                    values={{
+                      optional: (
+                        <em>
+                          {i18n.translate(
+                            'wazuh.endpointsSummary.serverAddress.pathOptional',
+                            { defaultMessage: 'optional' },
+                          )}
+                        </em>
+                      ),
+                    }}
+                  />
+                </span>
+              }
+              footer={
+                <EndpointDefaultHint>
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.serverAddress.pathDefaultHint',
+                    {
+                      defaultMessage:
+                        'If left empty, {defaultPath} default will be used',
+                      values: { defaultPath: AGENT_ENDPOINT_DEFAULT_PATH },
+                    },
+                  )}
+                </EndpointDefaultHint>
+              }
+              fullWidth={false}
+              placeholder={AGENT_ENDPOINT_DEFAULT_PATH}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </AdvancedOptions>
+      <EuiSpacer size='s' />
       <EuiFlexGroup wrap>
         <EuiFlexItem grow={false}>
           <EuiSwitch
             disabled={rememberToggleIsDisabled()}
-            label='Remember address, port, and path prefix'
+            label={i18n.translate(
+              'wazuh.endpointsSummary.serverAddress.rememberEndpoint',
+              { defaultMessage: 'Remember address, port, and path prefix' },
+            )}
             checked={rememberServerAddress}
             onChange={e => handleToggleRememberAddress(e)}
           />

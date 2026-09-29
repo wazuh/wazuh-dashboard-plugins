@@ -18,5 +18,5 @@ export const RegulatoryComplianceGDPR = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

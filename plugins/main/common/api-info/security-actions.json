@@ -19,7 +19,6 @@
     },
     "related_endpoints": [
       "GET /agents",
-      "GET /agents/{agent_id}/key",
       "GET /agents/no_group",
       "GET /agents/outdated",
       "GET /agents/stats/distinct",
@@ -76,6 +75,16 @@
       "PUT /agents/group"
     ]
   },
+  "agent:read_secrets": {
+    "description": "Read the agents' pre-shared keys -- the secrets stored in client.keys -- in clear",
+    "resources": ["agent:id", "agent:group"],
+    "example": {
+      "actions": ["agent:read_secrets"],
+      "resources": ["agent:id:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["GET /agents/{agent_id}/key"]
+  },
   "agent:restart": {
     "description": "Restart agents",
     "resources": ["agent:id", "agent:group"],
@@ -87,7 +96,6 @@
     "related_endpoints": [
       "PUT /agents/{agent_id}/restart",
       "PUT /agents/group/{group_id}/restart",
-      "PUT /agents/node/{node_id}/restart",
       "PUT /agents/restart"
     ]
   },
@@ -102,7 +110,6 @@
     "related_endpoints": [
       "PUT /agents/{agent_id}/reload",
       "PUT /agents/group/{group_id}/reload",
-      "PUT /agents/node/{node_id}/reload",
       "PUT /agents/reload"
     ]
   },
@@ -126,32 +133,48 @@
     },
     "related_endpoints": ["GET /agents/uninstall"]
   },
-  "cluster:read": {
-    "description": "Read Wazuh's cluster nodes configuration",
-    "resources": ["node:id"],
+  "enrollment_token:create": {
+    "description": "Mint enrollment tokens (the credential a new agent pastes to enroll over HTTPS)",
+    "resources": ["*:*"],
     "example": {
-      "actions": ["cluster:read"],
-      "resources": ["node:id:worker1", "node:id:worker3"],
-      "effect": "deny"
+      "actions": ["enrollment_token:create"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["POST /agents/enrollment-tokens"]
+  },
+  "enrollment_token:read": {
+    "description": "List enrollment tokens (their id, address, dates and uses; never their credential)",
+    "resources": ["*:*"],
+    "example": {
+      "actions": ["enrollment_token:read"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
+    },
+    "related_endpoints": ["GET /agents/enrollment-tokens"]
+  },
+  "enrollment_token:delete": {
+    "description": "Revoke enrollment tokens",
+    "resources": ["*:*"],
+    "example": {
+      "actions": ["enrollment_token:delete"],
+      "resources": ["*:*:*"],
+      "effect": "allow"
     },
     "related_endpoints": [
-      "PUT /agents/node/{node_id}/restart",
-      "PUT /agents/node/{node_id}/reload",
-      "GET /cluster/local/info",
-      "GET /cluster/local/config",
-      "GET /cluster/nodes",
-      "GET /cluster/healthcheck",
-      "GET /cluster/{node_id}/status",
-      "GET /cluster/{node_id}/info",
-      "GET /cluster/{node_id}/configuration",
-      "GET /cluster/{node_id}/daemons/stats",
-      "GET /cluster/{node_id}/logs",
-      "GET /cluster/{node_id}/logs/summary",
-      "PUT /cluster/restart",
-      "PUT /cluster/reload",
-      "GET /cluster/configuration/validation",
-      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+      "DELETE /agents/enrollment-tokens",
+      "DELETE /agents/enrollment-tokens/{token_id}"
     ]
+  },
+  "agent:scan_vulnerability": {
+    "description": "Trigger an on-demand vulnerability scan on agents",
+    "resources": ["agent:id", "agent:group"],
+    "example": {
+      "actions": ["agent:scan_vulnerability"],
+      "resources": ["agent:id:050", "agent:id:049"],
+      "effect": "deny"
+    },
+    "related_endpoints": ["PUT /agents/scan/vulnerability"]
   },
   "group:delete": {
     "description": "Delete agent groups",
@@ -199,6 +222,45 @@
       "effect": "deny"
     },
     "related_endpoints": ["PUT /groups/{group_id}/configuration"]
+  },
+  "cluster:read": {
+    "description": "Read Wazuh's cluster nodes configuration",
+    "resources": ["node:id"],
+    "example": {
+      "actions": ["cluster:read"],
+      "resources": ["node:id:worker1", "node:id:worker3"],
+      "effect": "deny"
+    },
+    "related_endpoints": [
+      "GET /cluster/local/info",
+      "GET /cluster/local/config",
+      "GET /cluster/nodes",
+      "GET /cluster/healthcheck",
+      "GET /cluster/{node_id}/status",
+      "GET /cluster/{node_id}/info",
+      "GET /cluster/{node_id}/configuration",
+      "GET /cluster/{node_id}/daemons/stats",
+      "GET /cluster/{node_id}/logs",
+      "GET /cluster/{node_id}/logs/summary",
+      "PUT /cluster/restart",
+      "PUT /cluster/reload",
+      "GET /cluster/configuration/validation",
+      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+    ]
+  },
+  "cluster:read_secrets": {
+    "description": "Read the sensitive configuration values -- the enrollment password and the cluster key -- in clear instead of masked",
+    "resources": ["node:id"],
+    "example": {
+      "actions": ["cluster:read_secrets"],
+      "resources": ["node:id:master-node"],
+      "effect": "allow"
+    },
+    "related_endpoints": [
+      "GET /cluster/local/config",
+      "GET /cluster/{node_id}/configuration",
+      "GET /cluster/{node_id}/configuration/{component}/{configuration}"
+    ]
   },
   "cluster:status": {
     "description": "Check Wazuh's cluster general status",

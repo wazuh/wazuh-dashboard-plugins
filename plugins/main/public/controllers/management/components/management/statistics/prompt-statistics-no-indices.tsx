@@ -12,17 +12,34 @@
 
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 export const PromptStatisticsNoIndices = ({ indexPatternID, existIndex }) => {
   return !existIndex ? (
     <EuiEmptyPrompt
       iconType='securitySignalDetected'
-      title={<h2>{indexPatternID} indices were not found.</h2>}
+      title={
+        <h2>
+          {i18n.translate('wazuh.statistics.promptNoIndices.indicesNotFound', {
+            defaultMessage: '{indexPatternID} indices were not found.',
+            values: { indexPatternID },
+          })}
+        </h2>
+      }
     />
   ) : (
     <EuiEmptyPrompt
       iconType='securitySignalDetected'
-      title={<h2>There was a problem creating the index pattern.</h2>}
+      title={
+        <h2>
+          {i18n.translate(
+            'wazuh.statistics.promptNoIndices.indexPatternCreationError',
+            {
+              defaultMessage: 'There was a problem creating the index pattern.',
+            },
+          )}
+        </h2>
+      }
     />
   );
 };

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   EuiFlexItem,
@@ -17,6 +18,7 @@ import {
   tDataGridColumn,
   getAllCustomRenders,
   PaginationOptions,
+  toEuiDataGridProps,
 } from '../data-grid';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 import {
@@ -89,7 +91,10 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
+    const inspectHintMsg = i18n.translate(
+      'wazuh.common.wazuhDataGrid.inspectDocumentDetails',
+      { defaultMessage: 'Inspect document details' },
+    );
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -144,7 +149,9 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
         error,
-        message: 'Error downloading csv report',
+        message: i18n.translate('wazuh.common.wazuhDataGrid.exportCsvError', {
+          defaultMessage: 'Error downloading csv report',
+        }),
       });
       ErrorHandler.handleError(searchError);
     } finally {
@@ -167,7 +174,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
               If this is used in future versions, we should add the functionality to manage the
               visibility of columns thorugh the Available fields button.
             */
-            {...dataGridProps}
+            {...toEuiDataGridProps(dataGridProps)}
             className={sideNavDocked ? 'dataGridDockedNav' : ''}
             toolbarVisibility={{
               additionalControls: (

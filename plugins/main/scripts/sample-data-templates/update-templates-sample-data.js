@@ -68,6 +68,7 @@ const config = {
     'findings-github': 'templates/streams/findings.json',
     'findings-malware-detection': 'templates/streams/findings.json',
     'findings-o365': 'templates/streams/findings.json',
+    'findings-regulatory-compliance': 'templates/streams/findings.json',
     'findings-sca': 'templates/streams/findings.json',
     'findings-threat-hunting': 'templates/streams/findings.json',
     'findings-vulnerability-detection': 'templates/streams/findings.json',

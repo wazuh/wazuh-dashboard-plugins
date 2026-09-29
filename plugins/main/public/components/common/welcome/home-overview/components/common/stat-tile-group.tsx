@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiPanel, EuiLink } from '@elastic/eui';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -37,7 +38,14 @@ export function StatTileGroup<K extends string>({
             value={value}
             errorTooltip={
               result.status === 'error'
-                ? result.error?.message ?? `Could not load ${tile.label}`
+                ? result.error?.message ??
+                  i18n.translate(
+                    'wazuh.common.homeOverviewStatTileGroup.loadError',
+                    {
+                      defaultMessage: 'Could not load {label}',
+                      values: { label: tile.label },
+                    },
+                  )
                 : undefined
             }
             errorColor={

@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { getCustomValueSuggestion } from './helpers/helper-value-suggestion';
 
 export const filtersValues: {
@@ -23,23 +24,43 @@ export const filtersValues: {
   {
     type: 'multiSelect',
     key: 'event.provider',
-    placeholder: 'Provider',
+    placeholder: i18n.translate(
+      'wazuh.office365.searchBarFilters.providerPlaceholder',
+      {
+        defaultMessage: 'Provider',
+      },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'user.name',
-    placeholder: 'User Name',
+    placeholder: i18n.translate(
+      'wazuh.office365.searchBarFilters.userNamePlaceholder',
+      {
+        defaultMessage: 'User Name',
+      },
+    ),
     // filterByKey: true,
     // options: getCustomValueSuggestion('data.office365.UserType'),
   },
   {
     type: 'multiSelect',
     key: 'event.action',
-    placeholder: 'Action',
+    placeholder: i18n.translate(
+      'wazuh.office365.searchBarFilters.actionPlaceholder',
+      {
+        defaultMessage: 'Action',
+      },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'event.outcome',
-    placeholder: 'Result Status',
+    placeholder: i18n.translate(
+      'wazuh.office365.searchBarFilters.resultStatusPlaceholder',
+      {
+        defaultMessage: 'Result Status',
+      },
+    ),
   },
 ];

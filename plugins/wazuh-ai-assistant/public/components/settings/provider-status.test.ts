@@ -52,6 +52,21 @@ test('outcomeFromTestResult: a failed test with no message falls back to a gener
   assert.equal((outcome as { message: string }).message, 'Connection failed.');
 });
 
+test('outcomeFromTestResult: a timed-out test maps to failed with the translated timeout message', () => {
+  const outcome = outcomeFromTestResult({
+    success: false,
+    latencyMs: 30_000,
+    // The server's own English copy: the client must not depend on it.
+    message: 'server text',
+    timedOut: true,
+  });
+  assert.deepEqual(outcome, {
+    status: 'failed',
+    message:
+      'No response within 30 s. Reasoning models can take a long time to start answering.',
+  });
+});
+
 test('outcomeFromTestError: an admin-gate rejection (thrown, never reached the provider) maps to could-not-verify', () => {
   const adminGateError = {
     body: {

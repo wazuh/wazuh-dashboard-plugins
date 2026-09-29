@@ -81,6 +81,17 @@ The **Test** button in Settings only proves the assistant can reach the endpoint
 response — it sends no Wazuh data and does not exercise tool calling. After configuring a provider,
 confirm it works with one real question in the Chat view — not with the Test button alone.
 
+The Test reports the **time to the first response** and stops there. It shows **Slow** from 5
+seconds on, which is typical of reasoning models, and gives up after 30 seconds (_No response within
+30 s_). A reasoning model can take that long to start answering, so try one question in the Chat
+view before changing the configuration.
+
+## Reasoning ("thinking") models
+
+Reasoning models work; the chat shows **Thinking…** while they reason, without the reasoning text.
+They add latency before every answer. If responses feel slow, consider disabling thinking on your
+model server; see your serving stack's documentation.
+
 ## Tool calling is a hard requirement
 
 The assistant has no direct access to Wazuh data — it reads everything by calling tools behind
@@ -139,6 +150,15 @@ configuration problem.
 - **Error hygiene**: upstream error bodies are sanitized before they reach logs or the browser —
   API keys and `Authorization` headers are redacted wherever they appear.
 
+## Long silent turns and reverse proxies
+
+**Stream interrupted: network error** means an idle-connection timeout closed the chat stream while
+the provider was still working, for example a reasoning model thinking. The chat stream therefore
+sends a keep-alive comment every 15 seconds. The dashboard's own `server.socketTimeout` (120,000 ms
+by default) is then not reached. A reverse proxy in front of the dashboard must not buffer the event
+stream (the response sets `X-Accel-Buffering: no`, which nginx honors) and needs a read timeout
+longer than 15 seconds.
+
 ## Outbound URL guard (SSRF)
 
 Every outbound provider fetch goes through `server/providers/url-guard.ts`:
@@ -169,5 +189,7 @@ at a new URL and where that URL is allowed to reach.
 | Provider rejects the request outright (an oversized-request error)            | Groq's tool-definition size limit on typical account tiers.                                                             | Groq is not supported for this assistant; pick another OpenAI-compatible service.                                |
 | Request fails with a Claude model configured under OpenAI-compatible          | Claude models only work under the Anthropic (Claude) provider type.                                                     | Recreate the provider with type Anthropic (Claude) and base URL `https://api.anthropic.com`.                     |
 | Very slow answers (minutes, not seconds)                                      | OpenRouter's free tier, or another provider's own rate limiting.                                                        | Use a paid tier or key, or a different provider.                                                                 |
+| "Thinking…" for a long time before every answer; Test shows Slow              | A reasoning model.                                                                                                      | See [Reasoning ("thinking") models](#reasoning-thinking-models).                                                 |
+| "Stream interrupted: network error" during a long answer                      | A reverse proxy or connection timeout closed the idle stream.                                                           | See [Long silent turns and reverse proxies](#long-silent-turns-and-reverse-proxies).                             |
 | Answer is cut off mid-sentence                                                | Anthropic's fixed 4,096-token output limit was consumed by reasoning before the answer.                                 | Not configurable; expect shorter answers from models that reason heavily.                                        |
 | Everything looks correctly configured but every request still fails           | An account-level setting on the provider's own side (for example data retention) is not enabled.                        | Check the provider's own account or organization console.                                                        |

@@ -7,6 +7,8 @@ import {
   EuiLink,
   EuiCheckbox,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../../utils/register-agent-data';
 import { CheckboxGroupComponent } from '../checkbox-group/checkbox-group';
 import './os-card.scss';
@@ -27,7 +29,14 @@ export const OsCard = ({ onChange, value }: Props) => {
             <EuiCard
               title={
                 <div data-testid='card-title' className='cardTitle'>
-                  <img className='cardIcon' src={data.icon} alt='Icon' />
+                  <img
+                    className='cardIcon'
+                    src={data.icon}
+                    alt={i18n.translate(
+                      'wazuh.endpointsSummary.osCard.iconAlt',
+                      { defaultMessage: 'Icon' },
+                    )}
+                  />
                   <span className='cardText'>{data.title}</span>
                 </div>
               }
@@ -54,17 +63,26 @@ export const OsCard = ({ onChange, value }: Props) => {
         iconType='iInCircle'
         title={
           <span>
-            For additional systems and architectures, please check our{' '}
-            <EuiLink
-              target='_blank'
-              href={webDocumentationLink(
-                'installation-guide/wazuh-agent/index.html',
-              )}
-              rel='noopener noreferrer'
-            >
-              documentation
-            </EuiLink>
-            .
+            <FormattedMessage
+              id='wazuh.endpointsSummary.osCard.additionalSystems'
+              defaultMessage='For additional systems and architectures, please check our {documentationLink}.'
+              values={{
+                documentationLink: (
+                  <EuiLink
+                    target='_blank'
+                    href={webDocumentationLink(
+                      'installation-guide/wazuh-agent/index.html',
+                    )}
+                    rel='noopener noreferrer'
+                  >
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.osCard.documentationLink',
+                      { defaultMessage: 'documentation' },
+                    )}
+                  </EuiLink>
+                ),
+              }}
+            />
           </span>
         }
       ></EuiCallOut>

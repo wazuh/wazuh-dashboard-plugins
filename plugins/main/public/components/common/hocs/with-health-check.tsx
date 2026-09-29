@@ -1,6 +1,7 @@
 import React from 'react';
 import useObservable from 'react-use/lib/useObservable';
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { getCore } from '../../../kibana-services';
 
 const DefaultMissingRequiredChecks = ({
@@ -14,10 +15,23 @@ const DefaultMissingRequiredChecks = ({
 }) => (
   <EuiEmptyPrompt
     iconType='alert'
-    title={<h2>Some checks are not successful</h2>}
+    title={
+      <h2>
+        {i18n.translate('wazuh.common.withHealthCheck.missingChecks.title', {
+          defaultMessage: 'Some checks are not successful',
+        })}
+      </h2>
+    }
     body={
       <div>
-        <span>Required checks to be healthy: </span>
+        <span>
+          {i18n.translate(
+            'wazuh.common.withHealthCheck.missingChecks.requiredChecks',
+            {
+              defaultMessage: 'Required checks to be healthy:',
+            },
+          )}{' '}
+        </span>
         <div>
           {missingSuccessChecks.reduce((acc, text, idx) => {
             if (idx > 0) {
@@ -31,7 +45,12 @@ const DefaultMissingRequiredChecks = ({
     }
     actions={
       <EuiButton color='primary' fill onClick={refresh}>
-        Refresh
+        {i18n.translate(
+          'wazuh.common.withHealthCheck.missingChecks.refreshButton',
+          {
+            defaultMessage: 'Refresh',
+          },
+        )}
       </EuiButton>
     }
   />

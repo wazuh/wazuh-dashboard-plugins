@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   WzButtonOpenOnClick,
   WzButtonPermissionsOpenOnClick,
@@ -52,14 +53,31 @@ function RenderFlyout({ flyoutTitle, flyoutProps, flyoutBody, onClose }) {
       {canNotCloseIsOpen && (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title={i18n.translate(
+              'wazuh.common.flyoutButton.unsavedChangesModal.title',
+              {
+                defaultMessage: 'Unsubmitted changes',
+              },
+            )}
             onConfirm={onClose}
             onCancel={() => setCanNotCloseIsOpen(false)}
-            cancelButtonText="No, don't do it"
-            confirmButtonText='Yes, do it'
+            cancelButtonText={i18n.translate(
+              'wazuh.common.flyoutButton.unsavedChangesModal.cancelButton',
+              { defaultMessage: "No, don't do it" },
+            )}
+            confirmButtonText={i18n.translate(
+              'wazuh.common.flyoutButton.unsavedChangesModal.confirmButton',
+              { defaultMessage: 'Yes, do it' },
+            )}
           >
             <p style={{ textAlign: 'center' }}>
-              There are unsaved changes. Are you sure you want to proceed?
+              {i18n.translate(
+                'wazuh.common.flyoutButton.unsavedChangesModal.body',
+                {
+                  defaultMessage:
+                    'There are unsaved changes. Are you sure you want to proceed?',
+                },
+              )}
             </p>
           </EuiConfirmModal>
         </EuiOverlayMask>

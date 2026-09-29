@@ -11,6 +11,7 @@
  */
 import React, { useEffect, useState, useMemo, Fragment } from 'react';
 import $ from 'jquery';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlyoutHeader,
   EuiLoadingContent,
@@ -181,7 +182,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the requested technique`,
+          title: i18n.translate(
+            'wazuh.mitreAttack.techniqueFlyout.errorFetchingTechnique',
+            {
+              defaultMessage: 'Error obtaining the requested technique',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -285,11 +291,20 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     const { techniqueData } = state;
     const data = [
       {
-        title: 'ID',
+        title: i18n.translate('wazuh.mitreAttack.techniqueFlyout.details.id', {
+          defaultMessage: 'ID',
+        }),
         description: (
           <EuiToolTip
             position='top'
-            content={`Open ${currentTechnique} details in the Intelligence section`}
+            content={i18n.translate(
+              'wazuh.mitreAttack.techniqueFlyout.openTechniqueInIntelligenceTooltip',
+              {
+                defaultMessage:
+                  'Open {technique} details in the Intelligence section',
+                values: { technique: currentTechnique },
+              },
+            )}
           >
             <EuiLink
               onClick={e => {
@@ -303,14 +318,26 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         ),
       },
       {
-        title: 'Tactics',
+        title: i18n.translate(
+          'wazuh.mitreAttack.techniqueFlyout.details.tactics',
+          {
+            defaultMessage: 'Tactics',
+          },
+        ),
         description: techniqueData.tactics
           ? techniqueData.tactics.map(tactic => {
               return (
                 <Fragment key={tactic.id}>
                   <EuiToolTip
                     position='top'
-                    content={`Open ${tactic.name} details in the Intelligence section`}
+                    content={i18n.translate(
+                      'wazuh.mitreAttack.techniqueFlyout.openTacticInIntelligenceTooltip',
+                      {
+                        defaultMessage:
+                          'Open {tactic} details in the Intelligence section',
+                        values: { tactic: tactic.name },
+                      },
+                    )}
                   >
                     <EuiLink
                       onClick={e => {
@@ -328,7 +355,12 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           : '',
       },
       {
-        title: 'Version',
+        title: i18n.translate(
+          'wazuh.mitreAttack.techniqueFlyout.details.version',
+          {
+            defaultMessage: 'Version',
+          },
+        ),
         description: techniqueData.mitre_version,
       },
     ];
@@ -339,7 +371,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           initialIsOpen={true}
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Technique details</h3>
+              <h3>
+                {i18n.translate(
+                  'wazuh.mitreAttack.techniqueFlyout.details.title',
+                  {
+                    defaultMessage: 'Technique details',
+                  },
+                )}
+              </h3>
             </EuiTitle>
           }
         >
@@ -367,12 +406,26 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
           buttonContent={
             <EuiTitle size='s'>
               <h3>
-                Recent events
+                {i18n.translate(
+                  'wazuh.mitreAttack.techniqueFlyout.recentEvents.title',
+                  {
+                    defaultMessage: 'Recent events',
+                  },
+                )}
                 <span style={{ marginLeft: 16 }}>
                   <span>
                     <EuiToolTip
                       position='top'
-                      content={`Show ${currentTechnique} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                      content={i18n.translate(
+                        'wazuh.mitreAttack.techniqueFlyout.recentEvents.showInDashboardTooltip',
+                        {
+                          defaultMessage: 'Show {id} in {tabName}',
+                          values: {
+                            id: currentTechnique,
+                            tabName: TAB_VIEW_NAME_DASHBOARD,
+                          },
+                        },
+                      )}
                     >
                       <EuiIcon
                         onMouseDown={e => {
@@ -386,7 +439,16 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     </EuiToolTip>
                     <EuiToolTip
                       position='top'
-                      content={`Inspect ${currentTechnique} in ${TAB_VIEW_NAME_EVENTS}`}
+                      content={i18n.translate(
+                        'wazuh.mitreAttack.techniqueFlyout.recentEvents.inspectInEventsTooltip',
+                        {
+                          defaultMessage: 'Inspect {id} in {tabName}',
+                          values: {
+                            id: currentTechnique,
+                            tabName: TAB_VIEW_NAME_EVENTS,
+                          },
+                        },
+                      )}
                     >
                       <EuiIcon
                         onMouseDown={e => {

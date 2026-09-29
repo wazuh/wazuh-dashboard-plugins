@@ -1,4 +1,8 @@
 import { initializeDefaultNotificationChannel } from './index';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../../../mocks/health-check-task-context.mock';
 import { defaultChannels } from '../common/constants';
 
 // Mock the client
@@ -7,14 +11,15 @@ const mockClient = {
 };
 
 // Mock context with logger
-const mockContext = () => ({
-  logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-  },
-});
+const mockContext = () =>
+  withTaskResult({
+    logger: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    },
+  });
 
 describe('initializeDefaultNotificationChannel', () => {
   beforeEach(() => {
@@ -47,7 +52,10 @@ describe('initializeDefaultNotificationChannel', () => {
       });
 
       const task = initializeDefaultNotificationChannel(mockClient as any);
-      await task.run(ctx);
+      const result = await task.run(ctx);
+
+      expect(result[TASK_RESULT]).toBe(true);
+      expect(result.status).toBe('ok');
 
       expect(mockClient.callAsInternalUser).toHaveBeenCalledWith(
         'notifications.getConfigs',
@@ -79,7 +87,13 @@ describe('initializeDefaultNotificationChannel', () => {
       });
 
       const task = initializeDefaultNotificationChannel(mockClient as any);
-      await task.run(ctx);
+      const result = await task.run(ctx);
+
+      expect(result[TASK_RESULT]).toBe(true);
+      expect(result.status).toBe('warning');
+      expect(result.message).toBe(
+        '3 default notification channels are missing',
+      );
 
       expect(mockClient.callAsInternalUser).toHaveBeenCalledTimes(1);
       expect(ctx.logger.debug).toHaveBeenCalledWith(

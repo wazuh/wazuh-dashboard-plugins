@@ -7,6 +7,10 @@ import type {
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type { DashboardDefinitionFromFile } from './dashboard-definition-reader';
 import type { InitializationTaskRunContext } from '../types';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../../mocks/health-check-task-context.mock';
 
 jest.mock('./dashboard-definition-reader', () => ({
   readDashboardDefinitionFiles: jest.fn(),
@@ -69,7 +73,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
     } as unknown as jest.Mocked<SavedObjectsClientContract>;
     mockCreateInternalRepository = jest.fn(() => mockClient);
 
-    ctx = {
+    ctx = withTaskResult({
       logger: createLogger(),
       context: {
         services: {
@@ -80,7 +84,7 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
           },
         },
       },
-    } as unknown as InitializationTaskRunContext;
+    }) as unknown as InitializationTaskRunContext;
 
     mockReadDashboardDefinitionFiles.mockReturnValue([mockDefinition]);
   });
@@ -96,7 +100,11 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
       initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
     const result = await task.run(ctx);
 
-    expect(result).toEqual({ status: 'ok' });
+    expect(result).toEqual({
+      [TASK_RESULT]: true,
+      status: 'ok',
+      data: undefined,
+    });
     expect(mockCreateInternalRepository).toHaveBeenCalledTimes(1);
     expect(mockReadDashboardDefinitionFiles).toHaveBeenCalledTimes(1);
     expect(mockClient.get).toHaveBeenCalledWith(
@@ -140,7 +148,11 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
       initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
     const result = await task.run(ctx);
 
-    expect(result).toEqual({ status: 'ok' });
+    expect(result).toEqual({
+      [TASK_RESULT]: true,
+      status: 'ok',
+      data: undefined,
+    });
     expect(mockCreateInternalRepository).toHaveBeenCalledTimes(1);
     expect(mockClient.get).not.toHaveBeenCalled();
     expect(mockClient.create).toHaveBeenCalledWith(

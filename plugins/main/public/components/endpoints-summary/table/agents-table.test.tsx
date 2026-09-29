@@ -1,9 +1,18 @@
 import React from 'react';
-import { render } from 'enzyme';
+import { render, mount } from 'enzyme';
+import { act } from '@testing-library/react';
 import { AgentsTable } from './agents-table';
+import { AgentsTableGlobalActions } from './global-actions/global-actions';
 import { WzRequest } from '../../../react-services/wz-request';
 import configureMockStore from 'redux-mock-store';
 import { Provider } from 'react-redux';
+
+jest.mock('../../../kibana-services', () => ({
+  ...jest.requireActual('../../../kibana-services'),
+  getUiSettings: () => ({
+    get: () => false,
+  }),
+}));
 
 jest.mock('../../common/hooks/use-app-config', () => ({
   useAppConfig: () => ({
@@ -374,5 +383,101 @@ describe('AgentsTable component', () => {
     expect(
       window.localStorage.getItem('wz-agents-overview-table-visible-fields'),
     ).toEqual(JSON.stringify(customColumns));
+  });
+
+  describe('selection across pages (regression, T2)', () => {
+    const mountAgentsTable = async () => {
+      let wrapper: any = null;
+      await act(async () => {
+        wrapper = mount(
+          <Provider store={store}>
+            <AgentsTable
+              filters={[]}
+              showOnlyOutdated={false}
+              setShowOnlyOutdated={() => jest.fn()}
+              totalOutdated={0}
+            />
+          </Provider>,
+        );
+        // Flush the chained async work (agent API version fetch, then the
+        // table's own data fetch) so the EuiBasicTable is actually rendered
+        // with rows before the tests interact with it.
+        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
+      wrapper.update();
+      return wrapper;
+    };
+
+    it('accumulates the selection and reports the accumulated total to global actions', async () => {
+      const wrapper = await mountAgentsTable();
+      const tableInstance = wrapper.find('EuiBasicTable').first().instance();
+
+      await act(async () => {
+        tableInstance.setSelection([data[0]]);
+      });
+      wrapper.update();
+
+      await act(async () => {
+        tableInstance.setSelection([data[0], data[1]]);
+      });
+      wrapper.update();
+
+      const globalActions = wrapper.find(AgentsTableGlobalActions);
+      expect(globalActions.prop('selectedAgents')).toHaveLength(2);
+      expect(
+        globalActions.prop('selectedAgents').map((a: any) => a.id),
+      ).toEqual(expect.arrayContaining([data[0].id, data[1].id]));
+    });
+
+    it('clears the selection when the underlying endpoint changes', async () => {
+      const wrapper = await mountAgentsTable();
+      const tableInstance = wrapper.find('EuiBasicTable').first().instance();
+
+      await act(async () => {
+        tableInstance.setSelection([data[0], data[1]]);
+      });
+      wrapper.update();
+
+      expect(tableInstance.state.selection).toHaveLength(2);
+
+      // AgentsTable always renders the '/agents' endpoint (it never varies
+      // for this caller), so an endpoint change can't be simulated by
+      // changing a prop here. What we can and must assert is the actual
+      // mechanism table-with-search-bar.tsx uses to react to an endpoint
+      // change: calling the table ref's imperative `setSelection([])`.
+      // Reconciling against the visible page must not resurrect any of
+      // the previously selected ids.
+      await act(async () => {
+        wrapper.find('EuiBasicTable').first().instance().setSelection([]);
+      });
+      wrapper.update();
+
+      expect(
+        wrapper.find('EuiBasicTable').first().instance().state.selection,
+      ).toEqual([]);
+      expect(
+        wrapper.find(AgentsTableGlobalActions).prop('selectedAgents'),
+      ).toEqual([]);
+    });
+
+    it('drops allAgentsSelected once the selection falls below the total', async () => {
+      const wrapper = await mountAgentsTable();
+      const tableInstance = wrapper.find('EuiBasicTable').first().instance();
+
+      await act(async () => {
+        tableInstance.setSelection(data);
+      });
+      wrapper.update();
+
+      await act(async () => {
+        tableInstance.setSelection([data[0]]);
+      });
+      wrapper.update();
+
+      expect(
+        wrapper.find(AgentsTableGlobalActions).prop('allAgentsSelected'),
+      ).toBe(false);
+    });
   });
 });

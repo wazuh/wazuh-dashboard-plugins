@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { useAsyncAction } from '../../hooks';
 import { ReportingService } from '../../../../react-services';
 import { WzButton } from '../../../common/buttons';
@@ -43,12 +44,20 @@ export const ButtonModuleGenerateReport = connect(mapStateToProps)(
           disabledReport && totalResults === 0
             ? {
                 position: 'top',
-                content: 'No results match for this search criteria.',
+                content: i18n.translate(
+                  'wazuh.common.generateReport.noResultsTooltip',
+                  {
+                    defaultMessage:
+                      'No results match for this search criteria.',
+                  },
+                ),
               }
             : undefined
         }
       >
-        Generate report
+        {i18n.translate('wazuh.common.generateReport.button', {
+          defaultMessage: 'Generate report',
+        })}
       </WzButton>
     );
   },

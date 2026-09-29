@@ -73,7 +73,6 @@ export const WAZUH_MENU_PAGE = {
   settingsConfigurationLink: '[data-test-subj=menuSettingsConfigurationLink]',
   settingsLogsLink: '[data-test-subj=menuSettingsLogsLink]',
   settingsMiscellaneousLink: '[data-test-subj=menuSettingsMiscellaneousLink]',
-  settingsAboutLink: '[data-test-subj=menuSettingsAboutLink]',
   //endregion
   //endregion
 };

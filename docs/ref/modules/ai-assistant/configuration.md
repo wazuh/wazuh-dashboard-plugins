@@ -23,6 +23,12 @@ sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-key
   add wazuh_ai_assistant.encryptionKey
 ```
 
+The packages generate this key into the keystore (32 random bytes, base64) on a fresh install and
+at every service start when neither the keystore nor `opensearch_dashboards.yml` defines it. They
+never generate it on upgrade and never replace an existing key, because the key is required to
+decrypt the API keys already stored. Set it manually only for installations from sources, or to
+use a key of your own. See [Credentials](../../getting-started/credentials.md#ai-assistant-encryption-key).
+
 With no `encryptionKey` set, saving a provider API key is rejected — the Settings form warns
 before submit and the HTTP API refuses the write — and a warning is logged at startup. Providers
 that need no API key can still be saved. Plaintext API keys are never stored, read, or managed: a
@@ -101,9 +107,10 @@ a single localized plugin is inconsistent for users and puts a translation cost 
 PR. The plugin did previously carry `en-US.json` and `es-ES.json`, but neither ever reached a user —
 `en-US` is never consulted for the default locale `en`, and `es-ES` was not registered on packaged
 installs because the archive did not include the plugin's `.i18nrc.json` — while both had drifted
-badly from the source. `plugins/wazuh-ai-assistant/common/i18n-strings.test.ts` now keeps the source
-strings sound (namespaced ids, no id reused for two messages, every message valid ICU) and fails if
-a catalog is reintroduced outside that wider effort.
+badly from the source. `plugins/wazuh-ai-assistant/common/i18n-strings.test.ts` now runs the i18n
+gate shared by every Wazuh plugin (`plugins/wazuh-core/test/i18n/i18n-strings-gate.ts`), which keeps the
+source strings sound (namespaced ids, no id reused for two messages, every message valid ICU) and
+fails if a catalog is reintroduced without being declared.
 
 **Model answers are a separate matter and are not affected.** The system prompt instructs the
 assistant to answer in the language of the user's most recent message, so a Spanish question gets a

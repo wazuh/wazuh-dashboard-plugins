@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import {
   ITHygieneNetworksInventoryInterfaces,
@@ -11,27 +12,37 @@ import { ModuleSubTabs } from '../../../common/tabs';
 const tabs = [
   {
     id: 'networks',
-    name: 'Addresses',
+    name: i18n.translate('wazuh.itHygiene.networksInventory.tabs.addresses', {
+      defaultMessage: 'Addresses',
+    }),
     component: ITHygieneNetworksInventoryNetworks,
   },
   {
     id: 'interfaces',
-    name: 'Interfaces',
+    name: i18n.translate('wazuh.itHygiene.networksInventory.tabs.interfaces', {
+      defaultMessage: 'Interfaces',
+    }),
     component: ITHygieneNetworksInventoryInterfaces,
   },
   {
     id: 'protocols',
-    name: 'Protocols',
+    name: i18n.translate('wazuh.itHygiene.networksInventory.tabs.protocols', {
+      defaultMessage: 'Protocols',
+    }),
     component: ITHygieneNetworksInventoryProtocols,
   },
   {
     id: 'listeners',
-    name: 'Listeners',
+    name: i18n.translate('wazuh.itHygiene.networksInventory.tabs.listeners', {
+      defaultMessage: 'Listeners',
+    }),
     component: ITHygieneNetworksInventoryServices,
   },
   {
     id: 'traffic',
-    name: 'Traffic',
+    name: i18n.translate('wazuh.itHygiene.networksInventory.tabs.traffic', {
+      defaultMessage: 'Traffic',
+    }),
     component: ITHygieneNetworksInventoryTraffic,
   },
 ];

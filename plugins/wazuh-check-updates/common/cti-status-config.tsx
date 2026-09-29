@@ -1,11 +1,15 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { statusCodes } from './constants';
 
 export const statusData = {
   [statusCodes.NOT_FOUND]: {
     color: 'warning',
-    onClickAriaLabel: 'View pending to start CTI registration',
+    onClickAriaLabel: i18n.translate(
+      'wazuhCheckUpdates.ctiRegistration.statusAriaLabel.pending',
+      { defaultMessage: 'View pending to start CTI registration' },
+    ),
     message: () => (
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.pending'
@@ -15,7 +19,10 @@ export const statusData = {
   },
   [statusCodes.SUCCESS]: {
     color: 'success',
-    onClickAriaLabel: 'View available CTI registration status',
+    onClickAriaLabel: i18n.translate(
+      'wazuhCheckUpdates.ctiRegistration.statusAriaLabel.available',
+      { defaultMessage: 'View available CTI registration status' },
+    ),
     message: () => (
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.available'
@@ -33,7 +40,10 @@ export const statusData = {
   },
   [statusCodes.REGISTRATION_FAILED]: {
     color: 'danger',
-    onClickAriaLabel: 'CTI registration failed',
+    onClickAriaLabel: i18n.translate(
+      'wazuhCheckUpdates.ctiRegistration.statusAriaLabel.failed',
+      { defaultMessage: 'CTI registration failed' },
+    ),
     message: () => (
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.failedNav'

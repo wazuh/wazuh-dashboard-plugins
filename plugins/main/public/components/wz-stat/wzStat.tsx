@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, {
   Fragment,
   HTMLAttributes,
@@ -44,7 +45,7 @@ const textAlignToClassNameMap = {
 };
 
 export const isColorClass = (
-  input: string
+  input: string,
 ): input is keyof typeof colorToClassNameMap => {
   return colorToClassNameMap.hasOwnProperty(input);
 };
@@ -80,78 +81,80 @@ export interface EuiStatProps {
 }
 
 export const WzStat: FunctionComponent<
-  CommonProps & Omit<HTMLAttributes<HTMLDivElement>, 'title'> & EuiStatProps> = ({
-    title,
-    description,
-    titleSize = 'l',
-    children,
+  CommonProps & Omit<HTMLAttributes<HTMLDivElement>, 'title'> & EuiStatProps
+> = ({
+  title,
+  description,
+  titleSize = 'l',
+  children,
+  className,
+  isLoading = false,
+  reverse = false,
+  textAlign = 'left',
+  titleColor = 'default',
+  ...rest
+}) => {
+  const classes = classNames(
+    'euiStat',
+    textAlignToClassNameMap[textAlign],
     className,
-    isLoading = false,
-    reverse = false,
-    textAlign = 'left',
-    titleColor = 'default',
-    ...rest
-  }) => {
+  );
 
-    const classes = classNames(
-      'euiStat',
-      textAlignToClassNameMap[textAlign],
-      className
-    );
+  const titleClasses = classNames(
+    'euiStat__title',
+    isColorClass(titleColor) ? colorToClassNameMap[titleColor] : null,
+    {
+      'euiStat__title-isLoading': isLoading,
+    },
+  );
 
-    const titleClasses = classNames(
-      'euiStat__title',
-      isColorClass(titleColor) ? colorToClassNameMap[titleColor] : null,
-      {
-        'euiStat__title-isLoading': isLoading,
-      }
-    );
+  const descriptionDisplay = (
+    <EuiText size='s' className='euiStat__description'>
+      <span aria-hidden='true'>{description}</span>
+    </EuiText>
+  );
 
-    const descriptionDisplay = (
-      <EuiText size="s" className="euiStat__description">
-        <span aria-hidden="true">{description}</span>
-      </EuiText>
-    );
+  const titleDisplay = isColorClass(titleColor) ? (
+    <EuiTitle size={titleSize} className={titleClasses}>
+      <span aria-hidden='true'>{isLoading ? '--' : title}</span>
+    </EuiTitle>
+  ) : (
+    <EuiTitle size={titleSize} className={titleClasses}>
+      <span aria-hidden='true' style={{ color: `${titleColor}` }}>
+        {isLoading ? '--' : title}
+      </span>
+    </EuiTitle>
+  );
 
-    const titleDisplay = isColorClass(titleColor) ? (
-      <EuiTitle size={titleSize} className={titleClasses}>
-        <span aria-hidden="true">{isLoading ? '--' : title}</span>
-      </EuiTitle>
-    ) : (
-      <EuiTitle size={titleSize} className={titleClasses}>
-        <span aria-hidden="true" style={{ color: `${titleColor}` }}>
-          {isLoading ? '--' : title}
-        </span>
-      </EuiTitle>
-    );
+  const screenReader = (
+    <EuiScreenReaderOnly>
+      <span>
+        {isLoading ? (
+          i18n.translate('wazuh.core.stat.loadingText', {
+            defaultMessage: 'Statistic is loading',
+          })
+        ) : (
+          <Fragment>
+            {reverse ? `${title} ${description}` : `${description} ${title}`}
+          </Fragment>
+        )}
+      </span>
+    </EuiScreenReaderOnly>
+  );
 
-    const screenReader = (
-      <EuiScreenReaderOnly>
-        <span>
-          {isLoading ? (
-            <span token="euiStat.loadingText" default="Statistic is loading" />
-          ) : (
-            <Fragment>
-              {reverse ? `${title} ${description}` : `${description} ${title}`}
-            </Fragment>
-          )}
-        </span>
-      </EuiScreenReaderOnly>
-    );
+  const statDisplay = (
+    <Fragment>
+      {!reverse && descriptionDisplay}
+      {titleDisplay}
+      {reverse && descriptionDisplay}
+      {screenReader}
+    </Fragment>
+  );
 
-    const statDisplay = (
-      <Fragment>
-        {!reverse && descriptionDisplay}
-        {titleDisplay}
-        {reverse && descriptionDisplay}
-        {screenReader}
-      </Fragment>
-    );
-
-    return (
-      <div className={classes} {...rest}>
-        {statDisplay}
-        {children}
-      </div>
-    );
-  };
+  return (
+    <div className={classes} {...rest}>
+      {statDisplay}
+      {children}
+    </div>
+  );
+};

@@ -18,5 +18,5 @@ export const RegulatoryComplianceNIS2 = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

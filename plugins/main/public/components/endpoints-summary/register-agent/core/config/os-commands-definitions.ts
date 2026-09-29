@@ -72,10 +72,13 @@ type IMacOSTypes = IMacOSApple | IMacOSIntel;
 export type tOperatingSystem = ILinuxOSTypes | IMacOSTypes | IWindowsOSTypes;
 
 export type tOptionalParameters =
+  | 'enrollmentToken'
   | 'serverAddress'
   | 'agentName'
   | 'agentGroups'
-  | 'wazuhPassword';
+  | 'wazuhPassword'
+  | 'sslVerification'
+  | 'managerCa';
 
 ///////////////////////////////////////////////////////////////////
 /// Package repository helpers (evaluated lazily at call time)
@@ -209,6 +212,19 @@ export const osCommandsDefinitions = [
 ///////////////////////////////////////////////////////////////////
 
 export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
+  /* The token the manager minted for this deployment. It already names the
+  manager (`adr`) and pins its CA, so the installer takes the connection target
+  and the trust anchor from it and the wizard emits no endpoint, CA or password
+  variable beside it -- the installer refuses a token any of those contradict.
+  The token text is unpadded base64url, so the single quotes that wrap every
+  other value here are enough on the three shells. */
+  enrollmentToken: {
+    property: 'WAZUH_ENROLLMENT_TOKEN',
+    getParamCommand: props => {
+      const { property, value } = props;
+      return value ? `${property}='${value}'` : '';
+    },
+  },
   /* The installer takes the whole connection target -- host, optional port and
   optional path prefix -- in one variable, which is what the agent writes into
   its `<manager><endpoint>`. The wizard composes the value from its three
@@ -260,6 +276,30 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
       }
 
       return value !== '' ? `${property}=$'${value}'` : '';
+    },
+  },
+  /* The agent verifies the manager certificate on its own -- an unset
+  `<verification_mode>` resolves to the endpoint's system CA store, or to
+  `certificate` when a CA is configured -- so the enabled state contributes
+  nothing and only the opt-out is spelled out. Emitting `system` here instead
+  would be harmful: the agent rejects `system` combined with a CA and drops the
+  CA, silently undoing a `WAZUH_REGISTRATION_CA` added to the command by hand. */
+  sslVerification: {
+    property: 'WAZUH_SSL_VERIFICATION',
+    getParamCommand: props => {
+      const { property, value } = props;
+      return value === false ? `${property}='none'` : '';
+    },
+  },
+  /* Path to a CA already present on the endpoint, which the installer writes
+  into `<agent><ssl><certificate_authorities>`. Left empty the agent falls back
+  to the endpoint's system CA store. */
+  managerCa: {
+    property: 'WAZUH_REGISTRATION_CA',
+    getParamCommand: props => {
+      const { property, value } = props;
+      const parsedValue = typeof value === 'string' ? value.trim() : value;
+      return parsedValue ? `${property}='${parsedValue}'` : '';
     },
   },
 };

@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import { EuiButtonEmpty } from '@elastic/eui';
 
@@ -22,6 +23,7 @@ import {
   updateRefreshTime,
 } from '../../../../../../redux/actions/configurationActions';
 import { clusterNodes } from '../utils/wz-fetch';
+import { clearSettingsSearchDataCache } from '../utils/settings-search-service';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
@@ -65,6 +67,11 @@ class WzRefreshClusterInfoButton extends Component {
       getErrorOrchestrator().handleError(options);
     }
     this.setState({ isLoading: false });
+    /* Search results are keyed by node, but a refresh means "reload this
+    node's data now" -- drop the cache before the refreshTime bump below
+    triggers the search feature's own reload, so it doesn't just replay a
+    stale cached read for the same node. */
+    clearSettingsSearchDataCache();
     this.props.updateRefreshTime();
   }
   render() {
@@ -75,7 +82,9 @@ class WzRefreshClusterInfoButton extends Component {
         onClick={() => this.refreshClusterNodes()}
         isDisabled={this.state.isLoading}
       >
-        Refresh
+        {i18n.translate('wazuh.configuration.refreshClusterInfo.button', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     );
   }

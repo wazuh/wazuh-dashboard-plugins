@@ -1,12 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Export Table Csv component renders correctly to match the snapshot 1`] = `
-<ExportTableCsv
-  endpoint="/"
-  filters={Array []}
-  title=""
-  totalItems={0}
->
+<ExportTableCsv>
   <EuiFlexItem
     grow={false}
   >
@@ -16,6 +11,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
       <EuiButtonEmpty
         iconType="importAction"
         isDisabled={true}
+        isLoading={false}
         onClick={[Function]}
       >
         <button
@@ -30,6 +26,7 @@ exports[`Export Table Csv component renders correctly to match the snapshot 1`] 
             iconSide="left"
             iconSize="m"
             iconType="importAction"
+            isLoading={false}
             textProps={
               Object {
                 "className": "euiButtonEmpty__text",

@@ -11,6 +11,7 @@ import { UIErrorLog } from '../../error-orchestrator/types';
 import { ErrorOrchestratorService } from '../../error-orchestrator/error-orchestrator.service';
 import axios, { AxiosError } from 'axios';
 import { OpenSearchDashboardsResponse } from '../../../../../../src/core/server/http/router/response';
+import { i18n } from '@osd/i18n';
 
 interface ILogCustomOptions {
   title: string;
@@ -132,7 +133,9 @@ export class ErrorHandler {
       error: {
         title: customLogOptions?.title
           ? customLogOptions?.title
-          : `[An error has occurred]`,
+          : i18n.translate('wazuh.core.errorHandler.defaultTitle', {
+              defaultMessage: '[An error has occurred]',
+            }),
         message: customLogOptions?.message
           ? customLogOptions?.message
           : error.message,

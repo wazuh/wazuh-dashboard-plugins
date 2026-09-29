@@ -860,4 +860,86 @@ providing a length property for a collection class.
 
 Do not use setters, they cause more problems than they can solve.
 
+## Internationalization (i18n)
+
+User-facing text goes through `@osd/i18n`: `i18n.translate(id, { defaultMessage })`, or
+`<FormattedMessage>` when a placeholder has to hold a React node. The English copy lives in
+`defaultMessage`. The plugins ship no English catalog, because a catalog entry overrides
+`defaultMessage` and would turn every drift into stale English in the UI.
+
+### Message ids
+
+```
+<osdPluginId>.<area>.<component>.<element>[.<variant>]
+
+wazuh.fileIntegrityMonitoring.eventsTable.columns.agentName
+wazuh.common.dataGrid.filterForValue
+wazuhCore.serverApi.error.unreachable
+```
+
+Four segments is the target, three when a component is the whole area, and five when a variant is
+genuinely distinct. Every segment is lowerCamelCase.
+
+- `<osdPluginId>` is the plugin's prefix, fixed by `prefix` and `paths` in its `.i18nrc.json`:
+  `wazuh`, `wazuhCore`, `wazuhCheckUpdates` or `wazuhAiAssistant`.
+- `<area>` is the product area, not the directory. For `main`, take it from the registered
+  application id in `public/utils/applications.ts`, camelCased (`file-integrity-monitoring` becomes
+  `fileIntegrityMonitoring`), dropping a `wz-` prefix or a `-dashboard` suffix (`wz-home` becomes
+  `home`, `incident-response-dashboard` becomes `incidentResponse`). Use `common` for shared
+  components and `core` for app chrome.
+- `<component>` is the UI object: a table, a flyout, a form or a wizard step.
+- `<element>` is the string: a column, a button, a label or an error.
+
+Four rules apply:
+
+1. An id identifies, it does not summarize. When the copy changes, the id stays.
+2. Never reuse an id for two different messages.
+3. Never build an id at runtime. AST extraction cannot resolve it, so the message can never be
+   translated.
+4. Never mirror the filesystem. Paths move, features do not.
+
+```js
+// good
+i18n.translate('wazuh.endpointsSummary.table.columns.status', {
+  defaultMessage: 'Status',
+});
+
+// bad: unprefixed, kebab-case, and it summarizes the copy
+i18n.translate('agents-table-status-column-header', {
+  defaultMessage: 'Status',
+});
+
+// bad: built at runtime
+i18n.translate(`wazuh.${area}.app.title`, { defaultMessage: title });
+```
+
+### Messages
+
+- Never concatenate translated fragments. Use ICU placeholders (`{count}`, `{agentName}`) and pass
+  `values`.
+- Use `plural` or `select` forms rather than branching over two literals.
+- Escape a literal brace with a backslash, written `'Use \\{\\} for an empty object'` in a JS
+  string. `{` otherwise opens a placeholder, and the platform's `intl-messageformat` does not
+  support ICU quoting (`'{'`).
+- Do not translate log lines, API field names, setting keys, index names, or anything persisted or
+  matched programmatically.
+- Do not translate in `server/`. Server messages end up in logs and API responses, so the UI
+  translates what it shows from a stable key instead. Code in `common/` that the server also runs,
+  such as `PLUGIN_SETTINGS` and `SettingsValidator` in `wazuh-core`, may translate: the locale is the
+  single `i18n.locale` setting, so the server and the browser resolve it the same way.
+
+### The i18n gate
+
+`plugins/wazuh-core/test/i18n/i18n-strings-gate.ts` walks a plugin's source and fails when an id is
+not namespaced, is reused for two messages or is built at runtime, when a message does not render
+as ICU, or when `.i18nrc.json` and `translations/` disagree with the catalogs the plugin declares.
+Each plugin runs it from `common/i18n-strings.test.ts` as part of `yarn test:jest`.
+
+### Translation catalogs
+
+A catalog (`translations/<locale>.json`) holds `messages` only. The platform replaces `formats`
+with the last catalog that declares it, so a plugin `formats`, even `{}`, breaks the whole locale.
+Each plugin's `.opensearch_dashboards-plugin-helpers.json` packages `.i18nrc.json` and
+`translations/`; without them a built plugin registers no catalog.
+
 [sideeffect]: http://en.wikipedia.org/wiki/Side_effect_(computer_science)

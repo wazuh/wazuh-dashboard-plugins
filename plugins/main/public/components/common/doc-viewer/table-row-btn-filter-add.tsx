@@ -45,12 +45,12 @@ export function DocViewTableRowBtnFilterAdd({
 }: Props) {
   const tooltipContent = disabled ? (
     <FormattedMessage
-      id='discover.docViews.table.unindexedFieldsCanNotBeSearchedTooltip'
+      id='wazuh.common.docViewer.unindexedFieldTooltip'
       defaultMessage='Unindexed fields can not be searched'
     />
   ) : (
     <FormattedMessage
-      id='discover.docViews.table.filterForValueButtonTooltip'
+      id='wazuh.common.docViewer.filterForValueTooltip'
       defaultMessage='Filter for value'
     />
   );
@@ -59,7 +59,7 @@ export function DocViewTableRowBtnFilterAdd({
     <EuiToolTip content={tooltipContent}>
       <EuiButtonIcon
         aria-label={i18n.translate(
-          'discover.docViews.table.filterForValueButtonAriaLabel',
+          'wazuh.common.docViewer.filterForValueAriaLabel',
           {
             defaultMessage: 'Filter for value',
           },

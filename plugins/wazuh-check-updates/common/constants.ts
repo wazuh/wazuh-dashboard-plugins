@@ -1,3 +1,5 @@
+import { i18n } from '@osd/i18n';
+
 export const PLUGIN_ID = 'wazuhCheckUpdates';
 export const PLUGIN_NAME = 'wazuh_check_updates';
 
@@ -13,6 +15,7 @@ export enum routes {
   ctiRegistrationStatus = `${ctiBasePath}/status`,
   contentUpdate = `${ctiBasePath}/update`,
   ctiConsumers = `${ctiBasePath}/consumers`,
+  ctiRegistrationPermission = `${ctiBasePath}/permission`,
 }
 
 /** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
@@ -42,14 +45,22 @@ export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
  */
 export const CTI_REGISTRATION_COMPLETED_BODY = { success: true } as const;
 
-/** Shown as `message` and in the success modal (i18n `successDetail` default). */
-export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE =
-  'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.';
+/** Shown as the `message` of a successful registration status. */
+export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
+  'wazuhCheckUpdates.ctiRegistration.successStatusMessage',
+  {
+    defaultMessage:
+      'This environment is registered for CTI updates. You will be notified about relevant changes when they are available.',
+  },
+);
 
 /** Wazuh Cloud portal / product URL. Uses `#` in the UI until set. */
 export const WAZUH_CLOUD_PORTAL_HREF = '';
 
-/** Base URL of the Wazuh Cloud CTI Console API (server-side OAuth device flow). */
+/**
+ * Default base URL of the Wazuh Cloud CTI Console API (server-side OAuth device
+ * flow). Overridable with the `wazuh_check_updates.ctiApiUrl` setting.
+ */
 export const WAZUH_CTI_CONSOLE_BASE_URL = 'https://api.pre.cloud.wazuh.com';
 
 /**
@@ -62,6 +73,16 @@ export const ctiConsoleApiPaths = {
 
 /** Content Manager plugin HTTP path prefix (cluster plugin / Imposter mock). */
 const WAZUH_CONTENT_MANAGER_BASE_PATH = '/_plugins/_content_manager';
+
+/**
+ * Turns Content Manager `POST …/subscription` into a privilege probe: the OpenSearch
+ * security plugin evaluates the action and answers `{ accessAllowed, missingPrivileges }`
+ * INSTEAD of executing it, so the call takes no body, has no side effects and always
+ * answers HTTP 200 — callers must branch on `accessAllowed`, never on the status code.
+ * See wazuh-indexer-plugins#1547.
+ */
+export const CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM =
+  'perform_permission_check';
 
 export const enum contentManagerRoutes {
   subscription = `${WAZUH_CONTENT_MANAGER_BASE_PATH}/subscription`,

@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import {
   EuiPanel,
@@ -20,11 +21,11 @@ import {
   EuiIcon,
   EuiHorizontalRule,
   EuiSpacer,
-  EuiButton
+  EuiButton,
 } from '@elastic/eui';
 
 import { updateRefreshTime } from '../../../../../../redux/actions/configurationActions';
-import { getToasts }  from '../../../../../../kibana-services';
+import { getToasts } from '../../../../../../kibana-services';
 import { connect } from 'react-redux';
 
 class WzWazuhAPINotReachable extends Component {
@@ -34,20 +35,20 @@ class WzWazuhAPINotReachable extends Component {
   onClickRefresh = () => {
     this.props.updateRefreshTime();
   };
-  addToast(toast){
-    getToasts().add(toast)
+  addToast(toast) {
+    getToasts().add(toast);
   }
   componentDidMount() {
     if (this.props.error) {
       this.addToast({
         title: (
           <Fragment>
-            <EuiIcon type="alert" />
+            <EuiIcon type='alert' />
             &nbsp;
             <span>{this.props.error}</span>
           </Fragment>
         ),
-        color: 'danger'
+        color: 'danger',
       });
     }
   }
@@ -57,13 +58,20 @@ class WzWazuhAPINotReachable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <div style={{ textAlign: 'center' }}>
-              <EuiIcon type="alert" style={{ marginRight: '4px' }} />
-              <span>API not reachable</span>
-              <EuiHorizontalRule margin="s" />
-              <EuiButton iconType="refresh" onClick={this.onClickRefresh}>
-                Refresh
+              <EuiIcon type='alert' style={{ marginRight: '4px' }} />
+              <span>
+                {i18n.translate('wazuh.configuration.apiNotReachable.title', {
+                  defaultMessage: 'API not reachable',
+                })}
+              </span>
+              <EuiHorizontalRule margin='s' />
+              <EuiButton iconType='refresh' onClick={this.onClickRefresh}>
+                {i18n.translate(
+                  'wazuh.configuration.apiNotReachable.refreshButton',
+                  { defaultMessage: 'Refresh' },
+                )}
               </EuiButton>
-              <EuiSpacer size="s" />
+              <EuiSpacer size='s' />
             </div>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -73,11 +81,7 @@ class WzWazuhAPINotReachable extends Component {
 }
 
 const mapDispatchToProps = dispatch => ({
-  updateRefreshTime: () =>
-    dispatch(updateRefreshTime())
+  updateRefreshTime: () => dispatch(updateRefreshTime()),
 });
 
-export default connect(
-    null,
-    mapDispatchToProps
-)(WzWazuhAPINotReachable);
+export default connect(null, mapDispatchToProps)(WzWazuhAPINotReachable);

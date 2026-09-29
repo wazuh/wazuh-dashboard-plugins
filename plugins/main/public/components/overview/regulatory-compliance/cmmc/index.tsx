@@ -18,5 +18,5 @@ export const RegulatoryComplianceCMMC = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

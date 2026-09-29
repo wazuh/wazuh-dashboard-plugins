@@ -11,6 +11,7 @@ import {
   EuiLoadingSpinner,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Agent, ResponseUpgradeAgents } from '../../../types';
 import { Result } from './upgrade-modal';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
@@ -44,13 +45,19 @@ export const UpgradeAgentsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'ID',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.agentsTable.columns.id',
+            { defaultMessage: 'ID' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.agentsTable.columns.name',
+            { defaultMessage: 'Name' },
+          ),
           align: 'left',
           sortable: true,
         },
@@ -75,13 +82,19 @@ export const UpgradeAgentsModalResult = ({
       columns={[
         {
           field: 'id',
-          name: 'Agent ID',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.upgradedAgentsTable.columns.agentId',
+            { defaultMessage: 'Agent ID' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'name',
-          name: 'Name',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.upgradedAgentsTable.columns.name',
+            { defaultMessage: 'Name' },
+          ),
           align: 'left',
           sortable: true,
         },
@@ -103,26 +116,38 @@ export const UpgradeAgentsModalResult = ({
       columns={[
         {
           field: 'error.code',
-          name: 'Code',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.errorsTable.columns.code',
+            { defaultMessage: 'Code' },
+          ),
           align: 'left',
           sortable: true,
           width: '100px',
         },
         {
           field: 'error.message',
-          name: 'Error',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.errorsTable.columns.error',
+            { defaultMessage: 'Error' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'error.remediation',
-          name: 'Remediation',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.errorsTable.columns.remediation',
+            { defaultMessage: 'Remediation' },
+          ),
           align: 'left',
           sortable: true,
         },
         {
           field: 'id',
-          name: 'Agent IDs',
+          name: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.errorsTable.columns.agentIds',
+            { defaultMessage: 'Agent IDs' },
+          ),
           align: 'left',
           render: ids => ids.join(', '),
         },
@@ -161,7 +186,10 @@ export const UpgradeAgentsModalResult = ({
       steps={[
         {
           step: 1,
-          title: 'Retrieve agents data',
+          title: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.retrieveAgentsStep',
+            { defaultMessage: 'Retrieve agents data' },
+          ),
           status: getAgentsStatus,
           children:
             getAgentsStatus === 'loading' ? null : getAgentsStatus ===
@@ -170,7 +198,13 @@ export const UpgradeAgentsModalResult = ({
                 id='agentsAccordion'
                 arrowDisplay='none'
                 paddingSize='m'
-                buttonContent={`Agents details (${finalAgents.length})`}
+                buttonContent={i18n.translate(
+                  'wazuh.endpointsSummary.bulkUpgradeResult.agentsDetails',
+                  {
+                    defaultMessage: 'Agents details ({count})',
+                    values: { count: finalAgents.length },
+                  },
+                )}
               >
                 {agentsTable(finalAgents)}
               </EuiAccordion>
@@ -178,7 +212,10 @@ export const UpgradeAgentsModalResult = ({
               <EuiCallOut
                 color='danger'
                 iconType='alert'
-                title='Could not get agents data'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.bulkUpgradeResult.getAgentsError',
+                  { defaultMessage: 'Could not get agents data' },
+                )}
               >
                 <EuiText>{getAgentsError?.message}</EuiText>
               </EuiCallOut>
@@ -186,7 +223,10 @@ export const UpgradeAgentsModalResult = ({
         },
         {
           step: 2,
-          title: 'Upgrade status',
+          title: i18n.translate(
+            'wazuh.endpointsSummary.bulkUpgradeResult.upgradeStatusStep',
+            { defaultMessage: 'Upgrade status' },
+          ),
           status: saveChangesStatus,
           children:
             getAgentsStatus === 'complete' ? (
@@ -203,7 +243,12 @@ export const UpgradeAgentsModalResult = ({
                         <EuiLoadingSpinner size='m' />
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiText>Sending upgrade request</EuiText>
+                        <EuiText>
+                          {i18n.translate(
+                            'wazuh.endpointsSummary.bulkUpgradeResult.sendingRequest',
+                            { defaultMessage: 'Sending upgrade request' },
+                          )}
+                        </EuiText>
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </EuiFlexItem>
@@ -217,7 +262,14 @@ export const UpgradeAgentsModalResult = ({
                           paddingSize='m'
                           buttonContent={resultStatus({
                             status: RESULT_TYPE.SUCCESS,
-                            text: `Agents queued for upgrade (${successAgents.length})`,
+                            text: i18n.translate(
+                              'wazuh.endpointsSummary.bulkUpgradeResult.queuedAgents',
+                              {
+                                defaultMessage:
+                                  'Agents queued for upgrade ({count})',
+                                values: { count: successAgents.length },
+                              },
+                            ),
                           })}
                         >
                           {upgradedAgentsTable(successAgents)}
@@ -235,7 +287,14 @@ export const UpgradeAgentsModalResult = ({
                           paddingSize='m'
                           buttonContent={resultStatus({
                             status: RESULT_TYPE.ERROR,
-                            text: `Agents not queued for upgrade (${totalErrorAgents})`,
+                            text: i18n.translate(
+                              'wazuh.endpointsSummary.bulkUpgradeResult.notQueuedAgents',
+                              {
+                                defaultMessage:
+                                  'Agents not queued for upgrade ({totalErrorAgents})',
+                                values: { totalErrorAgents },
+                              },
+                            ),
                           })}
                         >
                           {errorsTable(errorAgents)}

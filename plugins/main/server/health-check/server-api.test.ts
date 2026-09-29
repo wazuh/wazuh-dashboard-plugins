@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- the Wazuh Server API reports these fields in snake_case */
 import {
   PLUGIN_APP_NAME,
   PLUGIN_PLATFORM_WAZUH_DOCUMENTATION_URL_PATH_TROUBLESHOOTING,
@@ -7,7 +8,14 @@ import { version as appVersion } from '../../package.json';
 import {
   serverAPIConnectionCompatibility,
   checkAppServerCompatibility,
+  initializationTaskCreatorServerAPIConnectionCompatibility,
+  initializationTaskCreatorServerAPIRunAs,
 } from './server-api';
+import type { InitializationTaskRunContext } from './types';
+import {
+  TASK_RESULT,
+  withTaskResult,
+} from '../mocks/health-check-task-context.mock';
 
 describe('checkAppServerCompatibility', () => {
   it.each`
@@ -97,4 +105,99 @@ describe('serverAPIConnectionCompatibility', () => {
       }
     },
   );
+});
+
+// The manager reports allow_run_as with these values.
+const RUN_AS = {
+  UNABLE_TO_CHECK: -1,
+  ALL_DISABLED: 0,
+  USER_NOT_ALLOWED: 1,
+  HOST_DISABLED: 2,
+  ENABLED: 3,
+};
+
+const buildTaskContext = () =>
+  withTaskResult({
+    logger: {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    },
+    context: {
+      scope: 'internal',
+      services: {
+        core: {
+          opensearch: {
+            client: {
+              asInternalUser: {
+                transport: {
+                  request: jest.fn().mockResolvedValue({ body: {} }),
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  }) as unknown as InitializationTaskRunContext;
+
+describe('initializationTaskCreatorServerAPIConnectionCompatibility', () => {
+  it('returns a branded result carrying the checked hosts', async () => {
+    const services = {
+      manageHosts: {
+        get: jest.fn().mockResolvedValue([{ id: 'manager-local' }]),
+      },
+      serverAPIClient: {
+        asInternalUser: {
+          request: jest
+            .fn()
+            .mockResolvedValue({ data: { data: { api_version: appVersion } } }),
+        },
+      },
+    };
+
+    const result =
+      (await initializationTaskCreatorServerAPIConnectionCompatibility({
+        taskName: 'server-api:connection-compatibility',
+        services,
+      }).run(buildTaskContext())) as unknown as Record<PropertyKey, unknown>;
+
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('ok');
+    expect(result.data).toEqual([
+      {
+        connection: true,
+        compatibility: true,
+        api_version: appVersion,
+        id: 'manager-local',
+      },
+    ]);
+  });
+});
+
+describe('initializationTaskCreatorServerAPIRunAs', () => {
+  it('returns a branded result carrying the hosts that allow run_as', async () => {
+    const services = {
+      manageHosts: {
+        getEntries: jest
+          .fn()
+          .mockResolvedValue([
+            { id: 'manager-local', allow_run_as: RUN_AS.ENABLED },
+          ]),
+      },
+      API_USER_STATUS_RUN_AS: RUN_AS,
+    };
+
+    const result = (await initializationTaskCreatorServerAPIRunAs({
+      taskName: 'server-api:run-as',
+      services,
+    }).run(buildTaskContext())) as unknown as Record<PropertyKey, unknown>;
+
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('ok');
+    expect(result.data).toEqual([
+      { id: 'manager-local', allow_run_as: RUN_AS.ENABLED, enabled: true },
+    ]);
+  });
 });

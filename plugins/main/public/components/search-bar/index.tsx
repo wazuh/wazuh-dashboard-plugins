@@ -16,6 +16,7 @@ import { searchBarQueryLanguages } from './query-language';
 import _ from 'lodash';
 import { ISearchBarModeWQL } from './query-language/wql';
 import { SEARCH_BAR_DEBOUNCE_UPDATE_TIME } from '../../../common/constants';
+import { i18n } from '@osd/i18n';
 
 export interface SearchBarProps {
   defaultMode?: string;
@@ -90,10 +91,13 @@ export const SearchBar = ({
   );
 
   useEffect(() => {
-    // React to external changes and set the internal input text. Use the `transformInput` of
-    // the query language in use
-    rest.input &&
-      searchBarQueryLanguages[queryLanguage.id]?.transformInput &&
+    // `!== undefined`, not a truthiness check: an external caller
+    // clearing the filter to '' must still update the box, which a
+    // truthy check would otherwise skip.
+    if (
+      rest.input !== undefined &&
+      searchBarQueryLanguages[queryLanguage.id]?.transformInput
+    ) {
       setInput(
         searchBarQueryLanguages[queryLanguage.id]?.transformInput?.(
           rest.input,
@@ -103,6 +107,7 @@ export const SearchBar = ({
           },
         ),
       );
+    }
   }, [rest.inputTimeMark]);
 
   useEffect(() => {
@@ -171,7 +176,9 @@ export const SearchBar = ({
         }
         onClosePopover={() => setIsOpenSuggestionPopover(false)}
         onPopoverFocus={() => setIsOpenSuggestionPopover(true)}
-        placeholder={'Search'}
+        placeholder={i18n.translate('wazuh.core.searchBar.placeholder', {
+          defaultMessage: 'Search',
+        })}
         append={
           <EuiPopover
             button={
@@ -182,7 +189,11 @@ export const SearchBar = ({
             isOpen={isOpenPopoverQueryLanguage}
             closePopover={onQueryLanguagePopoverSwitch}
           >
-            <EuiPopoverTitle>SYNTAX OPTIONS</EuiPopoverTitle>
+            <EuiPopoverTitle>
+              {i18n.translate('wazuh.core.searchBar.syntaxOptionsTitle', {
+                defaultMessage: 'SYNTAX OPTIONS',
+              })}
+            </EuiPopoverTitle>
             <div style={{ width: '350px' }}>
               <EuiText>
                 {searchBarQueryLanguages[queryLanguage.id].description}
@@ -199,7 +210,12 @@ export const SearchBar = ({
                       target='__blank'
                       rel='noopener noreferrer'
                     >
-                      Documentation
+                      {i18n.translate(
+                        'wazuh.core.searchBar.documentationLink',
+                        {
+                          defaultMessage: 'Documentation',
+                        },
+                      )}
                     </EuiLink>
                   </div>
                 </>
@@ -207,7 +223,13 @@ export const SearchBar = ({
               {modes?.length > 1 && (
                 <>
                   <EuiSpacer />
-                  <EuiFormRow label='Select a query language' fullWidth>
+                  <EuiFormRow
+                    label={i18n.translate(
+                      'wazuh.core.searchBar.queryLanguageSelectLabel',
+                      { defaultMessage: 'Select a query language' },
+                    )}
+                    fullWidth
+                  >
                     <EuiSelect
                       id='query-language-selector'
                       options={modes.map(({ id }) => ({

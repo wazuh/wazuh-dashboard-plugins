@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 
@@ -52,7 +53,12 @@ const getVisStateFilter = (
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.filtersPanel.countLabel',
+              {
+                defaultMessage: 'Count',
+              },
+            ),
           },
           schema: 'metric',
         },
@@ -66,9 +72,17 @@ const getVisStateFilter = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.filtersPanel.otherBucketLabel',
+              {
+                defaultMessage: 'Other',
+              },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.filtersPanel.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
             customLabel: label,
           },
           schema: 'bucket',
@@ -100,8 +114,18 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topVulnerabilities',
           indexPatternId,
-          'Top vulnerabilities',
-          'Top 5 vulnerabilities',
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topVulnerabilitiesPanel.title',
+            {
+              defaultMessage: 'Top vulnerabilities',
+            },
+          ),
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topVulnerabilitiesPanel.bucketLabel',
+            {
+              defaultMessage: 'Top 5 vulnerabilities',
+            },
+          ),
           'vulnerability.id',
         ),
       },
@@ -120,8 +144,18 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topOSVulnerabilities',
           indexPatternId,
-          'Top operating system vulnerabilities',
-          'Top 5 OS',
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topOSVulnerabilitiesPanel.title',
+            {
+              defaultMessage: 'Top operating system vulnerabilities',
+            },
+          ),
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topOSVulnerabilitiesPanel.bucketLabel',
+            {
+              defaultMessage: 'Top 5 OS',
+            },
+          ),
           'host.os.full',
         ),
       },
@@ -140,8 +174,18 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topAgentVulnerabilities',
           indexPatternId,
-          'Agent filter',
-          'Top 5 agents',
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topAgentVulnerabilitiesPanel.title',
+            {
+              defaultMessage: 'Agent filter',
+            },
+          ),
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topAgentVulnerabilitiesPanel.bucketLabel',
+            {
+              defaultMessage: 'Top 5 agents',
+            },
+          ),
           'wazuh.agent.name',
         ),
       },
@@ -160,8 +204,18 @@ export const getDashboardFilters = (
         savedVis: getVisStateFilter(
           'topPackageSelector',
           indexPatternId,
-          'Top packages vulnerabilities',
-          'Top 5 packages',
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topPackageSelectorPanel.title',
+            {
+              defaultMessage: 'Top packages vulnerabilities',
+            },
+          ),
+          i18n.translate(
+            'wazuh.vulnerabilityDetection.topPackageSelectorPanel.bucketLabel',
+            {
+              defaultMessage: 'Top 5 packages',
+            },
+          ),
           'package.name',
         ),
       },

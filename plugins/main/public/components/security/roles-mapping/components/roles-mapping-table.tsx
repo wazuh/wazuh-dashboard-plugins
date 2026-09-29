@@ -7,6 +7,7 @@ import {
   EuiFlexGroup,
   EuiBasicTableColumn,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { ErrorHandler } from '../../../../react-services/error-handler';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
@@ -48,7 +49,11 @@ export const RolesMappingTable = ({
     return async () => {
       try {
         await RulesServices.DeleteRules([item.id]);
-        ErrorHandler.info('Role mapping was successfully deleted');
+        ErrorHandler.info(
+          i18n.translate('wazuh.security.rolesMappingTable.deleteSuccess', {
+            defaultMessage: 'Role mapping was successfully deleted',
+          }),
+        );
         updateRules();
         // Workaround for tooltip problem does not disappear
         // when deleting a rule if the following rule is a reserved rule
@@ -73,20 +78,26 @@ export const RolesMappingTable = ({
   const columns: EuiBasicTableColumn<any>[] = [
     {
       field: 'id',
-      name: 'ID',
+      name: i18n.translate('wazuh.security.rolesMappingTable.columns.id', {
+        defaultMessage: 'ID',
+      }),
       width: '75',
       sortable: true,
       truncateText: true,
     },
     {
       field: 'name',
-      name: 'Name',
+      name: i18n.translate('wazuh.security.rolesMappingTable.columns.name', {
+        defaultMessage: 'Name',
+      }),
       sortable: true,
       truncateText: true,
     },
     {
       field: 'roles',
-      name: 'Roles',
+      name: i18n.translate('wazuh.security.rolesMappingTable.columns.roles', {
+        defaultMessage: 'Roles',
+      }),
       render: item => {
         const tmpRoles = item.map((role, idx) => {
           return (
@@ -105,16 +116,28 @@ export const RolesMappingTable = ({
     },
     {
       field: 'id',
-      name: 'Status',
+      name: i18n.translate('wazuh.security.rolesMappingTable.columns.status', {
+        defaultMessage: 'Status',
+      }),
       render(item, obj) {
         if (WzAPIUtils.isReservedID(item)) {
           if (WAZUH_API_RESERVED_WUI_SECURITY_RULES.includes(obj.id)) {
             return (
               <EuiFlexGroup>
-                <EuiBadge color='primary'>Reserved</EuiBadge>
+                <EuiBadge color='primary'>
+                  {i18n.translate(
+                    'wazuh.security.rolesMappingTable.reservedBadge',
+                    { defaultMessage: 'Reserved' },
+                  )}
+                </EuiBadge>
                 <EuiToolTip
                   position='top'
-                  content='wui_ rules belong to wazuh-wui API user'
+                  content={i18n.translate(
+                    'wazuh.security.rolesMappingTable.wuiRulesTooltip',
+                    {
+                      defaultMessage: 'wui_ rules belong to wazuh-wui API user',
+                    },
+                  )}
                 >
                   <EuiBadge color='accent' title='' style={{ marginLeft: 10 }}>
                     wazuh-wui
@@ -122,7 +145,17 @@ export const RolesMappingTable = ({
                 </EuiToolTip>
               </EuiFlexGroup>
             );
-          } else return <EuiBadge color='primary'>Reserved</EuiBadge>;
+          }
+          return (
+            <EuiBadge color='primary'>
+              {i18n.translate(
+                'wazuh.security.rolesMappingTable.reservedBadge',
+                {
+                  defaultMessage: 'Reserved',
+                },
+              )}
+            </EuiBadge>
+          );
         }
       },
       width: '300',
@@ -131,7 +164,9 @@ export const RolesMappingTable = ({
     {
       align: 'right',
       width: '70',
-      name: 'Actions',
+      name: i18n.translate('wazuh.security.rolesMappingTable.columns.actions', {
+        defaultMessage: 'Actions',
+      }),
       render: item => (
         <div onClick={ev => ev.stopPropagation()}>
           <WzButtonPermissionsModalConfirm
@@ -141,19 +176,43 @@ export const RolesMappingTable = ({
             ]}
             tooltip={{
               content: WzAPIUtils.isReservedID(item.id)
-                ? "Reserved role mapping can't be deleted"
-                : 'Delete role mapping',
+                ? i18n.translate(
+                    'wazuh.security.rolesMappingTable.deleteReservedTooltip',
+                    {
+                      defaultMessage: "Reserved role mapping can't be deleted",
+                    },
+                  )
+                : i18n.translate(
+                    'wazuh.security.rolesMappingTable.deleteTooltip',
+                    { defaultMessage: 'Delete role mapping' },
+                  ),
               position: 'left',
             }}
             isDisabled={WzAPIUtils.isReservedID(item.id)}
-            modalTitle={`Do you want to delete the ${item.name} role mapping?`}
+            modalTitle={i18n.translate(
+              'wazuh.security.rolesMappingTable.deleteModalTitle',
+              {
+                defaultMessage:
+                  'Do you want to delete the {roleMappingName} role mapping?',
+                values: { roleMappingName: item.name },
+              },
+            )}
             onConfirm={onDeleteRoleMapping(item)}
             modalProps={{ buttonColor: 'danger' }}
             iconType='trash'
             color='danger'
-            aria-label='Delete role mapping'
-            modalCancelText='Cancel'
-            modalConfirmText='Confirm'
+            aria-label={i18n.translate(
+              'wazuh.security.rolesMappingTable.deleteAriaLabel',
+              { defaultMessage: 'Delete role mapping' },
+            )}
+            modalCancelText={i18n.translate(
+              'wazuh.security.rolesMappingTable.deleteModalCancel',
+              { defaultMessage: 'Cancel' },
+            )}
+            modalConfirmText={i18n.translate(
+              'wazuh.security.rolesMappingTable.deleteModalConfirm',
+              { defaultMessage: 'Confirm' },
+            )}
           />
         </div>
       ),

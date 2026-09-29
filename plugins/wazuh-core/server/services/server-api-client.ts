@@ -19,6 +19,14 @@ import { getCookieValueByName } from './cookie';
 import { ManageHosts, IAPIHost } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
 
+/**
+ * Request headers a caller is allowed to set on the outbound Server API
+ * request. Every other header - most importantly `Authorization` - is decided
+ * by this service, so a caller can never choose the credential that is used
+ * upstream.
+ */
+const ALLOWED_REQUEST_HEADERS = new Set(['content-type']);
+
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 type RequestPath = string;
 
@@ -376,14 +384,45 @@ export class ServerAPIClient {
       method: method,
       headers: {
         'content-type': 'application/json',
+        ...this._filterRequestHeaders(headers),
+        // Set after the caller headers so it can never be overridden.
         Authorization: `Bearer ${token}`,
-        ...(headers ? headers : {}),
       },
       data: body || rest || {},
       params: params || {},
       url: requestUrl,
       httpsAgent: httpsAgent,
     };
+  }
+
+  /**
+   * Keep only the caller-provided headers that are safe to send upstream
+   * @param headers Headers provided by the caller
+   * @returns The subset of headers present in the allowlist
+   */
+  private _filterRequestHeaders(headers: unknown): Record<string, unknown> {
+    if (!headers || typeof headers !== 'object') {
+      return {};
+    }
+
+    const allowed: Record<string, unknown> = {};
+    const rejected: string[] = [];
+
+    for (const [name, value] of Object.entries(headers)) {
+      if (ALLOWED_REQUEST_HEADERS.has(name.toLowerCase())) {
+        allowed[name] = value;
+      } else {
+        rejected.push(name);
+      }
+    }
+
+    if (rejected.length > 0) {
+      this.logger.warn(
+        `Ignored request headers that are not allowed: ${rejected.join(', ')}`,
+      );
+    }
+
+    return allowed;
   }
 
   /**

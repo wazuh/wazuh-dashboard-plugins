@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { updateGlobalBreadcrumb } from '../../redux/actions/globalBreadcrumbActions';
 import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
@@ -17,15 +18,19 @@ import { getErrorOrchestrator } from '../../react-services/common-services';
 import { getWzCurrentAppID } from '../../kibana-services';
 import { ApiTable } from '../settings/api/api-table';
 import { WzConfigurationSettings } from '../settings/configuration';
-import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
+// TODO: re-import when the sample data app is enabled again (#8213, #9114).
+// import { WzSampleDataWrapper } from '../add-modules-data/WzSampleDataWrapper';
 import { WzIndexerSettings } from '../indexer-settings';
-import { SettingsAbout } from '../settings/about/index';
-import { Applications, serverApis } from '../../utils/applications';
+import {
+  Applications,
+  getCurrentAppDefaultTabSearch,
+  serverApis,
+} from '../../utils/applications';
 import { compose } from 'redux';
 import { withErrorBoundary, withRouteResolvers } from '../common/hocs';
 import { connect } from 'react-redux';
 import { nestedResolve } from '../../services/resolves';
-import { Route, Switch } from '../router-search';
+import { Redirect, Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import { AppInfo } from './types';
 
@@ -78,7 +83,13 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Cannot initialize Settings`,
+          title: i18n.translate(
+            'wazuh.dashboardsSettings.settings.initErrorTitle',
+            {
+              defaultMessage: '{errorName}: Cannot initialize Settings',
+              values: { errorName: error.name },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -95,21 +106,22 @@ class SettingsComponent extends React.Component<SettingsComponentProps> {
             </div>
           </div>
         </Route>
-        <Route path='?tab=about'>
-          <div>
-            <SettingsAbout />
-          </div>
-        </Route>
         <Route path='?tab=indexer_settings'>
           <div>
             <WzIndexerSettings />
           </div>
         </Route>
-        <Route path='?tab=sample_data'>
+        {
+          // TODO: re-enable when the sample data app is enabled again.
+          // Uncomment `sampleData` in ../../utils/applications.ts and this
+          // route (disabled for #8213, re-tracked in #9114).
+        }
+        {/* <Route path='?tab=sample_data'>
           <div>
             <WzSampleDataWrapper />
           </div>
-        </Route>
+        </Route> */}
+        <Redirect to={getCurrentAppDefaultTabSearch('?tab=api')}></Redirect>
       </Switch>
     );
   }

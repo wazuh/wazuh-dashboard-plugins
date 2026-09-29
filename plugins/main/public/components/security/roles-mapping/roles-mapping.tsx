@@ -5,7 +5,9 @@ import {
   EuiPageContentHeaderSection,
   EuiPageContentBody,
   EuiTitle,
+  EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RolesMappingTable } from './components/roles-mapping-table';
 import { RolesMappingEdit } from './components/roles-mapping-edit';
 import { RolesMappingCreate } from './components/roles-mapping-create';
@@ -83,7 +85,11 @@ export const RolesMapping = withUserAuthorizationPrompt([
       setRolesEquivalences(_rolesObject);
     }
     if (rolesError) {
-      ErrorHandler.handle('There was an error loading roles');
+      ErrorHandler.handle(
+        i18n.translate('wazuh.security.rolesMapping.loadRolesError', {
+          defaultMessage: 'There was an error loading roles',
+        }),
+      );
     }
   }, [rolesLoading]);
 
@@ -172,8 +178,18 @@ export const RolesMapping = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Roles mapping</h2>
+            <h2>
+              {i18n.translate('wazuh.security.rolesMapping.title', {
+                defaultMessage: 'Roles mapping',
+              })}
+            </h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            {i18n.translate('wazuh.security.rolesMapping.description', {
+              defaultMessage:
+                'Map roles of the manager API to authentication contexts.',
+            })}
+          </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           {!loadingTable && (
@@ -185,7 +201,9 @@ export const RolesMapping = withUserAuthorizationPrompt([
                   setIsCreatingRule(true);
                 }}
               >
-                Create Role mapping
+                {i18n.translate('wazuh.security.rolesMapping.createButton', {
+                  defaultMessage: 'Create Role mapping',
+                })}
               </WzButtonPermissions>
               {createFlyout}
               {editFlyout}

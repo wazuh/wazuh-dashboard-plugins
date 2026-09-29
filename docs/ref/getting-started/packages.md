@@ -48,7 +48,10 @@ The Wazuh dashboard package includes:
 - **Data directory**: `/var/lib/wazuh-dashboard/`
 - **Log files**: `/var/log/wazuh-dashboard/`
 - **Plugin directory**: `/usr/share/wazuh-dashboard/plugins/`
-- **Certificates**: `/etc/wazuh-dashboard/certs/`
+- **Certificates**: `/etc/wazuh-dashboard/certs/` (issued on a fresh install, see [Credentials](credentials.md#certificates))
+- **Credential resolver**: `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`)
+- **Shared credentials library**: `/usr/share/wazuh-dashboard/lib/wazuh-credentials.sh`
+- **Shared credentials file**: `/etc/wazuh/credentials.env` (created by the first Wazuh package on the host, not shipped)
 
 ### System integration
 
@@ -71,10 +74,17 @@ Automatically installed dependencies:
 - `tar`
 - `curl`
 - `libcap2-bin`
+- `openssl`
 
 ### RHEL/CentOS/Fedora
 
 - `libcap`
+- `openssl`
+- `diffutils`
+- `util-linux`
+
+`openssl` issues the dashboard TLS certificates, and `diffutils` (`cmp`) and `util-linux` (`flock`)
+are used by the shared credentials library. See [Credentials](credentials.md).
 
 ## Package repositories
 

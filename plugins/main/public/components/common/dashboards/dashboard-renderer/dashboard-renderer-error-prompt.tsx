@@ -1,6 +1,7 @@
 import React from 'react';
 // @ts-ignore
 import { EuiEmptyPrompt, EuiLink, EuiButton } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { getCore } from '../../../../kibana-services';
 
 export type ErrorType = 'error' | 'empty' | 'not_found' | 'plugin_unavailable';
@@ -35,7 +36,12 @@ export const DashboardRendererErrorPrompt: React.FC<
         path: '#/list',
       })}
     >
-      Manage dashboards
+      {i18n.translate(
+        'wazuh.common.dashboardRenderer.errorPrompt.manageDashboardsLink',
+        {
+          defaultMessage: 'Manage dashboards',
+        },
+      )}
     </EuiLink>
   );
 
@@ -46,25 +52,26 @@ export const DashboardRendererErrorPrompt: React.FC<
       color='primary'
       fill
     >
-      Retry
+      {i18n.translate(
+        'wazuh.common.dashboardRenderer.errorPrompt.retryButton',
+        {
+          defaultMessage: 'Retry',
+        },
+      )}
     </EuiButton>
   );
-
-  const getDashboardSelectionMessage = () => {
-    if (!dashboardId) return '';
-
-    const messages = `id: ${
-      (hasPinnedAgent && agentDashboardId) || dashboardId
-    }`;
-    return `[${messages}]`;
-  };
 
   const getErrorContent = () => {
     switch (errorType) {
       case 'error':
         return {
           iconType: 'alert' as const,
-          title: 'Failed to render the dashboard',
+          title: i18n.translate(
+            'wazuh.common.dashboardRenderer.errorPrompt.errorTitle',
+            {
+              defaultMessage: 'Failed to render the dashboard',
+            },
+          ),
           body: <p>{errorMessage}</p>,
           actions: onRetry ? getRetryButton() : undefined,
         };
@@ -72,7 +79,12 @@ export const DashboardRendererErrorPrompt: React.FC<
       case 'empty':
         return {
           iconType: 'alert' as const,
-          title: 'Dashboard Renderer Error',
+          title: i18n.translate(
+            'wazuh.common.dashboardRenderer.errorPrompt.emptyTitle',
+            {
+              defaultMessage: 'Dashboard Renderer Error',
+            },
+          ),
           body: <p>{errorMessage}</p>,
           actions: getDashboardManagementLink(),
         };
@@ -80,11 +92,34 @@ export const DashboardRendererErrorPrompt: React.FC<
       case 'not_found':
         return {
           iconType: 'alert' as const,
-          title: 'Dashboard Not Found',
+          title: i18n.translate(
+            'wazuh.common.dashboardRenderer.errorPrompt.notFoundTitle',
+            {
+              defaultMessage: 'Dashboard Not Found',
+            },
+          ),
           body: (
             <p>
-              {errorMessage} Dashboard {getDashboardSelectionMessage()} not
-              found.
+              {dashboardId
+                ? i18n.translate(
+                    'wazuh.common.dashboardRenderer.errorPrompt.notFoundBody',
+                    {
+                      defaultMessage:
+                        '{errorMessage} Dashboard [id: {dashboardId}] not found.',
+                      values: {
+                        errorMessage: errorMessage ?? '',
+                        dashboardId:
+                          (hasPinnedAgent && agentDashboardId) || dashboardId,
+                      },
+                    },
+                  )
+                : i18n.translate(
+                    'wazuh.common.dashboardRenderer.errorPrompt.notFoundBodyNoId',
+                    {
+                      defaultMessage: '{errorMessage} Dashboard  not found.',
+                      values: { errorMessage: errorMessage ?? '' },
+                    },
+                  )}
             </p>
           ),
           actions: getDashboardManagementLink(),
@@ -93,11 +128,19 @@ export const DashboardRendererErrorPrompt: React.FC<
       case 'plugin_unavailable':
         return {
           iconType: 'alert' as const,
-          title: 'Dashboard by-value renderer is unavailable',
+          title: i18n.translate(
+            'wazuh.common.dashboardRenderer.errorPrompt.pluginUnavailableTitle',
+            { defaultMessage: 'Dashboard by-value renderer is unavailable' },
+          ),
           body: (
             <p>
-              Ensure the Dashboard plugin is started and supports by-value
-              rendering.
+              {i18n.translate(
+                'wazuh.common.dashboardRenderer.errorPrompt.pluginUnavailableBody',
+                {
+                  defaultMessage:
+                    'Ensure the Dashboard plugin is started and supports by-value rendering.',
+                },
+              )}
             </p>
           ),
           actions: undefined,
@@ -106,8 +149,23 @@ export const DashboardRendererErrorPrompt: React.FC<
       default:
         return {
           iconType: 'alert' as const,
-          title: 'Unknown Error',
-          body: <p>{errorMessage || 'An unexpected error occurred.'}</p>,
+          title: i18n.translate(
+            'wazuh.common.dashboardRenderer.errorPrompt.unknownTitle',
+            {
+              defaultMessage: 'Unknown Error',
+            },
+          ),
+          body: (
+            <p>
+              {errorMessage ||
+                i18n.translate(
+                  'wazuh.common.dashboardRenderer.errorPrompt.unknownBody',
+                  {
+                    defaultMessage: 'An unexpected error occurred.',
+                  },
+                )}
+            </p>
+          ),
           actions: undefined,
         };
     }

@@ -20,5 +20,5 @@ export const RegulatoryComplianceISO27001 = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

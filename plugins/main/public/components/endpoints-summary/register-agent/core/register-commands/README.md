@@ -164,6 +164,18 @@ export type tOptionalParams = {
 
 This configuration will define the different optional parameters that we want to support and the way how to we will process and show in the commands.The `getParamCommand` is the function that will process the props received and show the final command format.
 
+A parameter value is not necessarily a string: a parameter backed by a switch
+receives a boolean. Only the value `''` is filtered out before
+`getParamCommand` is called, so `false` reaches it like any other value, and
+returning `''` is what keeps a parameter out of the command. A switch whose
+enabled state matches the agent default therefore renders nothing when on and
+renders its opt-out when off, as `sslVerification` does.
+
+Adding a parameter also means adding its name to the ordered lists in
+`services/register-agent-os-commands-services.tsx` -- one for Linux and Windows,
+one for macOS, since the two OS families order and join the parameters
+differently. A name missing from those lists is silently dropped.
+
 ### Configuration example
 
 ```ts

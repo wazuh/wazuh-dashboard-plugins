@@ -8,8 +8,10 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
+import { obfuscateEnrollmentTokenInCommand } from '../../services/enrollment-token-command-service';
 
 interface ICommandSectionProps {
   commandText: string;
@@ -17,12 +19,13 @@ interface ICommandSectionProps {
   onCopy: () => void;
   os?: tOperatingSystem['name'];
   password?: string;
+  enrollmentToken?: string;
 }
 
 export default function CommandOutput(props: ICommandSectionProps) {
-  const { commandText, showCommand, onCopy, os, password } = props;
-  const [havePassword, setHavePassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  const { commandText, showCommand, onCopy, os, password, enrollmentToken } =
+    props;
+  const [showSecret, setShowSecret] = useState(false);
 
   const onHandleCopy = (command: any) => {
     onCopy && onCopy();
@@ -31,35 +34,42 @@ export default function CommandOutput(props: ICommandSectionProps) {
 
   const [commandToShow, setCommandToShow] = useState(commandText);
 
+  /* Both the enrollment password and the enrollment token authenticate the
+  agent, so neither is rendered in the clear until the operator asks for it.
+  Only one of them is ever in the command: the installer refuses a token that
+  carries a credential together with a password. */
+  const haveSecret = Boolean(password || enrollmentToken);
+
   useEffect(() => {
+    if (!commandText || !haveSecret || showSecret) {
+      setCommandToShow(commandText);
+      return;
+    }
+
+    let obfuscated = commandText;
     if (password) {
-      setHavePassword(true);
-      osdfucatePassword(password);
-    } else {
-      setHavePassword(false);
-      setCommandToShow(commandText);
+      obfuscated = osdfucatePasswordInCommand(password, obfuscated, os);
     }
-  }, [password, commandText, showPassword]);
-
-  const osdfucatePassword = (password: string) => {
-    if (!password) return;
-    if (!commandText) return;
-
-    if (showPassword) {
-      setCommandToShow(commandText);
-    } else {
-      setCommandToShow(osdfucatePasswordInCommand(password, commandText, os));
+    if (enrollmentToken) {
+      obfuscated = obfuscateEnrollmentTokenInCommand(obfuscated);
     }
+    setCommandToShow(obfuscated);
+  }, [password, enrollmentToken, commandText, showSecret, os]);
+
+  const onChangeShowSecret = (event: EuiSwitchEvent) => {
+    setShowSecret(event.target.checked);
   };
 
-  const onChangeShowPassword = (event: EuiSwitchEvent) => {
-    setShowPassword(event.target.checked);
-  };
   return (
     <Fragment>
       <EuiSpacer />
       <EuiText>
-        <div className='copy-codeblock-wrapper'>
+        <div
+          className='copy-codeblock-wrapper'
+          style={{
+            wordBreak: 'break-word',
+          }}
+        >
           <EuiCodeBlock
             style={{
               zIndex: '100',
@@ -77,19 +87,33 @@ export default function CommandOutput(props: ICommandSectionProps) {
                   onClick={() => onHandleCopy(copy())}
                 >
                   <p>
-                    <EuiIcon type='copy' /> Copy command
+                    <EuiIcon type='copy' />{' '}
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.commandOutput.copyCommand',
+                      { defaultMessage: 'Copy command' },
+                    )}
                   </p>
                 </div>
               )}
             </EuiCopy>
           )}
         </div>
-        {showCommand && havePassword ? (
+        {showCommand && haveSecret ? (
           <>
             <EuiSwitch
-              checked={showPassword}
-              label='Show password'
-              onChange={onChangeShowPassword}
+              checked={showSecret}
+              label={
+                enrollmentToken
+                  ? i18n.translate(
+                      'wazuh.endpointsSummary.commandOutput.showEnrollmentToken',
+                      { defaultMessage: 'Show enrollment token' },
+                    )
+                  : i18n.translate(
+                      'wazuh.endpointsSummary.commandOutput.showPassword',
+                      { defaultMessage: 'Show password' },
+                    )
+              }
+              onChange={onChangeShowSecret}
             />
             <EuiSpacer size='l' />
           </>

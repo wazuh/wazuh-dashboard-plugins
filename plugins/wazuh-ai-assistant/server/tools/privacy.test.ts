@@ -37,6 +37,69 @@ test('prescanAndMint: pseudonymizes an IPv4 address and is reversible', () => {
   assert.equal(p.reverseText(token), '10.0.2.15');
 });
 
+/* Every notation an operating system, a log line or a person actually writes. RFC 5952 requires
+the compressed form in generated text, so these are the common case rather than the edge one. */
+const IPV6_NOTATIONS = [
+  'fe80::a00:27ff:fe4e:66a1',
+  '2001:db8::1234',
+  'fe80::1',
+  '::1',
+  '2001:db8::',
+  '2001:db8:0:0:0:0:0:1',
+  '2001:0db8:85a3:0000:0000:8a2e:0370:7334',
+];
+
+for (const address of IPV6_NOTATIONS) {
+  test(`prescanAndMint: pseudonymizes IPv6 ${address} whole and reverses it`, () => {
+    const p = new Pseudonymizer();
+    const out = prescanAndMint(`peer ${address} went down`, p);
+
+    assert.match(out, /IP_\d+/);
+    /* The property that matters: no part of the address survives. Asserting the whole address is
+    absent would not catch this defect, which left the interface identifier appended to the
+    pseudonym ("IP_1a00:27ff:fe4e:66a1"). Pseudonyms come out first, since a short group like "1"
+    also occurs inside "IP_1". */
+    const remainder = out.replace(/IP_\d+/g, '');
+    for (const group of address.split(':').filter(Boolean)) {
+      assert.ok(
+        !remainder.includes(group),
+        `group "${group}" of ${address} reached the output: ${out}`,
+      );
+    }
+    assert.equal(p.reverseText(out), `peer ${address} went down`);
+  });
+}
+
+test('prescanAndMint: replaces the address inside a bracketed URL authority', () => {
+  const p = new Pseudonymizer();
+  const out = prescanAndMint('connect to [2001:db8::1234]:8443 now', p);
+
+  /* The port stays readable and the brackets stay balanced, so the authority is still parseable
+  once the colons are gone from the host. */
+  assert.match(out, /\[IP_\d+\]:8443/);
+  assert.doesNotMatch(out, /1234\]/);
+  assert.equal(p.reverseText(out), 'connect to [2001:db8::1234]:8443 now');
+});
+
+test('prescanAndMint: leaves colon-separated tokens that are not addresses untouched', () => {
+  const p = new Pseudonymizer();
+  const subject = 'mac 00:1a:2b:3c:4d:5e at 12:34:56 with level:7';
+  assert.equal(prescanAndMint(subject, p), subject);
+});
+
+test('prescanAndMintToolContent: pseudonymizes IPv6 in a digest message value', () => {
+  const p = new Pseudonymizer();
+  const digest = JSON.stringify({
+    samples: [
+      { message: 'sshd: connection from fe80::a00:27ff:fe4e:66a1 port 22' },
+    ],
+  });
+  const out = prescanAndMintToolContent(digest, p);
+
+  assert.doesNotMatch(out, /a00:27ff:fe4e:66a1/);
+  assert.equal(p.reverseText(out), digest);
+});
+
 test('prescanAndMint: pseudonymizes an FQDN but leaves bare words untouched', () => {
   const p = new Pseudonymizer();
   const out = prescanAndMint('the server webserver.corp.local is down', p);

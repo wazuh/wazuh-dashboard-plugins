@@ -3,8 +3,7 @@
     "affected_items": [
       {
         "global": {
-          "agents_disconnection_time": "15m",
-          "agents_disconnection_alert_time": "0"
+          "agents_disconnection_time": "15m"
         },
         "logging": {
           "log_format": "plain"

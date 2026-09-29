@@ -25,13 +25,99 @@ fi
 
 sed -i "/<https>/,/<\/https>/ s|<bind_addr>[^<]*</bind_addr>|<bind_addr>0.0.0.0</bind_addr>|g" /var/wazuh-manager/etc/wazuh-manager.conf
 
-# Configure the agent enrollment password expected by authd (use_password is
-# enabled by default in the manager package; without this file authd generates
-# a random password and agent enrollment fails with "Invalid password")
-if [ -n "$WAZUH_REGISTRATION_PASSWORD" ]; then
-  echo "$WAZUH_REGISTRATION_PASSWORD" > /var/wazuh-manager/etc/authd.pass
-  chmod 640 /var/wazuh-manager/etc/authd.pass
-  chown root:wazuh-manager /var/wazuh-manager/etc/authd.pass
+# Agent-facing listener certificate. One pair, read by both <remote><https>
+# (the HTTPS listener agents enroll and report through, 1517) and <auth>.
+#
+# The manager package does not generate certificates: it refuses to start with
+# "file not found: /var/wazuh-manager/etc/certs/remoted.pem". Agents also verify
+# the certificate, so it needs a SAN covering the address they connect to.
+# Issue it here with the installation assistant certificate tool, the same one
+# the wazuh repository uses to provision its manager integration tests, so this
+# environment exercises the deployment path.
+#
+# The CA is deliberately NOT minted here (hence -wm and not -A): the indexer,
+# the dashboard, imposter and the agents already trust the root CA that the
+# "generator" service left in the shared volume, and a fresh CA would break all
+# of them.
+CERTS_TOOL="${CERTS_TOOL:-/usr/share/wazuh-certs-tool/wazuh-certs-tool.sh}"
+CERTS_CONFIG="${CERTS_CONFIG:-/etc/wazuh-certs.yml}"
+CERTS_NODE_NAME="${CERTS_NODE_NAME:-wazuh.manager.local}"
+CERTS_CA="${CERTS_CA:-/etc/server_certs/root-ca.pem}"
+CERTS_CA_KEY="${CERTS_CA_KEY:-/etc/server_certs/root-ca-key.pem}"
+
+# The generator writes the CA into the shared volume concurrently. Give up
+# rather than wait forever, the way the agent containers already do: without a
+# CA there is nothing to sign with, and a container stuck here looks like a hang.
+ca_wait=0
+while [ ! -f "$CERTS_CA" ] || [ ! -f "$CERTS_CA_KEY" ]; do
+  if [ "$ca_wait" -ge 120 ]; then
+    echo "ERROR: the root CA pair did not appear in /etc/server_certs after ${ca_wait}s."
+    echo "The certificate generator may not have run. Check the 'generator' service."
+    exit 1
+  fi
+  echo "Waiting for the root CA..."
+  sleep 2
+  ca_wait=$((ca_wait + 2))
+done
+
+# Private output directory: the tool copies root-ca.key next to the leaves it
+# issues, and that must never reach the volume the agent containers mount.
+certs_out="$(mktemp -d)"
+if ! bash "$CERTS_TOOL" -wm "$CERTS_CA" "$CERTS_CA_KEY" -c "$CERTS_CONFIG" -o "$certs_out" -f; then
+  echo "ERROR: could not issue the agent-facing listener certificate."
+  rm -rf "$certs_out"
+  exit 1
+fi
+
+# Install under the names the shipped configuration already expects, so nothing
+# has to be rewritten: both <remote><https> and <auth> read
+# etc/certs/remoted.pem, and <remote><https> reads etc/certs/root-ca.pem. These
+# paths are relative to the manager home, so the files have to be copied in; an
+# absolute path into the shared certificate volume is reported as "missing or
+# unreadable" and the manager refuses to start.
+#
+# Ownership follows the deployment model: remoted and authd open the pair after
+# dropping privileges, while the CA only has to be group-readable.
+mkdir -p /var/wazuh-manager/etc/certs
+install -o root -g wazuh-manager -m 640 \
+  "$CERTS_CA" /var/wazuh-manager/etc/certs/root-ca.pem
+install -o wazuh-manager -g wazuh-manager -m 640 \
+  "$certs_out/$CERTS_NODE_NAME-remoted.pem" /var/wazuh-manager/etc/certs/remoted.pem
+install -o wazuh-manager -g wazuh-manager -m 640 \
+  "$certs_out/$CERTS_NODE_NAME-remoted-key.pem" /var/wazuh-manager/etc/certs/remoted-key.pem
+rm -rf "$certs_out"
+
+# Server API users. wazuh-manager-resolve-credentials (run by
+# wazuh-manager-control start) seeds rbac.db with generated passwords, or with
+# supplied ones that pass its policy: 12+ characters of mixed classes, which the
+# fixed development passwords do not. Seed it here instead, through the same
+# ORM call rbac_control makes once it has validated them; the resolver leaves an
+# already seeded rbac.db untouched. Only a new container gets here: a restarted
+# one keeps its rbac.db, and its users, as they are.
+RBAC_DB=/var/wazuh-manager/api/configuration/security/rbac.db
+if [ ! -s "$RBAC_DB" ]; then
+  if ! API_WAZUH_PASSWORD="${API_WAZUH_PASSWORD:-wazuh}" \
+    API_WUI_PASSWORD="${API_PASSWORD:-wazuh-wui}" \
+    /var/wazuh-manager/framework/python/bin/python3 -c '
+import os
+from wazuh.core.common import wazuh_gid, wazuh_uid
+
+# As rbac_control does: rbac.db is created by the service user, never by root.
+os.setgroups([])
+os.setgid(wazuh_gid())
+os.setuid(wazuh_uid())
+
+from wazuh.rbac.orm import check_database_integrity
+
+check_database_integrity(passwords={
+    "wazuh": os.environ["API_WAZUH_PASSWORD"],
+    "wazuh-wui": os.environ["API_WUI_PASSWORD"],
+})
+'; then
+    echo "ERROR: could not seed $RBAC_DB with the Server API users."
+    rm -f "$RBAC_DB"
+    exit 1
+  fi
 fi
 
 # Clean up stale PID and socket files from previous unclean shutdowns

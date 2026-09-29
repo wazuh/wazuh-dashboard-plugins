@@ -6,17 +6,19 @@ This section describes all the settings that adds Wazuh dashboard.
 
 The following settings can be defined in the configuration file `opensearch_dashboards.yml`:
 
-| Setting                                             | Description                                                                                                            | Default value     | Allowed values                                                 |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------- |
-| `wazuh_core.hosts`                                  | Define the Wazuh server hosts                                                                                          | -                 | Hosts (see #define-wazuh-server-hosts)                         |
-| `healthcheck.enabled`                               | define if the health check is enabled or not                                                                           | true              | true, false                                                    |
-| `healthcheck.checks_enabled`                        | define the checks that are enabled. This is a regular expression or a list of regular expressions (NodeJS compatibles) | `.*`              | string or list of strings                                      |
-| `healthcheck.interval`                              | define the interval to run the health check after the initial check                                                    | 15m               | 5m to 24h                                                      |
-| `healthcheck.retries_delay`                         | define the wait time after a failed overall health check                                                               | 2.5s              | 0 to 1m                                                        |
-| `healthcheck.max_retries`                           | define the maximum count of retries of the overall health check that can be executed                                   | 5                 | integer, minimum 1                                             |
-| `healthcheck.server_not_ready_troubleshooting_link` | define the troubleshooting link in the not-ready server                                                                | URL to Wazuh docs | a valid URL                                                    |
-| `wazuh.disabledSettings`                            | Define which indexer settings are hidden from the UI                                                                   | `[]`              | list of: `index-raw-events`                                    |
-| `opensearch_security_analytics.disabledSettings`    | Define which Ruleset Management settings are hidden from the UI                                                        | `[]`              | list of: `index-discarded-events`, `index-unclassified-events` |
+| Setting                                               | Description                                                                                                                                                                  | Default value     | Allowed values                                                 |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------- |
+| `wazuh_core.hosts`                                    | Define the Wazuh server hosts                                                                                                                                                | -                 | Hosts (see #define-wazuh-server-hosts)                         |
+| `healthcheck.enabled`                                 | define if the health check is enabled or not                                                                                                                                 | true              | true, false                                                    |
+| `healthcheck.checks_enabled`                          | define the checks that are enabled. This is a regular expression or a list of regular expressions (NodeJS compatibles)                                                       | `.*`              | string or list of strings                                      |
+| `healthcheck.interval`                                | define the interval to run the health check after the initial check                                                                                                          | 15m               | 5m to 24h                                                      |
+| `healthcheck.retries_delay`                           | define the wait time after a failed overall health check                                                                                                                     | 2.5s              | 0 to 1m                                                        |
+| `healthcheck.max_retries`                             | define the maximum count of retries of the overall health check that can be executed                                                                                         | 5                 | integer, minimum 1                                             |
+| `healthcheck.server_not_ready_troubleshooting_link`   | define the troubleshooting link in the not-ready server                                                                                                                      | URL to Wazuh docs | a valid URL                                                    |
+| `wazuh_core.healthCheckCertificateExpiryWarningDays`  | days before a server certificate expires at which the certificate validity health check reports yellow. A value outside the allowed values stops the dashboard from starting | 30                | integer, minimum 1                                             |
+| `wazuh_core.healthCheckCertificateExpiryCriticalDays` | days before a server certificate expires at which the certificate validity health check reports red. A value outside the allowed values stops the dashboard from starting    | 7                 | integer, minimum 1, lower than the warning days                |
+| `wazuh.disabledSettings`                              | Define which indexer settings are hidden from the UI                                                                                                                         | `[]`              | list of: `index-raw-events`                                    |
+| `opensearch_security_analytics.disabledSettings`      | Define which Ruleset Management settings are hidden from the UI                                                                                                              | `[]`              | list of: `index-discarded-events`, `index-unclassified-events` |
 
 ## Define Wazuh server hosts
 
@@ -26,18 +28,18 @@ The Wazuh server hosts are defined in the configuration file through the `wazuh_
 
 A host has the following properties:
 
-| Property | Description                                                    | Required | Default value | Allowed values                     |
-| -------- | -------------------------------------------------------------- | -------- | ------------- | ---------------------------------- |
-| url      | Define the URL address                                         | Yes      | -             | any valid URL string               |
-| port     | Define the port                                                | Yes      | -             | any integer between 1-65535        |
-| username | Define the username                                            | Yes      | -             | any string between 4-64 characters |
-| password | Define the password                                            | Yes      | -             | any string up to 64 characters     |
-| run_as   | Define if the user context is used to retrieve the permissions | No       | false         | true, false                        |
-| key      | Path to the SSL/TLS client private key file                    | No       | -             | absolute or relative file path     |
-| cert     | Path to the SSL/TLS client certificate file                    | No       | -             | absolute or relative file path     |
-| ca       | Path to the CA certificate file for server verification        | No       | -             | absolute or relative file path     |
+| Property | Description                                                                       | Required | Default value | Allowed values                     |
+| -------- | --------------------------------------------------------------------------------- | -------- | ------------- | ---------------------------------- |
+| url      | Define the URL address                                                            | Yes      | -             | any valid URL string               |
+| port     | Define the port                                                                   | Yes      | -             | any integer between 1-65535        |
+| username | Define the username                                                               | Yes      | -             | any string between 4-64 characters |
+| password | Define the password (see [Passwords in the keystore](#passwords-in-the-keystore)) | Yes      | -             | any string up to 64 characters     |
+| run_as   | Define if the user context is used to retrieve the permissions                    | No       | false         | true, false                        |
+| key      | Path to the SSL/TLS client private key file                                       | No       | -             | absolute or relative file path     |
+| cert     | Path to the SSL/TLS client certificate file                                       | No       | -             | absolute or relative file path     |
+| ca       | Path to the CA certificate file for server verification                           | No       | -             | absolute or relative file path     |
 
-This is an example of a single-host configuration (default installation):
+This is an example of a single-host configuration (default installation). The password of the `default` host is not in the file: the package stores it in the keystore (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
 ```yml
 wazuh_core.hosts:
@@ -45,7 +47,6 @@ wazuh_core.hosts:
     url: https://localhost
     port: 55000
     username: wazuh-wui
-    password: wazuh-wui
     run_as: true
 ```
 
@@ -57,17 +58,42 @@ wazuh_core.hosts:
     url: https://localhost
     port: 55000
     username: wazuh-wui
-    password: wazuh-wui
     run_as: true
   another_host:
     url: https://another_host_dns
     port: 55000
     username: wazuh-wui
-    password: wazuh-wui
+    password: <ANOTHER_HOST_PASSWORD>
     run_as: true
     key: '/etc/wazuh-dashboard/certs/dashboard-another-host.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-another-host.crt'
     ca: '/etc/wazuh-dashboard/certs/root-ca.pem'
+```
+
+### Passwords in the keystore
+
+The OpenSearch Dashboards keystore (`/etc/wazuh-dashboard/opensearch_dashboards.keystore`) is merged
+over `opensearch_dashboards.yml` when the dashboard starts, so a host password can be stored there as
+`wazuh_core.hosts.<HOST_ID>.password` instead of in plain text in the file.
+
+The packages manage the entries of the `default` host and of the indexer connection:
+
+| Keystore entry                               | Resolved from                         |
+| -------------------------------------------- | ------------------------------------- |
+| `wazuh_core.hosts.default.password`          | `WAZUH_MANAGER_WUI_PASSWORD`          |
+| `opensearch.username`, `opensearch.password` | `WAZUH_INDEXER_KIBANASERVER_PASSWORD` |
+
+They are read from `/etc/wazuh/credentials.env` or the environment, at installation and before
+every start, and the dashboard refuses to start while one of them is missing. A value set in
+`opensearch_dashboards.yml` counts as resolved and is never overridden. See
+[Credentials](getting-started/credentials.md).
+
+For any other host, add the entry yourself as the service user. Replace `<HOST_ID>` with the host
+identifier, and type the password when prompted:
+
+```bash
+sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.<HOST_ID>.password
 ```
 
 ## Session cookies
@@ -130,7 +156,7 @@ wazuh_core.hosts:
     url: 'https://wazuh.example.com'
     port: 55000
     username: wazuh-wui
-    password: wazuh-wui
+    password: <PRODUCTION_PASSWORD>
     run_as: false
     key: '/etc/wazuh-dashboard/certs/dashboard-client.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-client.crt'
@@ -145,7 +171,6 @@ wazuh_core.hosts:
     url: 'https://localhost'
     port: 55000
     username: wazuh-wui
-    password: wazuh-wui
     run_as: false
 ```
 

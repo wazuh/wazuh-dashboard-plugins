@@ -21,7 +21,6 @@ import {
   EuiTabs,
   EuiTab,
   EuiSpacer,
-  EuiProgress,
 } from '@elastic/eui';
 import { clusterNodes } from '../configuration/utils/wz-fetch';
 import { compose } from 'redux';
@@ -33,13 +32,14 @@ import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchest
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
 import { statistics } from '../../../../../utils/applications';
+import { i18n } from '@osd/i18n';
 import { DashboardTabsPanels } from '../../../../../components/overview/server-management-statistics/dashboards/dashboardTabsPanels';
 export class WzStatisticsOverview extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {
-      selectedTabId: 'remoted',
+      selectedTabId: 'normalization',
       stats: {},
       isLoading: false,
       loadingNode: false,
@@ -48,19 +48,17 @@ export class WzStatisticsOverview extends Component {
       refreshVisualizations: Date.now(),
     };
     this.tabs = [
-      {
-        id: 'remoted',
-        name: 'Comms',
-      },
+      // Comms tab hidden from the UI — kept for potential reuse, see #9170
+      // {
+      //   id: 'remoted',
+      //   name: 'Comms',
+      // },
       {
         id: 'normalization',
-        name: 'Normalization',
+        name: i18n.translate('wazuh.statistics.overview.normalizationTab', {
+          defaultMessage: 'Normalization',
+        }),
       },
-      // TODO: analysisd tab is commented out until analysisd metrics have a new data stream
-      // {
-      //   id: 'analysisd',
-      //   name: 'Analysis Engine',
-      // },
     ];
   }
 
@@ -69,9 +67,20 @@ export class WzStatisticsOverview extends Component {
     try {
       const data = await clusterNodes();
       const nodes = data.data.data.affected_items.map(item => {
-        return { value: item.name, text: `${item.name} (${item.type})` };
+        return {
+          value: item.name,
+          text: i18n.translate('wazuh.statistics.overview.nodeOption', {
+            defaultMessage: '{name} ({type})',
+            values: { name: item.name, type: item.type },
+          }),
+        };
       });
-      nodes.unshift({ value: 'all', text: 'All' });
+      nodes.unshift({
+        value: 'all',
+        text: i18n.translate('wazuh.statistics.overview.allNodesOption', {
+          defaultMessage: 'All',
+        }),
+      });
       this.setState({
         clusterNodes: nodes,
         clusterNodeSelected: nodes[0].value,
@@ -147,7 +156,11 @@ export class WzStatisticsOverview extends Component {
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiTitle>
-                    <h2>Statistics</h2>
+                    <h2>
+                      {i18n.translate('wazuh.statistics.overview.title', {
+                        defaultMessage: 'Statistics',
+                      })}
+                    </h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
@@ -156,7 +169,9 @@ export class WzStatisticsOverview extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color='subdued'>
-                From here you can see daemon statistics.
+                {i18n.translate('wazuh.statistics.overview.description', {
+                  defaultMessage: 'From here you can see daemon statistics.',
+                })}
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>

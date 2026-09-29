@@ -1,0 +1,12 @@
+# Mock of the per node certificate validity resource of wazuh/wazuh#39320.
+# It lives outside wazuh-config.yml because that file uses the openapi plugin,
+# which only serves paths present in the published spec, and this one is not
+# there yet.
+plugin: rest
+
+resources:
+  - method: GET
+    path: /cluster/{node_id}/daemons/remoted/tls
+    response:
+      statusCode: 200
+      scriptFile: certificate-validity.js

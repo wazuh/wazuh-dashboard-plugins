@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import {
   CTI_OAUTH_DEVICE_GRANT_TYPE,
   CTI_REGISTRATION_COMPLETED_BODY,
@@ -187,7 +188,11 @@ export async function fetchCtiRegistrationStatus(): Promise<{
     const statusCode =
       e.statusCode ?? e.body?.statusCode ?? statusCodes.NOT_FOUND;
     const message =
-      e.message ?? e.body?.message ?? 'Registration status request failed';
+      e.message ??
+      e.body?.message ??
+      i18n.translate('wazuhCheckUpdates.ctiRegistration.statusRequestFailed', {
+        defaultMessage: 'Registration status request failed',
+      });
     throw { statusCode, message };
   }
 }

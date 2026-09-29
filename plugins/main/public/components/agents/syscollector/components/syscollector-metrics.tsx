@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiIcon,
   EuiFlexGroup,
@@ -114,14 +115,24 @@ export const InventoryMetrics = compose(
   const items: IRibbonItem[] = [
     {
       key: 'cores',
-      label: 'Cores',
+      label: i18n.translate(
+        'wazuh.endpointsSummary.syscollectorMetrics.coresLabel',
+        {
+          defaultMessage: 'Cores',
+        },
+      ),
       value: data?.hardware?.host?.cpu?.cores,
       isLoading: isLoading,
       style: { maxWidth: 100 },
     },
     {
       key: 'memory',
-      label: 'Memory',
+      label: i18n.translate(
+        'wazuh.endpointsSummary.syscollectorMetrics.memoryLabel',
+        {
+          defaultMessage: 'Memory',
+        },
+      ),
       render: () =>
         itHygieneHardwareDataSource?.dataSource?.indexPattern && (
           <IndexPatternFormattedField // This could be used to render the rest of fields to take into account the field formatter
@@ -135,26 +146,49 @@ export const InventoryMetrics = compose(
     },
     {
       key: 'cpu',
-      label: 'CPU',
+      label: i18n.translate(
+        'wazuh.endpointsSummary.syscollectorMetrics.cpuLabel',
+        {
+          defaultMessage: 'CPU',
+        },
+      ),
       value: data?.hardware?.host?.cpu?.name,
       isLoading: isLoading,
       style: { maxWidth: 250 },
     },
     {
       key: 'hostname',
-      label: 'Host name',
+      label: i18n.translate(
+        'wazuh.endpointsSummary.syscollectorMetrics.hostNameLabel',
+        {
+          defaultMessage: 'Host name',
+        },
+      ),
       value: data?.software?.host?.hostname,
       isLoading: isLoading,
       style: { maxWidth: 100 },
     },
     {
       key: 'serial_number',
-      label: 'Serial number',
+      label: i18n.translate(
+        'wazuh.endpointsSummary.syscollectorMetrics.serialNumberLabel',
+        {
+          defaultMessage: 'Serial number',
+        },
+      ),
       value: data?.hardware?.host?.serial_number,
       isLoading: isLoading,
       style: { maxWidth: 100 },
     },
   ];
+
+  const openAppLabel = i18n.translate(
+    'wazuh.endpointsSummary.syscollectorMetrics.openApp',
+    {
+      defaultMessage: 'Open {appTitle}',
+      values: { appTitle: ITHygiene.title },
+    },
+  );
 
   return (
     <WzRibbonPanel>
@@ -162,11 +196,16 @@ export const InventoryMetrics = compose(
         title={
           <EuiFlexGroup justifyContent='spaceBetween'>
             <EuiFlexItem grow={false}>
-              <Typography level='section'>System inventory</Typography>
+              <Typography level='section'>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.syscollectorMetrics.title',
+                  { defaultMessage: 'System inventory' },
+                )}
+              </Typography>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>
-                <EuiToolTip position='top' content={`Open ${ITHygiene.title}`}>
+                <EuiToolTip position='top' content={openAppLabel}>
                   <EuiButtonIcon
                     iconType='popout'
                     color='primary'
@@ -174,7 +213,7 @@ export const InventoryMetrics = compose(
                     href={NavigationService.getInstance().getAppURL(
                       ITHygiene.id,
                     )}
-                    aria-label={`Open ${ITHygiene.title}`}
+                    aria-label={openAppLabel}
                   />
                 </EuiToolTip>
               </RedirectAppLinks>
@@ -194,7 +233,13 @@ export const InventoryMetrics = compose(
           </EuiFlexItem>
           <EuiFlexItem grow={false} responsive={false}>
             <EuiText size='s'>
-              Not enough hardware or operating system information
+              {i18n.translate(
+                'wazuh.endpointsSummary.syscollectorMetrics.notEnoughData',
+                {
+                  defaultMessage:
+                    'Not enough hardware or operating system information',
+                },
+              )}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>

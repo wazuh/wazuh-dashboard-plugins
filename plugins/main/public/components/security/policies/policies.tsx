@@ -6,7 +6,9 @@ import {
   EuiPageContentBody,
   EuiButton,
   EuiTitle,
+  EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { PoliciesTable } from './policies-table';
 import { usePagination } from '../../common/hooks/usePagination';
 import GetPoliciesService from './services/get-policies.service';
@@ -80,8 +82,17 @@ export const Policies = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Policies</h2>
+            <h2>
+              {i18n.translate('wazuh.security.policies.title', {
+                defaultMessage: 'Policies',
+              })}
+            </h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            {i18n.translate('wazuh.security.policies.description', {
+              defaultMessage: 'Manage the policies of the manager API.',
+            })}
+          </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
           {!loading && (
@@ -91,7 +102,9 @@ export const Policies = withUserAuthorizationPrompt([
                 permissions={[{ action: 'security:create', resource: '*:*:*' }]}
                 onClick={() => setIsCreatingPolicy(true)}
               >
-                Create policy
+                {i18n.translate('wazuh.security.policies.createButton', {
+                  defaultMessage: 'Create policy',
+                })}
               </WzButtonPermissions>
               {flyout}
               {editFlyout}

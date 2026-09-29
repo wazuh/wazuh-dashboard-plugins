@@ -97,6 +97,29 @@ describe('NavigationService test', () => {
     );
   });
 
+  it('should push a new history entry by default', () => {
+    const pushSpy = jest.spyOn(history, 'push');
+    const replaceSpy = jest.spyOn(history, 'replace');
+    navigationService.navigate('/test-path');
+    navigationService.updateAndNavigateSearchParams({ foo: 'bar' });
+    expect(pushSpy).toHaveBeenCalled();
+    expect(replaceSpy).not.toHaveBeenCalled();
+  });
+
+  it('should replace the current history entry when replace option is set', () => {
+    navigationService.navigate('/test-path');
+    const pushSpy = jest.spyOn(history, 'push');
+    const replaceSpy = jest.spyOn(history, 'replace');
+    navigationService.updateAndNavigateSearchParams(
+      { foo: 'bar' },
+      { replace: true },
+    );
+    expect(replaceSpy).toHaveBeenCalled();
+    expect(pushSpy).not.toHaveBeenCalled();
+    expect(history.location.pathname).toBe('/test-path');
+    expect(navigationService.getParams().get('foo')).toBe('bar');
+  });
+
   it('should call to navigateToApp from core.application', async () => {
     await navigationService.navigateToApp('app_id', {});
     expect(navigateToApp).toHaveBeenCalledTimes(1);

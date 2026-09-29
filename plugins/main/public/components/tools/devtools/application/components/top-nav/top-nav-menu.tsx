@@ -117,10 +117,9 @@ export const TopNavMenu: FunctionComponent<Props> = ({
 
   return (
     <EuiTabs size='s'>
-      {items.map((item, idx) => {
+      {items.map(item => {
         const tab = (
           <EuiTab
-            key={idx}
             disabled={disabled}
             onClick={item.onClick}
             title={item.label}
@@ -130,13 +129,14 @@ export const TopNavMenu: FunctionComponent<Props> = ({
           </EuiTab>
         );
 
-        return (
+        return React.cloneElement(
           item.renderWrapper?.({
             disabled: !!disabled,
             onClick: item.onClick,
             ['data-test-subj']: item.testId,
             children: tab,
-          }) || tab
+          }) || tab,
+          { key: item.id },
         );
       })}
     </EuiTabs>

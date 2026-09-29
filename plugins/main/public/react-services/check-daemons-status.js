@@ -13,6 +13,12 @@ import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzRequest } from './wz-request';
 import { delayAsPromise } from '../../common/utils';
+import { i18n } from '@osd/i18n';
+
+export const SERVER_NOT_RECOVERED_MESSAGE = i18n.translate(
+  'wazuh.core.serverNotReadyCallout.notRecovered',
+  { defaultMessage: 'Server could not be recovered.' },
+);
 
 let busy = false;
 
@@ -39,7 +45,7 @@ export class CheckDaemonsStatus {
         throw new Error('Not recovered');
       }
     } catch (error) {
-      store.dispatch(updateWazuhNotReadyYet('Server could not be recovered.'));
+      store.dispatch(updateWazuhNotReadyYet(SERVER_NOT_RECOVERED_MESSAGE));
       throw error;
     }
     busy = false;

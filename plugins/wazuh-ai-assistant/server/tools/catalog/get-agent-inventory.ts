@@ -70,7 +70,8 @@ export interface InventoryKindConfig {
    * for its field (a `terms` agg on a text-mapped field is a hard 400, turning a fidelity gap
    * into a broken tool for that kind — worse than the disclosure gap it fixes). Only `ports`
    * meets that bar today: this repo's own IT Hygiene dashboards already run terms aggregations
-   * on `interface.state` (plugins/main/.../it-hygiene/dashboards/dashboard-panels.ts) and
+   * on `interface.state` (plugins/main/common/dashboards/dashboard-definitions/.../it-hygiene/
+   * networks/inventories/interfaces/*.ndjson) and
    * aggregate `network.transport` in the services/traffic panels, which is live proof both are
    * aggregatable keywords. Kinds WITHOUT that evidence take the digest-level
    * `breakdownDimensions` fallback instead (see `digest` below): it groups the RETURNED rows via

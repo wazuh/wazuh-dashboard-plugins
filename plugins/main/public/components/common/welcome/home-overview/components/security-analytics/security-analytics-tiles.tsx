@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { StatTileGroup, StatTileSpec } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
 import {
@@ -27,37 +28,50 @@ export interface SecurityAnalyticsTilesProps {
 const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
   {
     key: 'integrations',
-    label: 'Integrations',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewRulesetTiles.integrations',
+      { defaultMessage: 'Integrations' },
+    ),
     testSubj: 'security-analytics-tile-integrations',
     onSelect: getIntegrationsUrl,
   },
   {
     key: 'filters',
-    label: 'Filters',
+    label: i18n.translate('wazuh.common.homeOverviewRulesetTiles.filters', {
+      defaultMessage: 'Filters',
+    }),
     testSubj: 'security-analytics-tile-filters',
     onSelect: getFiltersUrl,
   },
   {
     key: 'decoders',
-    label: 'Decoders',
+    label: i18n.translate('wazuh.common.homeOverviewRulesetTiles.decoders', {
+      defaultMessage: 'Decoders',
+    }),
     testSubj: 'security-analytics-tile-decoders',
     onSelect: getDecodersUrl,
   },
   {
     key: 'kvdbs',
-    label: 'KVDBs',
+    label: i18n.translate('wazuh.common.homeOverviewRulesetTiles.kvdbs', {
+      defaultMessage: 'KVDBs',
+    }),
     testSubj: 'security-analytics-tile-kvdbs',
     onSelect: getKvdbsUrl,
   },
   {
     key: 'detectors',
-    label: 'Detectors',
+    label: i18n.translate('wazuh.common.homeOverviewRulesetTiles.detectors', {
+      defaultMessage: 'Detectors',
+    }),
     testSubj: 'security-analytics-tile-detectors',
     onSelect: getDetectorsUrl,
   },
   {
     key: 'rules',
-    label: 'Rules',
+    label: i18n.translate('wazuh.common.homeOverviewRulesetTiles.rules', {
+      defaultMessage: 'Rules',
+    }),
     testSubj: 'security-analytics-tile-rules',
     onSelect: getRulesUrl,
   },

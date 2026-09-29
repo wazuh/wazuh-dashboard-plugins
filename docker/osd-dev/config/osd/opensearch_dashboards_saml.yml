@@ -51,3 +51,5 @@ wazuh_core.hosts:
     username: wazuh-wui
     password: wazuh-wui
     run_as: true
+wazuh_core.healthCheckCertificateExpiryWarningDays: 30
+wazuh_core.healthCheckCertificateExpiryCriticalDays: 7

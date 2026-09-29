@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
@@ -23,30 +24,56 @@ import {
 const settings = [
   {
     field: 'enabled',
-    label: 'Service status',
+    label: i18n.translate(
+      'wazuh.github.moduleConfiguration.serviceStatusLabel',
+      {
+        defaultMessage: 'Service status',
+      },
+    ),
     render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since agent was started',
+    label: i18n.translate(
+      'wazuh.github.moduleConfiguration.onlyFutureEventsLabel',
+      {
+        defaultMessage: 'Collect events generated since agent was started',
+      },
+    ),
   },
   {
     field: 'time_delay',
-    label:
-      'Time in seconds that each scan will monitor until that delay backwards',
+    label: i18n.translate('wazuh.github.moduleConfiguration.timeDelayLabel', {
+      defaultMessage:
+        'Time in seconds that each scan will monitor until that delay backwards',
+    }),
   },
   {
     field: 'curl_max_size',
-    label: 'Maximum size allowed for the GitHub API response',
+    label: i18n.translate('wazuh.github.moduleConfiguration.curlMaxSizeLabel', {
+      defaultMessage: 'Maximum size allowed for the GitHub API response',
+    }),
   },
   {
     field: 'interval',
-    label: 'Interval between GitHub wodle executions in seconds',
+    label: i18n.translate('wazuh.github.moduleConfiguration.intervalLabel', {
+      defaultMessage: 'Interval between GitHub wodle executions in seconds',
+    }),
   },
-  { field: 'event_type', label: 'Event type' },
+  {
+    field: 'event_type',
+    label: i18n.translate('wazuh.github.moduleConfiguration.eventTypeLabel', {
+      defaultMessage: 'Event type',
+    }),
+  },
   {
     field: 'api_auth',
-    label: 'Organizations',
+    label: i18n.translate(
+      'wazuh.github.moduleConfiguration.organizationsLabel',
+      {
+        defaultMessage: 'Organizations',
+      },
+    ),
     render: value => {
       const organizations = toApiAuthEntries(value)
         .map(v => v.org_name)
@@ -62,7 +89,14 @@ const settings = [
           </EuiDescriptionList>
         ))
       ) : (
-        <EuiText>No organizations configured</EuiText>
+        <EuiText>
+          {i18n.translate(
+            'wazuh.github.moduleConfiguration.noOrganizationsConfigured',
+            {
+              defaultMessage: 'No organizations configured',
+            },
+          )}
+        </EuiText>
       );
     },
   },
@@ -98,20 +132,26 @@ export const ModuleConfiguration = props => (
         ? mapModuleContentToRenderProperties(
             response,
             'github',
-            'Agent',
+            i18n.translate('wazuh.github.moduleConfiguration.agentEntity', {
+              defaultMessage: 'Agent',
+            }),
             params.name,
           )
         : type === 'cluster_node'
         ? mapWModuleConfigurationToRenderProperties(
             response.data.data.affected_items[0].wmodules,
             'github',
-            'Manager',
+            i18n.translate('wazuh.github.moduleConfiguration.managerEntity', {
+              defaultMessage: 'Manager',
+            }),
             params.name,
           )
         : mapWModuleConfigurationToRenderProperties(
             response.data.data.affected_items[0].wmodules,
             'github',
-            'Manager',
+            i18n.translate('wazuh.github.moduleConfiguration.managerEntity', {
+              defaultMessage: 'Manager',
+            }),
           );
     }}
   />

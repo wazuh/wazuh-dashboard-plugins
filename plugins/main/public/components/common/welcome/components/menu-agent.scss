@@ -1,0 +1,18 @@
+.wz-menu-agent-application {
+  .wz-menu-agent-application-pin {
+    opacity: 0.35;
+    transition: opacity $ouiAnimSpeedFast ease-in;
+  }
+
+  // Pinned ones stay visible without hovering the row.
+  .wz-menu-agent-application-pin-pinned,
+  &:hover .wz-menu-agent-application-pin,
+  &:focus-within .wz-menu-agent-application-pin {
+    opacity: 1;
+  }
+
+  // A disabled button emits no pointer events, so its tooltip never shows.
+  .wz-menu-agent-application-pin:disabled {
+    pointer-events: none;
+  }
+}

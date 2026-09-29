@@ -10,10 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../../../react-services/wz-request';
-import { getAgentReportedConfiguration } from './agent-config-service';
-import { replaceIllegalXML } from './xml';
 import { delayAsPromise } from '../../../../../../../common/utils';
+
+// The notice this module shows while a node restarts. The header callout
+// needs to tell it apart to show its spinner, and the text is translated,
+// so it can't match on the copy.
+let currentRestartingNotice;
+
+export const isRestartingNotice = notice =>
+  Boolean(notice) && notice === currentRestartingNotice;
 
 /**
  * Fetch full node configuration and extract requested keys.
@@ -26,7 +33,7 @@ import { delayAsPromise } from '../../../../../../../common/utils';
  * @param {function} updateWazuhNotReadyYet
  * @returns {object} Map of key → config object (or error string)
  */
-const getFullEndpointConfig = async (
+export const getFullEndpointConfig = async (
   node,
   sections,
   updateWazuhNotReadyYet,
@@ -45,109 +52,14 @@ const getFullEndpointConfig = async (
   } catch (error) {
     const errorMsg = await handleError(
       error,
-      'Fetch configuration',
+      i18n.translate('wazuh.configuration.wzFetch.fetchConfigurationLocation', {
+        defaultMessage: 'Fetch configuration',
+      }),
       updateWazuhNotReadyYet,
       node,
     );
     for (const section of sections) {
       result[section.key] = errorMsg;
-    }
-  }
-  return result;
-};
-
-/**
- * Get the configuration of a manager node or of an agent.
- *
- * Manager context (`node` is set): fetches the requested sections from the
- * Server API and returns them keyed by `component-configuration`.
- *
- * Supports two section formats:
- *  - Standard:      { component: string, configuration: string }
- *    Calls /cluster/{node}/configuration/{component}/{configuration}
- *
- *  - Full endpoint: { useFullEndpoint: true, key: string }
- *    Delegates to getFullEndpointConfig which calls
- *    /cluster/{node}/configuration once and extracts the requested
- *    keys. Only valid in manager context (node must be set).
- *
- * Agent context (`node` is false): the Server API no longer exposes an agent
- * configuration endpoint. The agent pushes its effective configuration to the
- * manager, which keeps the latest report per agent in the wazuh-agent-config
- * index, so the whole report is read at once and returned keyed by module name
- * (`agent`, `fim`, `logcollector`, ...). `sections` does not apply.
- *
- * @param {string} agentId Agent ID
- * @param {array} sections Sections. Manager context only
- * @param {false|string} [node=false] Node
- */
-export const getCurrentConfig = async (
-  agentId,
-  sections,
-  node = false,
-  updateWazuhNotReadyYet,
-) => {
-  if (!agentId || typeof agentId !== 'string') {
-    throw new Error('Invalid parameters');
-  }
-
-  if (!node) {
-    /* An agent with no document has never reported. That is the expected case
-    rather than an error: reporting is an ossec.conf toggle disabled by
-    default, so the views render their own empty state. */
-    const reportedConfiguration = await getAgentReportedConfiguration(agentId);
-
-    return reportedConfiguration ? reportedConfiguration.content : {};
-  }
-
-  if (!sections || !Array.isArray(sections) || !sections.length) {
-    throw new Error('Invalid parameters');
-  }
-
-  const result = {};
-
-  const fullEndpointSections = sections.filter(s => s.useFullEndpoint);
-  const regularSections = sections.filter(s => !s.useFullEndpoint);
-
-  if (fullEndpointSections.length > 0) {
-    Object.assign(
-      result,
-      await getFullEndpointConfig(
-        node,
-        fullEndpointSections,
-        updateWazuhNotReadyYet,
-      ),
-    );
-  }
-
-  for (const section of regularSections) {
-    const { component, configuration } = section;
-    if (
-      !component ||
-      typeof component !== 'string' ||
-      !configuration ||
-      typeof configuration !== 'string'
-    ) {
-      throw new Error('Invalid section');
-    }
-    try {
-      const partialResult = await WzRequest.apiReq(
-        'GET',
-        `/cluster/${node}/configuration/${component}/${configuration}`,
-        {},
-      );
-
-      result[`${component}-${configuration}`] =
-        partialResult.data.data.total_affected_items !== 0
-          ? partialResult.data.data.affected_items[0]
-          : {};
-    } catch (error) {
-      result[`${component}-${configuration}`] = await handleError(
-        error,
-        'Fetch configuration',
-        updateWazuhNotReadyYet,
-        node,
-      );
     }
   }
   return result;
@@ -163,8 +75,12 @@ export const extractMessage = error => {
     const isFromAPI =
       origin.includes('/api/request') || origin.includes('/api/csv');
     return isFromAPI
-      ? 'API is not reachable. Reason: timeout.'
-      : 'Server did not respond';
+      ? i18n.translate('wazuh.configuration.wzFetch.apiTimeout', {
+          defaultMessage: 'API is not reachable. Reason: timeout.',
+        })
+      : i18n.translate('wazuh.configuration.wzFetch.serverDidNotRespond', {
+          defaultMessage: 'Server did not respond',
+        });
   }
   if ((((error || {}).data || {}).errorData || {}).message)
     return error.data.errorData.message;
@@ -182,7 +98,12 @@ export const extractMessage = error => {
   if (((error || {}).message || {}).msg) return error.message.msg;
   if (typeof error === 'string') return error;
   if (typeof error === 'object') return JSON.stringify(error);
-  return error || 'Unexpected error';
+  return (
+    error ||
+    i18n.translate('wazuh.configuration.wzFetch.unexpectedError', {
+      defaultMessage: 'Unexpected error',
+    })
+  );
 };
 
 /**
@@ -202,7 +123,11 @@ export const handleError = async (
   const messageIsString = typeof message === 'string';
   try {
     if (messageIsString && message.includes('ERROR3099')) {
-      updateWazuhNotReadyYet('Server not ready yet.');
+      updateWazuhNotReadyYet(
+        i18n.translate('wazuh.configuration.wzFetch.serverNotReady', {
+          defaultMessage: 'Server not ready yet.',
+        }),
+      );
       await makePing(updateWazuhNotReadyYet);
       return;
     }
@@ -212,10 +137,20 @@ export const handleError = async (
 
     const hasOrigin = messageIsString && originIsString;
 
-    let text = hasOrigin ? `${message} (${origin})` : message;
+    let text = hasOrigin
+      ? i18n.translate('wazuh.configuration.wzFetch.messageWithOrigin', {
+          defaultMessage: '{message} ({origin})',
+          values: { message, origin },
+        })
+      : message;
 
     if (error.extraMessage) text = error.extraMessage;
-    text = location ? location + '. ' + text : text;
+    text = location
+      ? i18n.translate('wazuh.configuration.wzFetch.messageWithLocation', {
+          defaultMessage: '{location}. {message}',
+          values: { location, message: text },
+        })
+      : text;
 
     return text;
   } catch (error) {
@@ -293,7 +228,11 @@ export const makePing = async (updateWazuhNotReadyYet, tries = 30) => {
     }
     return Promise.resolve('Wazuh is ready');
   } catch (error) {
-    throw new Error('Server could not be recovered.');
+    throw new Error(
+      i18n.translate('wazuh.configuration.wzFetch.serverNotRecovered', {
+        defaultMessage: 'Server could not be recovered.',
+      }),
+    );
   }
 };
 
@@ -316,7 +255,11 @@ export const fetchFile = async selectedNode => {
     let xml = (data || {}).data || false;
 
     if (!xml) {
-      throw new Error('Could not fetch configuration file');
+      throw new Error(
+        i18n.translate('wazuh.configuration.wzFetch.fetchFileError', {
+          defaultMessage: 'Could not fetch configuration file',
+        }),
+      );
     }
 
     xml = xml.replace(/..xml.+\?>/, '');
@@ -336,7 +279,15 @@ export const restartNodeSelected = async (
   updateWazuhNotReadyYet,
 ) => {
   try {
-    updateWazuhNotReadyYet(`Restarting ${selectedNode}, please wait.`);
+    const notice = i18n.translate(
+      'wazuh.configuration.wzFetch.restartingNode',
+      {
+        defaultMessage: 'Restarting {nodeName}, please wait.',
+        values: { nodeName: selectedNode },
+      },
+    );
+    currentRestartingNotice = notice;
+    updateWazuhNotReadyYet(notice);
     await restartNode(selectedNode);
     return await makePing(updateWazuhNotReadyYet);
   } catch (error) {
@@ -400,35 +351,6 @@ export const restartNode = async node => {
       { delay: 15000 },
     );
 
-    return result;
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const saveConfiguration = async (selectedNode, xml) => {
-  try {
-    await saveFileCluster(xml, selectedNode);
-  } catch (error) {
-    throw error;
-  }
-};
-
-/**
- * Send wazuh-manager.conf content for a cluster node
- * @param {*} node Node name
- * @param {*} content XML raw content for wazuh-manager.conf file
- */
-export const saveNodeConfiguration = async (node, content) => {
-  try {
-    const result = await WzRequest.apiReq(
-      'PUT',
-      `/cluster/${node}/configuration?overwrite=true`,
-      {
-        content,
-        origin: 'xmleditor',
-      },
-    );
     return result;
   } catch (error) {
     throw error;

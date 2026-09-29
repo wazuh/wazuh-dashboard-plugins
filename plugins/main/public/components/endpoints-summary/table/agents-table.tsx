@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -20,13 +20,14 @@ import {
   EuiButton,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
 import {
   UI_ORDER_AGENT_STATUS,
   SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT,
 } from '../../../../common/constants';
-import { TableWzAPI } from '../../common/tables';
+import { TableWzAPI, TableWithSearchBarHandle } from '../../common/tables';
 import { WzRequest } from '../../../react-services/wz-request';
 import { get as getLodash } from 'lodash';
 import { endpointSummary } from '../../../utils/applications';
@@ -76,6 +77,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const [selectedItems, setSelectedItems] = useState<Agent[]>([]);
   const [allAgentsSelected, setAllAgentsSelected] = useState(false);
   const [apiVersion, setApiVersion] = useState('');
+  const tableRef = useRef<TableWithSearchBarHandle>(null);
 
   const getApiVersion = async () => {
     const response = await getWazuhAPIVersion('AgentsTable.getApiVersion');
@@ -112,9 +114,47 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     pendingUpgradeAgents.map(pendingAgent => pendingAgent.id),
   );
 
-  const onSelectionChange = (selectedItems: Agent[]) => {
-    setSelectedItems(selectedItems);
-    if (selectedItems.length < agentList.totalItems) {
+  // Set synchronously by onPageOrSortChange, in the same call stack as
+  // EuiBasicTable's own clearSelection()-then-onSelectionChange([]) on a
+  // page/sort change — the only way to tell that apart here from a
+  // genuine uncheck, since both call onSelectionChange the same way.
+  const pageOrSortChangeRef = useRef(false);
+
+  const onSelectionChange = (visibleSelected: Agent[]) => {
+    // EuiBasicTable only reports the currently visible page's checked rows.
+    // Newly checked rows are unambiguous and applied immediately; a
+    // previously staged row missing from visibleSelected is deferred, since
+    // it may have simply scrolled off the page rather than been genuinely
+    // unchecked. `setSelectedItems` must bail with the exact same reference
+    // when nothing real changed (`.filter` always returns a new array, even
+    // with no removals, which would otherwise re-render forever).
+    const visibleIds = new Set(agentList.items.map(({ id }) => id));
+    const nowCheckedIds = new Set(visibleSelected.map(({ id }) => id));
+
+    setSelectedItems(prevSelected => {
+      const prevIds = new Set(prevSelected.map(({ id }) => id));
+      const newlyChecked = visibleSelected.filter(({ id }) => !prevIds.has(id));
+      return newlyChecked.length
+        ? [...prevSelected, ...newlyChecked]
+        : prevSelected;
+    });
+
+    pageOrSortChangeRef.current = false;
+    queueMicrotask(() => {
+      if (pageOrSortChangeRef.current) {
+        return;
+      }
+      setSelectedItems(prev => {
+        const toRemove = prev.filter(
+          ({ id }) => visibleIds.has(id) && !nowCheckedIds.has(id),
+        );
+        return toRemove.length
+          ? prev.filter(({ id }) => !toRemove.some(r => r.id === id))
+          : prev;
+      });
+    });
+
+    if (visibleSelected.length < agentList.items?.length) {
       setAllAgentsSelected(false);
     }
   };
@@ -122,6 +162,17 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
   const selection = {
     onSelectionChange: onSelectionChange,
   };
+
+  // `selection.selected` is read once at mount as `initialSelected` in
+  // this OUI version, so checked visuals need an imperative re-sync
+  // whenever the visible page or the selection changes.
+  useEffect(() => {
+    tableRef.current?.setSelection(
+      agentList.items.filter(agent =>
+        selectedItems.some(selected => selected.id === agent.id),
+      ),
+    );
+  }, [agentList.items, selectedItems]);
 
   const getRowProps = item => {
     const { id } = item;
@@ -159,8 +210,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
     setAgentList(data);
   };
 
+  const isEveryVisibleItemSelected =
+    agentList.items?.length > 0 &&
+    agentList.items.every(({ id }) =>
+      selectedItems.some(selected => selected.id === id),
+    );
+
   const showSelectAllItems =
-    (selectedItems.length === agentList.items?.length &&
+    (isEveryVisibleItemSelected &&
       selectedItems.length < agentList.totalItems) ||
     allAgentsSelected;
 
@@ -176,9 +233,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             <EuiFlexItem grow={false}>
               <EuiCallOut
                 size='s'
-                title={`${totalSelected} ${
-                  totalSelected === 1 ? 'agent' : 'agents'
-                } selected`}
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.agentsTable.selectedAgents',
+                  {
+                    defaultMessage:
+                      '{totalSelected} {totalSelected, plural, one {agent} other {agents}} selected',
+                    values: { totalSelected },
+                  },
+                )}
               />
             </EuiFlexItem>
             {showSelectAllItems ? (
@@ -189,8 +251,20 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   color={!allAgentsSelected ? 'primary' : 'danger'}
                 >
                   {!allAgentsSelected
-                    ? `Select all ${agentList.totalItems} agents`
-                    : `Clear ${agentList.totalItems} agents selected`}
+                    ? i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.selectAllAgents',
+                        {
+                          defaultMessage: 'Select all {totalItems} agents',
+                          values: { totalItems: agentList.totalItems },
+                        },
+                      )
+                    : i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.clearSelectedAgents',
+                        {
+                          defaultMessage: 'Clear {totalItems} agents selected',
+                          values: { totalItems: agentList.totalItems },
+                        },
+                      )}
                 </EuiButton>
               </EuiFlexItem>
             ) : null}
@@ -208,8 +282,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
       <EuiFlexGroup className='wz-overflow-auto'>
         <EuiFlexItem>
           <TableWzAPI
-            title='Agents'
+            ref={tableRef}
+            title={i18n.translate('wazuh.endpointsSummary.agentsTable.title', {
+              defaultMessage: 'Agents',
+            })}
             addOnTitle={selectedtemsRenderer}
+            onPageOrSortChange={() => {
+              pageOrSortChangeRef.current = true;
+            }}
             actionButtons={
               <EuiFlexItem grow={false}>
                 <WzButtonPermissions
@@ -223,7 +303,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                     },
                   )}
                 >
-                  Deploy new agent
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.agentsTable.deployNewAgent',
+                    { defaultMessage: 'Deploy new agent' },
+                  )}
                 </WzButtonPermissions>
               </EuiFlexItem>
             }
@@ -285,31 +368,90 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   return [
                     {
                       label: 'dateAdd',
-                      description: 'filter by registration date',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.dateAdd',
+                        { defaultMessage: 'filter by registration date' },
+                      ),
                     },
-                    { label: 'id', description: 'filter by ID' },
-                    { label: 'ip', description: 'filter by IP address' },
-                    { label: 'group', description: 'filter by group' },
+                    {
+                      label: 'id',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.id',
+                        { defaultMessage: 'filter by ID' },
+                      ),
+                    },
+                    {
+                      label: 'ip',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.ip',
+                        { defaultMessage: 'filter by IP address' },
+                      ),
+                    },
+                    {
+                      label: 'group',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.group',
+                        { defaultMessage: 'filter by group' },
+                      ),
+                    },
                     {
                       label: 'lastKeepAlive',
-                      description: 'filter by last keep alive',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.lastKeepAlive',
+                        { defaultMessage: 'filter by last keep alive' },
+                      ),
                     },
-                    { label: 'manager', description: 'filter by manager' },
-                    { label: 'name', description: 'filter by name' },
+                    {
+                      label: 'manager',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.manager',
+                        { defaultMessage: 'filter by manager' },
+                      ),
+                    },
+                    {
+                      label: 'name',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.name',
+                        { defaultMessage: 'filter by name' },
+                      ),
+                    },
                     {
                       label: 'os.name',
-                      description: 'filter by operating system name',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.osName',
+                        { defaultMessage: 'filter by operating system name' },
+                      ),
                     },
                     {
                       label: 'os.platform',
-                      description: 'filter by operating platform',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.osPlatform',
+                        { defaultMessage: 'filter by operating platform' },
+                      ),
                     },
                     {
                       label: 'os.version',
-                      description: 'filter by operating system version',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.osVersion',
+                        {
+                          defaultMessage: 'filter by operating system version',
+                        },
+                      ),
                     },
-                    { label: 'status', description: 'filter by status' },
-                    { label: 'version', description: 'filter by version' },
+                    {
+                      label: 'status',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.status',
+                        { defaultMessage: 'filter by status' },
+                      ),
+                    },
+                    {
+                      label: 'version',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.version',
+                        { defaultMessage: 'filter by version' },
+                      ),
+                    },
                   ];
                 },
                 value: async (currentValue, { field }) => {
@@ -382,7 +524,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                         value,
                       )
                         ? undefined
-                        : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                        : i18n.translate(
+                            'wazuh.endpointsSummary.agentsTable.invalidDateFormat',
+                            {
+                              defaultMessage:
+                                '"{value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.',
+                              values: { value },
+                            },
+                          );
                     }
                   }
                 },
@@ -413,15 +562,25 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
       {pendingUpgradeAgents.length ? (
         <>
           <EuiCallOut
-            title={`${pendingUpgradeAgents.length} ${
-              pendingUpgradeAgents.length === 1 ? 'agent is' : 'agents are'
-            } being upgraded`}
+            title={i18n.translate(
+              'wazuh.endpointsSummary.agentsTable.pendingUpgradeTitle',
+              {
+                defaultMessage:
+                  '{count} {count, plural, one {agent is} other {agents are}} being upgraded',
+                values: { count: pendingUpgradeAgents.length },
+              },
+            )}
             color='primary'
             iconType='iInCircle'
           >
             <p>
-              The upgrade request was sent. This list will refresh automatically
-              once each agent reports the new version.
+              {i18n.translate(
+                'wazuh.endpointsSummary.agentsTable.pendingUpgradeDescription',
+                {
+                  defaultMessage:
+                    'The upgrade request was sent. This list will refresh automatically once each agent reports the new version.',
+                },
+              )}
             </p>
           </EuiCallOut>
           <EuiSpacer size='m' />

@@ -126,6 +126,10 @@ export type { SeverityLevel } from './wazuh-fields';
 export const DEFAULT_ANTHROPIC_MAX_TOKENS = 16384;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
 
+/** Cap of the provider test route, which stops at the first content token. Shared with the client
+ * timeout message. */
+export const PROVIDER_TEST_TIMEOUT_MS = 30_000;
+
 /**
  * Persisted-conversation size limits, shared by the SERVER route schemas that enforce them
  * (`server/routes/conversations.ts`) and the CLIENT helper that shapes the payload

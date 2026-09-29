@@ -12,7 +12,11 @@ import {
   StreamEvent,
   TurnStatusStep,
 } from '../../common/types';
-import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
+import {
+  ChatStreamOptions,
+  ProviderAdapter,
+  ProviderStreamEvent,
+} from '../providers/types';
 
 /**
  * The progressive turn-status steps a turn emits (`StreamEvent`'s `status.step`), asserted as a
@@ -28,7 +32,7 @@ import { ChatStreamOptions, ProviderAdapter } from '../providers/types';
  * imports `@osd/config-schema`, so it needs the full wazuh-dashboard checkout to run.
  */
 
-function scriptedAdapter(scripts: StreamEvent[][]): ProviderAdapter {
+function scriptedAdapter(scripts: ProviderStreamEvent[][]): ProviderAdapter {
   let callIndex = 0;
   return {
     async *chatStream(
@@ -36,7 +40,7 @@ function scriptedAdapter(scripts: StreamEvent[][]): ProviderAdapter {
       _messages: ChatMessage[],
       _signal: AbortSignal,
       _options?: ChatStreamOptions,
-    ): AsyncIterable<StreamEvent> {
+    ): AsyncIterable<ProviderStreamEvent> {
       const script = scripts[callIndex];
       callIndex += 1;
       if (!script) {
@@ -111,7 +115,7 @@ function fakeContext(): RequestHandlerContext {
 }
 
 async function runOrchestrate(
-  scripts: StreamEvent[][],
+  scripts: ProviderStreamEvent[][],
 ): Promise<StreamEvent[]> {
   const controller = new AbortController();
   const events: StreamEvent[] = [];
@@ -138,11 +142,21 @@ function stepsOf(events: StreamEvent[]): TurnStatusStep[] {
   );
 }
 
-const STEP_RANK: Record<TurnStatusStep, number> = {
+/** `thinking` is not a phase and may follow any of them (see `TurnStatusStep`), so it has no rank
+ * and is left out of the ordering check. */
+const STEP_RANK: Record<Exclude<TurnStatusStep, 'thinking'>, number> = {
   understanding: 0,
   querying: 1,
   writing: 2,
 };
+
+function phaseStepsOf(
+  events: StreamEvent[],
+): Array<Exclude<TurnStatusStep, 'thinking'>> {
+  return stepsOf(events).filter(
+    (step): step is Exclude<TurnStatusStep, 'thinking'> => step !== 'thinking',
+  );
+}
 
 test('orchestrate: a multi-round turn never walks its status step backwards, and only says "writing" once', async () => {
   // Round count derived from the bound, not hardcoded: a literal array length would encode "the
@@ -161,7 +175,7 @@ test('orchestrate: a multi-round turn never walks its status step backwards, and
     ],
   ]);
 
-  const steps = stepsOf(events);
+  const steps = phaseStepsOf(events);
   // Sanity: the turn really did run several tool rounds, so the ordering assertion below is
   // exercising the multi-round case rather than passing vacuously on a single-round turn.
   assert.ok(
@@ -188,6 +202,68 @@ test('orchestrate: a turn that answers without calling any tool never claims to 
   // results of, and the answer's own tokens are the only progress signal that turn needs.
   const events = await runOrchestrate([
     STAGE1_SCRIPT,
+    [
+      { type: 'delta', content: 'Six findings today.' },
+      { type: 'done', usage: { inputTokens: 10, outputTokens: 5 } },
+    ],
+  ]);
+
+  assert.deepEqual(stepsOf(events), ['understanding']);
+});
+
+// --- "Thinking…": the adapter's content-free reasoning_started signal ----------------------------
+
+test('orchestrate: an answer round that starts reasoning emits ONE thinking status, carrying no text', async () => {
+  const events = await runOrchestrate([
+    STAGE1_SCRIPT,
+    [
+      { type: 'reasoning_started' },
+      { type: 'delta', content: 'Six findings today.' },
+      { type: 'done', usage: { inputTokens: 10, outputTokens: 5 } },
+    ],
+  ]);
+
+  assert.deepEqual(stepsOf(events), ['understanding', 'thinking']);
+  const thinking = events.filter(
+    event => event.type === 'status' && event.step === 'thinking',
+  );
+  // Exactly these three fields: no reasoning text, no detail.
+  assert.deepEqual(thinking, [
+    { type: 'status', message: 'Thinking…', step: 'thinking' },
+  ]);
+  // The server-only signal itself never reaches the wire.
+  assert.ok(
+    !events.some(event => (event.type as string) === 'reasoning_started'),
+  );
+  // Emitted before the answer text, not after it.
+  const thinkingIndex = events.indexOf(thinking[0]);
+  const deltaIndex = events.findIndex(event => event.type === 'delta');
+  assert.ok(thinkingIndex < deltaIndex);
+});
+
+test('orchestrate: each reasoning round gets its own thinking status (tool round, then answer round)', async () => {
+  const events = await runOrchestrate([
+    STAGE1_SCRIPT,
+    [{ type: 'reasoning_started' }, ...REJECTED_SEARCH_ROUND],
+    [
+      { type: 'reasoning_started' },
+      { type: 'delta', content: 'Could not determine that.' },
+      { type: 'done', usage: { inputTokens: 10, outputTokens: 5 } },
+    ],
+  ]);
+
+  assert.equal(
+    stepsOf(events).filter(step => step === 'thinking').length,
+    2,
+    `expected one thinking status per reasoning round, got ${JSON.stringify(
+      stepsOf(events),
+    )}`,
+  );
+});
+
+test('orchestrate: reasoning during stage-1 routing keeps "Routing…" and emits no thinking status', async () => {
+  const events = await runOrchestrate([
+    [{ type: 'reasoning_started' }, ...STAGE1_SCRIPT],
     [
       { type: 'delta', content: 'Six findings today.' },
       { type: 'done', usage: { inputTokens: 10, outputTokens: 5 } },

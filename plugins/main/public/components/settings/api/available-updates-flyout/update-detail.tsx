@@ -11,6 +11,7 @@ import {
   EuiBadge,
   EuiTitle,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { getWazuhCorePlugin } from '../../../../kibana-services';
 
 interface UpdateDetailProps {
@@ -59,7 +60,10 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
           <EuiDescriptionList
             listItems={[
               {
-                title: 'Published',
+                title: i18n.translate(
+                  'wazuh.dashboardsSettings.updateDetail.publishedTitle',
+                  { defaultMessage: 'Published' },
+                ),
                 description:
                   getWazuhCorePlugin().utils.formatUIDate(published_date),
               },
@@ -73,12 +77,22 @@ export const UpdateDetail = ({ update, type }: UpdateDetailProps) => {
           <EuiFlexGroup responsive={false} wrap>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
               <EuiLink href={releaseNotesUrl} target='_blank' external>
-                Release notes
+                {i18n.translate(
+                  'wazuh.dashboardsSettings.updateDetail.releaseNotesLink',
+                  {
+                    defaultMessage: 'Release notes',
+                  },
+                )}
               </EuiLink>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
               <EuiLink href={upgradeGuideUrl} target='_blank' external>
-                Upgrade guide
+                {i18n.translate(
+                  'wazuh.dashboardsSettings.updateDetail.upgradeGuideLink',
+                  {
+                    defaultMessage: 'Upgrade guide',
+                  },
+                )}
               </EuiLink>
             </EuiFlexItem>
           </EuiFlexGroup>

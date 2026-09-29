@@ -11,6 +11,7 @@
  */
 
 import React, { Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiButton, EuiEmptyPrompt, EuiLink } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
 
@@ -39,7 +40,13 @@ export const PromptAgentConfigNotReported = () => {
     <EuiEmptyPrompt
       iconType='reportingApp'
       style={{ marginTop: 20 }}
-      title={<h2>Agent configuration not available</h2>}
+      title={
+        <h2>
+          {i18n.translate('wazuh.configuration.agentConfigNotReported.title', {
+            defaultMessage: 'Agent configuration not available',
+          })}
+        </h2>
+      }
       body={
         <Fragment>
           {/* Deliberately says nothing about which setting turns reporting on,
@@ -49,8 +56,10 @@ export const PromptAgentConfigNotReported = () => {
         observe -- no configuration reported -- with the documentation carrying
         the how. */}
           <p>
-            The agent hasn't reported its configuration yet. Check that
-            configuration reporting is enabled in the agent settings.
+            {i18n.translate('wazuh.configuration.agentConfigNotReported.body', {
+              defaultMessage:
+                "The agent hasn't reported its configuration yet. Check that configuration reporting is enabled in the agent settings.",
+            })}
           </p>
           <EuiLink
             href={documentationLink}
@@ -58,13 +67,19 @@ export const PromptAgentConfigNotReported = () => {
             rel='noopener noreferrer'
             external
           >
-            Local configuration reference
+            {i18n.translate(
+              'wazuh.configuration.agentConfigNotReported.documentationLink',
+              { defaultMessage: 'Local configuration reference' },
+            )}
           </EuiLink>
         </Fragment>
       }
       actions={
         <EuiButton color='primary' fill onClick={openAgentSelector}>
-          Select agent
+          {i18n.translate(
+            'wazuh.configuration.agentConfigNotReported.selectAgentButton',
+            { defaultMessage: 'Select agent' },
+          )}
         </EuiButton>
       }
     />

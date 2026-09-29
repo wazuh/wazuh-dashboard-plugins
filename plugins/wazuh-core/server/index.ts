@@ -16,7 +16,17 @@ export function plugin(initializerContext: PluginInitializerContext) {
 
 const initiliazerConfig = getConfigSettingsDefinitions(PLUGIN_SETTINGS);
 
-export const configSchema = schema.object(initiliazerConfig);
+// Each setting validator sees one value; this one compares the two thresholds.
+export const configSchema = schema.object(initiliazerConfig, {
+  validate: (value: Record<string, unknown>) => {
+    const warning = value.healthCheckCertificateExpiryWarningDays as number;
+    const critical = value.healthCheckCertificateExpiryCriticalDays as number;
+
+    if (critical >= warning) {
+      return `[healthCheckCertificateExpiryCriticalDays] (${critical}) must be lower than [healthCheckCertificateExpiryWarningDays] (${warning})`;
+    }
+  },
+});
 export type CorePluginConfigType = TypeOf<typeof configSchema>;
 
 export const config: PluginConfigDescriptor<CorePluginConfigType> = {

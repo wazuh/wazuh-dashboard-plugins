@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiButtonEmpty,
   EuiFlexGroup,
@@ -22,8 +23,10 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
+import converter from 'json-2-csv';
 import * as FileSaver from '../../../services/file-saver';
 import { formatUIDate } from '../../../react-services';
+import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -51,7 +54,13 @@ export function AgentStatTable({
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
-            <EuiIcon type='calendar' /> Start:{' '}
+            <EuiIcon type='calendar' />{' '}
+            {i18n.translate(
+              'wazuh.endpointsSummary.agentStatsTable.startLabel',
+              {
+                defaultMessage: 'Start:',
+              },
+            )}{' '}
             {loading ? (
               <EuiLoadingSpinner size='s' />
             ) : start ? (
@@ -59,7 +68,10 @@ export function AgentStatTable({
             ) : (
               '-'
             )}{' '}
-            - End:{' '}
+            -{' '}
+            {i18n.translate('wazuh.endpointsSummary.agentStatsTable.endLabel', {
+              defaultMessage: 'End:',
+            })}{' '}
             {loading ? (
               <EuiLoadingSpinner size='s' />
             ) : end ? (
@@ -85,7 +97,10 @@ export function AgentStatTable({
             iconType='importAction'
             isDisabled={loading || !tableItems.length}
           >
-            Download CSV
+            {i18n.translate(
+              'wazuh.endpointsSummary.agentStatsTable.downloadCsvButton',
+              { defaultMessage: 'Download CSV' },
+            )}
           </EuiButtonEmpty>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -93,13 +108,17 @@ export function AgentStatTable({
   );
 }
 
-function downloadCsv(columns: any[], data: any[], filename: string) {
+async function downloadCsv(columns: any[], data: any[], filename: string) {
   try {
-    const header = columns.map(column => column.name).join(',');
-    const body = data
-      .map(row => columns.map(column => row[column.field]).join(','))
-      .join('\n');
-    const result = [header, body].join('\n');
+    const options = {
+      emptyFieldValue: '',
+      keys: columns.map(column => ({
+        field: column.field,
+        title: column.name,
+      })),
+    };
+    const rows = neutralizeCsvFormulaValues(data);
+    const result = await converter.json2csvAsync(rows, options);
     const blob = new Blob([result], { type: 'text/csv' }); // eslint-disable-line
     FileSaver.saveAs(blob, `${filename}.csv`);
   } catch (error) {
@@ -109,8 +128,20 @@ function downloadCsv(columns: any[], data: any[], filename: string) {
       severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
       error: {
         error: error,
-        message: `Error generating CSV: ${error.message}`,
-        title: `CSV: ${error.name}`,
+        message: i18n.translate(
+          'wazuh.endpointsSummary.agentStatsTable.downloadCsvErrorMessage',
+          {
+            defaultMessage: 'Error generating CSV: {errorMessage}',
+            values: { errorMessage: error.message },
+          },
+        ),
+        title: i18n.translate(
+          'wazuh.endpointsSummary.agentStatsTable.downloadCsvErrorTitle',
+          {
+            defaultMessage: 'CSV: {errorName}',
+            values: { errorName: error.name },
+          },
+        ),
       },
     };
     getErrorOrchestrator().handleError(options);

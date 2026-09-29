@@ -11,6 +11,7 @@
  */
 
 import React, { Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiEmptyPrompt, EuiButton, EuiLink } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
@@ -27,12 +28,24 @@ export const PromptAgentNeverConnected = () => {
     <EuiEmptyPrompt
       iconType='securitySignalDetected'
       style={{ marginTop: 20 }}
-      title={<h2>Agent has never connected.</h2>}
+      title={
+        <h2>
+          {i18n.translate(
+            'wazuh.endpointsSummary.promptAgentNeverConnected.title',
+            { defaultMessage: 'Agent has never connected.' },
+          )}
+        </h2>
+      }
       body={
         <Fragment>
           <p>
-            The agent has been registered but has not yet connected to the
-            manager.
+            {i18n.translate(
+              'wazuh.endpointsSummary.promptAgentNeverConnected.body',
+              {
+                defaultMessage:
+                  'The agent has been registered but has not yet connected to the manager.',
+              },
+            )}
           </p>
           <EuiLink
             href={documentationLink}
@@ -40,13 +53,19 @@ export const PromptAgentNeverConnected = () => {
             rel='noopener noreferrer'
             external
           >
-            Checking connection with the server
+            {i18n.translate(
+              'wazuh.endpointsSummary.promptAgentNeverConnected.documentationLink',
+              { defaultMessage: 'Checking connection with the server' },
+            )}
           </EuiLink>
         </Fragment>
       }
       actions={
         <EuiButton color='primary' fill onClick={openAgentSelector}>
-          Select agent
+          {i18n.translate(
+            'wazuh.endpointsSummary.promptAgentNeverConnected.selectAgentButton',
+            { defaultMessage: 'Select agent' },
+          )}
         </EuiButton>
       }
     />

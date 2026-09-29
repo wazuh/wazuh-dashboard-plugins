@@ -2,7 +2,6 @@ import { DEPLOY_NEW_AGENT_PAGE } from '../../pageobjects/xpack/agents/deploy-new
 import { AGENTS_PAGE } from '../../pageobjects/xpack/agents/agents.page';
 import { FILTERS_PAGE } from '../../pageobjects/xpack/filters/filters.page';
 import { OVERVIEW_PAGE } from '../../pageobjects/xpack/overview/overview.page';
-import { ABOUT_PAGE } from '../../pageobjects/xpack/settings/about.page';
 import { API_CONFIGURATION_PAGE } from '../../pageobjects/xpack/settings/api-configuration.page';
 import { CONFIGURATION_PAGE } from '../../pageobjects/xpack/settings/configuration.page';
 import { LOGS_PAGE } from '../../pageobjects/xpack/settings/logs.page';
@@ -21,13 +20,11 @@ import { SAMPLE_DATA } from './xpack/sample-data-mapper';
 import { SETTINGS_MENU_LINKS } from './xpack/settings-mapper';
 import { REPORTING_PAGE } from '../../pageobjects/wzd/reporting/report.page';
 
-
 export const XPACK_PAGES_MAPPER = {
   DEPLOY_NEW_AGENT_PAGE,
   AGENTS_PAGE,
   FILTERS_PAGE,
   OVERVIEW_PAGE,
-  ABOUT_PAGE,
   API_CONFIGURATION_PAGE,
   CONFIGURATION_PAGE,
   LOGS_PAGE,
@@ -40,12 +37,11 @@ export const XPACK_PAGES_MAPPER = {
   MODULES_DIRECTORY_PAGE,
   REPORTING_PAGE,
 
-
   AGENT_MODULES,
   BASIC_MODULES,
   MODULES_CARDS,
   MODULES_SETTINGS,
   SAMPLE_DATA,
   SETTINGS_MENU_LINKS,
-  GROUPS_PAGE
+  GROUPS_PAGE,
 };

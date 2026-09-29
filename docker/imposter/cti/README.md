@@ -76,3 +76,19 @@ curl -i -X POST http://imposter:8080/api/v1/platform/environments/token \
   -H 'X-Mock-Scenario: expired_token' \
   -d 'grant_type=urn:ietf:params:oauth:grant-type:device_code&client_id=a17c21ed&device_code=mock_device_code_123'
 ```
+
+## Pointing the dashboard at this mock
+
+The CTI Console base URL defaults to the compiled constant
+(`WAZUH_CTI_CONSOLE_BASE_URL` in
+`plugins/wazuh-check-updates/common/constants.ts`). Override it in
+`opensearch_dashboards.yml` to target this mock — or any other CTI environment:
+
+```yml
+wazuh_check_updates.ctiApiUrl: 'http://imposter:8080'
+```
+
+The setting is absent from the shipped configuration file, so without it the
+device flow keeps going to the default CTI environment. Only the `http` and
+`https` schemes are accepted; an invalid value stops the dashboard at startup.
+A restart is required for a change to take effect.

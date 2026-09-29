@@ -2,7 +2,6 @@ import { DEPLOY_NEW_AGENT_PAGE } from '../../pageobjects/basic/agents/deploy-new
 import { AGENTS_PAGE } from '../../pageobjects/basic/agents/agents.page';
 import { FILTERS_PAGE } from '../../pageobjects/basic/filters/filters.page';
 import { OVERVIEW_PAGE } from '../../pageobjects/basic/overview/overview.page';
-import { ABOUT_PAGE } from '../../pageobjects/basic/settings/about.page';
 import { API_CONFIGURATION_PAGE } from '../../pageobjects/basic/settings/api-configuration.page';
 import { CONFIGURATION_PAGE } from '../../pageobjects/basic/settings/configuration.page';
 import { LOGS_PAGE } from '../../pageobjects/basic/settings/logs.page';
@@ -27,7 +26,6 @@ export const BASIC_PAGES_MAPPER = {
   AGENTS_PAGE,
   FILTERS_PAGE,
   OVERVIEW_PAGE,
-  ABOUT_PAGE,
   API_CONFIGURATION_PAGE,
   CONFIGURATION_PAGE,
   LOGS_PAGE,
@@ -46,5 +44,5 @@ export const BASIC_PAGES_MAPPER = {
   MODULES_SETTINGS,
   SAMPLE_DATA,
   SETTINGS_MENU_LINKS,
-  GROUPS_PAGE
+  GROUPS_PAGE,
 };

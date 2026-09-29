@@ -21,6 +21,15 @@ import { RequirementFlyout } from '../requirement-flyout';
 const getFacetButtons = wrapper =>
   wrapper.find(EuiPopover).map(popover => popover.prop('button'));
 
+// The tile text sits inside the facet button, wrapped in the tooltip and its
+// ellipsis span: EuiFacetButton > EuiToolTip > span > label.
+const getFacetLabels = wrapper =>
+  getFacetButtons(wrapper).map(
+    button =>
+      React.Children.toArray(button.props.children)[0].props.children.props
+        .children,
+  );
+
 const mockAddFilters = jest.fn();
 const mockUpdateAndNavigateSearchParams = jest.fn();
 
@@ -51,7 +60,7 @@ const baseProps = () => ({
   complianceObject: {},
   descriptions: {},
   selectedRequirements: {},
-  requirementsCount: [],
+  requirementCounts: {},
   loadingAlerts: false,
   othersCount: 7,
   fetchFilters: [],
@@ -152,11 +161,150 @@ describe('ComplianceSubrequirements - Show in dashboard / Inspect in findings', 
   });
 });
 
+describe('ComplianceSubrequirements - Inspect links with ruleset codes', () => {
+  // Same reason as the flyout: the findings of a HIPAA requirement can carry
+  // only the compliance tag of the ruleset, never the CFR citation.
+  it('filters by the code the findings carry', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...baseProps()}
+        section='hipaa'
+        complianceObject={{ '164.308(a)': ['164.308(a)(1)(ii)(D)'] }}
+        descriptions={{
+          '164.308(a)(1)(ii)(D)': {
+            title: 'Information system activity review',
+          },
+        }}
+        selectedRequirements={{ '164.308(a)': true }}
+        requirementCounts={{ '164.308(a)(1)(ii)(D)': 31 }}
+        requirementCodes={{ '164.308(a)(1)(ii)(D)': ['164.308.a.1.ii.D'] }}
+      />,
+    );
+
+    wrapper
+      .instance()
+      .openDiscover({ stopPropagation: jest.fn() }, '164.308(a)(1)(ii)(D)');
+
+    expect(mockAddFilters).toHaveBeenCalledWith([
+      expect.objectContaining({
+        query: {
+          match_phrase: {
+            'wazuh.rule.compliance.hipaa': '164.308.a.1.ii.D',
+          },
+        },
+      }),
+    ]);
+  });
+});
+
+describe('ComplianceSubrequirements - tile label', () => {
+  const propsWith = descriptions => ({
+    ...baseProps(),
+    complianceObject: { 'A.5.1': ['A.5.1'] },
+    descriptions,
+    selectedRequirements: { 'A.5.1': true },
+  });
+
+  // The title is the short name of the requirement; its full text, the
+  // description, is left for the flyout.
+  it('joins the identifier and the title, without the description', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...propsWith({
+          'A.5.1': {
+            title: 'Policies for information security',
+            description:
+              'Information security policy and topic-specific policies.',
+            category: 'Organizational controls',
+          },
+        })}
+      />,
+    );
+    expect(getFacetLabels(wrapper)).toContain(
+      'A.5.1 - Policies for information security',
+    );
+  });
+
+  it('falls back to the description when the requirement has no title', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...propsWith({
+          'A.5.1': {
+            description: 'Incident handling',
+            category: 'Organizational controls',
+          },
+        })}
+      />,
+    );
+    expect(getFacetLabels(wrapper)).toContain('A.5.1 - Incident handling');
+  });
+});
+
+describe('ComplianceSubrequirements - requirement flyout', () => {
+  const openFlyout = requirement => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...baseProps()}
+        complianceObject={{ 'A.5.1': ['A.5.1'] }}
+        descriptions={{ 'A.5.1': requirement }}
+        selectedRequirements={{ 'A.5.1': true }}
+        requirementCounts={{ 'A.5.1': 3 }}
+      />,
+    );
+    wrapper.instance().showFlyout('A.5.1');
+    wrapper.update();
+    return wrapper.find(RequirementFlyout);
+  };
+
+  it('names the requirement by its title and shows its description', () => {
+    const flyout = openFlyout({
+      title: 'Policies for information security',
+      description: 'Information security policy and topic-specific policies.',
+      category: 'Organizational controls',
+    });
+    expect(flyout.prop('title')).toBe(
+      'Requirement A.5.1 - Policies for information security',
+    );
+    expect(flyout.prop('description')).toBe(
+      'Information security policy and topic-specific policies.',
+    );
+  });
+
+  it('names the requirement by its identifier alone when it has no title', () => {
+    const flyout = openFlyout({
+      description: 'Incident handling',
+      category: 'Organizational controls',
+    });
+    expect(flyout.prop('title')).toBe('Requirement A.5.1');
+    expect(flyout.prop('description')).toBe('Incident handling');
+  });
+});
+
+describe('ComplianceSubrequirements - requirement count', () => {
+  // The count of a requirement is resolved server side over every code it is
+  // written with, so the tile shows it as given instead of adding buckets up.
+  it('shows the count resolved for the requirement', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...baseProps()}
+        complianceObject={{ '164.312(e)(1)': ['164.312(e)(1)'] }}
+        descriptions={{ '164.312(e)(1)': { title: 'Transmission security' } }}
+        selectedRequirements={{ '164.312(e)(1)': true }}
+        requirementCounts={{ '164.312(e)(1)': 1207 }}
+      />,
+    );
+
+    expect(
+      getFacetButtons(wrapper).map(button => button.props.quantity),
+    ).toContain(1207);
+  });
+});
+
 describe('ComplianceSubrequirements - hover icons on scroll', () => {
   const propsWithOneRequirement = () => ({
     ...baseProps(),
     complianceObject: { '1.1': ['1.1'] },
-    descriptions: { '1.1': 'Some requirement' },
+    descriptions: { '1.1': { title: 'Some requirement' } },
     selectedRequirements: { '1.1': true },
   });
 

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { useDocViewer } from '../../doc-viewer';
 import DocViewer from '../../doc-viewer/doc-viewer';
@@ -33,7 +34,9 @@ const DocDetails = ({
         tabs={[
           {
             id: 'table',
-            name: 'Table',
+            name: i18n.translate('wazuh.common.wazuhDiscover.tableTab', {
+              defaultMessage: 'Table',
+            }),
             content: (
               <>
                 <DocViewer
@@ -46,10 +49,15 @@ const DocDetails = ({
           },
           {
             id: 'json',
-            name: 'JSON',
+            name: i18n.translate('wazuh.common.wazuhDiscover.jsonTab', {
+              defaultMessage: 'JSON',
+            }),
             content: (
               <EuiCodeBlock
-                aria-label={'Document details'}
+                aria-label={i18n.translate(
+                  'wazuh.common.wazuhDiscover.jsonCodeBlockAriaLabel',
+                  { defaultMessage: 'Document details' },
+                )}
                 language='json'
                 isCopyable
                 paddingSize='s'

@@ -10,7 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
+import React, { ReactNode, useCallback, useState, forwardRef } from 'react';
 import {
   EuiTitle,
   EuiLoadingSpinner,
@@ -22,7 +23,10 @@ import {
   EuiIcon,
   EuiCheckboxGroup,
 } from '@elastic/eui';
-import { TableWithSearchBar } from './table-with-search-bar';
+import {
+  TableWithSearchBar,
+  TableWithSearchBarHandle,
+} from './table-with-search-bar';
 import { TableDefault } from './table-default';
 import { WzRequest } from '../../../react-services/wz-request';
 import { ExportTableCsv } from './components/export-table-csv';
@@ -52,37 +56,49 @@ const getFilters = (filters: Filters) => {
   return Object.keys(restFilters).length ? restFilters : defaultFilters;
 };
 
-export function TableWzAPI({
-  actionButtons,
-  postActionButtons,
-  addOnTitle,
-  extra,
-  setReload,
-  ...rest
-}: {
-  actionButtons?:
-    | ReactNode
-    | ReactNode[]
-    | (({ filters }: { filters: Filters }) => ReactNode);
-  postActionButtons?:
-    | ReactNode
-    | ReactNode[]
-    | (({ filters }: { filters: Filters }) => ReactNode);
-  title?: string;
-  addOnTitle?: ReactNode;
-  description?: string;
-  extra?: ReactNode;
-  downloadCsv?: boolean | string;
-  searchTable?: boolean;
-  endpoint: string;
-  buttonOptions?: CustomFilterButton[];
-  onFiltersChange?: (filters: Filters) => void;
-  showReload?: boolean;
-  searchBarProps?: any;
-  reload?: boolean;
-  onDataChange?: Function;
-  setReload?: (newValue: number) => void;
-}) {
+// Forwards its ref to TableWithSearchBar's own imperative handle
+// (setSelection); only meaningful with `searchTable`, since TableDefault
+// doesn't expose one.
+function TableWzAPIInner(
+  {
+    actionButtons,
+    postActionButtons,
+    addOnTitle,
+    extra,
+    setReload,
+    title,
+    downloadCsv = false,
+    ...rest
+  }: {
+    actionButtons?:
+      | ReactNode
+      | ReactNode[]
+      | (({ filters }: { filters: Filters }) => ReactNode);
+    postActionButtons?:
+      | ReactNode
+      | ReactNode[]
+      | (({ filters }: { filters: Filters }) => ReactNode);
+    title?: string;
+    addOnTitle?: ReactNode;
+    description?: string;
+    extra?: ReactNode;
+    downloadCsv?: boolean | string;
+    searchTable?: boolean;
+    endpoint: string;
+    buttonOptions?: CustomFilterButton[];
+    onFiltersChange?: (filters: Filters) => void;
+    showReload?: boolean;
+    searchBarProps?: any;
+    reload?: boolean;
+    onDataChange?: Function;
+    setReload?: (newValue: number) => void;
+    fetchData?: (
+      params: Record<string, any>,
+      context: { endpoint: string },
+    ) => Promise<{ affected_items: any[]; total_affected_items: number }>;
+  },
+  forwardedRef: React.Ref<TableWithSearchBarHandle>,
+) {
   const [totalItems, setTotalItems] = useState(0);
   const [filters, setFilters] = useState<Filters>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -173,11 +189,12 @@ export function TableWzAPI({
         limit: pageSize,
         sort: formatSorting(sorting.sort),
       };
-      const response = await WzRequest.apiReq('GET', endpoint, { params });
-
-      const { affected_items: items, total_affected_items: totalItems } = (
-        (response || {}).data || {}
-      ).data;
+      const fetchData = rest.fetchData;
+      const { affected_items: items, total_affected_items: totalItems } =
+        typeof fetchData === 'function'
+          ? await fetchData(params, { endpoint })
+          : ((await WzRequest.apiReq('GET', endpoint, { params })).data || {})
+              .data;
       setIsLoading(false);
       setTotalItems(totalItems);
 
@@ -241,8 +258,15 @@ export function TableWzAPI({
 
   const ReloadButton = (
     <EuiFlexItem grow={false}>
-      <EuiButtonEmpty iconType='refresh' onClick={() => triggerReload()}>
-        Refresh
+      <EuiButtonEmpty
+        iconType='refresh'
+        onClick={() => triggerReload()}
+        isLoading={isLoading}
+        isDisabled={isLoading}
+      >
+        {i18n.translate('wazuh.common.tableWzApi.refreshButton', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     </EuiFlexItem>
   );
@@ -250,13 +274,20 @@ export function TableWzAPI({
   const header = (
     <>
       <EuiFlexGroup wrap alignItems='center' responsive={false}>
-        <EuiFlexItem>
+        {/* This item's default min-width is "auto" (the browser default a
+            flex item never resets on its own), so it can refuse to shrink
+            below the title text's own width and force the row to wrap
+            instead of sharing space with the action buttons — most visible
+            when two of these tables sit side by side with half the usual
+            width, as in the group manage-agents panes. minWidth: 0 lets it
+            shrink like a normal flex item. */}
+        <EuiFlexItem style={{ minWidth: 0 }}>
           <EuiFlexGroup wrap alignItems='center' responsive={false}>
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
-              {rest.title && (
+              {title && (
                 <EuiTitle data-test-subj='table-wz-api-title' size='s'>
                   <h1>
-                    {rest.title}{' '}
+                    {title}{' '}
                     {isLoading ? (
                       <EuiLoadingSpinner size='s' />
                     ) : (
@@ -280,7 +311,7 @@ export function TableWzAPI({
             {/* Render optional reload button */}
             {rest.showReload && ReloadButton}
             {/* Render optional export to CSV button */}
-            {rest.downloadCsv && (
+            {downloadCsv && (
               <>
                 <ExportTableCsv
                   endpoint={rest.endpoint}
@@ -289,12 +320,9 @@ export function TableWzAPI({
                     ...filters,
                     sort: formatSorting(tableState.sorting),
                   })}
-                  title={
-                    typeof rest.downloadCsv === 'string'
-                      ? rest.downloadCsv
-                      : rest.title
-                  }
+                  title={typeof downloadCsv === 'string' ? downloadCsv : title}
                   maxRows={maxRows}
+                  isLoading={isLoading}
                 />
               </>
             )}
@@ -302,7 +330,13 @@ export function TableWzAPI({
             {renderActionButtons(postActionButtons, filters)}
             {rest.showFieldSelector && (
               <EuiFlexItem grow={false}>
-                <EuiToolTip content='Select visible fields' position='left'>
+                <EuiToolTip
+                  content={i18n.translate(
+                    'wazuh.common.tableWzApi.selectVisibleFieldsTooltip',
+                    { defaultMessage: 'Select visible fields' },
+                  )}
+                  position='left'
+                >
                   <EuiButtonEmpty
                     onClick={() => setIsOpenFieldSelector(state => !state)}
                   >
@@ -353,6 +387,7 @@ export function TableWzAPI({
 
   const table = rest.searchTable ? (
     <TableWithSearchBar
+      ref={forwardedRef}
       onSearch={onSearch}
       {...{ ...rest, reload: reloadFootprint }}
       tableColumns={tableColumns}
@@ -372,22 +407,21 @@ export function TableWzAPI({
   );
 
   return (
+    // grow={false} on everything but the table: EuiFlexItem defaults to
+    // flex-grow:1, which lets the header soak up leftover vertical space
+    // whenever this column is stretched to match a taller sibling.
     <EuiFlexGroup direction='column' gutterSize='s' responsive={false}>
-      <EuiFlexItem>{header}</EuiFlexItem>
+      <EuiFlexItem grow={false}>{header}</EuiFlexItem>
       {rest.description && (
-        <EuiFlexItem>
+        <EuiFlexItem grow={false}>
           <EuiText color='subdued'>{rest.description}</EuiText>
         </EuiFlexItem>
       )}
-      {extra ? <EuiFlexItem>{extra}</EuiFlexItem> : null}
+      {extra ? <EuiFlexItem grow={false}>{extra}</EuiFlexItem> : null}
       <EuiFlexItem>{table}</EuiFlexItem>
     </EuiFlexGroup>
   );
 }
 
-// Set default props
-TableWzAPI.defaultProps = {
-  title: null,
-  downloadCsv: false,
-  searchBar: false,
-};
+export const TableWzAPI = forwardRef(TableWzAPIInner);
+TableWzAPI.displayName = 'TableWzAPI';

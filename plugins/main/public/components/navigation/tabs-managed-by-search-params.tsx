@@ -1,29 +1,18 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { EuiTabs, EuiTab } from '@elastic/eui';
 import NavigationService from '../../react-services/navigation-service';
 import { useRouterSearch } from '../common/hooks';
-import { Redirect, Route, Switch } from '../router-search';
 
 export interface TabsManagedBySearchParamProps {
-  tabs: { id: string; name: string; component: any }[];
+  tabs: { id: string; name: string; component: React.ComponentType }[];
   searchParamNavigation: string;
-  tabsProps: any;
-}
-
-/**
- * Get the search URL parameter for a search object
- * @param search
- * @returns
- */
-function getSearchParametersFromSearch(search: { [key: string]: string }) {
-  return Object.entries(search)
-    .map(([key, value]) => `${key}=${value}`)
-    .join('&');
+  tabsProps: React.ComponentProps<typeof EuiTabs>;
 }
 
 /**
  * It renders tabs that are managed by a search query parameter and if the search
- * parameter is another value different to the expected tabs, then it redirects to the first tab.
+ * parameter is another value different to the expected tabs, then it selects the first tab
+ * and replaces the search parameter value.
  * It uses the NavigationService to navigate.
  * @param param0
  * @returns
@@ -34,19 +23,30 @@ export const TabsManagedBySearchParam = ({
   tabsProps = {},
 }: TabsManagedBySearchParamProps) => {
   const search = useRouterSearch();
+  const selectedTabId = search[searchParamNavigation];
+  /* The search parameter can be missing or hold a value that belongs to another module (for
+  example, when switching between modules that have tabs managed by the same search parameter),
+  so the first tab is used as fallback to avoid rendering an empty view. */
+  const selectedTab = tabs.find(tab => tab.id === selectedTabId) ?? tabs[0];
 
-  const switchTab = (view: string) => {
-    const navigationService = NavigationService.getInstance();
+  const switchTab = useCallback(
+    (view: string, options?: { replace?: boolean }) => {
+      NavigationService.getInstance().updateAndNavigateSearchParams(
+        { [searchParamNavigation]: view },
+        options,
+      );
+    },
+    [searchParamNavigation],
+  );
 
-    const newSeach = {
-      ...search,
-      [searchParamNavigation]: view,
-    };
-    const url = `${navigationService.getPathname()}?${getSearchParametersFromSearch(
-      newSeach,
-    )}`;
-    navigationService.navigate(url);
-  };
+  useEffect(() => {
+    if (selectedTabId !== selectedTab.id) {
+      // Sync the URL with the rendered tab without adding a new history entry
+      switchTab(selectedTab.id, { replace: true });
+    }
+  }, [selectedTabId, selectedTab.id, switchTab]);
+
+  const { component: SelectedTabComponent } = selectedTab;
 
   return (
     <>
@@ -54,31 +54,14 @@ export const TabsManagedBySearchParam = ({
         {tabs.map(tab => (
           <EuiTab
             key={tab.id}
-            isSelected={tab.id === search[searchParamNavigation]}
+            isSelected={tab.id === selectedTab.id}
             onClick={() => switchTab(tab.id)}
           >
             {tab.name}
           </EuiTab>
         ))}
       </EuiTabs>
-      <Switch>
-        {tabs
-          .map(({ id, component: Component }) => {
-            return (
-              <Route path={`?${searchParamNavigation}=${id}`} key={id}>
-                <Component />
-              </Route>
-            );
-          })
-          .flat()}
-
-        <Redirect
-          to={`?${getSearchParametersFromSearch({
-            ...search,
-            [searchParamNavigation]: tabs[0].id,
-          })}`}
-        ></Redirect>
-      </Switch>
+      <SelectedTabComponent />
     </>
   );
 };

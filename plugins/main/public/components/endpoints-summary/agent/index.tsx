@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { EuiPage, EuiPageBody, EuiProgress, EuiLink } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { AgentsWelcome } from '../../common/welcome/agents-welcome';
 import { MainAgentStats } from '../../agents/stats';
 import WzManagementConfiguration from '../../../controllers/management/components/management/configuration/configuration-main.js';
@@ -30,54 +32,65 @@ const mapStateToProps = state => ({
   agent: state.appStateReducers?.currentAgentData,
 });
 
+// The views of a selected agent set their own breadcrumb, which includes the
+// agent. Only the prompt sets it here: a parent effect runs after the effects
+// of its children, so it would override theirs.
+const PromptNoSelectedAgentView = withGlobalBreadcrumb(() => [
+  {
+    text: endpointSummary.breadcrumbLabel,
+    href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
+      path: `#/${SECTIONS.AGENTS_PREVIEW}`,
+    }),
+  },
+])(() => (
+  <PromptNoSelectedAgent
+    body={
+      <FormattedMessage
+        id='wazuh.endpointsSummary.agentView.noSelectedAgentBody'
+        defaultMessage='You need to select an agent or return to{endpointSummaryLink}'
+        values={{
+          endpointSummaryLink: (
+            <RedirectAppLinks application={getCore().application}>
+              <EuiLink
+                className='eui-textCenter'
+                aria-label={i18n.translate(
+                  'wazuh.endpointsSummary.agentView.endpointSummaryLinkAriaLabel',
+                  { defaultMessage: 'go to Endpoint summary' },
+                )}
+                href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
+                onClick={() =>
+                  NavigationService.getInstance().navigate(
+                    SECTIONS.AGENTS_PREVIEW,
+                  )
+                }
+              >
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentView.endpointSummaryLink',
+                  { defaultMessage: 'Endpoint summary' },
+                )}
+              </EuiLink>
+            </RedirectAppLinks>
+          ),
+        }}
+      />
+    }
+  />
+));
+
 export const AgentView = compose(
   withErrorBoundary,
   withRouteResolvers({ nestedResolve }),
   connect(mapStateToProps),
   withAgentSync,
-  withGlobalBreadcrumb(() => {
-    return [
-      {
-        text: endpointSummary.breadcrumbLabel,
-        href: NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
-          path: `#/${SECTIONS.AGENTS_PREVIEW}`,
-        }),
-      },
-    ];
-  }),
   withGuard(
     props => !(props.agent && props.agent.id),
-    () => (
-      <>
-        <PromptNoSelectedAgent
-          body={
-            <>
-              You need to select an agent or return to
-              <RedirectAppLinks application={getCore().application}>
-                <EuiLink
-                  className='eui-textCenter'
-                  aria-label='go to Endpoint summary'
-                  href={`${endpointSummary.id}#${SECTIONS.AGENTS_PREVIEW}`}
-                  onClick={() =>
-                    NavigationService.getInstance().navigate(
-                      SECTIONS.AGENTS_PREVIEW,
-                    )
-                  }
-                >
-                  Endpoint summary
-                </EuiLink>
-              </RedirectAppLinks>
-            </>
-          }
-        />
-      </>
-    ),
+    PromptNoSelectedAgentView,
   ),
 )(({ agent: agentData }) => {
   const { tab = AgentTabs.WELCOME } = useRouterSearch();
   const navigationService = NavigationService.getInstance();
 
-  //TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
+  // TODO: Replace with useDatasource and useSearchBar when replace WzDatePicker with SearchBar in AgentsWelcome component
   /* const savedTimefilter = $commonData.getTimefilter();
   if (savedTimefilter) {
     getDataPlugin().query.timefilter.timefilter.setTime(savedTimefilter);

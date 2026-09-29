@@ -34,6 +34,7 @@ import {
 } from '../../package.json';
 import { extractErrorMessage } from '../lib/extract-error-message';
 import { detectCCS } from '../lib/ccs-detector';
+import { neutralizeCsvFormulaValues } from '../../common/services/neutralize-csv-formula';
 
 export class WazuhApiCtrl {
   constructor() {}
@@ -925,10 +926,17 @@ export class WazuhApiCtrl {
             ? { [UnsupportedKeysJson2CsvAsyncSize]: size }
             : {}),
         }));
+        itemsArray = neutralizeCsvFormulaValues(itemsArray);
         let csv = await converter.json2csvAsync(itemsArray, options);
 
         return response.ok({
-          headers: { 'Content-Type': 'text/csv' },
+          headers: {
+            'Content-Type': 'text/csv',
+            'Content-Disposition': `attachment; filename="${tmpPath.replace(
+              /[^\w.-]+/g,
+              '-',
+            )}.csv"`,
+          },
           body: csv,
         });
       } else if (
@@ -977,24 +985,16 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} setup info or ErrorResponse
    */
-  async getSetupInfo(
+  getSetupInfo(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const osResp =
-        await context.core.opensearch.client.asInternalUser.transport.request({
-          method: 'GET',
-          path: '/',
-        });
-      const clusterUuid = osResp?.body?.cluster_uuid ?? null;
-
       const data = {
         'app-version': pluginVersion,
         revision: pluginRevision,
         configuration_file: context.wazuh_core.configuration.store.file,
-        cluster_uuid: clusterUuid,
       };
 
       return response.ok({

@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiBadge,
   EuiButton,
   EuiButtonEmpty,
   EuiCallOut,
+  EuiCode,
   EuiIcon,
   EuiLink,
   EuiLoadingSpinner,
@@ -29,6 +31,7 @@ import {
 } from '../../../../common/constants';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
 import { CtiConsumersAccordion } from './cti-consumers-accordion';
+import { useCtiRegistrationPermission } from '../hooks/use-cti-registration-permission';
 
 type CtiHrefLinkProps = {
   href: string;
@@ -62,6 +65,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   refetchStatus,
   onDeviceFlowStarted,
 }) => {
+  const alreadyRegistered = statusCTI.status === statusCodes.SUCCESS;
+  /**
+   * Registering needs a privilege on the indexer that the device flow only evaluates
+   * at the very end, after the environment already exists on the CTI side. Probing on
+   * open lets us warn instead of inviting a user into a flow that cannot complete.
+   */
+  const permission = useCtiRegistrationPermission(!alreadyRegistered);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
   const [deviceAuth, setDeviceAuth] =
@@ -196,13 +206,16 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     } catch {
       setLoading(false);
       setError(
-        'There was an error connecting to the CTI service. Please try again later.',
+        i18n.translate('wazuhCheckUpdates.ctiRegistration.connectionError', {
+          defaultMessage:
+            'There was an error connecting to the CTI service. Please try again later.',
+        }),
       );
     }
   };
 
   const awaitingServerSnapshot =
-    !serverSnapshotReady &&
+    (!serverSnapshotReady || permission.loading) &&
     statusCTI.status === statusCodes.NOT_FOUND &&
     !deviceAuth;
 
@@ -216,8 +229,18 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const showRegistrationFailed =
     statusCTI.status === statusCodes.REGISTRATION_FAILED;
 
+  const showPermissionDenied =
+    serverSnapshotReady &&
+    !permission.loading &&
+    !permission.accessAllowed &&
+    !showSuccess &&
+    !showRegistrationFailed &&
+    !deviceAuth;
+
   const showRegistrationIntro =
     serverSnapshotReady &&
+    !permission.loading &&
+    !showPermissionDenied &&
     !showSuccess &&
     !showRegistrationFailed &&
     !deviceAuth;
@@ -324,6 +347,47 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             />
           </EuiText>
         ) : null}
+        {showPermissionDenied ? (
+          <EuiCallOut
+            title={
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.permissionDeniedTitle'
+                defaultMessage='You cannot register this environment'
+              />
+            }
+            color='warning'
+            iconType='alert'
+            data-test-subj='ctiRegistrationPermissionDenied'
+          >
+            <EuiText size='s'>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.permissionDeniedBody'
+                defaultMessage='Registering Wazuh XDR requires privileges your user does not have.'
+              />
+            </EuiText>
+            {permission.missingPrivileges.length > 0 ? (
+              <>
+                <EuiSpacer size='s' />
+                <EuiText size='s'>
+                  <FormattedMessage
+                    id='wazuhCheckUpdates.ctiRegistration.permissionDeniedMissingLabel'
+                    defaultMessage='Missing privileges:'
+                  />
+                </EuiText>
+                <EuiSpacer size='xs' />
+                <EuiText size='s'>
+                  <ul>
+                    {permission.missingPrivileges.map(privilege => (
+                      <li key={privilege}>
+                        <EuiCode>{privilege}</EuiCode>
+                      </li>
+                    ))}
+                  </ul>
+                </EuiText>
+              </>
+            ) : null}
+          </EuiCallOut>
+        ) : null}
         {deviceAuth && !showSuccess && !showRegistrationFailed && (
           <>
             <CtiDeviceAuthLinks deviceAuth={deviceAuth} />
@@ -428,10 +492,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             iconType='alert'
             style={{ marginTop: deviceAuth ? 16 : 0, marginBottom: '16px' }}
           >
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.errorMessage'
-              defaultMessage={error}
-            />
+            {error}
           </EuiCallOut>
         )}
       </EuiModalBody>
@@ -451,7 +512,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               defaultMessage='Close'
             />
           </EuiButtonEmpty>
-        ) : deviceAuth ? (
+        ) : deviceAuth || showPermissionDenied ? (
           <EuiButtonEmpty onClick={handleModalToggle}>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'

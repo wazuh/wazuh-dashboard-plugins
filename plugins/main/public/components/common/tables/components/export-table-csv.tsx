@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { EuiFlexItem, EuiButtonEmpty, EuiIconTip } from '@elastic/eui';
 import exportCsv from '../../../../react-services/wz-csv';
@@ -19,11 +20,12 @@ import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
 
 export function ExportTableCsv({
-  endpoint,
-  totalItems,
-  filters,
-  title,
+  endpoint = '/',
+  totalItems = 0,
+  filters = [],
+  title = '',
   maxRows,
+  isLoading = false,
 }) {
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -39,7 +41,13 @@ export function ExportTableCsv({
         name,
         value,
       }));
-      showToast('success', 'Your download should begin automatically...', 3000);
+      showToast(
+        'success',
+        i18n.translate('wazuh.common.exportTableCsv.downloadStartedToast', {
+          defaultMessage: 'Your download should begin automatically...',
+        }),
+        3000,
+      );
       await exportCsv(endpoint, [...formatedFilters], `${title.toLowerCase()}`);
     } catch (error) {
       const options = {
@@ -49,7 +57,10 @@ export function ExportTableCsv({
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error downloading csv`,
+          title: i18n.translate('wazuh.common.exportTableCsv.downloadError', {
+            defaultMessage: '{errorName}: Error downloading csv',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -59,16 +70,26 @@ export function ExportTableCsv({
   return (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty
-        isDisabled={totalItems == 0}
+        isDisabled={totalItems == 0 || isLoading}
+        isLoading={isLoading}
         iconType='importAction'
         onClick={() => downloadCsv()}
       >
-        Export formatted
+        {i18n.translate('wazuh.common.exportTableCsv.exportFormattedButton', {
+          defaultMessage: 'Export formatted',
+        })}
         {totalItems > maxRows && (
           <>
             {' '}
             <EuiIconTip
-              content={`The exported CSV will be limited to the first ${maxRows} lines. You can change this limit in Dashboard management > App Settings`}
+              content={i18n.translate(
+                'wazuh.common.exportTableCsv.rowsLimitTooltip',
+                {
+                  defaultMessage:
+                    'The exported CSV will be limited to the first {maxRows} lines. You can change this limit in Dashboard management > App Settings',
+                  values: { maxRows: String(maxRows) },
+                },
+              )}
               size='m'
               color='primary'
               type='iInCircle'
@@ -79,11 +100,3 @@ export function ExportTableCsv({
     </EuiFlexItem>
   );
 }
-
-// Set default props
-ExportTableCsv.defaultProps = {
-  endpoint: '/',
-  totalItems: 0,
-  filters: [],
-  title: '',
-};

@@ -12,6 +12,7 @@ import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
 import { formatUIDate } from '../../../react-services';
+import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
 
 type ParseData<T> =
   | {
@@ -154,7 +155,9 @@ export const exportSearchToCSV = async (
     keys: resultsFields,
   };
 
-  let csv = await converter.json2csvAsync(data, options);
+  const rows = neutralizeCsvFormulaValues(data);
+
+  let csv = await converter.json2csvAsync(rows, options);
 
   const blobData = new Blob([csv], {
     type: 'text/csv',
@@ -182,6 +185,9 @@ const mapToDataGridColumn = (
     name: field.name,
     schema: field.type,
     actions: { showHide: true },
+    // Non-aggregatable fields (e.g. ECS match_only_text) have no doc_values
+    // and OpenSearch rejects a sort on them, so default to non-sortable.
+    isSortable: field.aggregatable,
     ...defaultColumn,
     cellActions: cellFilterActions(
       field,

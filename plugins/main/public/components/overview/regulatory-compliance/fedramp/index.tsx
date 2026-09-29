@@ -18,5 +18,5 @@ export const RegulatoryComplianceFedRAMP = () => {
     ),
   });
 
-  return <ComplianceModule moduleId={moduleId} tabs={tabs} />;
+  return <ComplianceModule tabs={tabs} />;
 };

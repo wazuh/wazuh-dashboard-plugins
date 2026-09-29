@@ -57,6 +57,7 @@ import {
   isEndpointBlockedError,
   outcomeFromTestError,
   outcomeFromTestResult,
+  SLOW_TEST_LATENCY_MS,
 } from './provider-status';
 
 // Exactly three selectable options — `allow-scan` is deliberately excluded here even though it
@@ -362,10 +363,11 @@ const SectionCard: React.FC<{
 );
 
 const STATUS_CHIP_TINT_CLASS: Record<
-  'ok' | 'failed' | 'testing' | 'could-not-verify' | 'pending',
+  'ok' | 'slow' | 'failed' | 'testing' | 'could-not-verify' | 'pending',
   string
 > = {
   ok: 'wzStatusChip--ok',
+  slow: 'wzStatusChip--slow',
   failed: 'wzStatusChip--failed',
   testing: 'wzStatusChip--testing',
   'could-not-verify': 'wzStatusChip--could-not-verify',
@@ -376,7 +378,7 @@ const STATUS_CHIP_TINT_CLASS: Record<
  * carries the state. `provider-status.ts` already models these states — this only restyles their
  * presentation. A hover/detail `reason` is optional: `ok` and `pending` never have one. */
 const ProviderStatusChip: React.FC<{
-  status: 'ok' | 'failed' | 'testing' | 'could-not-verify' | 'pending';
+  status: 'ok' | 'slow' | 'failed' | 'testing' | 'could-not-verify' | 'pending';
   label: string;
   reason?: string;
 }> = ({ status, label, reason }) => {
@@ -1392,16 +1394,45 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           );
         }
         if (result.status === 'ok') {
+          // `latencyMs` is the time to the first response.
+          const slow = result.latencyMs >= SLOW_TEST_LATENCY_MS;
+          const seconds = (result.latencyMs / 1000).toFixed(1);
+          let label: string;
+          if (slow) {
+            label = i18n.translate('wazuhAiAssistant.settings.testSlowBadge', {
+              defaultMessage: 'Slow ({seconds} s)',
+              values: { seconds },
+            });
+          } else if (result.latencyMs >= 1000) {
+            label = i18n.translate(
+              'wazuhAiAssistant.settings.testSuccessBadgeSeconds',
+              { defaultMessage: 'OK ({seconds} s)', values: { seconds } },
+            );
+          } else {
+            label = i18n.translate(
+              'wazuhAiAssistant.settings.testSuccessBadge',
+              {
+                defaultMessage: 'OK ({latency} ms)',
+                values: { latency: result.latencyMs },
+              },
+            );
+          }
           return (
             <ProviderStatusChip
-              status='ok'
-              label={i18n.translate(
-                'wazuhAiAssistant.settings.testSuccessBadge',
-                {
-                  defaultMessage: 'OK ({latency} ms)',
-                  values: { latency: result.latencyMs },
-                },
-              )}
+              status={slow ? 'slow' : 'ok'}
+              label={label}
+              reason={
+                slow
+                  ? i18n.translate(
+                      'wazuhAiAssistant.settings.testSlowTooltip',
+                      {
+                        defaultMessage:
+                          'The first response took {seconds} s. This is typical of reasoning models, which think before they answer. Chat with this provider may feel slow.',
+                        values: { seconds },
+                      },
+                    )
+                  : undefined
+              }
             />
           );
         }
