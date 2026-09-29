@@ -41,18 +41,16 @@ const [
 ] = getDefaultEuiMarkdownProcessingPlugins();
 
 /**
- * `processingPluginList` for error text only — an expanded failure reason and chat-page.tsx's
- * error banner, both of which may carry the operator-configured out-of-credits link
- * (`wazuh_ai_assistant.outOfCreditsMessage`, server/config.ts). The only change from EUI's
- * default is the `a` renderer, which sets no `target` and would navigate the dashboard tab
- * itself away to a third-party billing page.
- *
- * Deliberately NOT applied to a finished assistant answer: that surface is model output built
- * from tool results, so it keeps EUI's stock renderers plus the `sanitizeAssistantMarkdown`
- * string defense below.
+ * Builds a `processingPluginList` from EUI's defaults with `components` overriding its renderers.
+ * Every list built here renders the `img` node as `null`: all markdown this plugin renders (a
+ * finished answer, a failure reason, the error banner) can carry model output or upstream provider
+ * text, and a live `<img>` there is an uncontrolled, no-click outbound fetch. Dropping the node at
+ * the render layer covers every image form, which a per-form string regex cannot guarantee.
  */
-export const errorMarkdownProcessingPlugins: EuiMarkdownFormatProps['processingPluginList'] =
-  [
+function buildMarkdownProcessingPlugins(
+  components: Record<string, React.ElementType> = {},
+): EuiMarkdownFormatProps['processingPluginList'] {
+  return [
     remarkRehypePlugin,
     rehypeSlugPlugin,
     [
@@ -61,11 +59,32 @@ export const errorMarkdownProcessingPlugins: EuiMarkdownFormatProps['processingP
         ...rehype2reactOptions,
         components: {
           ...rehype2reactOptions.components,
-          a: ErrorMarkdownLink,
+          ...components,
+          img: () => null,
         },
       },
     ],
   ];
+}
+
+/**
+ * `processingPluginList` for error text only — an expanded failure reason and chat-page.tsx's
+ * error banner, both of which may carry the operator-configured out-of-credits link
+ * (`wazuh_ai_assistant.outOfCreditsMessage`, server/config.ts). On top of the image drop, the `a`
+ * renderer opens the link in a new tab: EUI's default sets no `target` and would navigate the
+ * dashboard tab itself away to a third-party billing page.
+ */
+export const errorMarkdownProcessingPlugins = buildMarkdownProcessingPlugins({
+  a: ErrorMarkdownLink,
+});
+
+/**
+ * `processingPluginList` for a finished assistant answer, which is model output built from tool
+ * results that can carry attacker-influenced text. Keeps EUI's stock renderers apart from the image
+ * drop.
+ */
+export const assistantAnswerProcessingPlugins =
+  buildMarkdownProcessingPlugins();
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -300,23 +319,16 @@ function formatTimestamp(epochMs: number): string {
 /**
  * SECURITY: the finished answer below is model output built from tool results, which
  * can themselves carry attacker-influenced text (a log line, a rule description, a filename).
- * `EuiMarkdownFormat` is otherwise given no plugin overrides, so its default renderer draws
- * `![alt](url)` as a live `<img>` (an uncontrolled outbound fetch to whatever URL ended up in
- * the model's answer) and — depending on the exact EUI/remark-rehype build the host platform
- * bundles — can interpret raw inline HTML. An assistant answer is analytical prose; it has no
- * legitimate need to embed a remote image or a raw HTML element.
+ * `EuiMarkdownFormat`'s default renderer draws `![alt](url)` as a live `<img>` (an uncontrolled
+ * outbound fetch to whatever URL ended up in the model's answer) and — depending on the exact
+ * EUI/remark-rehype build the host platform bundles — can interpret raw inline HTML. An assistant
+ * answer is analytical prose; it has no legitimate need to embed a remote image or a raw HTML
+ * element.
  *
- * EUI does expose `getDefaultEuiMarkdownProcessingPlugins`/`parsingPluginList` overrides for
- * exactly this kind of restriction, and that is the preferred fix — but this plugin is bundled
- * against whichever `@elastic/eui` version the host `wazuh-dashboard` platform ships (not a
- * version pinned in this repo), and that version cannot be resolved or exercised from this
- * worktree (no installed `node_modules`, no way to run a real render to confirm the plugin-list
- * shape holds for the bundled version). Rather than hard-code an internal EUI plugin API this
- * plugin cannot verify against its actual runtime, this sanitizes the STRING before it reaches
- * `EuiMarkdownFormat`, the same "mechanical, version-independent guarantee" already used for the
- * markdown-table backstop (see server/tools/markdown-table-filter.ts's doc comment). Fenced code
- * blocks and inline code spans are left untouched, so a literal `<img>` or `![]()` a user is
- * reading about in a code sample still displays as written.
+ * Markdown images are handled at the render layer (`buildMarkdownProcessingPlugins` renders the
+ * `img` node as `null`), so this string-level defense covers the rest: it strips raw HTML tags and
+ * drops non-http(s) link targets, keeping the label. Fenced code blocks and inline code spans are
+ * left untouched, so a literal `<img>` in a code sample still displays as written.
  */
 export function sanitizeAssistantMarkdown(content: string): string {
   // Split on fenced code blocks (```...```) and inline code spans (`...`); the capturing group
@@ -333,11 +345,6 @@ export function sanitizeAssistantMarkdown(content: string): string {
 function sanitizeProseSegment(segment: string): string {
   return (
     segment
-      // Markdown images (inline and reference-style) — strip entirely rather than degrading to a
-      // link, since a bare URL the model copied from tool data is exactly the kind of attacker-
-      // influenced text this guards against too.
-      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')
-      .replace(/!\[[^\]]*\]\[[^\]]*\]/g, '')
       // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
       // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
       // matches and passes through untouched.
@@ -346,8 +353,12 @@ function sanitizeProseSegment(segment: string): string {
       // "plain link... subject to a scheme check" (never javascript:/data:/vbscript:/a bare path).
       // The trailing `\)+` (not just `\)`) also consumes a stray extra ")" that a malicious target
       // itself containing an unmatched "(" (e.g. "javascript:alert(1)") would otherwise leave
-      // behind in the rendered text.
-      .replace(/\[([^\]]*)\]\((?!https?:\/\/)[^)]*\)+/gi, '$1')
+      // behind in the rendered text. A match led by `!` is an image, which renders as nothing
+      // anyway: drop it whole rather than leave its label behind as "!label" prose.
+      .replace(
+        /(!?)\[([^\]]*)\]\((?!https?:\/\/)[^)]*\)+/gi,
+        (_match, bang: string, label: string) => (bang ? '' : label),
+      )
   );
 }
 
@@ -616,11 +627,11 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div className={PROSE_MEASURE_CLASS}>
           <EuiText size='s'>
-            {/* sanitizeAssistantMarkdown: the finished answer is model output built
-                  from tool results that can carry attacker-influenced text — see that
-                  function's doc comment for why this runs here instead of an EUI
-                  processingPluginList override. */}
-            <EuiMarkdownFormat>{sanitizedContent}</EuiMarkdownFormat>
+            <EuiMarkdownFormat
+              processingPluginList={assistantAnswerProcessingPlugins}
+            >
+              {sanitizedContent}
+            </EuiMarkdownFormat>
           </EuiText>
         </div>
       )}
