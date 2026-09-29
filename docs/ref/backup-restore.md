@@ -8,7 +8,7 @@ This guide focuses on the assets managed by the Wazuh dashboard itself.
 - Dashboard NodeJS options: `/etc/wazuh-dashboard/node.options`
 - Dashboard keystore: `/etc/wazuh-dashboard/opensearch_dashboards.keystore`
 - TLS certificates: `/etc/wazuh-dashboard/certs/`
-- Shared Wazuh root CA, when this host created it: `/etc/wazuh/ca/` (see [Credentials](getting-started/credentials.md#certificates)). It is shared with the other Wazuh components on the host, and its private key can issue certificates they trust.
+- Shared Wazuh root CA, when this host created it: `/etc/wazuh/ca/` (see [Credentials](getting-started/credentials.md#certificates)). It is shared with the other Wazuh components on the host, and its private key can issue certificates they trust. Back up the directory as a whole: it includes the `.wazuh-dashboard-bootstrap-ca` marker, which records that this dashboard created the CA.
 - Saved objects exported from the UI (dashboards, visualizations, index patterns)
 - Custom assets
 

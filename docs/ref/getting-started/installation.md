@@ -146,6 +146,10 @@ the pair it issued.
    chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
    ```
 
+   > **Note:** Before the package is installed, the `wazuh-dashboard` user does not exist and the
+   > `chown` command fails. Skip it in that case: the package gives `/etc/wazuh-dashboard/certs/` to
+   > `wazuh-dashboard` when it is installed.
+
 2. If the install created a bootstrap CA in `/etc/wazuh/ca` and no other Wazuh component on the host
    uses it, delete it. A CA private key on a host that does not sign is exposure with no purpose.
 
