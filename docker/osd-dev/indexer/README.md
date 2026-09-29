@@ -8,6 +8,38 @@ This directory contains the files required to run a Wazuh indexer container usin
 - **entrypoint.sh**: Entrypoint script to initialize the container.
 - **installer.sh**: Script used to automate the installation and configuration of Wazuh indexer and its dependencies inside the container.
 
+## Credentials
+
+The package's `postinst` runs `resolve-credentials.sh --install`, which would
+generate random passwords, mint a bootstrap CA and issue certificates for the
+build container. Its password policy (12-64 characters with upper and lower
+case, a digit and a symbol) also rejects the fixed development passwords. So
+the image skips it: `installer.sh` creates the resolver's initialisation marker
+(`/var/lib/wazuh-indexer/.initialized`) before installing the package, and keeps
+`internal_users.yml` with its password placeholders as
+`internal_users.yml.template`. Nothing runs the resolver later either, since
+only the systemd unit calls `--prestart`.
+
+On every start, `entrypoint.sh`:
+
+- rebuilds `internal_users.yml` from the template, hashing these passwords with
+  the security plugin's `hash.sh`:
+
+  | Variable                        | User            | Default         |
+  | ------------------------------- | --------------- | --------------- |
+  | `INDEXER_ADMIN_PASSWORD`        | `admin`         | `admin`         |
+  | `INDEXER_KIBANASERVER_PASSWORD` | `kibanaserver`  | `kibanaserver`  |
+  | `INDEXER_MANAGER_PASSWORD`      | `wazuh-manager` | `wazuh-manager` |
+
+- fills `plugins.security.nodes_dn` and `plugins.security.authcz.admin_dn` in
+  `opensearch.yml` with the subjects of the mounted `certs/indexer.pem` and
+  `certs/admin.pem`, which the `generator` service issues;
+- loads the configuration with `securityadmin.sh`.
+
+To change a password, set the variable and recreate the container. The
+dashboard (`kibanaserver`), the manager (`INDEXER_PASSWORD`) and the exporter
+read their own copies, so update those too.
+
 ## Usage
 
 ### Recommended: Using `dev.sh`

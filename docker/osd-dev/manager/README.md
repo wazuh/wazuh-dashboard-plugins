@@ -32,6 +32,31 @@ missing the container waits up to 120s and then exits, which usually means the
 
 To change the certificate's SAN or its filename prefix, edit `wazuh-certs.yml`.
 
+## Credentials
+
+The package's `postinst` runs `wazuh-manager-resolve-credentials --install`,
+which seeds `rbac.db` with random Server API passwords, mints a bootstrap CA
+(private key included) and issues certificates for the build container.
+`installer.sh` removes all of it with `--clear`, as the manager documents for
+container images.
+
+The resolver only accepts supplied passwords that pass its policy (12-64
+characters with upper and lower case, a digit and a symbol), and the fixed
+development ones do not. So, on a container's first start, `entrypoint.sh` seeds
+`rbac.db` itself through the same ORM call `rbac_control seed` makes after
+validating:
+
+| Variable             | User        | Default     |
+| -------------------- | ----------- | ----------- |
+| `API_PASSWORD`       | `wazuh-wui` | `wazuh-wui` |
+| `API_WAZUH_PASSWORD` | `wazuh`     | `wazuh`     |
+
+It also stores `INDEXER_USERNAME`/`INDEXER_PASSWORD` in the keystore. The
+`--prestart` step that `wazuh-manager-control start` runs then finds both
+resolved and leaves them alone. A restarted container keeps its `rbac.db`, so
+recreate the container to change a password. `API_PASSWORD` is shared with the
+agent services, which use it to mint their enrollment tokens.
+
 ## Usage
 
 ### Recommended: Using `dev.sh`
