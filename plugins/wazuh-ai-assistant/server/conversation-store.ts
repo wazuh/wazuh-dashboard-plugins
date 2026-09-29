@@ -1,7 +1,6 @@
 import { RequestHandlerContext } from '../../../src/core/server';
 import { CONVERSATION_SESSIONS_INDEX_ALIAS } from '../common/constants';
 import { PersistedChatMessage } from '../common/types';
-import { neutralizeMarkdownImages } from '../common/neutralize-markdown-images';
 
 /** The real, request-scoped OpenSearch client type — resolved via indexed access from
  * `RequestHandlerContext` rather than imported from `@opensearch-project/opensearch` directly, so
@@ -209,22 +208,6 @@ export async function findConversationHit(
  * guaranteed to reflect it — no client-visible race, and (unlike `refresh: true`) no forced
  * out-of-cycle refresh on every write either.
  */
-/**
- * Neutralizes images in assistant message content before it is persisted, so a stored transcript
- * carries no live image construct regardless of how it is later rendered or exported. Only
- * `role:'assistant'` content (the untrusted model output) is touched; a user's typed message is left
- * verbatim. Returns a new array without mutating the input.
- */
-export function neutralizeStoredImages(
-  messages: PersistedChatMessage[],
-): PersistedChatMessage[] {
-  return messages.map(message =>
-    message.role === 'assistant' && typeof message.content === 'string'
-      ? { ...message, content: neutralizeMarkdownImages(message.content) }
-      : message,
-  );
-}
-
 export async function createConversation(
   context: RequestHandlerContext,
   document: ConversationDocument,
@@ -233,7 +216,7 @@ export async function createConversation(
     index: CONVERSATION_SESSIONS_INDEX_ALIAS,
     op_type: 'create',
     refresh: 'wait_for',
-    body: { ...document, messages: neutralizeStoredImages(document.messages) },
+    body: document,
   });
   const body = response.body as { _id: string };
   return body._id;
@@ -282,7 +265,7 @@ export async function updateConversation(
     if_seq_no: occ.ifSeqNo,
     if_primary_term: occ.ifPrimaryTerm,
     refresh: 'wait_for',
-    body: { ...document, messages: neutralizeStoredImages(document.messages) },
+    body: document,
   });
   const body = response.body as { _seq_no: number; _primary_term: number };
   return { seqNo: body._seq_no, primaryTerm: body._primary_term };
