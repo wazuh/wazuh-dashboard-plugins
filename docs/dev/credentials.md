@@ -98,11 +98,12 @@ Loopback is always appended.
 
 Root runs `bin/resolve-credentials` from the maintainer scripts and from `ExecStartPre=+` or the
 SysV init script, it sources `lib/wazuh-credentials.sh`, and it reads
-`/etc/default/wazuh-dashboard`, which systemd passes through `EnvironmentFile=` and the SysV script sources with `.`. A service
-account able to change any of them could have root run its own code: by rewriting a file, by
-renaming a directory above it (or `node/bin/node`) and putting its own in its place, or by setting
-`PATH`, `NODE_OPTIONS` or `LD_PRELOAD` in the environment file. `Restart=always` would let it
-trigger that on demand. So the whole installation directory is root-owned:
+`/etc/default/wazuh-dashboard`, which systemd passes through `EnvironmentFile=` and the SysV script
+sources with `.`. A service account able to change any of them could have root run its own code: by
+rewriting a file, by renaming a directory above it (or `node/bin/node`) and putting its own in its
+place, or by setting `PATH`, `NODE_OPTIONS` or `LD_PRELOAD` in the environment file.
+`Restart=always` would let it trigger that on demand. So the whole installation directory is
+root-owned:
 
 | Path                                                             | Owner                             | Mode                 |
 | ---------------------------------------------------------------- | --------------------------------- | -------------------- |
