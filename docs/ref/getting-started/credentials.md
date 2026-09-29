@@ -146,7 +146,8 @@ That trap is why the file, not the command line, is the recommended way to suppl
 service start, the unit also reads `/etc/default/wazuh-dashboard` (Debian-based) and
 `/etc/sysconfig/wazuh-dashboard` (RPM-based). The packages install `/etc/default/wazuh-dashboard`
 as `root:wazuh-dashboard 0640`, because root reads it at every start: edit it as root. Passwords
-set there keep working.
+set there keep working. No package ships `/etc/sysconfig/wazuh-dashboard`; if you create it, make
+it `root:wazuh-dashboard 0640` too.
 
 ## Installing and starting
 

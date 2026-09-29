@@ -35,4 +35,6 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 - Do not give the `wazuh-dashboard` user ownership of `/usr/share/wazuh-dashboard/` or
   `/etc/default/wazuh-dashboard`. Root runs code from the first and reads the second at every
   start, so the packages install them as `root:root` and `root:wazuh-dashboard 0640`. Only
-  `/usr/share/wazuh-dashboard/data/` belongs to the service user.
+  `/usr/share/wazuh-dashboard/data/` belongs to the service user. If you create
+  `/etc/sysconfig/wazuh-dashboard`, which the service also reads, give it the same
+  `root:wazuh-dashboard 0640`.

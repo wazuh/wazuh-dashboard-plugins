@@ -96,9 +96,9 @@ Loopback is always appended.
 
 ## File ownership
 
-Root runs `bin/resolve-credentials` from the maintainer scripts and from `ExecStartPre=+` (or the
-SysV start), it sources `lib/wazuh-credentials.sh`, and it reads `/etc/default/wazuh-dashboard`,
-which systemd passes through `EnvironmentFile=` and the SysV script sources with `.`. A service
+Root runs `bin/resolve-credentials` from the maintainer scripts and from `ExecStartPre=+` or the
+SysV init script, it sources `lib/wazuh-credentials.sh`, and it reads
+`/etc/default/wazuh-dashboard`, which systemd passes through `EnvironmentFile=` and the SysV script sources with `.`. A service
 account able to change any of them could have root run its own code: by rewriting a file, by
 renaming a directory above it (or `node/bin/node`) and putting its own in its place, or by setting
 `PATH`, `NODE_OPTIONS` or `LD_PRELOAD` in the environment file. `Restart=always` would let it

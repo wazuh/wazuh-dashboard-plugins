@@ -43,10 +43,10 @@ The Wazuh dashboard package includes:
 
 ### Installation paths
 
-- **Application files**: `/usr/share/wazuh-dashboard/` (owned by `root:root`, except `data/`, which
-  belongs to `wazuh-dashboard`)
+- **Application files**: `/usr/share/wazuh-dashboard/` (`root:root`)
 - **Configuration files**: `/etc/wazuh-dashboard/`
-- **Data directory**: `/var/lib/wazuh-dashboard/`
+- **Data directory**: `/usr/share/wazuh-dashboard/data/` (`wazuh-dashboard:wazuh-dashboard 0750`, the
+  only part of the installation directory the service user owns)
 - **Log files**: `/var/log/wazuh-dashboard/`
 - **Plugin directory**: `/usr/share/wazuh-dashboard/plugins/`
 - **Certificates**: `/etc/wazuh-dashboard/certs/` (issued on a fresh install, see [Credentials](credentials.md#certificates))
