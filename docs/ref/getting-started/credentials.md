@@ -331,7 +331,15 @@ sudo install -m 0400 -o root -g root root-ca.key /etc/wazuh/ca/root-ca.key
 On a host that must not sign, stage only `root-ca.pem` (no key) and provide the dashboard pair
 yourself. A host that never receives the CA private key cannot leak it.
 
-A CA you stage, with or without its key, is never removed by [`--clear`](#container-images).
+A CA you stage, with or without its key, is not removed by [`--clear`](#container-images), which
+deletes only a CA the dashboard minted and marked with `.wazuh-dashboard-bootstrap-ca`. When you
+stage a CA over one the dashboard minted, delete that marker too, or `--clear` removes your CA and
+its private key:
+
+```bash
+sudo rm -f /etc/wazuh/ca/.wazuh-dashboard-bootstrap-ca
+```
+
 Removing the package can still delete it with the rest of `/etc/wazuh`: see
 [Upgrades and removal](#upgrades-and-removal).
 

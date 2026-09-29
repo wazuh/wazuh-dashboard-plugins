@@ -97,6 +97,8 @@ answer that question: an operator who stages their own signing CA leaves exactly
 
 - It is written under the shared lock, in the same step as the mint, and only when the CA was absent
   before and has a private key after. A CA that was reused or staged never gets one.
+- `--clear` checks only that the marker exists, not that the CA beside it is the one minted. A CA
+  staged over a minted one keeps the old marker, so the operator must delete it.
 - A failed write is logged but does not fail the install. Without the marker `--clear` keeps the CA,
   which is the safe direction.
 - The name is the dashboard's own, as the manager uses `.wazuh-manager-bootstrap-ca`: each component

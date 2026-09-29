@@ -33,9 +33,9 @@ issued.
 
 If the journal shows
 `EACCES: permission denied, open '/etc/wazuh-dashboard/certs/dashboard-key.pem'`, the certificate
-files are not owned by the service user. This happens with a pair placed in `certs/` as `root`, for
-example before the package was installed. Give them to the service user and start the service
-again:
+files are not owned by the service user. This happens with a pair copied into `certs/` as `root`
+after the package was installed, or with an older package that did not give `certs/` to the service
+user. Give them to the service user and start the service again:
 
 ```bash
 chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
