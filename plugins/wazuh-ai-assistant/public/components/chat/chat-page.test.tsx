@@ -1247,7 +1247,7 @@ describe('ChatPage — saves denied by permission', () => {
     'You do not have permission to perform this action. Missing indexer permission: cluster:admin/ai_assistant/session/write.';
   const RETRY_PROMISE = /saving is retried after each answer/;
 
-  /** Sends a first question and lets its answer complete, so both of the turn's saves have run. */
+  /** Sends a first question and completes its answer, so both of the turn's saves have run. */
   async function completeFirstTurn(
     stream: ReturnType<typeof createControllableStream>,
   ) {
@@ -1407,7 +1407,6 @@ describe('ChatPage — saves denied by permission', () => {
     await completeFirstTurn(stream);
 
     expect(screen.getByText(RETRY_PROMISE)).toBeInTheDocument();
-    // Both of the turn's saves were attempted.
     expect(mockConversationsService.create).toHaveBeenCalledTimes(2);
   });
 

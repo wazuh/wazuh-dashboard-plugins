@@ -69,13 +69,11 @@ export const WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH =
 export const WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH =
   '/_plugins/_setup/ai_assistant/providers';
 
-/** Write side of persisted conversations: `POST` creates one, `PUT`/`PATCH`/`DELETE {this path}/{id}`
- * replace the transcript, rename, or delete it. Sessions are read straight from
- * `CONVERSATION_SESSIONS_INDEX_ALIAS`, but the calling user's role holds no index-level `write`
- * on it, so every mutation goes through this endpoint instead
- * (server/conversation-store.ts), authorized by the indexer's own
- * `plugin:wazuh/ai_assistant/session/write` cluster permission. The indexer stamps the owner from
- * the authenticated principal and ignores any `user`/timestamp fields in the request body. */
+/** `POST` creates a session; `PUT`/`PATCH`/`DELETE {this path}/{id}` replace its transcript, rename
+ * or delete it. The caller's role holds no index-level `write` on
+ * `CONVERSATION_SESSIONS_INDEX_ALIAS`, so mutations go through this endpoint, authorized by the
+ * `plugin:wazuh/ai_assistant/session/write` cluster permission. The indexer stamps the owner and
+ * ignores any `user`/timestamp fields in the body. */
 export const WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH =
   '/_plugins/_setup/ai_assistant/sessions';
 

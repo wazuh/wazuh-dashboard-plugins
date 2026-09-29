@@ -21,10 +21,9 @@ export function getHttpErrorStatus(error: unknown): number | undefined {
 }
 
 /**
- * Duck-types the server's own explanation off an error thrown by OSD's `HttpSetup`: the routes
- * answer failures as `{ message }`, which the client exposes as `error.body.message`. Blank or
- * non-string values count as absent, so callers can tell "the server said something" from "only the
- * generic status text is available" (`error.message` is just "Forbidden" for a 403).
+ * Duck-types the server's message off an error thrown by OSD's `HttpSetup` (`error.body.message`).
+ * Blank or non-string values count as absent, since `error.message` is only the generic status
+ * text (e.g. "Forbidden").
  */
 export function getHttpErrorBodyMessage(error: unknown): string | undefined {
   if (!error || typeof error !== 'object') {

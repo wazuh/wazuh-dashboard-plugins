@@ -52,17 +52,15 @@ export interface ConversationDocument {
   updated_at: string;
   messages: PersistedChatMessage[];
   /**
-   * The data stream's `data_stream.timestamp_field` (the OpenSearch/Elasticsearch data-stream
-   * convention), always equal to `created_at`. The indexer's sessions endpoint stamps it, along
-   * with `user`, `created_at` and `updated_at`; this plugin only ever READS it back.
+   * The data stream's `data_stream.timestamp_field`, always equal to `created_at`. The indexer
+   * stamps it, along with `user`, `created_at` and `updated_at`.
    */
   '@timestamp': string;
 }
 
 /**
- * One conversation document plus the OpenSearch bookkeeping needed to version it:
- * `seqNo`/`primaryTerm` are the pair `encodeVersion` turns into the opaque `version` token the
- * sessions endpoint's `expected_version` check keys on.
+ * One conversation document plus the `seqNo`/`primaryTerm` pair that `encodeVersion` turns into the
+ * opaque `version` token the sessions endpoint's `expected_version` check uses.
  */
 export interface ConversationHit {
   id: string;
@@ -161,8 +159,8 @@ export async function countConversations(
  * stream whose backing index rolls over daily (wazuh-indexer-plugins#1422), and the get-by-id API
  * can only target one concrete index — it has no way to know which backing index holds a given id
  * without being told. A `search` filtered on `_id` fans out across every backing index the alias
- * currently points to. `seq_no_primary_term: true` is requested so the hit also carries the
- * version the write endpoints check against, without a second round trip.
+ * currently points to. `seq_no_primary_term: true` makes the hit carry the version the write
+ * endpoints check against.
  */
 export async function findConversationHit(
   context: RequestHandlerContext,
@@ -184,17 +182,13 @@ export async function findConversationHit(
   return hit ? toHit(hit) : undefined;
 }
 
-// Every write below goes through the indexer's sessions endpoint
-// (`WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH`) as the current user, never straight against the
-// index: the caller's role holds no index-level `write` on the sessions alias, only the cluster
-// permission that authorizes this endpoint. The indexer stamps `user` from the authenticated
-// principal and owns `created_at`, `updated_at` and `@timestamp`, so none of those are sent, and
-// the functions return what it replied rather than anything derived from this server's clock. A
-// write is visible to the very next `search` when the endpoint answers, so no read here races it.
+// Writes go through the indexer's sessions endpoint as the current user: the caller's role holds no
+// index-level `write` on the sessions alias, only the cluster permission behind this endpoint. The
+// indexer stamps `user` and owns the timestamps, so none are sent.
 //
-// Failures reject with the OpenSearch client's `ResponseError` (`.statusCode` set): 403 when the
-// role lacks the write permission, 404 for a session that is missing or not the caller's, 409 for
-// a version conflict on `updateConversation` or the per-user session cap on `createConversation`.
+// Failures reject with the OpenSearch client's `ResponseError` (`.statusCode` set): 403 without the
+// permission, 404 for a session that is missing or not the caller's, 409 for a version conflict on
+// `updateConversation` or the per-user session cap on `createConversation`.
 
 function sessionPath(id?: string): string {
   return id === undefined
@@ -202,8 +196,7 @@ function sessionPath(id?: string): string {
     : `${WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH}/${encodeURIComponent(id)}`;
 }
 
-/** What the sessions endpoint replies with once it has stored a session. `version` is already in
- * the `encodeVersion` format. */
+/** The sessions endpoint's reply for a stored session; `version` is in `encodeVersion` format. */
 export interface StoredSession {
   title: string;
   created_at: string;
@@ -226,9 +219,9 @@ export async function createConversation(
 }
 
 /**
- * Full replace of an existing conversation's `messages`, checked against `expectedVersion` (the
- * `encodeVersion` token): a write since that version rejects with a 409 instead of applying. An
- * absent `title` keeps the stored one, so an auto-save never reverts a rename.
+ * Full replace of `messages`, checked against `expectedVersion` (an `encodeVersion` token): a newer
+ * write rejects with a 409. An absent `title` keeps the stored one, so an auto-save never reverts a
+ * rename.
  */
 export async function updateConversation(
   context: RequestHandlerContext,

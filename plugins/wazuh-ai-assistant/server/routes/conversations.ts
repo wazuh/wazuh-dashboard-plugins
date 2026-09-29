@@ -483,12 +483,10 @@ export function registerConversationRoutes(
     },
     withInternalErrorHandling(async (context, request, response) => {
       // Create is NOT owner-CHECKING (nothing pre-existing to compare against, unlike the
-      // five routes below), so it is deliberately excluded from the fail-closed set. The owner is
-      // only used for the cap count here — the indexer stamps the stored owner itself from the
-      // authenticated principal — so an unresolved identity falls back to the shared
-      // `CONVERSATION_OWNER_FALLBACK` sentinel. This is a safe dead end: every owner-CHECKING route
-      // below fails closed for an unresolved identity, so such a caller can never list, read,
-      // update, or delete a conversation back through this API.
+      // five routes below), so it is deliberately excluded from the fail-closed set. The owner only
+      // feeds the cap count (the indexer stamps the stored owner), so an unresolved identity falls
+      // back to the shared `CONVERSATION_OWNER_FALLBACK` sentinel, a conversation no owner-CHECKING
+      // route below can reach for an unresolved-identity caller.
       const owner =
         (await resolveOwner(context, request)) ?? CONVERSATION_OWNER_FALLBACK;
 
@@ -507,9 +505,8 @@ export function registerConversationRoutes(
           messages: request.body.messages as PersistedChatMessage[],
         });
       } catch (error) {
-        // The count above is a read-then-write, so two concurrent creates can both pass it; the
-        // endpoint enforces the same cap itself and answers 409 to the loser. On a create that is
-        // the cap, never a version conflict.
+        // Two concurrent creates can both pass the count above; the endpoint enforces the same cap
+        // and answers 409 to the loser. On a create that is the cap, never a version conflict.
         if (isVersionConflictError(error)) {
           return conversationLimitReachedResponse(response);
         }
@@ -632,8 +629,6 @@ export function registerConversationRoutes(
   // a `ConversationSummary` (id/title/updatedAt) in hand when a user renames a row, never the full
   // `messages` transcript -- requiring the client to GET the whole conversation first just to
   // rename it would be wasted work and a needless place for a stale-transcript overwrite bug.
-  // The indexer leaves `messages`/`created_at`/`user` untouched, and trims the title.
-  //
   // `updated_at` is DELIBERATELY not bumped (m9): a rename is not conversation activity, and
   // bumping it would jump the row into the rail's "Today" group purely because its title changed,
   // which reads as a lie about when it was last actually used.

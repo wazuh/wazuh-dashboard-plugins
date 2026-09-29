@@ -11,9 +11,8 @@ import {
 /**
  * `encodeVersion`/`decodeVersion` are the opaque optimistic-concurrency token round-tripped
  * through `ConversationRecord.version` (see that type's doc comment in common/types.ts) — they
- * replace the saved-objects client's own opaque `version` string now that conversations live in
- * the `wazuh-ai-assistant-sessions` index alias, which has no such single value of its own (only a
- * seq_no/primary_term pair). Both are pure, so — same convention as
+ * encode the seq_no/primary_term pair that the `wazuh-ai-assistant-sessions` alias exposes in place
+ * of a single version value. Both are pure, so — same convention as
  * this plugin's other route-level helpers (`isVersionConflictError`, `resolveOwner`) — they are
  * unit-tested directly rather than through a route, since this plugin has no request/response
  * mocking harness for OpenSearch Dashboards routes.
@@ -59,9 +58,7 @@ test('decodeVersion: rejects a negative number in either position (regex only ma
   assert.equal(decodeVersion('1:-1'), undefined);
 });
 
-// Writes go through the indexer's sessions endpoint as the calling user; reads stay on `search`.
-// A minimal `context` exposing only `transport.request` is enough to pin the exact request each
-// write function issues and how it reads the endpoint's reply.
+// A `context` exposing only `transport.request` pins the exact request each write function issues.
 describe('session writes (indexer sessions endpoint)', () => {
   const request = jest.fn();
   const context = {

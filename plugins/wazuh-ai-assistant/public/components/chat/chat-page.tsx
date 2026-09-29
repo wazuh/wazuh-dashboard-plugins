@@ -570,31 +570,22 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // believing their history was being kept when it had stopped being saved after the first
     // rejection.
     const [saveFailed, setSaveFailed] = useState(false);
-    // A save was refused for lack of permission (403), which the next answer cannot fix: while set,
-    // automatic saves are skipped instead of repeating a request that is bound to fail, and the
-    // callout shows the server's reason instead of promising a retry. "Retry now" still goes
-    // through, so a user whose role was fixed can save without reloading. The ref is what the save
-    // task reads (it runs after renders have moved on); the state is what the callout renders.
+    // A save refused with a 403 stops the automatic saves (the next answer cannot fix it) and the
+    // callout shows the server's reason. "Retry now" still goes through. The ref is what the queued
+    // save task reads; the state is what the callout renders.
     const [saveDeniedReason, setSaveDeniedReason] = useState<string | null>(
       null,
     );
     const saveDeniedRef = useRef(false);
 
-    /**
-     * Clears the save callout when a new turn begins, unless saves are stopped by a permission
-     * denial: no save will run for that turn, so clearing would hide a conversation that is still
-     * unsaved.
-     */
+    /** Clears the save callout for a new turn, unless a permission denial is stopping saves. */
     const clearTransientSaveFailure = () => {
       if (!saveDeniedRef.current) {
         setSaveFailed(false);
       }
     };
 
-    /**
-     * Forgets a permission denial together with its callout. The denial belongs to the
-     * conversation it was raised on, so another conversation gets its own first attempt.
-     */
+    /** Forgets a permission denial with its callout: it belongs to the conversation it was raised on. */
     const clearSaveDenial = () => {
       if (saveDeniedRef.current) {
         saveDeniedRef.current = false;
@@ -1968,15 +1959,14 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       messages: UiChatMessage[];
       turnRecords: AssistantTurnRecord[];
       adoptAsActive: boolean;
-      /** A save the user asked for ("Retry now"): attempted even while automatic saves are stopped. */
+      /** A user-requested save ("Retry now"): attempted even while automatic saves are stopped. */
       manual?: boolean;
     }): Promise<void> => {
       const task = async () => {
         if (args.messages.length === 0) {
           return;
         }
-        // Read when the task RUNS, not when it was queued: a save queued behind the one that got
-        // denied must not send the same doomed request.
+        // Read when the task RUNS, so a save queued behind a denied one is skipped.
         if (saveDeniedRef.current && !args.manual) {
           return;
         }
@@ -2054,9 +2044,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           // stopped being saved" is not something to discover later. Only for the conversation on
           // screen: a notice about a conversation the user already left would be unactionable.
           if (args.adoptAsActive) {
-            // A permission denial is final until the user's role changes, so it stops the automatic
-            // saves and carries the server's own reason; every other failure keeps the generic
-            // wording and the per-answer retry.
+            // Only a permission denial stops the automatic saves and shows the server's reason.
             const denied = getHttpErrorStatus(persistError) === 403;
             saveDeniedRef.current = denied;
             setSaveDeniedReason(
@@ -3388,8 +3376,8 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     passive: the next turn's save still retries on its own, and "Retry now"
                     (handleRetrySave) lets the user clear it immediately once whatever blocked the
                     save (e.g. a read-only index) is fixed, instead of waiting on the next answer.
-                    A permission denial (saveDeniedReason) is the exception: automatic saves stop,
-                    the body carries the server's reason, and only "Retry now" tries again.
+                    On a permission denial (saveDeniedReason) automatic saves stop and only "Retry
+                    now" tries again.
                     Either path clears this the same way, via persistConversationTurn's own
                     setSaveFailed(false) on success. */}
                       {saveFailed && (

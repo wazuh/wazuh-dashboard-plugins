@@ -22,8 +22,8 @@ import { registerConversationRoutes } from './conversations';
  * a wrong status code, not just as a change to an internal helper's return value.
  *
  * `context.core.opensearch.client.asCurrentUser` is mocked directly (there is no real OpenSearch
- * here) -- `search` backs `findConversationHit`, `transport.request` backs the indexer
- * sessions endpoint call `renameConversation` makes (conversation-store.ts). `context.wazuh.security.getCurrentUser` backs `resolveOwner`
+ * here) -- `search` backs `findConversationHit`, `transport.request` backs `renameConversation`
+ * (conversation-store.ts). `context.wazuh.security.getCurrentUser` backs `resolveOwner`
  * (server/identity.ts).
  */
 

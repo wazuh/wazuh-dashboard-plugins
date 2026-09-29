@@ -11,11 +11,9 @@ import {
 import { registerConversationRoutes } from './conversations';
 
 /**
- * Drives the registered create (POST), replace (PUT) and delete (DELETE) routes end to end over a
- * real HTTP request, with the OpenSearch client mocked: `search` backs the read side
- * (`countConversations`, `findConversationHit`) and `transport.request` backs every write, which
- * must go to the indexer's sessions endpoint rather than to the index itself. The rename (PATCH)
- * route has its own file, conversations-patch-route.test.ts.
+ * Drives the create (POST), replace (PUT) and delete (DELETE) routes over a real HTTP request with
+ * the OpenSearch client mocked: `search` backs the reads and `transport.request` every write. The
+ * rename (PATCH) route is covered in conversations-patch-route.test.ts.
  */
 
 const serverAddress = '127.0.0.1';
@@ -42,7 +40,6 @@ const context = {
     },
   },
 };
-// Same `any` escape hatches, for the same reasons, as conversations-patch-route.test.ts.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const enhanceWithContext = (fn: (...args: any[]) => any) =>
   fn.bind(null, context);
