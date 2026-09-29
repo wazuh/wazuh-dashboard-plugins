@@ -466,7 +466,9 @@ export class WazuhApiCtrl {
         data !== null &&
         !Array.isArray(data) &&
         Object.prototype.hasOwnProperty.call(data, 'delay');
-      if (hasDelay && !isValidJobDelay(data.delay)) {
+      // A null delay sends the request right away
+      const delay = hasDelay ? data.delay ?? 0 : 0;
+      if (!isValidJobDelay(delay)) {
         return ErrorResponse(
           INVALID_DELAY_MESSAGE,
           3015,
@@ -532,7 +534,6 @@ export class WazuhApiCtrl {
         delete data.origin;
       }
       // The delay parameter only schedules the request, so it is never sent to the server API.
-      const delay = hasDelay ? data.delay : 0;
       if (hasDelay) {
         delete data.delay;
       }
@@ -559,14 +560,6 @@ export class WazuhApiCtrl {
           },
         });
         if (admission.added === false) {
-          if (admission.reason === 'invalid_start') {
-            return ErrorResponse(
-              INVALID_DELAY_MESSAGE,
-              3015,
-              HTTP_STATUS_CODES.BAD_REQUEST,
-              response,
-            );
-          }
           context.wazuh.logger.warn(
             `Delayed request rejected (${admission.reason}) for user [${owner}]: ${method} ${path}`,
           );

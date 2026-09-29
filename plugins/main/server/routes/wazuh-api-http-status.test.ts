@@ -232,6 +232,17 @@ describe('[endpoint] POST /api/request - delayed requests', () => {
     expect(mockApiRequest.mock.calls[0][2]).not.toHaveProperty('delay');
   });
 
+  it('sends a null delay right away and strips it from the data', async () => {
+    mockApiRequest.mockResolvedValue({ status: 200, data: { error: 0 } });
+
+    await restart({ delay: null, other: 'x' }).expect(HTTP_STATUS_CODES.OK);
+
+    expect(queue).toHaveLength(0);
+    expect(mockApiRequest).toHaveBeenCalledTimes(1);
+    expect(mockApiRequest.mock.calls[0][2]).toMatchObject({ other: 'x' });
+    expect(mockApiRequest.mock.calls[0][2]).not.toHaveProperty('delay');
+  });
+
   it('responds 429 when the queue is full', async () => {
     for (let i = 0; i < WAZUH_QUEUE_MAX_JOBS; i++) {
       addJobToQueue({
