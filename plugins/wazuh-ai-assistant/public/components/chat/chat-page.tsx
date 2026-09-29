@@ -53,10 +53,7 @@ import {
   ToolCall,
 } from '../../../common/types';
 import { mergeConversationMessages } from '../../../common/conversation-merge';
-import {
-  getHttpErrorBodyMessage,
-  getHttpErrorStatus,
-} from '../../../common/http-status';
+import { getHttpErrorStatus } from '../../../common/http-status';
 import { restoreAndClearDraft, stashDraft } from '../../../common/draft-stash';
 import {
   buildConversationRoute,
@@ -570,30 +567,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     // believing their history was being kept when it had stopped being saved after the first
     // rejection.
     const [saveFailed, setSaveFailed] = useState(false);
-    // A save refused with a 403 stops the automatic saves (the next answer cannot fix it) and the
-    // callout shows the server's reason. "Retry now" still goes through. The ref is what the queued
-    // save task reads; the state is what the callout renders.
-    const [saveDeniedReason, setSaveDeniedReason] = useState<string | null>(
-      null,
-    );
-    const saveDeniedRef = useRef(false);
-
-    /** Clears the save callout for a new turn, unless a permission denial is stopping saves. */
-    const clearTransientSaveFailure = () => {
-      if (!saveDeniedRef.current) {
-        setSaveFailed(false);
-      }
-    };
-
-    /** Forgets a permission denial with its callout: it belongs to the conversation it was raised on. */
-    const clearSaveDenial = () => {
-      if (saveDeniedRef.current) {
-        saveDeniedRef.current = false;
-        setSaveDeniedReason(null);
-        setSaveFailed(false);
-      }
-    };
-
     // Drives the saveFailed callout's "Retry now" button: true only for the duration of a
     // manually-triggered retry, so the button shows a spinner and cannot be double-clicked into a
     // second concurrent save. `persistConversationTurn` itself is already queued/serialized
@@ -1554,7 +1527,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setError(null);
       setManagerAuthHint(false);
       setMergeNotice(null);
-      clearSaveDenial();
     };
 
     /**
@@ -1687,7 +1659,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setError(null);
       setManagerAuthHint(false);
       setMergeNotice(null);
-      clearSaveDenial();
     };
 
     /**
@@ -1959,15 +1930,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       messages: UiChatMessage[];
       turnRecords: AssistantTurnRecord[];
       adoptAsActive: boolean;
-      /** A user-requested save ("Retry now"): attempted even while automatic saves are stopped. */
-      manual?: boolean;
     }): Promise<void> => {
       const task = async () => {
         if (args.messages.length === 0) {
-          return;
-        }
-        // Read when the task RUNS, so a save queued behind a denied one is skipped.
-        if (saveDeniedRef.current && !args.manual) {
           return;
         }
         const { target, turnRecords } = args;
@@ -2027,8 +1992,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           }
           notifyConversationsChanged();
           if (args.adoptAsActive) {
-            saveDeniedRef.current = false;
-            setSaveDeniedReason(null);
             setSaveFailed(false);
           }
         } catch (persistError) {
@@ -2044,21 +2007,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
           // stopped being saved" is not something to discover later. Only for the conversation on
           // screen: a notice about a conversation the user already left would be unactionable.
           if (args.adoptAsActive) {
-            // Only a permission denial stops the automatic saves and shows the server's reason.
-            const denied = getHttpErrorStatus(persistError) === 403;
-            saveDeniedRef.current = denied;
-            setSaveDeniedReason(
-              denied
-                ? getHttpErrorBodyMessage(persistError) ??
-                    i18n.translate(
-                      'wazuhAiAssistant.chat.conversations.saveDenied.fallbackReason',
-                      {
-                        defaultMessage:
-                          'Your role is not allowed to save conversations.',
-                      },
-                    )
-                : null,
-            );
             setSaveFailed(true);
           }
         }
@@ -2103,7 +2051,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       };
       void persistConversationTurn({
         adoptAsActive: true,
-        manual: true,
         target,
         messages: messagesRef.current,
         turnRecords: turnHistoryRef.current,
@@ -2753,7 +2700,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       setManagerAuthHint(false);
       setMergeNotice(null);
       setSessionExpired(false);
-      clearTransientSaveFailure();
+      setSaveFailed(false);
       // The first send of a centred conversation is what docks the composer. Started here, before
       // the first `await`, for two reasons: the FLIP measurement has to be taken from the frame the
       // user pressed Send in, and the transcript has to be in its final (docked) layout before the
@@ -2811,7 +2758,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       );
       setError(null);
       setManagerAuthHint(false);
-      clearTransientSaveFailure();
+      setSaveFailed(false);
       updateMessages(history);
       await startTurn(history);
     };
@@ -3376,8 +3323,6 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     passive: the next turn's save still retries on its own, and "Retry now"
                     (handleRetrySave) lets the user clear it immediately once whatever blocked the
                     save (e.g. a read-only index) is fixed, instead of waiting on the next answer.
-                    On a permission denial (saveDeniedReason) automatic saves stop and only "Retry
-                    now" tries again.
                     Either path clears this the same way, via persistConversationTurn's own
                     setSaveFailed(false) on success. */}
                       {saveFailed && (
@@ -3391,24 +3336,13 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           )}
                           color='warning'
                           iconType='alert'
-                          body={
-                            saveDeniedReason === null
-                              ? i18n.translate(
-                                  'wazuhAiAssistant.chat.conversations.saveFailed.body',
-                                  {
-                                    defaultMessage:
-                                      'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
-                                  },
-                                )
-                              : i18n.translate(
-                                  'wazuhAiAssistant.chat.conversations.saveDenied.body',
-                                  {
-                                    defaultMessage:
-                                      '{reason} The latest messages are not being saved, so they may be missing if you reload. The chat still works.',
-                                    values: { reason: saveDeniedReason },
-                                  },
-                                )
-                          }
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.conversations.saveFailed.body',
+                            {
+                              defaultMessage:
+                                'The latest messages could not be saved, so they may be missing if you reload. The chat still works, and saving is retried after each answer.',
+                            },
+                          )}
                           action={
                             <EuiButton
                               size='s'
