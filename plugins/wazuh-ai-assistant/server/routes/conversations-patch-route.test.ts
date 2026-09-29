@@ -235,6 +235,23 @@ describe(`[endpoint] PATCH ${API_PATHS.CONVERSATION_BY_ID(':id')}`, () => {
       .expect(404);
   });
 
+  test('returns 409 when the endpoint reports a concurrent write', async () => {
+    mockGetCurrentUser.mockResolvedValue({ username: 'alice' });
+    mockSearch.mockResolvedValue(searchResponseWithHit());
+    mockTransportRequest.mockRejectedValue(
+      Object.assign(new Error('version conflict'), { statusCode: 409 }),
+    );
+
+    const response = await supertest(innerServer.listener)
+      .patch(API_PATHS.CONVERSATION_BY_ID('conv-1'))
+      .send({ title: 'New title' })
+      .expect(409);
+
+    expect(response.body.message).toBe(
+      'Conversation was updated by another session since you last loaded it. Refresh and retry.',
+    );
+  });
+
   test('surfaces an indexer 403 with the missing-permission message', async () => {
     mockGetCurrentUser.mockResolvedValue({ username: 'alice' });
     mockSearch.mockResolvedValue(searchResponseWithHit());

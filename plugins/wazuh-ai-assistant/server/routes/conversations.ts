@@ -667,6 +667,15 @@ export function registerConversationRoutes(
           request.body.title,
         );
       } catch (error) {
+        if (isVersionConflictError(error)) {
+          return response.customError({
+            statusCode: 409,
+            body: {
+              message:
+                'Conversation was updated by another session since you last loaded it. Refresh and retry.',
+            },
+          });
+        }
         if (isNotFoundError(error)) {
           return response.notFound();
         }
