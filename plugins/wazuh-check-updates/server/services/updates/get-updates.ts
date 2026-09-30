@@ -69,13 +69,17 @@ export const getUpdates = async (
     };
 
     if (status !== 200 || typeof message === 'string') {
-      return saveAndReturn({
+      // Return the error to the caller that triggered this check, but do NOT
+      // persist it: the available-updates saved object is a single global record
+      // shared by every session, so a transient failure must not overwrite the
+      // last successful result for everyone.
+      return {
         last_check_date_dashboard: new Date(),
         status: API_UPDATES_STATUS.ERROR,
         error: {
           detail: typeof message === 'string' ? message : 'Unknown error',
         },
-      });
+      };
     }
 
     return saveAndReturn({
@@ -96,10 +100,12 @@ export const getUpdates = async (
         error.meta?.body,
       )}`,
     );
-    return saveAndReturn({
+    // As above, return the error to the caller without persisting it so a
+    // transient failure does not clobber the shared saved object.
+    return {
       last_check_date_dashboard: new Date(),
       status: API_UPDATES_STATUS.ERROR,
       error: { title: error.message, detail: error.message },
-    });
+    };
   }
 };

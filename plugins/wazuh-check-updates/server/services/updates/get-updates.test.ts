@@ -109,6 +109,7 @@ describe('getUpdates function', () => {
       last_check_date_dashboard: expect.any(Date),
       status: API_UPDATES_STATUS.AVAILABLE_UPDATES,
     });
+    expect(mockSetSavedObject).toHaveBeenCalledTimes(1);
   });
 
   it('should query the indexer with the internal user, not the current user', async () => {
@@ -166,6 +167,8 @@ describe('getUpdates function', () => {
       status: API_UPDATES_STATUS.ERROR,
       error: { detail: 'Unable to reach the CTI API to check for updates.' },
     });
+    // A failed check must not overwrite the shared saved object.
+    expect(mockSetSavedObject).not.toHaveBeenCalled();
   });
 
   it('should return error when indexer request throws', async () => {
@@ -183,5 +186,7 @@ describe('getUpdates function', () => {
         detail: 'Connection refused',
       },
     });
+    // A failed check must not overwrite the shared saved object.
+    expect(mockSetSavedObject).not.toHaveBeenCalled();
   });
 });
