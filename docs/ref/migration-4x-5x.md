@@ -362,7 +362,7 @@ every start. Giving it to the service user would let that account run code as ro
 ```bash
 # Ensure correct ownership
 sudo chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/
-sudo chown -R wazuh-dashboard:wazuh-dashboard /var/lib/wazuh-dashboard/
+sudo chown -R wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/
 
 # Set secure permissions
 sudo chmod 640 /etc/wazuh-dashboard/opensearch_dashboards.yml
