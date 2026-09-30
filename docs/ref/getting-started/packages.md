@@ -47,7 +47,7 @@ The Wazuh dashboard package includes:
 - **Configuration files**: `/etc/wazuh-dashboard/`
 - **Data directory**: `/usr/share/wazuh-dashboard/data/` (`wazuh-dashboard:wazuh-dashboard 0750`, the
   only part of the installation directory the service user owns)
-- **Log files**: `/var/log/wazuh-dashboard/`
+- **Logs**: systemd journal (`journalctl -u wazuh-dashboard`); the package writes no log files
 - **Plugin directory**: `/usr/share/wazuh-dashboard/plugins/`
 - **Certificates**: `/etc/wazuh-dashboard/certs/` (issued on a fresh install, see [Credentials](credentials.md#certificates))
 - **Credential resolver**: `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`)
