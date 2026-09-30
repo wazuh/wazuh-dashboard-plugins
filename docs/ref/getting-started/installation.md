@@ -67,7 +67,7 @@ Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the f
   - `url`: The URL to the server API including the protocol and address (DNS or IP).
   - `port`: The port where is served.
   - `username`: The user that runs the requests.
-  - `run_as`: This defines how the dashboard requests the data, using the default configured account (`false`) or the current user's context (`true`).
+  - `run_as`: This defines how the dashboard requests the data, using the default configured account (`false`) or the current user's context (`true`). Defaults to `true` when omitted.
 
   Do not set the `password` of the `default` host in this file. The package stores it in the keystore from `WAZUH_MANAGER_WUI_PASSWORD`, as described in [Credentials and certificates](#credentials-and-certificates). A value set in the file takes precedence and is never overridden.
 

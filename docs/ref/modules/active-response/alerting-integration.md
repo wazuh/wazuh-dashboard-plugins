@@ -26,7 +26,7 @@ Give the monitor a name — for this use case, `Block-IP-monitor` — and pick a
 
 ## Step 3: Configure the data source
 
-Under **Select data**, pick the findings index that holds the events to watch. For this SSH root-login use case, select `wazuh-findings-v5-system-activity*` — the access-management findings index, which carries authentication events such as SSH logins. Other findings indices (`wazuh-findings-v5-security*`, `wazuh-findings-v5-network-activity*`, etc.) cover different categories; pick the one that matches the rules driving your active response.
+Under **Select data**, pick the findings index that holds the events to watch. For this SSH root-login use case, select `wazuh-findings-v5-access-management` — the access-management findings index, which carries authentication events such as SSH logins. Other findings indices (`wazuh-findings-v5-security`, `wazuh-findings-v5-network-activity`, etc.) cover different categories; pick the one that matches the rules driving your active response. Select concrete indices: active response monitors reject index patterns such as `wazuh-findings-v5*`.
 
 ![Select data - Index picker](images/10-monitor-select-index.png)
 
