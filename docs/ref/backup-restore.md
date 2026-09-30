@@ -48,7 +48,7 @@ $backup_folder
 mkdir -p "$backup_folder/saved_objects"
 ```
 
-> Note: if multitenancy is used, exportthe saved objects of each tenant repeating the following steps, consider separating in directories by tenant.
+> Note: if multitenancy is used, export the saved objects of each tenant repeating the following steps, consider separating in directories by tenant.
 
 3.2. Open **Dashboard management** > **Dashboards Management** > **Saved objects**.
 
