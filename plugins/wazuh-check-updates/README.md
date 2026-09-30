@@ -84,11 +84,10 @@ cluster:monitor/content_manager/version/check
 ```
 
 In the packaged Wazuh indexer configuration, `kibanaserver` holds this action
-through the built-in `kibana_server` role (its `cluster_monitor` action group
-covers `cluster:monitor/*`) and through the Wazuh `dashboard_server` role, which
-grants the `plugin:content_manager/version/check` action group. If the internal
-user lacks this permission, the endpoint responds with `403` and the
-available-updates status is reported as an error.
+through the built-in `kibana_server` role, whose `cluster_monitor` action group
+covers `cluster:monitor/*`. If the internal user lacks this permission, the
+endpoint responds with `403` and the available-updates status is reported as an
+error.
 
 A failed check is returned only to the caller that triggered it and is not
 persisted, so the saved object keeps the last _successful_ result and its

@@ -37,13 +37,9 @@ run the following cluster action on the Wazuh indexer:
 | `cluster:monitor/content_manager/version/check` | cluster | Query the latest available Wazuh version. |
 
 In the packaged Wazuh indexer configuration, the `kibanaserver` internal user holds this
-permission through two roles:
-
-- `kibana_server`: the built-in OpenSearch security role, mapped to `kibanaserver`. It
-  includes the `cluster_monitor` action group (`cluster:monitor/*`), which covers the
-  version-check action.
-- `dashboard_server`: the Wazuh role mapped to `kibanaserver`. It grants the
-  `plugin:content_manager/version/check` action group explicitly.
+permission through the built-in OpenSearch security role `kibana_server`, which is mapped
+to `kibanaserver`. That role includes the `cluster_monitor` action group
+(`cluster:monitor/*`), which covers the version-check action.
 
 No additional configuration is required for a default deployment.
 
