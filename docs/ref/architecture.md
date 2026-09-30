@@ -145,10 +145,10 @@ notifications, alerting, reporting), which come from other repositories. See
 
 ### wazuh-ai-assistant
 
-`wazuh-ai-assistant` is a self-contained plugin with its own application, settings and saved
-objects. The browser renders the chat and streams the answer; every provider call, tool
-execution and guardrail runs on the server, which queries the Wazuh indexer and the Wazuh server
-API as the current user. It declares `wazuh` as optional: it joins the **Home** navigation
+`wazuh-ai-assistant` is a self-contained plugin with its own application and settings. The
+browser renders the chat and streams the answer; every provider call, tool execution and
+guardrail runs on the server, which queries the Wazuh indexer and the Wazuh server API as the
+current user. It declares `wazuh` as optional: it joins the **Home** navigation
 category that `main` also uses, and works without it. See
 [AI Assistant > Architecture](modules/ai-assistant/architecture.md).
 
@@ -177,7 +177,8 @@ Plugins share code and state through two mechanisms, both provided by OpenSearch
   `plugins.wazuhCheckUpdates.CtiRegistration` for the CTI registration header control.
 - **Route handler contexts**: a server plugin can attach values to the `context` argument of
   every route handler. `wazuh-core` registers `context.wazuh_core`, `main` registers
-  `context.wazuh`, and `wazuh-check-updates` registers `context.wazuh_check_updates`.
+  `context.wazuh`, `wazuh-check-updates` registers `context.wazuh_check_updates`, and
+  `wazuh-ai-assistant` registers `context.wazuh_ai_assistant`.
 
 ## Data flows
 
@@ -215,20 +216,24 @@ Plugins share code and state through two mechanisms, both provided by OpenSearch
 
 ## Persistence
 
-The plugins keep no database of their own. What they store lives in the Wazuh indexer, in the
-OpenSearch Dashboards index, as saved objects:
+The plugins keep no database of their own. What they store lives in the Wazuh indexer. `main`
+and `wazuh-check-updates` store saved objects in the OpenSearch Dashboards index:
 
 | Saved object                                  | Plugin                | Contents                                                          |
 | --------------------------------------------- | --------------------- | ----------------------------------------------------------------- |
 | `index-pattern`, `visualization`, `dashboard` | `main`                | Index patterns and bundled dashboards created by the health check |
 | `wazuh-check-updates-available-updates`       | `wazuh-check-updates` | Last successful result of the available-updates check (hidden)    |
 | `wazuh-check-updates-user-preferences`        | `wazuh-check-updates` | Per-user preferences, such as a dismissed notification (hidden)   |
-| `wazuh-ai-assistant-provider`                 | `wazuh-ai-assistant`  | Configured AI providers (hidden)                                  |
-| `wazuh-ai-assistant-settings`                 | `wazuh-ai-assistant`  | Assistant settings (hidden)                                       |
-| `wazuh-ai-assistant-conversation`             | `wazuh-ai-assistant`  | Conversations, scoped to their owner (hidden)                     |
 
 Hidden types are not listed in **Saved objects** management and are not exported from there, so
 they are backed up with the OpenSearch Dashboards index, at the index or snapshot level.
+
+`wazuh-ai-assistant` stores no saved objects. Its AI providers and settings are read and written
+through the setup plugin of the Wazuh indexer (`/_plugins/_setup/ai_assistant/providers` and
+`/_plugins/_setup/ai_assistant/settings`). Conversations are stored in the
+`wazuh-ai-assistant-sessions` data stream, which the indexer rotates daily and prunes after 7
+days, and which restricts each conversation to its owner. The plugin reads them from that data
+stream and writes them through `/_plugins/_setup/ai_assistant/sessions`.
 
 The Wazuh server API hosts are not saved objects: they are read from `wazuh_core.hosts` in
 `opensearch_dashboards.yml`, with passwords optionally stored in the OpenSearch Dashboards
@@ -239,6 +244,6 @@ keystore.
 The Wazuh dashboard also ships plugins that are developed in their own repositories: security,
 alerting, notifications, reporting and security analytics. `main` lists some of them as optional
 plugins and integrates with them when they are installed, for example to create the default
-notification channels and sample monitors. The local development environment in
-`docker/osd-dev` can mount those repositories next to the plugins of this one; its options are
-described in `docker/osd-dev/README.md`. See [Run from Sources](../dev/run-sources.md).
+notification channels. The local development environment in `docker/osd-dev` can mount those
+repositories next to the plugins of this one; its options are described in
+`docker/osd-dev/README.md`. See [Run from Sources](../dev/run-sources.md).
