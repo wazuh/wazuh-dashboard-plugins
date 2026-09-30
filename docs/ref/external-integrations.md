@@ -51,8 +51,9 @@ Slack integration enables real-time security alerts and notifications to be sent
 2. Click **Create monitor**
 3. Configure the monitor:
    - **Monitor name**: `High Priority Security Events`
-   - **Data source**: Select your Wazuh indices pattern
-   - **Query**: Define conditions (e.g., `rule.level >= 12` for high-severity alerts)
+   - **Monitor type**: `Per document monitor`
+   - **Index**: `wazuh-findings-v5*`
+   - **Query**: Define conditions (e.g., `wazuh.rule.level is critical` for high-severity findings)
    - **Trigger conditions**: Set thresholds for alerting
 4. In the **Notifications** section:
    - Select your Slack channel
@@ -225,8 +226,10 @@ Shuffle is a security orchestration platform that automates response workflows f
 1. Navigate to **☰ Menu > Explore > Alerting > Monitors**
 2. Click **Create monitor**
 3. Configure for events requiring automation:
-   - **Monitor name**: `Malware Detection Workflow`
-   - **Query**: `rule.groups: "malware" OR rule.groups: "rootcheck"`
+   - **Monitor name**: `File Integrity Workflow`
+   - **Monitor type**: `Per document monitor`
+   - **Index**: `wazuh-findings-v5*`
+   - **Query**: `wazuh.integration.name is wazuh-fim`
    - **Trigger conditions**: Match any event
 4. In **Notifications**:
    - Select your Shuffle channel
