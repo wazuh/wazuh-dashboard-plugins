@@ -1,6 +1,6 @@
 # How to generate a container image
 
-The development environment in `docker/osd-dev` runs the
+The development environment in [docker/osd-dev](../../docker/osd-dev) runs the
 `quay.io/wazuh/osd-dev` image. This repository does not contain the recipe for
 that image: the Dockerfile and the build script are in the `wazuh-dashboard`
 repository, under `dev-tools/build-dev-image`. The
@@ -44,4 +44,5 @@ publish the image with `--push`, you can omit `--platform` to build both.
 The development environment runs the `quay.io/wazuh/osd-dev:<osd_version>`
 image. The `-osd <osd_version>` option of `docker/osd-dev/dev.sh` selects the
 tag; without it, the version in `plugins/wazuh-core/package.json` is used. See
-`docker/osd-dev/README.md` for the available options.
+[docker/osd-dev/README.md](../../docker/osd-dev/README.md) for the available
+options.
