@@ -9,7 +9,7 @@ Wazuh 5.x introduces significant changes to the dashboard plugins architecture a
 - **Platform upgrade**: Migration from Kibana/OpenSearch Dashboards 2.x to OpenSearch Dashboards 3.x
 - **Configuration changes**: Settings relocated from `wazuh.yml` to `opensearch_dashboards.yml`
 - **Plugin restructure**: Core functionality split into modular plugins (`wazuh-core`, `wazuh-check-updates`, `wazuh-ai-assistant`)
-- **Index pattern updates**: New default pattern `wazuh-events*` replacing `wazuh-alerts-*`
+- **Index pattern updates**: New default pattern `wazuh-events-v5*` replacing `wazuh-alerts-*`
 - **UI modernization**: Removal of legacy interfaces and deprecated features
 - **Security enhancements**: Updated authentication and authorization mechanisms
 
@@ -147,10 +147,10 @@ wazuh_core.hosts:
 
 #### Index pattern changes
 
-| 4.x Setting                | 5.x Equivalent    | Notes                                 |
-| -------------------------- | ----------------- | ------------------------------------- |
-| `pattern: wazuh-alerts-*`  | `wazuh-events*`   | Default changed; update if customized |
-| `wazuh.monitoring.pattern` | Advanced Settings | Configure in UI, not config file      |
+| 4.x Setting                | 5.x Equivalent     | Notes                                                          |
+| -------------------------- | ------------------ | -------------------------------------------------------------- |
+| `pattern: wazuh-alerts-*`  | `wazuh-events-v5*` | Default changed; rule-based alerts are in `wazuh-findings-v5*` |
+| `wazuh.monitoring.pattern` | Advanced Settings  | Configure in UI, not config file                               |
 
 #### Removed settings
 
@@ -189,9 +189,7 @@ If you have custom scripts or integrations:
 
 | 4.x Endpoint         | 5.x Equivalent                     |
 | -------------------- | ---------------------------------- |
-| `/api/status`        | `/api/wazuh-core/status`           |
 | `/api/check-updates` | `/api/wazuh-check-updates/updates` |
-| `/api/timestamp`     | `/api/wazuh-core/timestamp`        |
 
 ### UI changes
 
@@ -454,8 +452,8 @@ Expected response:
 
 Navigate to **☰ Menu > Dashboard Management > Index patterns**:
 
-- Default pattern `wazuh-events*` exists
-- Time field is `timestamp`
+- Default pattern `wazuh-events-v5*` exists
+- Time field is `@timestamp`
 - Field mappings are loaded
 
 ### 5. Test notifications and alerting
@@ -564,10 +562,11 @@ Wazuh API is not reachable
    ```
 
 4. **Verify API user credentials**:
-   ```bash
-   # On manager
-   sudo /var/ossec/bin/wazuh-authd -P
-   ```
+
+   The authentication request of step 2 returns an error instead of a token when the `wazuh-wui`
+   credentials are wrong. Make sure the password matches the one of the `wazuh-wui` account on the
+   Server API, and see [Credentials](getting-started/credentials.md) for where the dashboard reads
+   it from.
 
 ### Issue 3: Missing saved objects
 
@@ -584,14 +583,14 @@ Wazuh API is not reachable
 2. **Manually create index pattern** if missing:
 
    ```bash
-   curl -X POST "https://localhost:5601/api/saved_objects/index-pattern/wazuh-events" \
+   curl -X POST "https://localhost:5601/api/saved_objects/index-pattern/wazuh-events-v5*" \
      -H "osd-xsrf: true" \
      -H "Content-Type: application/json" \
      -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD \
      -d '{
        "attributes": {
-         "title": "wazuh-events*",
-         "timeFieldName": "timestamp"
+         "title": "wazuh-events-v5*",
+         "timeFieldName": "@timestamp"
        }
      }'
    ```
@@ -661,7 +660,7 @@ See [Custom Branding](./custom-branding/custom-branding.md).
 2. **Optimize OpenSearch indices**:
 
    ```bash
-   curl -X POST "https://localhost:9200/wazuh-events*/_forcemerge?max_num_segments=1" \
+   curl -X POST "https://localhost:9200/wazuh-events-v5*/_forcemerge?max_num_segments=1" \
      -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD -k
    ```
 

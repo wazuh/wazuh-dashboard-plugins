@@ -4,6 +4,7 @@
 - [Notifications and Alerting](./notifications-alerting.md)
 - [Indexer Management Settings](./indexer-settings.md)
 - [Enrollment tokens](./enrollment-tokens/)
+- [Available Updates](./available-updates.md)
 - [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md)
 - [Ruleset Management](./ruleset-management/)
   - [Normalization](./ruleset-management/normalization.md)
