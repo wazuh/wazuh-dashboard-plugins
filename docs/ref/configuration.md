@@ -34,7 +34,7 @@ A host has the following properties:
 | port     | Define the port                                                                   | Yes      | -             | any integer between 1-65535        |
 | username | Define the username                                                               | Yes      | -             | any string between 4-64 characters |
 | password | Define the password (see [Passwords in the keystore](#passwords-in-the-keystore)) | Yes      | -             | any string up to 64 characters     |
-| run_as   | Define if the user context is used to retrieve the permissions                    | No       | false         | true, false                        |
+| run_as   | Define if the user context is used to retrieve the permissions                    | No       | true          | true, false                        |
 | key      | Path to the SSL/TLS client private key file                                       | No       | -             | absolute or relative file path     |
 | cert     | Path to the SSL/TLS client certificate file                                       | No       | -             | absolute or relative file path     |
 | ca       | Path to the CA certificate file for server verification                           | No       | -             | absolute or relative file path     |
