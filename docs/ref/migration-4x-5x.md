@@ -472,13 +472,17 @@ See [External Integrations](external-integrations.md) for reconfiguration if nee
 
 ### 6. Validate agent enrollment
 
-Test new agent enrollment:
+Test new agent enrollment. A 5.x agent registers with an enrollment token only: the 4.x
+registration variables, such as `WAZUH_MANAGER_ENDPOINT` or `WAZUH_REGISTRATION_PASSWORD`, are
+ignored by the 5.x installer. Obtain the command from the **Deploy new agent** wizard, or replace
+`<enrollment-token>` below with a token minted on the manager. See
+[Agent deploy one-liner](agent-deploy-one-liner.md#enrollment-token).
 
 ```bash
 # Use updated enrollment command with 5.x manager
 curl -so wazuh-agent-5.0.0-1.deb \
   https://packages.wazuh.com/5.x/apt/pool/main/w/wazuh-agent/wazuh-agent_5.0.0-1_amd64.deb \
-  && WAZUH_MANAGER_ENDPOINT='your-manager-ip' dpkg -i ./wazuh-agent-5.0.0-1.deb
+  && WAZUH_ENROLLMENT_TOKEN='<enrollment-token>' dpkg -i ./wazuh-agent-5.0.0-1.deb
 
 sudo systemctl daemon-reload
 sudo systemctl enable wazuh-agent

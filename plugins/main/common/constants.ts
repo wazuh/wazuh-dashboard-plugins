@@ -588,6 +588,12 @@ export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
+// Longest delay a queued job can be scheduled with
+export const WAZUH_QUEUE_MAX_DELAY_MS = 60000;
+// Pending jobs the queue holds, so delayed requests cannot exhaust the memory
+export const WAZUH_QUEUE_MAX_JOBS = 50;
+// Pending jobs one user can hold, so a single user cannot fill the queue
+export const WAZUH_QUEUE_MAX_JOBS_PER_USER = 5;
 
 // Wazuh errors
 export const WAZUH_ERROR_DAEMONS_NOT_READY = 'ERROR3099';
