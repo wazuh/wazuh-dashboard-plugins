@@ -25,6 +25,7 @@ cd dev-tools/build-dev-image
 	--opensearch-version 3.6.0.0 \
 	--wazuh-branch 5.0.0 \
 	--plugins-branch 5.0.0 \
+	--platform linux/amd64 \
 	--tag 3.6.0
 ```
 
@@ -32,6 +33,11 @@ Replace the OpenSearch Dashboards version, the branches, and the tag with the
 values of your target. The branch options that are not set (`--security-branch`,
 `--reporting-branch`, and the rest) default to `main`. The script builds a local
 image by default. Add `--push` to publish it to the registry.
+
+The script builds for `linux/amd64,linux/arm64` by default. A local build of
+several platforms fails on the classic Docker image store, so the example sets
+`--platform` to one platform. Set it to the architecture of your host. When you
+publish the image with `--push`, you can omit `--platform` to build both.
 
 ## Use the image
 
