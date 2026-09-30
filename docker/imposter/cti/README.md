@@ -54,7 +54,7 @@ the header `X-Mock-Scenario` with one of:
 
 This mock runs **inside the existing Imposter container** (no extra service
 required). With `IMPOSTER_CONFIG_SCAN_RECURSIVE=true` on the Imposter service
-(see `docker/osd-dev/dev.yml` and `docker/kbn-dev/dev.yml`), every `*-config.yml`
+(see `docker/osd-dev/dev.yml`), every `*-config.yml`
 under `/opt/imposter/config` is loaded, including `cti/cti-config.yml` alongside
 `wazuh-config.yml`. Paths do not collide with the Wazuh API mocks.
 
