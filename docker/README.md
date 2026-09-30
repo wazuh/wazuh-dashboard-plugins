@@ -209,9 +209,8 @@ To setup the credentials (**this only has to be done once**):
 3. In the new window that opens, click on `Docker Configuration` and follow the steps.
 
 The development image (`quay.io/wazuh/osd-dev`) is built from the
-[wazuh-dashboard][6] repository. Its Dockerfile and build scripts are in
-[`dev-tools/build-dev-image`][7]. See that directory's README for the build
-options and for how to push the image to Quay.
+[wazuh-dashboard][6] repository. Follow the development image build
+instructions in that repository, including how to push the image to Quay.
 
 ## [Imposter-cli](https://github.com/gatehill/imposter-cli)
 
@@ -281,4 +280,3 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 [4]: https://quay.io/organization/wazuh 'quay.io/wazuh'
 [5]: https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626 'App permissions'
 [6]: https://github.com/wazuh/wazuh-dashboard 'wazuh-dashboard'
-[7]: https://github.com/wazuh/wazuh-dashboard/tree/HEAD/dev-tools/build-dev-image 'dev-tools/build-dev-image'
