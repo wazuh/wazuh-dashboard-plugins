@@ -83,15 +83,21 @@ action:
 cluster:monitor/content_manager/version/check
 ```
 
-On the Wazuh indexer this action is provided by the `plugin:content_manager/version/check`
-action group and must be granted to the role mapped to the internal user
-(`dashboard_server` in the packaged configuration). If the internal user lacks
-this permission, the endpoint responds with `403` and the available-updates status
-is reported as an error.
+In the packaged Wazuh indexer configuration, `kibanaserver` holds this action
+through the built-in `kibana_server` role (its `cluster_monitor` action group
+covers `cluster:monitor/*`) and through the Wazuh `dashboard_server` role, which
+grants the `plugin:content_manager/version/check` action group. If the internal
+user lacks this permission, the endpoint responds with `403` and the
+available-updates status is reported as an error.
 
-> **Note for non-default deployments:** if you change the dashboard internal user
-> or use a custom indexer security configuration, make sure the corresponding role
-> grants `cluster:monitor/content_manager/version/check` (directly or through the
+A failed check is returned only to the caller that triggered it and is not
+persisted, so the saved object keeps the last _successful_ result and its
+`last_check_date_dashboard`.
+
+> **Note for non-default deployments:** if you change the dashboard internal user,
+> use a custom indexer security configuration, or remove the `kibana_server` role
+> mapping, make sure a role mapped to that user grants
+> `cluster:monitor/content_manager/version/check` (directly or through the
 > `plugin:content_manager/version/check` action group).
 
 ## Software and libraries used

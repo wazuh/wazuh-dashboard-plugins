@@ -23,7 +23,9 @@ user of the deployment, so all sessions display the same status.
 - **Storage**: the outcome of a successful check is written once to the shared saved
   object and served to every session on subsequent reads. A failed check is returned
   only to the session that triggered it and does not replace the last successful
-  result.
+  result. As a result, the date shown to other sessions is the date of the last
+  _successful_ check, even if later checks fail (for example, in an air-gapped
+  deployment where the CTI service is unreachable).
 
 ## Required indexer permission
 
@@ -34,16 +36,23 @@ run the following cluster action on the Wazuh indexer:
 | ----------------------------------------------- | ------- | ----------------------------------------- |
 | `cluster:monitor/content_manager/version/check` | cluster | Query the latest available Wazuh version. |
 
-In the packaged Wazuh indexer configuration this permission is provided by the
-`plugin:content_manager/version/check` action group and granted to the
-`dashboard_server` role, which is mapped to the `kibanaserver` internal user. No
-additional configuration is required for a default deployment.
+In the packaged Wazuh indexer configuration, the `kibanaserver` internal user holds this
+permission through two roles:
 
-> **Note:** If you change the dashboard internal user or use a custom indexer security
-> configuration, grant `cluster:monitor/content_manager/version/check` (directly or
-> through the `plugin:content_manager/version/check` action group) to the role mapped
-> to that user. When the internal user lacks this permission, the indexer responds with
-> `403` and the **Updates status** is reported as an error.
+- `kibana_server`: the built-in OpenSearch security role, mapped to `kibanaserver`. It
+  includes the `cluster_monitor` action group (`cluster:monitor/*`), which covers the
+  version-check action.
+- `dashboard_server`: the Wazuh role mapped to `kibanaserver`. It grants the
+  `plugin:content_manager/version/check` action group explicitly.
+
+No additional configuration is required for a default deployment.
+
+> **Note:** If you change the dashboard internal user, use a custom indexer security
+> configuration, or remove the `kibana_server` role mapping, grant
+> `cluster:monitor/content_manager/version/check` (directly or through the
+> `plugin:content_manager/version/check` action group) to a role mapped to that user.
+> When the internal user lacks this permission, the indexer responds with `403` and the
+> **Updates status** is reported as an error.
 
 ## Verification
 
