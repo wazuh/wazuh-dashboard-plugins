@@ -50,7 +50,15 @@ export const getUpdates = async (
   }
 
   try {
-    const response = await opensearchClient.asCurrentUser.transport.request({
+    // Available updates are a global, non-user-scoped concept stored in a single
+    // shared saved object. Run the version check with the internal identity
+    // (`asInternalUser`) instead of the requesting user so the result does not
+    // depend on the caller's cluster permissions: a user lacking
+    // `cluster:monitor/content_manager/version/check` no longer fails the check,
+    // overwrites the shared record with an error, or leaks their identity through
+    // the stored error message. This requires the dashboard internal user to hold
+    // that permission on the Wazuh indexer (see the plugin README).
+    const response = await opensearchClient.asInternalUser.transport.request({
       method: 'GET',
       path: CONTENT_MANAGER_VERSION_CHECK_PATH,
     });

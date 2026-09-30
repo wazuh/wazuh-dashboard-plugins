@@ -13,10 +13,17 @@ mockSetSavedObject.mockImplementation(() => ({}));
 jest.mock('../saved-object/set-saved-object');
 
 const mockTransportRequest = jest.fn();
+const mockCurrentUserTransportRequest = jest.fn();
 const mockOpensearchClient = {
-  asCurrentUser: {
+  // The version check must run with the internal identity, not the current user.
+  asInternalUser: {
     transport: {
       request: mockTransportRequest,
+    },
+  },
+  asCurrentUser: {
+    transport: {
+      request: mockCurrentUserTransportRequest,
     },
   },
 };
@@ -102,6 +109,20 @@ describe('getUpdates function', () => {
       last_check_date_dashboard: expect.any(Date),
       status: API_UPDATES_STATUS.AVAILABLE_UPDATES,
     });
+  });
+
+  it('should query the indexer with the internal user, not the current user', async () => {
+    mockTransportRequest.mockImplementationOnce(() => ({
+      body: { message: {}, status: 200 },
+    }));
+
+    await getUpdates(true, mockOpensearchClient as any);
+
+    expect(mockTransportRequest).toHaveBeenCalledWith({
+      method: 'GET',
+      path: '/_plugins/_content_manager/version/check',
+    });
+    expect(mockCurrentUserTransportRequest).not.toHaveBeenCalled();
   });
 
   it('should return up to date when no updates in indexer response', async () => {

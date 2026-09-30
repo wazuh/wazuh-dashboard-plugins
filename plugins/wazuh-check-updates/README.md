@@ -61,9 +61,38 @@ The data managed by the plugin is stored and queried in saved objects. There are
 
 The saved object of type "wazuh-check-updates-available-updates" stores the available updates for each API and the last date when a request was made to the Wazuh API to fetch the data. There is a single object of this type for the entire application, shared among all users.
 
+Because this record is global and shared, the version check that populates it runs with the **dashboard internal user** (`asInternalUser`), not the requesting user. This keeps the result independent of each caller's cluster permissions: any authenticated user can trigger the check without failing it, overwriting the shared record with an error, or exposing their identity through a stored error message. See [Indexer permission requirement](#indexer-permission-requirement).
+
 ### 2. User Preferences
 
 The saved objects of type "wazuh-check-updates-user-preferences" store user preferences related to available updates. These objects store whether the user prefers not to receive notifications for new updates and the latest updates that the user dismissed when closing the notification. There can be one object of this type for each user.
+
+## Indexer permission requirement
+
+The available-updates check queries the Wazuh indexer content-manager endpoint
+`GET /_plugins/_content_manager/version/check`. This request is issued with the
+dashboard **internal user** (the user configured as `opensearch.username` in
+`opensearch_dashboards.yml`, `kibanaserver` by default) via `asInternalUser`, so
+the write to the shared saved object never depends on the permissions of the user
+whose session triggered it.
+
+For the check to succeed, that internal user must be allowed to run the cluster
+action:
+
+```
+cluster:monitor/content_manager/version/check
+```
+
+On the Wazuh indexer this action is provided by the `plugin:content_manager/version/check`
+action group and must be granted to the role mapped to the internal user
+(`dashboard_server` in the packaged configuration). If the internal user lacks
+this permission, the endpoint responds with `403` and the available-updates status
+is reported as an error.
+
+> **Note for non-default deployments:** if you change the dashboard internal user
+> or use a custom indexer security configuration, make sure the corresponding role
+> grants `cluster:monitor/content_manager/version/check` (directly or through the
+> `plugin:content_manager/version/check` action group).
 
 ## Software and libraries used
 
