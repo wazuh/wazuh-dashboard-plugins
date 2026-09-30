@@ -98,8 +98,12 @@ export class WazuhCheckUpdatesPlugin
   ): WazuhCheckUpdatesPluginStart {
     this.logger.debug('wazuhCheckUpdates: Started');
 
+    // The saved object types are hidden, so they must be explicitly included
     const internalSavedObjectsClient =
-      core.savedObjects.createInternalRepository();
+      core.savedObjects.createInternalRepository([
+        availableUpdatesObject.name,
+        userPreferencesObject.name,
+      ]);
     setCore(core);
 
     setInternalSavedObjectsClient(internalSavedObjectsClient);
