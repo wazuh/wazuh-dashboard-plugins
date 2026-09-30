@@ -378,14 +378,13 @@ sudo systemctl enable wazuh-dashboard
 sudo systemctl start wazuh-dashboard
 
 # Monitor startup logs
-sudo tail -f /var/log/wazuh-dashboard/opensearch_dashboards.log
+sudo journalctl -u wazuh-dashboard -f
 ```
 
-Look for successful startup messages:
+Look for the successful startup message:
 
 ```
-[info][server][OpenSearchDashboards] http server running at https://0.0.0.0:443
-[info][plugins][wazuh] Wazuh plugin initialized
+{"type":"log","@timestamp":"...","tags":["info","http","server","OpenSearchDashboards"],"pid":...,"message":"http server running at https://0.0.0.0:443"}
 ```
 
 ### Step 5: Import saved objects
@@ -528,7 +527,7 @@ supply the named password in `/etc/wazuh/credentials.env`. See
 
 4. **Review logs**:
    ```bash
-   sudo tail -100 /var/log/wazuh-dashboard/opensearch_dashboards.log
+   sudo journalctl -u wazuh-dashboard -n 100 --no-pager
    ```
 
 ### Issue 2: API connection errors
