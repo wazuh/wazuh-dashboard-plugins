@@ -17,7 +17,7 @@ describe.skip('Queue jobs', () => {
   it('Sure that job was executed and removed from queue', () => {
     jobQueueRun({});
     function wait(time: number) {
-      return new Promise((res) => {
+      return new Promise(res => {
         setTimeout(res, time);
       });
     }
