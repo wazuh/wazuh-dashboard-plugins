@@ -53,6 +53,11 @@ Keep the change scoped to the issue. Respect the architecture and conventions in
 - `filenames-simple` naming (kebab-case), TypeScript, English everywhere.
 - User-facing text you add or touch goes through i18n, following STYLEGUIDE's
   Internationalization section. The i18n gate in `yarn test:jest` rejects bad ids and messages.
+- Documentation you add or touch never links to another Wazuh repository
+  (`github.com/wazuh/<repo>/...`): those URLs point to a specific branch. Write a
+  literal reference instead, such as _Wazuh Manager > Getting Started >
+  Installation > Options_. See the "References to other Wazuh repositories"
+  section of [`docs/AGENTS.md`](../../../docs/AGENTS.md).
 
 ### 3. Tests (colocated)
 
