@@ -82,7 +82,7 @@ In the creation/edition form, some fields are shown or hidden depending on the c
 
 #### Add active responses as a new action type in alerting triggers
 
-The active responses can be added when using the **Per documento monitor** in the alerting configuration. In the triggers configuration, a new button **Add active response** allows users to select an active response channel.
+The active responses can be added when using the **Per document monitor** in the alerting configuration. In the triggers configuration, a new button **Add active response** allows users to select an active response channel.
 
 The existing button was changed to **Add notification** to differentiate it from the new button for active responses. This allows users to add existing notifications channels. This uses the same concept to managed/unmanaged notification channels to separate the management.
 
