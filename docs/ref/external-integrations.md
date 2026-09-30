@@ -276,8 +276,14 @@ Monitor the health and performance of external integrations:
 
 3. **Audit integration logs**:
 
-   - Wazuh manager: `/var/ossec/logs/integrations.log`
-   - OpenSearch Dashboards: `/var/log/wazuh-dashboard/opensearch_dashboards.log`
+   - Wazuh indexer: `/var/log/wazuh-indexer/wazuh-cluster.log`. Monitors run and notifications
+     are sent by the Alerting and Notifications plugins on the indexer, so delivery errors appear
+     here. The file is named after `cluster.name` in `/etc/wazuh-indexer/opensearch.yml`.
+   - Wazuh dashboard: `journalctl -u wazuh-dashboard`. The dashboard logs to the systemd journal
+     by default.
+
+   > **Note:** The Wazuh manager does not take part in these integrations. `wazuh-integratord`
+   > was removed in 5.0.0, so there is no manager integrations log.
 
 4. **Performance metrics**:
    - Alert delivery latency

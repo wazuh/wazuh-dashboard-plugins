@@ -89,7 +89,7 @@ After initial setup:
 If you encounter issues during installation or setup:
 
 - Check [Diagnostic Guide](../../diag/diagnostic.md)
-- Review log files at `/var/log/wazuh-dashboard/`
+- Review the service logs with `journalctl -u wazuh-dashboard`
 - Verify network connectivity to indexer and manager
 - Ensure certificates are properly configured
 - If the service does not start, see [When the dashboard does not start](credentials.md#when-the-dashboard-does-not-start)
