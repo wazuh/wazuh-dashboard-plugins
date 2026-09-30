@@ -72,7 +72,7 @@ The Wazuh dashboard depends on:
 
 ### Wazuh indexer (OpenSearch)
 
-- Version compatibility: OpenSearch 2.x (check `package.json` for exact version)
+- Version compatibility: OpenSearch 3.6.0 (the `opensearch` value in `buildSrc/version.properties` at the `wazuh-indexer` repository)
 - Connection type: HTTPS with TLS certificate verification
 - Required permissions: Read and write access to Wazuh indices
 - The password of the `kibanaserver` account (`WAZUH_INDEXER_KIBANASERVER_PASSWORD`)
