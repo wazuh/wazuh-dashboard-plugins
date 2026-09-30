@@ -153,8 +153,9 @@ variables, `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD`. A 5.0
 agent installer ignores both, so the command installs the agent but does not
 register it: the agent is left with no manager to connect to. Grant the
 permission and generate the command again, or register the installed agent
-afterwards with a token minted on the manager, as described in
-[Installing without a token](https://github.com/wazuh/wazuh/blob/5.0.0/docs/ref/getting-started/installation.md#installing-without-a-token).
+afterwards with a token minted on the manager, as described in the manager
+documentation, _Wazuh Manager > Getting Started > Installation > Installing
+without a token_.
 
 The tokens the server has minted are listed, revoked and purged in the
 [Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from
@@ -191,20 +192,18 @@ Three combinations are possible, and each generates a different command:
 
 `WAZUH_SSL_VERIFICATION` also accepts `full`, `certificate` and `system`, which
 the wizard does not generate. `system` suits a manager fronted by a publicly
-trusted certificate. See
-[TLS verification](https://github.com/wazuh/wazuh/blob/5.0.0/docs/ref/getting-started/installation.md#tls-verification)
-in the manager documentation.
+trusted certificate. See the manager documentation, _Wazuh Manager > Getting
+Started > Installation > TLS verification_.
 
 ## Notes
 
 Use the manager FQDN as the **Server address** when the agents reach the
 manager through DNS. The token is minted for that address, and the manager
 refuses to mint one for an address that is not a subject alternative name of
-its listener certificate (`remote.https.certificate`); see
-[Enrollment tokens](https://github.com/wazuh/wazuh/blob/5.0.0/docs/ref/modules/authd/README.md#enrollment-tokens)
-in the manager documentation. Add further variables as needed, for example
-`WAZUH_AGENT_NAME` or `WAZUH_AGENT_GROUP`. See
-[Deployment variables](#deployment-variables).
+its listener certificate (`remote.https.certificate`); see the manager
+documentation, _Wazuh Manager > Modules > Authd > Enrollment tokens_. Add
+further variables as needed, for example `WAZUH_AGENT_NAME` or
+`WAZUH_AGENT_GROUP`. See [Deployment variables](#deployment-variables).
 
 The agent connects to exactly one manager: there is no server rotation and no
 failover between several, so a token names a single manager address rather
@@ -256,8 +255,8 @@ starting the dev server:
 The 5.0 agent installer reads the variables below. The wizard generates
 `WAZUH_ENROLLMENT_TOKEN`, `WAZUH_SSL_VERIFICATION`, `WAZUH_AGENT_NAME` and
 `WAZUH_AGENT_GROUP`; the others can be added to the command by hand. The
-manager documentation is the reference for the installer:
-[Options](https://github.com/wazuh/wazuh/blob/5.0.0/docs/ref/getting-started/installation.md#options).
+manager documentation is the reference for the installer: _Wazuh Manager >
+Getting Started > Installation > Options_.
 
 | Option                    | Description                                                                                                                                                                                                                                                                                                                        |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -290,5 +289,5 @@ A command that relies on them installs the agent but leaves it unregistered.
 | `WAZUH_REGISTRATION_CERTIFICATE`, `WAZUH_REGISTRATION_KEY` | `<agent><ssl><certificate>` and `<agent><ssl><key>` in `ossec.conf`.                                                                                |
 
 The manager documentation lists every removed name, including the older
-aliases and the Windows MSI spellings:
-[Variables removed in 5.0](https://github.com/wazuh/wazuh/blob/5.0.0/docs/ref/getting-started/installation.md#variables-removed-in-50).
+aliases and the Windows MSI spellings: _Wazuh Manager > Getting Started >
+Installation > Variables removed in 5.0_.
