@@ -38,6 +38,7 @@
   - [Health check](ref/modules/healthcheck.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
   - [Indexer Management Settings](ref/modules/indexer-settings.md)
+  - [Available Updates](ref/modules/available-updates.md)
   - [Enrollment tokens](ref/modules/enrollment-tokens/README.md)
   - [Active Response](ref/modules/active-response/index.md)
     - [Create an active response](ref/modules/active-response/create.md)
