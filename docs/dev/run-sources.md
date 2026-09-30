@@ -1,14 +1,14 @@
 # How to run from sources
 
 The recommended way to run the plugins from source is using the Docker-based
-development environments in [docker/](../../docker). These environments include
+development environments in the `docker/` directory of the repository. These environments include
 an OpenSearch indexer, Wazuh manager, OpenSearch Dashboards development
 environment, optional Wazuh agents (with `-a` flag), and supporting services
 (Imposter mock server, Elasticsearch-exporter).
 
 ## Start the OpenSearch Dashboards dev environment
 
-1. Review the prerequisites in [docker/osd-dev/README.md](../../docker/osd-dev/README.md).
+1. Review the prerequisites in `docker/osd-dev/README.md`.
 2. Start the environment from the repository root:
 
 ```bash
@@ -37,7 +37,7 @@ For SAML-enabled environments:
 ./dev.sh up -saml
 ```
 
-See [docker/osd-dev/README.md](../../docker/osd-dev/README.md) for all available
+See `docker/osd-dev/README.md` for all available
 options, including `--server`, `--indexer-local`, and external plugin mappings.
 
 3. Attach a shell to the development container:
@@ -54,7 +54,7 @@ yarn start --no-base-path
 ```
 
 If dependencies are missing, install them from the `/plugins` directory inside
-the container (see [docker/osd-dev/README.md](../../docker/osd-dev/README.md)).
+the container (see `docker/osd-dev/README.md`).
 
 The dashboard should be available at https://0.0.0.0:5601/ (default credentials: `admin:admin`, or `wazuh:wazuh` for SAML environments).
 

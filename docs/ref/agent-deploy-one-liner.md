@@ -44,9 +44,8 @@ interface, for example in end-to-end testing scenarios.
 
 6. **Optional configuration** (when required):
    - **Verify the manager certificate**: leave it enabled unless the endpoint
-     cannot verify the manager listener. While it is enabled, **Manager CA file
-     path on the endpoint** takes the certificate authority to verify the
-     manager against. See
+     cannot verify the manager listener. A token install needs no certificate
+     authority path: the agent obtains its trust anchor through the token. See
      [Manager certificate verification](#manager-certificate-verification).
    - **Agent name**: define how the agent is identified.
    - **Agent group**: assign the agent to an existing group (for example, `default`).
@@ -120,20 +119,25 @@ is checked only for what would break the generated command apart, a space or a
 single quote, since the manager is what decides whether the text is a token it
 issued.
 
-The token names the manager and carries the credential the agent enrolls with.
-The installer refuses a token supplied together with a value that contradicts
-it, so with a token in hand the wizard emits neither
-`WAZUH_MANAGER_ENDPOINT` nor `WAZUH_REGISTRATION_PASSWORD` beside
-`WAZUH_ENROLLMENT_TOKEN`. Editing the server address after generating a token
-discards it, since the address the agent would reach comes from the token. A
-token supplied on the **Use an existing token** tab is left alone, because it
-was not minted from those fields and they say nothing about the manager it
-names.
+`WAZUH_ENROLLMENT_TOKEN` is the only way the 5.0 agent installer registers an
+agent. The token names the manager, pins the certificate authority of the
+manager it was minted on, and carries the credential the agent enrolls with, so
+the installer takes the manager address and the trust anchor from it. The 4.x
+registration variables -- `WAZUH_MANAGER_ENDPOINT`,
+`WAZUH_REGISTRATION_PASSWORD`, `WAZUH_REGISTRATION_SERVER` and the rest of the
+family -- were removed in 5.0: the installer still reads them, logs that each
+one "is not supported in 5.0 and was ignored", and writes nothing. With a token
+in hand the wizard therefore emits neither `WAZUH_MANAGER_ENDPOINT` nor
+`WAZUH_REGISTRATION_PASSWORD` beside `WAZUH_ENROLLMENT_TOKEN`. See
+[Variables removed in 5.0](#variables-removed-in-50).
 
-How the endpoint verifies the manager is not one of those values, and the token
-settles nothing about it. The **Optional settings** step keeps deciding it,
-with or without a token, and both variables it generates may accompany
-`WAZUH_ENROLLMENT_TOKEN` in the command. See
+Editing the server address after generating a token discards it, since the
+address the agent would reach comes from the token. A token supplied on the
+**Use an existing token** tab is left alone, because it was not minted from
+those fields and they say nothing about the manager it names.
+
+The **Optional settings** step still decides whether the endpoint verifies the
+manager certificate, with or without a token. See
 [Manager certificate verification](#manager-certificate-verification).
 
 A section that holds a value opens by itself rather than hiding it: the port and
@@ -143,12 +147,18 @@ cannot be seen cannot be corrected and the deployment commands stay blocked
 until it is.
 
 Minting requires the `enrollment_token:create` permission. Where it is missing --
-including against a server whose RBAC policy predates the action -- the wizard
-falls back to the enrollment password, and the **Enrollment token** step is not
-shown.
+including against a server whose RBAC policy predates the action -- the
+**Enrollment token** step is not shown and the wizard falls back to the 4.x
+variables, `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD`. A 5.0
+agent installer ignores both, so the command installs the agent but does not
+register it: the agent is left with no manager to connect to. Grant the
+permission and generate the command again, or register the installed agent
+afterwards with a token minted on the manager, as described in the manager
+documentation, _Wazuh Manager > Getting Started > Installation > Installing
+without a token_.
 
 The tokens the server has minted are listed, revoked and purged in the
-[Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from
+[Enrollment tokens](modules/enrollment-tokens/) module, reachable from
 **Manage the minted tokens** in this step.
 
 ## Manager certificate verification
@@ -162,42 +172,51 @@ whether or not the deployment uses an enrollment token:
 - **Verify the manager certificate**, enabled by default.
 - **Manager CA file path on the endpoint**, shown while verification is
   enabled. It takes the path of a certificate authority already present on the
-  endpoint, which the installer writes into the agent configuration.
+  endpoint.
+
+A token install needs neither. The token carries a **pin**, the SHA-256 digest
+of the public key of the certificate authority that signs the manager's
+agent-facing certificate. On its first start the agent fetches that authority
+from the manager, checks it against the pin, installs it as its trust anchor at
+`etc/certs/root-ca.pem`, and enrolls over a fully verified connection. The
+verification mode then resolves to `full` against that anchor, and
+`WAZUH_SSL_VERIFICATION` only overrides it.
 
 Three combinations are possible, and each generates a different command:
 
-| Wizard state                           | What the generated command carries                                                                                                                                                                                                                                                             |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verification enabled, no CA path       | Nothing. The agent verifies the manager against the endpoint's own system CA store, which trusts publicly issued certificates only.                                                                                                                                                            |
-| Verification enabled, CA path supplied | `WAZUH_REGISTRATION_CA='<path>'`. The agent verifies the manager against that authority, which is what a self-signed manager certificate requires.                                                                                                                                             |
-| Verification disabled                  | `WAZUH_SSL_VERIFICATION='none'`, and the CA path input is hidden, since an authority to verify against means nothing once nothing is verified. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only. |
+| Wizard state                           | What the generated command carries                                                                                                                                                                                                                                                                                          |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verification enabled, no CA path       | Nothing. After a token install the agent verifies the manager against the trust anchor the token delivered.                                                                                                                                                                                                                 |
+| Verification enabled, CA path supplied | `WAZUH_REGISTRATION_CA='<path>'`. This variable was removed in 5.0 and the installer ignores it, so the path has no effect. A token install does not need it; on an agent configured by hand, place the authority at `etc/certs/root-ca.pem` or name it in `<agent><ssl><certificate_authorities>` in `ossec.conf` instead. |
+| Verification disabled                  | `WAZUH_SSL_VERIFICATION='none'`, and the CA path input is hidden, since an authority to verify against means nothing once nothing is verified. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only.                              |
 
-An enrollment token does not replace any of this. The token carries a **pin**,
-the SHA-256 digest of the manager certificate authority's public key, and a
-digest is not the authority itself: the agent still obtains the certificate
-authority separately -- from the endpoint's system store, from the path
-supplied here, or from the manager's own `/cacerts` endpoint -- and uses the
-pin to establish that what it obtained is the expected one. Supplying the
-authority therefore remains the operator's decision beside a token, exactly as
-it is without one.
+`WAZUH_SSL_VERIFICATION` also accepts `full`, `certificate` and `system`, which
+the wizard does not generate. `system` suits a manager fronted by a publicly
+trusted certificate. See the manager documentation, _Wazuh Manager > Getting
+Started > Installation > TLS verification_.
 
 ## Notes
 
-Use the manager FQDN for both `WAZUH_MANAGER_ENDPOINT` and
-`WAZUH_REGISTRATION_SERVER` when enrollment is performed through DNS. Add
-additional variables as needed, for example `WAZUH_AGENT_NAME` or
-`WAZUH_REGISTRATION_PASSWORD`. See [Deployment variables](#deployment-variables).
+Use the manager FQDN as the **Server address** when the agents reach the
+manager through DNS. The token is minted for that address, and the manager
+refuses to mint one for an address that is not a subject alternative name of
+its listener certificate (`remote.https.certificate`); see the manager
+documentation, _Wazuh Manager > Modules > Authd > Enrollment tokens_. Add
+further variables as needed, for example `WAZUH_AGENT_NAME` or
+`WAZUH_AGENT_GROUP`. See [Deployment variables](#deployment-variables).
 
 The agent connects to exactly one manager: there is no server rotation and no
-failover between several, so `WAZUH_MANAGER_ENDPOINT` takes a single endpoint
-rather than a list. High availability is provided by a load balancer in front
-of the managers, which the agent reaches through one endpoint.
+failover between several, so a token names a single manager address rather
+than a list. High availability is provided by a load balancer in front of the
+managers, which the agent reaches through one address.
 
-The wizard fills the endpoint from three separate fields -- address, port and
-path prefix -- and joins them into the value it generates. The port and the
-path prefix are optional: left empty, they are omitted from the command and the
-agent applies its own defaults. **Remember server address** stores all three, so
-the next visit is prefilled with the whole endpoint.
+The wizard takes the manager address from three separate fields -- address,
+port and path prefix -- and sends all three with the mint request, so the
+token carries the whole endpoint. The port and the path prefix are optional:
+left empty, the agent applies its own defaults, `1517` and `/wazuh-manager/`.
+The path prefix must match the manager's `<remote><https><global_prefix>`, or
+every request the agent sends answers `404`. **Remember server address** stores
+all three, so the next visit is prefilled with the whole endpoint.
 
 ## How the download URL and package name are built
 
@@ -233,19 +252,42 @@ starting the dev server:
 
 ### Deployment variables
 
-| Option                         | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| WAZUH_MANAGER_ENDPOINT         | The Wazuh manager the agent connects to, as a single connection target: `host[:port][/path]`. `host` is an IP address or FQDN; the port and the path prefix are optional and default to `1517` and `/wazuh-manager/` when omitted. The path prefix must match the manager's `<remote><https><global_prefix>`, or every request the agent sends answers `404`. This is the variable the wizard generates when the deployment does not use an enrollment token. |
-| WAZUH_ENROLLMENT_TOKEN         | The enrollment token the agent enrolls with, minted by the server for one manager address. It names the manager and carries the enrollment credential, so it replaces `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD` rather than accompanying them. This is the variable the wizard generates when the **Enrollment token** step is available.                                                                                                    |
-| WAZUH_REGISTRATION_SERVER      | Specifies the Wazuh enrollment server, used for the Wazuh agent enrollment. If empty, the host from WAZUH_MANAGER_ENDPOINT will be used.                                                                                                                                                                                                                                                                                                                      |
-| WAZUH_REGISTRATION_PORT        | Specifies the port used by the Wazuh enrollment server.                                                                                                                                                                                                                                                                                                                                                                                                       |
-| WAZUH_REGISTRATION_PASSWORD    | Sets password used to authenticate during enrollment, stored in etc/authd.pass.                                                                                                                                                                                                                                                                                                                                                                               |
-| WAZUH_KEEP_ALIVE_INTERVAL      | Sets the time between Wazuh agent checks for Wazuh manager connection.                                                                                                                                                                                                                                                                                                                                                                                        |
-| WAZUH_TIME_RECONNECT           | Sets the time interval for the Wazuh agent to reconnect with the Wazuh manager when connectivity is lost.                                                                                                                                                                                                                                                                                                                                                     |
-| WAZUH_REGISTRATION_CA          | Host SSL validation need of Certificate of Authority. This option specifies the CA path.                                                                                                                                                                                                                                                                                                                                                                      |
-| WAZUH_SSL_VERIFICATION         | Set to `none` to stop the agent from verifying the manager certificate, which leaves the connection open to interception. Omitted, the agent verifies the certificate against `WAZUH_REGISTRATION_CA` when one is supplied, and against the endpoint's system CA store otherwise.                                                                                                                                                                             |
-| WAZUH_REGISTRATION_CERTIFICATE | The SSL agent verification needs a CA signed certificate and the respective key. This option specifies the certificate path.                                                                                                                                                                                                                                                                                                                                  |
-| WAZUH_REGISTRATION_KEY         | Specifies the key path completing the required variables with WAZUH_REGISTRATION_CERTIFICATE for the SSL agent verification process.                                                                                                                                                                                                                                                                                                                          |
-| WAZUH_AGENT_NAME               | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                                                                                                                                                                                                  |
-| WAZUH_AGENT_GROUP              | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                                                                                                                                                                                                 |
-| ENROLLMENT_DELAY               | Assigns the time that agentd should wait after a successful enrollment.                                                                                                                                                                                                                                                                                                                                                                                       |
+The 5.0 agent installer reads the variables below. The wizard generates
+`WAZUH_ENROLLMENT_TOKEN`, `WAZUH_SSL_VERIFICATION`, `WAZUH_AGENT_NAME` and
+`WAZUH_AGENT_GROUP`; the others can be added to the command by hand. The
+manager documentation is the reference for the installer: _Wazuh Manager >
+Getting Started > Installation > Options_.
+
+| Option                    | Description                                                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| WAZUH_ENROLLMENT_TOKEN    | The enrollment token minted on the manager, and the only way to register an agent. It names the manager, pins its certificate authority and carries the enrollment credential. The installer writes the address it carries into `<agent><manager><endpoint>` and leaves the token for the agent to enroll with on its first start. |
+| WAZUH_SSL_VERIFICATION    | Writes `<agent><ssl><verification_mode>`: one of `full`, `certificate`, `system` or `none`. Omitted, a token install verifies the manager in `full` mode against the trust anchor the token delivered. The wizard generates only `none`, which leaves the connection open to interception.                                         |
+| WAZUH_AGENT_NAME          | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                                                                       |
+| WAZUH_AGENT_GROUP         | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                                                                      |
+| WAZUH_KEEP_ALIVE_INTERVAL | Sets the time, in seconds, between the Wazuh agent keep-alive notifications to the Wazuh manager.                                                                                                                                                                                                                                  |
+| WAZUH_TIME_RECONNECT      | **No effect.** Targets `<agent><time-reconnect>`, an option that is deprecated and ignored in 5.0.                                                                                                                                                                                                                                 |
+| ENROLLMENT_DELAY          | Assigns the time, in seconds, that the agent waits after a successful enrollment before its first connection attempt.                                                                                                                                                                                                              |
+
+### Variables removed in 5.0
+
+The enrollment token replaced the whole registration family. The installer
+still reads the names below, so a 4.x-era command or an untouched playbook is
+told what happened, but none of them writes anything:
+
+```console
+wazuh-agent: WAZUH_MANAGER_ENDPOINT is not supported in 5.0 and was ignored: registration is configured by WAZUH_ENROLLMENT_TOKEN alone; this variable no longer has any effect.
+```
+
+A command that relies on them installs the agent but leaves it unregistered.
+
+| Removed variable                                           | Replacement                                                                                                                                         |
+| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WAZUH_MANAGER_ENDPOINT`                                   | `WAZUH_ENROLLMENT_TOKEN`: the manager address travels inside the token.                                                                             |
+| `WAZUH_REGISTRATION_PASSWORD`                              | `WAZUH_ENROLLMENT_TOKEN`: the token carries its own credential, scoped and revocable.                                                               |
+| `WAZUH_REGISTRATION_SERVER`, `WAZUH_REGISTRATION_PORT`     | Nothing. Enrollment uses the manager's own HTTPS endpoint; there is no separate enrollment listener to address.                                     |
+| `WAZUH_REGISTRATION_CA`                                    | Nothing on a token install, since the trust anchor arrives with the token. On an agent configured by hand, `<agent><ssl><certificate_authorities>`. |
+| `WAZUH_REGISTRATION_CERTIFICATE`, `WAZUH_REGISTRATION_KEY` | `<agent><ssl><certificate>` and `<agent><ssl><key>` in `ossec.conf`.                                                                                |
+
+The manager documentation lists every removed name, including the older
+aliases and the Windows MSI spellings: _Wazuh Manager > Getting Started >
+Installation > Variables removed in 5.0_.

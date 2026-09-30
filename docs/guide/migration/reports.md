@@ -64,7 +64,7 @@ There is no automated path to import 4.x report files into the 5.x reporting sys
 
 Copy all existing PDF reports from the server filesystem before uninstalling the Wazuh dashboard 4.x package. Because reports are stored per user, you must copy the entire `downloads/reports/` directory to capture all users' reports.
 
-> **Note**: If you completed the [dashboard files backup](./README.md#back-up-dashboard-files) step in the migration overview, the 4.x PDF reports are already included under `wazuh/downloads/reports/` in your backup directory. The files preserved this way are standalone PDF documents — they cannot be imported into the 5.x Reporting plugin, which stores reports in an index instead of the server filesystem.
+> **Note**: If you completed the [dashboard files backup](./#back-up-dashboard-files) step in the migration overview, the 4.x PDF reports are already included under `wazuh/downloads/reports/` in your backup directory. The files preserved this way are standalone PDF documents — they cannot be imported into the 5.x Reporting plugin, which stores reports in an index instead of the server filesystem.
 
 ### Copy reports from the filesystem
 

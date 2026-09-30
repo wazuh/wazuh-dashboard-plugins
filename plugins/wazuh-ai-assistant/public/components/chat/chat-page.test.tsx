@@ -813,7 +813,8 @@ describe('ChatPage — restoring the open conversation', () => {
 
 describe('ChatPage — a resumed conversation is the same conversation', () => {
   it('restores past timestamps rather than stamping everything with the resume time', async () => {
-    const savedAt = Date.parse('2024-01-01T09:00:00.000Z');
+    // Three hours back: never the same HH:MM label as "now", whatever time the suite runs.
+    const savedAt = Date.now() - 3 * 60 * 60 * 1000;
     mockConversationsService.get.mockResolvedValue(
       conversationRecord({
         messages: [
