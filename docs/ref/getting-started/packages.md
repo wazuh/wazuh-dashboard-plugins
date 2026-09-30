@@ -109,7 +109,7 @@ Wazuh dashboard follows semantic versioning:
 
 Each Wazuh dashboard version is built for a specific OpenSearch Dashboards version:
 
-- **Wazuh 5.0.0**: OpenSearch Dashboards 3.3.0
+- **Wazuh 5.0.0**: OpenSearch Dashboards 3.6.0
 - Check `plugins/wazuh-core/package.json` for exact platform version
 
 ## Installation methods
