@@ -281,4 +281,4 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 [4]: https://quay.io/organization/wazuh 'quay.io/wazuh'
 [5]: https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626 'App permissions'
 [6]: https://github.com/wazuh/wazuh-dashboard 'wazuh-dashboard'
-[7]: https://github.com/wazuh/wazuh-dashboard/tree/5.0.0/dev-tools/build-dev-image 'dev-tools/build-dev-image'
+[7]: https://github.com/wazuh/wazuh-dashboard/tree/main/dev-tools/build-dev-image 'dev-tools/build-dev-image'
