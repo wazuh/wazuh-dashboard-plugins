@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- [Node.js](https://nodejs.org/en/) (see [.nvmrc](../../.nvmrc))
+- [Node.js](https://nodejs.org/en/) (see `.nvmrc` at the repository root)
 - [Yarn](https://yarnpkg.com/)
 
 ## First time setup

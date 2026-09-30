@@ -8,7 +8,7 @@ Wazuh dashboard plugins.
 Prerequisites:
 
 - Git
-- Node.js (use the version in [.nvmrc](../../.nvmrc))
+- Node.js (use the version in `.nvmrc` at the repository root)
 - Yarn classic (v1)
 - Docker Desktop (optional, required for the docker-based dev environments)
 

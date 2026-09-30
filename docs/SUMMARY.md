@@ -39,6 +39,7 @@
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
   - [Indexer Management Settings](ref/modules/indexer-settings.md)
   - [Enrollment tokens](ref/modules/enrollment-tokens/README.md)
+  - [Saved Objects for Dashboards and Visualizations](ref/modules/saved-objects-dashboards.md)
   - [Active Response](ref/modules/active-response/index.md)
     - [Create an active response](ref/modules/active-response/create.md)
     - [Attach to an Alerting trigger](ref/modules/active-response/alerting-integration.md)

@@ -84,7 +84,7 @@ grep -v "^#" /etc/wazuh-dashboard/opensearch_dashboards.yml | grep -v "^$" \
 
 ### 3. Review breaking changes
 
-Review the full [CHANGELOG](../../CHANGELOG.md) and note:
+Review the full `CHANGELOG.md` at the repository root and note:
 
 - Deprecated settings that must be removed
 - Renamed configuration keys
@@ -729,7 +729,7 @@ sudo systemctl start wazuh-dashboard
 ## Additional migration resources
 
 - **Upgrade documentation**: [Upgrade](upgrade.md)
-- **CHANGELOG**: [CHANGELOG.md](../../CHANGELOG.md)
+- **CHANGELOG**: `CHANGELOG.md` at the repository root
 - **Requirements**: [Requirements](getting-started/requirements.md)
 - **Configuration reference**: [Configuration](configuration.md)
 - **Security hardening**: [Security](security.md)

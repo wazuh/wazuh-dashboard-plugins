@@ -158,7 +158,7 @@ documentation, _Wazuh Manager > Getting Started > Installation > Installing
 without a token_.
 
 The tokens the server has minted are listed, revoked and purged in the
-[Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from
+[Enrollment tokens](modules/enrollment-tokens/) module, reachable from
 **Manage the minted tokens** in this step.
 
 ## Manager certificate verification

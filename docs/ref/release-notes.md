@@ -86,7 +86,7 @@
 
 <!-- Links -->
 
-[ruleset-management-module]: ./modules/ruleset-management/README.md
+[ruleset-management-module]: ./modules/ruleset-management/
 [active-response-module]: ./modules/active-response/index.md
 [healthcheck-module]: ./modules/healthcheck.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
