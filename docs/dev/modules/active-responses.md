@@ -25,7 +25,7 @@ The application definition is located in `public/active-responses/application.ts
 
 As the active responses and the usual notifications are notifications in the backend side, they are categorized as `notifications` for the usual notification channels and others such as `active-responses`. The categories different from `notifications` are considered managed categories, which means they are not listed in the **Notification** app and they have a dedicated app to be managed, such as the **Active Responses** app for the `active-responses` category.
 
-See [Channel categories](#channel-categories) for more information about the concept of managed categories and how they are used to separate "other" notification channels from the usual notification channels.
+See [Channel categories](#notification-channel-categories) for more information about the concept of managed categories and how they are used to separate "other" notification channels from the usual notification channels.
 
 #### Add the active responses as a new notification channel
 
