@@ -199,9 +199,12 @@ in the manager documentation.
 
 Use the manager FQDN as the **Server address** when the agents reach the
 manager through DNS. The token is minted for that address, and the manager
-refuses to mint one for an address that is not among the names in its listener
-certificate. Add further variables as needed, for example `WAZUH_AGENT_NAME` or
-`WAZUH_AGENT_GROUP`. See [Deployment variables](#deployment-variables).
+refuses to mint one for an address that is not a subject alternative name of
+its listener certificate (`remote.https.certificate`); see
+[Enrollment tokens](https://github.com/wazuh/wazuh/blob/5.0.0/docs/ref/modules/authd/README.md#enrollment-tokens)
+in the manager documentation. Add further variables as needed, for example
+`WAZUH_AGENT_NAME` or `WAZUH_AGENT_GROUP`. See
+[Deployment variables](#deployment-variables).
 
 The agent connects to exactly one manager: there is no server rotation and no
 failover between several, so a token names a single manager address rather
