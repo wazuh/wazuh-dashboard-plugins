@@ -1,29 +1,32 @@
 # How to generate a container image
 
-This repository provides Dockerfiles for development images under
-[docker/images](../../docker/images). Use these to build local images that
-match the OpenSearch Dashboards version you are targeting.
+The development environment in [docker/osd-dev](../../docker/osd-dev) runs the
+`quay.io/wazuh/osd-dev:<OSD_VERSION>` image. This image is built from the
+[wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, not from this one.
+The Dockerfile (`wzd.dockerfile`) and the build scripts are in
+[dev-tools/build-dev-image](https://github.com/wazuh/wazuh-dashboard/tree/5.0.0/dev-tools/build-dev-image).
 
 ## Prerequisites
 
 - Docker Desktop or Docker Engine
+- The [buildx](https://github.com/docker/buildx) plugin and QEMU, for multi-architecture builds
 - Access to the internet for base image downloads
 
 ## Build an OpenSearch Dashboards dev image
 
-From the repository root:
+From the root of a `wazuh-dashboard` checkout:
 
 ```bash
-cd docker/images
-docker build \
-	--build-arg NODE_VERSION=$(cat ../../.nvmrc) \
-	--build-arg OPENSEARCH_VERSION=3.3.0 \
-	-t quay.io/wazuh/osd-dev:3.3.0 \
-	-f osd-dev.Dockerfile .
+cd dev-tools/build-dev-image
+./build-multiarch.sh --tag <tag>
 ```
 
-Adjust `OPENSEARCH_VERSION` and the output tag as needed for your target.
+Replace `<tag>` with the image tag to produce. Use `--push` to publish the image to
+`quay.io/wazuh`. The script also accepts the Node.js version, the platform version and the
+branch of each plugin repository. See the
+[build-dev-image README](https://github.com/wazuh/wazuh-dashboard/blob/5.0.0/dev-tools/build-dev-image/README.md)
+for the full list of options and for the equivalent manual `docker build` command.
 
-## Examples:
+## Examples
 
-For additional image recipes and examples, see [docker/README.md](../../docker/README.md).
+For more about the development environments, see [docker/README.md](../../docker/README.md).

@@ -208,29 +208,10 @@ To setup the credentials (**this only has to be done once**):
 2. Click on `CLI Password: Generate Encrypted Password`
 3. In the new window that opens, click on `Docker Configuration` and follow the steps.
 
-To build an image, use the docker build command like:
-
-Use the `--build-arg` flag to specify the version of Node and the version of
-the platform. The version of Node to use is defined in the `.nvmrc` file. Use
-the Node version defined in that file for the target platform version, as the
-version of Node might be increased between platform's versions.
-
-For example, to build the image for OpenSearch Dashboards `2.6.0`:
-
-```bash
-cd images
-docker build --build-arg NODE_VERSION=14.20.1 --build-arg OPENSEARCH_VERSION=2.6.0 -t quay.io/wazuh/osd-dev:2.6.0 -f osd-dev.Dockerfile .
-cd ..
-```
-
-Push the image to Quay:
-
-```bash
-docker push quay.io/wazuh/image-name:version
-```
-
-If you're creating a new image, copy one of the ones already present
-in the directory, and adapt it to the new version.
+The development image (`quay.io/wazuh/osd-dev`) is built from the
+[wazuh-dashboard][6] repository. Its Dockerfile and build scripts are in
+[`dev-tools/build-dev-image`][7]. See that directory's README for the build
+options and for how to push the image to Quay.
 
 ## [Imposter-cli](https://github.com/gatehill/imposter-cli)
 
@@ -299,3 +280,5 @@ error getting credentials - err: exit status 1, out: `error getting credentials 
 [3]: https://prometheus.io/docs/visualization/grafana/ 'Prometheus'
 [4]: https://quay.io/organization/wazuh 'quay.io/wazuh'
 [5]: https://github.com/wazuh/wazuh-dashboard-plugins/issues/3872#issuecomment-1305507626 'App permissions'
+[6]: https://github.com/wazuh/wazuh-dashboard 'wazuh-dashboard'
+[7]: https://github.com/wazuh/wazuh-dashboard/tree/5.0.0/dev-tools/build-dev-image 'dev-tools/build-dev-image'

@@ -71,7 +71,6 @@ The Docker environment includes:
 
 ## Notes
 
-- For Elasticsearch/Kibana-based environments, use [docker/kbn-dev](../../docker/kbn-dev).
 - Ensure the plugin branch matches your target OpenSearch Dashboards version.
 - Use `--server <version>` for a real Wazuh server release (e.g., `--server 4.7.2`).
 - Use `--server-local <tag>` to test local Wazuh manager builds (place `.deb` packages in `docker/osd-dev/manager/`).
