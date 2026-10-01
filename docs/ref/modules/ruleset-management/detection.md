@@ -56,7 +56,7 @@ A detection rule is composed of the following main blocks:
 
 The following walkthrough demonstrates how to create a detection rule for SSH brute force attempts in the **Draft** space, as part of the `custom-ssh-auth` integration created in the [Normalization](./normalization.md) use case.
 
-**Prerequisites:** The `custom-ssh-auth` integration exists in the **Draft** space with its decoder already defined.
+**Prerequisites:** The `custom-ssh-auth` integration and its decoder were already promoted to the **Test** space (the [Normalization](./normalization.md) walkthrough's Step 4). This walkthrough adds a new rule to that same integration in the **Draft** space, so the later promotion tags the integration as an update and the rule as an addition.
 
 ---
 

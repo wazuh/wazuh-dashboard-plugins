@@ -107,11 +107,12 @@ check:
 normalize:
   - map:
       - '@timestamp': get_date()
+      - event.action: 'authentication_failed'
 ```
 
 </details>
 
-The `check` block defines the condition that must be satisfied for this decoder to apply. The `normalize` block defines the field mappings applied when the condition matches.
+The `check` block defines the condition that must be satisfied for this decoder to apply. The `normalize` block defines the field mappings applied when the condition matches. The `event.action` mapping is required here: the [Detection](./detection.md) walkthrough's example rule matches on `event.action: authentication_failed`, and without this decoder setting that field, the rule never matches and no finding is produced.
 
 Click **Create decoder**. The definition is validated by the engine before it is saved — a decoder missing a required field is rejected (for example, omitting `name` fails with _'name' is required_). The form opens pre-filled with a placeholder decoder that must be replaced.
 
