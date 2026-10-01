@@ -6,7 +6,8 @@ assistant turns it into **read-only** queries against the Wazuh Indexer and the 
 and streams back a short grounded answer together with the real result table.
 
 The module is delivered by its own plugin, `wazuh-ai-assistant` (plugin id `wazuhAiAssistant`),
-and appears in the left navigation as **AI Assistant** under the **Wazuh** category.
+and appears in the left navigation as **AI Assistant** under the **Home** category
+(`wz-category-home`) — the same category as the Overview app.
 
 This module exposes the following views:
 
