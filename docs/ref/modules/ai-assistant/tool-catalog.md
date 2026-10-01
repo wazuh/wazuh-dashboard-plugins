@@ -60,10 +60,11 @@ matches. It is deliberately narrow:
   returns the reason to the model for one bounded self-correction.
 
 `find_document_by_field(index_pattern, values)` is a separate, typed exact-ID lookup — not the
-escape hatch — covering the same index families plus `wazuh-threatintel-*`: it automatically tries
-every applicable ID field for the chosen index (the OpenSearch `_id`, plus business-level UUID
-fields such as `wazuh.event.id`, `wazuh.rule.id`, `vulnerability.id`, `event.doc_id`) so the model
-never has to know which field a given ID belongs to.
+escape hatch — restricted to `wazuh-findings-v5-*`, `wazuh-events-v5-*` and `wazuh-states-*` (no
+`wazuh-threatintel-*` support): it automatically tries every applicable ID field for the chosen
+index (the OpenSearch `_id`, plus business-level UUID fields such as `wazuh.event.id`,
+`wazuh.rule.id`, `vulnerability.id`, `event.doc_id`) so the model never has to know which field a
+given ID belongs to.
 
 ## The two-stage router
 
