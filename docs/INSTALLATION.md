@@ -11,6 +11,9 @@ with Markdown, along with [mdBook Mermaid](https://github.com/badboy/mdbook-merm
 
 - **mdbook**: 0.5.2
 - **mdbook-mermaid**: 0.17.0
+- **mdbook-linkcheck** (optional locally — CI installs it automatically; `book.toml` marks the
+  `[output.linkcheck]` backend `optional`, so a local build without it just skips the check instead
+  of failing): install with `cargo install mdbook-linkcheck`.
 
 ## Installation
 
@@ -54,7 +57,7 @@ Once you have installed mdBook and mdBook Mermaid:
 # Navigate to the docs directory
 cd docs
 
-# Build the documentation (generates html in docs/book/)
+# Build the documentation (generates html in docs/book/html/, linkcheck output in docs/book/linkcheck/)
 mdbook build
 
 # Serve locally with live reload (recommended for development)

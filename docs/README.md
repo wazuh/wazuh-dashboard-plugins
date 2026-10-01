@@ -12,6 +12,6 @@ This folder contains the technical documentation for the Wazuh dashboard. The do
 See [Documentation installation and setup](INSTALLATION.md) for the required mdBook/mdBook-Mermaid
 versions, installing them via `rustup`, and troubleshooting. Once installed:
 
-- Build: `./build.sh` (output in the `book` directory).
+- Build: `./build.sh` (HTML output in `book/html/`; linkcheck output in `book/linkcheck/`).
 - Serve locally for preview: `./server.sh` (available at
   [http://127.0.0.1:3000](http://127.0.0.1:3000)).

@@ -12,6 +12,9 @@ create-missing = false
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
 
+[output.linkcheck]
+optional = true
+
 [output.html]
 default-theme = "light"
 preferred-dark-theme = "navy"
