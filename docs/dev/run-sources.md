@@ -53,7 +53,7 @@ docker exec -it <CONTAINER_ID> bash
 yarn start --no-base-path
 ```
 
-If dependencies are missing, install them from the `/plugins` directory inside
+If dependencies are missing, install them from the `/home/node/kbn/plugins/<name>` directory inside
 the container (see `docker/osd-dev/README.md`).
 
 The dashboard should be available at https://0.0.0.0:5601/ (default credentials: `admin:admin`, or `wazuh:wazuh` for SAML environments).
