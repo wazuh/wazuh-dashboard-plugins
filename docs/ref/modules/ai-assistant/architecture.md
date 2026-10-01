@@ -25,9 +25,10 @@ The plugin has **zero npm runtime dependencies**: everything comes from the host
    1. **Stage 1 — route**: one cheap model call with a single synthetic `route_question` tool
       picks 1–2 categories (agents, findings, vulnerabilities, fim, sca, mitre, inventory,
       compliance, security_analytics, free_search, general) from a compact menu.
-   2. **Stage 2 — act**: the model is re-invoked with only the routed categories' typed tools
-      (3–6 schemas instead of all 32), keeping every provider in its reliable tool-count range
-      and cutting token overhead.
+   2. **Stage 2 — act**: the model is re-invoked with the routed categories' typed tools, plus any
+      chained detail tools (`router.ts`'s `CHAIN_PAIRS`, expanded to a fixed point) and the two
+      always-on tools `search_wazuh_data` and `get_field_values` — a handful of schemas instead of
+      all 35, keeping every provider in its reliable tool-count range and cutting token overhead.
    3. When the model emits a `tool_call`, the server **lints and clamps** the query
       (guardrails), executes it locally — Indexer via
       `context.core.opensearch.client.asCurrentUser`, Manager API via
