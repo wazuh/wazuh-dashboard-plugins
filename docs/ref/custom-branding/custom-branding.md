@@ -3,11 +3,9 @@
 This guide summarizes how to replace logos and branding assets in the Wazuh
 dashboard.
 
-## UI
+## Loading and header logos
 
 <!-- Reference: https://docs.opensearch.org/3.6/dashboards/branding/ -->
-
-### Loading and header logos
 
 Edit `opensearch_dashboards.yml` and set the branding URLs:
 
@@ -47,7 +45,7 @@ Expanded header logo:
 
 ## Application title
 
-Edit `opensearch_dashboards.yml` and set the branding URLs:
+Edit `opensearch_dashboards.yml` and set the application title (a plain text string, not a URL):
 
 ```yml
 opensearchDashboards.branding:
@@ -100,9 +98,9 @@ systemctl restart wazuh-dashboard
 
 ![Favicon](./images/favicon_logo.png)
 
-### Login page
+## Login page
 
-#### Basic authentication
+### Basic authentication
 
 ```yml
 opensearch_security.ui.basicauth:
@@ -121,6 +119,13 @@ systemctl restart wazuh-dashboard
 ```
 
 ![Login page](./images/login_page_basicauth.png)
+
+<!--
+### Provider authentication
+
+TODO: define settings for SSO, refer to the `server/index.ts` file of the Wazuh Security Dashboards plugin repository.
+
+-->
 
 ## Help menu links
 
@@ -173,18 +178,11 @@ Restart the service after changes:
 systemctl restart wazuh-dashboard
 ```
 
-<!--
-#### Provider authentication
-
-TODO: define settings for SSO, refer to: https://github.com/wazuh/wazuh-security-dashboards-plugin/blob/main/server/index.ts#L258-L281
-
--->
-
-# Reporting
+## Reporting
 
 The PDF reports can be customized through a report definition that allows to define a custom header and footer.
 
-1. Go to **Explore** > **Reporting**
+1. Go to **Explore > Reporting**
 2. Click on **Create** button.
 3. Define the report name and description, source and other settings.
 4. In the **Report definition** section, click on the **Add header** or **Add footer** option to customize them.
@@ -199,7 +197,7 @@ For example, for the header, you can add the following HTML code to set a custom
 
 ![Custom report header](./images/report_custom_header.png)
 
-# Host the images in the dashboard server
+## Host the images in the dashboard server
 
 To host the images in the dashboard server, place them in the `src/core/server/core_app/assets` folder of the Wazuh dashboard installation. For example, if you place an image named `custom-logo.png` in the `src/core/server/core_app/assets` folder, you can reference it in the configuration as follows:
 

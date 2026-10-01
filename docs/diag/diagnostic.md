@@ -1,4 +1,4 @@
-# Diagnostic Guide
+# Diagnostic guide
 
 ## Errors
 
@@ -56,24 +56,24 @@ the dashboard, as described in [Rotation](../ref/getting-started/credentials.md#
 
 ### Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.
 
-This means the filter related to the selected server API (`cluster.name` in the alerts case or `wazuh.cluster.name` in the inventories data) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
+This means the filter related to the selected server API (`wazuh.cluster.name`) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
 
 The cookie is set when getting the cluster information after the server API is selected through the selector or automatically when enters to some apps of Wazuh dashboard if possible.
 
 1. Verify a server API is selected in the selector of the dashboard header.
 2. Ensure the server API is online and reachable (use `ping` or `cURL` to test connectivity).
-3. Check the server API configuration in `wazuh.yml` (URL, user, port, credentials).
+3. Check the server API configuration in `wazuh_core.hosts` in `opensearch_dashboards.yml` (URL, user, port, credentials).
 4. Confirm the `clusterInfo` cookie is set in the browser.
 
-### Index pattern [id: index_pattern_id] not found.
+### Index pattern \[id: index_pattern_id\] not found.
 
 This means the expected index pattern used as data source for a view or panel could not be found.
 
-This is usually caused because the expected index pattern does not exist. Go to Dashboard Management to create the expected index pattern if there are matching indices else it could indicate the data collection is disabled or there is a problem.
+This is usually caused because the expected index pattern does not exist. Go to **Dashboard management > Dashboards Management** to create the expected index pattern if there are matching indices else it could indicate the data collection is disabled or there is a problem.
 
 In some cases, it searches by index pattern ID, and in others, this could be the ID or title. This requirement is specified in the error depending on the view or panel.
 
-1. Check if the specified index pattern exists in Dashboard Management > Index Patterns.
+1. Check if the specified index pattern exists in **Dashboard management > Dashboards Management > Index patterns**.
 2. If missing, create the index pattern if matching indices are available.
 3. If no matching indices exist:
 
@@ -87,7 +87,7 @@ This means the dashboard can not connect with the server API host.
 This could be caused by:
 
 - Server API host is not reachable from the Wazuh dashboard host.
-  - Network problem (e.g. termporal issue, firewall).
+  - Network problem (e.g. temporary issue, firewall).
 - Server API is down/stopped.
 - Wrong server API host configuration (URL, port or credentials)
 
@@ -101,7 +101,7 @@ systemctl status wazuh-manager
 
 Use the `ping` command or `cURL` to try the communication using the configuration for the server API host in the Wazuh dashboard.
 
-3. Review the server API host configuration in the Wazuh dashboard side (URL, port and credentials)
+3. Review the server API host configuration in `wazuh_core.hosts` in `opensearch_dashboards.yml` (URL, port and credentials)
 
 ### No server API selected. Please choose one from the server API selector.
 
@@ -113,5 +113,5 @@ This can be caused because the server API host is not selected or this could be 
 
 1. Select a server API host in the dashboard header.
 2. Ensure the server API is online and reachable.
-3. Verify the server API configuration (URL, port, credentials).
+3. Verify the server API configuration in `wazuh_core.hosts` in `opensearch_dashboards.yml` (URL, port, credentials).
 4. Confirm the `currentApi` cookie is set in the browser.

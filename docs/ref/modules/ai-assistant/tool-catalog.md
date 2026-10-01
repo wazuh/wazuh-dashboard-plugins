@@ -1,6 +1,6 @@
 # Tool catalog
 
-The assistant answers questions exclusively through a fixed catalog of **32 read-only tools**.
+The assistant answers questions exclusively through a fixed catalog of **35 read-only tools**.
 There are **no mutating tools**: every tool is read-tier, and there is no code-execution sink.
 The worst an injected instruction (for example, text smuggled in through an ingested finding) can
 achieve is another read the requesting user could already perform.
@@ -25,43 +25,55 @@ Key properties:
 - **Digest spec** — what the model is allowed to see: counts, per-intent aggregates, and at most
   5 whitelisted sample rows, serialized under a 6,000-character hard cap.
 
-## The 32 tools
+## The 35 tools
 
-| Category                     | Tools                                                                                                                                                                                                                                                                                               |
-| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Agents                       | `get_agents` (one or more of `active`/`pending`/`never_connected`/`disconnected`, and/or exact agent IDs)                                                                                                                                                                                           |
-| Findings                     | `get_critical_findings`, `get_findings_by_time`, `get_top_rules`, `get_security_summary`, `get_brute_force`, `get_suspicious_powershell`, `search_findings_by_agent`, `search_findings_by_multiple_agents`, `search_findings_by_os`, `search_findings_by_rule_tag`, `search_findings_by_rule_title` |
-| Vulnerabilities              | `get_vulnerabilities`, `get_critical_vulnerabilities`, `get_vulnerabilities_by_agent`, `get_vulnerability_by_cve`                                                                                                                                                                                   |
-| FIM                          | `get_fim_files`                                                                                                                                                                                                                                                                                     |
-| SCA                          | `get_sca_results`, `get_sca_checks`                                                                                                                                                                                                                                                                 |
-| MITRE ATT&CK                 | `get_mitre_findings`, `get_mitre_summary`                                                                                                                                                                                                                                                           |
-| Inventory (syscollector)     | `get_agent_os`, `get_agent_packages`, `get_agent_ports`, `get_agent_processes`                                                                                                                                                                                                                      |
-| Compliance                   | `get_compliance_alerts`, `get_compliance_summary` (one or more of 10 frameworks — CMMC, FedRAMP, GDPR, HIPAA, ISO 27001, NIS2, NIST 800-171/800-53, PCI DSS, TSC — plus an optional `exclude_framework`)                                                                                            |
-| Ruleset Management           | `get_rules` (correlation ruleset), `get_threat_intel_components` (decoders/integrations/policies/filters/KVDBs), `get_detectors` (detector definitions)                                                                                                                                             |
-| Generic lookup / free search | `find_document_by_field` (exact-ID lookup across every applicable field), `search_wazuh_data` (the escape hatch)                                                                                                                                                                                    |
+| Category                     | Tools                                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Agents                       | `get_agents` (one or more of `active`/`pending`/`never_connected`/`disconnected`, and/or exact agent IDs)                                                                                                                                                                                                                                    |
+| Findings                     | `get_critical_findings`, `get_findings_by_time`, `get_top_rules`, `get_security_summary`, `get_brute_force`, `get_suspicious_powershell`, `search_findings_by_agent`, `search_findings_by_multiple_agents`, `search_findings_by_os`, `search_findings_by_rule_tag`, `search_findings_by_rule_title`, `get_top_agents`, `get_events_by_agent` |
+| Vulnerabilities              | `get_vulnerabilities`, `get_critical_vulnerabilities`, `get_vulnerabilities_by_agent`, `get_vulnerability_by_cve`, `get_cve_intel`                                                                                                                                                                                                           |
+| FIM                          | `get_fim_files`                                                                                                                                                                                                                                                                                                                              |
+| SCA                          | `get_sca_results`, `get_sca_checks`                                                                                                                                                                                                                                                                                                          |
+| MITRE ATT&CK                 | `get_mitre_findings`, `get_mitre_summary`                                                                                                                                                                                                                                                                                                    |
+| Inventory (syscollector)     | `get_agent_inventory` (one of `os`/`packages`/`ports`/`processes`/`hotfixes`)                                                                                                                                                                                                                                                                |
+| Compliance                   | `get_compliance_alerts`, `get_compliance_summary` (one or more of 10 frameworks — CMMC, FedRAMP, GDPR, HIPAA, ISO 27001, NIS2, NIST 800-171/800-53, PCI DSS, TSC — plus an optional `exclude_framework`)                                                                                                                                     |
+| Ruleset Management           | `get_rules` (correlation ruleset), `get_threat_intel_components` (decoders/integrations/policies/filters/KVDBs), `get_detectors` (detector definitions), `lookup_indicator`, `get_cti_status`                                                                                                                                                |
+| Generic lookup / free search | `find_document_by_field` (exact-ID lookup across every applicable field), `search_wazuh_data` (the escape hatch), `get_field_values` (always-on field-discovery tool)                                                                                                                                                                        |
 
 On Wazuh 5.0 the tools read from the 5.0 data layer: the `wazuh-events-v5-*` event indices,
 `wazuh-findings-v5-*`, the `wazuh-states-*` state indices (vulnerabilities, FIM, SCA, inventory),
 the `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` Ruleset Management
-pipeline content, and the single fixed `.opensearch-sap-detectors-config` index (detector
-definitions). Each tool's module in `server/tools/catalog/` documents which index or Server API
-endpoint it queries on 5.0 and why.
+pipeline content, the `wazuh-threatintel-enrichments-a` IOC feed (`lookup_indicator`), the
+`.wazuh-threatintel-vulnerabilities-a` CVE feed (`get_cve_intel`), the `.wazuh-cti-consumers` and
+`.wazuh-content-manager-jobs` CTI sync indices (`get_cti_status`), and the single fixed
+`.opensearch-sap-detectors-config` index (detector definitions), plus the
+`.opensearch-sap-<type>-findings` index whose document count `get_detectors` adds when the call
+targets a single detector type. Each tool's module in
+`server/tools/catalog/` documents which index or Server API endpoint it queries on 5.0 and why.
 
 ## The escape hatch
 
-`search_wazuh_data(index_pattern, dsl)` covers the long tail of questions no typed tool matches.
-It is deliberately narrow:
+`search_wazuh_data(index_pattern, query_dsl)` covers the long tail of questions no typed tool
+matches. It is deliberately narrow:
 
-- `index_pattern` must match the allowlist: `wazuh-events-v5-*`, `wazuh-findings-v5-*`,
-  `wazuh-states-*`. Read-only `_search`/`_count` only.
+- `index_pattern` must be one of a fixed enum (`server/tools/catalog/generic-query-families.ts`):
+  `wazuh-findings-v5-*`, `wazuh-events-v5-*`, `wazuh-states-*` (plus one entry per
+  `wazuh-states-*` index), `wazuh-metrics-*`, the CTI sync indices (`.wazuh-cti-consumers`,
+  `.wazuh-content-manager-jobs`), `.opensearch-sap-*-findings`,
+  `.opensearch-sap-pre-packaged-rules-config`, `.opensearch-sap-correlation-metadata`, and the raw
+  threat-intel feeds `.wazuh-threatintel-vulnerabilities-a` and `wazuh-threatintel-enrichments-a`.
+  The `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families and
+  `.opensearch-sap-detectors-config` are deliberately left out — typed tools own them. Read-only
+  `_search`/`_count` only.
 - The model-proposed DSL goes through the **full guardrail lint** (below). A rejected query
   returns the reason to the model for one bounded self-correction.
 
 `find_document_by_field(index_pattern, values)` is a separate, typed exact-ID lookup — not the
-escape hatch — covering the same index families plus `wazuh-threatintel-*`: it automatically tries
-every applicable ID field for the chosen index (the OpenSearch `_id`, plus business-level UUID
-fields such as `wazuh.event.id`, `wazuh.rule.id`, `vulnerability.id`, `event.doc_id`) so the model
-never has to know which field a given ID belongs to.
+escape hatch — restricted to `wazuh-findings-v5-*`, `wazuh-events-v5-*` and `wazuh-states-*` (no
+`wazuh-threatintel-*` support): it automatically tries every applicable ID field for the chosen
+index (the OpenSearch `_id`, plus business-level UUID fields such as `wazuh.event.id`,
+`wazuh.rule.id`, `vulnerability.id`, `event.doc_id`) so the model never has to know which field a
+given ID belongs to.
 
 ## The two-stage router
 
@@ -72,9 +84,15 @@ single call:
 1. **Stage 1 — route**: one cheap call with a single synthetic `route_question` tool picks 1–2
    categories from an eleven-entry menu (`agents`, `findings`, `vulnerabilities`, `fim`, `sca`,
    `mitre`, `inventory`, `compliance`, `security_analytics`, `free_search`, `general`).
-2. **Stage 2 — act**: the model is re-invoked with only the routed categories' tools. The escape
-   hatch stays reachable when routed to `free_search`; `general` answers without touching Wazuh
-   data at all.
+2. **Stage 2 — act**: the model is re-invoked with the routed categories' tools, expanded with any
+   chained detail tool whose summary tool is already in the set (`CHAIN_PAIRS`, e.g.
+   `get_agents` chains to `get_vulnerabilities_by_agent`/`get_sca_results`/`get_agent_inventory`/
+   `search_findings_by_agent`, and `get_top_agents` to `search_findings_by_agent`/
+   `get_events_by_agent`; expanded to a fixed point so a chained tool that is itself a chain key
+   keeps chaining). `search_wazuh_data` (the escape hatch) and `get_field_values` are added
+   unconditionally on **every** turn, regardless of route. A lone `general` route resolves to a
+   minimal recovery set (`get_security_summary` + the always-on `search_wazuh_data` and
+   `get_field_values`) rather than no tools at all, so a misclassified turn always has a data path.
 
 The router is a **token-cost optimization, not an access control**: every tool remains equally
 authorized, and the real permission check is the user's own RBAC applied to every query. Every
@@ -102,19 +120,23 @@ retry):
 - `script` anywhere (query, sort, aggs, `script_fields`, `runtime_mappings`) — hard block.
 - `regexp` blocked; `wildcard`/`query_string` values with leading `*`/`?` blocked.
 - Date `range` on time fields must be bounded on both sides; span ≤ 90 days.
-- A numeric `range` against a keyword-typed severity field (currently `wazuh.rule.level`,
-  whose values are categorical severity words such as `critical`/`high`/`medium`/`low`) is
-  rejected outright: OpenSearch does not error on a numeric range against a keyword field, it
-  silently falls back to lexicographic string comparison — a real but WRONG result (e.g.
-  `gte: "medium"` excludes `"high"`, since "h" sorts before "m"), which would look like a
-  legitimate answer to the model.
+- A **numeric** `range` bound against a keyword-typed severity field (currently
+  `wazuh.rule.level`, whose values are categorical severity words such as
+  `critical`/`high`/`medium`/`low`) is rejected outright, since OpenSearch does not error on it —
+  it silently falls back to lexicographic string comparison instead. Only the numeric-bound case
+  is caught this way: a **string** bound such as `gte: "medium"` is not rejected and passes
+  through, hitting that same silent lexicographic fallback (`"medium"` excludes `"high"`, since
+  "h" sorts before "m") — a real but WRONG result that looks like a legitimate answer to the
+  model.
 - Bucket aggregations only on a vetted low-cardinality field allowlist; bucket `size` ≤ 100;
   at most 5 top-level aggregations.
 - Index pattern checked against the allowlist before anything else: `wazuh-events-v5-*`,
-  `wazuh-findings-v5-*`, `wazuh-states-*`, the 6 named
-  `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families (the
-  IOC/enrichment feed is deliberately excluded), and the single exact index
-  `.opensearch-sap-detectors-config`.
+  `wazuh-findings-v5-*`, `wazuh-states-*`, `wazuh-metrics-*`, the 6 named
+  `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families, the
+  fixed `wazuh-threatintel-enrichments-a` and `.wazuh-threatintel-vulnerabilities-a` CTI feed
+  indices, the `.wazuh-cti-consumers` and `.wazuh-content-manager-jobs` CTI sync indices, and the
+  `.opensearch-sap-detectors-config`, `.opensearch-sap-pre-packaged-rules-config`,
+  `.opensearch-sap-correlation-metadata` and `.opensearch-sap-*-findings` indices.
 
 ## Digest and privacy layers
 

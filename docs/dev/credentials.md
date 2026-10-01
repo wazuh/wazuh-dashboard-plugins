@@ -5,11 +5,9 @@ This page covers how that works, what it needs from the host, and what to keep i
 changing the packaging. For the operator's view (the keys, the credentials file and the recovery
 steps), see [Credentials](../ref/getting-started/credentials.md).
 
-The implementation lives in the
-[wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, under
+The implementation lives in the `wazuh-dashboard` repository, under
 `dev-tools/build-packages/credentials/`, and is part of the install-time credential design shared
-with the indexer and the manager
-([wazuh-indexer#1928](https://github.com/wazuh/wazuh-indexer/issues/1928)).
+with the indexer and the manager (`wazuh-indexer` issue #1928).
 
 ## Two halves
 

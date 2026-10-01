@@ -25,16 +25,17 @@ The plugin has **zero npm runtime dependencies**: everything comes from the host
    1. **Stage 1 — route**: one cheap model call with a single synthetic `route_question` tool
       picks 1–2 categories (agents, findings, vulnerabilities, fim, sca, mitre, inventory,
       compliance, security_analytics, free_search, general) from a compact menu.
-   2. **Stage 2 — act**: the model is re-invoked with only the routed categories' typed tools
-      (3–6 schemas instead of all 32), keeping every provider in its reliable tool-count range
-      and cutting token overhead.
+   2. **Stage 2 — act**: the model is re-invoked with the routed categories' typed tools, plus any
+      chained detail tools (`router.ts`'s `CHAIN_PAIRS`, expanded to a fixed point) and the two
+      always-on tools `search_wazuh_data` and `get_field_values` — a handful of schemas instead of
+      all 35, keeping every provider in its reliable tool-count range and cutting token overhead.
    3. When the model emits a `tool_call`, the server **lints and clamps** the query
       (guardrails), executes it locally — Indexer via
       `context.core.opensearch.client.asCurrentUser`, Manager API via
       `context.wazuh_core.api.client.asCurrentUser` — and builds a **digest** for the model plus
       a `table` stream event with the full local result for the browser.
-   4. The loop is bounded: at most **3 tool rounds per turn**, then the final answer streams as
-      text deltas.
+   4. The loop is bounded: at most **6 tool rounds per turn** (`MAX_TOOL_ROUNDS`,
+      `server/routes/chat.ts:182`), then the final answer streams as text deltas.
 3. The browser renders the streamed text, the result table (severity badges, pagination, an
    **Open in Discover** deep link when results are truncated), and de-pseudonymizes the answer
    locally if privacy mode was active.
@@ -46,16 +47,19 @@ text deltas, assembled `tool_call` events (the browser never sees partial tool J
 events carrying the tool's `tableSpec`-shaped result, and terminal status/error events. Provider
 adapters translate their wire formats into this one contract, so the UI is provider-agnostic.
 
-## Saved objects
+## Storage
 
-Three saved-object types, all registered **`hidden: true`** (invisible to the generic
-saved-objects API and the Saved Objects export UI — back them up at the index/snapshot level):
+The plugin registers **no saved-object types**. Everything is stored through the Wazuh indexer's
+own APIs instead:
 
-| Type                              | Contents                                                                                                                 | Scope                  |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
-| `wazuh-ai-assistant-provider`     | One per configured provider: name, type, base URL, model, `apiKey` (optionally encrypted, see [Security](./security.md)) | Global (admin-managed) |
-| `wazuh-ai-assistant-settings`     | Singleton: privacy defaults per provider, user-override flag, field policy                                               | Global (admin-managed) |
-| `wazuh-ai-assistant-conversation` | One per conversation: title, owner, and messages with their timestamps, result tables and tool calls                     | Owner-scoped           |
+| Contents                                                                                                      | Backend                                                                           | Scope                  |
+| ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------- |
+| Provider records: name, type, base URL, model, `apiKey` (optionally encrypted, see [Security](./security.md)) | `/_plugins/_setup/ai_assistant/providers`                                         | Global (admin-managed) |
+| Privacy defaults per provider, user-override flag, field policy                                               | `/_plugins/_setup/ai_assistant/settings`                                          | Global (admin-managed) |
+| Conversations: title, owner, and messages with their timestamps, result tables and tool calls                 | `wazuh-ai-assistant-sessions` index, via `/_plugins/_setup/ai_assistant/sessions` | Owner-scoped           |
+
+Conversation retention is a separate ISM policy, `ai-assistant-sessions-policy` (7-day default),
+that manages the `wazuh-ai-assistant-sessions` backing indices rather than the settings API above.
 
 Conversation routes never leak cross-owner existence (`404` instead of `403`), list responses
 return summaries only (never `messages`), and writes use optimistic concurrency.
@@ -99,7 +103,7 @@ enforcement boundary; the plugin adds no privileged path (see [Security](./secur
 | Aggregation buckets / `top_hits` | 100; ≤ 5 top-level aggregations                              |
 | Digest sent to the model         | 6,000 chars, ≤ 5 sample rows                                 |
 | Table rendered to the user       | 500 rows                                                     |
-| Tool rounds per turn             | 3                                                            |
+| Tool rounds per turn             | 6                                                            |
 | Concurrent chat streams          | 5 per user, 30 server-wide                                   |
 | Provider stall timeouts          | 30 s to first byte, 120 s idle                               |
 | Conversations per user           | 500 (title 200 chars, message 100,000 chars, 1,000 messages) |

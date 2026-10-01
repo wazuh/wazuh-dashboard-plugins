@@ -2,7 +2,7 @@
 
 ## wazuh plugin
 
-The `wazuh` plugin requires some files that are based in some external resources. This is usually done when installing its dependencies or it can be executed on demand in the development phase.
+The `wazuh` plugin requires some files that are based on some external resources. This is usually done when installing its dependencies or it can be executed on demand in the development phase.
 
 ### Indexer resources
 
@@ -14,29 +14,30 @@ This process is done through the `update-indexer-resources` script located at `p
 
 ---
 
-#### Process Overview
+#### Process overview
 
-The script performs the following steps:
+The script performs the following steps, in this order:
 
-1. **Dependency Check**:
+1. **Skip Download Option**:
 
-- Verifies that the required dependencies (`git` and `node`) are installed and available in the system's `PATH`.
-- If any dependency is missing, the script exits with an error message.
+- If the environment variable `SKIP_DOWNLOAD_INDEXER_RESOURCES` is set to `true`, the script skips the resource download process and exits immediately, before checking anything else. This is used for some development process that does not require these files such as the code formatting checks.
 
-2. **Skip Download Option**:
-
-- If the environment variable `SKIP_DOWNLOAD_INDEXER_RESOURCES` is set to `true`, the script skips the resource download process and exits immediately. This is used for some development process that does not require these files such as the code formatting checks.
-
-3. **Git Reference Input**:
+2. **Git Reference Input**:
 
 - Accepts a Git reference (branch, tag, or commit) as an input parameter.
 - If no input is provided, it uses the `GIT_REF` environment variable as the default.
 - If neither is set, the script prompts the user to manually enter the Git reference.
 
+3. **Dependency Check**:
+
+- Verifies that the required dependencies (`git` and `node`) are installed and available in the system's `PATH`.
+- If any dependency is missing, the script exits with an error message.
+
 4. **Resolve Candidate Reference**:
 
-- Tries to get the version of `package.json` of `wazuh` (`main` directory) plugin and adds the version (e.g `5.0.0`) and final tag (e.g. `v5.0.0`) as candidates.
-- Finds the first reference of the candidates in the `wazuh-indexer-plugins` repository and this will be used as the resolved reference.
+- The supplied Git reference (parameter, `GIT_REF`, or prompted value) is the **first** candidate tried against the `wazuh-indexer-plugins` repository.
+- If that doesn't resolve, it falls back to the version read from `wazuh`'s (`main` directory) `package.json` and that version's `v`-prefixed tag (e.g. `5.0.0`, then `v5.0.0`) as further candidates.
+- The first candidate that exists as a branch or tag in `wazuh-indexer-plugins` is used as the resolved reference.
 
 5. **Update Resources**:
 
@@ -61,7 +62,7 @@ You can run the script with the following command:
 
 The script is located at `plugins/main/scripts/build-tools/update-indexer-resources` path of the `wazuh-dashboard-plugins` repository.
 
-Witin the respository, go to `plugins/main` directory:
+Within the repository, go to `plugins/main` directory:
 
 - Provide reference as parameter:
 
@@ -75,4 +76,4 @@ bash scripts/build-tools/update-indexer-resources [GIT_REF]
 GIT_REF=<git_ref_wazuh_indexer_plugins> bash scripts/build-tools/update-indexer-resources
 ```
 
-If no parameter or `GIT_REF` enviroment is declared, the script will prompt the user to manually enter the Git reference.
+If no parameter or `GIT_REF` environment variable is declared, the script will prompt the user to manually enter the Git reference.

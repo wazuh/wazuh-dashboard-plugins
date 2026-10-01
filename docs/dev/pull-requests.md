@@ -1,12 +1,12 @@
-# Pull Requests, Workflows and Actions
+# Pull requests, workflows and actions
 
 This documentation assumes basic knowledge of certain tools and technologies, such as Docker, Bash (Linux) or Git.
 
 Before you start coding, read the sections below: they cover how to open good pull requests and how our GitHub Actions behave when you do. Getting this right up front saves CI minutes and review cycles for everyone.
 
-## Pull Requests
+## Pull requests
 
-These are the standard procedures for creating, updating, and reviewing Pull Requests across the Wazuh Dashboard repositories.
+These are the standard procedures for creating, updating, and reviewing Pull Requests across the Wazuh dashboard repositories.
 
 ### Lifecycle
 
@@ -19,91 +19,17 @@ These are the standard procedures for creating, updating, and reviewing Pull Req
 
 Every Pull Request **must** start in **Draft** status. Workflows do not run on Draft PRs — this is enforced across all repositories to avoid wasting GitHub Actions minutes on work in progress — so use Draft status freely while iterating on your changes.
 
-Before marking the PR as ready, **review** the changes and **run the tests and checks (prettier, linter...)** locally to verify they pass and [Run Tests](run-tests.md). This prevents avoidable CI failures that waste runner time and delay reviews. Once everything is complete and locally validated, click **"Ready for review"** and move the linked issue to **Pending review**. This is the moment workflows are triggered for the first time.
+Before marking the PR as ready, **review** the changes and **run the tests and checks (prettier, linter...)** locally to verify they pass and [Run tests](run-tests.md). This prevents avoidable CI failures that waste runner time and delay reviews. Once everything is complete and locally validated, click **"Ready for review"** and move the linked issue to **Pending review**. This is the moment workflows are triggered for the first time.
 
 To address review feedback, push new commits on top of the branch and re-request review once you have resolved all comments. Avoid amending or rebasing published commits during review, and if CI fails after pushing, investigate and fix it before requesting re-review. When the PR is approved and CI passes, it can be merged. Use **squash merge** for single-purpose PRs to keep a clean history.
 
 ### Body template
 
-Every Pull Request must use the repository's pull request template. Its full content:
-
-```markdown
-## Description
-
-<!--
-Provide a brief description of the problem this pull request addresses. Include relevant context to help reviewers understand the purpose and scope of the changes.
-
-If this pull request resolves an existing issue, reference it here. For example:
-Closes #<issue_number>
--->
-
-## Proposed Changes
-
-<!--
-Summarize the changes made in this pull request. Include:
-- Features added
-- Bugs fixed
-- Any relevant technical details
--->
-
-### Results and Evidence
-
-<!--
-Provide evidence of the changes made, such as:
-- Logs
-- Screenshots
-- Before/after comparisons
--->
-
-### Artifacts Affected
-
-<!--
-List the artifacts impacted by this pull request, such as:
-- Executables (specify platforms if applicable)
-- Default configuration files
-- Packages
--->
-
-### Configuration Changes
-
-<!--
-If applicable, list any configuration changes introduced by this pull request, including:
-- New configuration parameters
-- Changes to default values
-- Backward compatibility notes
--->
-
-### Documentation Updates
-
-<!--
-If applicable, list the sections of documentation that have been updated as part of this pull request.
--->
-
-### Tests Introduced
-
-<!--
-If applicable, describe any new unit or integration tests added as part of this pull request. Include:
-- Scope of the tests
-- Any relevant details about test coverage
--->
-
-## Review Checklist
-
-<!--
-List any manual tests completed to verify the functionality of the changes. Include any manual tests that are still required for final approval.
--->
-
-- [ ] Code changes reviewed
-- [ ] Relevant evidence provided
-- [ ] Tests cover the new functionality
-- [ ] Configuration changes documented
-- [ ] Developer documentation reflects the changes
-- [ ] Meets requirements and/or definition of done
-- [ ] No unresolved dependencies with other issues
-- [ ] PR is linked to the relevant issue(s)
-- [ ] Correct labels applied (e.g., `no-changelog`)
-- [ ] ...
-```
+Every Pull Request must use the repository's own `.github/pull_request_template.md` at the
+repository root, which GitHub pre-fills automatically when you open a PR. It has sections for
+**Description**, **Proposed Changes**, **Results and Evidence**, **Artifacts Affected**,
+**Configuration Changes**, **Documentation Updates**, **Tests Introduced**, and a **Review
+Checklist**.
 
 Always link the related issue in **`## Description`** with a closing keyword (`Closes`, `Fixes`, `Fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence under **`### Results and Evidence`**.
 
@@ -113,7 +39,17 @@ Start from the linked issue to understand the context and acceptance criteria, t
 
 ### Changelog
 
-Every PR is expected to include an entry in `CHANGELOG.md`, under the `Added`, `Changed`, `Fixed` or `Removed` section for the upcoming version. This is enforced by the **Changelog Verifier** workflow (`5_changelog_verifier.yml`).
+Every PR is expected to include an entry in `CHANGELOG.md`, under the `Added`, `Changed`, `Fixed` or `Removed` section for the upcoming version. This is enforced by the **Changelog Verifier** workflow (`5_codequality_changelog.yml`).
+
+**Row format**: each section is a two-column table, `Issue` and `Comment`:
+
+```markdown
+| Issue                                                                 | Comment                         |
+| --------------------------------------------------------------------- | ------------------------------- |
+| [#1234](https://github.com/wazuh/wazuh-dashboard-plugins/issues/1234) | Short description of the change |
+```
+
+The `Issue` column links the issue (`#1234`) the PR closes, not the PR itself — the entry links to the problem being solved, not the implementation. For an issue in another repository, prefix it (`[wazuh-dashboard#1086](https://github.com/wazuh/wazuh-dashboard/issues/1086)`).
 
 **When an entry is required**: whenever the change affects the published package, the UI, or any other user-facing behavior.
 
@@ -144,7 +80,7 @@ If you're unsure whether your PR qualifies, default to adding an entry, or ask a
 
 ## Workflows and Actions
 
-This section defines the naming conventions and operational rules for the GitHub Actions and Workflows used across the Wazuh Dashboard repositories.
+This section defines the naming conventions and operational rules for the GitHub Actions and Workflows used across the Wazuh dashboard repositories.
 
 ### Naming convention
 
@@ -173,8 +109,14 @@ The prefix is drawn from the following set of use cases:
 | Package builder                                     | `builderpackage`     | Subsystem          | `5_builderpackage_plugins`                  |
 | Precompiled object builder                          | `builderprecompiled` | Subsystem          | `5_builderprecompiled_base-dev-environment` |
 | Version bumping                                     | `bumper`             | Repository         | `5_bumper_repository`                       |
+| Documentation build/deploy                          | `documentation`      | Deploy target      | `6_documentation_deploy-to-gh-pages`        |
 
 When composing jobs from Actions, a single job step **cannot** mix Actions with different prefixes, and steps **must** use matrices whenever possible.
+
+**Unprefixed workflows**: `.github/workflows/` also has workflows that predate this convention and
+are not expected to be renamed to it (`backport.yml`, `build.yml`, `codeql.yml`,
+`dependency-review.yml`, `dev-environment.yml`, `eslint.yml`, `manual-build.yml`, `playground.yml`).
+New workflows should follow the convention above; these are grandfathered in.
 
 ### Runners
 

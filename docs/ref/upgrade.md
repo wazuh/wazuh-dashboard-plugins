@@ -2,7 +2,7 @@
 
 This section guides you through the upgrade process of the Wazuh dashboard.
 
-## Pre-Upgrade Requirements
+## Pre-upgrade requirements
 
 Before upgrading, ensure you:
 
@@ -28,7 +28,7 @@ service wazuh-dashboard stop
 
 2. Backup
 
-It is recommended to take a backup before proceding the upgrade. See [backup](./backup-restore.md).
+It is recommended to take a backup before proceeding with the upgrade. See [backup](./backup-restore.md).
 
 Backup the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file to save your settings at least, this could be required to redefine the configuration changes. Create a copy of the file using the following command:
 
@@ -58,7 +58,11 @@ yum localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
 dnf localinstall wazuh-dashboard-<VERSION>-<REVISION>.<ARCHITECTURE>.rpm
 ```
 
-> **Note:** When prompted, choose to replace the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file with the updated version.
+> **Note:** `dpkg` prompts interactively for a modified conffile — choose to replace
+> `/etc/wazuh-dashboard/opensearch_dashboards.yml` with the updated version. RPM's `%config(noreplace)`
+> directive means `rpm`/`yum`/`dnf` never prompt and never overwrite a modified file: the package's new
+> version is instead written alongside it as `opensearch_dashboards.yml.rpmnew`, which you must diff
+> and merge manually.
 
 4. Reapply the configuration changes.
 
@@ -106,21 +110,27 @@ they are. It does not issue certificates or generate new secrets.
 
 You can now access the Wazuh dashboard via: `https://<DASHBOARD_IP_ADDRESS>`.
 
-6. Import the saved objects customizations exported while preparing the upgrade if required.
+6. Import the saved objects customizations exported as part of the
+   [backup](./backup-restore.md#creating-a-backup) taken in
+   [Pre-Upgrade Requirements](#pre-upgrade-requirements) above, if required — this guide has no
+   separate export step of its own.
 
-- Navigate to **Dashboard management** > **Dashboard Management** > **Saved objects** on the Wazuh dashboard.
+- Navigate to **Dashboard management > Dashboards Management > Saved objects** on the Wazuh dashboard.
 - Click **Import**, add the ndjson file and click **Import**.
 
 > **Note:**
 > Note that the upgrade process doesn't update plugins installed manually. Outdated plugins might cause the upgrade to fail.
 >
-> - Run the following command on the Wazuh dashboard server to list installed plugins and identify those that require an update:
+> - Run the following command on the Wazuh dashboard server to list installed plugins and their versions:
 >
 >   ```bash
 >   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-plugin list
 >   ```
 >
->   In the output, plugins that require an update will be labeled as "outdated".
+>   The output is a plain `<plugin_id>@<version>` line per plugin — there is no "outdated" label.
+>   Compare each manually installed plugin's version against the new OpenSearch Dashboards version
+>   (`opensearch-dashboards --version`) to identify which ones need updating; a mismatched plugin
+>   also typically fails to load, with an incompatibility error in the dashboard's logs.
 >
 > - Remove the outdated plugins and reinstall the latest version replacing `<PLUGIN_NAME>` with the name of the plugin. Run these commands as root: the plugin directory is owned by `root`, so the `wazuh-dashboard` user cannot write to it.
 >
@@ -145,5 +155,8 @@ service wazuh-dashboard status
 
 ## Migrating from 4.x to 5.x
 
-If you are moving from 4.x to 5.x, review the migration checklist in
-[Migration guide (4.x to 5.x)](migration-4x-5x.md) before applying the upgrade.
+The procedure above only applies to same-major-version upgrades (for example 5.0.0 to 5.1.0).
+There is no upgrade path from 4.x: a 4.x deployment cannot apply the package upgrade above and
+must instead do a fresh 5.x installation alongside it. Follow the
+[migration guide](../guide/migration/README.md) for the full manual migration procedure (data,
+configuration, and dashboards).

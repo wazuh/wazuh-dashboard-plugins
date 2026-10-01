@@ -76,13 +76,12 @@ server.host: 0.0.0.0
 server.port: 443
 opensearch.hosts: https://localhost:9200
 opensearch.ssl.verificationMode: certificate
----
 wazuh_core.hosts:
   default:
     url: https://localhost
     port: 55000
     username: wazuh-wui
-    run_as: false
+    run_as: true
 ```
 
 ### Credentials and certificates

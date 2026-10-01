@@ -6,19 +6,26 @@ This section describes all the settings that adds Wazuh dashboard.
 
 The following settings can be defined in the configuration file `opensearch_dashboards.yml`:
 
-| Setting                                               | Description                                                                                                                                                                  | Default value     | Allowed values                                                 |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | -------------------------------------------------------------- |
-| `wazuh_core.hosts`                                    | Define the Wazuh server hosts                                                                                                                                                | -                 | Hosts (see #define-wazuh-server-hosts)                         |
-| `healthcheck.enabled`                                 | define if the health check is enabled or not                                                                                                                                 | true              | true, false                                                    |
-| `healthcheck.checks_enabled`                          | define the checks that are enabled. This is a regular expression or a list of regular expressions (NodeJS compatibles)                                                       | `.*`              | string or list of strings                                      |
-| `healthcheck.interval`                                | define the interval to run the health check after the initial check                                                                                                          | 15m               | 5m to 24h                                                      |
-| `healthcheck.retries_delay`                           | define the wait time after a failed overall health check                                                                                                                     | 2.5s              | 0 to 1m                                                        |
-| `healthcheck.max_retries`                             | define the maximum count of retries of the overall health check that can be executed                                                                                         | 5                 | integer, minimum 1                                             |
-| `healthcheck.server_not_ready_troubleshooting_link`   | define the troubleshooting link in the not-ready server                                                                                                                      | URL to Wazuh docs | a valid URL                                                    |
-| `wazuh_core.healthCheckCertificateExpiryWarningDays`  | days before a server certificate expires at which the certificate validity health check reports yellow. A value outside the allowed values stops the dashboard from starting | 30                | integer, minimum 1                                             |
-| `wazuh_core.healthCheckCertificateExpiryCriticalDays` | days before a server certificate expires at which the certificate validity health check reports red. A value outside the allowed values stops the dashboard from starting    | 7                 | integer, minimum 1, lower than the warning days                |
-| `wazuh.disabledSettings`                              | Define which indexer settings are hidden from the UI                                                                                                                         | `[]`              | list of: `index-raw-events`                                    |
-| `opensearch_security_analytics.disabledSettings`      | Define which Ruleset Management settings are hidden from the UI                                                                                                              | `[]`              | list of: `index-discarded-events`, `index-unclassified-events` |
+| Setting                                                    | Description                                                                                                                                                                  | Default value                     | Allowed values                                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------- |
+| `wazuh_core.hosts`                                         | Define the Wazuh server hosts                                                                                                                                                | -                                 | Hosts (see [Define Wazuh server hosts](#define-wazuh-server-hosts)) |
+| `healthcheck.enabled`                                      | define if the health check is enabled or not                                                                                                                                 | true                              | true, false                                                         |
+| `healthcheck.checks_enabled`                               | define the checks that are enabled. This is a regular expression or a list of regular expressions (NodeJS compatibles)                                                       | `.*`                              | string or list of strings                                           |
+| `healthcheck.interval`                                     | define the interval to run the health check after the initial check                                                                                                          | 15m                               | 5m to 24h                                                           |
+| `healthcheck.retries_delay`                                | define the wait time after a failed overall health check                                                                                                                     | 2.5s                              | 0 to 1m                                                             |
+| `healthcheck.max_retries`                                  | define the maximum count of retries of the overall health check that can be executed                                                                                         | 5                                 | integer, minimum 1                                                  |
+| `healthcheck.server_not_ready_troubleshooting_link`        | define the troubleshooting link in the not-ready server                                                                                                                      | URL to Wazuh docs                 | a valid URL                                                         |
+| `wazuh_core.healthCheckCertificateExpiryWarningDays`       | days before a server certificate expires at which the certificate validity health check reports yellow. A value outside the allowed values stops the dashboard from starting | 30                                | integer, minimum 1                                                  |
+| `wazuh_core.healthCheckCertificateExpiryCriticalDays`      | days before a server certificate expires at which the certificate validity health check reports red. A value outside the allowed values stops the dashboard from starting    | 7                                 | integer, minimum 1, lower than the warning days                     |
+| `wazuh.disabledSettings`                                   | Define which indexer settings are hidden from the UI                                                                                                                         | `[]`                              | list of: `index-raw-events`                                         |
+| `opensearch_security_analytics.disabledSettings`           | Define which Ruleset Management settings are hidden from the UI                                                                                                              | `[]`                              | list of: `index-discarded-events`, `index-unclassified-events`      |
+| `wazuh_check_updates.ctiRegistrationUiEnabled`             | Show the CTI Console registration UI and status                                                                                                                              | `false`                           | true, false                                                         |
+| `wazuh_check_updates.ctiRegistrationStatusPollIntervalSec` | How often the UI polls the CTI Console registration status, in seconds                                                                                                       | `30`                              | integer                                                             |
+| `wazuh_check_updates.ctiApiUrl`                            | Base URL of the CTI API. Not set in the shipped configuration file; override only to target another CTI environment                                                          | `https://api.pre.cloud.wazuh.com` | a valid `http`/`https` URL                                          |
+
+The AI Assistant has its own set of `wazuh_ai_assistant.*` settings (`enabled`, `encryptionKey`,
+`settingsReadOnly`, `outOfCreditsMessage`) — see
+[AI Assistant Configuration](modules/ai-assistant/configuration.md#dashboard-configuration-keys).
 
 ## Define Wazuh server hosts
 
@@ -28,16 +35,16 @@ The Wazuh server hosts are defined in the configuration file through the `wazuh_
 
 A host has the following properties:
 
-| Property | Description                                                                       | Required | Default value | Allowed values                     |
-| -------- | --------------------------------------------------------------------------------- | -------- | ------------- | ---------------------------------- |
-| url      | Define the URL address                                                            | Yes      | -             | any valid URL string               |
-| port     | Define the port                                                                   | Yes      | -             | any integer between 1-65535        |
-| username | Define the username                                                               | Yes      | -             | any string between 4-64 characters |
-| password | Define the password (see [Passwords in the keystore](#passwords-in-the-keystore)) | Yes      | -             | any string up to 64 characters     |
-| run_as   | Define if the user context is used to retrieve the permissions                    | No       | true          | true, false                        |
-| key      | Path to the SSL/TLS client private key file                                       | No       | -             | absolute or relative file path     |
-| cert     | Path to the SSL/TLS client certificate file                                       | No       | -             | absolute or relative file path     |
-| ca       | Path to the CA certificate file for server verification                           | No       | -             | absolute or relative file path     |
+| Property | Description                                                                       | Required                                                                                                              | Default value | Allowed values                     |
+| -------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------- |
+| url      | Define the URL address                                                            | Yes                                                                                                                   | -             | any valid URL string               |
+| port     | Define the port                                                                   | Yes                                                                                                                   | -             | any integer between 1-65535        |
+| username | Define the username                                                               | Yes                                                                                                                   | -             | any string between 4-64 characters |
+| password | Define the password (see [Passwords in the keystore](#passwords-in-the-keystore)) | Yes, in the keystore (recommended) or in the file; the package resolves the `default` host password into the keystore | -             | any string up to 64 characters     |
+| run_as   | Define if the user context is used to retrieve the permissions                    | No                                                                                                                    | true          | true, false                        |
+| key      | Path to the SSL/TLS client private key file                                       | No                                                                                                                    | -             | absolute or relative file path     |
+| cert     | Path to the SSL/TLS client certificate file                                       | No                                                                                                                    | -             | absolute or relative file path     |
+| ca       | Path to the CA certificate file for server verification                           | No                                                                                                                    | -             | absolute or relative file path     |
 
 This is an example of a single-host configuration (default installation). The password of the `default` host is not in the file: the package stores it in the keystore (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
@@ -50,7 +57,7 @@ wazuh_core.hosts:
     run_as: true
 ```
 
-For environments with multiple managers, define one entry per host. This is used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used:
+For environments with multiple managers, define one entry per host. This is used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used. Store the password of each host other than `default` in the keystore (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
 ```yml
 wazuh_core.hosts:
@@ -63,7 +70,6 @@ wazuh_core.hosts:
     url: https://another_host_dns
     port: 55000
     username: wazuh-wui
-    password: <ANOTHER_HOST_PASSWORD>
     run_as: true
     key: '/etc/wazuh-dashboard/certs/dashboard-another-host.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-another-host.crt'
@@ -125,7 +131,7 @@ The dashboard reads the certificate files from disk when establishing the first 
 
 The `verify_ca` field exposed in the **Server API** management table is derived automatically from the presence of the `ca` path in the host configuration. It is not a configurable field.
 
-> **Cache note:** The HTTPS agent is created once per host and cached in memory. If certificate files are replaced on disk, the Wazuh Dashboard process must be restarted for the new files to take effect.
+> **Cache note:** The HTTPS agent is created once per host and cached in memory. If certificate files are replaced on disk, the Wazuh dashboard process must be restarted for the new files to take effect.
 
 ### Certificate path resolution
 
@@ -148,7 +154,7 @@ The dashboard surfaces certificate errors at connection time rather than at star
 
 ### Configuration example
 
-The following example configures a host with full client certificate authentication and server certificate verification:
+The following example configures a host with full client certificate authentication and server certificate verification. Its password goes in the keystore as `wazuh_core.hosts.production.password` (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
 ```yml
 wazuh_core.hosts:
@@ -156,7 +162,6 @@ wazuh_core.hosts:
     url: 'https://wazuh.example.com'
     port: 55000
     username: wazuh-wui
-    password: <PRODUCTION_PASSWORD>
     run_as: false
     key: '/etc/wazuh-dashboard/certs/dashboard-client.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-client.crt'
@@ -174,13 +179,15 @@ wazuh_core.hosts:
     run_as: false
 ```
 
-# Tenant configuration
+## Tenant configuration
 
-Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management** > **Dashboard Management** > **Advanced settings**:
+Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management > Dashboards Management > Advanced settings**:
 
-| Setting                | Description                                                | Default value | Allowed values                |
-| ---------------------- | ---------------------------------------------------------- | ------------- | ----------------------------- |
-| enrollment.dns         | Define the Wazuh server DNS for the guide to deploy agents | ''            | any valid DNS or IP           |
-| reports.csv.maxRows    | Define the maximum rows to exports in some tables          | 10000         | any number starting from 0    |
-| timeout                | Define the timeout for some requests done from UI          | 20000         | any number starting from 1500 |
-| wazuh.updates.disabled | Define if the updates check is disabled                    | true          | true, false                   |
+| Setting                | Description                                                                                                                                                  | Default value | Allowed values                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------- |
+| enrollment.dns         | Define the Wazuh server DNS for the guide to deploy agents                                                                                                   | ''            | any valid DNS or IP           |
+| enrollment.port        | Port of the Wazuh registration server for agent enrollment. Empty uses the agent default (1517)                                                              | ''            | any valid port number         |
+| enrollment.path        | Path prefix the agent prepends to every request to the Wazuh server; must match the server's global prefix. Empty uses the agent default (`/wazuh-manager/`) | ''            | any valid path prefix         |
+| reports.csv.maxRows    | Define the maximum rows to exports in some tables                                                                                                            | 10000         | any number starting from 0    |
+| timeout                | Define the timeout for some requests done from UI                                                                                                            | 20000         | any number starting from 1500 |
+| wazuh.updates.disabled | Define if the updates check is disabled                                                                                                                      | true          | true, false                   |

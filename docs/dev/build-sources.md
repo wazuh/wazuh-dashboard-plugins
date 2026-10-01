@@ -5,20 +5,20 @@ distributable ZIP packages for development or manual installation.
 
 > **Note**: This guide builds **only the plugins** in this repository. If you
 > need complete system packages (DEB/RPM) including the full dashboard
-> distribution, see [Build Packages](build-packages.md).
+> distribution, see [Build packages](build-packages.md).
 
 ## Prerequisites
 
-- Toolchain configured as described in [Setup Environment](setup.md)
+- Toolchain configured as described in [Set up environment](setup.md)
 - `jq` installed (used to read plugin versions)
-- Git reference (branch or tag) from
-  [wazuh-indexer-plugins](https://github.com/wazuh/wazuh-indexer-plugins)
-  compatible with your plugin version
-- Docker dev environment available (see [Run from Sources](run-sources.md))
+- Git reference (branch or tag) from the `wazuh-indexer-plugins` repository, compatible with your
+  plugin version
+- A `wazuh-dashboard` source tree to build in: the Docker dev environment (see
+  [Run from sources](run-sources.md)) or a host checkout (see [Build packages](build-packages.md))
 
 ## Install dependencies
 
-If you haven't already installed dependencies (from [Setup Environment](setup.md)),
+If you haven't already installed dependencies (from [Set up environment](setup.md)),
 do so now:
 
 ```bash
@@ -43,8 +43,9 @@ done
 
 ## Build the plugins
 
-Each plugin must be built with the OpenSearch Dashboards version declared in
-its `package.json`.
+Each plugin must be built with the OpenSearch Dashboards version. The commands below read it only
+once, from `plugins/main/package.json`, and reuse that value for every plugin — all 4 plugins
+declare the same `pluginPlatform.version`, so this is not a per-plugin read.
 
 ```bash
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version plugins/main/package.json)
@@ -66,26 +67,27 @@ OPENSEARCH_DASHBOARDS_VERSION=$OPENSEARCH_DASHBOARDS_VERSION yarn build
 cd ../..
 ```
 
-The build artifacts (ZIP files) are written to each plugin's `build/` directory:
+The build artifacts (ZIP files) are named `<id>-<OSD version>.zip` (the plugin id from
+`opensearch_dashboards.json`, not the plugin's own `5.0.0-NN` version) and are written to each
+plugin's `build/` directory:
 
-- `plugins/main/build/wazuh-<version>.zip`
-- `plugins/wazuh-core/build/wazuhCore-<version>.zip`
-- `plugins/wazuh-check-updates/build/wazuhCheckUpdates-<version>.zip`
-- `plugins/wazuh-ai-assistant/build/wazuhAiAssistant-<version>.zip`
+- `plugins/main/build/wazuh-<OSD version>.zip`
+- `plugins/wazuh-core/build/wazuhCore-<OSD version>.zip`
+- `plugins/wazuh-check-updates/build/wazuhCheckUpdates-<OSD version>.zip`
+- `plugins/wazuh-ai-assistant/build/wazuhAiAssistant-<OSD version>.zip`
 
 ## Build inside Docker
 
-The supported workflow is to run these steps inside the Docker-based
-development environment. This ensures the required OpenSearch Dashboards build
-helpers are available and the build matches the target platform.
-
-Use [Run from Sources](run-sources.md) to start the environment and attach a
+`yarn build` runs `node ../../scripts/plugin_helpers`, so the plugins must sit inside an
+OpenSearch Dashboards (`wazuh-dashboard`) source tree. The Docker-based development environment
+provides one: use [Run from sources](run-sources.md) to start the environment and attach a
 shell, then execute the install and build steps above from within the
-container.
+container. Docker is not strictly required: the host flow in [Build packages](build-packages.md)
+copies the plugins into a `wazuh-dashboard` checkout and builds them there.
 
 ## Next steps
 
 - To install these plugins manually, see the installation guide in the reference
   manual.
 - If you need complete system packages (DEB/RPM) for distribution, see
-  [Build Packages](build-packages.md).
+  [Build packages](build-packages.md).

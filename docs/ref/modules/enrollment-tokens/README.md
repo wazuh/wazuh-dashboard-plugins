@@ -133,7 +133,7 @@ permissions of the logged-in user.
 
 | Action             | Required permission       |
 | ------------------ | ------------------------- |
-| List and review    | Read access to the tokens |
+| List and review    | `enrollment_token:read`   |
 | **Create token**   | `enrollment_token:create` |
 | **Revoke** a token | `enrollment_token:delete` |
 | **Purge tokens**   | `enrollment_token:delete` |

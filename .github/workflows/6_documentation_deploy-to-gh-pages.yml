@@ -2,12 +2,12 @@
 #
 # ⚡ Overview:
 # This GitHub Action automatically deploys an mdBook site to GitHub Pages whenever
-# changes are pushed to the `main` branch or when manually triggered.
+# changes are pushed to the `main` branch or when manually triggered. Pull requests
+# that touch `docs/**` only build the book (including the link check), without deploying.
 #
 # 📚 Key Features:
 # - 📝 Uses `mdBook` for documentation building, with support for:
 #   - ✅ Link checking
-#   - 🗂️ Table of contents generation
 #   - 📈 Mermaid diagrams
 #
 # 🔗 Reference:
@@ -20,37 +20,70 @@ on:
     branches:
       - main
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/6_documentation_deploy-to-gh-pages.yml'
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
-  deploy:
+  build:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-24.04
     permissions:
-      contents: write # To push a branch
-      pages: write # To push to a GitHub Pages site
-      id-token: write # To update the deployment status
+      contents: read
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    env:
+      # mdbook-linkcheck 0.7.7 (latest) does not support mdBook 0.5.x, and
+      # mdbook-mermaid 0.17.x requires mdBook 0.5.x, so all three are pinned.
+      MDBOOK_VERSION: '0.4.52'
+      MDBOOK_MERMAID_VERSION: '0.16.2'
+      MDBOOK_LINKCHECK_VERSION: '0.7.7'
     steps:
       - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup mdBook with link checking, ToC, and Mermaid support
-        uses: jontze/action-mdbook@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          use-linkcheck: true
-          use-mermaid: true
-          use-toc: true
+      # Release binaries are installed with curl because the organization's
+      # allowed-actions policy blocks third-party setup actions.
+      - name: Install mdBook with link checking and Mermaid support
+        run: |
+          set -euo pipefail
+          bin_dir="${RUNNER_TEMP}/mdbook-bin"
+          mkdir -p "${bin_dir}"
+          curl -fsSL "https://github.com/rust-lang/mdBook/releases/download/v${MDBOOK_VERSION}/mdbook-v${MDBOOK_VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar -xz -C "${bin_dir}" mdbook
+          curl -fsSL "https://github.com/badboy/mdbook-mermaid/releases/download/v${MDBOOK_MERMAID_VERSION}/mdbook-mermaid-v${MDBOOK_MERMAID_VERSION}-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar -xz -C "${bin_dir}" mdbook-mermaid
+          curl -fsSL -o "${RUNNER_TEMP}/mdbook-linkcheck.zip" \
+            "https://github.com/Michael-F-Bryan/mdbook-linkcheck/releases/download/v${MDBOOK_LINKCHECK_VERSION}/mdbook-linkcheck.x86_64-unknown-linux-gnu.zip"
+          unzip -o -q "${RUNNER_TEMP}/mdbook-linkcheck.zip" mdbook-linkcheck -d "${bin_dir}"
+          # The zip archive does not keep the executable bit.
+          chmod +x "${bin_dir}/mdbook-linkcheck"
+          echo "${bin_dir}" >> "${GITHUB_PATH}"
+          "${bin_dir}/mdbook" --version
+          "${bin_dir}/mdbook-mermaid" --version
+          "${bin_dir}/mdbook-linkcheck" --version
       - name: Build the book from the `docs` directory
         run: mdbook build
         working-directory: docs
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
       - name: Upload built book as a GitHub Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'docs/book'
+          path: 'docs/book/html'
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write # To push to a GitHub Pages site
+      id-token: write # To update the deployment status
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
       - name: Deploy the artifact to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

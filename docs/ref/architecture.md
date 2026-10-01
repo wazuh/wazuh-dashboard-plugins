@@ -1,6 +1,6 @@
 # Architecture
 
-The Wazuh dashboard is built on top of [OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/)
+The Wazuh dashboard is built on top of [OpenSearch Dashboards](https://docs.opensearch.org/3.6/dashboards/)
 and extends it with a set of plugins that provide the Wazuh user interface, the connection to the
 Wazuh server API, update notifications and the AI assistant. This repository holds four of those
 plugins. The platform itself, the fork of OpenSearch Dashboards the plugins are installed into, is
@@ -111,7 +111,7 @@ any plugin reaches the server API client as `context.wazuh_core.api.client.asCur
 - **Available updates**: checks the latest published Wazuh version through the content manager
   of the Wazuh indexer (`GET /_plugins/_content_manager/version/check`), stores the result in a
   shared saved object and exposes the `UpdatesNotification` component that `main` renders at the
-  bottom of the interface. See [Available Updates](modules/available-updates.md).
+  bottom of the interface. See [Available updates](modules/available-updates.md).
 - **CTI registration**: registers the environment with the Wazuh CTI Console through the OAuth
   2.0 device authorization grant, then hands the resulting subscription to the content manager of
   the Wazuh indexer (`/_plugins/_content_manager/subscription`). The browser side exposes the
@@ -131,13 +131,21 @@ applications in the OpenSearch Dashboards navigation, grouped in categories such
   helpers (`/elastic/...`, `/indexer/...`) and the host listing (`/hosts/apis`).
 - Registers the health checks that validate the server API connection and `run_as`, report the
   server certificate validity, create the index patterns, provision the bundled dashboards and
-  visualizations, and create the default notification channels. See
-  [Health check](modules/healthcheck.md).
+  visualizations, and validate the default notification channels the Wazuh indexer provisions.
+  See [Health check](modules/healthcheck.md).
 - Runs two jobs at start: an initialization job that logs the environment and ensures the
   OpenSearch Dashboards index and its template exist, and an in-memory queue, scheduled with
   `node-cron`, that sends the server API requests a user asked to delay.
 - Adds the `x-frame-options`, `x-content-type-options` and, over HTTPS,
   `strict-transport-security` headers to every response.
+
+The browser side of `main` also hosts the [Case Management](modules/case-management/README.md),
+[Incident Response](modules/incident-response/README.md),
+[Enrollment tokens](modules/enrollment-tokens/README.md) and
+[Indexer management settings](modules/indexer-settings.md) applications.
+[Active Response](modules/active-response/README.md) is provided by the
+`wazuh-dashboard-notifications` and `wazuh-dashboard-alerting` plugins, and
+[Ruleset management](modules/ruleset-management/README.md) by `wazuh-dashboard-security-analytics`.
 
 `main` also integrates with the optional plugins it lists in its manifest (security,
 notifications, alerting, reporting), which come from other repositories. See
@@ -207,7 +215,7 @@ Plugins share code and state through two mechanisms, both provided by OpenSearch
 5. **Available updates**: the notification asks `GET /api/wazuh-check-updates/updates`. The
    server queries the content manager of the Wazuh indexer as the dashboard internal user and
    stores a successful result in a saved object shared by every user. See
-   [Available Updates](modules/available-updates.md).
+   [Available updates](modules/available-updates.md).
 6. **AI assistant chat turn**: the browser posts the conversation to the chat route and reads the
    answer as a stream. The server calls the configured AI provider, runs the tools the model
    requests against the Wazuh indexer and the Wazuh server API as the current user, and streams
@@ -246,4 +254,4 @@ alerting, notifications, reporting and security analytics. `main` lists some of 
 plugins and integrates with them when they are installed, for example to create the default
 notification channels. The local development environment in `docker/osd-dev` can mount those
 repositories next to the plugins of this one; its options are described in
-`docker/osd-dev/README.md`. See [Run from Sources](../dev/run-sources.md).
+`docker/osd-dev/README.md`. See [Run from sources](../dev/run-sources.md).
