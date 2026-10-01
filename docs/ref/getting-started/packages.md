@@ -24,8 +24,9 @@ Two package formats are available:
 ## Package name
 
 - **Package name**: `wazuh-dashboard`
-- **Current version**: 5.0.0 (alpha0)
-- **Architecture**: x86_64 (amd64)
+- **Current version**: 5.0.0 (rc1)
+- **Architecture**: 64-bit Intel/AMD (`amd64`/`x86_64`) and 64-bit ARM (`arm64`/`aarch64`) — see
+  the [package name table](#package-name-1) below
 
 ## Package contents
 
@@ -92,8 +93,8 @@ are used by the shared credentials library. See [Credentials](credentials.md).
 
 Official Wazuh repositories:
 
-- **APT repository**: `https://packages.wazuh.com/5.x/apt/`
-- **Yum repository**: `https://packages.wazuh.com/5.x/yum/`
+- **APT repository**: `https://packages.wazuh.com/production/5.x/apt/`
+- **Yum repository**: `https://packages.wazuh.com/production/5.x/yum/`
 - **GPG key**: `https://packages.wazuh.com/key/GPG-KEY-WAZUH`
 
 ## Version scheme
