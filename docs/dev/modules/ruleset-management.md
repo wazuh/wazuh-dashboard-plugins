@@ -47,7 +47,7 @@ Integration categories:
 - **Access Management**: Integrations related to the management of access to systems and applications, such as user access, authentication, and group management.
 - **Applications**: Integrations related to the analysis of application logs, such as application lifecycle, API and web resources activities.
 - **Cloud Services**: Integrations related to the analysis of cloud services logs, such as services managed by cloud providers.
-- **Network Activity**: Integrations related to the analysis of network activity logs, such as DNS, HTTP, Email, SSH, FTP, DHCP, RPD.
+- **Network Activity**: Integrations related to the analysis of network activity logs, such as DNS, HTTP, Email, SSH, FTP, DHCP, RDP.
 - **System Activity**: Integrations related to the analysis of system logs, such as system monitoring logs.
 - **Security**: Integrations related to the analysis of security logs, such as security-related logs and events.
 - **Others**: Integrations that do not fit in the previous categories.
