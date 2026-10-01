@@ -34,8 +34,8 @@ The plugin has **zero npm runtime dependencies**: everything comes from the host
       `context.core.opensearch.client.asCurrentUser`, Manager API via
       `context.wazuh_core.api.client.asCurrentUser` — and builds a **digest** for the model plus
       a `table` stream event with the full local result for the browser.
-   4. The loop is bounded: at most **3 tool rounds per turn**, then the final answer streams as
-      text deltas.
+   4. The loop is bounded: at most **6 tool rounds per turn** (`MAX_TOOL_ROUNDS`,
+      `server/routes/chat.ts:182`), then the final answer streams as text deltas.
 3. The browser renders the streamed text, the result table (severity badges, pagination, an
    **Open in Discover** deep link when results are truncated), and de-pseudonymizes the answer
    locally if privacy mode was active.
@@ -100,7 +100,7 @@ enforcement boundary; the plugin adds no privileged path (see [Security](./secur
 | Aggregation buckets / `top_hits` | 100; ≤ 5 top-level aggregations                              |
 | Digest sent to the model         | 6,000 chars, ≤ 5 sample rows                                 |
 | Table rendered to the user       | 500 rows                                                     |
-| Tool rounds per turn             | 3                                                            |
+| Tool rounds per turn             | 6                                                            |
 | Concurrent chat streams          | 5 per user, 30 server-wide                                   |
 | Provider stall timeouts          | 30 s to first byte, 120 s idle                               |
 | Conversations per user           | 500 (title 200 chars, message 100,000 chars, 1,000 messages) |
