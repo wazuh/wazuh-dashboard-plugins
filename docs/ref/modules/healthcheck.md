@@ -22,7 +22,7 @@ This defines a service that is integrated with the core lifecycle of the applica
   server    log   [10:04:59.857] [info][healthcheck] Set scheduled checks each 900000ms
 ```
 
-5. If some enabled and critical check fails in the initial check, this will avoid the application can correctly initialize until this is solved. In this case, the Wazuh dashboard server is not ready yet view should display information about the failing critical checks.
+5. If some enabled and critical check fails in the initial check, this will avoid the application can correctly initialize until this is solved. In this case, the Wazuh dashboard server is not ready yet view should display information about the failing critical checks. No shipped Wazuh check is currently registered as critical (`metadata.critical` defaults to `false` and no task in `plugins/main/server/plugin.ts` sets it), so this blocking path is not exercised by any check today.
 
 # Checks
 
@@ -34,7 +34,7 @@ The checks represents the unit to check and some could do some write actions suc
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `saved-objects:index-patterns`                | Validate (create if possible) the existence of the compatible index patterns used by the different modules (events, findings, states, metrics, active responses, threat-intel enrichments, agent config, etc. — there is no "alerts" index pattern on 5.0) |
 | `server-api:connection-compatibility`         | Validate the connection and compatibility with the server API hosts                                                                                                                                                                                        |
-| `server-api:run-as`                           | Validate that the the `run_as` setting is enabled in each host and is allowed to use by the configured user.                                                                                                                                               |
+| `server-api:run-as`                           | Validate that the `run_as` setting is enabled in each host and is allowed to use by the configured user.                                                                                                                                                   |
 | `integrations:default-notifications-channels` | Validate the existence of the default Notifications channels (provisioned by `wazuh-indexer-notifications`). It does not create any Alerting monitors. See [Notifications and Alerting](./notifications-alerting.md) for details.                          |
 | `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md) for details.                         |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
@@ -134,7 +134,7 @@ The checks has the following properties as part of the execution:
 | gray   | Initial result value, check did not finish or disabled      |
 | yellow | Some was wrong and some features could not work             |
 | red    | Failure; a critical check with this result blocks the start |
-| green  | Suscessful                                                  |
+| green  | Successful                                                  |
 
 - status: define the status lifecycle of the check.
 
@@ -184,17 +184,18 @@ The enabled checks can be seen in the application logs:
 server    log   [10:52:31.480] [info][healthcheck] Enabled checks [6]: [integrations:default-notifications-channels,server-api:connection-compatibility,server-api:run-as,server-api:certificate-validity,saved-objects:dashboards,saved-objects:index-patterns]
 ```
 
-This setting can be a string or a list of strings.
+This setting can be a string or a list of strings. It **replaces** the default `.*` entirely
+rather than adding to it, so setting it disables every check that does not match.
 
 For example,
 
-- Enable the check related to the index patterns:
+- Limit the enabled checks to only the index-patterns check (every other check is disabled):
 
 ```yml
 healthcheck.checks_enabled: 'saved-objects:index-patterns'
 ```
 
-- Enable the checks related to the index patterns and the dashboards saved objects:
+- Limit the enabled checks to only the index-patterns and dashboards saved-objects checks:
 
 ```yml
 healthcheck.checks_enabled:
