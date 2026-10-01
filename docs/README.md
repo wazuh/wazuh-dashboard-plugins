@@ -6,22 +6,11 @@ This folder contains the technical documentation for the Wazuh dashboard. The do
 - **Reference Manual**: Detailed information on the application's architecture, configuration, and usage.
 - **Diagnostic Guide**: Steps to diagnose errors and resolve common issues.
 
-## Requirements
+## Setup and usage
 
-To work with this documentation, you need **mdBook** installed. For installation instructions, refer to the [mdBook documentation](https://rust-lang.github.io/mdBook/).
+See [Documentation installation and setup](INSTALLATION.md) for the required mdBook/mdBook-Mermaid
+versions, installing them via `rustup`, and troubleshooting. Once installed:
 
-## Usage
-
-- To build the documentation, run:
-
-  ```bash
-  ./build.sh
-  ```
-
-  The output will be generated in the `book` directory.
-
-- To serve the documentation locally for preview, run:
-  ```bash
-  ./server.sh
-  ```
-  The documentation will be available at [http://127.0.0.1:3000](http://127.0.0.1:3000).
+- Build: `./build.sh` (output in the `book` directory).
+- Serve locally for preview: `./server.sh` (available at
+  [http://127.0.0.1:3000](http://127.0.0.1:3000)).
