@@ -191,50 +191,23 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`${id} exists`);
 
-      // Fetch needed information about the cluster local node
-      const responseClusterInfo =
-        await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/cluster/local/info`,
-          {},
-          { apiHostID: id, forceRefresh: true },
-        );
-
-      // Look for socket-related errors
-      if (this.checkResponseIsDown(context, responseClusterInfo)) {
-        return ErrorResponse(
-          `ERROR3099 - ${responseClusterInfo.detail || 'Server not ready yet'}`,
-          3099,
-          HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-          response,
-        );
-      }
-
-      // If we have a valid response from the Wazuh API
-      try {
-        const { node, cluster } =
-          await context.wazuh_core.manageHosts.getRegistryDataByHost(
-            apiHostData,
-            {
-              throwError: true,
-            },
-          );
-
-        api.cluster_info = { node, cluster };
-
-        return response.ok({
-          body: {
-            statusCode: HTTP_STATUS_CODES.OK,
-            data: api,
-            idChanged: request.body.idChanged || null,
+      const { node, cluster } =
+        await context.wazuh_core.manageHosts.getRegistryDataByHost(
+          apiHostData,
+          {
+            throwError: true,
           },
-        });
-      } catch (error) {
-        // If we have an invalid response from the Wazuh API
-        throw new Error(
-          responseClusterInfo.detail || `${api.url}:${api.port} is unreachable`,
         );
-      }
+
+      api.cluster_info = { node, cluster };
+
+      return response.ok({
+        body: {
+          statusCode: HTTP_STATUS_CODES.OK,
+          data: api,
+          idChanged: request.body.idChanged || null,
+        },
+      });
     } catch (error) {
       if (error.code === 'EPROTO') {
         return response.ok({

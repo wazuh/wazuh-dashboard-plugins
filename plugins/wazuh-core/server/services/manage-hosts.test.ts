@@ -12,6 +12,8 @@
 
 import { ManageHosts } from './manage-hosts';
 import { IConfiguration } from '../../common/services/configuration';
+import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
+import { ServerAPIClient } from './server-api-client';
 
 const mockLogger = {
   debug: jest.fn(),
@@ -173,4 +175,54 @@ describe('ManageHosts Service', () => {
       expect(result[0].id).toBe('default2');
     });
   });
+
+  /* eslint-disable camelcase -- Wazuh Server API field names */
+  describe('getRegistryDataByHost', () => {
+    it('requests the API user and the cluster info in parallel', async () => {
+      const resolvers: ((value: unknown) => void)[] = [];
+      mockServerAPIClient.asInternalUser.request.mockReset();
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        () => new Promise(resolve => resolvers.push(resolve)),
+      );
+      manageHosts.setServerAPIClient(
+        mockServerAPIClient as unknown as ServerAPIClient,
+      );
+
+      const registryData = (
+        manageHosts as unknown as {
+          getRegistryDataByHost: (
+            host: unknown,
+            options: unknown,
+          ) => Promise<unknown>;
+        }
+      ).getRegistryDataByHost(
+        { id: 'default', run_as: true },
+        { throwError: true },
+      );
+
+      expect(
+        mockServerAPIClient.asInternalUser.request.mock.calls.map(
+          ([, path]) => path,
+        ),
+      ).toEqual(['/security/users/me', '/cluster/local/info']);
+
+      resolvers[0]({
+        status: 200,
+        data: { data: { affected_items: [{ allow_run_as: true }] } },
+      });
+      resolvers[1]({
+        status: 200,
+        data: {
+          data: { affected_items: [{ node: 'node01', cluster: 'wazuh' }] },
+        },
+      });
+
+      await expect(registryData).resolves.toMatchObject({
+        node: 'node01',
+        cluster: 'wazuh',
+        allow_run_as: API_USER_STATUS_RUN_AS.ENABLED,
+      });
+    });
+  });
+  /* eslint-enable camelcase */
 });

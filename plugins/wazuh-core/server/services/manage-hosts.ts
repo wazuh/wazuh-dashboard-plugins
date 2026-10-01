@@ -252,14 +252,21 @@ export class ManageHosts {
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {
-      // Get allow_run_as
-      const responseAllowRunAs =
-        await this.serverAPIClient.asInternalUser.request(
+      const [responseAllowRunAs, responseClusterLocal] = await Promise.all([
+        this.serverAPIClient.asInternalUser.request(
           'GET',
           '/security/users/me',
           {},
           { apiHostID },
-        );
+        ),
+        this.serverAPIClient.asInternalUser.request(
+          'GET',
+          `/cluster/local/info`,
+          {},
+          { apiHostID },
+        ),
+      ]);
+
       if (this.isServerAPIClientResponseOk(responseAllowRunAs)) {
         const allow_run_as_response =
           responseAllowRunAs.data.data.affected_items[0].allow_run_as;
@@ -275,14 +282,6 @@ export class ManageHosts {
       } else {
         allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
       }
-
-      const responseClusterLocal =
-        await this.serverAPIClient.asInternalUser.request(
-          'GET',
-          `/cluster/local/info`,
-          {},
-          { apiHostID },
-        );
 
       if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
         node = responseClusterLocal.data.data.affected_items[0].node;

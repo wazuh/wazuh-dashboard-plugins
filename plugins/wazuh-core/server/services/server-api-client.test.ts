@@ -133,3 +133,30 @@ describe('ServerAPIClient._buildRequestOptions', () => {
     });
   });
 });
+
+describe('ServerAPIClient.asInternalUser.request', () => {
+  it('shares one login between parallel requests', async () => {
+    const { client } = createClient();
+    const internals = client as unknown as {
+      asInternalUser: { request: ServerAPIClient['asInternalUser']['request'] };
+      _authenticate: jest.Mock;
+      _request: jest.Mock;
+    };
+    internals._authenticate = jest.fn().mockResolvedValue('internal-token');
+    internals._request = jest.fn().mockResolvedValue({ status: 200 });
+    const request = () =>
+      internals.asInternalUser.request(
+        'GET',
+        '/agents',
+        {},
+        {
+          apiHostID: 'default',
+        },
+      );
+
+    await Promise.all([request(), request()]);
+
+    expect(internals._authenticate).toHaveBeenCalledTimes(1);
+    expect(internals._request).toHaveBeenCalledTimes(2);
+  });
+});
