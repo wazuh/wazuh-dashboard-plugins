@@ -135,7 +135,7 @@ describe('ServerAPIClient._buildRequestOptions', () => {
 });
 
 describe('ServerAPIClient.asInternalUser.request', () => {
-  it('shares one login between parallel requests', async () => {
+  const setup = () => {
     const { client } = createClient();
     const internals = client as unknown as {
       asInternalUser: { request: ServerAPIClient['asInternalUser']['request'] };
@@ -154,9 +154,43 @@ describe('ServerAPIClient.asInternalUser.request', () => {
         },
       );
 
+    return { internals, request };
+  };
+
+  it('shares one login between parallel requests', async () => {
+    const { internals, request } = setup();
+
     await Promise.all([request(), request()]);
 
     expect(internals._authenticate).toHaveBeenCalledTimes(1);
     expect(internals._request).toHaveBeenCalledTimes(2);
+  });
+
+  it('shares one new login when parallel requests get an expired token', async () => {
+    const { internals, request } = setup();
+    await request();
+    internals._authenticate.mockClear();
+    internals._authenticate.mockResolvedValue('new-token');
+    const expired = { response: { status: 401 } };
+    internals._request.mockImplementation((_method, _path, _data, { token }) =>
+      token === 'internal-token'
+        ? Promise.reject(expired)
+        : Promise.resolve({ status: 200 }),
+    );
+
+    await expect(Promise.all([request(), request()])).resolves.toEqual([
+      { status: 200 },
+      { status: 200 },
+    ]);
+    expect(internals._authenticate).toHaveBeenCalledTimes(1);
+  });
+
+  it('logs in again after a failed login', async () => {
+    const { internals, request } = setup();
+    internals._authenticate.mockRejectedValueOnce(new Error('login failed'));
+
+    await expect(request()).rejects.toThrow('login failed');
+    await expect(request()).resolves.toEqual({ status: 200 });
+    expect(internals._authenticate).toHaveBeenCalledTimes(2);
   });
 });
