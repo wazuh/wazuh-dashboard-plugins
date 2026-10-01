@@ -16,10 +16,10 @@ Some settings have been removed entirely; others have been relocated to the **Ad
 
 ### Where each setting belongs in 5.x
 
-| Location                                               | Settings                                                                     |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------- |
-| `opensearch_dashboards.yml`                            | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`       |
-| **☰ Menu > Dashboards Management > Advanced settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled` |
+| Location                                                                      | Settings                                                                     |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `opensearch_dashboards.yml`                                                   | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`       |
+| **☰ Menu > Dashboard management > Dashboards Management > Advanced settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.disabled` |
 
 By default, these settings are tenant-level preferences managed through the UI (or the saved objects API). They can also be forced globally for all tenants using `uiSettings.overrides` in `opensearch_dashboards.yml`.
 
@@ -122,16 +122,16 @@ In 4.x, individual health check steps could be enabled or disabled using separat
 
 The 4.x boolean settings do not map one-to-one to 5.x check names. For example, the old `checks.pattern` toggle covered a single index-pattern validation, whereas 5.x validates every index pattern (events, findings, states, metrics, active responses, threat-intel enrichments, agent config, …) as a single batched check, `saved-objects:index-patterns`. See the [Health check reference](../../ref/modules/healthcheck.md) for the full list of 5.x check names.
 
-| 4.x setting         | Default | 5.x equivalent                                                                                                                         |
-| ------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `checks.api`        | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`)                              |
-| `checks.fields`     | `true`  | Removed health check task.                                                                                                             |
-| `checks.maxBuckets` | `true`  | Removed health check task.                                                                                                             |
-| `checks.metaFields` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboards Management > Advanced settings. |
-| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches the single `saved-objects:index-patterns` check)                                   |
-| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches `server-api:run-as`)                                                               |
-| `checks.template`   | `true`  | Removed health check task.                                                                                                             |
-| `checks.timeFilter` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboards Management > Advanced settings. |
+| 4.x setting         | Default | 5.x equivalent                                                                                                                                                |
+| ------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `checks.api`        | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`)                                                     |
+| `checks.fields`     | `true`  | Removed health check task.                                                                                                                                    |
+| `checks.maxBuckets` | `true`  | Removed health check task.                                                                                                                                    |
+| `checks.metaFields` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard management > Dashboards Management > Advanced settings. |
+| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches the single `saved-objects:index-patterns` check)                                                          |
+| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches `server-api:run-as`)                                                                                      |
+| `checks.template`   | `true`  | Removed health check task.                                                                                                                                    |
+| `checks.timeFilter` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard management > Dashboards Management > Advanced settings. |
 
 To disable a specific check in 5.x, set `healthcheck.checks_enabled` to a pattern that does not match it. To enable all checks (the default), set the value to `.*` or leave it unset.
 
@@ -212,7 +212,7 @@ uiSettings.overrides.defaultRoute: /app/wz-home
 
 Reconfigure the following settings after the 5.x installation is complete. Use the dashboard UI, or force them globally for all tenants via `uiSettings.overrides` in `opensearch_dashboards.yml`:
 
-1. Navigate to **☰ Menu > Dashboards Management > Advanced settings**.
+1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Advanced settings**.
 2. Locate and update the following settings if they were customized in your 4.x deployment:
 
    | Setting                  | Description                                              |
@@ -238,6 +238,6 @@ After completing the migration and starting the Wazuh dashboard 5.x service, ver
 
 1. Navigate to **☰ Menu > Dashboard management > Health Check**.
 2. Confirm that the **Server API connection and compatibility** check passes.
-3. Navigate to **☰ Menu > Dashboards Management > Advanced settings** and confirm that any previously customized tenant-level settings are present.
+3. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Advanced settings** and confirm that any previously customized tenant-level settings are present.
 
 If the API connection check fails, review the `wazuh_core.hosts` block in `opensearch_dashboards.yml` and ensure the URL, port, and credentials are correct. For further troubleshooting, refer to the [Migration guide overview](./README.md).
