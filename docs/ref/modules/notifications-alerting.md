@@ -1,8 +1,10 @@
-# Notifications in the Dashboard
+# Notifications and Alerting
 
 ## Overview
 
-When executed, the Health Check validates that the Notifications plugin is available and verifies that a minimal, working configuration exists.
+The `integrations:default-notifications-channels` Health Check task is registered only when the
+`notificationsDashboards` plugin is present. When registered, it validates that the Notifications
+plugin is available and verifies that a minimal, working configuration exists.
 If the plugin is detected, it automatically:
 
 - Verifies the existence of the **default notification channels** for the supported integrations. The channels themselves are provisioned by the [Wazuh indexer notifications plugin](https://github.com/wazuh/wazuh-indexer-notifications).
@@ -36,7 +38,9 @@ When the Notifications functionality is available in the dashboard, the Health C
 | **Jira Channel**      | Creates issues via Jira REST API.                                                   | [Create a Jira API token](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/) and configure the URL with `Authorization: Basic base64(email:api_token)`. |
 | **Shuffle Channel**   | Triggers Shuffle workflows via webhook.                                             | [Get your Shuffle workflow webhook URL](https://shuffler.io/docs/triggers#webhook-example) and paste it in the configuration.                                                                            |
 
-> All channels are stored as saved objects under the `Global` tenant with names like `Slack Channel`, `PagerDuty Channel`, etc.
+> Channels are not saved objects: they are Notifications plugin configs, stored and read through
+> `/_plugins/_notifications/configs` on the Wazuh indexer. Their ids are `default_slack_channel`,
+> `default_jira_channel`, `default_pagerduty_channel`, and `default_shuffle_channel`.
 
 Security recommendations: treat these URLs and credentials as secrets. Review permissions and channel visibility before enabling it.
 
@@ -54,13 +58,7 @@ Security recommendations: treat these URLs and credentials as secrets. Review pe
 
 ## Enable Only Notification Checks
 
-To exclusively enable notification-related checks through configuration:
-
-```yml
-healthcheck.checks_enabled: 'notification-channel'
-```
-
-Or, to explicitly target the task described above:
+To exclusively enable the task described above:
 
 ```yml
 healthcheck.checks_enabled: 'integrations:default-notifications-channels'
@@ -72,8 +70,8 @@ The Health Check logs detailed progress information during verification.
 Examples of log entries include:
 
 ```
-server    log   [15:03:45.031] [info][healthcheck][integrations:default-notifications-channels] All default notification channels are now present and verified
-server    log   [15:18:44.971] [info][healthcheck][integrations:default-notifications-channels] Starting verification of default notification channels
+server    log   [15:03:44.971] [info][healthcheck][integrations:default-notifications-channels] Starting verification of default notification channels
+server    log   [15:03:45.031] [info][healthcheck][integrations:default-notifications-channels] All default notification channels are present and verified
 ```
 
 If a check fails, review these log entries for details on which resource was missing or misconfigured.
