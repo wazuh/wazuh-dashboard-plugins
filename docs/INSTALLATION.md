@@ -13,9 +13,9 @@ These match the versions pinned in the `6_documentation_deploy-to-gh-pages.yml` 
 
 - **mdbook**: 0.4.52
 - **mdbook-mermaid**: 0.16.2
-- **mdbook-linkcheck**: 0.7.7 (optional locally — CI installs it automatically; `book.toml` marks the
-  `[output.linkcheck]` backend `optional`, so a local build without it just skips the check instead
-  of failing): install with `cargo install mdbook-linkcheck --version 0.7.7`.
+- **mdbook-linkcheck**: 0.7.7 (optional locally — CI downloads the pinned release binaries of all
+  three tools; `book.toml` marks the `[output.linkcheck]` backend `optional`, so a local build
+  without it just skips the check instead of failing): install with `cargo install mdbook-linkcheck --version 0.7.7`.
 
 Do not upgrade to mdBook 0.5.x: mdbook-linkcheck 0.7.7, its latest release, fails against it
 (`missing field sections`), and mdbook-mermaid 0.17.x only works with mdBook 0.5.x.
