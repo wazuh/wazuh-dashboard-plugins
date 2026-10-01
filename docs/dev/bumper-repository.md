@@ -87,15 +87,15 @@ All paths below were confirmed to exist in this repository. The script targets
 plugin files dynamically via `git ls-files`, so the lists reflect the tracked
 files at run time.
 
-| File / pattern                                                            | Field updated                                                                                       |
-| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `VERSION.json`                                                            | `version`, `stage`                                                                                  |
-| `plugins/*/package.json` (tracked, excluding `test/cypress/package.json`) | `version`, `revision`                                                                               |
-| `plugins/*/opensearch_dashboards.json` (tracked)                          | `version` set to `<version>-<revision>`                                                             |
-| `CHANGELOG.md`                                                            | Inserts/updates the `## Wazuh v<version> - OpenSearch Dashboards <platform> - Revision <rev>` entry |
-| `plugins/main/common/api-info/endpoints.json`                             | Documentation URLs `documentation.wazuh.com/<major.minor>`                                          |
-| `.github/workflows/*.yml` (selected, see below)                           | `default:` branch references                                                                        |
-| `docker/imposter/wazuh-config.yml`                                        | `specFile` Git reference in the URL                                                                 |
+| File / pattern                                                            | Field updated                                                                                                                                                          |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VERSION.json`                                                            | `version`, `stage`                                                                                                                                                     |
+| `plugins/*/package.json` (tracked, excluding `test/cypress/package.json`) | `version`, `revision`                                                                                                                                                  |
+| `plugins/*/opensearch_dashboards.json` (tracked)                          | `version` set to `<version>-<revision>`                                                                                                                                |
+| `CHANGELOG.md`                                                            | Delegated to `tools/changelog_bump.sh` — resets to a single `## [vX.Y.Z]` entry and rebuilds `## Prior versions` (see [CHANGELOG behavior](#changelog-behavior) below) |
+| `plugins/main/common/api-info/endpoints.json`                             | Documentation URLs `documentation.wazuh.com/<major.minor>`                                                                                                             |
+| `.github/workflows/*.yml` (selected, see below)                           | `default:` branch references                                                                                                                                           |
+| `docker/imposter/wazuh-config.yml`                                        | `specFile` Git reference in the URL                                                                                                                                    |
 
 In this repository the tracked plugin files currently are:
 
@@ -132,11 +132,12 @@ The revision is computed by comparing the new `--version` against the current
 
 ### CHANGELOG behavior
 
-The OpenSearch Dashboards version is read from `pluginPlatform.version` in
-`plugins/main/package.json`. If a changelog entry for the same
-`v<version>` + platform version already exists, only its revision number is
-updated (and only when `--stage` is provided); otherwise a new entry is inserted
-near the top of `CHANGELOG.md`.
+`CHANGELOG.md` updates are delegated to `tools/changelog_bump.sh`, not handled inline by
+`repository_bumper.sh`. From 5.x, `CHANGELOG.md` only ever holds **one** version's changes
+(`## [vX.Y.Z]`, with empty Added/Changed/Removed/Fixed tables) plus a `## Prior versions` section
+linking out to the two most recent minors (every patch of each, newest first) — it is reset on
+each version bump, not appended to. A stage-only bump (version unchanged) or tag generation
+(`--tag`) only resyncs the `## Prior versions` section and leaves the current entry untouched.
 
 ### Branch reference updates
 
