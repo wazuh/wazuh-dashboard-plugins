@@ -79,14 +79,17 @@ Each instance is configured with a single `wazuh_core.hosts` entry pointing to i
 manager. Only the literal `default` host name gets its password resolved automatically from
 `/etc/wazuh/credentials.env`; a differently-named host like `production` or `staging` does not, so
 avoid writing its password in plain text in `opensearch_dashboards.yml` — add it to the keystore
-instead, under the matching dotted path:
+of each instance instead, under the matching dotted path (see
+[Passwords in the keystore](../../ref/configuration.md#passwords-in-the-keystore)).
+
+**Instance 1**: add the password to the keystore, and type it when prompted:
 
 ```bash
 sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
   add wazuh_core.hosts.production.password
 ```
 
-**Instance 1** (`opensearch_dashboards.yml`):
+Then configure the host in `opensearch_dashboards.yml`:
 
 ```yaml
 wazuh_core.hosts:
@@ -94,11 +97,17 @@ wazuh_core.hosts:
     url: https://wazuh-manager-prod
     port: 55000
     username: wazuh-wui
-    password: <PROD_PASSWORD>
     run_as: false
 ```
 
-**Instance 2** (`opensearch_dashboards.yml`):
+**Instance 2**: add the password to the keystore, and type it when prompted:
+
+```bash
+sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.staging.password
+```
+
+Then configure the host in `opensearch_dashboards.yml`:
 
 ```yaml
 wazuh_core.hosts:
@@ -106,7 +115,6 @@ wazuh_core.hosts:
     url: https://wazuh-manager-staging
     port: 55000
     username: wazuh-wui
-    password: <STAGING_PASSWORD>
     run_as: false
 ```
 
@@ -151,7 +159,18 @@ When CCS is active, the dashboard:
 
    A non-empty response confirms that CCS is configured.
 
-3. Define one host entry per manager in `opensearch_dashboards.yml`:
+3. Add the password of each host to the keystore (see
+   [Passwords in the keystore](../../ref/configuration.md#passwords-in-the-keystore)), and type it
+   when prompted:
+
+   ```bash
+   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+     add wazuh_core.hosts.production.password
+   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+     add wazuh_core.hosts.staging.password
+   ```
+
+   Then define one host entry per manager in `opensearch_dashboards.yml`:
 
    ```yaml
    wazuh_core.hosts:
@@ -159,13 +178,11 @@ When CCS is active, the dashboard:
        url: https://wazuh-manager-prod
        port: 55000
        username: wazuh-wui
-       password: <PROD_PASSWORD>
        run_as: false
      staging:
        url: https://wazuh-manager-staging
        port: 55000
        username: wazuh-wui
-       password: <STAGING_PASSWORD>
        run_as: false
    ```
 

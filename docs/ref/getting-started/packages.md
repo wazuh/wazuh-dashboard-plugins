@@ -172,40 +172,46 @@ where:
 
 #### Production
 
-URL: `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+URL:
+
+- APT (Debian-based): `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/apt/pool/main/w/wazuh-dashboard/<PACKAGE_NAME>`
+- Yum (RHEL/CentOS-based): `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/yum/<PACKAGE_NAME>`
 
 where:
 
 - `<MAJOR_VERSION>`: major version number, e.g. `5`
-- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
 - `<PACKAGE_NAME>`: package name
 
 The `<REVISION>` in the package name for production packages is usually `1`.
 
-Example: `https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-dashboard_5.0.0-1_amd64.deb`
+Example: `https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-dashboard/wazuh-dashboard_5.0.0-1_amd64.deb`
 
 #### Pre-release
 
-URL: `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+URL:
+
+- APT (Debian-based): `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/apt/pool/main/w/wazuh-dashboard/<PACKAGE_NAME>`
+- Yum (RHEL/CentOS-based): `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/yum/<PACKAGE_NAME>`
 
 where:
 
 - `<MAJOR_VERSION>`: major version number, e.g. `5`
-- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
 - `<PACKAGE_NAME>`: package name
 
 The `<REVISION>` in the package name for pre-release packages can be `alpha1`, `alpha2`, `beta1`, `rc1`, etc. e.g. `rc1`
 
-Example: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/apt/pool/main/w/wazuh-dashboard_5.0.0-alpha1_amd64.deb`
+Example: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/apt/pool/main/w/wazuh-dashboard/wazuh-dashboard_5.0.0-alpha1_amd64.deb`
 
 #### Nightly
 
-URL: `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+URL:
+
+- APT (Debian-based): `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/apt/pool/main/w/wazuh-dashboard/<PACKAGE_NAME>`
+- Yum (RHEL/CentOS-based): `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/yum/<PACKAGE_NAME>`
 
 where:
 
 - `<VERSION>`: version number, e.g. `5.0.0`
-- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
 - `<PACKAGE_NAME>`: package name
 
 The `<REVISION>` in the package name for nightly packages is `latest`.

@@ -1,4 +1,4 @@
-# Getting Started
+# Getting started
 
 This section guides you through the prerequisites and installation process for
 the Wazuh dashboard plugins.
@@ -17,7 +17,7 @@ To get started with the Wazuh dashboard, follow these steps in order:
 Before installing:
 
 - A supported Linux distribution and architecture (see [Compatibility](../compatibility.md))
-- Minimum 4 GB RAM and 2 CPU cores (8 GB RAM and 4+ cores recommended for production)
+- Enough CPU and RAM (see [Hardware requirements](requirements.md#hardware-requirements))
 - Network access to Wazuh indexer and Wazuh manager API
 - The `kibanaserver` and `wazuh-wui` passwords, when the indexer or the manager runs on another host (see [Credentials](credentials.md))
 - Root or sudo privileges

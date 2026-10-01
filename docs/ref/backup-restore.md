@@ -125,6 +125,15 @@ chmod 500 /etc/wazuh-dashboard/certs
 chmod 400 /etc/wazuh-dashboard/certs/*
 ```
 
+If the backup includes the shared Wazuh root CA (`etc/wazuh/ca/`), restore it as a whole,
+including the `.wazuh-dashboard-bootstrap-ca` marker, before starting the dashboard. `cp -a` keeps
+the ownership and permissions the backup preserved:
+
+```
+mkdir -p /etc/wazuh/ca
+cp -a etc/wazuh/ca/. /etc/wazuh/ca/
+```
+
 The restored keystore entries take precedence over `/etc/wazuh/credentials.env`, so the dashboard
 uses the restored passwords. If the passwords changed since the backup, update them as described in
 [Rotation](getting-started/credentials.md#rotation).

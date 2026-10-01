@@ -129,7 +129,7 @@ The 4.x boolean settings do not map one-to-one to 5.x check names. For example, 
 | `checks.maxBuckets` | `true`  | Removed health check task.                                                                                                                                    |
 | `checks.metaFields` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard management > Dashboards Management > Advanced settings. |
 | `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches the single `saved-objects:index-patterns` check)                                                          |
-| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches `server-api:run-as`)                                                                                      |
+| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches `server-api:connection-compatibility`)                                                                    |
 | `checks.template`   | `true`  | Removed health check task.                                                                                                                                    |
 | `checks.timeFilter` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard management > Dashboards Management > Advanced settings. |
 

@@ -2,8 +2,9 @@
 
 ## Hardware requirements
 
-See the [Compatibility](../compatibility.md#hardware-requirements) page for the minimum and
-recommended CPU/RAM. In addition:
+| Minimum RAM (GB) | Minimum CPU (cores) | Recommended RAM (GB) | Recommended CPU (cores) |
+| ---------------- | ------------------- | -------------------- | ----------------------- |
+| 4                | 2                   | 8                    | 4                       |
 
 - **Disk space**: 2 GB of free space minimum, 10+ GB recommended for production.
 - **Network**: 1 Gbps network interface recommended for production.
@@ -20,9 +21,10 @@ supported operating system versions and architectures.
 ### System privileges
 
 - Root or sudo privileges to install packages and manage services. The package itself creates
-  `/usr/share/wazuh-dashboard/` and `/etc/wazuh-dashboard/` as `root:root` (only
-  `/usr/share/wazuh-dashboard/data/` is owned by the `wazuh-dashboard` service user) — do not
-  grant broader write access to these paths afterward. See [Security](../security.md#operational-practices).
+  `/usr/share/wazuh-dashboard/` as `root:root` (only `/usr/share/wazuh-dashboard/data/` is owned
+  by the `wazuh-dashboard` service user) and `/etc/wazuh-dashboard/` as
+  `wazuh-dashboard:wazuh-dashboard 0750` — do not grant broader write access to these paths
+  afterward. See [Security](../security.md#operational-practices).
 
 ### System dependencies
 
@@ -57,14 +59,14 @@ The Wazuh dashboard depends on:
 
 ### Wazuh indexer (OpenSearch)
 
-- Version compatibility: OpenSearch 3.6.0 (the `opensearch` value in `buildSrc/version.properties` at the `wazuh-indexer` repository)
+- Version compatibility: see the [Compatibility](../compatibility.md#version-compatibility) matrix
 - Connection type: HTTPS with TLS certificate verification
 - Required permissions: Read and write access to Wazuh indices
 - The password of the `kibanaserver` account (`WAZUH_INDEXER_KIBANASERVER_PASSWORD`)
 
 ### Wazuh manager API
 
-- Version compatibility: Wazuh 5.x
+- Version compatibility: see the [Compatibility](../compatibility.md#version-compatibility) matrix
 - The password of the `wazuh-wui` account (`WAZUH_MANAGER_WUI_PASSWORD`)
 - API user with appropriate permissions for:
   - Agent management

@@ -52,7 +52,7 @@
   - Plugin adaptation: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
 - Fork of the Alerting and Notifications plugins. [[3][fork-alerting]] [[4][fork-notifications]]
   - Alerting and Notifications available under **Explore > Alerting** and **Explore > Notifications**.
-  - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup provided by indexer.
+  - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) provided by the indexer on startup.
   - Multi-channel support: Slack, Microsoft Teams, Amazon Chime, Email (SMTP/SES), AWS SNS, and custom webhooks.
   - Active response channels kept as a dedicated channel type, separate from standard notification channels [#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
 - New "[AI Assistant][ai-assistant-module]" plugin [#8789](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8789).
@@ -112,7 +112,7 @@
 [enrollment-tokens-module]: ./modules/enrollment-tokens/README.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
 [healthcheck-not-ready]: ./modules/healthcheck.md#wazuh-dashboard-is-not-ready-yet
-[migration-guide]: ./migration-4x-5x.md
+[migration-guide]: ../guide/migration/README.md
 [fork-security-analytics]: https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/1
 [fork-reporting]: https://github.com/wazuh/wazuh-dashboard-reporting/issues/1
 [fork-alerting]: https://github.com/wazuh/wazuh-dashboard-alerting/issues/1
