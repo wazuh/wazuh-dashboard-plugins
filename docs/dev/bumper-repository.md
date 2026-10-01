@@ -156,6 +156,7 @@ this fixed list of workflows:
 .github/workflows/dev-environment.yml
 .github/workflows/manual-build.yml
 .github/workflows/playground.yml
+.github/workflows/wazuh-build-push-docker-action.yml
 ```
 
 The replacement value is `v<version>[-<stage>]` when `--tag` is set, otherwise the
