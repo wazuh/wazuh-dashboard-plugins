@@ -100,15 +100,18 @@ failed to parse manifest ... feature `edition2024` is required
 The package requires the Cargo feature called `edition2024`, but that feature is not stabilized in this version of Cargo.
 ```
 
-This happens because one of mdBook's transitive dependencies has been updated to use Rust edition 2024, which is only
-supported on nightly Rust toolchains.
+This happens because one of mdBook's transitive dependencies has been updated to use Rust edition 2024. Edition 2024 has been stable since Rust 1.85 — this error means your `stable` toolchain
+predates that release, not that edition 2024 requires nightly.
 
-To fix it install using nightly Rust:
+To fix it, update your stable toolchain:
 
 ```sh
-rustup install nightly
-rustup run nightly cargo install mdbook --version 0.4.52
+rustup update stable
 ```
+
+Installing the older `mdbook --version 0.4.52` instead would avoid the edition2024 error, but it
+contradicts the `mdbook: 0.5.2` pin in [Required versions](#required-versions) above — update
+Rust instead of downgrading mdBook.
 
 ### Mermaid diagrams not rendering
 
