@@ -374,10 +374,10 @@ WZD_ZIPPED_PACKAGES_DIR=$(pwd)
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-reporting/reportsDashboards-3.*.*.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-security-analytics/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/alerting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-alerting/alertingDashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/notifications-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-notifications/notifications-dashboards-3.*.*.0.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhAiAssistant-3.*.*.zip
 ```
 
 3.2 Build the system package
