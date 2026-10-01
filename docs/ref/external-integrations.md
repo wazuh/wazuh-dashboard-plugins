@@ -8,9 +8,21 @@ The Wazuh dashboard supports integration with:
 
 - **Slack** - Team communication and notifications
 - **PagerDuty** - Incident management and on-call alerting
+- **Jira** - Issue creation for security events
 - **Shuffle** - Security orchestration and workflow automation
 
-Notification integrations (Slack, PagerDuty, Shuffle) use OpenSearch Dashboards Notifications and Alerting plugins.
+Notification integrations (Slack, PagerDuty, Jira, Shuffle) use OpenSearch Dashboards
+Notifications and Alerting plugins.
+
+### Default channels provisioned by Health Check
+
+When the Notifications plugin is present, the Wazuh indexer notifications plugin provisions one
+disabled channel per integration above (`default_slack_channel`, `default_pagerduty_channel`,
+`default_jira_channel`, `default_shuffle_channel`), and the `integrations:default-notifications-channels`
+Health Check task verifies they exist. Configuring one of these existing channels with real
+credentials and enabling it is equivalent to creating a new channel from scratch in the sections
+below. See [Notifications and Alerting](modules/notifications-alerting.md) for the full table and
+the steps to complete their configuration.
 
 ---
 
@@ -195,6 +207,60 @@ Customize incident payload with contextual information:
 
 ---
 
+## Jira integration
+
+Jira integration enables automatic issue creation for security events.
+
+### Prerequisites
+
+- Jira Cloud account with permissions to create API tokens and issues
+- Wazuh dashboard with Notifications plugin enabled
+
+### Step 1: Create a Jira API token
+
+1. Log in to https://id.atlassian.com/manage-profile/security/api-tokens
+2. Click **Create API token**, name it (e.g., "Wazuh Alerts") and copy the token
+3. Note your Atlassian account email and your Jira instance URL (e.g., `https://<org>.atlassian.net`)
+
+### Step 2: Configure Jira in Wazuh dashboard
+
+There is no dedicated Jira channel type — Jira is configured as a generic **Webhook** channel
+that posts to the Jira REST API, authenticated with HTTP Basic auth:
+
+1. Navigate to **☰ Menu > Explore > Notifications > Channels**, or open the pre-provisioned
+   `default_jira_channel` described in [Default channels provisioned by Health Check](#default-channels-provisioned-by-health-check)
+2. Configure the channel:
+   - **Webhook URL**: `<jira-instance-url>/rest/api/2/issue`
+   - **Headers**: `Authorization: Basic <base64(email:api_token)>`
+3. Save and toggle the channel to **Unmuted**
+
+### Step 3: Create a monitor for issue creation
+
+1. Navigate to **☰ Menu > Explore > Alerting > Monitors**
+2. Configure a per document monitor on `wazuh-findings-v5-security` with the trigger condition
+   for the events that should open an issue
+3. In **Notifications**, select the Jira channel and set the message body to a valid Jira
+   `issue` payload, for example:
+
+```json
+{
+  "fields": {
+    "project": { "key": "SEC" },
+    "summary": "Wazuh alert: {{ctx.trigger.name}}",
+    "issuetype": { "name": "Bug" }
+  }
+}
+```
+
+### Troubleshooting
+
+- **401 Unauthorized**: verify the base64-encoded `email:api_token` pair and that the token has
+  not expired
+- **Issue not created**: confirm the `project.key` and `issuetype.name` exist in the target Jira
+  project
+
+---
+
 ## Shuffle integration
 
 Shuffle is a security orchestration platform that automates response workflows for security events.
@@ -331,4 +397,5 @@ Monitor the health and performance of external integrations:
 - Official integrations documentation:
   - Slack API: https://api.slack.com/messaging/webhooks
   - PagerDuty: https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTgw-events-api-v2-overview
+  - Jira REST API: https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post
   - Shuffle: https://shuffler.io/docs/workflows
