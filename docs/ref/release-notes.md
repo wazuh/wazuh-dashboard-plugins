@@ -55,6 +55,25 @@
   - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup provided by indexer.
   - Multi-channel support: Slack, Microsoft Teams, Amazon Chime, Email (SMTP/SES), AWS SNS, and custom webhooks.
   - Active response channels kept as a dedicated channel type, separate from standard notification channels [#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
+- New "[AI Assistant][ai-assistant-module]" plugin [#8789](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8789).
+  - Provider-agnostic AI chat experience (OpenAI-compatible or Anthropic) that answers security
+    questions through a fixed catalog of read-only tools, with every query executing locally under
+    the calling user's own RBAC.
+  - Optional pseudonymization (privacy mode) and API-key encryption at rest
+    (`wazuh_ai_assistant.encryptionKey`), with a settings-lock control
+    (`wazuh_ai_assistant.settingsReadOnly`) [#9067](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9067).
+- New "[Enrollment Tokens][enrollment-tokens-module]" app under **Agents management**
+  [#9145](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9145).
+  - `WAZUH_ENROLLMENT_TOKEN` is the only way the 5.0 agent installer registers an agent — the 4.x
+    registration variables it replaces (`WAZUH_MANAGER_ENDPOINT`, `WAZUH_REGISTRATION_PASSWORD`,
+    `WAZUH_REGISTRATION_SERVER`, `WAZUH_REGISTRATION_PORT`, `WAZUH_REGISTRATION_CA`,
+    `WAZUH_REGISTRATION_CERTIFICATE`, `WAZUH_REGISTRATION_KEY`) are ignored by the 5.0 installer.
+  - List, create, revoke and purge tokens from the **Enrollment tokens** app; the **Deploy new
+    agent** wizard mints a token for a single deployment.
+- Install-time credential resolution: the package no longer ships default passwords. It resolves
+  the `kibanaserver` and `wazuh-wui` passwords from `/etc/wazuh/credentials.env` into the dashboard
+  keystore at install time and again before every start (`wazuh-indexer` issue #1928). See
+  [Credentials](getting-started/credentials.md).
 
 ## Additional highlights
 
@@ -89,6 +108,8 @@
 [ruleset-management-module]: ./modules/ruleset-management/README.md
 [active-response-module]: ./modules/active-response/README.md
 [healthcheck-module]: ./modules/healthcheck.md
+[ai-assistant-module]: ./modules/ai-assistant/README.md
+[enrollment-tokens-module]: ./modules/enrollment-tokens/README.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
 [healthcheck-not-ready]: ./modules/healthcheck.md#wazuh-dashboard-is-not-ready-yet
 [migration-guide]: ./migration-4x-5x.md
