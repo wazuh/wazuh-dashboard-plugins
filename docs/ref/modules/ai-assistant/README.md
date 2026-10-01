@@ -71,7 +71,8 @@ and can be encrypted at rest.
 
 The assistant cannot run free-form actions. It picks from a fixed catalog of 35 **read-only,
 declarative tools** (plus a guarded free-search escape hatch limited to `wazuh-events-v5-*`,
-`wazuh-findings-v5-*`, and `wazuh-states-*` indices). Every query is linted and clamped by
+`wazuh-findings-v5-*`, `wazuh-states-*`, `wazuh-metrics-*`, the threat-intel indices,
+`.wazuh-cti-consumers`, and `.wazuh-content-manager-jobs`). Every query is linted and clamped by
 server-side guardrails before execution. The model sees a **digest** capped at 6,000 characters;
 the user sees the **full table** (up to 500 rows) rendered from the tool's own `tableSpec` — the
 table shape is deterministic and never controlled by the model.

@@ -49,11 +49,13 @@ endpoint it queries on 5.0 and why.
 
 ## The escape hatch
 
-`search_wazuh_data(index_pattern, dsl)` covers the long tail of questions no typed tool matches.
-It is deliberately narrow:
+`search_wazuh_data(index_pattern, query_dsl)` covers the long tail of questions no typed tool
+matches. It is deliberately narrow:
 
 - `index_pattern` must match the allowlist: `wazuh-events-v5-*`, `wazuh-findings-v5-*`,
-  `wazuh-states-*`. Read-only `_search`/`_count` only.
+  `wazuh-states-*`, `wazuh-metrics-*`, the `wazuh-threatintel-*` sub-families, the CTI feed indices
+  (`.wazuh-cti-consumers`, `.wazuh-content-manager-jobs`), and the `.opensearch-sap-*-findings`
+  indices. Read-only `_search`/`_count` only.
 - The model-proposed DSL goes through the **full guardrail lint** (below). A rejected query
   returns the reason to the model for one bounded self-correction.
 
@@ -111,10 +113,12 @@ retry):
 - Bucket aggregations only on a vetted low-cardinality field allowlist; bucket `size` ≤ 100;
   at most 5 top-level aggregations.
 - Index pattern checked against the allowlist before anything else: `wazuh-events-v5-*`,
-  `wazuh-findings-v5-*`, `wazuh-states-*`, the 6 named
-  `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families (the
-  IOC/enrichment feed is deliberately excluded), and the single exact index
-  `.opensearch-sap-detectors-config`.
+  `wazuh-findings-v5-*`, `wazuh-states-*`, `wazuh-metrics-*`, the 6 named
+  `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families, the
+  fixed `wazuh-threatintel-enrichments-a` and `.wazuh-threatintel-vulnerabilities-a` CTI feed
+  indices, `.wazuh-cti-consumers`, `.wazuh-content-manager-jobs`, and the
+  `.opensearch-sap-detectors-config`, `.opensearch-sap-pre-packaged-rules-config`,
+  `.opensearch-sap-correlation-metadata` and `.opensearch-sap-*-findings` indices.
 
 ## Digest and privacy layers
 
