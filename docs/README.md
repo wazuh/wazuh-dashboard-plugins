@@ -14,4 +14,4 @@ versions, installing them via `rustup`, and troubleshooting. Once installed:
 
 - Build: `./build.sh` (HTML output in `book/html/`; linkcheck output in `book/linkcheck/`).
 - Serve locally for preview: `./server.sh` (available at
-  [http://127.0.0.1:3000](http://127.0.0.1:3000)).
+  [http://localhost:3000](http://localhost:3000)).
