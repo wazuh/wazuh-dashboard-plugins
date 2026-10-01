@@ -87,7 +87,7 @@ This means the dashboard can not connect with the server API host.
 This could be caused by:
 
 - Server API host is not reachable from the Wazuh dashboard host.
-  - Network problem (e.g. termporal issue, firewall).
+  - Network problem (e.g. temporary issue, firewall).
 - Server API is down/stopped.
 - Wrong server API host configuration (URL, port or credentials)
 
