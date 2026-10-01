@@ -110,12 +110,14 @@ retry):
 - `script` anywhere (query, sort, aggs, `script_fields`, `runtime_mappings`) — hard block.
 - `regexp` blocked; `wildcard`/`query_string` values with leading `*`/`?` blocked.
 - Date `range` on time fields must be bounded on both sides; span ≤ 90 days.
-- A numeric `range` against a keyword-typed severity field (currently `wazuh.rule.level`,
-  whose values are categorical severity words such as `critical`/`high`/`medium`/`low`) is
-  rejected outright: OpenSearch does not error on a numeric range against a keyword field, it
-  silently falls back to lexicographic string comparison — a real but WRONG result (e.g.
-  `gte: "medium"` excludes `"high"`, since "h" sorts before "m"), which would look like a
-  legitimate answer to the model.
+- A **numeric** `range` bound against a keyword-typed severity field (currently
+  `wazuh.rule.level`, whose values are categorical severity words such as
+  `critical`/`high`/`medium`/`low`) is rejected outright, since OpenSearch does not error on it —
+  it silently falls back to lexicographic string comparison instead. Only the numeric-bound case
+  is caught this way: a **string** bound such as `gte: "medium"` is not rejected and passes
+  through, hitting that same silent lexicographic fallback (`"medium"` excludes `"high"`, since
+  "h" sorts before "m") — a real but WRONG result that looks like a legitimate answer to the
+  model.
 - Bucket aggregations only on a vetted low-cardinality field allowlist; bucket `size` ≤ 100;
   at most 5 top-level aggregations.
 - Index pattern checked against the allowlist before anything else: `wazuh-events-v5-*`,
