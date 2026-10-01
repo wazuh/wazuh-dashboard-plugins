@@ -64,3 +64,11 @@ curl -sk -u kibanaserver:<KIBANASERVER_PASSWORD> \
 
 For the `kibanaserver` password, see [Credentials](../getting-started/credentials.md).
 For an overview of the Wazuh dashboard security model, see [Security](../security.md).
+
+## Disabling the notification per user
+
+The update notification shown at the bottom of the interface has a **Disable updates
+notifications** checkbox. Unlike the shared available-updates result, this preference is stored
+per user, in the hidden `wazuh-check-updates-user-preferences` saved object
+(`hide_update_notifications` field) — enabling it only hides the notification for the user who set
+it, not for the rest of the deployment. See [Persistence](../architecture.md#persistence).
