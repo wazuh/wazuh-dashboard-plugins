@@ -38,7 +38,24 @@ For SAML-enabled environments:
 ```
 
 See `docker/osd-dev/README.md` for all available
-options, including `--server`, `--indexer-local`, and external plugin mappings.
+options, including `--server`, `--indexer-local`, external plugin mappings, `--mailpit` (optional
+Mailpit email testing service), `--base`/`-r` (external repository mappings, resolved from
+`<common-parent-directory>`), `--plugins-root` (aliases `-wdp`, `--wz-home`; where internal plugins
+are read from when not auto-detected), and `PORT` (overrides the dashboard's exposed port).
+
+Before the first `./dev.sh up`, two external Docker networks must already exist — Compose fails
+otherwise, since `dev.yml` declares them `external: true`:
+
+```bash
+docker network create devel
+docker network create mon
+```
+
+Also set `vm.max_map_count=262144` (required by the indexer to avoid out-of-memory errors; see
+`docker/osd-dev/README.md` for the `sysctl` command), install `nvm` for the Node.js version used
+by the dev scripts, and set `GIT_REF` when installing `plugins/main`'s dependencies directly
+(outside the container) — see [Setup Environment](setup.md). `dev.yml` also has a commented-out
+Loki logging driver option for centralized container logs, disabled by default.
 
 3. Attach a shell to the development container:
 
