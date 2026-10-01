@@ -1,16 +1,16 @@
 # Documentation
 
-## 🎯 Document Focus and Perspective
+## 🎯 Document focus and perspective
 
 The documentation should focus on **Wazuh dashboard as an independent product or application**, and not only at the level of Wazuh _plugins_ or excessive references to OpenSearch.
 
 The main objective is for this to be a complete resource (**source of truth**) that reduces the need to rewrite responses to common or frequently asked questions.
 
-## 💡 Content Strategy
+## 💡 Content strategy
 
 The documentation should address the topic as follows:
 
-### 1️⃣ **General Introduction (Entry Point)**
+### 1️⃣ **General introduction (entry point)**
 
 - Explain each Dashboard feature in general terms.
 - Describe in general terms **what they allow the user to do** to leverage the data.

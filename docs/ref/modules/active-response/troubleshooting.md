@@ -39,7 +39,7 @@ Ask your administrator to revert the action directly on the target agent — the
 
 ---
 
-## Related Sections
+## Related sections
 
 - [Detection](../ruleset-management/detection.md) — Detection rules that produce the alerts consumed by active response triggers.
 - [Normalization](../ruleset-management/normalization.md) — Decoders and integrations that prepare the events upstream.

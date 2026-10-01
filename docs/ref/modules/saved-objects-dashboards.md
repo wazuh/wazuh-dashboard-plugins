@@ -10,14 +10,14 @@ Use this task to:
 - Avoid manual imports of NDJSON export files when a deployment is recreated.
 - Prepare existing dashboards to be reused by features that rely on saved object references (for example, sharing, reporting, or embedding).
 
-## How It Works
+## How it works
 
 - **Source of truth**: definitions live under `plugins/main/common/dashboards/dashboard-definitions` (recursively) with the `.ndjson` extension.
 - **Supported objects**: `visualization` and `dashboard` types. Each definition file must contain exactly one dashboard plus its referenced visualizations (one JSON document per line).
 - **Creation and overwrite**: on the **initial** health check run (`scope === 'internal-initial'`, which happens on every dashboard restart, not only the first install), the task creates every object with `overwrite: true` — any manual edit a user made to one of these provided dashboards/visualizations is reverted back to the repository definition. On later, non-initial runs it checks whether each object already exists and, if present, skips it (`overwrite: false`); only missing objects get created. Every write uses `refresh: true`.
 - **Execution context**: runs under the Dashboard internal user in the `Global` tenant through the health check lifecycle. Any parsing or creation error will fail the task and surface in the health check status.
 
-## Related Health Check Task
+## Related health check task
 
 - **Task name**: `saved-objects:dashboards`
 - **Function**: reads every NDJSON definition file, creates all referenced visualizations first, and then ensures the dashboard that depends on them. Custom IDs defined in the files allow predictable tracking and reuse.
@@ -30,7 +30,7 @@ healthcheck.checks_enabled: 'saved-objects:dashboards'
 
 For general Health Check details, see [Health Check](./healthcheck.md).
 
-## Logs and Troubleshooting
+## Logs and troubleshooting
 
 Typical log entries when the task runs:
 

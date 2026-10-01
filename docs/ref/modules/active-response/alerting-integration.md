@@ -8,7 +8,7 @@ An active response only runs when an Alerting trigger invokes it. This walkthrou
 
 ## Step 1: Open Alerting and create a monitor
 
-Navigate to **Alerting → Monitors → Create monitor**. If no monitors exist yet, the Alerts tab looks like this:
+Navigate to **Alerting > Monitors > Create monitor**. If no monitors exist yet, the Alerts tab looks like this:
 
 ![Alerting - Alerts empty state](images/08-alerting-alerts-empty.png)
 
@@ -120,6 +120,6 @@ Within about one minute, a finding with `wazuh.rule.title: SSH root login via pa
 Once the use case has been validated, roll back the lab setup:
 
 1. From the monitor overview, **disable** or **delete** `Block-IP-monitor`.
-2. From **Explore → Active Responses**, delete `Block-IP-stateful-response`. The confirmation dialog requires typing the literal word `delete`.
+2. From **Explore > Active Responses**, delete `Block-IP-stateful-response`. The confirmation dialog requires typing the literal word `delete`.
 3. Restore the original `sshd_config` on the agent — in particular revert `PermitRootLogin yes` and `PasswordAuthentication yes` if you enabled them — and restart `sshd`.
 4. Verify on the agent that no leftover firewall rule remains (`firewall-cmd --reload` or `iptables -F WAZUH_ACTIVE_RESPONSE`). The stateful timeout should have reverted the rule, but confirm before closing the session.

@@ -5,7 +5,7 @@ The following walkthrough shows how to create an active response that blocks the
 **Prerequisites:**
 
 - Wazuh indexer, manager, and dashboard running version **5.0.0** or later.
-- The `wazuh-active-responses*` index pattern available in **Dashboard management → Dashboards Management → Index patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
+- The `wazuh-active-responses*` index pattern available in **Dashboard management > Dashboards Management > Index patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
 
 > **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](README.md#about-the-executable).
 
@@ -15,7 +15,7 @@ The following walkthrough shows how to create an active response that blocks the
 
 Inside the Wazuh dashboard, open the side menu (top-left hamburger icon), expand **Explore**, and select **Active Responses**.
 
-![Side menu - Explore → Active Responses](images/00-explore-menu-entry.png)
+![Side menu - Explore > Active Responses](images/00-explore-menu-entry.png)
 
 If no active responses have been created yet, the view shows an empty state with a **Create active response** button. Otherwise, the main screen is the list of existing active responses (see [Step 5](#step-5-verify-the-active-response-in-the-list)).
 
@@ -94,7 +94,7 @@ Clicking the **Name** in the list opens the details page. The header shows the n
 Available actions from this page:
 
 - **Mute active response / Unmute active response** (header button) — toggles the status. Muting opens a confirmation dialog: _"This active response will stop sending responses to its recipients. However, the active response will remain available for selection."_
-- **Actions → Edit** — opens the edit form with the current values pre-filled.
-- **Actions → Delete** — opens a confirmation dialog that requires typing the literal word `delete` before the confirmation button is enabled.
+- **Actions > Edit** — opens the edit form with the current values pre-filled.
+- **Actions > Delete** — opens a confirmation dialog that requires typing the literal word `delete` before the confirmation button is enabled.
 
 > **Important:** deleting an active response does **not** remove references to it from Alerting. Any trigger that still points to the deleted entry becomes a broken action. Review your monitors after every deletion, or prefer **Mute** for short pauses.

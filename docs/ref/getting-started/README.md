@@ -3,7 +3,7 @@
 This section guides you through the prerequisites and installation process for
 the Wazuh dashboard plugins.
 
-## Quick Start
+## Quick start
 
 To get started with the Wazuh dashboard, follow these steps in order:
 
@@ -52,12 +52,12 @@ For custom deployments or troubleshooting, see [Installation](installation.md) f
 
 For developers or testing environments, run the plugins from source code using Docker:
 
-See the [Development Documentation](../../dev/README.md) for:
+See the [Development documentation](../../dev/README.md) for:
 
-- **[Setup Environment](../../dev/setup.md)** - Install toolchain (Git, Node.js, Yarn, Docker)
-- **[Build from Sources](../../dev/build-sources.md)** - Build plugins inside Docker
-- **[Run from Sources](../../dev/run-sources.md)** - Launch Docker dev environment with indexer, manager, and optional agents
-- **[Run Tests](../../dev/run-tests.md)** - Execute unit and integration tests
+- **[Set up environment](../../dev/setup.md)** - Install toolchain (Git, Node.js, Yarn, Docker)
+- **[Build from sources](../../dev/build-sources.md)** - Build plugins inside Docker
+- **[Run from sources](../../dev/run-sources.md)** - Launch Docker dev environment with indexer, manager, and optional agents
+- **[Run tests](../../dev/run-tests.md)** - Execute unit and integration tests
 
 This Docker-based workflow provides:
 
@@ -71,24 +71,24 @@ This Docker-based workflow provides:
 Once installed, configure:
 
 1. **[Configuration](../configuration.md)** - Basic plugin settings and API connections
-2. **[Single Sign-On](../sso.md)** (optional) - Set up SAML authentication
-3. **[Custom Branding](../custom-branding/custom-branding.md)** (optional) - Customize the UI appearance
+2. **[Single sign-on](../sso.md)** (optional) - Set up SAML authentication
+3. **[Custom branding](../custom-branding/custom-branding.md)** (optional) - Customize the UI appearance
 4. **[Security](../security.md)** - Apply security best practices
 
 ## Next steps
 
 After initial setup:
 
-- **Deploy agents**: Use the [Agent Deploy One-Liner](../agent-deploy-one-liner.md) for quick agent deployment
-- **Configure integrations**: Set up [External Integrations](../external-integrations.md) for notifications (Slack, PagerDuty)
+- **Deploy agents**: Use the [Agent deploy one-liner](../agent-deploy-one-liner.md) for quick agent deployment
+- **Configure integrations**: Set up [External integrations](../external-integrations.md) for notifications (Slack, PagerDuty)
 - **Monitor health**: Review [Health Check](../modules/healthcheck.md) module status
-- **Backup data**: Follow [Back Up and Restore](../backup-restore.md) procedures
+- **Backup data**: Follow [Back up and restore](../backup-restore.md) procedures
 
 ## Troubleshooting
 
 If you encounter issues during installation or setup:
 
-- Check [Diagnostic Guide](../../diag/diagnostic.md)
+- Check [Diagnostic guide](../../diag/diagnostic.md)
 - Review the service logs with `journalctl -u wazuh-dashboard`
 - Verify network connectivity to indexer and manager
 - Ensure certificates are properly configured

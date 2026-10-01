@@ -1,12 +1,11 @@
 # Development documentation
 
-See [Setup Environment](setup.md) for the full toolchain prerequisites (Node.js, Yarn, Docker) and
+See [Set up environment](setup.md) for the full toolchain prerequisites (Node.js, Yarn, Docker) and
 per-plugin dependency installation. The steps below cover the repository-root setup only.
 
 ## First time setup
 
-> [!IMPORTANT]
-> You must stay at the root of the project.
+> **Important:** You must stay at the root of the project.
 
 ```bash
 yarn install

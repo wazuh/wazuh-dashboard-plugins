@@ -57,7 +57,7 @@ docker network create mon
 Also set `vm.max_map_count=262144` (required by the indexer to avoid out-of-memory errors; see
 `docker/osd-dev/README.md` for the `sysctl` command), install `nvm` for the Node.js version used
 by the dev scripts, and set `GIT_REF` when installing `plugins/main`'s dependencies directly
-(outside the container) — see [Build from Sources](build-sources.md). `dev.yml` also has a commented-out
+(outside the container) — see [Build from sources](build-sources.md). `dev.yml` also has a commented-out
 Loki logging driver option for centralized container logs, disabled by default.
 
 3. Attach a shell to the development container:

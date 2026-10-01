@@ -4,7 +4,7 @@ This documentation assumes basic knowledge of certain tools and technologies, su
 
 Before you start coding, read the sections below: they cover how to open good pull requests and how our GitHub Actions behave when you do. Getting this right up front saves CI minutes and review cycles for everyone.
 
-## Pull Requests
+## Pull requests
 
 These are the standard procedures for creating, updating, and reviewing Pull Requests across the Wazuh dashboard repositories.
 
@@ -19,7 +19,7 @@ These are the standard procedures for creating, updating, and reviewing Pull Req
 
 Every Pull Request **must** start in **Draft** status. Workflows do not run on Draft PRs — this is enforced across all repositories to avoid wasting GitHub Actions minutes on work in progress — so use Draft status freely while iterating on your changes.
 
-Before marking the PR as ready, **review** the changes and **run the tests and checks (prettier, linter...)** locally to verify they pass and [Run Tests](run-tests.md). This prevents avoidable CI failures that waste runner time and delay reviews. Once everything is complete and locally validated, click **"Ready for review"** and move the linked issue to **Pending review**. This is the moment workflows are triggered for the first time.
+Before marking the PR as ready, **review** the changes and **run the tests and checks (prettier, linter...)** locally to verify they pass and [Run tests](run-tests.md). This prevents avoidable CI failures that waste runner time and delay reviews. Once everything is complete and locally validated, click **"Ready for review"** and move the linked issue to **Pending review**. This is the moment workflows are triggered for the first time.
 
 To address review feedback, push new commits on top of the branch and re-request review once you have resolved all comments. Avoid amending or rebasing published commits during review, and if CI fails after pushing, investigate and fix it before requesting re-review. When the PR is approved and CI passes, it can be merged. Use **squash merge** for single-purpose PRs to keep a clean history.
 

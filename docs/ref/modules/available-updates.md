@@ -6,12 +6,18 @@ The Wazuh dashboard notifies users when a newer Wazuh version is available. It c
 Wazuh indexer for the latest published version and presents the result in two places:
 
 - The update notification shown at the bottom of the interface.
-- The **Updates status** column of **Dashboard management** → **Server API**.
+- The **Updates status** of each API connection in **Dashboard management > Server API**: a field
+  of the connection details, or a column of the connections table in Cross-Cluster Search mode.
+
+The check is disabled by default (`wazuh.updates.disabled: true`): neither place is rendered until
+you set `wazuh.updates.disabled` to `false` in
+**Dashboard management > Dashboards Management > Advanced settings** (see
+[Tenant configuration](../configuration.md#tenant-configuration)).
 
 The result of the check is stored in a single saved object that is shared by every
 user of the deployment, so all sessions display the same status.
 
-## How It Works
+## How it works
 
 - **Source**: the check queries the Wazuh indexer content-manager endpoint
   `GET /_plugins/_content_manager/version/check`.
@@ -41,7 +47,7 @@ permission through the built-in OpenSearch security role `kibana_server`, which 
 to `kibanaserver`. That role includes the `cluster_monitor` action group
 (`cluster:monitor/*`), which covers the version-check action.
 
-No additional configuration is required for a default deployment.
+No additional indexer configuration is required for a default deployment.
 
 > **Note:** If you change the dashboard internal user, use a custom indexer security
 > configuration, or remove the `kibana_server` role mapping, grant

@@ -38,7 +38,7 @@ Slack integration enables real-time security alerts and notifications to be sent
 ### Step 1: Create a Slack incoming webhook
 
 1. Go to https://api.slack.com/apps
-2. Click **Create New App** > **From scratch**
+2. Click **Create New App > From scratch**
 3. Enter app name (e.g., "Wazuh Alerts") and select your workspace
 4. In the app settings, go to **Incoming Webhooks** and activate it
 5. Click **Add New Webhook to Workspace**
@@ -173,7 +173,7 @@ channel. There is no separate "Integration Key" field either: the key travels in
 
 > **⚠️ Warning:** The **Send test message** doesn't work yet because PagerDuty expects a custom payload
 
-1. Use `Indexer Management > Dev Tools` to create a document that will trigger the monitor:
+1. Use **Indexer Management > Dev Tools** to create a document that will trigger the monitor:
 
 ```json
 POST /wazuh-findings-v5-security/_doc
@@ -283,7 +283,7 @@ Shuffle is a security orchestration platform that automates response workflows f
 2. Navigate to **Workflows**
 3. Create a new workflow or select an existing one
 4. Add a **Webhook** trigger node:
-   - Click **+ Add Node** > **Trigger** > **Webhook**
+   - Click **+ Add Node > Trigger > Webhook**
    - Name: `Wazuh Security Events`
 5. Copy the webhook URL (format: `https://shuffler.io/api/v1/hooks/webhook_<id>`)
 6. Configure workflow actions (e.g., enrich data, send to SIEM, create tickets)

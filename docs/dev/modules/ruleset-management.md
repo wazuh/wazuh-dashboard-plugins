@@ -1,4 +1,4 @@
-# Ruleset Management
+# Ruleset management
 
 This module allows to manage the analysis of the security events logs and generate alerts based on the defined rules. It provides a set of tools to create, edit, and manage decoders, integrations, filters, KVDBs, detectors and rules, and test the logs against the defined integrations in logtest.
 
@@ -65,7 +65,7 @@ Filter has the following properties:
 | `description` | A description of the filter. |
 | `type` | The type of the filter. It can be `pre-filter` or `post-filter`. |
 | `enabled` | Indicates if the filter is enabled or not. |
-| `check` | An array of objects, e.g., [{field: value}, ...], that defines the filter conditions. |
+| `check` | An array of objects, e.g., `[{field: value}, ...]`, that defines the filter conditions. |
 | `author` | The author of the filter. |
 | `documentation` | A link to the documentation of the filter. |
 | `references` | A list of references related to the filter. |

@@ -18,7 +18,7 @@ This automation simplifies the setup process and ensures that notifications can 
 
 These functions are part of the dashboard and may be available depending on the platform installation and configuration.
 
-## Related Health Check Task
+## Related health check task
 
 The Health Check includes a specific task that streamlines the setup of these capabilities:
 
@@ -27,7 +27,7 @@ The Health Check includes a specific task that streamlines the setup of these ca
 
 For general Health Check details, see [Health Check](./healthcheck.md).
 
-## Default Notification Channels
+## Default notification channels
 
 When the Notifications functionality is available in the dashboard, the Health Check expects the following channels to exist (provisioned by Wazuh indexer notifications plugin, all created disabled):
 
@@ -44,11 +44,11 @@ When the Notifications functionality is available in the dashboard, the Health C
 
 Security recommendations: treat these URLs and credentials as secrets. Review permissions and channel visibility before enabling it.
 
-## Steps to Complete the Configuration
+## Steps to complete the configuration
 
 1. Configure and enable the notification channel
 
-   - Go to `Explore > Notifications > Channels` and open one of the default channels (Slack, PagerDuty, Jira, or Shuffle).
+   - Go to **Explore > Notifications > Channels** and open one of the default channels (Slack, PagerDuty, Jira, or Shuffle).
    - Provide the required endpoint or credentials, replacing the placeholders with real values:
      - **Slack**: specify the Incoming Webhook URL obtained from your Slack workspace.
      - **PagerDuty**: keep the default URL and set your Integration Key in the `X-Routing-Key` header.
@@ -56,7 +56,7 @@ Security recommendations: treat these URLs and credentials as secrets. Review pe
      - **Shuffle**: specify the Webhook URL of the workflow you will use.
    - Save and unmuted/enable the channel when the test is successful.
 
-## Enable Only Notification Checks
+## Enable only notification checks
 
 To exclusively enable the task described above:
 
@@ -64,7 +64,7 @@ To exclusively enable the task described above:
 healthcheck.checks_enabled: 'integrations:default-notifications-channels'
 ```
 
-## Logs and Troubleshooting
+## Logs and troubleshooting
 
 The Health Check logs detailed progress information during verification.
 Examples of log entries include:
@@ -76,7 +76,7 @@ server    log   [15:03:45.031] [info][healthcheck][integrations:default-notifica
 
 If a check fails, review these log entries for details on which resource was missing or misconfigured.
 
-## Useful Links and References
+## Useful links and references
 
 - [Health Check](./healthcheck.md).
 - Slack – [Incoming Webhooks](https://api.slack.com/messaging/webhooks): official guide to create and obtain the URL.

@@ -35,16 +35,16 @@ The Wazuh server hosts are defined in the configuration file through the `wazuh_
 
 A host has the following properties:
 
-| Property | Description                                                                       | Required                                                                                          | Default value | Allowed values                     |
-| -------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------- |
-| url      | Define the URL address                                                            | Yes                                                                                               | -             | any valid URL string               |
-| port     | Define the port                                                                   | Yes                                                                                               | -             | any integer between 1-65535        |
-| username | Define the username                                                               | Yes                                                                                               | -             | any string between 4-64 characters |
-| password | Define the password (see [Passwords in the keystore](#passwords-in-the-keystore)) | Yes, except for the `default` host, whose password the package resolves into the keystore instead | -             | any string up to 64 characters     |
-| run_as   | Define if the user context is used to retrieve the permissions                    | No                                                                                                | true          | true, false                        |
-| key      | Path to the SSL/TLS client private key file                                       | No                                                                                                | -             | absolute or relative file path     |
-| cert     | Path to the SSL/TLS client certificate file                                       | No                                                                                                | -             | absolute or relative file path     |
-| ca       | Path to the CA certificate file for server verification                           | No                                                                                                | -             | absolute or relative file path     |
+| Property | Description                                                                       | Required                                                                                                              | Default value | Allowed values                     |
+| -------- | --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------------------------- |
+| url      | Define the URL address                                                            | Yes                                                                                                                   | -             | any valid URL string               |
+| port     | Define the port                                                                   | Yes                                                                                                                   | -             | any integer between 1-65535        |
+| username | Define the username                                                               | Yes                                                                                                                   | -             | any string between 4-64 characters |
+| password | Define the password (see [Passwords in the keystore](#passwords-in-the-keystore)) | Yes, in the keystore (recommended) or in the file; the package resolves the `default` host password into the keystore | -             | any string up to 64 characters     |
+| run_as   | Define if the user context is used to retrieve the permissions                    | No                                                                                                                    | true          | true, false                        |
+| key      | Path to the SSL/TLS client private key file                                       | No                                                                                                                    | -             | absolute or relative file path     |
+| cert     | Path to the SSL/TLS client certificate file                                       | No                                                                                                                    | -             | absolute or relative file path     |
+| ca       | Path to the CA certificate file for server verification                           | No                                                                                                                    | -             | absolute or relative file path     |
 
 This is an example of a single-host configuration (default installation). The password of the `default` host is not in the file: the package stores it in the keystore (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
@@ -57,7 +57,7 @@ wazuh_core.hosts:
     run_as: true
 ```
 
-For environments with multiple managers, define one entry per host. This is used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used:
+For environments with multiple managers, define one entry per host. This is used only when [Cross-Cluster Search](https://docs.opensearch.org/latest/search-plugins/cross-cluster-search/) is configured; otherwise only the first entry is used. Store the password of each host other than `default` in the keystore (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
 ```yml
 wazuh_core.hosts:
@@ -70,7 +70,6 @@ wazuh_core.hosts:
     url: https://another_host_dns
     port: 55000
     username: wazuh-wui
-    password: <ANOTHER_HOST_PASSWORD>
     run_as: true
     key: '/etc/wazuh-dashboard/certs/dashboard-another-host.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-another-host.crt'
@@ -155,7 +154,7 @@ The dashboard surfaces certificate errors at connection time rather than at star
 
 ### Configuration example
 
-The following example configures a host with full client certificate authentication and server certificate verification:
+The following example configures a host with full client certificate authentication and server certificate verification. Its password goes in the keystore as `wazuh_core.hosts.production.password` (see [Passwords in the keystore](#passwords-in-the-keystore)):
 
 ```yml
 wazuh_core.hosts:
@@ -163,7 +162,6 @@ wazuh_core.hosts:
     url: 'https://wazuh.example.com'
     port: 55000
     username: wazuh-wui
-    password: <PRODUCTION_PASSWORD>
     run_as: false
     key: '/etc/wazuh-dashboard/certs/dashboard-client.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-client.crt'
@@ -183,7 +181,7 @@ wazuh_core.hosts:
 
 ## Tenant configuration
 
-Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management** > **Dashboards Management** > **Advanced settings**:
+Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management > Dashboards Management > Advanced settings**:
 
 | Setting                | Description                                                                                                                                                  | Default value | Allowed values                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------- |

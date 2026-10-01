@@ -83,7 +83,7 @@ Input validation (`validate_input`):
 
 ### What the script modifies
 
-All paths below were confirmed to exist in this repository. The script targets
+The paths below exist in this repository unless noted otherwise. The script targets
 plugin files dynamically via `git ls-files`, so the lists reflect the tracked
 files at run time.
 
@@ -161,8 +161,9 @@ this fixed list of workflows:
 
 The replacement value is `v<version>[-<stage>]` when `--tag` is set, otherwise the
 plain `<version>`. The script guards each path with an existence check, so any
-file in the list that is not present is skipped with a `WARNING`. This list is
-specific to `wazuh-dashboard-plugins` (see
+file in the list that is not present is skipped with a `WARNING`.
+`wazuh-build-push-docker-action.yml` is not currently in `.github/workflows/`, so it
+is always skipped. This list is specific to `wazuh-dashboard-plugins` (see
 [The bumper across Wazuh dashboard repositories](#the-bumper-across-wazuh-dashboard-repositories)).
 
 `docker/imposter/wazuh-config.yml` is updated the same way: the

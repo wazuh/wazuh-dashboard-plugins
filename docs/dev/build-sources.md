@@ -5,19 +5,20 @@ distributable ZIP packages for development or manual installation.
 
 > **Note**: This guide builds **only the plugins** in this repository. If you
 > need complete system packages (DEB/RPM) including the full dashboard
-> distribution, see [Build Packages](build-packages.md).
+> distribution, see [Build packages](build-packages.md).
 
 ## Prerequisites
 
-- Toolchain configured as described in [Setup Environment](setup.md)
+- Toolchain configured as described in [Set up environment](setup.md)
 - `jq` installed (used to read plugin versions)
 - Git reference (branch or tag) from the `wazuh-indexer-plugins` repository, compatible with your
   plugin version
-- Docker dev environment available (see [Run from Sources](run-sources.md))
+- A `wazuh-dashboard` source tree to build in: the Docker dev environment (see
+  [Run from sources](run-sources.md)) or a host checkout (see [Build packages](build-packages.md))
 
 ## Install dependencies
 
-If you haven't already installed dependencies (from [Setup Environment](setup.md)),
+If you haven't already installed dependencies (from [Set up environment](setup.md)),
 do so now:
 
 ```bash
@@ -79,9 +80,9 @@ plugin's `build/` directory:
 
 `yarn build` runs `node ../../scripts/plugin_helpers`, so the plugins must sit inside an
 OpenSearch Dashboards (`wazuh-dashboard`) source tree. The Docker-based development environment
-provides one: use [Run from Sources](run-sources.md) to start the environment and attach a
+provides one: use [Run from sources](run-sources.md) to start the environment and attach a
 shell, then execute the install and build steps above from within the
-container. Docker is not strictly required: the host flow in [Build Packages](build-packages.md)
+container. Docker is not strictly required: the host flow in [Build packages](build-packages.md)
 copies the plugins into a `wazuh-dashboard` checkout and builds them there.
 
 ## Next steps
@@ -89,4 +90,4 @@ copies the plugins into a `wazuh-dashboard` checkout and builds them there.
 - To install these plugins manually, see the installation guide in the reference
   manual.
 - If you need complete system packages (DEB/RPM) for distribution, see
-  [Build Packages](build-packages.md).
+  [Build packages](build-packages.md).

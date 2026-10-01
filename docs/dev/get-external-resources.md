@@ -14,7 +14,7 @@ This process is done through the `update-indexer-resources` script located at `p
 
 ---
 
-#### Process Overview
+#### Process overview
 
 The script performs the following steps, in this order:
 

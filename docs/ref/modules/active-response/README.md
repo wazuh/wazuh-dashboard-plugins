@@ -17,7 +17,7 @@ Active Response combines three areas of the Wazuh dashboard:
 
 | Area                 | Role in Active Response                                                                                                                                                          |
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Active Responses** | Manage active responses from the Wazuh dashboard (under **Explore → Active Responses**). Each entry defines the executable, type, timeout, and target location of a remediation. |
+| **Active Responses** | Manage active responses from the Wazuh dashboard (under **Explore > Active Responses**). Each entry defines the executable, type, timeout, and target location of a remediation. |
 | **Alerting**         | Active Response monitors expose an **Add active response** action that invokes one when the trigger condition is met.                                                            |
 | **Discover**         | The `wazuh-active-responses*` index pattern keeps an auditable record of every execution, retained for 3 days by default.                                                        |
 

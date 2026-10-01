@@ -120,6 +120,13 @@ systemctl restart wazuh-dashboard
 
 ![Login page](./images/login_page_basicauth.png)
 
+<!--
+### Provider authentication
+
+TODO: define settings for SSO, refer to the `server/index.ts` file of the Wazuh Security Dashboards plugin repository.
+
+-->
+
 ## Help menu links
 
 The top-right help menu shows a fixed set of links (Documentation, Slack Channel, Projects on Github, Google Group) that stay visible regardless of the active app. Override the whole list through `opensearch_dashboards.yml`:
@@ -171,18 +178,11 @@ Restart the service after changes:
 systemctl restart wazuh-dashboard
 ```
 
-<!--
-#### Provider authentication
-
-TODO: define settings for SSO, refer to: https://github.com/wazuh/wazuh-security-dashboards-plugin/blob/main/server/index.ts#L258-L281
-
--->
-
 ## Reporting
 
 The PDF reports can be customized through a report definition that allows to define a custom header and footer.
 
-1. Go to **Explore** > **Reporting**
+1. Go to **Explore > Reporting**
 2. Click on **Create** button.
 3. Define the report name and description, source and other settings.
 4. In the **Report definition** section, click on the **Add header** or **Add footer** option to customize them.

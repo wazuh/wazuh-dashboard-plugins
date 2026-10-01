@@ -34,7 +34,7 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
   [Define Wazuh server hosts](configuration.md#define-wazuh-server-hosts).
 - Fine-grained manager API permissions (for example `enrollment_token:create`,
   `enrollment_token:read`, `enrollment_token:delete`) are enforced by the manager's own RBAC, not
-  the dashboard — see [Enrollment Tokens](modules/enrollment-tokens/README.md#permissions).
+  the dashboard — see [Enrollment tokens](modules/enrollment-tokens/README.md#permissions).
 - `wazuh.disabledSettings` and `opensearch_security_analytics.disabledSettings` hide specific
   indexer/Ruleset Management settings from the UI without changing the indexer's own RBAC — see
   [Configuration](configuration.md#file).

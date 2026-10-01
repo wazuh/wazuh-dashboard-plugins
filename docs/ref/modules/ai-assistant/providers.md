@@ -1,7 +1,7 @@
 # Providers
 
 A **provider** is a configured AI endpoint the assistant talks to. Providers are managed in
-**AI Assistant → Settings → Providers** — authorized by the Wazuh indexer's own RBAC on the
+**AI Assistant > Settings > Providers** — authorized by the Wazuh indexer's own RBAC on the
 calling user (see
 [Security](./security.md#settings-and-providers-authorized-by-indexer-rbac)). Multiple providers can coexist; one is marked as the
 default, and the chat header lets the user pick among the configured ones.

@@ -1,6 +1,6 @@
 # How to run the tests
 
-Tests are executed per plugin from within the Docker development environment. First, follow the steps in [Run from Sources](run-sources.md) to bring up the development environment.
+Tests are executed per plugin from within the Docker development environment. First, follow the steps in [Run from sources](run-sources.md) to bring up the development environment.
 
 ## Starting the development environment
 
@@ -39,7 +39,7 @@ Jest displays results with coverage information. In `main`, `wazuh-core` and
 projects (a `node` one matching `**/*.test.ts` and a `jsdom` one matching `**/*.test.{ts,tsx}`),
 so `.test.js` files are not run there.
 
-## Important Notes
+## Important notes
 
 - Tests **must be executed inside the Docker container** – running `yarn test:jest` directly on
   the host machine will fail due to missing dependencies and environment setup (e.g.,
@@ -49,7 +49,7 @@ so `.test.js` files are not run there.
   requiring you to already be inside the dev environment's container. `plugins/wazuh-core` also
   declares `test:jest:runner`, but its `scripts/runner.js` does not exist, so it fails;
   `plugins/wazuh-ai-assistant` does not define it.
-- Ensure the Docker development environment is running before attempting to run tests (see [Run from Sources](run-sources.md)).
+- Ensure the Docker development environment is running before attempting to run tests (see [Run from sources](run-sources.md)).
 - The container includes all necessary Node.js dependencies and Jest for unit testing.
 - Some test suites may produce warnings or console messages that do not affect test results (e.g., "Browserslist: caniuse-lite is outdated", prop validation warnings).
 - **Note:** Other test scripts listed in `package.json` (e.g., `test:server`, `test:browser`, `test:ui:runner`) are not available in the Docker development environment as they require additional OpenSearch Dashboards infrastructure not included in the dev setup. For comprehensive testing, use the CI/CD pipeline or a production-like environment setup.

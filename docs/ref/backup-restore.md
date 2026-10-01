@@ -58,7 +58,7 @@ mkdir -p "$backup_folder/saved_objects"
 
 > Note: if multitenancy is used, export the saved objects of each tenant repeating the following steps, consider separating in directories by tenant.
 
-3.2. Open **Dashboard management** > **Dashboards Management** > **Saved objects**.
+3.2. Open **Dashboard management > Dashboards Management > Saved objects**.
 
 3.3. Export the required objects, or use **Export all objects**. Choose as destination the **saved_objects** directory.
 
@@ -147,7 +147,7 @@ cp <path/to/asset/> <destination_path>
 chown root:root <destination_path>
 ```
 
-Custom assets hosted in the dashboard server (see [Custom Branding](custom-branding/custom-branding.md#host-the-images-in-the-dashboard-server))
+Custom assets hosted in the dashboard server (see [Custom branding](custom-branding/custom-branding.md#host-the-images-in-the-dashboard-server))
 live under `/usr/share/wazuh-dashboard/`, which the package installs as `root:root` — matching
 ownership here keeps it consistent with the rest of that tree.
 
@@ -165,6 +165,6 @@ systemctl restart wazuh-dashboard
 service wazuh-dashboard restart
 ```
 
-6. Import saved objects from **Dashboard management** > **Dashboards Management** > **Saved objects**.
+6. Import saved objects from **Dashboard management > Dashboards Management > Saved objects**.
 
 Import the saved object stored in `$backup_folder`. If using multitenancy, import the related saved objects into each tenant.

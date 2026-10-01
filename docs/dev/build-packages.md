@@ -5,7 +5,7 @@ Wazuh dashboard, including all required plugins and dependencies.
 
 > **Note**: This builds **complete installation packages**. If you only need to
 > build the plugins from this repository for development, see
-> [Build from Sources](build-sources.md).
+> [Build from sources](build-sources.md).
 
 ## Step by step
 
@@ -188,8 +188,8 @@ After completing the previous steps, you will have the following packages in the
 
 9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script accepts the following parameters. The package options take a URL (`http(s)://`, `ftp://` or `file://`), not a bare path, so local files are passed as `file://<absolute path>`:
 
-- `-c`, `--commit-sha`: [Optional] Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below). Defaults to the short SHA of the current `wazuh-dashboard` commit.
-- `-r`, `--revision`: [Optional] Revision of the package. Defaults to `1`.
+- `-c`, `--commit-sha`: _(Optional)_ Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below). Defaults to the short SHA of the current `wazuh-dashboard` commit.
+- `-r`, `--revision`: _(Optional)_ Revision of the package. Defaults to `1`.
 - `--deb` or `--rpm`: Distribution of the package.
 - `-a`: URL of the `wazuh-package.zip`.
 - `-b`, `--base`: URL of the `dashboard-package.zip`.
@@ -323,8 +323,8 @@ cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
    - `-sa`, `--securityAnalytics`: Branch of the `wazuh-dashboard-security-analytics` repository.
    - `-al`, `--alerting`: Branch of the `wazuh-dashboard-alerting` repository.
    - `-no`, `--notifications`: Branch of the `wazuh-dashboard-notifications` repository.
-   - `--arm`: [Optional] Build for arm64 instead of x64.
-   - `--node-version`: [Optional] Node version to use; defaults to the script's own pinned
+   - `--arm`: _(Optional)_ Build for arm64 instead of x64.
+   - `--node-version`: _(Optional)_ Node version to use; defaults to the script's own pinned
      version — pass `$(cat ../../../.nvmrc)` to match the repository's `.nvmrc` instead of
      hardcoding it.
 

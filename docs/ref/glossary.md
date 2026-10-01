@@ -20,10 +20,11 @@
   [Active Response](modules/active-response/README.md).
 - **Enrollment token**: The credential a 5.x agent presents to register with a manager, replacing
   the 4.x registration password/variables. See
-  [Enrollment Tokens](modules/enrollment-tokens/README.md).
+  [Enrollment tokens](modules/enrollment-tokens/README.md).
 - **RBAC**: Role-based access control — the indexer's and the manager's own permission systems,
   which the dashboard enforces by running user-facing queries as the logged-in user
-  (`asCurrentUser`). Background tasks are the exception: the Health Check and the update check
-  (`wazuh-check-updates`) run as the internal user (`asInternalUser`).
+  (`asCurrentUser`). Two server-side checks are the exception and run as the internal user
+  (`asInternalUser`): the Health Check, and the update check (`wazuh-check-updates`), which runs
+  when a request to its route asks for fresh data, not on a schedule.
 - **CTI**: Cyber Threat Intelligence — the Wazuh-curated threat-intelligence content (indicators,
   rules, decoders) distributed to the indexer's content manager.

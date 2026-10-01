@@ -46,7 +46,9 @@ the `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` R
 pipeline content, the `wazuh-threatintel-enrichments-a` IOC feed (`lookup_indicator`), the
 `.wazuh-threatintel-vulnerabilities-a` CVE feed (`get_cve_intel`), the `.wazuh-cti-consumers` and
 `.wazuh-content-manager-jobs` CTI sync indices (`get_cti_status`), and the single fixed
-`.opensearch-sap-detectors-config` index (detector definitions). Each tool's module in
+`.opensearch-sap-detectors-config` index (detector definitions), plus the
+`.opensearch-sap-<type>-findings` index whose document count `get_detectors` adds when the call
+targets a single detector type. Each tool's module in
 `server/tools/catalog/` documents which index or Server API endpoint it queries on 5.0 and why.
 
 ## The escape hatch
@@ -56,7 +58,7 @@ matches. It is deliberately narrow:
 
 - `index_pattern` must be one of a fixed enum (`server/tools/catalog/generic-query-families.ts`):
   `wazuh-findings-v5-*`, `wazuh-events-v5-*`, `wazuh-states-*` (plus one entry per
-  `wazuh-states-*` index), `wazuh-metrics-*`, the CTI feed indices (`.wazuh-cti-consumers`,
+  `wazuh-states-*` index), `wazuh-metrics-*`, the CTI sync indices (`.wazuh-cti-consumers`,
   `.wazuh-content-manager-jobs`), `.opensearch-sap-*-findings`,
   `.opensearch-sap-pre-packaged-rules-config`, `.opensearch-sap-correlation-metadata`, and the raw
   threat-intel feeds `.wazuh-threatintel-vulnerabilities-a` and `wazuh-threatintel-enrichments-a`.
@@ -132,7 +134,7 @@ retry):
   `wazuh-findings-v5-*`, `wazuh-states-*`, `wazuh-metrics-*`, the 6 named
   `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families, the
   fixed `wazuh-threatintel-enrichments-a` and `.wazuh-threatintel-vulnerabilities-a` CTI feed
-  indices, `.wazuh-cti-consumers`, `.wazuh-content-manager-jobs`, and the
+  indices, the `.wazuh-cti-consumers` and `.wazuh-content-manager-jobs` CTI sync indices, and the
   `.opensearch-sap-detectors-config`, `.opensearch-sap-pre-packaged-rules-config`,
   `.opensearch-sap-correlation-metadata` and `.opensearch-sap-*-findings` indices.
 

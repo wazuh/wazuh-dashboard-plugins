@@ -59,19 +59,19 @@ Export only the objects you created or modified.
 ### Using the UI
 
 1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**.
-2. To export all custom objects, select the checkboxes next to each user-created dashboard, visualization and saved search, and next to each custom index pattern they use. Do not select the 4.x `wazuh-alerts-*` index pattern: 5.x replaces it (see Step 4).
-3. Click **Export** in the action bar and disable **Include related objects**: when enabled, it adds the referenced `wazuh-alerts-*` index pattern back to the file.
+2. To export all custom objects, select the checkboxes next to each user-created dashboard, visualization and saved search, and next to each custom index pattern they use. Do not select the 4.x default Wazuh index patterns (`wazuh-alerts-*`, `wazuh-monitoring-*`, `wazuh-statistics-*` and the `wazuh-states-*-*` patterns): 5.x replaces them (see Step 4).
+3. Click **Export** in the action bar and disable **Include related objects**: when enabled, it adds the referenced 4.x default index patterns back to the file.
 4. Save the exported `.ndjson` file to a secure location.
 
 If you need to export everything at once as a fallback:
 
 1. Select **Export X objects** (the button label shows the total count).
-2. Save the file, then remove the `wazuh-alerts-*` index pattern from it with the `jq` command of [Using the API](#using-the-api) below.
+2. Save the file, then remove the 4.x default Wazuh index patterns from it with the `jq` command of [Using the API](#using-the-api) below.
 3. When importing into 5.x, use the **Check for existing objects** conflict strategy (see Step 3) to avoid overwriting default Wazuh objects that were already provisioned.
 
 ### Using the API
 
-Run the following commands from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The `jq` command drops the 4.x `wazuh-alerts-*` index pattern and keeps your custom index patterns. The output file is saved in the current working directory:
+Run the following commands from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The `jq` command drops the 4.x default Wazuh index patterns (`wazuh-alerts-*`, `wazuh-monitoring-*`, `wazuh-statistics-*` and `wazuh-states-*-*`) and keeps your custom index patterns. The output file is saved in the current working directory:
 
 ```bash
 curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_export" \
@@ -85,7 +85,7 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   }' \
   -o saved-objects-export.ndjson
 
-jq -c 'select(.type != "index-pattern" or .attributes.title != "wazuh-alerts-*")' \
+jq -c 'select(.type != "index-pattern" or (.attributes.title | test("^wazuh-(alerts|monitoring|statistics|states-.+)-\\*$") | not))' \
   saved-objects-export.ndjson > saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
 
@@ -230,7 +230,7 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   }' \
   -o saved-objects-export-<TENANT>.ndjson
 
-jq -c 'select(.type != "index-pattern" or .attributes.title != "wazuh-alerts-*")' \
+jq -c 'select(.type != "index-pattern" or (.attributes.title | test("^wazuh-(alerts|monitoring|statistics|states-.+)-\\*$") | not))' \
   saved-objects-export-<TENANT>.ndjson > saved-objects-backup-<TENANT>-$(date +%Y%m%d).ndjson
 ```
 

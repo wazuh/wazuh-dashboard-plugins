@@ -6,7 +6,7 @@ Wazuh 5.0 does not provide an automatic upgrade path from 4.x. This guide descri
 
 ## Platform compatibility
 
-All Wazuh stack components (indexer, manager, dashboard) must be upgraded to 5.x together. Mixed-version deployments are not supported. See the [Compatibility](../../ref/compatibility.md#version-compatibility) matrix for the platform versions of each release, and [Requirements](../../ref/getting-started/requirements.md) for the 5.x system requirements. TLS certificates must be valid for OpenSearch 3.x.
+All Wazuh stack components (indexer, manager, dashboard) must be upgraded to 5.x together. The dashboard and the manager must run the same major.minor version (5.0.x). Mixed-version deployments are not supported. See the [Compatibility](../../ref/compatibility.md#version-compatibility) matrix for the platform versions of each release, and [Requirements](../../ref/getting-started/requirements.md) for the 5.x system requirements. TLS certificates must be valid for OpenSearch 3.x.
 
 For the full list of changes, see the [Release notes](../../ref/release-notes.md#breaking-changes) and the `CHANGELOG.md` file at the repository root: note the removed settings, renamed configuration keys, removed features you may be using, and new required configuration.
 
@@ -65,11 +65,11 @@ sudo cp /etc/wazuh-dashboard/opensearch_dashboards.yml \
 sudo cp -a /etc/wazuh-dashboard/certs/ "$BACKUP_DIR/certs/"
 
 # List the custom settings of opensearch_dashboards.yml (non-comment, non-empty lines)
-grep -v "^#" /etc/wazuh-dashboard/opensearch_dashboards.yml | grep -v "^$" \
+sudo grep -v "^#" /etc/wazuh-dashboard/opensearch_dashboards.yml | grep -v "^$" \
   > "$BACKUP_DIR/custom-settings.txt"
 ```
 
-This copies the plugin configuration (`wazuh/config/wazuh.yml`), the dashboard TLS certificates, and generated PDF reports (`wazuh/downloads/reports/`). Both are located under the `path.data` directory defined in `opensearch_dashboards.yml` (default: `/usr/share/wazuh-dashboard/data`).
+This copies the plugin configuration (`wazuh/config/wazuh.yml`) and the generated PDF reports (`wazuh/downloads/reports/`), both located under the `path.data` directory defined in `opensearch_dashboards.yml` (default: `/usr/share/wazuh-dashboard/data`). It also copies `opensearch_dashboards.yml` and the dashboard TLS certificates from `/etc/wazuh-dashboard/`, and saves the custom settings of `opensearch_dashboards.yml` to `custom-settings.txt`.
 
 > **Note**: The `wazuh/downloads/reports/` directory is owned by the `wazuh-dashboard` system user. Run the command with `sudo` or as a user with sufficient permissions to read the directory.
 
@@ -80,10 +80,10 @@ See [Reports](./reports.md) for details on what can and cannot be migrated.
 Export only the dashboards and visualizations you created or modified. Default Wazuh objects are re-provisioned automatically in 5.x and must not be re-imported.
 
 1. In the Wazuh dashboard, navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**.
-2. Select the checkboxes next to each custom dashboard, visualization and saved search, and next to each custom index pattern they use. Do not select the 4.x `wazuh-alerts-*` index pattern: 5.x replaces it (see [Resolve index pattern conflicts](./dashboards.md#step-4-resolve-index-pattern-conflicts)).
-3. Click **Export**, disable **Include related objects** (it would add the `wazuh-alerts-*` index pattern back), and save the resulting `.ndjson` file to a secure location.
+2. Select the checkboxes next to each custom dashboard, visualization and saved search, and next to each custom index pattern they use. Do not select the 4.x default Wazuh index patterns (`wazuh-alerts-*`, `wazuh-monitoring-*`, `wazuh-statistics-*` and the `wazuh-states-*-*` patterns): 5.x replaces them (see [Resolve index pattern conflicts](./dashboards.md#step-4-resolve-index-pattern-conflicts)).
+3. Click **Export**, disable **Include related objects** (it would add the referenced 4.x default index patterns back), and save the resulting `.ndjson` file to a secure location.
 
-If you export all objects as a fallback, remove the `wazuh-alerts-*` index pattern from the file with the `jq` command below, and use the **Check for existing objects** conflict strategy when importing into 5.x. See [Custom dashboards and visualizations](./dashboards.md) for details.
+If you export all objects as a fallback, remove the 4.x default Wazuh index patterns from the file with the `jq` command below, and use the **Check for existing objects** conflict strategy when importing into 5.x. See [Custom dashboards and visualizations](./dashboards.md) for details.
 
 Alternatively, use the API. Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
 
@@ -96,8 +96,8 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   -d '{"type": ["dashboard", "visualization", "search", "index-pattern"], "includeReferencesDeep": false}' \
   -o saved-objects-export.ndjson
 
-# Drop the 4.x wazuh-alerts-* index pattern, keep the custom ones
-jq -c 'select(.type != "index-pattern" or .attributes.title != "wazuh-alerts-*")' \
+# Drop the 4.x default Wazuh index patterns, keep the custom ones
+jq -c 'select(.type != "index-pattern" or (.attributes.title | test("^wazuh-(alerts|monitoring|statistics|states-.+)-\\*$") | not))' \
   saved-objects-export.ndjson > saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
 
@@ -140,7 +140,9 @@ Expected response:
   "data": {
     "title": "Wazuh API REST",
     "api_version": "5.0.0",
-    "revision": 50000,
+    "revision": "rc1",
+    "license_name": "GPL 2.0",
+    "license_url": "<LICENSE_URL>",
     "hostname": "wazuh-manager",
     "timestamp": "2026-02-24T10:00:00Z"
   }
@@ -170,7 +172,7 @@ A 5.x agent registers with an enrollment token only: the 4.x registration variab
 ```bash
 curl -so wazuh-agent-5.0.0-1.deb \
   https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-agent/wazuh-agent_5.0.0-1_amd64.deb \
-  && WAZUH_ENROLLMENT_TOKEN='<enrollment-token>' dpkg -i ./wazuh-agent-5.0.0-1.deb
+  && sudo WAZUH_ENROLLMENT_TOKEN='<enrollment-token>' dpkg -i ./wazuh-agent-5.0.0-1.deb
 
 sudo systemctl daemon-reload
 sudo systemctl enable wazuh-agent
@@ -237,13 +239,14 @@ If dashboards or visualizations don't appear after the migration:
 
 1. Re-import the saved objects as described in [Custom dashboards and visualizations](./dashboards.md#step-3-import-saved-objects-into-wazuh-5x).
 
-2. If the default index pattern is missing, create it manually:
+2. If the default index pattern is missing, create it manually, replacing `<DASHBOARD_HOST>` with the 5.x dashboard hostname or IP and `<DASHBOARD_PORT>` with the dashboard port (`server.port`, `443` by default):
 
    ```bash
-   curl -X POST "https://localhost:5601/api/saved_objects/index-pattern/wazuh-events-v5*" \
+   curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/index-pattern/wazuh-events-v5*" \
      -H "osd-xsrf: true" \
      -H "Content-Type: application/json" \
      -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD \
+     -k \
      -d '{
        "attributes": {
          "title": "wazuh-events-v5*",
@@ -280,10 +283,10 @@ If the dashboard is slow or unresponsive after the migration:
 
 1. Clear the browser cache and cookies.
 
-2. Optimize the indexer indices:
+2. Optimize the indexer indices that are no longer written to. Force-merge only rolled-over (read-only) backing indices, never the current write index of a data stream. Replace `<ROLLED_OVER_INDEX>` with the name of such an index:
 
    ```bash
-   curl -X POST "https://localhost:9200/wazuh-events-v5*/_forcemerge?max_num_segments=1" \
+   curl -X POST "https://localhost:9200/<ROLLED_OVER_INDEX>/_forcemerge?max_num_segments=1" \
      -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD -k
    ```
 

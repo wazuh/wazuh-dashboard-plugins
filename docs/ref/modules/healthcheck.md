@@ -22,7 +22,7 @@ This defines a service that is integrated with the core lifecycle of the applica
   server    log   [10:04:59.857] [info][healthcheck] Set scheduled checks each 900000ms
 ```
 
-5. If some enabled and critical check fails in the initial check, this will avoid the application can correctly initialize until this is solved. In this case, the Wazuh dashboard server is not ready yet view should display information about the failing critical checks. No shipped Wazuh check is currently registered as critical (`metadata.critical` defaults to `false` and no task in `plugins/main/server/plugin.ts` sets it), so this blocking path is not exercised by any check today.
+5. If some enabled and critical check fails in the initial check, this will avoid the application can correctly initialize until this is solved. In this case, the Wazuh dashboard server is not ready yet view should display information about the failing critical checks. No shipped Wazuh check is currently registered as critical (the task's `critical` field defaults to `false` and no task in `plugins/main/server/plugin.ts` sets it), so this blocking path is not exercised by any check today.
 
 ## Checks
 
@@ -36,18 +36,18 @@ The checks represents the unit to check and some could do some write actions suc
 | `server-api:connection-compatibility`         | Validate the connection and compatibility with the server API hosts                                                                                                                                                                                        |
 | `server-api:run-as`                           | Validate that the `run_as` setting is enabled in each host and is allowed to use by the configured user.                                                                                                                                                   |
 | `integrations:default-notifications-channels` | Validate the existence of the default Notifications channels (provisioned by `wazuh-indexer-notifications`). It does not create any Alerting monitors. See [Notifications and Alerting](./notifications-alerting.md) for details.                          |
-| `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md) for details.                         |
+| `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md) for details.                         |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
 
 ### Notifications and Alerting
 
 For details about the default notification channels the Wazuh indexer provisions (and Health Check validates) and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).
 
-### Saved Objects for Dashboards and Visualizations
+### Saved objects for dashboards and visualizations
 
-For details about the task that provisions dashboard and visualization saved objects from the repository definitions, see [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md).
+For details about the task that provisions dashboard and visualization saved objects from the repository definitions, see [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md).
 
-### Server Certificate Validity
+### Server certificate validity
 
 The `server-api:certificate-validity` check reports the state of the TLS certificates of every Wazuh manager node: the certificate the agent listener serves and the CA bundle the manager publishes to agents. It reports the worst state it finds and names the affected nodes.
 
