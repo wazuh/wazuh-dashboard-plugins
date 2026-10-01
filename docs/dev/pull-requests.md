@@ -25,85 +25,11 @@ To address review feedback, push new commits on top of the branch and re-request
 
 ### Body template
 
-Every Pull Request must use the repository's pull request template. Its full content:
-
-```markdown
-## Description
-
-<!--
-Provide a brief description of the problem this pull request addresses. Include relevant context to help reviewers understand the purpose and scope of the changes.
-
-If this pull request resolves an existing issue, reference it here. For example:
-Closes #<issue_number>
--->
-
-## Proposed Changes
-
-<!--
-Summarize the changes made in this pull request. Include:
-- Features added
-- Bugs fixed
-- Any relevant technical details
--->
-
-### Results and Evidence
-
-<!--
-Provide evidence of the changes made, such as:
-- Logs
-- Screenshots
-- Before/after comparisons
--->
-
-### Artifacts Affected
-
-<!--
-List the artifacts impacted by this pull request, such as:
-- Executables (specify platforms if applicable)
-- Default configuration files
-- Packages
--->
-
-### Configuration Changes
-
-<!--
-If applicable, list any configuration changes introduced by this pull request, including:
-- New configuration parameters
-- Changes to default values
-- Backward compatibility notes
--->
-
-### Documentation Updates
-
-<!--
-If applicable, list the sections of documentation that have been updated as part of this pull request.
--->
-
-### Tests Introduced
-
-<!--
-If applicable, describe any new unit or integration tests added as part of this pull request. Include:
-- Scope of the tests
-- Any relevant details about test coverage
--->
-
-## Review Checklist
-
-<!--
-List any manual tests completed to verify the functionality of the changes. Include any manual tests that are still required for final approval.
--->
-
-- [ ] Code changes reviewed
-- [ ] Relevant evidence provided
-- [ ] Tests cover the new functionality
-- [ ] Configuration changes documented
-- [ ] Developer documentation reflects the changes
-- [ ] Meets requirements and/or definition of done
-- [ ] No unresolved dependencies with other issues
-- [ ] PR is linked to the relevant issue(s)
-- [ ] Correct labels applied (e.g., `no-changelog`)
-- [ ] ...
-```
+Every Pull Request must use the repository's own `.github/pull_request_template.md` at the
+repository root, which GitHub pre-fills automatically when you open a PR. It has sections for
+**Description**, **Proposed Changes**, **Results and Evidence**, **Artifacts Affected**,
+**Configuration Changes**, **Documentation Updates**, **Tests Introduced**, and a **Review
+Checklist**.
 
 Always link the related issue in **`## Description`** with a closing keyword (`Closes`, `Fixes`, `Fix`) so it auto closes on merge, and describe **why** rather than just **what**, the diff already shows what changed, so the description should explain the motivation. Any change to the UI **must** include a screenshot or video as evidence under **`### Results and Evidence`**.
 
@@ -114,6 +40,16 @@ Start from the linked issue to understand the context and acceptance criteria, t
 ### Changelog
 
 Every PR is expected to include an entry in `CHANGELOG.md`, under the `Added`, `Changed`, `Fixed` or `Removed` section for the upcoming version. This is enforced by the **Changelog Verifier** workflow (`5_codequality_changelog.yml`).
+
+**Row format**: each section is a two-column table, `Issue` and `Comment`:
+
+```markdown
+| Issue                                                                 | Comment                         |
+| --------------------------------------------------------------------- | ------------------------------- |
+| [#1234](https://github.com/wazuh/wazuh-dashboard-plugins/issues/1234) | Short description of the change |
+```
+
+The `Issue` column links the issue (`#1234`) the PR closes, not the PR itself — the entry links to the problem being solved, not the implementation. For an issue in another repository, prefix it (`[wazuh-dashboard#1086](https://github.com/wazuh/wazuh-dashboard/issues/1086)`).
 
 **When an entry is required**: whenever the change affects the published package, the UI, or any other user-facing behavior.
 
@@ -173,8 +109,14 @@ The prefix is drawn from the following set of use cases:
 | Package builder                                     | `builderpackage`     | Subsystem          | `5_builderpackage_plugins`                  |
 | Precompiled object builder                          | `builderprecompiled` | Subsystem          | `5_builderprecompiled_base-dev-environment` |
 | Version bumping                                     | `bumper`             | Repository         | `5_bumper_repository`                       |
+| Documentation build/deploy                          | `documentation`      | Deploy target      | `6_documentation_deploy-to-gh-pages`        |
 
 When composing jobs from Actions, a single job step **cannot** mix Actions with different prefixes, and steps **must** use matrices whenever possible.
+
+**Unprefixed workflows**: `.github/workflows/` also has workflows that predate this convention and
+are not expected to be renamed to it (`backport.yml`, `build.yml`, `codeql.yml`,
+`dependency-review.yml`, `dev-environment.yml`, `eslint.yml`, `manual-build.yml`, `playground.yml`).
+New workflows should follow the convention above; these are grandfathered in.
 
 ### Runners
 
