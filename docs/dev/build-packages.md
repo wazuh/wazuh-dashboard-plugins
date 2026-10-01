@@ -321,17 +321,20 @@ git clone -b $WAZUH_DASHBOARDS_BRANCH https://github.com/wazuh/wazuh-dashboard.g
 cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
 ```
 
-2. Build the Docker image with the following parameters:
-   - `NODE_VERSION`: Node version to use in the `.nvmrc` file.
-   - `WAZUH_DASHBOARDS_BRANCH`: Branch of the Wazuh dashboards repository.
-   - `WAZUH_DASHBOARDS_PLUGINS`: Branch of the Wazuh dashboards Plugins repository.
-   - `WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Dashboards Plugin repository.
-   - `WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh reporting plugin repository.
-   - `WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Ruleset Management plugin repository.
-   - `WAZUH_DASHBOARD_ALERTING_BRANCH`: Branch of the Wazuh alerting plugin repository.
-   - `WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH`: Branch of the Wazuh notifications plugin repository.
-   - `OPENSEARCH_DASHBOARDS_VERSION`: Version of the OpenSearch Dashboards. You can find the version in the `package.json` file of the Wazuh dashboards repository.
-   - `-t`: Tag of the image.
+2. Build the Docker image. `run-docker-compose.sh` (`base-packages-to-base/run-docker-compose.sh`)
+   accepts these parameters — there is no `-t`/tag option, and `OPENSEARCH_DASHBOARDS_VERSION` is
+   not one of them (it is only used later, in step 3.2's `build-packages.sh` call):
+   - `-b`, `--base`: Branch of the `wazuh-dashboard` repository.
+   - `-a`, `--app`: Branch of the `wazuh-dashboard-plugins` repository.
+   - `-s`, `--security`: Branch of the `wazuh-security-dashboards-plugin` repository.
+   - `-r`, `--reporting`: Branch of the `wazuh-dashboard-reporting` repository.
+   - `-sa`, `--securityAnalytics`: Branch of the `wazuh-dashboard-security-analytics` repository.
+   - `-al`, `--alerting`: Branch of the `wazuh-dashboard-alerting` repository.
+   - `-no`, `--notifications`: Branch of the `wazuh-dashboard-notifications` repository.
+   - `--arm`: [Optional] Build for arm64 instead of x64.
+   - `--node-version`: [Optional] Node version to use; defaults to the script's own pinned
+     version — pass `$(cat ../../../.nvmrc)` to match the repository's `.nvmrc` instead of
+     hardcoding it.
 
 ```bash
 WAZUH_DASHBOARDS_BRANCH='<REPLACE_PLACEHOLDER>' && \
