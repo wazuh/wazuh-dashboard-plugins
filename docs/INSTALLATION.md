@@ -1,6 +1,6 @@
 # Documentation installation and setup
 
-This guide covers how to set up the documentation build environment for the Wazuh QA Automation documentation.
+This guide covers how to set up the documentation build environment for the Wazuh dashboard plugins documentation.
 
 ## Prerequisites
 
