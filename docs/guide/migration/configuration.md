@@ -240,4 +240,4 @@ After completing the migration and starting the Wazuh dashboard 5.x service, ver
 2. Confirm that the **Server API connection and compatibility** check passes.
 3. Navigate to **☰ Menu > Dashboards Management > Advanced settings** and confirm that any previously customized tenant-level settings are present.
 
-If the API connection check fails, review the `wazuh_core.hosts` block in `opensearch_dashboards.yml` and ensure the URL, port, and credentials are correct. For further troubleshooting, refer to the [Migration guide overview](./).
+If the API connection check fails, review the `wazuh_core.hosts` block in `opensearch_dashboards.yml` and ensure the URL, port, and credentials are correct. For further troubleshooting, refer to the [Migration guide overview](./README.md).

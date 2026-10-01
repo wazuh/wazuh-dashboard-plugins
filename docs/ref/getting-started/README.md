@@ -52,7 +52,7 @@ For custom deployments or troubleshooting, see [Installation](installation.md) f
 
 For developers or testing environments, run the plugins from source code using Docker:
 
-See the [Development Documentation](../../dev/) for:
+See the [Development Documentation](../../dev/README.md) for:
 
 - **[Setup Environment](../../dev/setup.md)** - Install toolchain (Git, Node.js, Yarn, Docker)
 - **[Build from Sources](../../dev/build-sources.md)** - Build plugins inside Docker
