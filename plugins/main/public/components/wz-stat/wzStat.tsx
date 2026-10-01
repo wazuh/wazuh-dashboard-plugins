@@ -110,34 +110,34 @@ export const WzStat: FunctionComponent<
 
   const descriptionDisplay = (
     <EuiText size='s' className='euiStat__description'>
-      <span aria-hidden='true'>{description}</span>
+      {description}
     </EuiText>
   );
 
   const titleDisplay = isColorClass(titleColor) ? (
     <EuiTitle size={titleSize} className={titleClasses}>
-      <span aria-hidden='true'>{isLoading ? '--' : title}</span>
+      <span aria-hidden={isLoading || undefined}>
+        {isLoading ? '--' : title}
+      </span>
     </EuiTitle>
   ) : (
     <EuiTitle size={titleSize} className={titleClasses}>
-      <span aria-hidden='true' style={{ color: `${titleColor}` }}>
+      <span
+        aria-hidden={isLoading || undefined}
+        style={{ color: `${titleColor}` }}
+      >
         {isLoading ? '--' : title}
       </span>
     </EuiTitle>
   );
 
-  const screenReader = (
+  // The label and value can be React nodes, so they are read from the visible content.
+  const screenReader = isLoading && (
     <EuiScreenReaderOnly>
       <span>
-        {isLoading ? (
-          i18n.translate('wazuh.core.stat.loadingText', {
-            defaultMessage: 'Statistic is loading',
-          })
-        ) : (
-          <Fragment>
-            {reverse ? `${title} ${description}` : `${description} ${title}`}
-          </Fragment>
-        )}
+        {i18n.translate('wazuh.core.stat.loadingText', {
+          defaultMessage: 'Statistic is loading',
+        })}
       </span>
     </EuiScreenReaderOnly>
   );
