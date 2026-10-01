@@ -43,8 +43,9 @@ done
 
 ## Build the plugins
 
-Each plugin must be built with the OpenSearch Dashboards version declared in
-its `package.json`.
+Each plugin must be built with the OpenSearch Dashboards version. The commands below read it only
+once, from `plugins/main/package.json`, and reuse that value for every plugin — all 4 plugins
+declare the same `pluginPlatform.version`, so this is not a per-plugin read.
 
 ```bash
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version plugins/main/package.json)
