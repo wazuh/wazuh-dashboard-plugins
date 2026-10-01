@@ -110,12 +110,12 @@ The standalone `wazuh.yml` configuration file is **removed** in 5.x. All plugin 
 
 ```yaml
 hosts:
-  - id: default
-    url: https://wazuh-manager
-    port: 55000
-    username: wazuh-wui
-    password: wazuh-wui
-    run_as: false
+  - default:
+      url: https://wazuh-manager
+      port: 55000
+      username: wazuh-wui
+      password: wazuh-wui
+      run_as: false
 
 pattern: wazuh-alerts-*
 
@@ -147,10 +147,10 @@ wazuh_core.hosts:
 
 #### Index pattern changes
 
-| 4.x Setting                | 5.x Equivalent     | Notes                                                          |
-| -------------------------- | ------------------ | -------------------------------------------------------------- |
-| `pattern: wazuh-alerts-*`  | `wazuh-events-v5*` | Default changed; rule-based alerts are in `wazuh-findings-v5*` |
-| `wazuh.monitoring.pattern` | Advanced Settings  | Configure in UI, not config file                               |
+| 4.x Setting                | 5.x Equivalent     | Notes                                                                                           |
+| -------------------------- | ------------------ | ----------------------------------------------------------------------------------------------- |
+| `pattern: wazuh-alerts-*`  | `wazuh-events-v5*` | Default changed; rule-based alerts are in `wazuh-findings-v5*`                                  |
+| `wazuh.monitoring.pattern` | Removed            | The agent monitoring feature is removed; agent status is queried on demand from the manager API |
 
 #### Removed settings
 
@@ -196,7 +196,6 @@ If you have custom scripts or integrations:
 #### Removed features
 
 - **Legacy App Settings**: Use **☰ Menu > Dashboard Management > Advanced Settings** or `opensearch_dashboards.yml`
-- **Dev Tools integration**: Use native OpenSearch Dashboards Dev Tools
 - **Deprecated modules**: Some 4.x experimental modules removed
 
 #### Renamed navigation paths
@@ -205,7 +204,7 @@ If you have custom scripts or integrations:
 | -------------------------- | ---------------------------------------- |
 | `/app/wazuh#/overview`     | `/app/wz-home`                           |
 | `/app/wazuh#/settings`     | Dashboard Management > Advanced Settings |
-| `/app/wazuh#/health-check` | **☰ Menu > Management > Health Check**   |
+| `/app/wazuh#/health-check` | **Dashboard management > Health Check**  |
 
 ---
 
@@ -305,7 +304,7 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
 4. **Set default route**:
 
    ```yaml
-   opensearchDashboards.defaultAppId: wz-home
+   uiSettings.overrides.defaultRoute: /app/wz-home
    ```
 
 5. **Remove deprecated settings** (if present):
@@ -322,8 +321,8 @@ Verify certificate paths in `opensearch_dashboards.yml`:
 
 ```yaml
 server.ssl.enabled: true
-server.ssl.certificate: /etc/wazuh-dashboard/certs/dashboard.crt
-server.ssl.key: /etc/wazuh-dashboard/certs/dashboard.key
+server.ssl.certificate: /etc/wazuh-dashboard/certs/dashboard.pem
+server.ssl.key: /etc/wazuh-dashboard/certs/dashboard-key.pem
 
 opensearch.ssl.certificateAuthorities:
   ['/etc/wazuh-dashboard/certs/root-ca.pem']
@@ -366,7 +365,8 @@ sudo chown -R wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/
 
 # Set secure permissions
 sudo chmod 640 /etc/wazuh-dashboard/opensearch_dashboards.yml
-sudo chmod 600 /etc/wazuh-dashboard/certs/*.key
+sudo chmod 500 /etc/wazuh-dashboard/certs
+sudo chmod 400 /etc/wazuh-dashboard/certs/*
 ```
 
 ### Step 4: Start and verify dashboard
@@ -414,14 +414,14 @@ Look for the successful startup message:
 
 ### 2. Run health check
 
-1. Navigate to **☰ Menu > Management > Health Check**
-2. Click **Check**
-3. Verify all checks pass:
-   - ✅ API connection
-   - ✅ Indexer connection
-   - ✅ Plugin status
-   - ✅ Index patterns
-   - ✅ Template verification
+1. Navigate to **Dashboard management > Health Check**
+2. Verify the registered checks pass:
+   - ✅ `server-api:connection-compatibility`
+   - ✅ `server-api:run-as`
+   - ✅ `server-api:certificate-validity`
+   - ✅ `saved-objects:dashboards`
+   - ✅ `saved-objects:index-patterns`
+   - ✅ `integrations:default-notifications-channels` (when the Notifications plugin is available)
 
 ### 3. Validate API connections
 
@@ -478,7 +478,7 @@ ignored by the 5.x installer. Obtain the command from the **Deploy new agent** w
 ```bash
 # Use updated enrollment command with 5.x manager
 curl -so wazuh-agent-5.0.0-1.deb \
-  https://packages.wazuh.com/5.x/apt/pool/main/w/wazuh-agent/wazuh-agent_5.0.0-1_amd64.deb \
+  https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-agent_5.0.0-1_amd64.deb \
   && WAZUH_ENROLLMENT_TOKEN='<enrollment-token>' dpkg -i ./wazuh-agent-5.0.0-1.deb
 
 sudo systemctl daemon-reload
@@ -595,7 +595,7 @@ Wazuh API is not reachable
    ```
 
 3. **Regenerate default objects**:
-   - Navigate to **Management > Health Check**
+   - Navigate to **Dashboard management > Health Check**
    - Click **Check** to recreate missing templates and patterns
 
 ### Issue 4: Custom branding not working
@@ -610,11 +610,12 @@ Migrate to OpenSearch Dashboards branding in `opensearch_dashboards.yml`:
 opensearchDashboards.branding:
   logo:
     defaultUrl: 'https://your-cdn.com/logo.svg'
+    darkModeUrl: 'https://your-cdn.com/logo-dark.svg'
   mark:
     defaultUrl: 'https://your-cdn.com/icon.svg'
+    darkModeUrl: 'https://your-cdn.com/icon-dark.svg'
   applicationTitle: 'Your Custom Title'
   faviconUrl: 'https://your-cdn.com/favicon.ico'
-  darkMode: false
 ```
 
 See [Custom Branding](./custom-branding/custom-branding.md).
@@ -638,7 +639,7 @@ See [Custom Branding](./custom-branding/custom-branding.md).
 2. **Verify plugin compatibility**:
 
    ```bash
-   cat /usr/share/wazuh-dashboard/plugins/wazuh/package.json | grep -A 2 "opensearchDashboards"
+   cat /usr/share/wazuh-dashboard/plugins/wazuh/package.json | grep -A 2 "pluginPlatform"
    ```
 
 3. **Reset plugins**:
