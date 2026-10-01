@@ -2,12 +2,12 @@
 #
 # ⚡ Overview:
 # This GitHub Action automatically deploys an mdBook site to GitHub Pages whenever
-# changes are pushed to the `main` branch or when manually triggered.
+# changes are pushed to the `main` branch or when manually triggered. Pull requests
+# that touch `docs/**` only build the book (including the link check), without deploying.
 #
 # 📚 Key Features:
 # - 📝 Uses `mdBook` for documentation building, with support for:
 #   - ✅ Link checking
-#   - 🗂️ Table of contents generation
 #   - 📈 Mermaid diagrams
 #
 # 🔗 Reference:
@@ -20,37 +20,50 @@ on:
     branches:
       - main
   workflow_dispatch:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - '.github/workflows/6_documentation_deploy-to-gh-pages.yml'
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   deploy:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-24.04
     permissions:
       contents: write # To push a branch
       pages: write # To push to a GitHub Pages site
       id-token: write # To update the deployment status
     concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     steps:
       - name: Checkout repository with full history
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Setup mdBook with link checking, ToC, and Mermaid support
-        uses: jontze/action-mdbook@v3
+      # mdbook-linkcheck 0.7.7 (latest) does not support mdBook 0.5.x, and
+      # mdbook-mermaid 0.17.x requires mdBook 0.5.x, so all three are pinned.
+      - name: Setup mdBook with link checking and Mermaid support
+        uses: jontze/action-mdbook@afbd393a3b4724186e112f783b3c9e645788c90c # v3.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          mdbook-version: '0.4.52'
           use-linkcheck: true
+          linkcheck-version: '0.7.7'
           use-mermaid: true
-          use-toc: true
+          mermaid-version: '0.16.2'
       - name: Build the book from the `docs` directory
         run: mdbook build
         working-directory: docs
       - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
       - name: Upload built book as a GitHub Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: 'docs/book/html'
       - name: Deploy the artifact to GitHub Pages
+        if: github.event_name != 'pull_request'
         id: deployment
         uses: actions/deploy-pages@v4

@@ -1,4 +1,4 @@
-# Wazuh dashboard Technical Documentation
+# Wazuh dashboard technical documentation
 
 This folder contains the technical documentation for the Wazuh dashboard. The documentation is organized into the following guides:
 

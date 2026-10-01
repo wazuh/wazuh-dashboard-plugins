@@ -40,10 +40,14 @@ another repository, name the repository and the path in code format.
 Links to files in this repository use relative paths (`../agent-deploy-one-liner.md#enrollment-token`).
 
 **Exceptions**: the rule is about _other_ repositories. A link to this repository
-(`wazuh/wazuh-dashboard-plugins`) is not a violation — use a relative path instead, per the line
-above. Naming a repository in a code span without turning it into a link (for example
-`` `wazuh/wazuh-dashboard` `` in prose) is not a violation either; the rule only targets clickable,
-branch-pinned URLs that can go stale or resolve to the wrong version.
+(`wazuh/wazuh-dashboard-plugins`) is not a violation — use a relative path for pages inside
+`docs/`, per the line above; for files outside `docs/` (for example `plugins/main/package.json`),
+a relative path would leave the book root, so an absolute
+`https://github.com/wazuh/wazuh-dashboard-plugins/...` URL is allowed. A URL inside an inline code
+span (for example `` `https://github.com/wazuh/wazuh-dashboard` ``) is not a violation either.
+Anything else is: the check (`.claude/skills/check-standards/SKILL.md`, _Documentation links_)
+flags every added line containing `https://github.com/wazuh/<other-repo>` once inline code spans
+are stripped — Markdown links, bare URLs and fenced code blocks alike, whatever the branch.
 
 ## 📄 Registering new pages
 
