@@ -62,6 +62,12 @@ mkdir -p "$backup_folder/saved_objects"
 
 3.3. Export the required objects, or use **Export all objects**. Choose as destination the **saved_objects** directory.
 
+> **Note:** **Export all objects** does not include hidden saved object types, such as the
+> `wazuh-check-updates-*` objects created by `wazuh-check-updates` (see
+> [Persistence](architecture.md#persistence)) — they are not listed in **Saved objects**
+> management and have no export option there. The only way to back them up is an index or
+> snapshot backup of the OpenSearch Dashboards index itself, through the Wazuh indexer.
+
 4. Custom assets
 
 If the dashboard is serving custom assets (i.e. images for UI customization), copy these files to the $backup_folder directory.
