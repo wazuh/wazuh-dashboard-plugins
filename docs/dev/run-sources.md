@@ -2,7 +2,7 @@
 
 The recommended way to run the plugins from source is using the Docker-based
 development environments in the `docker/` directory of the repository. These environments include
-an OpenSearch indexer, Wazuh manager, OpenSearch Dashboards development
+a Wazuh indexer (`quay.io/wazuh/wazuh-indexer`), Wazuh manager, OpenSearch Dashboards development
 environment, optional Wazuh agents (with `-a` flag), and supporting services
 (Imposter mock server, Elasticsearch-exporter).
 
