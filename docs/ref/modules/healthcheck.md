@@ -19,7 +19,7 @@ This defines a service that is integrated with the core lifecycle of the applica
 
 ```log
   server    log   [10:04:59.857] [info][healthcheck] Checks are ok
-  server    log   [10:04:59.857] [info][healthcheck] Set scheduled checks each 300000ms
+  server    log   [10:04:59.857] [info][healthcheck] Set scheduled checks each 900000ms
 ```
 
 5. If some enabled and critical check fails in the initial check, this will avoid the application can correctly initialize until this is solved. In this case, the Wazuh dashboard server is not ready yet view should display information about the failing critical checks.
@@ -181,7 +181,7 @@ By default all the checks are enabled else the enabled checks are redefined thro
 The enabled checks can be seen in the application logs:
 
 ```log
-server    log   [10:52:31.480] [info][healthcheck] Enabled checks [5]: [integrations:default-notifications-channels,server-api:connection-compatibility,server-api:run-as,saved-objects:dashboards,saved-objects:index-patterns]
+server    log   [10:52:31.480] [info][healthcheck] Enabled checks [6]: [integrations:default-notifications-channels,server-api:connection-compatibility,server-api:run-as,server-api:certificate-validity,saved-objects:dashboards,saved-objects:index-patterns]
 ```
 
 This setting can be a string or a list of strings.
