@@ -5,8 +5,8 @@ Active responses are a powerful feature of Wazuh that allow you to automate acti
 ## Repositories
 
 - [wazuh-dashboard-notifications](https://github.com/wazuh/wazuh-dashboard-notifications): This plugin adds the **Active Responses** app into the **Explore** section of the Wazuh dashboard that allows users to manage the active responses.
-- [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting): This plugin adds the ability to configure active response channels in alerting triggers when the monitor is a **Per document monitor**.
-- [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins): This plugin adds the healtcheck task to create the index pattern related to active responses: `wazuh-active-responses*`.
+- [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting): This plugin adds the ability to configure active response channels in alerting triggers when the monitor is an **Active Response monitor** (`MONITOR_TYPE.ACTIVE_RESPONSE`, a dedicated Wazuh-added monitor type — not the **Per document monitor** type).
+- [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins): This plugin adds the health check task to create the index pattern related to active responses: `wazuh-active-responses*`.
 
 ### wazuh-dashboard-notifications
 
@@ -82,7 +82,7 @@ In the creation/edition form, some fields are shown or hidden depending on the c
 
 #### Add active responses as a new action type in alerting triggers
 
-The active responses can be added when using the **Per document monitor** in the alerting configuration. In the triggers configuration, a new button **Add active response** allows users to select an active response channel.
+The active responses can be added when using the **Active Response monitor** type in the alerting configuration. In the triggers configuration, a new button **Add active response** allows users to select an active response channel.
 
 The existing button was changed to **Add notification** to differentiate it from the new button for active responses. This allows users to add existing notifications channels. This uses the same concept to managed/unmanaged notification channels to separate the management.
 
@@ -99,7 +99,7 @@ In the active response action for the trigger of an alerting monitor, the user c
 ## Active response execution flow
 
 1. Create an active response channel in the **Active Responses** app with the desired configuration.
-2. Create an alerting monitor with the **Per document monitor** type and add a trigger with an active response action that uses the created active response channel.
+2. Create an alerting monitor with the **Active Response monitor** type and add a trigger with an active response action that uses the created active response channel.
 3. Run the active response "notification" in the Wazuh indexer side:
    3.1. Extract the document ID and index name from the received message: `document_id|index_name`.
    3.2. Get the document that triggered the alert using the extracted document ID and index name.
@@ -115,10 +115,9 @@ In the active response action for the trigger of an alerting monitor, the user c
   "wazuh": {
     "active_response": {
       "name": string; // the name of the active response channel that triggered the active response
-      "type": 'active-response' // the type of the notification channel, used to differentiate the active responses from the usual notifications channels
       "executable": string; // the executable to run for the active response
-      "extra_arguments": string | null; // the extra arguments to run for the active response
-      "type": 'stateful' | 'stateless'; // the type of the active response
+      "extra_arguments": string | null; // the extra arguments to run for the active response -- named `extra_args` in the channel configuration schema above; `SendMessageActionHelper.kt` (wazuh-indexer-notifications) renames it to `extra_arguments` when building this notification payload
+      "type": 'stateful' | 'stateless'; // the type of the active response -- there is only one `type` field here; an earlier revision of this doc incorrectly showed a second one
       "stateful_timeout": number; // only for stateful active response, the timeout for the active response
       "location": 'all' | 'defined-agent' | 'local'; // the location where the active response should be executed
       "agent_id": string | null; // only required when location is defined-agent, the agent ID where the active response should be executed
