@@ -54,7 +54,10 @@ Identify the purpose of each host in your 4.x configuration and choose the migra
 
 ### Option A: Single manager (recommended for most deployments)
 
-If the multiple entries connected to managers in a **Wazuh cluster**, or if one manager was the primary operational target, configure a single host entry pointing to that manager or the cluster's virtual IP or load balancer address.
+If the multiple entries connected to managers in a **Wazuh cluster**, or if one manager was the
+primary operational target, configure a single host entry pointing to that manager, or — when the
+managers are members of a Wazuh cluster — to the cluster's virtual IP address or the load balancer
+in front of the cluster nodes.
 
 In `opensearch_dashboards.yml`. Do not set `password` here for the `default` host — the package
 resolves it into the keystore from `/etc/wazuh/credentials.env` instead:
@@ -108,22 +111,6 @@ wazuh_core.hosts:
 ```
 
 Each instance operates independently and connects only to its designated manager.
-
-### Option C: Wazuh cluster with a load balancer
-
-If the managers were members of a **Wazuh cluster**, configure a single host entry pointing to the cluster's virtual IP address or the load balancer in front of the cluster nodes:
-
-```yaml
-wazuh_core.hosts:
-  cluster:
-    url: https://<CLUSTER_VIP_OR_LB>
-    port: 55000
-    username: wazuh-wui
-    password: <YOUR_PASSWORD>
-    run_as: false
-```
-
-This approach maintains a single dashboard instance while providing access to the full cluster.
 
 ### Option D: Cross-Cluster Search with multiple manager APIs
 
@@ -205,7 +192,7 @@ For full configuration details and prerequisites (TLS, transport layer settings,
 
 2. **Select the appropriate option** from the list above.
 
-3. **Update `opensearch_dashboards.yml`** on each dashboard instance. Use a single entry for Options A–C; use multiple entries only for Option D after CCS is configured. See [Configuration migration](./configuration.md) for the full settings reference.
+3. **Update `opensearch_dashboards.yml`** on each dashboard instance. Use a single entry for Option A or B; use multiple entries only for Option D after CCS is configured. See [Configuration migration](./configuration.md) for the full settings reference.
 
 4. **Export saved objects** from the 4.x instance before decommissioning it. See [Custom dashboards and visualizations](./dashboards.md).
 
