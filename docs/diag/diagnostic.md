@@ -56,7 +56,7 @@ the dashboard, as described in [Rotation](../ref/getting-started/credentials.md#
 
 ### Filter could not be created because no server API is selected. Make sure a server API is available and choose one in the selector.
 
-This means the filter related to the selected server API (`cluster.name` in the alerts case or `wazuh.cluster.name` in the inventories data) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
+This means the filter related to the selected server API (`cluster.name` in the events/findings case or `wazuh.cluster.name` in the inventories/states data) can not be created due to the required information is not available because this could not be obtained in some dashboard or inventory view. The required data to create the filter is stored in the `clusterInfo` cookie in the client browser.
 
 The cookie is set when getting the cluster information after the server API is selected through the selector or automatically when enters to some apps of Wazuh dashboard if possible.
 
