@@ -6,7 +6,7 @@ The Wazuh dashboard notifies users when a newer Wazuh version is available. It c
 Wazuh indexer for the latest published version and presents the result in two places:
 
 - The update notification shown at the bottom of the interface.
-- The **Updates status** column of **Server management** → **API Configuration**.
+- The **Updates status** column of **Dashboard management** → **Server API**.
 
 The result of the check is stored in a single saved object that is shared by every
 user of the deployment, so all sessions display the same status.
