@@ -33,8 +33,8 @@ five whitelisted sample rows); the full result renders locally as a table in the
 
 ## Reference pages
 
-- [Architecture](./architecture.md) — client/server split, the SSE chat pipeline, saved objects,
-  and the wazuh-core integration points.
+- [Architecture](./architecture.md) — client/server split, the SSE chat pipeline, storage, and
+  the wazuh-core integration points.
 - [Tool catalog](./tool-catalog.md) — the 35 read-only tools, the in-process registry, and the
   two-stage router.
 - [Providers](./providers.md) — the provider adapters, which providers and models are verified

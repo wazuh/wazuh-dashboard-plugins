@@ -47,16 +47,19 @@ text deltas, assembled `tool_call` events (the browser never sees partial tool J
 events carrying the tool's `tableSpec`-shaped result, and terminal status/error events. Provider
 adapters translate their wire formats into this one contract, so the UI is provider-agnostic.
 
-## Saved objects
+## Storage
 
-Three saved-object types, all registered **`hidden: true`** (invisible to the generic
-saved-objects API and the Saved Objects export UI — back them up at the index/snapshot level):
+The plugin registers **no saved-object types**. Everything is stored through the Wazuh indexer's
+own APIs instead:
 
-| Type                              | Contents                                                                                                                 | Scope                  |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ---------------------- |
-| `wazuh-ai-assistant-provider`     | One per configured provider: name, type, base URL, model, `apiKey` (optionally encrypted, see [Security](./security.md)) | Global (admin-managed) |
-| `wazuh-ai-assistant-settings`     | Singleton: privacy defaults per provider, user-override flag, field policy                                               | Global (admin-managed) |
-| `wazuh-ai-assistant-conversation` | One per conversation: title, owner, and messages with their timestamps, result tables and tool calls                     | Owner-scoped           |
+| Contents                                                                                                      | Backend                                                                           | Scope                  |
+| ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | ---------------------- |
+| Provider records: name, type, base URL, model, `apiKey` (optionally encrypted, see [Security](./security.md)) | `/_plugins/_setup/ai_assistant/providers`                                         | Global (admin-managed) |
+| Privacy defaults per provider, user-override flag, field policy                                               | `/_plugins/_setup/ai_assistant/settings`                                          | Global (admin-managed) |
+| Conversations: title, owner, and messages with their timestamps, result tables and tool calls                 | `wazuh-ai-assistant-sessions` index, via `/_plugins/_setup/ai_assistant/sessions` | Owner-scoped           |
+
+Conversation retention is a separate ISM policy, `ai-assistant-sessions-policy` (7-day default),
+that manages the `wazuh-ai-assistant-sessions` backing indices rather than the settings API above.
 
 Conversation routes never leak cross-owner existence (`404` instead of `403`), list responses
 return summaries only (never `messages`), and writes use optimistic concurrency.
