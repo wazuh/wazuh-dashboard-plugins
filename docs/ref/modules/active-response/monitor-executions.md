@@ -79,6 +79,6 @@ After the `Stateful timeout` elapses (`30` seconds for `Block-IP-stateful-respon
 
 ## Step 4: Pivot to the source alert
 
-From any execution record, `event.doc_id` and `event.index` point back to the alert that fired the action. Switch the Discover index pattern to the value of `event.index` (for the SSH root-login use case, this resolves to `wazuh-findings-v5-access-management*`) and filter by `_id == event.doc_id` to open the original `SSH root login via password authentication` alert. This closes the loop between **detection → activation → execution**.
+From any execution record, `event.doc_id` and `event.index` point back to the alert that fired the action. Switch the Discover index pattern to the value of `event.index` (for the SSH root-login use case, this resolves to `wazuh-findings-v5-access-management*`) and filter with the DQL query `_id:"<doc_id>"`, substituting the record's actual `event.doc_id` value, to open the original `SSH root login via password authentication` alert. This closes the loop between **detection → activation → execution**.
 
 > **Note:** execution records are retained for **3 days** by default. If you need longer forensic retention, ask your administrator to adjust the retention policy or export the records to another index.

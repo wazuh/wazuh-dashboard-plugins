@@ -16,7 +16,7 @@ Navigate to **Alerting → Monitors → Create monitor**. If no monitors exist y
 
 ## Step 2: Select **Active Response**
 
-In the **Monitor type** selector, choose **Active Response**. This is mandatory: any other monitor type (Per query, Per bucket, Per cluster metrics, Composite) will hide the **Add active response** button in the trigger step.
+In the **Monitor type** selector, choose **Active Response**. This is mandatory: any other monitor type (Per query, Per bucket, Per cluster metrics, Per document, Composite) will hide the **Add active response** button in the trigger step.
 
 ![Monitor type - Active Response](images/09-monitor-type-active-response.png)
 

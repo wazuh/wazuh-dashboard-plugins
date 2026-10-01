@@ -21,7 +21,7 @@ Active Response combines three areas of the Wazuh dashboard:
 | **Alerting**         | Active Response monitors expose an **Add active response** action that invokes one when the trigger condition is met.                                                            |
 | **Discover**         | The `wazuh-active-responses*` index pattern keeps an auditable record of every execution, retained for 3 days by default.                                                        |
 
-An active response never runs on its own: it must be attached to an Active Response monitor trigger. When the trigger fires, an execution record is stored in **Discover**, the manager picks it up within about one minute, and the target agent carries out the action.
+An active response never runs on its own: it must be attached to an Active Response monitor trigger. When the trigger fires, an execution record is written to the `wazuh-active-responses*` index (viewable from **Discover**), the manager picks it up within about one minute, and the target agent carries out the action.
 
 ## Use cases
 
