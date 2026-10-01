@@ -78,9 +78,9 @@ plugin's `build/` directory:
 
 ## Build inside Docker
 
-The supported workflow is to run these steps inside the Docker-based
-development environment. This ensures the required OpenSearch Dashboards build
-helpers are available and the build matches the target platform.
+Docker is required to run these steps: the canonical dev/test environment is Docker, since a host
+build fails without OSD's `setup_node_env` and the required OpenSearch Dashboards build helpers,
+which only the Docker-based development environment provides.
 
 Use [Run from Sources](run-sources.md) to start the environment and attach a
 shell, then execute the install and build steps above from within the

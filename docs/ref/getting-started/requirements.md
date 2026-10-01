@@ -36,8 +36,10 @@ Supported Linux distributions:
 
 ### System privileges
 
-- Root or sudo privileges to install packages and manage services
-- Write permissions to `/usr/share/wazuh-dashboard/` and `/etc/wazuh-dashboard/`
+- Root or sudo privileges to install packages and manage services. The package itself creates
+  `/usr/share/wazuh-dashboard/` and `/etc/wazuh-dashboard/` as `root:root` (only
+  `/usr/share/wazuh-dashboard/data/` is owned by the `wazuh-dashboard` service user) — do not
+  grant broader write access to these paths afterward. See [Security](../security.md#operational-practices).
 
 ### System dependencies
 

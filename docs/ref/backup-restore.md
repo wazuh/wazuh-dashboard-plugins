@@ -129,8 +129,12 @@ If some custom asset was backed, then for each one:
 
 ```
 cp <path/to/asset/> <destination_path>
-chown wazuh-dashboard:wazuh-dashboard <destination_path>
+chown root:root <destination_path>
 ```
+
+Custom assets hosted in the dashboard server (see [Custom Branding](custom-branding/custom-branding.md#host-the-images-in-the-dashboard-server))
+live under `/usr/share/wazuh-dashboard/`, which the package installs as `root:root` — matching
+ownership here keeps it consistent with the rest of that tree.
 
 5. Restart the service:
 

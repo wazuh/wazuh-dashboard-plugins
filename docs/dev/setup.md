@@ -10,7 +10,9 @@ Prerequisites:
 - Git
 - Node.js (use the version in `.nvmrc` at the repository root)
 - Yarn classic (v1)
-- Docker Desktop (optional, required for the docker-based dev environments)
+- Docker Desktop — not needed for editing code alone, but required to run the dev server, build, or
+  run tests: the canonical dev/test environment is Docker (see [Run from Sources](run-sources.md)
+  and [Run the tests](run-tests.md)); host runs fail because Jest needs OSD's `setup_node_env`.
 
 Install and select Node.js with nvm:
 
