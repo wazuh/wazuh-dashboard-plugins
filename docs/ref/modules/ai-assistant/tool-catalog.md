@@ -75,9 +75,14 @@ single call:
 1. **Stage 1 — route**: one cheap call with a single synthetic `route_question` tool picks 1–2
    categories from an eleven-entry menu (`agents`, `findings`, `vulnerabilities`, `fim`, `sca`,
    `mitre`, `inventory`, `compliance`, `security_analytics`, `free_search`, `general`).
-2. **Stage 2 — act**: the model is re-invoked with only the routed categories' tools. The escape
-   hatch stays reachable when routed to `free_search`; `general` answers without touching Wazuh
-   data at all.
+2. **Stage 2 — act**: the model is re-invoked with the routed categories' tools, expanded with any
+   chained detail tool whose summary tool is already in the set (`CHAIN_PAIRS`, e.g.
+   `get_agents` chains to `search_findings_by_agent`/`get_events_by_agent`, expanded to a fixed
+   point so a chained tool that is itself a chain key keeps chaining). `search_wazuh_data` (the
+   escape hatch) and `get_field_values` are added unconditionally on **every** turn, regardless of
+   route. A lone `general` route resolves to a minimal recovery set
+   (`get_security_summary` + `search_wazuh_data`) rather than no tools at all, so a
+   misclassified turn always has a data path.
 
 The router is a **token-cost optimization, not an access control**: every tool remains equally
 authorized, and the real permission check is the user's own RBAC applied to every query. Every
