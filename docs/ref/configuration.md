@@ -174,7 +174,7 @@ wazuh_core.hosts:
     run_as: false
 ```
 
-# Tenant configuration
+## Tenant configuration
 
 Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management** > **Dashboards Management** > **Advanced settings**:
 

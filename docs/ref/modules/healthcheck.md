@@ -6,11 +6,11 @@ The details of the overall status or checks can be seen through the **Dashboard 
 
 The plugins can register task to be checked. These uses the context of the internal user of the dashboard, so this means the tasks related to saved objects such as index patterns are only checked in the `Global` tenant.
 
-# Lifecycle
+## Lifecycle
 
 This defines a service that is integrated with the core lifecycle of the application.
 
-## Server
+### Server
 
 1. Setup the health check using the provided or default configuration.
 2. The plugins register the tasks to run
@@ -24,11 +24,11 @@ This defines a service that is integrated with the core lifecycle of the applica
 
 5. If some enabled and critical check fails in the initial check, this will avoid the application can correctly initialize until this is solved. In this case, the Wazuh dashboard server is not ready yet view should display information about the failing critical checks. No shipped Wazuh check is currently registered as critical (`metadata.critical` defaults to `false` and no task in `plugins/main/server/plugin.ts` sets it), so this blocking path is not exercised by any check today.
 
-# Checks
+## Checks
 
 The checks represents the unit to check and some could do some write actions such as creating index patterns.
 
-## List
+### List
 
 | Name                                          | Description                                                                                                                                                                                                                                                |
 | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -39,21 +39,21 @@ The checks represents the unit to check and some could do some write actions suc
 | `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md) for details.                         |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
 
-## Notifications and Alerting
+### Notifications and Alerting
 
 For details about the default notification channels created by Health Check and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).
 
-## Saved Objects for Dashboards and Visualizations
+### Saved Objects for Dashboards and Visualizations
 
 For details about the task that provisions dashboard and visualization saved objects from the repository definitions, see [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md).
 
-## Server Certificate Validity
+### Server Certificate Validity
 
 The `server-api:certificate-validity` check reports the state of the TLS certificates of every Wazuh manager node: the certificate the agent listener serves and the CA bundle the manager publishes to agents. It reports the worst state it finds and names the affected nodes.
 
 Plan the renewal before the certificates expire. Once the CA bundle expires, every verifying agent fails the TLS handshake, and agents refresh their trust over that same TLS, so they cannot repair an expired bundle from their side.
 
-### How it works
+#### How it works
 
 - **Source**: the check queries the Wazuh server API resource `GET /cluster/{node_id}/daemons/remoted/tls` for every node of the first server API host in `wazuh_core.hosts`. The API user needs the `cluster:read` permission on the node, the same one other cluster endpoints use.
 - **What it evaluates**, per node:
@@ -65,7 +65,7 @@ Plan the renewal before the certificates expire. Once the CA bundle expires, eve
 - **Freshness**: the manager reads the CA bundle and validates the chain on every request, so the next check reports a change to the bundle. The listener certificate is the one the manager loaded when `remoted` started, and it keeps serving it until `remoted` restarts.
 - **Startup**: the check is not critical. A red result appears in the health check without holding the dashboard behind the not-ready screen, because the operator needs the dashboard to plan the renewal.
 
-### Results
+#### Results
 
 | Condition                                                                   | Result |
 | --------------------------------------------------------------------------- | ------ |
@@ -90,7 +90,7 @@ server    log   [17:12:03.576] [warning][healthcheck][server-api:certificate-val
 Ensure the listener certificate is replaced and remoted restarted. The manager has served the one it loaded on 2026-09-22T17:10:31Z since then, so replacing the file alone does not clear this.
 ```
 
-### Thresholds
+#### Thresholds
 
 The thresholds are the `wazuh_core.healthCheckCertificateExpiryWarningDays` and `wazuh_core.healthCheckCertificateExpiryCriticalDays` [settings](#settings), set in `opensearch_dashboards.yml`:
 
@@ -112,7 +112,7 @@ wazuh_core.healthCheckCertificateExpiryCriticalDays: 14
  FATAL  ValidationError: [config validation of [wazuh_core]]: [healthCheckCertificateExpiryCriticalDays] (60) must be lower than [healthCheckCertificateExpiryWarningDays] (7)
 ```
 
-### Troubleshooting
+#### Troubleshooting
 
 - **The check still reports a certificate after you replace it**: the manager serves the listener certificate it loaded when `remoted` started, so replacing `remoted.pem` on disk has no effect until `remoted` restarts. The action line of the message states the date the manager loaded the current certificate.
 - **No CA chains to the listener certificate**: the CA bundle does not contain the CA that issued the certificate the listener serves, so the manager refuses to serve the bundle to agents. Add the issuing CA to the bundle with `wazuh-manager-certs add`, or replace the listener certificate with one issued by a CA already in the bundle.
@@ -123,7 +123,7 @@ wazuh_core.healthCheckCertificateExpiryCriticalDays: 14
 server    log   [16:51:55.364] [warning][healthcheck][server-api:certificate-validity] Could not list the manager nodes to check their certificates: Request failed with status code 500
 ```
 
-## Execution results
+### Execution results
 
 The checks has the following properties as part of the execution:
 
@@ -149,7 +149,7 @@ The checks has the following properties as part of the execution:
 - data: the return information of the check.
 - metadata (enabled, critical).
 
-## Overall result
+### Overall result
 
 This represents the summary of the results:
 
@@ -157,14 +157,14 @@ This represents the summary of the results:
 - `yellow`: there is at least a `yellow` check (no `red` checks).
 - `red`: there is at least a `red` check.
 
-# Configuration
+## Configuration
 
-## Settings
+### Settings
 
 See [Configuration](../configuration.md#file) for the full list of `healthcheck.*` and
 `wazuh_core.healthCheckCertificateExpiry*` settings, their defaults, and allowed values.
 
-## Enabling checks
+### Enabling checks
 
 By default all the checks are enabled else the enabled checks are redefined through the `healthcheck.checks_enabled` setting.
 
@@ -192,7 +192,7 @@ healthcheck.checks_enabled:
   ['saved-objects:index-patterns', 'saved-objects:dashboards']
 ```
 
-# Application
+## Application
 
 The health check data can be explored in the **Dashboard management > Health Check** app.
 
@@ -206,7 +206,7 @@ Check details:
 
 ![health check application check details](./images/healthcheck-application-check-details.png)
 
-# Icon in the platform header
+## Icon in the platform header
 
 A pulse icon, colored based on the overall result, is present in the platform header to draw attention to a health check status that needs attention.
 
@@ -218,7 +218,7 @@ For example, when the status is `yellow`:
 
 ![health check warning header icon](./images/healthcheck-warning-header-icon.png)
 
-# Wazuh dashboard is not ready yet
+## Wazuh dashboard is not ready yet
 
 This page can include information about failing checks (critical or non-critical).
 
@@ -226,7 +226,7 @@ Any failed critical checks avoid the Wazuh dashboard can correctly work and thes
 
 The checks data can be exported to JSON to be shared for troubleshooting.
 
-# Troubleshooting
+## Troubleshooting
 
 - Review related logs to the health check service in the backend side:
 
