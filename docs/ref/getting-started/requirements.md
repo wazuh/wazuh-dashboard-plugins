@@ -2,20 +2,11 @@
 
 ## Hardware requirements
 
-### Minimum specifications
+See the [Compatibility](../compatibility.md#hardware-requirements) page for the minimum and
+recommended CPU/RAM. In addition:
 
-- **CPU**: 2 cores
-- **RAM**: 4 GB
-- **Disk space**: 2 GB of free space
-
-### Recommended specifications
-
-For production environments:
-
-- **CPU**: 4+ cores
-- **RAM**: 8+ GB
-- **Disk space**: 10+ GB of free space
-- **Network**: 1 Gbps network interface
+- **Disk space**: 2 GB of free space minimum, 10+ GB recommended for production.
+- **Network**: 1 Gbps network interface recommended for production.
 
 > **Note**: Hardware requirements may vary based on the number of monitored agents, data retention policies, and dashboard usage patterns.
 
@@ -23,16 +14,8 @@ For production environments:
 
 ### Operating system
 
-Supported Linux distributions:
-
-- **Debian-based** (DEB packages):
-  - Debian 10, 11, 12
-  - Ubuntu 18.04, 20.04, 22.04, 24.04
-- **Red Hat-based** (RPM packages):
-  - RHEL 7, 8, 9
-  - CentOS 7, 8
-  - Amazon Linux 2, 2023
-  - Fedora 34+
+See the [Compatibility](../compatibility.md#supported-operating-systems) page for the list of
+supported operating system versions and architectures.
 
 ### System privileges
 
