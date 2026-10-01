@@ -66,12 +66,14 @@ OPENSEARCH_DASHBOARDS_VERSION=$OPENSEARCH_DASHBOARDS_VERSION yarn build
 cd ../..
 ```
 
-The build artifacts (ZIP files) are written to each plugin's `build/` directory:
+The build artifacts (ZIP files) are named `<id>-<OSD version>.zip` (the plugin id from
+`opensearch_dashboards.json`, not the plugin's own `5.0.0-NN` version) and are written to each
+plugin's `build/` directory:
 
-- `plugins/main/build/wazuh-<version>.zip`
-- `plugins/wazuh-core/build/wazuhCore-<version>.zip`
-- `plugins/wazuh-check-updates/build/wazuhCheckUpdates-<version>.zip`
-- `plugins/wazuh-ai-assistant/build/wazuhAiAssistant-<version>.zip`
+- `plugins/main/build/wazuh-<OSD version>.zip`
+- `plugins/wazuh-core/build/wazuhCore-<OSD version>.zip`
+- `plugins/wazuh-check-updates/build/wazuhCheckUpdates-<OSD version>.zip`
+- `plugins/wazuh-ai-assistant/build/wazuhAiAssistant-<OSD version>.zip`
 
 ## Build inside Docker
 
