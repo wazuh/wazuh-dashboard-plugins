@@ -22,6 +22,56 @@ The following parameters are required in the Wazuh SSO configuration:
 | `roles_key`         | The attribute in the SAML assertion where the roles/groups are sent.                                                                                                                                |
 | `exchange_key`      | The shared secret used to sign the internal JWT the security plugin issues after a successful SAML login — not the SAML assertion itself, which the IdP signs. It must have at least 64 characters. |
 
+## Configuration example
+
+The following `config.yml` snippet, from the Keycloak-backed SAML dev environment
+(`docker/osd-dev/config/os/config-saml.yml` in this repository, used when running
+`./dev.sh up -saml`), shows a working `saml_auth` authentication domain for the Wazuh indexer's
+security plugin:
+
+```yaml
+config:
+  dynamic:
+    http:
+      anonymous_auth_enabled: false
+    authc:
+      internal_auth:
+        order: 0
+        http_enabled: true
+        transport_enabled: true
+        http_authenticator:
+          type: basic
+          challenge: false
+        authentication_backend:
+          type: internal
+      saml_auth:
+        order: 1
+        http_enabled: true
+        transport_enabled: false
+        http_authenticator:
+          type: saml
+          challenge: true
+          config:
+            idp:
+              metadata_url: http://idp:8080/realms/wazuh/protocol/saml/descriptor
+              entity_id: http://idp:8080/realms/wazuh
+            sp:
+              entity_id: wazuh
+              signature_private_key_filepath: 'certs/admin-key.pem'
+            kibana_url: https://localhost:5601
+            roles_key: Role
+            exchange_key: 1a2a3a4a5a6a7a8a9a0a1b2b3b4b5b6b
+        authentication_backend:
+          type: noop
+```
+
+Keep `internal_auth` (lower `order`) alongside `saml_auth` so the internal admin user can still
+sign in directly if the IdP is unreachable. On the Wazuh dashboard side,
+`opensearch_security.auth.type: 'saml'` and the ACS/logout paths must be added to
+`server.xsrf.allowlist` in `opensearch_dashboards.yml` (see
+`docker/osd-dev/config/osd/opensearch_dashboards_saml.yml` for a full example), otherwise the
+IdP's POST to the assertion consumer service is rejected as a cross-site request.
+
 ## High-level setup
 
 1. Create two groups in the IdP (for example, `wazuh-admin` and `wazuh-readonly`).
