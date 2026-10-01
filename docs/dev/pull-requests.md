@@ -113,7 +113,7 @@ Start from the linked issue to understand the context and acceptance criteria, t
 
 ### Changelog
 
-Every PR is expected to include an entry in `CHANGELOG.md`, under the `Added`, `Changed`, `Fixed` or `Removed` section for the upcoming version. This is enforced by the **Changelog Verifier** workflow (`5_changelog_verifier.yml`).
+Every PR is expected to include an entry in `CHANGELOG.md`, under the `Added`, `Changed`, `Fixed` or `Removed` section for the upcoming version. This is enforced by the **Changelog Verifier** workflow (`5_codequality_changelog.yml`).
 
 **When an entry is required**: whenever the change affects the published package, the UI, or any other user-facing behavior.
 
