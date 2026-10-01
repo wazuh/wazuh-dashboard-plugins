@@ -6,12 +6,12 @@
 
 - [Introduction](dev/README.md)
 - [Setup Environment](dev/setup.md)
+- [Run from Sources](dev/run-sources.md)
+- [Get external resources](dev/get-external-resources.md)
+- [Run Tests](dev/run-tests.md)
+- [Build from Sources](dev/build-sources.md)
 - [Build Packages](dev/build-packages.md)
 - [Build Image](dev/build-image.md)
-- [Build from Sources](dev/build-sources.md)
-- [Run from Sources](dev/run-sources.md)
-- [Get external resouces](dev/get-external-resources.md)
-- [Run Tests](dev/run-tests.md)
 - [Pull Requests](dev/pull-requests.md)
 - [Credential and TLS resolution](dev/credentials.md)
 - [Repository Bumper](dev/bumper-repository.md)
@@ -62,20 +62,18 @@
 - [Upgrade](ref/upgrade.md)
 - [Migration 4.x to 5.x](ref/migration-4x-5x.md)
 - [Uninstall](ref/uninstall.md)
-
-# Migration Guide
-
-- [Overview](guide/migration/README.md)
-
-  - [Configuration](guide/migration/configuration.md)
-  - [Custom dashboards and visualizations](guide/migration/dashboards.md)
-  - [Reports](guide/migration/reports.md)
-  - [Multi-manager environments](guide/migration/multi-manager.md)
-
 - [Back Up and Restore](ref/backup-restore.md)
 - [Security](ref/security.md)
 - [Performance](ref/performance.md)
 - [Glossary](ref/glossary.md)
+
+# Migration Guide
+
+- [Overview](guide/migration/README.md)
+  - [Configuration](guide/migration/configuration.md)
+  - [Custom dashboards and visualizations](guide/migration/dashboards.md)
+  - [Reports](guide/migration/reports.md)
+  - [Multi-manager environments](guide/migration/multi-manager.md)
 
 # Diagnostic Documentation
 
