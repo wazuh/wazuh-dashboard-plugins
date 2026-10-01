@@ -118,7 +118,7 @@ The following settings have no equivalent in 5.x and must not be carried over to
 
 In 4.x, individual health check steps could be enabled or disabled using separate boolean settings (`checks.*`). In 5.x, these are replaced by the `healthcheck.checks_enabled` setting in `opensearch_dashboards.yml`, which accepts a regular expression or list of regular expressions matching the **5.x check names** to enable.
 
-The 4.x boolean settings do not map one-to-one to 5.x check names. For example, the old `checks.pattern` toggle covered a single index-pattern validation, whereas 5.x registers separate checks such as `index-pattern:alerts`, `index-pattern:events-security`, and dozens of others. See the [Health check reference](../../ref/modules/healthcheck.md) for the full list of 5.x check names.
+The 4.x boolean settings do not map one-to-one to 5.x check names. For example, the old `checks.pattern` toggle covered a single index-pattern validation, whereas 5.x validates every index pattern (events, findings, states, metrics, active responses, threat-intel enrichments, agent config, …) as a single batched check, `saved-objects:index-patterns`. See the [Health check reference](../../ref/modules/healthcheck.md) for the full list of 5.x check names.
 
 | 4.x setting         | Default | 5.x equivalent                                                                                                                        |
 | ------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------- |
@@ -126,8 +126,8 @@ The 4.x boolean settings do not map one-to-one to 5.x check names. For example, 
 | `checks.fields`     | `true`  | Removed health check task.                                                                                                            |
 | `checks.maxBuckets` | `true`  | Removed health check task.                                                                                                            |
 | `checks.metaFields` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard Management > Advanced settings. |
-| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `index-pattern:*`)                                                 |
-| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches checks such as `server-api:connection-compatibility`)                             |
+| `checks.pattern`    | `true`  | Controlled by `healthcheck.checks_enabled` (matches the single `saved-objects:index-patterns` check)                                  |
+| `checks.setup`      | `true`  | Controlled by `healthcheck.checks_enabled` (matches `server-api:run-as`)                                                              |
 | `checks.template`   | `true`  | Removed health check task.                                                                                                            |
 | `checks.timeFilter` | `true`  | Removed health check task. Changed default value in the dashboard configuration. Managed in Dashboard Management > Advanced settings. |
 
@@ -152,7 +152,7 @@ If your deployment had dashboards or alerts that depended on either index, those
 
 ### Customization settings
 
-The settings `customization.logo.app`, `customization.enabled`, `customization.logo.healthcheck`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. The dedicated health check view that used `customization.logo.healthcheck` was removed in 5.x. PDF report branding is not configurable because report generation is now handled by the Reporting plugin.
+The settings `customization.logo.app`, `customization.enabled`, `customization.logo.healthcheck`, `customization.logo.reports`, `customization.reports.header`, and `customization.reports.footer` have no equivalent in 5.x and must be removed. The dedicated health check view that used `customization.logo.healthcheck` was removed in 5.x. PDF report branding is configured per report definition in the Reporting plugin's UI instead of a config-file setting: add a custom header or footer from **Add header**/**Add footer** when creating or editing a report definition (see [Custom Branding](../../ref/custom-branding/custom-branding.md#reporting)).
 
 For a full branding migration example, see [Custom Branding](../../ref/custom-branding/custom-branding.md).
 
