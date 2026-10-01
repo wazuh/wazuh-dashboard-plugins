@@ -85,15 +85,15 @@ Retention and housekeeping for the caller's stored conversations (per-user cap: 
 All routes live under `/api/wazuh_ai_assistant` and enforce the same rules as the UI (indexer RBAC
 on provider/settings reads and writes, owner scoping on conversations):
 
-| Route                                                           | Purpose                                                                                                                                                             |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /chat`                                                    | Chat turn; responds as an SSE stream.                                                                                                                               |
-| `GET/POST /providers`, `GET/PUT/DELETE /providers/{id}`         | Provider CRUD (writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys). Writes also 403 when `settingsReadOnly` is set. |
-| `POST /providers/{id}/test`                                     | Connectivity test (same indexer write permission). Persists nothing, so it stays available even when `settingsReadOnly` is set.                                     |
-| `POST /providers/{id}/default`                                  | Set the default provider (same indexer write permission). 403 when `settingsReadOnly` is set.                                                                       |
-| `GET/PUT /settings`                                             | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access). PUT 403s when `settingsReadOnly` is set.          |
-| `GET /settings/access`                                          | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page, including `settingsLocked`.                        |
-| `GET/POST /conversations`, `GET/PUT/DELETE /conversations/{id}` | Owner-scoped conversation CRUD.                                                                                                                                     |
+| Route                                                                 | Purpose                                                                                                                                                             |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /chat`                                                          | Chat turn; responds as an SSE stream.                                                                                                                               |
+| `GET/POST /providers`, `PUT/DELETE /providers/{id}`                   | Provider CRUD (writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys). Writes also 403 when `settingsReadOnly` is set. |
+| `POST /providers/{id}/test`                                           | Connectivity test (same indexer write permission). Persists nothing, so it stays available even when `settingsReadOnly` is set.                                     |
+| `POST /providers/{id}/default`                                        | Set the default provider (same indexer write permission). 403 when `settingsReadOnly` is set.                                                                       |
+| `GET/PUT /settings`                                                   | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access). PUT 403s when `settingsReadOnly` is set.          |
+| `GET /settings/access`                                                | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page, including `settingsLocked`.                        |
+| `GET/POST /conversations`, `GET/PUT/PATCH/DELETE /conversations/{id}` | Owner-scoped conversation CRUD; `PATCH` renames a conversation.                                                                                                     |
 
 ## Internationalization
 
