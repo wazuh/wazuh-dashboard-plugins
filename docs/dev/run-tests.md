@@ -39,7 +39,11 @@ plugin — and displays results with coverage information.
 
 ## Important Notes
 
-- Tests **must be executed inside the Docker container** – running tests directly on the host machine will fail due to missing dependencies and environment setup (e.g., `setup_node_env`).
+- Tests **must be executed inside the Docker container** – running `yarn test:jest` directly on
+  the host machine will fail due to missing dependencies and environment setup (e.g.,
+  `setup_node_env`). `yarn test:jest:runner` is the exception: it runs from the host and spins up
+  its own Docker container (`scripts/runner.js`, see `docker/runner/docker-compose.yml`) to execute
+  Jest, rather than requiring you to already be inside the dev environment's container.
 - Ensure the Docker development environment is running before attempting to run tests (see [Run from Sources](run-sources.md)).
 - The container includes all necessary Node.js dependencies and Jest for unit testing.
 - Some test suites may produce warnings or console messages that do not affect test results (e.g., "Browserslist: caniuse-lite is outdated", prop validation warnings).
