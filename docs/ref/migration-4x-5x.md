@@ -148,7 +148,7 @@ wazuh_core.hosts:
 
 **5.x (Advanced settings UI):**
 
-- Navigate to **☰ Menu > Dashboards Management > Advanced settings**
+- Navigate to **☰ Menu > Dashboard management > Dashboards Management > Advanced settings**
 - Configure tenant-level settings:
   - `timeout`: 20000
   - Other UI preferences
@@ -203,16 +203,16 @@ If you have custom scripts or integrations:
 
 #### Removed features
 
-- **Legacy App Settings**: Use **☰ Menu > Dashboards Management > Advanced settings** or `opensearch_dashboards.yml`
+- **Legacy App Settings**: Use **☰ Menu > Dashboard management > Dashboards Management > Advanced settings** or `opensearch_dashboards.yml`
 - **Deprecated modules**: Some 4.x experimental modules removed
 
 #### Renamed navigation paths
 
-| 4.x Path                   | 5.x Path                                  |
-| -------------------------- | ----------------------------------------- |
-| `/app/wazuh#/overview`     | `/app/wz-home`                            |
-| `/app/wazuh#/settings`     | Dashboards Management > Advanced settings |
-| `/app/wazuh#/health-check` | **Dashboard management > Health Check**   |
+| 4.x Path                   | 5.x Path                                                         |
+| -------------------------- | ---------------------------------------------------------------- |
+| `/app/wazuh#/overview`     | `/app/wz-home`                                                   |
+| `/app/wazuh#/settings`     | Dashboard management > Dashboards Management > Advanced settings |
+| `/app/wazuh#/health-check` | **Dashboard management > Health Check**                          |
 
 ---
 
