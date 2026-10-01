@@ -161,18 +161,8 @@ This represents the summary of the results:
 
 ## Settings
 
-The service has the following settings:
-
-| setting                                               | description                                                                                                            | default value     | allowed values                                  |
-| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------- | ----------------------------------------------- |
-| `healthcheck.enabled`                                 | define if the health check is enabled or not                                                                           | true              | true, false                                     |
-| `healthcheck.checks_enabled`                          | define the checks that are enabled. This is a regular expression or a list of regular expressions (NodeJS compatibles) | `.*`              | string or list of strings                       |
-| `healthcheck.interval`                                | define the interval to run the health check after the initial check                                                    | 15m               | 5m to 24h                                       |
-| `healthcheck.retries_delay`                           | define the wait time after a failed overall health check                                                               | 2.5s              | 0 to 1m                                         |
-| `healthcheck.max_retries`                             | define the maximum count of retries of the overall health check that can be executed                                   | 5                 | integer, minimum 1                              |
-| `healthcheck.server_not_ready_troubleshooting_link`   | define the troubleshooting link in the not-ready server                                                                | URL to Wazuh docs | a valid URL                                     |
-| `wazuh_core.healthCheckCertificateExpiryWarningDays`  | days before a server certificate expires at which `server-api:certificate-validity` reports yellow                     | 30                | integer, minimum 1                              |
-| `wazuh_core.healthCheckCertificateExpiryCriticalDays` | days before a server certificate expires at which `server-api:certificate-validity` reports red                        | 7                 | integer, minimum 1, lower than the warning days |
+See [Configuration](../configuration.md#file) for the full list of `healthcheck.*` and
+`wazuh_core.healthCheckCertificateExpiry*` settings, their defaults, and allowed values.
 
 ## Enabling checks
 
