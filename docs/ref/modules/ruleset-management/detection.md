@@ -42,6 +42,8 @@ A detection rule is composed of the following main blocks:
 | ---------------- | ------------------------------------------------------------------------------------------------------- |
 | `id`             | Unique identifier for the rule.                                                                         |
 | `logsource`      | Binds the rule to a specific integration. The `product` field must match the integration title exactly. |
+| `status`         | Maturity of the rule: `experimental`, `test`, or `stable`.                                              |
+| `enabled`        | Whether the rule is active. A disabled rule is kept in the integration but never evaluated.             |
 | `detection`      | Defines the field conditions (`selection`) and the logical `condition` that triggers the finding.       |
 | `level`          | Severity level of the finding (`informational`, `low`, `medium`, `high`, `critical`).                   |
 | `tags`           | Free-form tags, commonly used for MITRE ATT&CK technique references.                                    |
