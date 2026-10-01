@@ -17,7 +17,7 @@ Ensure that these dependencies are installed on the system.
 
 - **Docker**: refer to the [Docker installation guide](https://docs.docker.com/engine/install/)
 - **nvm (node version manager)**: refer to the [NVM installation guide](https://github.com/nvm-sh/nvm#installing-and-updating)
-- **yarn v1.22.22 (node version manager)**: refer to the [Yarn installation guide](https://classic.yarnpkg.com/en/docs/install/)
+- **yarn v1.22.22 (package manager)**: refer to the [Yarn installation guide](https://classic.yarnpkg.com/en/docs/install/)
 - **Utilities**. Ensure that the following are installed:
   - `zip`
   - `unzip`
@@ -63,6 +63,7 @@ yarn build-platform --linux --skip-os-packages --release
 > Replace the `GIT_REF` by the branch or tag for the security plugin, e.g. `v5.0.0`.
 
 ```bash
+GIT_REF=<REPLACE_PLACEHOLDER>
 cd plugins/
 git clone -b $GIT_REF https://github.com/wazuh/wazuh-security-dashboards-plugin.git
 cd wazuh-security-dashboards-plugin/
@@ -85,7 +86,7 @@ nvm use $(cat .nvmrc)
 cp -r plugins/* ../
 ```
 
-The plugin in the `main` directory needs a git reference to an existent branch or tag in the [`wazuh-indexer-repository`](https://github.com/wazuh/wazuh-indexer-plugins) to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
+The plugin in the `main` directory needs a git reference to an existent branch or tag in the [`wazuh-indexer-plugins`](https://github.com/wazuh/wazuh-indexer-plugins) repository to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
 
 ```bash
 cd ../main
@@ -188,10 +189,10 @@ After completing the previous steps, you will have the following packages in the
 9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script requires the following parameters:
 
 - `-c`, `--commit-sha`: Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below).
-- `-r`: Revision of the package.
+- `-r`, `--revision`: Revision of the package.
 - `--deb` or `--rpm`: Distribution of the package.
 - `-a`: Path to the `wazuh-package.zip`.
-- `-b`: Path to the `dashboard-package.zip`.
+- `-b`, `--base`: Path to the `dashboard-package.zip`.
 - `-rp`: Path to the `reporting-package.zip`.
 - `-s`: Path to the `security-package.zip`.
 - `-sa`: Path to the `security-analytics-package.zip`.
