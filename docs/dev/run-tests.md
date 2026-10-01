@@ -34,7 +34,8 @@ yarn test:jest
 Repeat the same pattern for `plugins/wazuh-core`,
 `plugins/wazuh-check-updates` and `plugins/wazuh-ai-assistant` if needed.
 
-Jest will execute all `.test.ts` and `.test.tsx` files in the plugin and display results with coverage information.
+Jest matches `**/*.test.{js,ts,tsx}` — every `.test.js`, `.test.ts`, and `.test.tsx` file in the
+plugin — and displays results with coverage information.
 
 ## Important Notes
 
