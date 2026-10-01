@@ -87,7 +87,7 @@
 <!-- Links -->
 
 [ruleset-management-module]: ./modules/ruleset-management/README.md
-[active-response-module]: ./modules/active-response/index.md
+[active-response-module]: ./modules/active-response/README.md
 [healthcheck-module]: ./modules/healthcheck.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
 [healthcheck-not-ready]: ./modules/healthcheck.md#wazuh-dashboard-is-not-ready-yet

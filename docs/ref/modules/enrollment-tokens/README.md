@@ -1,4 +1,4 @@
-# Enrollment tokens
+# Enrollment Tokens
 
 The **Enrollment tokens** module lists the enrollment tokens the Wazuh server has minted, and
 allows an administrator to create, review, revoke and purge them. It is the counterpart of the

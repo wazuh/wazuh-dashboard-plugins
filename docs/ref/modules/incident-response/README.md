@@ -8,7 +8,7 @@ finding.
 
 The module reads the active response records from the `wazuh-active-responses*` indices. It does
 not define or trigger the actions. You define the active responses in the
-[Active Response](../active-response/index.md) feature and attach them to a trigger. When
+[Active Response](../active-response/README.md) feature and attach them to a trigger. When
 a trigger fires an action, the Wazuh indexer's own Notifications plugin writes a record to the
 `wazuh-active-responses*` indices; the manager polls that index and forwards the action to the
 agent, and the record appears in this module. The record reflects the action issued, not a
@@ -34,12 +34,12 @@ records.
 | Area                        | Role in Incident Response                                                                                                                                                                                                     |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Active response records** | The source data. The module reads the `wazuh-active-responses*` indices. Each record describes one action written by the indexer's Notifications plugin and polled by the manager to run on an agent, not a confirmed result. |
-| **Active Response**         | Defines the actions and attaches them to a trigger. See the [Active Response](../active-response/index.md) module for how to create and run an action.                                                                        |
+| **Active Response**         | Defines the actions and attaches them to a trigger. See the [Active Response](../active-response/README.md) module for how to create and run an action.                                                                       |
 | **Findings**                | Each action record keeps a reference to the finding that triggered it (the `event.doc_id` field). The **Source finding** tab reads that finding from the `wazuh-findings-v5*` indices.                                        |
 
 ## Reference
 
-- [Active Response](../active-response/index.md): How to define an active response, attach it to a trigger, and audit the executions on the agent.
+- [Active Response](../active-response/README.md): How to define an active response, attach it to a trigger, and audit the executions on the agent.
 
 ---
 
@@ -54,7 +54,7 @@ the manager can fail to notify the agent, or the agent can fail to run it.
 The **Responses** view lists the records, and the **Dashboard** view summarizes them.
 
 The records are read-only in this module. To change which actions run, edit the active response
-definition and its trigger in the [Active Response](../active-response/index.md) feature.
+definition and its trigger in the [Active Response](../active-response/README.md) feature.
 
 ### Source finding
 

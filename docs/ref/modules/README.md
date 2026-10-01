@@ -6,7 +6,7 @@
 - [Enrollment tokens](./enrollment-tokens/)
 - [Available Updates](./available-updates.md)
 - [Saved Objects for Dashboards and Visualizations](./saved-objects-dashboards.md)
-- [Active Response](./active-response/index.md)
+- [Active Response](./active-response/README.md)
   - [Create an active response](./active-response/create.md)
   - [Attach to an Alerting trigger](./active-response/alerting-integration.md)
   - [Monitor executions](./active-response/monitor-executions.md)

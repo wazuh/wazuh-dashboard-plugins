@@ -1,4 +1,4 @@
-# Development documentation
+# Development Documentation
 
 See [Setup Environment](setup.md) for the full toolchain prerequisites (Node.js, Yarn, Docker) and
 per-plugin dependency installation. The steps below cover the repository-root setup only.
