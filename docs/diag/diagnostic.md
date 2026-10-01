@@ -62,7 +62,7 @@ The cookie is set when getting the cluster information after the server API is s
 
 1. Verify a server API is selected in the selector of the dashboard header.
 2. Ensure the server API is online and reachable (use `ping` or `cURL` to test connectivity).
-3. Check the server API configuration in `wazuh.yml` (URL, user, port, credentials).
+3. Check the server API configuration in `wazuh_core.hosts` in `opensearch_dashboards.yml` (URL, user, port, credentials).
 4. Confirm the `clusterInfo` cookie is set in the browser.
 
 ### Index pattern [id: index_pattern_id] not found.
@@ -101,7 +101,7 @@ systemctl status wazuh-manager
 
 Use the `ping` command or `cURL` to try the communication using the configuration for the server API host in the Wazuh dashboard.
 
-3. Review the server API host configuration in the Wazuh dashboard side (URL, port and credentials)
+3. Review the server API host configuration in `wazuh_core.hosts` in `opensearch_dashboards.yml` (URL, port and credentials)
 
 ### No server API selected. Please choose one from the server API selector.
 
@@ -113,5 +113,5 @@ This can be caused because the server API host is not selected or this could be 
 
 1. Select a server API host in the dashboard header.
 2. Ensure the server API is online and reachable.
-3. Verify the server API configuration (URL, port, credentials).
+3. Verify the server API configuration in `wazuh_core.hosts` in `opensearch_dashboards.yml` (URL, port, credentials).
 4. Confirm the `currentApi` cookie is set in the browser.
