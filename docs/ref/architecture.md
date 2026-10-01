@@ -1,6 +1,6 @@
 # Architecture
 
-The Wazuh dashboard is built on top of [OpenSearch Dashboards](https://opensearch.org/docs/latest/dashboards/)
+The Wazuh dashboard is built on top of [OpenSearch Dashboards](https://docs.opensearch.org/3.6/dashboards/)
 and extends it with a set of plugins that provide the Wazuh user interface, the connection to the
 Wazuh server API, update notifications and the AI assistant. This repository holds four of those
 plugins. The platform itself, the fork of OpenSearch Dashboards the plugins are installed into, is
@@ -133,6 +133,10 @@ applications in the OpenSearch Dashboards navigation, grouped in categories such
   server certificate validity, create the index patterns, provision the bundled dashboards and
   visualizations, and create the default notification channels. See
   [Health check](modules/healthcheck.md).
+- Registers the other Wazuh modules: [Active Response](modules/active-response/README.md),
+  [Ruleset Management](modules/ruleset-management/), [Case Management](modules/case-management/),
+  [Incident Response](modules/incident-response/), [Enrollment Tokens](modules/enrollment-tokens/)
+  and [Indexer Management Settings](modules/indexer-settings.md).
 - Runs two jobs at start: an initialization job that logs the environment and ensures the
   OpenSearch Dashboards index and its template exist, and an in-memory queue, scheduled with
   `node-cron`, that sends the server API requests a user asked to delay.
