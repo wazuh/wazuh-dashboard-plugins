@@ -80,8 +80,8 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   -u admin:<PASSWORD> \
   -k \
   -d '{
-    "type": ["dashboard", "visualization", "search", "index-pattern"],
-    "includeReferencesDeep": true
+    "type": ["dashboard", "visualization", "search"],
+    "includeReferencesDeep": false
   }' \
   -o saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
@@ -222,8 +222,8 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   -u admin:<PASSWORD> \
   -k \
   -d '{
-    "type": ["dashboard", "visualization", "search", "index-pattern"],
-    "includeReferencesDeep": true
+    "type": ["dashboard", "visualization", "search"],
+    "includeReferencesDeep": false
   }' \
   -o saved-objects-backup-<TENANT>-$(date +%Y%m%d).ndjson
 ```
