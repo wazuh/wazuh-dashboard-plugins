@@ -70,15 +70,19 @@ Slack integration enables real-time security alerts and notifications to be sent
 
 ### Slack message customization
 
-Customize alert messages with Mustache templates:
+Customize alert messages with Mustache templates. `ctx.trigger` only exposes `name` and
+`severity` — there is no `ctx.trigger.rule_id`, `rule_description`, `agent_name` or `timestamp`.
+Fields from the matched document (rule, agent, timestamp) are reached through
+`ctx.results[0].hits.hits[0]._source.<field>` instead:
 
 ```
 🚨 *Wazuh Security Alert*
+*Trigger*: {{ctx.trigger.name}}
 *Severity*: {{ctx.trigger.severity}}
-*Rule ID*: {{ctx.trigger.rule_id}}
-*Description*: {{ctx.trigger.rule_description}}
-*Agent*: {{ctx.trigger.agent_name}}
-*Time*: {{ctx.trigger.timestamp}}
+*Rule ID*: {{ctx.results.0.hits.hits.0._source.rule.id}}
+*Description*: {{ctx.results.0.hits.hits.0._source.rule.description}}
+*Agent*: {{ctx.results.0.hits.hits.0._source.agent.name}}
+*Time*: {{ctx.periodStart}} UTC
 ```
 
 ### Troubleshooting
@@ -113,12 +117,16 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
 
 ### Step 2: Configure PagerDuty in Wazuh dashboard
 
+There is no dedicated PagerDuty channel type — PagerDuty is configured as a generic **Webhook**
+channel. There is no separate "Integration Key" field either: the key is sent as the `routing_key`
+field of the message body configured in Step 3, not as a per-channel setting:
+
 1. Navigate to **☰ Menu > Explore > Notifications > Channels**
 2. Click **Create channel**
 3. Configure the channel:
    - **Name**: `PagerDuty Critical Incidents`
-   - **Webhook URL**: Add Europe extension if needed: `https://events.eu.pagerduty...`
-   - **Integration Key**: Paste the integration key from Step 1
+   - **Channel type**: `Webhook`
+   - **Webhook URL**: `https://events.pagerduty.com/v2/enqueue` (or the EU region's enqueue URL if applicable)
    - **Description**: (optional) `Critical security incidents to on-call team`
 4. Click **Save**
 5. Toggle the channel to **Unmuted**
@@ -139,7 +147,7 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
    - **Channel**: Select PagerDuty channel
    - **Message**: Create the content based on the PagerDuty documentation:
      - [PagerDuty docs](https://developer.pagerduty.com/docs/send-alert-event)
-     - Example message: `{"event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}`
+     - Example message: `{"routing_key":"<integration_key>","event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}}`
 5. Click **Create**
 
 ### Step 4: Test incident creation
