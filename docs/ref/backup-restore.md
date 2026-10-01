@@ -34,6 +34,14 @@ rsync -aREz \
 $backup_folder
 ```
 
+> **Note:** If this host created the shared Wazuh root CA (see [What to back up](#what-to-back-up)
+> above), also back up `/etc/wazuh/ca/` as a whole — including the `.wazuh-dashboard-bootstrap-ca`
+> marker:
+>
+> ```
+> rsync -aREz /etc/wazuh/ca/ $backup_folder
+> ```
+
 > **Note:** The keystore holds the `kibanaserver` and `wazuh-wui` passwords and the AI Assistant
 > encryption key (`wazuh_ai_assistant.encryptionKey`). Without that key, the provider API keys
 > stored by the AI Assistant cannot be decrypted, so keep the keystore backup as protected as the
@@ -92,6 +100,7 @@ Decompress the backup files and change the current working directory to the dire
 
 ```
 tar -xzvf wazuh-dashboard-backup.tar.gz
+backup_destination_folder=$(tar -tzf wazuh-dashboard-backup.tar.gz | head -1)
 cd $backup_destination_folder
 ```
 
@@ -101,7 +110,7 @@ cd $backup_destination_folder
 cp etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearch_dashboards.yml
 cp etc/wazuh-dashboard/node.options /etc/wazuh-dashboard/node.options
 cp etc/wazuh-dashboard/opensearch_dashboards.keystore /etc/wazuh-dashboard/opensearch_dashboards.keystore
-cp -r etc/wazuh-dashboard/certs/ /etc/wazuh-dashboard/certs/
+cp -r etc/wazuh-dashboard/certs/. /etc/wazuh-dashboard/certs/
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.yml
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/node.options
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.keystore
