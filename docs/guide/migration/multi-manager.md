@@ -56,7 +56,8 @@ Identify the purpose of each host in your 4.x configuration and choose the migra
 
 If the multiple entries connected to managers in a **Wazuh cluster**, or if one manager was the primary operational target, configure a single host entry pointing to that manager or the cluster's virtual IP or load balancer address.
 
-In `opensearch_dashboards.yml`:
+In `opensearch_dashboards.yml`. Do not set `password` here for the `default` host — the package
+resolves it into the keystore from `/etc/wazuh/credentials.env` instead:
 
 ```yaml
 wazuh_core.hosts:
@@ -64,7 +65,6 @@ wazuh_core.hosts:
     url: https://<WAZUH_MANAGER_IP_OR_HOSTNAME>
     port: 55000
     username: wazuh-wui
-    password: <YOUR_PASSWORD>
     run_as: false
 ```
 
@@ -72,7 +72,16 @@ wazuh_core.hosts:
 
 If the multiple entries served genuinely independent Wazuh deployments (for example, different customer environments or separate security domains), deploy a **separate Wazuh dashboard instance for each manager**.
 
-Each instance is configured with a single `wazuh_core.hosts` entry pointing to its respective Wazuh manager:
+Each instance is configured with a single `wazuh_core.hosts` entry pointing to its respective Wazuh
+manager. Only the literal `default` host name gets its password resolved automatically from
+`/etc/wazuh/credentials.env`; a differently-named host like `production` or `staging` does not, so
+avoid writing its password in plain text in `opensearch_dashboards.yml` — add it to the keystore
+instead, under the matching dotted path:
+
+```bash
+sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.production.password
+```
 
 **Instance 1** (`opensearch_dashboards.yml`):
 

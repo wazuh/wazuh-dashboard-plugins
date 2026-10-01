@@ -43,13 +43,15 @@ hosts:
 
 ### 5.x format (`opensearch_dashboards.yml`)
 
+Do not set the `default` host's password here — the package resolves it into the keystore from
+`/etc/wazuh/credentials.env` instead:
+
 ```yaml
 wazuh_core.hosts:
   default:
     url: https://wazuh-manager
     port: 55000
     username: wazuh-wui
-    password: <YOUR_PASSWORD>
     run_as: true
 ```
 
@@ -182,7 +184,8 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
 
 ### 3. Add the Wazuh server host block
 
-Append the following block to `opensearch_dashboards.yml`, replacing the placeholder values with those from your 4.x `wazuh.yml`:
+Append the following block to `opensearch_dashboards.yml`, replacing the placeholder values with those from your 4.x `wazuh.yml`. Do not set `password` here for the `default` host — the package
+resolves it into the keystore from `/etc/wazuh/credentials.env` instead:
 
 ```yaml
 wazuh_core.hosts:
@@ -190,11 +193,10 @@ wazuh_core.hosts:
     url: https://<WAZUH_MANAGER_IP_OR_HOSTNAME>
     port: <PORT>
     username: <USERNAME>
-    password: <PASSWORD>
     run_as: <RUN_AS>
 ```
 
-Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, `<PASSWORD>`, and `<RUN_AS>` with the values from your 4.x configuration.
+Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, and `<RUN_AS>` with the values from your 4.x configuration.
 
 > **Note**: If you previously configured multiple hosts in `wazuh.yml`, review the [Multi-manager environments](./multi-manager.md) guide before adding more than one entry.
 

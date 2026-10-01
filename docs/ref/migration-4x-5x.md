@@ -128,13 +128,16 @@ ip.selector: true
 
 **5.x (`/etc/wazuh-dashboard/opensearch_dashboards.yml`):**
 
+Do not set the `default` host's password in this file — the package resolves it into the
+keystore from `/etc/wazuh/credentials.env` instead (see
+[Credentials](getting-started/credentials.md)):
+
 ```yaml
 wazuh_core.hosts:
   default:
     url: https://wazuh-manager
     port: 55000
     username: wazuh-wui
-    password: wazuh-wui
     run_as: false
 ```
 
