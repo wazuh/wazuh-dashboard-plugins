@@ -12,8 +12,8 @@ Once the containers are running, access the OpenSearch Dashboards container:
 
 ```bash
 docker exec -it <container-id> bash
-# Or use the container name pattern (e.g., osd-dev-330-osd-1)
-docker exec -it osd-dev-330-osd-1 bash
+# Or use the container name pattern (e.g., os-dev-360-osd-1 for OSD version 3.6.0)
+docker exec -it os-dev-360-osd-1 bash
 ```
 
 Find your container ID or name:
