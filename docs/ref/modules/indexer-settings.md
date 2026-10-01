@@ -26,12 +26,22 @@ Controls whether raw events are indexed.
 
 > **Note:** This setting can be hidden from the UI through the platform configuration. If your deployment hides it, the **Enable raw events** control will not appear on the Settings page. For details on hiding settings, see [Configuration](../configuration.md).
 
+Hiding it is configured with `wazuh.disabledSettings` in `opensearch_dashboards.yml`, an array of
+disabled-setting ids. The only id it currently accepts is `index-raw-events`, which hides the
+**Enable raw events** toggle:
+
+```yaml
+wazuh.disabledSettings: ['index-raw-events']
+```
+
 ### Update CTI content feeds
 
 Triggers an update of the threat intelligence content from the subscribed CTI (Cyber Threat Intelligence) feeds.
 
 - Click **Update CTI content** to request the update.
 - The request is sent immediately and runs asynchronously; you do **not** need to save changes for this action.
+- The button calls `POST /api/cti-feeds/update` on the dashboard server, which forwards the
+  request to `POST /_plugins/_content_manager/update` on the Wazuh indexer as the current user.
 
 ## Saving and discarding changes
 
