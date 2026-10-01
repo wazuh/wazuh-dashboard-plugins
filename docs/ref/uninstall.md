@@ -4,6 +4,25 @@ Follow the steps below to uninstall the Wazuh dashboard using your package manag
 
 > **Note**: You need root user privileges to run all the commands described below.
 
+## Stop and disable the service
+
+Stop the service before removing the package, and disable it so it does not start again on a
+future reinstall before the configuration is ready:
+
+**Systemd:**
+
+```bash
+systemctl stop wazuh-dashboard
+systemctl disable wazuh-dashboard
+```
+
+**SysV init:**
+
+```bash
+service wazuh-dashboard stop
+chkconfig wazuh-dashboard off  # or: update-rc.d -f wazuh-dashboard remove
+```
+
 ## Remove the Wazuh dashboard installation
 
 **APT**
@@ -79,3 +98,19 @@ The Wazuh indexer, manager and dashboard share `/etc/wazuh`, which holds the cre
 `wazuh-indexer` nor `wazuh-manager` is still installed on the host. On Debian-based systems, a
 package removed without purging its configuration files still counts as installed. A CA relocated
 with `WAZUH_CA_DIR` is not removed. See [Credentials](getting-started/credentials.md#upgrades-and-removal).
+
+## Leftovers on the Wazuh indexer
+
+Removing or purging the `wazuh-dashboard` package only touches this host's files. It never
+connects to the Wazuh indexer, so everything the dashboard stored there survives the uninstall:
+
+- The OpenSearch Dashboards index, with the index patterns, dashboards and visualizations created
+  by Health Check, and the hidden `wazuh-check-updates-*` saved objects. See
+  [Persistence](architecture.md#persistence).
+- The `wazuh-ai-assistant-sessions` data stream, if the AI Assistant plugin was installed.
+- The notification channel configurations (`default_slack_channel`, `default_pagerduty_channel`,
+  `default_jira_channel`, `default_shuffle_channel`, and any custom channel), stored by the
+  Notifications plugin. See [Notifications and Alerting](modules/notifications-alerting.md).
+
+Delete these through the Wazuh indexer directly (for example, `DELETE` the OpenSearch Dashboards
+index or data stream) if they must not outlive the dashboard installation that created them.
