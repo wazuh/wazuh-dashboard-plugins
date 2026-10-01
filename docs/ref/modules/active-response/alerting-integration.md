@@ -20,7 +20,9 @@ In the **Monitor type** selector, choose **Active Response**. This is mandatory:
 
 ![Monitor type - Active Response](images/09-monitor-type-active-response.png)
 
-Give the monitor a name — for this use case, `Block-IP-monitor` — and pick a **Schedule** (for example, `By interval`, every `1` minute).
+Give the monitor a name — for this use case, `Block-IP-monitor` — and pick a **Schedule** (for
+example, `By interval`, every `1` minute). Active Response monitors cap the schedule interval at
+**60 seconds**: the form rejects a larger value and shows the maximum for the selected unit.
 
 ---
 

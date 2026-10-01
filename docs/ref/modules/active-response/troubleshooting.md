@@ -12,6 +12,8 @@
 | The `wazuh-active-responses*` index pattern is missing from Discover             | The dashboard did not create it on startup                                                                     | Ask your administrator to inspect the dashboard logs and restart              |
 | Execution records disappear after 3 days                                         | Expected — default retention                                                                                   | Ask your administrator to extend retention or export records to another index |
 | The active response runs on an unexpected agent                                  | `Location = All` with an overly broad monitor query, or an incorrect `Agent ID`                                | Narrow the monitor query; review the `Agent ID`                               |
+| The schedule interval is rejected when saving the monitor                        | Active Response monitors cap the interval at 60 seconds                                                        | Set an interval of 60 seconds or less                                         |
+| The monitor's data source is rejected                                            | Active Response monitors require a concrete index (e.g. `wazuh-findings-v5-security`), not an index pattern    | Select a concrete index instead of `wazuh-findings-v5*`                       |
 
 ---
 
