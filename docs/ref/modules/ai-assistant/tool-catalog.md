@@ -43,19 +43,26 @@ Key properties:
 On Wazuh 5.0 the tools read from the 5.0 data layer: the `wazuh-events-v5-*` event indices,
 `wazuh-findings-v5-*`, the `wazuh-states-*` state indices (vulnerabilities, FIM, SCA, inventory),
 the `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` Ruleset Management
-pipeline content, and the single fixed `.opensearch-sap-detectors-config` index (detector
-definitions). Each tool's module in `server/tools/catalog/` documents which index or Server API
-endpoint it queries on 5.0 and why.
+pipeline content, the `wazuh-threatintel-enrichments-a` IOC feed (`lookup_indicator`), the
+`.wazuh-threatintel-vulnerabilities-a` CVE feed (`get_cve_intel`), the `.wazuh-cti-consumers` and
+`.wazuh-content-manager-jobs` CTI sync indices (`get_cti_status`), and the single fixed
+`.opensearch-sap-detectors-config` index (detector definitions). Each tool's module in
+`server/tools/catalog/` documents which index or Server API endpoint it queries on 5.0 and why.
 
 ## The escape hatch
 
 `search_wazuh_data(index_pattern, query_dsl)` covers the long tail of questions no typed tool
 matches. It is deliberately narrow:
 
-- `index_pattern` must match the allowlist: `wazuh-events-v5-*`, `wazuh-findings-v5-*`,
-  `wazuh-states-*`, `wazuh-metrics-*`, the `wazuh-threatintel-*` sub-families, the CTI feed indices
-  (`.wazuh-cti-consumers`, `.wazuh-content-manager-jobs`), and the `.opensearch-sap-*-findings`
-  indices. Read-only `_search`/`_count` only.
+- `index_pattern` must be one of a fixed enum (`server/tools/catalog/generic-query-families.ts`):
+  `wazuh-findings-v5-*`, `wazuh-events-v5-*`, `wazuh-states-*` (plus one entry per
+  `wazuh-states-*` index), `wazuh-metrics-*`, the CTI feed indices (`.wazuh-cti-consumers`,
+  `.wazuh-content-manager-jobs`), `.opensearch-sap-*-findings`,
+  `.opensearch-sap-pre-packaged-rules-config`, `.opensearch-sap-correlation-metadata`, and the raw
+  threat-intel feeds `.wazuh-threatintel-vulnerabilities-a` and `wazuh-threatintel-enrichments-a`.
+  The `wazuh-threatintel-{rules,decoders,integrations,policies,filters,kvdbs}-*` sub-families and
+  `.opensearch-sap-detectors-config` are deliberately left out — typed tools own them. Read-only
+  `_search`/`_count` only.
 - The model-proposed DSL goes through the **full guardrail lint** (below). A rejected query
   returns the reason to the model for one bounded self-correction.
 
@@ -77,12 +84,13 @@ single call:
    `mitre`, `inventory`, `compliance`, `security_analytics`, `free_search`, `general`).
 2. **Stage 2 — act**: the model is re-invoked with the routed categories' tools, expanded with any
    chained detail tool whose summary tool is already in the set (`CHAIN_PAIRS`, e.g.
-   `get_agents` chains to `search_findings_by_agent`/`get_events_by_agent`, expanded to a fixed
-   point so a chained tool that is itself a chain key keeps chaining). `search_wazuh_data` (the
-   escape hatch) and `get_field_values` are added unconditionally on **every** turn, regardless of
-   route. A lone `general` route resolves to a minimal recovery set
-   (`get_security_summary` + `search_wazuh_data`) rather than no tools at all, so a
-   misclassified turn always has a data path.
+   `get_agents` chains to `get_vulnerabilities_by_agent`/`get_sca_results`/`get_agent_inventory`/
+   `search_findings_by_agent`, and `get_top_agents` to `search_findings_by_agent`/
+   `get_events_by_agent`; expanded to a fixed point so a chained tool that is itself a chain key
+   keeps chaining). `search_wazuh_data` (the escape hatch) and `get_field_values` are added
+   unconditionally on **every** turn, regardless of route. A lone `general` route resolves to a
+   minimal recovery set (`get_security_summary` + the always-on `search_wazuh_data` and
+   `get_field_values`) rather than no tools at all, so a misclassified turn always has a data path.
 
 The router is a **token-cost optimization, not an access control**: every tool remains equally
 authorized, and the real permission check is the user's own RBAC applied to every query. Every
