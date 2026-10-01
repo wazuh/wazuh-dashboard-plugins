@@ -35,7 +35,7 @@ five whitelisted sample rows); the full result renders locally as a table in the
 
 - [Architecture](./architecture.md) — client/server split, the SSE chat pipeline, saved objects,
   and the wazuh-core integration points.
-- [Tool catalog](./tool-catalog.md) — the 32 read-only tools, the in-process registry, and the
+- [Tool catalog](./tool-catalog.md) — the 35 read-only tools, the in-process registry, and the
   two-stage router.
 - [Providers](./providers.md) — the provider adapters, which providers and models are verified
   working, retry/stall handling, and the SSRF guard on outbound traffic.
@@ -67,7 +67,7 @@ and can be encrypted at rest.
 
 ### Tools, digests, and tables
 
-The assistant cannot run free-form actions. It picks from a fixed catalog of 32 **read-only,
+The assistant cannot run free-form actions. It picks from a fixed catalog of 35 **read-only,
 declarative tools** (plus a guarded free-search escape hatch limited to `wazuh-events-v5-*`,
 `wazuh-findings-v5-*`, and `wazuh-states-*` indices). Every query is linted and clamped by
 server-side guardrails before execution. The model sees a **digest** capped at 6,000 characters;
