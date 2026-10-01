@@ -1,9 +1,7 @@
 # Development documentation
 
-## Requirements
-
-- [Node.js](https://nodejs.org/en/) (see `.nvmrc` at the repository root)
-- [Yarn](https://yarnpkg.com/)
+See [Setup Environment](setup.md) for the full toolchain prerequisites (Node.js, Yarn, Docker) and
+per-plugin dependency installation. The steps below cover the repository-root setup only.
 
 ## First time setup
 
