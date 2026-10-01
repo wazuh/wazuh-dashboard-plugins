@@ -131,17 +131,21 @@ applications in the OpenSearch Dashboards navigation, grouped in categories such
   helpers (`/elastic/...`, `/indexer/...`) and the host listing (`/hosts/apis`).
 - Registers the health checks that validate the server API connection and `run_as`, report the
   server certificate validity, create the index patterns, provision the bundled dashboards and
-  visualizations, and create the default notification channels. See
-  [Health check](modules/healthcheck.md).
-- Registers the other Wazuh modules: [Active Response](modules/active-response/README.md),
-  [Ruleset Management](modules/ruleset-management/), [Case Management](modules/case-management/),
-  [Incident Response](modules/incident-response/), [Enrollment Tokens](modules/enrollment-tokens/)
-  and [Indexer Management Settings](modules/indexer-settings.md).
+  visualizations, and validate the default notification channels the Wazuh indexer provisions.
+  See [Health check](modules/healthcheck.md).
 - Runs two jobs at start: an initialization job that logs the environment and ensures the
   OpenSearch Dashboards index and its template exist, and an in-memory queue, scheduled with
   `node-cron`, that sends the server API requests a user asked to delay.
 - Adds the `x-frame-options`, `x-content-type-options` and, over HTTPS,
   `strict-transport-security` headers to every response.
+
+The browser side of `main` also hosts the [Case Management](modules/case-management/README.md),
+[Incident Response](modules/incident-response/README.md),
+[Enrollment tokens](modules/enrollment-tokens/README.md) and
+[Indexer Management Settings](modules/indexer-settings.md) applications.
+[Active Response](modules/active-response/README.md) is provided by the
+`wazuh-dashboard-notifications` and `wazuh-dashboard-alerting` plugins, and
+[Ruleset Management](modules/ruleset-management/README.md) by `wazuh-dashboard-security-analytics`.
 
 `main` also integrates with the optional plugins it lists in its manifest (security,
 notifications, alerting, reporting), which come from other repositories. See

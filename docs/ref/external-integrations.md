@@ -14,7 +14,7 @@ The Wazuh dashboard supports integration with:
 Notification integrations (Slack, PagerDuty, Jira, Shuffle) use OpenSearch Dashboards
 Notifications and Alerting plugins.
 
-### Default channels provisioned by Health Check
+### Default channels provisioned by the indexer
 
 When the Notifications plugin is present, the Wazuh indexer notifications plugin provisions one
 disabled channel per integration above (`default_slack_channel`, `default_pagerduty_channel`,
@@ -82,19 +82,24 @@ Slack integration enables real-time security alerts and notifications to be sent
 
 ### Slack message customization
 
-Customize alert messages with Mustache templates. `ctx.trigger` only exposes `name` and
+Customize alert messages with Mustache templates. `ctx.trigger` exposes `id`, `name` and
 `severity` — there is no `ctx.trigger.rule_id`, `rule_description`, `agent_name` or `timestamp`.
-Fields from the matched document (rule, agent, timestamp) are reached through
-`ctx.results[0].hits.hits[0]._source.<field>` instead:
+The per document monitor created in Step 3 leaves `ctx.results` empty: each alert in
+`ctx.alerts` carries the matched documents in `sample_documents`, so fields from the finding
+(rule, agent, timestamp) are reached through `_source.<field>` inside that section:
 
 ```
 🚨 *Wazuh Security Alert*
 *Trigger*: {{ctx.trigger.name}}
 *Severity*: {{ctx.trigger.severity}}
-*Rule ID*: {{ctx.results.0.hits.hits.0._source.rule.id}}
-*Description*: {{ctx.results.0.hits.hits.0._source.rule.description}}
-*Agent*: {{ctx.results.0.hits.hits.0._source.agent.name}}
-*Time*: {{ctx.periodStart}} UTC
+{{#ctx.alerts}}
+{{#sample_documents}}
+*Rule ID*: {{_source.wazuh.rule.id}}
+*Rule*: {{_source.wazuh.rule.title}}
+*Agent*: {{_source.wazuh.agent.name}}
+*Time*: {{_source.@timestamp}}
+{{/sample_documents}}
+{{/ctx.alerts}}
 ```
 
 ### Troubleshooting
@@ -130,8 +135,9 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
 ### Step 2: Configure PagerDuty in Wazuh dashboard
 
 There is no dedicated PagerDuty channel type — PagerDuty is configured as a generic **Webhook**
-channel. There is no separate "Integration Key" field either: the key is sent as the `routing_key`
-field of the message body configured in Step 3, not as a per-channel setting:
+channel. There is no separate "Integration Key" field either: the key travels in an
+`X-Routing-Key` header, as in the pre-provisioned `default_pagerduty_channel` described in
+[Default channels provisioned by the indexer](#default-channels-provisioned-by-the-indexer):
 
 1. Navigate to **☰ Menu > Explore > Notifications > Channels**
 2. Click **Create channel**
@@ -139,6 +145,7 @@ field of the message body configured in Step 3, not as a per-channel setting:
    - **Name**: `PagerDuty Critical Incidents`
    - **Channel type**: `Webhook`
    - **Webhook URL**: `https://events.pagerduty.com/v2/enqueue` (or the EU region's enqueue URL if applicable)
+   - **Headers**: `Content-Type: application/json` and `X-Routing-Key: <integration_key>`
    - **Description**: (optional) `Critical security incidents to on-call team`
 4. Click **Save**
 5. Toggle the channel to **Unmuted**
@@ -159,7 +166,7 @@ field of the message body configured in Step 3, not as a per-channel setting:
    - **Channel**: Select PagerDuty channel
    - **Message**: Create the content based on the PagerDuty documentation:
      - [PagerDuty docs](https://developer.pagerduty.com/docs/send-alert-event)
-     - Example message: `{"routing_key":"<integration_key>","event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}}`
+     - Example message: `{"event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}}`
 5. Click **Create**
 
 ### Step 4: Test incident creation
@@ -228,9 +235,9 @@ There is no dedicated Jira channel type — Jira is configured as a generic **We
 that posts to the Jira REST API, authenticated with HTTP Basic auth:
 
 1. Navigate to **☰ Menu > Explore > Notifications > Channels**, or open the pre-provisioned
-   `default_jira_channel` described in [Default channels provisioned by Health Check](#default-channels-provisioned-by-health-check)
+   `default_jira_channel` described in [Default channels provisioned by the indexer](#default-channels-provisioned-by-the-indexer)
 2. Configure the channel:
-   - **Webhook URL**: `<jira-instance-url>/rest/api/2/issue`
+   - **Webhook URL**: `<jira-instance-url>/rest/api/3/issue`
    - **Headers**: `Authorization: Basic <base64(email:api_token)>`
 3. Save and toggle the channel to **Unmuted**
 

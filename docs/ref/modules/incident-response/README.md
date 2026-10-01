@@ -21,8 +21,8 @@ category.
 This module exposes the following views:
 
 - **Dashboard**: Visualizations that summarize the active response actions — an evolution-over-time
-  chart by rule level, a locations map, and top-5 breakdowns by active response, by agent, and by
-  executable.
+  chart by rule level, a pie chart of active response locations, top-5 bar charts by active
+  response and by executable, and a heatmap of the top 5 agents by active response.
 - **Responses**: A table of the individual action records. Select a row to open the details. The
   details flyout has a **Source finding** tab that shows the finding that triggered the action.
 

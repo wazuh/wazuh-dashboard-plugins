@@ -15,13 +15,13 @@ Use these practices to keep the dashboard responsive in large deployments.
 
 ## Dashboard configuration
 
-- `timeout` (Advanced Settings, default `20000` ms) bounds how long the dashboard waits for some
+- `timeout` (Advanced settings, default `20000` ms) bounds how long the dashboard waits for some
   UI-triggered requests — raise it if large deployments see premature timeouts on heavy views, but
   prefer narrowing the query first.
-- `reports.csv.maxRows` (Advanced Settings, default `10000`) caps CSV export size. Keep it at or
-  below the backing index's own `index.max_result_window` (OpenSearch default `10000`): a value
-  above that makes exports fail instead of silently truncating, since the query can never return
-  more hits than the index allows.
+- `reports.csv.maxRows` (Advanced settings, default `10000`) caps the rows of the CSV exports built
+  from Server API tables (for example, the agents and groups lists), which the dashboard fetches
+  page by page; a larger table is truncated to that many rows. Raising it makes those exports
+  issue more Server API requests.
 - `healthcheck.interval` (`opensearch_dashboards.yml`, default `15m`) controls how often the
   recurring health check re-runs after the initial one — see
   [Health check](modules/healthcheck.md#settings). A shorter interval means more background load

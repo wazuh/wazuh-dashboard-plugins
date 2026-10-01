@@ -51,12 +51,13 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 - `server.customResponseHeaders` in `opensearch_dashboards.yml` adds arbitrary response headers
   (for example a stricter `Content-Security-Policy` or `Strict-Transport-Security`) without
   changing dashboard code.
-- `server.xsrf.disableProtection` (default `false`) and `server.xsrf.whitelist` control OSD's
-  built-in XSRF protection; only whitelist a path if it must be called without the `osd-xsrf`
-  header (most Wazuh dashboard routes don't need to).
-- `server.cors` is `false` by default — Cross-Origin Resource Sharing is disabled unless you
-  explicitly set an allowed origin list, which only makes sense when another trusted site embeds
-  the dashboard's API.
+- `server.xsrf.disableProtection` (default `false`) and `server.xsrf.allowlist` control OSD's
+  built-in XSRF protection; only allowlist a path if it must be called without the `osd-xsrf`
+  header (most Wazuh dashboard routes don't need to). The older `server.xsrf.whitelist` name is
+  deprecated and renamed to `server.xsrf.allowlist`.
+- `server.cors` is a boolean, `false` by default. There is no allowed-origin list: setting it to
+  `true` enables Cross-Origin Resource Sharing with the server's default policy, so leave it
+  disabled unless another trusted site must call the dashboard's API.
 
 ## Operational practices
 

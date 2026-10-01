@@ -52,13 +52,13 @@ For administrators deploying the plugins:
 - [Health Check](modules/healthcheck.md) - System health monitoring
 - [Notifications and Alerting](modules/notifications-alerting.md) - Alert channels and workflows
 - [Indexer Management Settings](modules/indexer-settings.md) - Wazuh indexer configuration from the dashboard
-- [Enrollment Tokens](modules/enrollment-tokens/) - Agent enrollment token management
+- [Enrollment tokens](modules/enrollment-tokens/README.md) - Agent enrollment token management
 - [Available Updates](modules/available-updates.md) - New-version notifications
 - [Active Response](modules/active-response/README.md) - Trigger and monitor active responses
-- [Ruleset Management](modules/ruleset-management/) - Normalization and detection rules
-- [AI Assistant](modules/ai-assistant/) - AI-powered chat over Wazuh data
-- [Case Management](modules/case-management/) - Investigation case tracking
-- [Incident Response](modules/incident-response/) - Incident response workflows
+- [Ruleset Management](modules/ruleset-management/README.md) - Normalization and detection rules
+- [AI Assistant](modules/ai-assistant/README.md) - AI-powered chat over Wazuh data
+- [Case Management](modules/case-management/README.md) - Investigation case tracking
+- [Incident Response](modules/incident-response/README.md) - Incident response workflows
 
 ### Integration and Operations
 

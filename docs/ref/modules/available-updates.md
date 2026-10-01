@@ -1,4 +1,4 @@
-# Available Updates
+# Available updates
 
 ## Overview
 

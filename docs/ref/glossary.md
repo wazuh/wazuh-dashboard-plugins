@@ -22,7 +22,8 @@
   the 4.x registration password/variables. See
   [Enrollment Tokens](modules/enrollment-tokens/README.md).
 - **RBAC**: Role-based access control — the indexer's and the manager's own permission systems,
-  which the dashboard enforces by always acting as the logged-in user (`asCurrentUser`), never a
-  privileged service account.
+  which the dashboard enforces by running user-facing queries as the logged-in user
+  (`asCurrentUser`). Background tasks are the exception: the Health Check and the update check
+  (`wazuh-check-updates`) run as the internal user (`asInternalUser`).
 - **CTI**: Cyber Threat Intelligence — the Wazuh-curated threat-intelligence content (indicators,
   rules, decoders) distributed to the indexer's content manager.

@@ -1,4 +1,4 @@
-# Saved Objects for Dashboards and Visualizations
+# Saved objects for dashboards and visualizations
 
 ## Overview
 

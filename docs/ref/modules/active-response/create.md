@@ -7,7 +7,7 @@ The following walkthrough shows how to create an active response that blocks the
 - Wazuh indexer, manager, and dashboard running version **5.0.0** or later.
 - The `wazuh-active-responses*` index pattern available in **Dashboard management → Dashboards Management → Index patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
 
-> **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](index.md#about-the-executable).
+> **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](README.md#about-the-executable).
 
 ---
 
@@ -42,7 +42,7 @@ Click **Create active response**. The form is organized in two panels: **Name an
 
 Complete the fields in order:
 
-- **Executable** — `block-ip`. Required. Enter exactly this name. The `block-ip` script is one of the default executables shipped with the Wazuh agent (see [Concepts → About the executable](index.md#about-the-executable)); enter only its name, without a path. An empty value shows the error `Executable name cannot be empty.`
+- **Executable** — `block-ip`. Required. Enter exactly this name. The `block-ip` script is one of the default executables shipped with the Wazuh agent (see [Concepts → About the executable](README.md#about-the-executable)); enter only its name, without a path. An empty value shows the error `Executable name cannot be empty.`
 - **Extra arguments** — leave empty for this example. Optional.
 - **Type** — select `Stateful`. This makes the **Stateful timeout (seconds)** field appear.
 - **Stateful timeout (seconds)** — `30` (thirty seconds — the time after which the agent will undo the block-IP action). Default: `180`. Validations: non-numeric values show `Stateful timeout must be a number.`; values `≤ 0` show `Stateful timeout must be greater than 0.`

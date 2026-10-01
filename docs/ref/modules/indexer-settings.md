@@ -1,4 +1,4 @@
-# Indexer Management Settings
+# Indexer management settings
 
 ## Overview
 

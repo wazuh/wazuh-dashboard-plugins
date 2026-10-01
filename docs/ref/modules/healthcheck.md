@@ -41,7 +41,7 @@ The checks represents the unit to check and some could do some write actions suc
 
 ### Notifications and Alerting
 
-For details about the default notification channels created by Health Check and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).
+For details about the default notification channels the Wazuh indexer provisions (and Health Check validates) and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).
 
 ### Saved Objects for Dashboards and Visualizations
 

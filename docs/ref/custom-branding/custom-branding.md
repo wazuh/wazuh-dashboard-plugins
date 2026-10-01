@@ -98,9 +98,9 @@ systemctl restart wazuh-dashboard
 
 ![Favicon](./images/favicon_logo.png)
 
-### Login page
+## Login page
 
-#### Basic authentication
+### Basic authentication
 
 ```yml
 opensearch_security.ui.basicauth:

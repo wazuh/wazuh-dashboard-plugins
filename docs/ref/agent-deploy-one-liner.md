@@ -178,10 +178,12 @@ A token install needs neither. The token carries a **pin**, the SHA-256 digest
 of the public key of the certificate authority that signs the manager's
 agent-facing certificate. On its first start the agent fetches that authority
 from the manager, checks it against the pin, installs it as its trust anchor at
-`etc/certs/root-ca.pem`, and enrolls over a fully verified connection. Left unset,
-`<verification_mode>` resolves to the endpoint's system CA store, or to `certificate` once a CA is
-configured (at `etc/certs/root-ca.pem` from the token, or via `WAZUH_REGISTRATION_CA` by hand) —
-`WAZUH_SSL_VERIFICATION` only needs to be set to explicitly override that.
+`etc/certs/root-ca.pem`, and enrolls over a fully verified connection. Left
+unset, `<verification_mode>` resolves to `certificate` when
+`<agent><ssl><certificate_authorities>` names a CA, to `full` when the trust
+anchor `etc/certs/root-ca.pem` is present, and to `none` otherwise; it never
+falls back to the system CA store. After a token install the mode is therefore
+`full`, and `WAZUH_SSL_VERIFICATION` only overrides it.
 
 Three combinations are possible, and each generates a different command:
 
@@ -259,15 +261,15 @@ The 5.0 agent installer reads the variables below. The wizard generates
 manager documentation is the reference for the installer: _Wazuh Manager >
 Getting Started > Installation > Options_.
 
-| Option                    | Description                                                                                                                                                                                                                                                                                                                            |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| WAZUH_ENROLLMENT_TOKEN    | The enrollment token minted on the manager, and the only way to register an agent. It names the manager, pins its certificate authority and carries the enrollment credential. The installer writes the address it carries into `<agent><manager><endpoint>` and leaves the token for the agent to enroll with on its first start.     |
-| WAZUH_SSL_VERIFICATION    | Writes `<agent><ssl><verification_mode>`: one of `full`, `certificate`, `system` or `none`. Omitted, it resolves to the endpoint's system CA store, or to `certificate` once a CA is configured (the token's trust anchor, or a CA added by hand). The wizard generates only `none`, which leaves the connection open to interception. |
-| WAZUH_AGENT_NAME          | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                                                                           |
-| WAZUH_AGENT_GROUP         | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                                                                          |
-| WAZUH_KEEP_ALIVE_INTERVAL | Sets the time, in seconds, between the Wazuh agent keep-alive notifications to the Wazuh manager.                                                                                                                                                                                                                                      |
-| WAZUH_TIME_RECONNECT      | **No effect.** Targets `<agent><time-reconnect>`, an option that is deprecated and ignored in 5.0.                                                                                                                                                                                                                                     |
-| ENROLLMENT_DELAY          | Assigns the time, in seconds, that the agent waits after a successful enrollment before its first connection attempt.                                                                                                                                                                                                                  |
+| Option                    | Description                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| WAZUH_ENROLLMENT_TOKEN    | The enrollment token minted on the manager, and the only way to register an agent. It names the manager, pins its certificate authority and carries the enrollment credential. The installer writes the address it carries into `<agent><manager><endpoint>` and leaves the token for the agent to enroll with on its first start.                                 |
+| WAZUH_SSL_VERIFICATION    | Writes `<agent><ssl><verification_mode>`: one of `full`, `certificate`, `system` or `none`. Omitted, it resolves to `full` against the trust anchor a token install delivers, to `certificate` when a CA is set in `ossec.conf`, or to `none` when there is no trust material. The wizard generates only `none`, which leaves the connection open to interception. |
+| WAZUH_AGENT_NAME          | Designates the Wazuh agent's name. By default, it will be the computer name.                                                                                                                                                                                                                                                                                       |
+| WAZUH_AGENT_GROUP         | Assigns the Wazuh agent to one or more existing groups (separated by commas).                                                                                                                                                                                                                                                                                      |
+| WAZUH_KEEP_ALIVE_INTERVAL | Sets the time, in seconds, between the Wazuh agent keep-alive notifications to the Wazuh manager.                                                                                                                                                                                                                                                                  |
+| WAZUH_TIME_RECONNECT      | **No effect.** Targets `<agent><time-reconnect>`, an option that is deprecated and ignored in 5.0.                                                                                                                                                                                                                                                                 |
+| ENROLLMENT_DELAY          | Assigns the time, in seconds, that the agent waits after a successful enrollment before its first connection attempt.                                                                                                                                                                                                                                              |
 
 ### Variables removed in 5.0
 
