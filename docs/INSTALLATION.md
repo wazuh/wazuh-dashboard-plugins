@@ -19,8 +19,8 @@ The documentation tools require Rust and Cargo. The recommended way to install t
 Install Rust:
 
 ```bash
-   curl --proto '=https' --tlsv1.2 -sSf [https://sh.rustup.rs](https://sh.rustup.rs) | sh
-   source $HOME/.cargo/env
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source $HOME/.cargo/env
 ```
 
 Reload or create new terminal
