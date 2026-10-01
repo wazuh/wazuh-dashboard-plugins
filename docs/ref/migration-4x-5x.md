@@ -1,6 +1,11 @@
 # Migration guide (4.x to 5.x)
 
-This comprehensive guide covers migrating the Wazuh dashboard plugins from version 4.x to 5.x, including breaking changes, configuration updates, and troubleshooting steps.
+> **For the step-by-step migration procedure, see the [migration guide](../guide/migration/README.md).**
+> This page is reference material: the compatibility matrix, the full list of breaking changes, and
+> troubleshooting for common migration issues. There is no automatic or in-place upgrade from 4.x —
+> 5.x is always a fresh installation.
+
+This page covers what changed between the Wazuh dashboard plugins' 4.x and 5.x versions: breaking changes, configuration mapping, and troubleshooting.
 
 ## Overview
 
@@ -213,195 +218,11 @@ If you have custom scripts or integrations:
 
 ## Migration steps
 
-### Step 1: Upgrade stack components in order
-
-Follow this sequence to avoid compatibility issues:
-
-#### 1.1 Upgrade Wazuh indexer (first)
-
-```bash
-# Stop Wazuh dashboard first
-sudo systemctl stop wazuh-dashboard
-
-# Upgrade indexer
-sudo apt-get update && sudo apt-get install wazuh-indexer=5.0.0-1  # Debian/Ubuntu
-# OR
-sudo yum install wazuh-indexer-5.0.0-1  # RHEL/CentOS
-
-# Restart indexer
-sudo systemctl restart wazuh-indexer
-
-# Verify indexer health
-curl -k -u admin:$WAZUH_INDEXER_ADMIN_PASSWORD https://localhost:9200/_cluster/health?pretty
-```
-
-#### 1.2 Upgrade Wazuh manager (second)
-
-```bash
-# Upgrade manager
-sudo apt-get install wazuh-manager=5.0.0-1  # Debian/Ubuntu
-# OR
-sudo yum install wazuh-manager-5.0.0-1  # RHEL/CentOS
-
-# Restart manager
-sudo systemctl restart wazuh-manager
-
-# Verify manager status
-sudo systemctl status wazuh-manager
-```
-
-#### 1.3 Upgrade Wazuh dashboard (last)
-
-```bash
-# Upgrade dashboard package
-sudo apt-get install wazuh-dashboard=5.0.0-1  # Debian/Ubuntu
-# OR
-sudo yum install wazuh-dashboard-5.0.0-1  # RHEL/CentOS
-
-# Do NOT start yet - configure first
-```
-
-### Step 2: Migrate configuration
-
-#### 2.1 Update opensearch_dashboards.yml
-
-Edit `/etc/wazuh-dashboard/opensearch_dashboards.yml`:
-
-```bash
-sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
-```
-
-**Required changes**:
-
-1. **Update server settings** (if customized):
-
-   ```yaml
-   server.host: '0.0.0.0'
-   server.port: 443
-   server.name: 'wazuh-dashboard'
-   ```
-
-2. **Update indexer connection**:
-
-   ```yaml
-   opensearch.hosts: ['https://localhost:9200']
-   opensearch.ssl.verificationMode: certificate
-   ```
-
-3. **Add Wazuh API configuration** (migrated from wazuh.yml).
-
-   The 5.x packages store the `wazuh-wui` password of the `default` host in the keystore, from
-   `WAZUH_MANAGER_WUI_PASSWORD` in `/etc/wazuh/credentials.env`. Omit `password` for that host, or
-   set it here: a value in `opensearch_dashboards.yml` takes precedence and is never overridden. See
-   [Credentials](getting-started/credentials.md).
-
-   ```yaml
-   wazuh_core.hosts:
-     default:
-       url: https://localhost
-       port: 55000
-       username: wazuh-wui
-       run_as: false
-   ```
-
-4. **Set default route**:
-
-   ```yaml
-   uiSettings.overrides.defaultRoute: /app/wz-home
-   ```
-
-5. **Remove deprecated settings** (if present):
-
-   Remove any lines containing:
-
-   - `customization.*`
-   - `wazuh.monitoring.*`
-   - `admin`
-
-#### 2.2 Update certificate paths (if changed)
-
-Verify certificate paths in `opensearch_dashboards.yml`:
-
-```yaml
-server.ssl.enabled: true
-server.ssl.certificate: /etc/wazuh-dashboard/certs/dashboard.pem
-server.ssl.key: /etc/wazuh-dashboard/certs/dashboard-key.pem
-
-opensearch.ssl.certificateAuthorities:
-  ['/etc/wazuh-dashboard/certs/root-ca.pem']
-```
-
-#### 2.3 Apply custom branding (if used in 4.x)
-
-Migrate `customization.*` settings to OpenSearch Dashboards branding:
-
-**4.x custom branding:**
-
-```yaml
-# Old - remove from config
-customization.enabled: true
-customization.logo.app: /custom/logo.svg
-```
-
-**5.x branding:**
-
-```yaml
-opensearchDashboards.branding.logo:
-  defaultUrl: 'https://example.com/logo.svg'
-opensearchDashboards.branding.mark:
-  defaultUrl: 'https://example.com/icon.svg'
-opensearchDashboards.branding.applicationTitle: 'Custom Security Dashboard'
-```
-
-See [Custom Branding](custom-branding/custom-branding.md) for complete guide.
-
-### Step 3: Update file permissions
-
-Do not change the ownership of `/usr/share/wazuh-dashboard/`. The package installs it as
-`root:root`, with only `data/` owned by `wazuh-dashboard`, because root runs code from that tree at
-every start. Giving it to the service user would let that account run code as root.
-
-```bash
-# Ensure correct ownership
-sudo chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/
-sudo chown -R wazuh-dashboard:wazuh-dashboard /usr/share/wazuh-dashboard/data/
-
-# Set secure permissions
-sudo chmod 640 /etc/wazuh-dashboard/opensearch_dashboards.yml
-sudo chmod 500 /etc/wazuh-dashboard/certs
-sudo chmod 400 /etc/wazuh-dashboard/certs/*
-```
-
-### Step 4: Start and verify dashboard
-
-```bash
-# Start dashboard
-sudo systemctl daemon-reload
-sudo systemctl enable wazuh-dashboard
-sudo systemctl start wazuh-dashboard
-
-# Monitor startup logs
-sudo journalctl -u wazuh-dashboard -f
-```
-
-Look for the successful startup message:
-
-```
-{"type":"log","@timestamp":"...","tags":["info","http","server","OpenSearchDashboards"],"pid":...,"message":"http server running at https://0.0.0.0:443"}
-```
-
-### Step 5: Import saved objects
-
-1. Log in to the dashboard at `https://your-dashboard-ip/`
-2. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**
-3. Click **Import**
-4. Select your backed-up `.ndjson` file
-5. Handle conflicts:
-   - **Check for existing objects**: Recommended for most cases
-   - **Automatically overwrite**: Use with caution
-6. Click **Import**
-
----
+This is reference material only — for the actual step-by-step procedure, see the
+[migration guide](../guide/migration/README.md). There is no in-place upgrade from 4.x: install
+5.x fresh (see [Installation](getting-started/installation.md)), then follow the migration guide
+to translate configuration, re-import saved objects, and preserve reports before decommissioning
+the 4.x deployment.
 
 ## Post-migration validation
 
@@ -687,46 +508,12 @@ See [Custom Branding](./custom-branding/custom-branding.md).
 
 ---
 
-## Rollback procedure
+## Rollback
 
-If migration fails and you need to rollback:
-
-### 1. Stop 5.x dashboard
-
-```bash
-sudo systemctl stop wazuh-dashboard
-```
-
-### 2. Downgrade package
-
-```bash
-# Debian/Ubuntu
-sudo apt-get install wazuh-dashboard=4.9.0-1 --allow-downgrades
-
-# RHEL/CentOS
-sudo yum downgrade wazuh-dashboard-4.9.0-1
-```
-
-### 3. Restore configuration
-
-```bash
-sudo rm -rf /etc/wazuh-dashboard/
-sudo cp -a /root/backup-wazuh-dashboard-YYYYMMDD/ /etc/wazuh-dashboard/
-```
-
-### 4. Rollback stack components
-
-Follow the same procedure for indexer and manager (in reverse order).
-
-### 5. Restart services
-
-```bash
-sudo systemctl start wazuh-dashboard
-```
-
-> **Warning**: Rollback is complex and may result in data loss. Only perform if absolutely necessary.
-
----
+There is no package downgrade or rollback procedure, because moving to 5.x is a fresh install, not
+an in-place upgrade of the 4.x deployment. If 5.x needs to be abandoned, keep using the existing
+4.x deployment (do not decommission it until the 5.x migration is validated) and remove the 5.x
+installation.
 
 ## Additional migration resources
 

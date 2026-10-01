@@ -155,5 +155,9 @@ service wazuh-dashboard status
 
 ## Migrating from 4.x to 5.x
 
-If you are moving from 4.x to 5.x, review the migration checklist in
-[Migration guide (4.x to 5.x)](migration-4x-5x.md) before applying the upgrade.
+The procedure above only applies to same-major-version upgrades (for example 5.0.0 to 5.1.0).
+There is no upgrade path from 4.x: a 4.x deployment cannot apply the package upgrade above and
+must instead do a fresh 5.x installation alongside it. Follow the
+[migration guide](../guide/migration/README.md) for the full manual migration procedure (data,
+configuration, and dashboards); [Migration guide (4.x to 5.x)](migration-4x-5x.md) is a reference
+of what changed between the two versions, not an in-place upgrade or rollback procedure.
