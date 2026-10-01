@@ -20,7 +20,7 @@ The script auto-detects versions from `plugins/wazuh-core/package.json` and
 internal plugins from `plugins/`. For specific versions:
 
 ```bash
-./dev.sh up -os 2.11.0 -osd 2.11.0
+./dev.sh up -os 3.6.0 -osd 3.6.0
 ```
 
 For environments with agents:
