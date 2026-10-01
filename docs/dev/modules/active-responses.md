@@ -4,9 +4,9 @@ Active responses are a powerful feature of Wazuh that allow you to automate acti
 
 ## Repositories
 
-- [wazuh-dashboard-notifications](https://github.com/wazuh/wazuh-dashboard-notifications): This plugin adds the **Active Responses** app into the **Explore** section of the Wazuh dashboard that allows users to manage the active responses.
-- [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting): This plugin adds the ability to configure active response channels in alerting triggers when the monitor is an **Active Response monitor** (`MONITOR_TYPE.ACTIVE_RESPONSE`, a dedicated Wazuh-added monitor type — not the **Per document monitor** type).
-- [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins): This plugin adds the health check task to create the index pattern related to active responses: `wazuh-active-responses*`.
+- `wazuh-dashboard-notifications`: This plugin adds the **Active Responses** app into the **Explore** section of the Wazuh dashboard that allows users to manage the active responses.
+- `wazuh-dashboard-alerting`: This plugin adds the ability to configure active response channels in alerting triggers when the monitor is an **Active Response monitor** (`MONITOR_TYPE.ACTIVE_RESPONSE`, a dedicated Wazuh-added monitor type — not the **Per document monitor** type).
+- `wazuh-dashboard-plugins` (this repository): This plugin adds the health check task to create the index pattern related to active responses: `wazuh-active-responses*`.
 
 ### wazuh-dashboard-notifications
 

@@ -42,7 +42,7 @@ To use the `build-packages.sh` script, you first need to generate the packages f
 
 Follow the steps below to build the packages:
 
-1. Clone the [wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, navigate to the `wazuh-dashboard/` directory, and build the application:
+1. Clone the `wazuh-dashboard` repository, navigate to the `wazuh-dashboard/` directory, and build the application:
 
 > Replace the `GIT_REF` by the Wazuh dashboard branch or tag in the `wazuh-dashboard` repository, e.g. `v5.0.0`.
 
@@ -57,7 +57,7 @@ yarn build-platform --linux --skip-os-packages --release
 
 > Note: for `arm` architecture uses `--linux-arm` instead of `--linux`.
 
-2. Clone the [wazuh-security-dashboards-plugin](https://github.com/wazuh/wazuh-security-dashboards-plugin.git) repository in the `wazuh-dashboard/plugins` folder and build the plugin:
+2. Clone the `wazuh-security-dashboards-plugin` repository in the `wazuh-dashboard/plugins` folder and build the plugin:
 
 > Run the following commands while in the `wazuh-dashboard/` directory.
 > Replace the `GIT_REF` by the branch or tag for the security plugin, e.g. `v5.0.0`.
@@ -71,7 +71,7 @@ yarn
 yarn build
 ```
 
-3. Clone the [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-plugins/` folder, and build the plugins:
+3. Clone the `wazuh-dashboard-plugins` repository (this repository) in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-plugins/` folder, and build the plugins:
 
 > The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh dashboard plugins, e.g. `v5.0.0`.
@@ -86,7 +86,7 @@ nvm use $(cat .nvmrc)
 cp -r plugins/* ../
 ```
 
-The plugin in the `main` directory needs a git reference to an existent branch or tag in the [`wazuh-indexer-plugins`](https://github.com/wazuh/wazuh-indexer-plugins) repository to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
+The plugin in the `main` directory needs a git reference to an existent branch or tag in the `wazuh-indexer-plugins` repository to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
 
 ```bash
 cd ../main
@@ -103,7 +103,7 @@ yarn
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
 ```
 
-4. Clone the [wazuh-dashboard-reporting](https://github.com/wazuh/wazuh-dashboard-reporting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
+4. Clone the `wazuh-dashboard-reporting` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
 
 > The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh reporting plugin, e.g. `v5.0.0`.
@@ -117,7 +117,7 @@ yarn
 yarn build
 ```
 
-5. Clone the [wazuh-dashboard-security-analytics](https://github.com/wazuh/wazuh-dashboard-security-analytics.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-security-analytics/` folder, and build the plugin:
+5. Clone the `wazuh-dashboard-security-analytics` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-security-analytics/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh Ruleset Management plugin, e.g. `v5.0.0`.
@@ -131,7 +131,7 @@ yarn
 yarn build
 ```
 
-6. Clone the [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-alerting/` folder, and build the plugin:
+6. Clone the `wazuh-dashboard-alerting` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-alerting/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh alerting plugin, e.g. `v5.0.0`.
@@ -145,7 +145,7 @@ yarn
 yarn build
 ```
 
-7. Clone the [wazuh-dashboard-notifications](https://github.com/wazuh/wazuh-dashboard-notifications.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-notifications/` folder, and build the plugin:
+7. Clone the `wazuh-dashboard-notifications` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-notifications/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh notifications plugin, e.g. `v5.0.0`.
@@ -304,7 +304,7 @@ Ensure that these dependencies are installed on the system.
 
 ### Building the Wazuh dashboard package using Docker
 
-1. Clone the [wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, navigate to the `wazuh-dashboard/dev-tools/build-packages/base-packages-to-base` directory, and build the application.
+1. Clone the `wazuh-dashboard` repository, navigate to the `wazuh-dashboard/dev-tools/build-packages/base-packages-to-base` directory, and build the application.
 
 ```bash
 WAZUH_DASHBOARDS_BRANCH=<REPLACE_PLACEHOLDER>

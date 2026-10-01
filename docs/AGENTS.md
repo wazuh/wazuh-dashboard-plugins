@@ -38,3 +38,29 @@ another repository, name the repository and the path in code format.
 | `[VERSION.json](https://github.com/wazuh/wazuh-dashboard/blob/main/VERSION.json)`                       | `VERSION.json` at the `wazuh-dashboard` repository                                         |
 
 Links to files in this repository use relative paths (`../agent-deploy-one-liner.md#enrollment-token`).
+
+**Exceptions**: the rule is about _other_ repositories. A link to this repository
+(`wazuh/wazuh-dashboard-plugins`) is not a violation — use a relative path instead, per the line
+above. Naming a repository in a code span without turning it into a link (for example
+`` `wazuh/wazuh-dashboard` `` in prose) is not a violation either; the rule only targets clickable,
+branch-pinned URLs that can go stale or resolve to the wrong version.
+
+## 📄 Registering new pages
+
+`book.toml` sets `create-missing = false`: mdBook will **not** auto-create a page just because
+`SUMMARY.md` links to it, and a page that exists under `docs/` but isn't listed in `SUMMARY.md` is
+not part of the book (not navigable, not searched, not built). Every new page must be added to
+`SUMMARY.md` by hand, in the position matching its place in the book's structure.
+
+## 🖼️ Where images go
+
+Place a page's images in an `images/` subdirectory next to the Markdown file(s) that reference
+them (for example `docs/ref/modules/active-response/images/`,
+`docs/ref/custom-branding/images/`), and reference them with a relative path
+(`./images/<file>.png`).
+
+## 🏷️ The `no-changelog` label
+
+Tooling, test-only, and docs-only pull requests (like fixes to this `docs/` tree) use the
+`no-changelog` label and add no `CHANGELOG.md` entry — see the repository's own
+[pull request guide](dev/pull-requests.md) for the full CHANGELOG policy.

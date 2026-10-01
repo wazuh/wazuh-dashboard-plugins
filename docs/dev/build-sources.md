@@ -11,9 +11,8 @@ distributable ZIP packages for development or manual installation.
 
 - Toolchain configured as described in [Setup Environment](setup.md)
 - `jq` installed (used to read plugin versions)
-- Git reference (branch or tag) from
-  [wazuh-indexer-plugins](https://github.com/wazuh/wazuh-indexer-plugins)
-  compatible with your plugin version
+- Git reference (branch or tag) from the `wazuh-indexer-plugins` repository, compatible with your
+  plugin version
 - Docker dev environment available (see [Run from Sources](run-sources.md))
 
 ## Install dependencies
