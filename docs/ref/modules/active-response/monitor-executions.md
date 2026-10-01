@@ -1,6 +1,6 @@
 # Monitor active response executions
 
-Every time an active response fires, the **Discover** view (under the `wazuh-active-responses*` index pattern) is the authoritative trace: it records every invocation issued by the dashboard and forwarded by the manager. On the target agent, additional traces may be available depending on the script:
+Every time an active response fires, the **Discover** view (under the `wazuh-active-responses*` index pattern) is the authoritative trace: it records every invocation written by the Wazuh indexer's own Notifications plugin and polled by the manager. On the target agent, additional traces may be available depending on the script:
 
 - **Lifecycle events** — the agent service logs receipt and dispatch of the command in `/var/ossec/logs/ossec.log`. To see the command execution was received by the agent, increase the verbosity of `execd.debug` to `2` (require restart if changed) in the internal options (`/var/ossec/etc/local_internal_options.conf` or `/var/ossec/etc/internal_options.conf`).
 - **Script output** — if the executable writes to `/var/ossec/logs/active-responses.log` (most built-in scripts do), you will also see a per-execution line there. Custom scripts decide their own logging destination, so absence from this file is not by itself an error.
