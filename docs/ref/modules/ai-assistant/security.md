@@ -92,11 +92,11 @@ Provider API keys can be encrypted with **AES-256-GCM** using a key supplied thr
 dashboard configuration (`wazuh_ai_assistant.encryptionKey`; prefer the OpenSearch Dashboards
 keystore). The implementation is Node's builtin `crypto` only — no new dependency.
 
-- The format, `enc:v1:`, binds each ciphertext to its own saved object via GCM
-  **Additional Authenticated Data** (`wazuh-ai-assistant-provider:<saved object id>:apiKey`).
-  Copying an encrypted blob into another provider's field — via saved-objects import, restore,
-  or any write path that bypasses the plugin — fails decryption hard instead of silently handing
-  the wrong provider a working key.
+- The format, `enc:v1:`, binds each ciphertext to its own provider record via GCM
+  **Additional Authenticated Data** (`wazuh-ai-assistant-provider:<provider id>:apiKey`). Copying
+  an encrypted blob into another provider's field — via a direct indexer write or any path that
+  bypasses the plugin — fails decryption hard instead of silently handing the wrong provider a
+  working key.
 - Unset by default, but required to save API keys: without a key configured, provider writes
   carrying an API key are rejected (a startup warning is also logged). Plaintext keys are never
   supported or managed: a value stored by an earlier pre-release build fails decryption and must
@@ -114,7 +114,7 @@ Full format and threat-model details: `plugins/wazuh-ai-assistant/docs/ENCRYPTIO
   [Tool catalog](./tool-catalog.md#guardrails)): injected timeout, size clamps, bounded time
   windows, aggregation caps, script/regexp/leading-wildcard blocks, index-pattern allowlist.
 - **Storage caps**: 500 conversations per user; title/message/count limits prevent unbounded
-  saved-object growth.
+  growth of stored conversations.
 
 ## What leaves the cluster
 
@@ -136,8 +136,10 @@ privacy on/off badge.
 ## Conversation isolation
 
 Conversations are owner-scoped: list endpoints return only the caller's summaries, and requests
-for another owner's conversation return `404` — existence is never leaked across owners. The
-saved-object types are `hidden: true`, invisible to the generic saved-objects API and export UI.
+for another owner's conversation return `404` — existence is never leaked across owners.
+Conversations are not saved objects — the plugin registers none — so they never appear in the
+generic saved-objects API or export UI; isolation is enforced by the indexer's own
+document-level security plus an application-level `user` filter on every query.
 
 A saved conversation stores what the user actually saw, so that resuming one restores the same
 conversation rather than a summary of it: the prose turns, their timestamps, the result tables

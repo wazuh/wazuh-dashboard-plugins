@@ -1,10 +1,12 @@
 # Encryption at rest for provider API keys
 
-Provider API keys (`wazuh-ai-assistant-provider` saved object's `apiKey` attribute) are never
-returned by this plugin's public API — `GET/POST/PUT /api/wazuh_ai_assistant/providers` only ever
-expose a `hasApiKey` boolean (see `server/routes/settings.ts`'s `toSummary`). But the saved object
-itself is stored in the `.kibana`/saved-objects index, which is readable in plaintext by anyone
-with direct access to that index (e.g. via the Wazuh indexer API, snapshots, or index backups).
+Provider API keys (a provider record's `apiKey` attribute) are never returned by this plugin's
+public API — `GET/POST/PUT /api/wazuh_ai_assistant/providers` only ever expose a `hasApiKey`
+boolean (see `server/routes/settings.ts`'s `toSummary`). The plugin registers no saved-object
+types: provider records are stored through the Wazuh indexer's own
+`/_plugins/_setup/ai_assistant/providers` API, which is readable in plaintext by anyone with
+direct access to that backing index (e.g. via the indexer's own API, snapshots, or index
+backups).
 
 This plugin can encrypt `apiKey` at rest with AES-256-GCM using a key supplied through Wazuh dashboard
 own config file — no new npm dependency, no separate secrets service, Node's builtin
@@ -44,7 +46,7 @@ own config file — no new npm dependency, no separate secrets service, Node's b
    is `ENABLED` (info) or `DISABLED` (a **warning**, since provider API keys cannot be saved until
    it is configured) — never the key itself; see `server/plugin.ts`'s `setup()`.
 4. Nothing else to do: every provider API key created or updated (via the Settings UI's provider
-   form) from this point on is encrypted before being written to the saved object.
+   form) from this point on is encrypted before being written to the provider record.
 
 ## What happens if you don't set it
 
@@ -86,19 +88,19 @@ Provider API keys are encrypted as **`enc:v1:<base64>`** using AES-256-GCM with 
 base64 payload is `iv (12 bytes) ‖ auth tag (16 bytes) ‖ ciphertext`.
 
 The GCM call additionally binds an **Additional Authenticated Data (AAD)** value:
-`wazuh-ai-assistant-provider:<saved object id>:apiKey` (built by the one shared `buildAad` helper
+`wazuh-ai-assistant-provider:<provider id>:apiKey` (built by the one shared `buildAad` helper
 in `server/crypto/api-key-cipher.ts` that both `encrypt` and `decrypt` call, so the two can never
 disagree on the exact bytes). This mirrors OSD core's own `data_source` plugin — the platform
 precedent for this exact AES-256-GCM/IV-12/tag-16 construction — which binds its own wrapping-key
 name and namespace into its ciphertexts for the same reason.
 
 **What this prevents:** without an AAD binding, a ciphertext blob would be bare and portable —
-anyone able to write saved-object attributes (a saved-objects import, a bug elsewhere, an admin
-mistake, or a lower-privilege actor with unexpected write access) could copy provider A's
-encrypted `apiKey` value into provider B's `apiKey` field (or any other field entirely) and it
-would still decrypt there, silently handing provider B the wrong key. Binding the AAD to the exact
-saved-object id (and a fixed `apiKey` purpose label) turns that copy into a **hard decrypt
-failure**: GCM authenticates the AAD together with the ciphertext, so a value decrypted under the
+anyone able to write provider attributes directly (a direct indexer write bypassing the plugin, a
+bug elsewhere, an admin mistake, or a lower-privilege actor with unexpected write access) could
+copy provider A's encrypted `apiKey` value into provider B's `apiKey` field (or any other field
+entirely) and it would still decrypt there, silently handing provider B the wrong key. Binding the
+AAD to the exact provider id (and a fixed `apiKey` purpose label) turns that copy into a **hard
+decrypt failure**: GCM authenticates the AAD together with the ciphertext, so a value decrypted under the
 wrong id fails auth-tag verification exactly the same way a tampered ciphertext byte would — never
 a silent, wrong-provider success. This is a ciphertext-substitution / confused-deputy defense, not
 a confidentiality feature on its own.
@@ -106,25 +108,24 @@ a confidentiality feature on its own.
 Anything not starting with `enc:v1:` is rejected by `decrypt()` — plaintext API keys are not
 supported.
 
-### The saved-object-id parameter
+### The `savedObjectId` parameter
 
 `ApiKeyCipher.encrypt(plaintext, savedObjectId)` and `ApiKeyCipher.decrypt(stored, savedObjectId)`
-both take the provider's saved-object id as a **mandatory** second parameter — the id the AAD is
-bound to. Required, never optional, so no call site can forget to supply the real id. Every call
-site in `server/routes/settings.ts` and `server/routes/chat.ts` threads the real provider id
-through.
+both take the provider id as a **mandatory** second parameter — the id the AAD is bound to
+(named `savedObjectId` for historical reasons, even though providers are indexer-stored records,
+not saved objects). Required, never optional, so no call site can forget to supply the real id.
+Every call site in `server/routes/settings.ts` and `server/routes/chat.ts` threads the real
+provider id through.
 
-One subtlety this created: `POST /providers` (create) needs the id to encrypt the key, but the
-saved-objects `create()` call is what normally mints that id — not available until after it
-returns. Rather than create the object first and `update()` it a moment later with the real
-ciphertext (two separate writes, with a genuine "provider left with no key" failure window if the
-second write fails), the create route pre-generates the id client-side with `crypto.randomUUID()`
-and passes it through the saved-objects client's explicit-id create option
-(`client.create(type, attributes, {id})`) — the same explicit-id contract this plugin already
-relies on elsewhere (the `wazuh-ai-assistant-settings` singleton is created with a fixed id the same
-way). This keeps provider creation a single atomic write: it either fully succeeds (the provider
-exists, with its `apiKey` already correctly bound to its own id) or fully fails and nothing is
-created at all — there is no intermediate state where a provider exists without a working key.
+One subtlety this created: `POST /providers` (create) needs the id to encrypt the key before the
+indexer's create call has run. Rather than create the record first and update it a moment later
+with the real ciphertext (two separate writes, with a genuine "provider left with no key" failure
+window if the second write fails), the create route pre-generates the id client-side with
+`crypto.randomUUID()` (`server/routes/settings.ts`'s `providerId`) and sends it as part of the
+single `POST .../providers` request body. This keeps provider creation a single atomic write: it
+either fully succeeds (the provider exists, with its `apiKey` already correctly bound to its own
+id) or fully fails and nothing is created at all — there is no intermediate state where a provider
+exists without a working key.
 
 ## Key rotation
 
@@ -137,15 +138,15 @@ new key).
 
 ## Threat model notes
 
-- This protects `apiKey` against read access to the saved-objects index/snapshots. It does not
+- This protects `apiKey` against read access to the indexer's backing index/snapshots. It does not
   protect against an attacker who can read `opensearch_dashboards.yml` (which holds the key
   itself) or who can reach the running dashboard process's memory.
 - The key never leaves the server: it is not exposed to the browser (`exposeToBrowser: {}` in
   `server/config.ts`) and is never logged (`server/plugin.ts` logs only an ENABLED/DISABLED
   boolean).
 - The AAD binding (see "Format" above) additionally protects against ciphertext substitution: even
-  someone able to write raw `apiKey` bytes into a saved object (bypassing this plugin's own routes
-  entirely — e.g. via a saved-objects import/restore, or a bug in an unrelated code path) cannot
+  someone able to write raw `apiKey` bytes into a provider record (bypassing this plugin's own
+  routes entirely — e.g. via a direct indexer write, or a bug in an unrelated code path) cannot
   make a copied `enc:v1:` blob from a different provider decrypt successfully. A value only ever
-  decrypts under the exact saved-object id it was encrypted for; anything else is a hard failure,
+  decrypts under the exact provider id it was encrypted for; anything else is a hard failure,
   never a silent wrong-key success.

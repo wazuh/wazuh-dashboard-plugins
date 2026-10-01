@@ -49,8 +49,10 @@ five whitelisted sample rows); the full result renders locally as a table in the
 
 ### Conversations
 
-Chat history is persisted as **owner-scoped saved objects** (`wazuh-ai-assistant-conversation`).
-Each user only ever sees their own conversations; a request for another owner's conversation
+Chat history is persisted **owner-scoped** in the `wazuh-ai-assistant-sessions` index, reached
+through the Wazuh indexer's own `/_plugins/_setup/ai_assistant/sessions` API — the plugin
+registers no saved-object types. Each user only ever sees their own conversations; a request for
+another owner's conversation
 returns `404` (never `403`), so cross-owner existence is not leaked. Updates use optimistic
 concurrency so two tabs cannot silently overwrite each other.
 
