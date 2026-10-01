@@ -215,20 +215,10 @@ The script generates the package in the `output` folder of the same directory wh
 
 ### Credentials resolver
 
-The package includes the credential resolver described in
-[Credentials](../ref/getting-started/credentials.md). It has two halves, and only one of them lives
-in the `wazuh-dashboard` repository:
-
-- `dev-tools/build-packages/credentials/resolve-credentials.sh`: the dashboard-specific half. It is
-  installed as `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`). Its
-  [README](https://github.com/wazuh/wazuh-dashboard/blob/5.0.0/dev-tools/build-packages/credentials/README.md)
-  documents the modes and the internals.
-- `wazuh-credentials.sh`: the shared half (credentials file format, locking, path validation, CA
-  handling), common to the indexer, the manager and the dashboard. It is owned by
-  [wazuh-installation-assistant](https://github.com/wazuh/wazuh-installation-assistant) under
-  `credentials_lib/`, and is **downloaded at build time** into `lib/wazuh-credentials.sh`
-  (`root:root 0644`). It is not committed to `wazuh-dashboard`, so the copies used by
-  the three components cannot drift apart.
+The package includes the credential resolver described in [Credentials](../ref/getting-started/credentials.md)
+and, for the two-halves design, [Credential and TLS resolution](credentials.md). This section only
+covers the build-time download mechanism for the shared half (`wazuh-credentials.sh`), which is not
+committed to `wazuh-dashboard`.
 
 `build-packages.sh` downloads the library from
 `https://raw.githubusercontent.com/wazuh/wazuh-installation-assistant/<ref>/credentials_lib/wazuh-credentials.sh`,
