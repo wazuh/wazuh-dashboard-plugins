@@ -6,7 +6,7 @@ Before you start coding, read the sections below: they cover how to open good pu
 
 ## Pull Requests
 
-These are the standard procedures for creating, updating, and reviewing Pull Requests across the Wazuh Dashboard repositories.
+These are the standard procedures for creating, updating, and reviewing Pull Requests across the Wazuh dashboard repositories.
 
 ### Lifecycle
 
@@ -144,7 +144,7 @@ If you're unsure whether your PR qualifies, default to adding an entry, or ask a
 
 ## Workflows and Actions
 
-This section defines the naming conventions and operational rules for the GitHub Actions and Workflows used across the Wazuh Dashboard repositories.
+This section defines the naming conventions and operational rules for the GitHub Actions and Workflows used across the Wazuh dashboard repositories.
 
 ### Naming convention
 

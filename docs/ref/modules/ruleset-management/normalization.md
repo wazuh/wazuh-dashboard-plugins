@@ -1,6 +1,6 @@
 # Normalization
 
-The **Normalization** module is part of the **Ruleset Management** section in the Wazuh Dashboard. It provides visibility and management over the components that govern how raw log data is parsed, enriched, and structured before it is used for detection and analysis.
+The **Normalization** module is part of the **Ruleset Management** section in the Wazuh dashboard. It provides visibility and management over the components that govern how raw log data is parsed, enriched, and structured before it is used for detection and analysis.
 
 This module exposes the following sections:
 

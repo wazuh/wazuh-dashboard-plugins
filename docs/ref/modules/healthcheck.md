@@ -2,7 +2,7 @@
 
 The health check provides a mechanism to add and run checks that are needed for the different modules of the application.
 
-The details of the overall status or checks can be seen through the **Dashboard management** > **Health Check** app.
+The details of the overall status or checks can be seen through the **Dashboard management > Health Check** app.
 
 The plugins can register task to be checked. These uses the context of the internal user of the dashboard, so this means the tasks related to saved objects such as index patterns are only checked in the `Global` tenant.
 
@@ -204,7 +204,7 @@ healthcheck.checks_enabled:
 
 # Application
 
-The health check data can be explored in the **Dashboard management** > **Health Check** app.
+The health check data can be explored in the **Dashboard management > Health Check** app.
 
 This displays information about the overall result and checks details. It allows to export the health check data to JSON to be shared for troubleshooting.
 

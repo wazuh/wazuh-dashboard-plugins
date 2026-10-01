@@ -1,6 +1,6 @@
 # Ruleset Management
 
-**Ruleset Management** is a core section of the Wazuh Dashboard that provides the tools required to manage the full lifecycle of log normalization and event-based detection. It brings together the configuration of integrations, decoders, key-value databases, and detection rules under a unified interface backed by the Wazuh Engine.
+**Ruleset Management** is a core section of the Wazuh dashboard that provides the tools required to manage the full lifecycle of log normalization and event-based detection. It brings together the configuration of integrations, decoders, key-value databases, and detection rules under a unified interface backed by the Wazuh Engine.
 
 ## Modules
 

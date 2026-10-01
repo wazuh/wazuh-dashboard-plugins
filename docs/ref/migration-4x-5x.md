@@ -41,7 +41,7 @@ Before starting the migration:
 
 #### Back up saved objects
 
-1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**
+1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**
 2. Click **Export all**
 3. Save the exported `.ndjson` file to a safe location
 4. Alternatively, use the API. Replace `<ADMIN_PASSWORD>` with the password of the 4.x `admin` user:
@@ -102,7 +102,7 @@ Review the full `CHANGELOG.md` at the repository root and note:
 The standalone `wazuh.yml` configuration file is **removed** in 5.x. All plugin settings have been moved to:
 
 1. **`opensearch_dashboards.yml`** - Core settings
-2. **Advanced Settings UI** - Tenant-level preferences
+2. **Advanced settings UI** - Tenant-level preferences
 
 **Migration path**:
 
@@ -138,9 +138,9 @@ wazuh_core.hosts:
     run_as: false
 ```
 
-**5.x (Advanced Settings UI):**
+**5.x (Advanced settings UI):**
 
-- Navigate to **☰ Menu > Dashboard Management > Advanced Settings**
+- Navigate to **☰ Menu > Dashboards Management > Advanced settings**
 - Configure tenant-level settings:
   - `timeout`: 20000
   - Other UI preferences
@@ -195,16 +195,16 @@ If you have custom scripts or integrations:
 
 #### Removed features
 
-- **Legacy App Settings**: Use **☰ Menu > Dashboard Management > Advanced Settings** or `opensearch_dashboards.yml`
+- **Legacy App Settings**: Use **☰ Menu > Dashboards Management > Advanced settings** or `opensearch_dashboards.yml`
 - **Deprecated modules**: Some 4.x experimental modules removed
 
 #### Renamed navigation paths
 
-| 4.x Path                   | 5.x Path                                 |
-| -------------------------- | ---------------------------------------- |
-| `/app/wazuh#/overview`     | `/app/wz-home`                           |
-| `/app/wazuh#/settings`     | Dashboard Management > Advanced Settings |
-| `/app/wazuh#/health-check` | **Dashboard management > Health Check**  |
+| 4.x Path                   | 5.x Path                                  |
+| -------------------------- | ----------------------------------------- |
+| `/app/wazuh#/overview`     | `/app/wz-home`                            |
+| `/app/wazuh#/settings`     | Dashboards Management > Advanced settings |
+| `/app/wazuh#/health-check` | **Dashboard management > Health Check**   |
 
 ---
 
@@ -390,7 +390,7 @@ Look for the successful startup message:
 ### Step 5: Import saved objects
 
 1. Log in to the dashboard at `https://your-dashboard-ip/`
-2. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**
+2. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**
 3. Click **Import**
 4. Select your backed-up `.ndjson` file
 5. Handle conflicts:
@@ -449,7 +449,7 @@ Expected response:
 
 ### 4. Verify index patterns
 
-Navigate to **☰ Menu > Dashboard Management > Index patterns**:
+Navigate to **☰ Menu > Dashboard management > Dashboards Management > Index patterns**:
 
 - Default pattern `wazuh-events-v5*` exists
 - Time field is `@timestamp`
@@ -575,7 +575,7 @@ Wazuh API is not reachable
 
 1. **Re-import saved objects**:
 
-   - Go to **Dashboard management > Dashboard Management > Saved objects > Import**
+   - Go to **Dashboard management > Dashboards Management > Saved objects > Import**
    - Select backed-up `.ndjson` file
    - Choose **Automatically overwrite conflicts**
 

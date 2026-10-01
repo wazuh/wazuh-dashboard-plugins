@@ -5,7 +5,7 @@ The following walkthrough shows how to create an active response that blocks the
 **Prerequisites:**
 
 - Wazuh indexer, manager, and dashboard running version **5.0.0** or later.
-- The `wazuh-active-responses*` index pattern available in **Dashboard Management → Index Patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
+- The `wazuh-active-responses*` index pattern available in **Dashboard management → Dashboards Management → Index patterns**. The dashboard creates it automatically at startup; contact your administrator if it is missing.
 
 > **Note:** creating the active response only stores the executable name. For the remediation to actually run when the monitor fires, the executable must be available on the target agent — see [Concepts → About the executable](index.md#about-the-executable).
 

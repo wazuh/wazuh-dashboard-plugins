@@ -125,7 +125,7 @@ The dashboard reads the certificate files from disk when establishing the first 
 
 The `verify_ca` field exposed in the **Server API** management table is derived automatically from the presence of the `ca` path in the host configuration. It is not a configurable field.
 
-> **Cache note:** The HTTPS agent is created once per host and cached in memory. If certificate files are replaced on disk, the Wazuh Dashboard process must be restarted for the new files to take effect.
+> **Cache note:** The HTTPS agent is created once per host and cached in memory. If certificate files are replaced on disk, the Wazuh dashboard process must be restarted for the new files to take effect.
 
 ### Certificate path resolution
 
@@ -176,7 +176,7 @@ wazuh_core.hosts:
 
 # Tenant configuration
 
-Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management** > **Dashboard Management** > **Advanced settings**:
+Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management** > **Dashboards Management** > **Advanced settings**:
 
 | Setting                | Description                                                                                                                                                  | Default value | Allowed values                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------- |

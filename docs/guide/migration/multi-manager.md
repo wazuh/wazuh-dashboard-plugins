@@ -181,7 +181,7 @@ When CCS is active, the dashboard:
 
 5. In the Wazuh dashboard, create an index pattern that spans multiple clusters:
 
-   - Navigate to **☰ Menu > Dashboard Management > Index patterns**.
+   - Navigate to **☰ Menu > Dashboard management > Dashboards Management > Index patterns**.
    - Create a new pattern such as `*:wazuh-events*` to include all registered remote clusters, or use `cluster-b:wazuh-events*` to target a specific one.
 
 6. Build dashboards and visualizations using the cross-cluster index pattern.

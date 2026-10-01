@@ -115,7 +115,7 @@ You can now access the Wazuh dashboard via: `https://<DASHBOARD_IP_ADDRESS>`.
    [Pre-Upgrade Requirements](#pre-upgrade-requirements) above, if required — this guide has no
    separate export step of its own.
 
-- Navigate to **Dashboard management** > **Dashboard Management** > **Saved objects** on the Wazuh dashboard.
+- Navigate to **Dashboard management** > **Dashboards Management** > **Saved objects** on the Wazuh dashboard.
 - Click **Import**, add the ndjson file and click **Import**.
 
 > **Note:**

@@ -1,6 +1,6 @@
 # Detection
 
-The **Detection** module is part of the **Ruleset Management** section in the Wazuh Dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
+The **Detection** module is part of the **Ruleset Management** section in the Wazuh dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
 
 This module exposes the following sections:
 

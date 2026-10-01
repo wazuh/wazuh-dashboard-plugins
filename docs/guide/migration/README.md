@@ -34,7 +34,7 @@ The following areas of the Wazuh dashboard have changed significantly between 4.
 | Plugin reporting feature                        | Built-in; PDFs stored at `<path.data>/wazuh/downloads/reports/<hashed_username>/` | **Deprecated**; replaced by the OpenSearch Dashboards Reporting plugin                                                                                                         |
 | Multiple Wazuh manager APIs                     | Supported via UI API selector                                                     | One active manager by default; multiple `wazuh_core.hosts` entries require [Cross-Cluster Search](./multi-manager.md#option-d-cross-cluster-search-with-multiple-manager-apis) |
 | Navigation — home                               | `/app/wazuh#/overview`                                                            | `/app/wz-home`                                                                                                                                                                 |
-| Navigation — settings                           | `/app/wazuh#/settings`                                                            | **☰ Menu > Dashboard Management > Advanced Settings**                                                                                                                          |
+| Navigation — settings                           | `/app/wazuh#/settings`                                                            | **☰ Menu > Dashboards Management > Advanced settings**                                                                                                                         |
 | Navigation — health check                       | `/app/wazuh#/health-check`                                                        | **☰ Menu > Dashboard management > Health Check**                                                                                                                               |
 
 ## Migration topics
@@ -76,7 +76,7 @@ See [Reports](./reports.md) for details on what can and cannot be migrated.
 
 Export only the dashboards and visualizations you created or modified. Default Wazuh objects are re-provisioned automatically in 5.x and must not be re-imported.
 
-1. In the Wazuh dashboard, navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**.
+1. In the Wazuh dashboard, navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**.
 2. Select the checkboxes next to each custom dashboard or visualization and click **Export**.
 3. Enable **Include related objects** and save the resulting `.ndjson` file to a secure location.
 

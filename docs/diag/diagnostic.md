@@ -69,11 +69,11 @@ The cookie is set when getting the cluster information after the server API is s
 
 This means the expected index pattern used as data source for a view or panel could not be found.
 
-This is usually caused because the expected index pattern does not exist. Go to Dashboard Management to create the expected index pattern if there are matching indices else it could indicate the data collection is disabled or there is a problem.
+This is usually caused because the expected index pattern does not exist. Go to Dashboard management > Dashboards Management to create the expected index pattern if there are matching indices else it could indicate the data collection is disabled or there is a problem.
 
 In some cases, it searches by index pattern ID, and in others, this could be the ID or title. This requirement is specified in the error depending on the view or panel.
 
-1. Check if the specified index pattern exists in Dashboard Management > Index Patterns.
+1. Check if the specified index pattern exists in Dashboard management > Dashboards Management > Index patterns.
 2. If missing, create the index pattern if matching indices are available.
 3. If no matching indices exist:
 

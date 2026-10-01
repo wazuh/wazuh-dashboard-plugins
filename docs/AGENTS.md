@@ -2,7 +2,7 @@
 
 ## 🎯 Document Focus and Perspective
 
-The documentation should focus on **Wazuh Dashboard as an independent product or application**, and not only at the level of Wazuh _plugins_ or excessive references to OpenSearch.
+The documentation should focus on **Wazuh dashboard as an independent product or application**, and not only at the level of Wazuh _plugins_ or excessive references to OpenSearch.
 
 The main objective is for this to be a complete resource (**source of truth**) that reduces the need to rewrite responses to common or frequently asked questions.
 
