@@ -288,8 +288,8 @@ Example:
 ```bash
 cd wazuh-dashboard
 DASHBOARD_COMMIT_SHA=$(git rev-parse --short HEAD)
-PLUGINS_COMMIT_SHA=$(git -C plugins/wazuh-security-dashboards-plugin rev-parse --short HEAD)
-SECURITY_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-plugins rev-parse --short HEAD)
+PLUGINS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-plugins rev-parse --short HEAD)
+SECURITY_COMMIT_SHA=$(git -C plugins/wazuh-security-dashboards-plugin rev-parse --short HEAD)
 REPORTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-reporting rev-parse --short HEAD)
 SECURITY_ANALYTICS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-security-analytics rev-parse --short HEAD)
 ALERTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-alerting rev-parse --short HEAD)
