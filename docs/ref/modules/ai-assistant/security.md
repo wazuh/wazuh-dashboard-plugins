@@ -25,8 +25,10 @@ writes run as the calling user (`asCurrentUser`) against the Wazuh indexer's own
 `/_plugins/_setup/ai_assistant/...` endpoints — the indexer's own
 `plugin:wazuh/ai_assistant/settings/{read,write}` permissions on that identity's backend role are
 what authorize each request (see [Required indexer permissions](#required-indexer-permissions)
-below). `GET /providers` stays readable by any authenticated user regardless, because the Chat
-view needs the provider list — it never returns a key, only `hasApiKey`.
+below), including `GET /providers` in the Settings view. It never returns a key, only
+`hasApiKey`. The Chat view's own provider lookup is a separate code path
+(`server/routes/chat.ts`) that does not require `settings/read`, so any authenticated user can
+chat with whichever provider they select regardless of their own settings permissions.
 
 An operator can additionally lock every settings/provider write with
 `wazuh_ai_assistant.settingsReadOnly` (see
@@ -60,8 +62,9 @@ checked against the chatting user's own backend role, not just an admin's.
 | Permission                                                                                                                                                                                                                                        | Type    | Why                                                                                                                                                                                                                                                                |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | Index `read` (dls: `{"term": {"user": "${user.name}"}}`) + `write` (dsl: `{"term": {"user": "${user.name}"}}`) on `wazuh-ai-assistant-sessions*`, `.ds-wazuh-ai-assistant-sessions-*` — or a bundled `wazuh_ai_assistant` role providing the same | Index   | Persist and retrieve the caller's own conversation turns. Enforced twice: indexer document-level security (a `{"term": {"user": "${user.name}"}}` filter on the role) **and** an application-level `user` filter on every query — defense in depth, not either/or. |
+| `plugin:wazuh/ai_assistant/session/write`                                                                                                                                                                                                         | Cluster | Create, update and delete the caller's own AI assistant sessions — bundled into the `wazuh_ai_assistant` role alongside the index permission above.                                                                                                                |
 | `plugin:wazuh/ai_assistant/settings/read`                                                                                                                                                                                                         | Cluster | Resolve the default provider and privacy settings needed to start or continue a turn (`GET /_plugins/_setup/ai_assistant/settings`).                                                                                                                               |
-| `cluster:admin/opendistro/ism/policy/get`                                                                                                                                                                                                         | Cluster | Read the `ai-assistant-sessions-policy` ISM policy — extract the value for `conversationsRetentionDays` setting                                                                                                                                                    |
+| `cluster:admin/opendistro/ism/policy/get`                                                                                                                                                                                                         | Cluster | Read the `ai-assistant-sessions-policy` ISM policy — extract the value for `conversationRetentionDays` setting                                                                                                                                                     |
 
 ### Manage settings (providers, privacy, conversation history)
 
