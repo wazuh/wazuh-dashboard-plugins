@@ -77,13 +77,12 @@ plugin's `build/` directory:
 
 ## Build inside Docker
 
-Docker is required to run these steps: the canonical dev/test environment is Docker, since a host
-build fails without OSD's `setup_node_env` and the required OpenSearch Dashboards build helpers,
-which only the Docker-based development environment provides.
-
-Use [Run from Sources](run-sources.md) to start the environment and attach a
+`yarn build` runs `node ../../scripts/plugin_helpers`, so the plugins must sit inside an
+OpenSearch Dashboards (`wazuh-dashboard`) source tree. The Docker-based development environment
+provides one: use [Run from Sources](run-sources.md) to start the environment and attach a
 shell, then execute the install and build steps above from within the
-container.
+container. Docker is not strictly required: the host flow in [Build Packages](build-packages.md)
+copies the plugins into a `wazuh-dashboard` checkout and builds them there.
 
 ## Next steps
 

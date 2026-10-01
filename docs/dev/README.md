@@ -1,4 +1,4 @@
-# Development Documentation
+# Development documentation
 
 See [Setup Environment](setup.md) for the full toolchain prerequisites (Node.js, Yarn, Docker) and
 per-plugin dependency installation. The steps below cover the repository-root setup only.
@@ -27,16 +27,18 @@ cd plugins/main
 yarn lint
 ```
 
-This command will lint the code on the changed files.
+This command lints every file under the plugin's `public/`, `server/` and `common/` folders, not
+only the changed ones.
 
 ## Formatting
 
-`yarn format` does not exist at the repository root either — run it from the relevant plugin's own
-folder the same way:
+`yarn format` does not exist at the repository root either, and only `plugins/main` defines it:
 
 ```bash
 cd plugins/main
 yarn format
 ```
 
-This command will format the code on the changed files.
+This command rewrites, with Prettier, every file under `plugins/main`'s `public/`, `server/` and
+`common/` folders, not only the changed ones. For the other plugins, run Prettier directly, e.g.
+`npx prettier --write <files>` from the repository root.

@@ -34,16 +34,21 @@ yarn test:jest
 Repeat the same pattern for `plugins/wazuh-core`,
 `plugins/wazuh-check-updates` and `plugins/wazuh-ai-assistant` if needed.
 
-Jest matches `**/*.test.{js,ts,tsx}` — every `.test.js`, `.test.ts`, and `.test.tsx` file in the
-plugin — and displays results with coverage information.
+Jest displays results with coverage information. In `main`, `wazuh-core` and
+`wazuh-check-updates` it matches `**/*.test.{js,ts,tsx}`; `wazuh-ai-assistant` defines two Jest
+projects (a `node` one matching `**/*.test.ts` and a `jsdom` one matching `**/*.test.{ts,tsx}`),
+so `.test.js` files are not run there.
 
 ## Important Notes
 
 - Tests **must be executed inside the Docker container** – running `yarn test:jest` directly on
   the host machine will fail due to missing dependencies and environment setup (e.g.,
-  `setup_node_env`). `yarn test:jest:runner` is the exception: it runs from the host and spins up
-  its own Docker container (`scripts/runner.js`, see `docker/runner/docker-compose.yml`) to execute
-  Jest, rather than requiring you to already be inside the dev environment's container.
+  `setup_node_env`). `yarn test:jest:runner` is the exception in `plugins/main` and
+  `plugins/wazuh-check-updates`: it runs from the host and spins up its own Docker container
+  (`scripts/runner.js`, see `docker/runner/docker-compose.yml`) to execute Jest, rather than
+  requiring you to already be inside the dev environment's container. `plugins/wazuh-core` also
+  declares `test:jest:runner`, but its `scripts/runner.js` does not exist, so it fails;
+  `plugins/wazuh-ai-assistant` does not define it.
 - Ensure the Docker development environment is running before attempting to run tests (see [Run from Sources](run-sources.md)).
 - The container includes all necessary Node.js dependencies and Jest for unit testing.
 - Some test suites may produce warnings or console messages that do not affect test results (e.g., "Browserslist: caniuse-lite is outdated", prop validation warnings).

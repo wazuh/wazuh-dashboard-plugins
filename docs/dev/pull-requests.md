@@ -1,4 +1,4 @@
-# Pull Requests, Workflows and Actions
+# Pull requests, workflows and actions
 
 This documentation assumes basic knowledge of certain tools and technologies, such as Docker, Bash (Linux) or Git.
 

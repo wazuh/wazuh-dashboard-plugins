@@ -17,10 +17,11 @@ cd docker/osd-dev
 ```
 
 The script auto-detects versions from `plugins/wazuh-core/package.json` and
-internal plugins from `plugins/`. For specific versions:
+internal plugins from `plugins/`: `-os` (Wazuh indexer image tag) defaults to `<version>-latest`
+and `-osd` (OpenSearch Dashboards version) to `pluginPlatform.version`. For specific versions:
 
 ```bash
-./dev.sh up -os 3.6.0 -osd 3.6.0
+./dev.sh up -os 5.0.0-latest -osd 3.6.0
 ```
 
 For environments with agents:
@@ -41,7 +42,9 @@ See `docker/osd-dev/README.md` for all available
 options, including `--server`, `--indexer-local`, external plugin mappings, `--mailpit` (optional
 Mailpit email testing service), `--base`/`-r` (external repository mappings, resolved from
 `<common-parent-directory>`), `--plugins-root` (aliases `-wdp`, `--wz-home`; where internal plugins
-are read from when not auto-detected), and `PORT` (overrides the dashboard's exposed port).
+are read from when not auto-detected). The scripts read a `PORT` variable for the dashboard's
+exposed port, but `dev.sh` does not forward it into the script container
+(`scripts/dev-ts.yml`), so the port is always `5601`.
 
 Before the first `./dev.sh up`, two external Docker networks must already exist — Compose fails
 otherwise, since `dev.yml` declares them `external: true`:
@@ -54,7 +57,7 @@ docker network create mon
 Also set `vm.max_map_count=262144` (required by the indexer to avoid out-of-memory errors; see
 `docker/osd-dev/README.md` for the `sysctl` command), install `nvm` for the Node.js version used
 by the dev scripts, and set `GIT_REF` when installing `plugins/main`'s dependencies directly
-(outside the container) — see [Setup Environment](setup.md). `dev.yml` also has a commented-out
+(outside the container) — see [Build from Sources](build-sources.md). `dev.yml` also has a commented-out
 Loki logging driver option for centralized container logs, disabled by default.
 
 3. Attach a shell to the development container:
@@ -89,7 +92,8 @@ The Docker environment includes:
 ## Notes
 
 - Ensure the plugin branch matches your target OpenSearch Dashboards version.
-- Use `--server <version>` for a real Wazuh server release (e.g., `--server 5.0.0` — `4.7.2` is a
-  4.x manager, incompatible with this 5.x dashboard).
+- Use `--server <version>` for a real Wazuh server release; the version is a
+  `wazuh/wazuh-manager` Docker Hub tag (e.g., `--server 5.0.0-beta5` — `5.0.0` itself is not
+  published yet, and `4.7.2` is a 4.x manager, incompatible with this 5.x dashboard).
 - Use `--server-local <tag>` to test local Wazuh manager builds (place `.deb` packages in `docker/osd-dev/manager/`).
 - Use `--indexer-local <tag>` to test local Wazuh indexer builds (place `.deb` package in `docker/osd-dev/indexer/`).

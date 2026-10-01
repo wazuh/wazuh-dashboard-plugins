@@ -186,18 +186,18 @@ After completing the previous steps, you will have the following packages in the
 - `security-package.zip`
 - `wazuh-package.zip`
 
-9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script requires the following parameters:
+9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script accepts the following parameters. The package options take a URL (`http(s)://`, `ftp://` or `file://`), not a bare path, so local files are passed as `file://<absolute path>`:
 
-- `-c`, `--commit-sha`: Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below).
-- `-r`, `--revision`: Revision of the package.
+- `-c`, `--commit-sha`: [Optional] Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below). Defaults to the short SHA of the current `wazuh-dashboard` commit.
+- `-r`, `--revision`: [Optional] Revision of the package. Defaults to `1`.
 - `--deb` or `--rpm`: Distribution of the package.
-- `-a`: Path to the `wazuh-package.zip`.
-- `-b`, `--base`: Path to the `dashboard-package.zip`.
-- `-rp`: Path to the `reporting-package.zip`.
-- `-s`: Path to the `security-package.zip`.
-- `-sa`: Path to the `security-analytics-package.zip`.
-- `-al`: Path to the `alerting-package.zip`.
-- `-no`: Path to the `notifications-package.zip`.
+- `-a`: URL of the `wazuh-package.zip`.
+- `-b`, `--base`: URL of the `dashboard-package.zip`.
+- `-rp`: URL of the `reporting-package.zip`.
+- `-s`: URL of the `security-package.zip`.
+- `-sa`: URL of the `security-analytics-package.zip`.
+- `-al`: URL of the `alerting-package.zip`.
+- `-no`: URL of the `notifications-package.zip`.
 
 ```bash
 cd ../wazuh-dashboard/dev-tools/build-packages/
@@ -313,8 +313,9 @@ cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
 ```
 
 2. Build the Docker image. `run-docker-compose.sh` (`base-packages-to-base/run-docker-compose.sh`)
-   accepts these parameters — there is no `-t`/tag option, and `OPENSEARCH_DASHBOARDS_VERSION` is
-   not one of them (it is only used later, in step 3.2's `build-packages.sh` call):
+   accepts these parameters — there is no `-t`/tag option, and the OpenSearch Dashboards version
+   cannot be passed (it is fixed by `OPENSEARCH_DASHBOARDS_VERSION` in
+   `base-packages-to-base/docker-compose.yml` and `base-packages.Dockerfile`):
    - `-b`, `--base`: Branch of the `wazuh-dashboard` repository.
    - `-a`, `--app`: Branch of the `wazuh-dashboard-plugins` repository.
    - `-s`, `--security`: Branch of the `wazuh-security-dashboards-plugin` repository.

@@ -101,34 +101,35 @@ In the active response action for the trigger of an alerting monitor, the user c
 1. Create an active response channel in the **Active Responses** app with the desired configuration.
 2. Create an alerting monitor with the **Active Response monitor** type and add a trigger with an active response action that uses the created active response channel.
 3. Run the active response "notification" in the Wazuh indexer side:
-   3.1. Extract the document ID and index name from the received message: `document_id|index_name`.
-   3.2. Get the document that triggered the alert using the extracted document ID and index name.
-   3.3. Create a JSON with:
 
-```ts
-{
-  "@timestamp": string; // timestamp when the active response "notification" is generated
-  "event": {
-    "doc_id": string; // the document ID that triggered the alert
-    "index": string; // the index name of the document that triggered the alert
-  },
-  "wazuh": {
-    "active_response": {
-      "name": string; // the name of the active response channel that triggered the active response
-      "executable": string; // the executable to run for the active response
-      "extra_arguments": string | null; // the extra arguments to run for the active response -- named `extra_args` in the channel configuration schema above; `SendMessageActionHelper.kt` (wazuh-indexer-notifications) renames it to `extra_arguments` when building this notification payload
-      "type": 'stateful' | 'stateless'; // the type of the active response -- there is only one `type` field here; an earlier revision of this doc incorrectly showed a second one
-      "stateful_timeout": number; // only for stateful active response, the timeout for the active response
-      "location": 'all' | 'defined-agent' | 'local'; // the location where the active response should be executed
-      "agent_id": string | null; // only required when location is defined-agent, the agent ID where the active response should be executed
-    }
-    /* other wazuh allowed fields of the document, see notifications/notifications/src/main/kotlin/org/opensearch/notifications/send/SendMessageActionHelper.kt of wazuh-indexer-notifications plugin
-    */
-  }
-}
-```
+   1. Extract the document ID and index name from the received message: `document_id|index_name`.
+   2. Get the document that triggered the alert using the extracted document ID and index name.
+   3. Create a JSON with:
 
-3.4. Index as a new document in the `wazuh-active-responses` index.
+      ```ts
+      {
+        "@timestamp": string; // timestamp when the active response "notification" is generated
+        "event": {
+          "doc_id": string; // the document ID that triggered the alert
+          "index": string; // the index name of the document that triggered the alert
+        },
+        "wazuh": {
+          "active_response": {
+            "name": string; // the name of the active response channel that triggered the active response
+            "executable": string; // the executable to run for the active response
+            "extra_arguments": string | null; // the extra arguments to run for the active response -- named `extra_args` in the channel configuration schema above; `SendMessageActionHelper.kt` (wazuh-indexer-notifications) renames it to `extra_arguments` when building this notification payload
+            "type": 'stateful' | 'stateless'; // the type of the active response
+            "stateful_timeout": number; // only for stateful active response, the timeout for the active response
+            "location": 'all' | 'defined-agent' | 'local'; // the location where the active response should be executed
+            "agent_id": string | null; // only required when location is defined-agent, the agent ID where the active response should be executed
+          }
+          /* other wazuh allowed fields of the document, see notifications/notifications/src/main/kotlin/org/opensearch/notifications/send/SendMessageActionHelper.kt of wazuh-indexer-notifications plugin
+          */
+        }
+      }
+      ```
+
+   4. Index as a new document in the `wazuh-active-responses` index.
 
 4. The Wazuh manager runs scheduled monitor of the `wazuh-active-responses` index, when a new document is indexed, the manager sends a message to the destination that runs the active response depending on the configuration of the active response channel.
 
