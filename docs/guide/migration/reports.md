@@ -97,7 +97,7 @@ After completing the migration to Wazuh dashboard 5.x:
 3. Click **Generate report** in the toolbar. In `wazuh` plugin module views, this exports to **PDF only**.
 4. Generated reports are stored in an index and are accessible from **☰ Menu > Explore > Reporting**.
 
-> **Note**: To generate reports, the logged-in user must have the appropriate permissions in the `reports_read` and `reports_write` roles, or an equivalent role with access to the reporting index and API endpoints. CSV exports from data tables of the `wazuh` plugin are a separate feature governed by the `reports.csv.maxRows` Advanced Setting.
+> **Note**: To generate reports, the logged-in user must have the `reports_full_access` role (or an equivalent custom role granting the same `cluster:admin/opendistro/reports/*` permissions) — `reports_read_access` and `reports_instances_read_access` only allow viewing and downloading existing reports, not creating them. CSV exports from data tables of the `wazuh` plugin are a separate feature governed by the `reports.csv.maxRows` Advanced Setting.
 
 ---
 
