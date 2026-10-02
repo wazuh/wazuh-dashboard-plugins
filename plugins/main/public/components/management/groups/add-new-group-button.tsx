@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFieldText,
   EuiForm,
@@ -63,7 +64,9 @@ export const AddNewGroupButton = ({
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error creating a new group',
+          title: i18n.translate('wazuh.endpointGroups.addNewGroup.errorTitle', {
+            defaultMessage: 'Error creating a new group',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -74,8 +77,12 @@ export const AddNewGroupButton = ({
 
     getToasts().add({
       color: 'success',
-      title: 'Success',
-      text: 'The group has been created successfully',
+      title: i18n.translate('wazuh.endpointGroups.addNewGroup.successTitle', {
+        defaultMessage: 'Success',
+      }),
+      text: i18n.translate('wazuh.endpointGroups.addNewGroup.successText', {
+        defaultMessage: 'The group has been created successfully',
+      }),
       toastLifeTimeMs: 2000,
     });
     closePopover();
@@ -91,7 +98,9 @@ export const AddNewGroupButton = ({
       permissions={CREATE_GROUP_PERMISSIONS}
       onClick={() => (isPopoverOpen ? closePopover() : setIsPopoverOpen(true))}
     >
-      Add new group
+      {i18n.translate('wazuh.endpointGroups.addNewGroup.button', {
+        defaultMessage: 'Add new group',
+      })}
     </WzButtonPermissions>
   );
 
@@ -110,7 +119,12 @@ export const AddNewGroupButton = ({
           createGroup();
         }}
       >
-        <EuiFormRow label='Introduce the group name' id='addNewGroupName'>
+        <EuiFormRow
+          label={i18n.translate('wazuh.endpointGroups.addNewGroup.nameLabel', {
+            defaultMessage: 'Introduce the group name',
+          })}
+          id='addNewGroupName'
+        >
           <EuiFieldText
             value={groupName}
             onChange={event =>
@@ -127,7 +141,9 @@ export const AddNewGroupButton = ({
           isLoading={isSaving}
           fill
         >
-          Save new group
+          {i18n.translate('wazuh.endpointGroups.addNewGroup.saveButton', {
+            defaultMessage: 'Save new group',
+          })}
         </WzButtonPermissions>
       </EuiForm>
     </EuiPopover>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiBadge, EuiLoadingSpinner } from '@elastic/eui';
 
 interface DevToolsRequestStatusIndicatorProps {
@@ -33,7 +34,9 @@ const DevToolsRequestStatusIndicator = ({
             style={{ gap: 6 }}
           >
             <EuiLoadingSpinner size='s' />
-            Request in progress
+            {i18n.translate('wazuh.devTools.requestStatus.inProgress', {
+              defaultMessage: 'Request in progress',
+            })}
           </EuiFlexGroup>
         </EuiBadge>
       ) : show ? (

@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { DistributionBar, DistributionBarSegment } from './distribution-bar';
 import { SeverityBand, SeverityCounts } from '../../interfaces/types';
 import { SEVERITY_PRESENTATION } from '../../lib/severity-presentation';
@@ -21,7 +22,10 @@ export const SeverityDistributionBar: React.FC<
   counts,
   headline,
   onSelect,
-  emptyMessage = 'No data available',
+  emptyMessage = i18n.translate(
+    'wazuh.common.homeOverviewSeverityDistributionBar.noData',
+    { defaultMessage: 'No data available' },
+  ),
   testSubjPrefix = 'severity-distribution',
 }) => {
   // A band the search didn't report is left out; one that came back 0 is shown.

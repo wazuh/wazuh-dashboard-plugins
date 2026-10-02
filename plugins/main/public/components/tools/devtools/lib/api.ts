@@ -4,6 +4,7 @@ import { WzHttpClient } from './services/wz-http-client';
 import { DevToolsActions } from './actions/dev-tools-actions';
 import { FileService } from './services/file-service';
 import type CodeMirror from '../../../../utils/codemirror/lib/codemirror';
+import { i18n } from '@osd/i18n';
 
 // Singleton-ish default actions instance for UI usage
 const defaultActions = new DevToolsActions(
@@ -27,7 +28,9 @@ export function saveEditorContentAsJson(editor: CodeMirror.Editor) {
     err.log({
       context: 'exportOutput',
       error: error as any,
-      title: 'Export JSON',
+      title: i18n.translate('wazuh.devTools.export.errorTitle', {
+        defaultMessage: 'Export JSON',
+      }),
     });
   }
 }

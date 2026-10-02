@@ -15,7 +15,7 @@ const RestoreStateColumnsButton = (props: RestoreStateColumnsButtonProps) => {
       position='top'
       content={
         <FormattedMessage
-          id='wz.discover.restoreState.tooltip'
+          id='wazuh.common.wazuhDiscover.resetViewTooltip'
           defaultMessage='This action will remove any column width and fields customization of the data grid.'
         />
       }
@@ -30,7 +30,7 @@ const RestoreStateColumnsButton = (props: RestoreStateColumnsButtonProps) => {
         disabled={props.dataGridStatePersistenceManager.isStateMatchingDefaults}
       >
         <FormattedMessage
-          id='wz.discover.restoreState'
+          id='wazuh.common.wazuhDiscover.resetViewButton'
           defaultMessage='Reset view'
         />
       </EuiButtonEmpty>

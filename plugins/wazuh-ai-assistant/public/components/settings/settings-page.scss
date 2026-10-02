@@ -161,7 +161,8 @@ $wzSettingsCardPillHeight: $wzSettingsCardPillLineHeight +
     @include wzStatusChip($euiColorPrimary);
   }
 
-  &--could-not-verify {
+  &--could-not-verify,
+  &--slow {
     @include wzStatusChip($euiColorWarning, $euiColorWarningText);
   }
 

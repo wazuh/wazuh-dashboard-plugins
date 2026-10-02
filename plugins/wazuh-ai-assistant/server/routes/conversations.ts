@@ -31,9 +31,12 @@ import {
   encodeVersion,
   findConversationHit,
   listConversations,
+  renameConversation,
+  StoredSession,
   updateConversation,
 } from '../conversation-store';
 import { resolveWazuhUsername } from '../identity';
+import { isNotFoundError } from '../settings/opensearch-user';
 import {
   paginationQuerySchema,
   resolvePagination,
@@ -133,13 +136,13 @@ function toSummary(
 }
 
 /** `version` is optional here (not read off `document`) because it comes from the OpenSearch
- * write/read response's own seq_no/primary_term pair (`conversation-store.ts`'s `encodeVersion`),
- * not from anything stored in `_source` — every call site below passes whatever its own hit/write
- * response actually carried. See `ConversationRecord`'s doc comment (common/types.ts) for what the
- * client does with it. */
+ * read response's own seq_no/primary_term pair (`conversation-store.ts`'s `encodeVersion`) or from
+ * the write endpoint's reply, not from anything stored in `_source` — every call site below passes
+ * whatever its own hit/write response actually carried. See `ConversationRecord`'s doc comment
+ * (common/types.ts) for what the client does with it. */
 function toRecord(
   id: string,
-  document: ConversationDocument,
+  document: Omit<ConversationDocument, 'user' | '@timestamp'>,
   version?: string,
 ): ConversationRecord {
   return {
@@ -154,13 +157,13 @@ function toRecord(
 
 /**
  * Version-conflict detection for the optimistic-concurrency PUT below: `updateConversation`'s
- * required `occ` argument (the client's `expectedVersion` when present, otherwise the PUT route's
- * own just-fetched version — see that route's doc comment) makes OpenSearch reject the write with
- * a `ResponseError` instead of applying it whenever the checked pair no longer matches what is
+ * required `expectedVersion` (the client's own when present, otherwise the PUT route's just-fetched
+ * version — see that route's doc comment) makes the sessions endpoint reject the write with a
+ * `ResponseError` instead of applying it whenever the checked version no longer matches what is
  * stored. That error's
  * `.statusCode` getter reads the response body's numeric `status` (see
- * `@opensearch-project/opensearch`'s `lib/errors.js`), which is 409 for a real
- * `version_conflict_engine_exception`. Duck-typed rather than importing that error class, purely
+ * `@opensearch-project/opensearch`'s `lib/errors.js`), which is 409 for a version conflict.
+ * Duck-typed rather than importing that error class, purely
  * so this same helper keeps working unchanged against a plain object shaped like one (as the tests
  * for this function already do) without adding a hard dependency on the OpenSearch client package
  * from this file.
@@ -410,9 +413,8 @@ const updateBodySchema = schema.object({
    * stored document so a write since the CLIENT's own last load 409s instead of applying
    * (`isVersionConflictError` above translates that into the response). When absent (or
    * undecodable) — an older client that predates this field, or one that simply omits it — the
-   * PUT route falls back to the version it just read for itself: the data stream requires SOME
-   * optimistic-concurrency pair on every write to a backing index (see `updateConversation`'s doc
-   * comment), so there is no unconditional-overwrite option available at all any more. */
+   * PUT route falls back to the version it just read for itself, so a write that landed between
+   * that read and this one still 409s. */
   expectedVersion: schema.maybe(schema.string()),
 });
 
@@ -470,7 +472,7 @@ export function registerConversationRoutes(
     }, logger),
   );
 
-  // Create: stamps owner + both timestamps server-side. Empty conversations are the CALLER's
+  // Create: the indexer stamps the owner and the timestamps. Empty conversations are the CALLER's
   // responsibility not to send (public/services/conversations-service.ts's caller, chat-page.tsx,
   // never auto-saves an empty one) — this route itself accepts an empty `messages` array without
   // complaint, since a deliberate "create a blank conversation" is a reasonable future use.
@@ -481,12 +483,10 @@ export function registerConversationRoutes(
     },
     withInternalErrorHandling(async (context, request, response) => {
       // Create is NOT owner-CHECKING (nothing pre-existing to compare against, unlike the
-      // five routes below), so it is deliberately excluded from the fail-closed set — an
-      // unresolved identity here still stamps the shared `CONVERSATION_OWNER_FALLBACK` sentinel,
-      // exactly the prior behavior. This is a safe dead end: every owner-CHECKING route below now
-      // fails closed for an unresolved identity, so a conversation stamped with the shared
-      // sentinel can never be listed, read, updated, or deleted back through this API by an
-      // unresolved-identity caller.
+      // five routes below), so it is deliberately excluded from the fail-closed set. The owner only
+      // feeds the cap count (the indexer stamps the stored owner), so an unresolved identity falls
+      // back to the shared `CONVERSATION_OWNER_FALLBACK` sentinel, a conversation no owner-CHECKING
+      // route below can reach for an unresolved-identity caller.
       const owner =
         (await resolveOwner(context, request)) ?? CONVERSATION_OWNER_FALLBACK;
 
@@ -498,19 +498,23 @@ export function registerConversationRoutes(
         return conversationLimitReachedResponse(response);
       }
 
-      const nowIso = new Date().toISOString();
-      const document: ConversationDocument = {
-        user: owner,
-        title: request.body.title,
-        created_at: nowIso,
-        // Same value as created_at — see ConversationDocument's doc comment in
-        // conversation-store.ts for why the data stream requires this field at all.
-        '@timestamp': nowIso,
-        updated_at: nowIso,
-        messages: request.body.messages as PersistedChatMessage[],
-      };
-      const id = await createConversation(context, document);
-      return response.ok({ body: toRecord(id, document) });
+      let created;
+      try {
+        created = await createConversation(context, {
+          title: request.body.title,
+          messages: request.body.messages as PersistedChatMessage[],
+        });
+      } catch (error) {
+        // Two concurrent creates can both pass the count above; the endpoint enforces the same cap
+        // and answers 409 to the loser. On a create that is the cap, never a version conflict.
+        if (isVersionConflictError(error)) {
+          return conversationLimitReachedResponse(response);
+        }
+        throw error;
+      }
+      return response.ok({
+        body: toRecord(created.id, created, created.version),
+      });
     }, logger),
   );
 
@@ -541,18 +545,15 @@ export function registerConversationRoutes(
   );
 
   // Update: full replace of messages (title is OPTIONAL now, see updateBodySchema's doc comment
-  // above for why); `created_at`/`user`/`title` (when omitted) are carried over untouched,
-  // `updated_at` is always server-recomputed (never trusts a client-sent timestamp).
+  // above for why); the indexer carries `created_at`/`user`/`title` (when omitted) over untouched
+  // and always recomputes `updated_at` itself (never trusts a client-sent timestamp).
   //
-  // Optimistic concurrency is not optional here, in either sense of the word: a data stream
-  // rejects an unconditional `index` request sent directly against one of its backing indices
-  // outright (see `updateConversation`'s doc comment), so `if_seq_no`/`if_primary_term` are always
-  // sent below. When the client supplied `expectedVersion` (same conversation open in two tabs;
-  // this catches a write since the client's own last load, not just since this request started),
-  // that is the pair checked. When it did not (an older client that predates `expectedVersion`, or
-  // this request simply not carrying one), this request's own just-fetched `existing.seqNo`/
-  // `primaryTerm` is used instead — there is no client version to honor, but the platform still
-  // requires SOME pair, and either way a genuine conflict gets the same 409 below.
+  // Optimistic concurrency: the write is always checked against a version. When the client supplied
+  // `expectedVersion` (same conversation open in two tabs; this catches a write since the client's
+  // own last load, not just since this request started), that is the version checked. When it did
+  // not (an older client that predates `expectedVersion`, or this request simply not carrying
+  // one), this request's own just-fetched version is used instead — either way a genuine conflict
+  // gets the same 409 below.
   router.put(
     {
       path: API_PATHS.CONVERSATION_BY_ID(`{id}`),
@@ -574,48 +575,33 @@ export function registerConversationRoutes(
       if (!existing) {
         return response.notFound();
       }
-      const updatedAt = new Date().toISOString();
-      const messages = request.body.messages as PersistedChatMessage[];
       const { expectedVersion } = request.body;
-      const requestedOcc = expectedVersion
-        ? decodeVersion(expectedVersion)
-        : undefined;
       // Falls back to this request's own just-fetched version when the client sent no (decodable)
-      // expectedVersion — see the router.put doc comment above for why this fallback exists at
-      // all (the platform, not client opt-in, is what requires SOME pair here).
-      const occ = requestedOcc ?? {
-        seqNo: existing.seqNo,
-        primaryTerm: existing.primaryTerm,
-      };
+      // expectedVersion — see the router.put doc comment above for why.
+      const versionToCheck =
+        expectedVersion && decodeVersion(expectedVersion)
+          ? expectedVersion
+          : encodeVersion(existing.seqNo, existing.primaryTerm);
 
-      // updateConversation writes this as a FULL overwrite, not a partial patch (see that
-      // function's doc comment for why: DLS on this alias unconditionally rejects the partial
-      // `_update` API) — carry over every field this request isn't changing (user, created_at,
-      // @timestamp) from the already-resolved `existing.source` rather than omitting them.
-      const nextDocument: ConversationDocument = {
-        ...existing.source,
-        // Carried over unchanged when the client omits `title` (every current client does, on
-        // every PUT -- see updateBodySchema's doc comment): `existing.source.title` already IS
-        // the fallback via the spread above, this line only applies when a title was actually
-        // sent (an older client, or a future caller with a real reason to).
-        title: request.body.title ?? existing.source.title,
-        messages,
-        updated_at: updatedAt,
-      };
-
-      let written;
+      let written: StoredSession;
       try {
-        written = await updateConversation(context, existing, nextDocument, {
-          ifSeqNo: occ.seqNo,
-          ifPrimaryTerm: occ.primaryTerm,
-        });
+        written = await updateConversation(
+          context,
+          existing.id,
+          {
+            messages: request.body.messages as PersistedChatMessage[],
+            title: request.body.title,
+          },
+          versionToCheck,
+        );
       } catch (error) {
-        // A conflict is meaningful here regardless of which pair triggered it (the client's own
+        // A conflict is meaningful here regardless of which version triggered it (the client's own
         // `expectedVersion`, or this request's own fallback read) — either way, something else
         // wrote to this conversation after the version being checked against, so the same
-        // actionable 409 applies. Any other failure (network/mapping/etc.) is not this route's
-        // problem to discriminate further; it falls through to withInternalErrorHandling's 500,
-        // same as every other unexpected error in this file.
+        // actionable 409 applies. A 404 means it was deleted between the lookup above and this
+        // write. Any other failure (network/mapping/etc.) is not this route's problem to
+        // discriminate further; it falls through to withInternalErrorHandling's 500, same as every
+        // other unexpected error in this file.
         if (isVersionConflictError(error)) {
           return response.customError({
             statusCode: 409,
@@ -625,15 +611,14 @@ export function registerConversationRoutes(
             },
           });
         }
+        if (isNotFoundError(error)) {
+          return response.notFound();
+        }
         throw error;
       }
 
       return response.ok({
-        body: toRecord(
-          request.params.id,
-          nextDocument,
-          encodeVersion(written.seqNo, written.primaryTerm),
-        ),
+        body: toRecord(request.params.id, written, written.version),
       });
     }, logger),
   );
@@ -644,18 +629,11 @@ export function registerConversationRoutes(
   // a `ConversationSummary` (id/title/updatedAt) in hand when a user renames a row, never the full
   // `messages` transcript -- requiring the client to GET the whole conversation first just to
   // rename it would be wasted work and a needless place for a stale-transcript overwrite bug.
-  // `messages`/`created_at`/`user` are carried over untouched from `existing.source`, mirroring the
-  // PUT route's own "carry over every field this request isn't changing" convention.
+  // `updated_at` is DELIBERATELY not bumped (m9): a rename is not conversation activity, and
+  // bumping it would jump the row into the rail's "Today" group purely because its title changed,
+  // which reads as a lie about when it was last actually used.
   //
-  // `updated_at` is DELIBERATELY carried over unchanged, NOT recomputed (m9): a rename is not
-  // conversation activity, and bumping it would jump the row into the rail's "Today" group purely
-  // because its title changed, which reads as a lie about when it was last actually used.
-  //
-  // Optimistic concurrency still applies (same reason as PUT's doc comment: the backing data stream
-  // rejects an unconditional write), using this request's own just-fetched seqNo/primaryTerm --
-  // there is no client-supplied `expectedVersion` for a rename, so a genuine conflict (someone else
-  // saved/deleted the conversation between this request's GET and its write) 409s the same way.
-  // The response carries the WRITE's own fresh version (`encodeVersion`), not the pre-write one --
+  // The response carries the WRITE's own fresh version, not the pre-write one --
   // chat-page.tsx's `handleRenameConversation` stamps this onto `conversationVersionRef` when the
   // renamed conversation is the active one, so the very next auto-save does not 409 against a
   // version this rename just moved past.
@@ -680,21 +658,14 @@ export function registerConversationRoutes(
       if (!existing) {
         return response.notFound();
       }
-      // Trimmed server-side (m10) -- the schema's `rejectWhitespaceOnly` validator above has
-      // already ruled out a title that TRIMS to nothing, but a title with real content plus
-      // incidental leading/trailing whitespace (a stray space from a paste) should not be stored
-      // with that whitespace baked in.
-      const nextDocument: ConversationDocument = {
-        ...existing.source,
-        title: request.body.title.trim(),
-      };
 
       let written;
       try {
-        written = await updateConversation(context, existing, nextDocument, {
-          ifSeqNo: existing.seqNo,
-          ifPrimaryTerm: existing.primaryTerm,
-        });
+        written = await renameConversation(
+          context,
+          existing.id,
+          request.body.title,
+        );
       } catch (error) {
         if (isVersionConflictError(error)) {
           return response.customError({
@@ -705,13 +676,18 @@ export function registerConversationRoutes(
             },
           });
         }
+        if (isNotFoundError(error)) {
+          return response.notFound();
+        }
         throw error;
       }
 
       return response.ok({
         body: {
-          ...toSummary(request.params.id, nextDocument),
-          version: encodeVersion(written.seqNo, written.primaryTerm),
+          id: request.params.id,
+          title: written.title,
+          updatedAt: written.updated_at,
+          version: written.version,
         },
       });
     }, logger),
@@ -736,7 +712,14 @@ export function registerConversationRoutes(
       if (!existing) {
         return response.notFound();
       }
-      await deleteConversation(context, existing);
+      try {
+        await deleteConversation(context, existing.id);
+      } catch (error) {
+        if (isNotFoundError(error)) {
+          return response.notFound();
+        }
+        throw error;
+      }
       return response.ok({ body: { deleted: true } });
     }, logger),
   );

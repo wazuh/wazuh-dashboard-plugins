@@ -17,6 +17,7 @@ import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
 import { request } from '../services/request-handler';
 import NavigationService from './navigation-service';
 import { AppState } from './app-state';
+import { i18n } from '@osd/i18n';
 
 export class GenericRequest {
   /**
@@ -124,7 +125,14 @@ export class GenericRequest {
       if (returnError) return Promise.reject(err);
       return (((err || {}).response || {}).data || {}).message || false
         ? Promise.reject(new Error(err.response.data.message))
-        : Promise.reject(err || new Error('Server did not respond'));
+        : Promise.reject(
+            err ||
+              new Error(
+                i18n.translate('wazuh.core.request.serverDidNotRespond', {
+                  defaultMessage: 'Server did not respond',
+                }),
+              ),
+          );
     }
   }
 }

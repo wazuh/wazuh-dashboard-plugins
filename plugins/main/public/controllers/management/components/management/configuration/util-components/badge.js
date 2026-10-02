@@ -11,6 +11,7 @@
  */
 
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 
 import { EuiBadge } from '@elastic/eui';
 
@@ -23,9 +24,19 @@ class WzBadge extends Component {
     if (typeof nextProps === 'object') {
       if (typeof nextProps.enabled !== 'undefined') {
         if (nextProps.enabled) {
-          return { color: 'secondary', content: 'ENABLED' };
+          return {
+            color: 'secondary',
+            content: i18n.translate('wazuh.configuration.badge.enabled', {
+              defaultMessage: 'ENABLED',
+            }),
+          };
         } else {
-          return { color: 'danger', content: 'DISABLED' };
+          return {
+            color: 'danger',
+            content: i18n.translate('wazuh.configuration.badge.disabled', {
+              defaultMessage: 'DISABLED',
+            }),
+          };
         }
       } else if (nextProps.color && nextProps.content) {
         return { color: nextProps.color, content: nextProps.content };

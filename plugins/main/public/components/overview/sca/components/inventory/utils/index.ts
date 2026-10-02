@@ -1,4 +1,5 @@
 import { commonColumns } from '../../../../common/data-grid-columns';
+import { i18n } from '@osd/i18n';
 
 export const tableColumns = [
   commonColumns['wazuh.agent.name'],
@@ -12,11 +13,21 @@ export const managedFilters = [
   {
     type: 'multiSelect',
     key: 'policy.name',
-    placeholder: 'Policy',
+    placeholder: i18n.translate(
+      'wazuh.configurationAssessment.inventoryFilters.policy',
+      {
+        defaultMessage: 'Policy',
+      },
+    ),
   },
   {
     type: 'multiSelect',
     key: 'check.name',
-    placeholder: 'Check',
+    placeholder: i18n.translate(
+      'wazuh.configurationAssessment.inventoryFilters.check',
+      {
+        defaultMessage: 'Check',
+      },
+    ),
   },
 ];

@@ -3,7 +3,7 @@ import { SAVED_OBJECT_USER_PREFERENCES } from '../../../../common/constants';
 
 export const userPreferencesObject: SavedObjectsType = {
   name: SAVED_OBJECT_USER_PREFERENCES,
-  hidden: false,
+  hidden: true,
   namespaceType: 'agnostic',
   mappings: {
     properties: {

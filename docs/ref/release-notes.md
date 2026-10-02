@@ -41,7 +41,7 @@
     - Validates and provisions required resources: index patterns, saved-object dashboards. Validates: notification channels, manager API connectivity and compatibility and `run_as` configuration for the manager API hosts.
   - "Wazuh dashboard is not ready yet" blocking page redesigned with Wazuh look and feel, exportable diagnostics, and actionable check details [#7681](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7681) [wazuh/wazuh-dashboard#866](https://github.com/wazuh/wazuh-dashboard/issues/866).
   - Dashboard components adapted to self-contain requirement failures — missing index patterns or unavailable API no longer blank the screen; affected views show contextual prompts instead [#7680](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7680).
-  - New **Dashboard Management > Health Check** app displays overall status, per-check details, and JSON export for troubleshooting [#7697](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7697) [wazuh/wazuh-dashboard#870](https://github.com/wazuh/wazuh-dashboard/issues/870).
+  - New **Dashboard management > Health Check** app displays overall status, per-check details, and JSON export for troubleshooting [#7697](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7697) [wazuh/wazuh-dashboard#870](https://github.com/wazuh/wazuh-dashboard/issues/870).
     - Platform header icon shows overall health state without interrupting navigation.
     - Refined check presentation: alerts-specific index pattern labeling, manager-aware API selector, warning-based messaging, and simplified filtering [#7744](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7744).
 - Reporting revamp [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45). [[2][fork-reporting]]
@@ -52,9 +52,28 @@
   - Plugin adaptation: white-labeled UI, Notebook-based reports removed, and report detail fixes [wazuh/wazuh-dashboard-reporting#54](https://github.com/wazuh/wazuh-dashboard-reporting/issues/54) [#51](https://github.com/wazuh/wazuh-dashboard-reporting/issues/51) [#50](https://github.com/wazuh/wazuh-dashboard-reporting/issues/50).
 - Fork of the Alerting and Notifications plugins. [[3][fork-alerting]] [[4][fork-notifications]]
   - Alerting and Notifications available under **Explore > Alerting** and **Explore > Notifications**.
-  - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) and sample Alerting monitors on startup provided by indexer.
+  - Health Check validates the default notification channels (Slack, PagerDuty, Jira, Shuffle) provided by the indexer on startup.
   - Multi-channel support: Slack, Microsoft Teams, Amazon Chime, Email (SMTP/SES), AWS SNS, and custom webhooks.
   - Active response channels kept as a dedicated channel type, separate from standard notification channels [#6](https://github.com/wazuh/wazuh-dashboard-alerting/issues/6).
+- New "[AI Assistant][ai-assistant-module]" plugin [#8789](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8789).
+  - Provider-agnostic AI chat experience (OpenAI-compatible or Anthropic) that answers security
+    questions through a fixed catalog of read-only tools, with every query executing locally under
+    the calling user's own RBAC.
+  - Optional pseudonymization (privacy mode) and API-key encryption at rest
+    (`wazuh_ai_assistant.encryptionKey`), with a settings-lock control
+    (`wazuh_ai_assistant.settingsReadOnly`) [#9067](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9067).
+- New "[Enrollment Tokens][enrollment-tokens-module]" app under **Agents management**
+  [#9145](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9145).
+  - `WAZUH_ENROLLMENT_TOKEN` is the only way the 5.0 agent installer registers an agent — the 4.x
+    registration variables it replaces (`WAZUH_MANAGER_ENDPOINT`, `WAZUH_REGISTRATION_PASSWORD`,
+    `WAZUH_REGISTRATION_SERVER`, `WAZUH_REGISTRATION_PORT`, `WAZUH_REGISTRATION_CA`,
+    `WAZUH_REGISTRATION_CERTIFICATE`, `WAZUH_REGISTRATION_KEY`) are ignored by the 5.0 installer.
+  - List, create, revoke and purge tokens from the **Enrollment tokens** app; the **Deploy new
+    agent** wizard mints a token for a single deployment.
+- Install-time credential resolution: the package no longer ships default passwords. It resolves
+  the `kibanaserver` and `wazuh-wui` passwords from `/etc/wazuh/credentials.env` into the dashboard
+  keystore at install time and again before every start (`wazuh-indexer` issue #1928). See
+  [Credentials](getting-started/credentials.md).
 
 ## Additional highlights
 
@@ -65,33 +84,35 @@
 
 ## Breaking changes
 
-- Wazuh Dashboard 4.x cannot be upgraded to 5.x. A fresh installation is required.
-- `wazuh.yml` configuration file removed. All plugin settings have been migrated to `opensearch_dashboards.yml` and the Advanced Settings UI [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871). See the [migration guide][migration-guide] for the full mapping.
+- Wazuh dashboard 4.x cannot be upgraded to 5.x. A fresh installation is required.
+- `wazuh.yml` configuration file removed. All plugin settings have been migrated to `opensearch_dashboards.yml` and the Advanced settings UI [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871). See the [migration guide][migration-guide] for the full mapping.
   - Several settings removed with no replacement: `customization.*`, `alerts.sample.prefix`, `configuration.ui_api_editable`, `ip.selector`, `ip.ignore`, `pattern`, `hideManagerAlerts`, and all monitoring and statistics job settings [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871) [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933) [#8102](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8102).
 - Default index pattern changed from `wazuh-alerts-*` to `wazuh-events-v5*`. The global index pattern selector has been removed from the navigation bar [#7933](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7933).
 - Dashboards redesigned as saved objects — inline dashboards from 4.x are not compatible with the new renderer. Custom dashboards must be exported before migration and re-imported and adapted to the new data model afterwards [#7842](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7842).
-- Health Check redesigned [#7532](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7532) — the blocking login-time health check (`/app/wazuh#/health-check`) and frontend routes `/health-check` and `/blank-screen` are removed [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610). Individual `checks.*` toggles and `customization.logo.healthcheck` are replaced by `healthcheck.*` settings in `opensearch_dashboards.yml`. Health status is available at **Dashboard Management > Health Check** [#7697](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7697).
+- Health Check redesigned [#7532](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7532) — the blocking login-time health check (`/app/wazuh#/health-check`) and frontend routes `/health-check` and `/blank-screen` are removed [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610). Individual `checks.*` toggles and `customization.logo.healthcheck` are replaced by `healthcheck.*` settings in `opensearch_dashboards.yml`. Health status is available at **Dashboard management > Health Check** [#7697](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7697).
 - Cluster mode mandatory for all installations [#7688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7688) [wazuh/wazuh#31295](https://github.com/wazuh/wazuh/issues/31295) — the distinction between cluster and manager mode is removed; the dashboard always operates in cluster mode, including single-node deployments.
   - All filters and search queries use `wazuh.cluster.name` instead of `manager.name`.
   - API calls route through cluster endpoints; `/cluster/status` checks and cluster-disabled UI components are removed.
-  - RBAC permissions updated: The legacy `manager:read`, `manager:update_config`, `manager:restart`, and `manager_read_api_config` have been consolidated into their existing `cluster:*` equivalents.
+  - RBAC permissions updated: The legacy `manager:read`, `manager:update_config`, `manager:restart`, and `manager:read_api_config` have been consolidated into their existing `cluster:*` equivalents.
 - Removed deprecated modules: OpenSCAP, CIS-CAT, and Osquery [#7645](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7645).
-- Legacy reporting application removed from the dashboard plugins. PDF and CSV generation is now handled by the Reporting fork bundled with Wazuh Dashboard packages [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813) [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45).
+- Legacy reporting application removed from the dashboard plugins. PDF and CSV generation is now handled by the Reporting fork bundled with Wazuh dashboard packages [#7813](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7813) [wazuh/wazuh-indexer-reporting#45](https://github.com/wazuh/wazuh-indexer-reporting/issues/45).
 - Rules, Decoders, CDB List, and Ruleset Test applications removed from the dashboard [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901). Content management moved to the Wazuh Indexer Content Manager plugin [wazuh/wazuh-indexer-plugins#214](https://github.com/wazuh/wazuh-indexer-plugins/issues/214).
 - Backend monitoring and statistics jobs removed from the dashboard server [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597). Agent and communications telemetry is now written to dedicated metrics data streams managed by the Wazuh indexer.
-- App Settings application removed — settings are now managed via `opensearch_dashboards.yml` or **Dashboard Management > Advanced Settings** [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871).
-- Default value of `wazuh.updates.disabled` changed from `false` to `true` — update notifications are disabled by default in Advanced Settings [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236).
+- App Settings application removed — settings are now managed via `opensearch_dashboards.yml` or **Dashboard management > Dashboards Management > Advanced settings** [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871).
+- Default value of `wazuh.updates.disabled` changed from `false` to `true` — update notifications are disabled by default in Advanced settings [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236).
 - Only one Wazuh server API host configuration is allowed per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436).
 - Sample Data, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). The views of cluster has been redistributed to the Status app.
 
 <!-- Links -->
 
 [ruleset-management-module]: ./modules/ruleset-management/README.md
-[active-response-module]: ./modules/active-response/index.md
+[active-response-module]: ./modules/active-response/README.md
 [healthcheck-module]: ./modules/healthcheck.md
+[ai-assistant-module]: ./modules/ai-assistant/README.md
+[enrollment-tokens-module]: ./modules/enrollment-tokens/README.md
 [healthcheck-lifecycle]: ./modules/healthcheck.md#lifecycle
 [healthcheck-not-ready]: ./modules/healthcheck.md#wazuh-dashboard-is-not-ready-yet
-[migration-guide]: ./migration-4x-5x.md
+[migration-guide]: ../guide/migration/README.md
 [fork-security-analytics]: https://github.com/wazuh/wazuh-dashboard-security-analytics/issues/1
 [fork-reporting]: https://github.com/wazuh/wazuh-dashboard-reporting/issues/1
 [fork-alerting]: https://github.com/wazuh/wazuh-dashboard-alerting/issues/1

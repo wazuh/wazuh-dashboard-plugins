@@ -8,6 +8,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 import { osdfucatePasswordInCommand } from '../../services/wazuh-password-service';
 import { obfuscateEnrollmentTokenInCommand } from '../../services/enrollment-token-command-service';
@@ -37,7 +38,6 @@ export default function CommandOutput(props: ICommandSectionProps) {
   agent, so neither is rendered in the clear until the operator asks for it.
   Only one of them is ever in the command: the installer refuses a token that
   carries a credential together with a password. */
-  const secretLabel = enrollmentToken ? 'enrollment token' : 'password';
   const haveSecret = Boolean(password || enrollmentToken);
 
   useEffect(() => {
@@ -87,7 +87,11 @@ export default function CommandOutput(props: ICommandSectionProps) {
                   onClick={() => onHandleCopy(copy())}
                 >
                   <p>
-                    <EuiIcon type='copy' /> Copy command
+                    <EuiIcon type='copy' />{' '}
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.commandOutput.copyCommand',
+                      { defaultMessage: 'Copy command' },
+                    )}
                   </p>
                 </div>
               )}
@@ -98,7 +102,17 @@ export default function CommandOutput(props: ICommandSectionProps) {
           <>
             <EuiSwitch
               checked={showSecret}
-              label={`Show ${secretLabel}`}
+              label={
+                enrollmentToken
+                  ? i18n.translate(
+                      'wazuh.endpointsSummary.commandOutput.showEnrollmentToken',
+                      { defaultMessage: 'Show enrollment token' },
+                    )
+                  : i18n.translate(
+                      'wazuh.endpointsSummary.commandOutput.showPassword',
+                      { defaultMessage: 'Show password' },
+                    )
+              }
               onChange={onChangeShowSecret}
             />
             <EuiSpacer size='l' />

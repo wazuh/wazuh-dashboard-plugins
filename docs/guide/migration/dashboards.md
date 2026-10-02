@@ -6,7 +6,7 @@ The Wazuh dashboard stores user-created dashboards and visualizations as **saved
 
 In Wazuh 4.x, default dashboard definitions were embedded in the plugin. In Wazuh 5.x, default dashboards are provisioned as saved objects by reference during the health check task on first start.
 
-> **Warning**: Do not re-import default Wazuh objects. Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard management > Dashboard Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
+> **Warning**: Do not re-import default Wazuh objects. Overwriting the default dashboards and visualizations with 4.x versions may cause broken panels, stale index pattern references, or conflicts with features introduced in 5.x. If you are unsure whether an object is custom or default, open **☰ Menu > Dashboard management > Dashboards Management > Saved objects** after installation and look for objects whose description includes `Provided by Wazuh` — those are provisioned automatically and must not be re-imported.
 
 ---
 
@@ -58,20 +58,20 @@ Export only the objects you created or modified.
 
 ### Using the UI
 
-1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**.
-2. To export all custom objects, select the checkboxes next to each user-created dashboard or visualization and click **Export** in the action bar.
-3. Enable **Include related objects** to include all referenced visualizations and searches.
+1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**.
+2. To export all custom objects, select the checkboxes next to each user-created dashboard, visualization and saved search, and next to each custom index pattern they use. Do not select the 4.x default Wazuh index patterns (`wazuh-alerts-*`, `wazuh-monitoring-*`, `wazuh-statistics-*` and the `wazuh-states-*-*` patterns): 5.x replaces them (see Step 4).
+3. Click **Export** in the action bar and disable **Include related objects**: when enabled, it adds the referenced 4.x default index patterns back to the file.
 4. Save the exported `.ndjson` file to a secure location.
 
 If you need to export everything at once as a fallback:
 
 1. Select **Export X objects** (the button label shows the total count).
-2. In the export dialog, ensure that **Include related objects** is selected.
-3. Save the file. When importing into 5.x, use the **Check for existing objects** conflict strategy (see Step 3) to avoid overwriting default Wazuh objects that were already provisioned.
+2. Save the file, then remove the 4.x default Wazuh index patterns from it with the `jq` command of [Using the API](#using-the-api) below.
+3. When importing into 5.x, use the **Check for existing objects** conflict strategy (see Step 3) to avoid overwriting default Wazuh objects that were already provisioned.
 
 ### Using the API
 
-Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
+Run the following commands from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The `jq` command drops the 4.x default Wazuh index patterns (`wazuh-alerts-*`, `wazuh-monitoring-*`, `wazuh-statistics-*` and `wazuh-states-*-*`) and keeps your custom index patterns. The output file is saved in the current working directory:
 
 ```bash
 curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_export" \
@@ -81,9 +81,12 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   -k \
   -d '{
     "type": ["dashboard", "visualization", "search", "index-pattern"],
-    "includeReferencesDeep": true
+    "includeReferencesDeep": false
   }' \
-  -o saved-objects-backup-$(date +%Y%m%d).ndjson
+  -o saved-objects-export.ndjson
+
+jq -c 'select(.type != "index-pattern" or (.attributes.title | test("^wazuh-(alerts|monitoring|statistics|states-.+)-\\*$") | not))' \
+  saved-objects-export.ndjson > saved-objects-backup-$(date +%Y%m%d).ndjson
 ```
 
 ---
@@ -98,7 +101,7 @@ Complete the Wazuh 5.x installation and verify that the dashboard is accessible 
 
 ### Using the UI
 
-1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects**.
+1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**.
 2. Click **Import**.
 3. Select the `.ndjson` file exported from the 4.x deployment.
 4. Choose a conflict resolution strategy:
@@ -189,7 +192,7 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_impor
 
 After importing, verify that the migrated objects are accessible and displaying data:
 
-1. Navigate to **☰ Menu > Dashboard management > Dashboard Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
+1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
 2. Open each migrated dashboard and confirm that panels load without errors.
 3. If a panel shows a "No results found" message, verify that:
    - the index pattern referenced by its visualizations points to `wazuh-findings-v5*` (for alert-based visualizations) or another appropriate 5.x pattern
@@ -223,9 +226,12 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_expor
   -k \
   -d '{
     "type": ["dashboard", "visualization", "search", "index-pattern"],
-    "includeReferencesDeep": true
+    "includeReferencesDeep": false
   }' \
-  -o saved-objects-backup-<TENANT>-$(date +%Y%m%d).ndjson
+  -o saved-objects-export-<TENANT>.ndjson
+
+jq -c 'select(.type != "index-pattern" or (.attributes.title | test("^wazuh-(alerts|monitoring|statistics|states-.+)-\\*$") | not))' \
+  saved-objects-export-<TENANT>.ndjson > saved-objects-backup-<TENANT>-$(date +%Y%m%d).ndjson
 ```
 
 Import example (5.x):

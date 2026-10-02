@@ -13,6 +13,7 @@
  */
 
 import React, { useCallback } from 'react';
+import { i18n } from '@osd/i18n';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import {
   useVisualizationBasicWidgetSelector,
@@ -76,7 +77,9 @@ export const RequirementVis = withPanel({ paddingSize: 'm' })(props => {
   return (
     <>
       <VisualizationBasicWidgetSelectorHeader
-        title='Compliance'
+        title={i18n.translate('wazuh.common.agentWelcomeCompliance.title', {
+          defaultMessage: 'Compliance',
+        })}
         selectorOptions={selectionOptionsCompliance}
         selectedOption={selectedOption}
         onChange={onChange}
@@ -181,9 +184,18 @@ const RequirementVisBody = compose(
       selectorOptions={selectionOptionsCompliance}
       onFetch={fetchData}
       onFetchExtraDependencies={[timeFilter, props.agent]}
-      noDataTitle='No results'
+      noDataTitle={i18n.translate(
+        'wazuh.common.agentWelcomeCompliance.noDataTitle',
+        {
+          defaultMessage: 'No results',
+        },
+      )}
       noDataMessage={(_, optionRequirement) =>
-        `No ${optionRequirement.text} results were found in the selected time range.`
+        i18n.translate('wazuh.common.agentWelcomeCompliance.noDataMessage', {
+          defaultMessage:
+            'No {requirement} results were found in the selected time range.',
+          values: { requirement: optionRequirement.text },
+        })
       }
       selectedOption={props.selectedOption}
       selectorOptions={props.selectorOptions}

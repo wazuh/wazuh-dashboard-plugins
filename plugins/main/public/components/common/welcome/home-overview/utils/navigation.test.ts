@@ -5,6 +5,7 @@ import {
   getMitreIntelligenceResourceUrl,
   getMitreFrameworkTacticUrl,
   getVulnerabilityDetectionBySeverityUrl,
+  isAiAssistantRegistered,
 } from './navigation';
 
 jest.mock('../../../../../react-services/navigation-service', () => ({
@@ -199,5 +200,17 @@ describe('getMitreFrameworkTacticUrl', () => {
 describe('getAiAssistantUrl', () => {
   it('links to the wazuh-ai-assistant plugin app id (its PLUGIN_ID, kept as a literal here -- see the doc comment above getAiAssistantUrl for why it is not imported cross-plugin)', () => {
     expect(getAiAssistantUrl()).toBe('/app/wazuhAiAssistant');
+  });
+});
+
+describe('isAiAssistantRegistered', () => {
+  it('is true when OSD registered the wazuhAiAssistant app', () => {
+    expect(isAiAssistantRegistered(new Map([['wazuhAiAssistant', {}]]))).toBe(
+      true,
+    );
+  });
+
+  it('is false when the plugin is disabled, so its app is not registered', () => {
+    expect(isAiAssistantRegistered(new Map([['wz-home', {}]]))).toBe(false);
   });
 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiButtonGroup } from '@elastic/eui';
 import {
   FILTER_OPERATOR,
@@ -42,12 +43,22 @@ const VulsEvaluationFilter = ({
   const toggleButtons = [
     {
       id: 'evaluated',
-      label: 'Evaluated',
+      label: i18n.translate(
+        'wazuh.vulnerabilityDetection.evaluationFilter.evaluated',
+        {
+          defaultMessage: 'Evaluated',
+        },
+      ),
       className: 'keep-for-report',
     },
     {
       id: 'underEvaluation',
-      label: 'Under evaluation',
+      label: i18n.translate(
+        'wazuh.vulnerabilityDetection.evaluationFilter.underEvaluation',
+        {
+          defaultMessage: 'Under evaluation',
+        },
+      ),
       className: 'keep-for-report',
     },
   ];
@@ -87,7 +98,12 @@ const VulsEvaluationFilter = ({
 
   return (
     <EuiButtonGroup
-      legend='Evaluated / Under evaluation'
+      legend={i18n.translate(
+        'wazuh.vulnerabilityDetection.evaluationFilter.legend',
+        {
+          defaultMessage: 'Evaluated / Under evaluation',
+        },
+      )}
       className='button-group-filter'
       type='multi'
       idToSelectedMap={toggleIdToSelectedMap}

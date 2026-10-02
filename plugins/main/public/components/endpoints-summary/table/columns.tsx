@@ -11,6 +11,7 @@ import {
   EuiToolTip,
   EuiBadge,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Agent } from '../types';
 import WzIconSVG from '../../common/icons/wz-icon-svg';
 import { getAgentOSType } from '../../../react-services';
@@ -39,28 +40,39 @@ export const agentsTableColumns = (
 ) => [
   {
     field: 'id',
-    name: 'ID',
+    name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.id', {
+      defaultMessage: 'ID',
+    }),
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'name',
-    name: 'Name',
+    name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.name', {
+      defaultMessage: 'Name',
+    }),
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'ip',
-    name: 'IP address',
+    name: i18n.translate(
+      'wazuh.endpointsSummary.agentsTableColumns.ipAddress',
+      {
+        defaultMessage: 'IP address',
+      },
+    ),
     sortable: true,
     show: true,
     searchable: true,
   },
   {
     field: 'group',
-    name: 'Group(s)',
+    name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.groups', {
+      defaultMessage: 'Group(s)',
+    }),
     sortable: true,
     show: true,
     render: groups => renderGroups(groups, setFilters),
@@ -69,7 +81,12 @@ export const agentsTableColumns = (
   {
     field: 'os.name,os.version',
     composeField: ['os.name', 'os.version'],
-    name: 'Operating system',
+    name: i18n.translate(
+      'wazuh.endpointsSummary.agentsTableColumns.operatingSystem',
+      {
+        defaultMessage: 'Operating system',
+      },
+    ),
     sortable: true,
     show: true,
     render: (field: any, agentData: Agent) => addIconPlatformRender(agentData),
@@ -77,7 +94,9 @@ export const agentsTableColumns = (
   },
   {
     field: 'version',
-    name: 'Version',
+    name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.version', {
+      defaultMessage: 'Version',
+    }),
     sortable: true,
     show: true,
     searchable: true,
@@ -94,7 +113,18 @@ export const agentsTableColumns = (
           <EuiFlexItem grow={false}>{version}</EuiFlexItem>
           {isOutdated ? (
             <EuiFlexItem grow={false}>
-              <EuiToolTip content={<p>Outdated</p>}>
+              <EuiToolTip
+                content={
+                  <p>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.agentsTableColumns.outdatedTooltip',
+                      {
+                        defaultMessage: 'Outdated',
+                      },
+                    )}
+                  </p>
+                }
+              >
                 <EuiHealth className='wz-flex' color='danger'></EuiHealth>
               </EuiToolTip>
             </EuiFlexItem>
@@ -107,9 +137,19 @@ export const agentsTableColumns = (
     field: 'dateAdd',
     name: (
       <span>
-        Registration date{' '}
+        {i18n.translate(
+          'wazuh.endpointsSummary.agentsTableColumns.registrationDate',
+          {
+            defaultMessage: 'Registration date',
+          },
+        )}{' '}
         <EuiIconTip
-          content='This is not searchable through a search term.'
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentsTableColumns.registrationDateNotSearchableTooltip',
+            {
+              defaultMessage: 'This is not searchable through a search term.',
+            },
+          )}
           size='s'
           color='subdued'
           type='alert'
@@ -125,9 +165,19 @@ export const agentsTableColumns = (
     field: 'lastKeepAlive',
     name: (
       <span>
-        Last keep alive{' '}
+        {i18n.translate(
+          'wazuh.endpointsSummary.agentsTableColumns.lastKeepAlive',
+          {
+            defaultMessage: 'Last keep alive',
+          },
+        )}{' '}
         <EuiIconTip
-          content='This is not searchable through a search term.'
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentsTableColumns.lastKeepAliveNotSearchableTooltip',
+            {
+              defaultMessage: 'This is not searchable through a search term.',
+            },
+          )}
           size='s'
           color='subdued'
           type='alert'
@@ -141,7 +191,9 @@ export const agentsTableColumns = (
   },
   {
     field: 'status',
-    name: 'Status',
+    name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.status', {
+      defaultMessage: 'Status',
+    }),
     truncateText: true,
     sortable: true,
     show: true,
@@ -159,10 +211,25 @@ export const agentsTableColumns = (
           <EuiFlexItem grow={false}>
             <EuiToolTip
               content={
-                <p>Upgrade request sent. This may take a few minutes.</p>
+                <p>
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.agentsTableColumns.upgradingTooltip',
+                    {
+                      defaultMessage:
+                        'Upgrade request sent. This may take a few minutes.',
+                    },
+                  )}
+                </p>
               }
             >
-              <EuiBadge color='primary'>Upgrading</EuiBadge>
+              <EuiBadge color='primary'>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentsTableColumns.upgradingBadge',
+                  {
+                    defaultMessage: 'Upgrading',
+                  },
+                )}
+              </EuiBadge>
             </EuiToolTip>
           </EuiFlexItem>
         ) : null}
@@ -171,7 +238,9 @@ export const agentsTableColumns = (
   },
   {
     field: 'actions',
-    name: 'Actions',
+    name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.actions', {
+      defaultMessage: 'Actions',
+    }),
     show: true,
     actions: agentsTableActions(
       setAgent,
@@ -208,7 +277,12 @@ const renderGroups = (groups: string[], setFilters: any) => {
     <GroupTruncate
       groups={groups}
       length={25}
-      label={'more'}
+      label={i18n.translate(
+        'wazuh.endpointsSummary.agentsTableColumns.moreGroupsLabel',
+        {
+          defaultMessage: 'more',
+        },
+      )}
       action={'filter'}
       filterAction={group => filterGroupBadge(group, setFilters)}
     />

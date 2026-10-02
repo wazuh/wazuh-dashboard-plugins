@@ -11,6 +11,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { useDispatch } from 'react-redux';
 import { EuiButton, EuiEmptyPrompt } from '@elastic/eui';
 import { showExploreAgentModalGlobal } from '../../../redux/actions/appStateActions';
@@ -30,7 +31,10 @@ export const PromptSelectAgent = ({ body, title }: PromptSelectAgentProps) => {
       body={body && <>{body}</>}
       actions={
         <EuiButton color='primary' fill onClick={openAgentSelector}>
-          Select agent
+          {i18n.translate(
+            'wazuh.endpointsSummary.promptSelectAgent.selectAgentButton',
+            { defaultMessage: 'Select agent' },
+          )}
         </EuiButton>
       }
     />

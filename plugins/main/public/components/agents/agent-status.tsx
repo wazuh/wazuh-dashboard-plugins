@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   agentStatusColorByAgentStatus,
   agentStatusLabelByAgentStatus,
@@ -39,11 +40,22 @@ export const AgentStatus = ({
       />
       <EuiIconTip
         anchorClassName='wz-agent-icon-tip'
-        aria-label='Description'
+        aria-label={i18n.translate(
+          'wazuh.endpointsSummary.agentStatus.descriptionAriaLabel',
+          { defaultMessage: 'Description' },
+        )}
         size='m'
         type='iInCircle'
         color='primary'
-        content={statusCodeAgent?.STATUS_DESCRIPTION ?? 'Without information'}
+        content={
+          statusCodeAgent?.STATUS_DESCRIPTION ??
+          i18n.translate(
+            'wazuh.endpointsSummary.agentStatus.withoutInformation',
+            {
+              defaultMessage: 'Without information',
+            },
+          )
+        }
       />
     </div>
   );

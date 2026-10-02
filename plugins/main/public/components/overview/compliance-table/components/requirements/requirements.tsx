@@ -22,6 +22,7 @@ import {
   EuiFacetGroup,
   EuiToolTip,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { requirementsName } from '../../requirement-name';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
 
@@ -31,7 +32,11 @@ export class ComplianceRequirements extends Component {
     isPopoverOpen: boolean;
   };
 
-  props!: {};
+  props!: {
+    requirementCounts?: Record<string, number>;
+    descriptions?: Record<string, { title: string }>;
+    section?: string;
+  };
 
   constructor(props) {
     super(props);
@@ -51,19 +56,14 @@ export class ComplianceRequirements extends Component {
   }
 
   getRequirementsList() {
-    const requirementsCount = this.props.requirementsCount || [];
-
-    const { selectedRequirements } = this.props;
+    const requirementCounts = this.props.requirementCounts || {};
     const requirementIds = Object.keys(this.props.complianceObject);
     const requirementList: Array<any> = requirementIds.map(item => {
       let quantity = 0;
+      // Each requirement is already counted over every code it is written
+      // with; a group totals the requirements it holds.
       this.props.complianceObject[item].forEach(subitem => {
-        quantity +=
-          (
-            requirementsCount.find(
-              requirement => requirement.key === subitem,
-            ) || {}
-          ).doc_count || 0;
+        quantity += requirementCounts[subitem] || 0;
       });
       return {
         id: item,
@@ -89,8 +89,21 @@ export class ComplianceRequirements extends Component {
           })
           .map(facet => {
             let iconNode;
+            const requirementLabel = i18n.translate(
+              'wazuh.complianceTable.requirementsPanel.facetLabel',
+              {
+                defaultMessage: 'Requirement {requirement}',
+                values: { requirement: facet.label },
+              },
+            );
+            // A group is named by its framework, or, where the group is a
+            // requirement of its own (a NIS2 article holds the points of its
+            // paragraphs), by the title the standard gives that requirement.
+            const ownTitle = this.props.descriptions?.[facet.label]?.title;
             const name =
-              requirementsName[facet.label] || `Requirement ${facet.label}`;
+              requirementsName[this.props.section]?.[facet.label] ||
+              (ownTitle && `${facet.label} - ${ownTitle}`) ||
+              requirementLabel;
             return (
               <EuiFacetButton
                 key={'Requirement ' + facet.id}
@@ -116,7 +129,7 @@ export class ComplianceRequirements extends Component {
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    Requirement {facet.label}
+                    {requirementLabel}
                   </span>
                 </EuiToolTip>
               </EuiFacetButton>
@@ -146,10 +159,20 @@ export class ComplianceRequirements extends Component {
     const panels = [
       {
         id: 0,
-        title: 'Options',
+        title: i18n.translate(
+          'wazuh.complianceTable.requirementsPanel.optionsTitle',
+          {
+            defaultMessage: 'Options',
+          },
+        ),
         items: [
           {
-            name: 'Select all',
+            name: i18n.translate(
+              'wazuh.complianceTable.requirementsPanel.selectAll',
+              {
+                defaultMessage: 'Select all',
+              },
+            ),
             icon: <EuiIcon type='check' size='m' />,
             onClick: () => {
               this.closePopover();
@@ -157,7 +180,12 @@ export class ComplianceRequirements extends Component {
             },
           },
           {
-            name: 'Unselect all',
+            name: i18n.translate(
+              'wazuh.complianceTable.requirementsPanel.unselectAll',
+              {
+                defaultMessage: 'Unselect all',
+              },
+            ),
             icon: <EuiIcon type='cross' size='m' />,
             onClick: () => {
               this.closePopover();

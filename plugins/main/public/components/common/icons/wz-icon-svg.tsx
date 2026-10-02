@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { getUiSettings } from '../../../kibana-services';
 import { WAZUH_AGENTS_OS_TYPE } from '../../../../common/constants';
 
@@ -53,7 +54,13 @@ export default function WzIconSVG({
   return (
     <img
       src={darkMode ? iconSet.dark : iconSet.light}
-      alt={alt || `${type} icon`}
+      alt={
+        alt ||
+        i18n.translate('wazuh.common.iconSvg.alt', {
+          defaultMessage: '{type} icon',
+          values: { type },
+        })
+      }
       style={{ width, height, ...style }}
       className={className}
     />

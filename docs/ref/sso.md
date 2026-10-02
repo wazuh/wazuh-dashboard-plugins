@@ -12,15 +12,74 @@ This guide summarizes how to configure SAML-based SSO for the Wazuh dashboard wi
 
 The following parameters are required in the Wazuh SSO configuration:
 
-| Parameter           | Description                                                                                                                                            |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `idp.metadata_url`  | URL to an XML file that contains metadata information about the application configured on the IdP side. It can be used instead of `idp.metadata_file`. |
-| `idp.metadata_file` | XML file that contains the metadata information about the application configured on the IdP side. It can be used instead of `idp.metadata_url`.        |
-| `idp.entity_id`     | Entity ID of the Identity Provider. This is a unique value assigned to an Identity Provider.                                                           |
-| `sp.entity_id`      | Entity ID of the Service Provider. This is a unique value assigned to a Service Provider.                                                              |
-| `kibana_url`        | URL to access the Wazuh dashboard.                                                                                                                     |
-| `roles_key`         | The attribute in the SAML assertion where the roles/groups are sent.                                                                                   |
-| `exchange_key`      | The key that will be used to sign the assertions. It must have at least 64 characters.                                                                 |
+| Parameter           | Description                                                                                                                                                                                                                                   |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `idp.metadata_url`  | URL to an XML file that contains metadata information about the application configured on the IdP side. It can be used instead of `idp.metadata_file`.                                                                                        |
+| `idp.metadata_file` | XML file that contains the metadata information about the application configured on the IdP side. It can be used instead of `idp.metadata_url`.                                                                                               |
+| `idp.entity_id`     | Entity ID of the Identity Provider. This is a unique value assigned to an Identity Provider.                                                                                                                                                  |
+| `sp.entity_id`      | Entity ID of the Service Provider. This is a unique value assigned to a Service Provider.                                                                                                                                                     |
+| `kibana_url`        | URL to access the Wazuh dashboard.                                                                                                                                                                                                            |
+| `roles_key`         | The attribute in the SAML assertion where the roles/groups are sent.                                                                                                                                                                          |
+| `exchange_key`      | The shared secret used to sign the internal JWT the security plugin issues after a successful SAML login — not the SAML assertion itself, which the IdP signs. The JWT is signed with HS512, so use a random value of at least 64 characters. |
+
+## Configuration example
+
+The following `config.yml` snippet, from the Keycloak-backed SAML dev environment
+(`docker/osd-dev/config/os/config-saml.yml` in this repository, used when running
+`./dev.sh up -saml`), shows a working `saml_auth` authentication domain for the Wazuh indexer's
+security plugin:
+
+```yaml
+_meta:
+  type: 'config'
+  config_version: 2
+
+config:
+  dynamic:
+    http:
+      anonymous_auth_enabled: false
+    authc:
+      internal_auth:
+        order: 0
+        http_enabled: true
+        transport_enabled: true
+        http_authenticator:
+          type: basic
+          challenge: false
+        authentication_backend:
+          type: internal
+      saml_auth:
+        order: 1
+        http_enabled: true
+        transport_enabled: false
+        http_authenticator:
+          type: saml
+          challenge: true
+          config:
+            idp:
+              metadata_url: http://idp:8080/realms/wazuh/protocol/saml/descriptor
+              entity_id: http://idp:8080/realms/wazuh
+            sp:
+              entity_id: wazuh
+              signature_private_key_filepath: 'certs/admin-key.pem'
+            kibana_url: https://localhost:5601
+            roles_key: Role
+            exchange_key: 1a2a3a4a5a6a7a8a9a0a1b2b3b4b5b6b
+        authentication_backend:
+          type: noop
+```
+
+The example is for development only. Its 32-character `exchange_key` is shorter than the
+recommended 64 characters (the security plugin pads short keys instead of rejecting them), and
+`sp.signature_private_key_filepath` reuses the indexer admin certificate key. In production,
+generate a dedicated random `exchange_key` and a dedicated key pair for signing SAML requests.
+
+Keep `internal_auth` (lower `order`) alongside `saml_auth` so the internal admin user can still
+sign in directly if the IdP is unreachable. On the Wazuh dashboard side,
+`opensearch_security.auth.type: 'saml'` and the ACS/logout paths must be added to
+`server.xsrf.allowlist` in `opensearch_dashboards.yml` (see
+`docker/osd-dev/config/osd/opensearch_dashboards_saml.yml` for a full example), otherwise the
+IdP's POST to the assertion consumer service is rejected as a cross-site request.
 
 ## High-level setup
 

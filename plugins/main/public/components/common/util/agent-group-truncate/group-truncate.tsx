@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -86,7 +87,11 @@ export class GroupTruncate extends React.Component<GroupTruncateProps> {
           this.togglePopover();
         }}
       >
-        &nbsp;{`+${quantity} ${this.props.label}`}
+        &nbsp;
+        {i18n.translate('wazuh.common.groupTruncate.moreGroups', {
+          defaultMessage: '+{quantity} {label}',
+          values: { quantity, label: this.props.label },
+        })}
       </EuiLink>
     );
   }

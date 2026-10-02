@@ -3,7 +3,9 @@ import fs from 'fs';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { EuiMarkdownFormat } from '@elastic/eui';
 import {
+  errorMarkdownProcessingPlugins,
   MessageBubble,
   sanitizeAssistantMarkdown,
   UiChatMessage,
@@ -750,19 +752,6 @@ describe('MessageBubble', () => {
 });
 
 describe('sanitizeAssistantMarkdown', () => {
-  it('strips inline Markdown image syntax, including the URL', () => {
-    const out = sanitizeAssistantMarkdown(
-      'before ![alt](http://evil.example/x) after',
-    );
-    expect(out).not.toContain('![');
-    expect(out).not.toContain('evil.example');
-  });
-
-  it('strips reference-style Markdown image syntax', () => {
-    const out = sanitizeAssistantMarkdown('before ![alt][ref] after');
-    expect(out).not.toContain('![');
-  });
-
   it('strips raw HTML tags (open, close, self-closing)', () => {
     const out = sanitizeAssistantMarkdown(
       '<img src=x onerror=alert(1)> and <div>text</div> and <br/>',
@@ -798,6 +787,14 @@ describe('sanitizeAssistantMarkdown', () => {
     expect(sanitizeAssistantMarkdown(input)).toBe(input);
   });
 
+  it('drops an image with a non-http(s) target whole instead of leaving "!label" behind', () => {
+    expect(
+      sanitizeAssistantMarkdown(
+        'a ![x](data:image/png;base64,AA) b ![y](/p.png) c',
+      ),
+    ).toBe('a  b  c');
+  });
+
   it('keeps an explicit http(s) link but drops a non-http(s) link target, keeping only its label', () => {
     const out = sanitizeAssistantMarkdown(
       'See [CVE page](https://nvd.nist.gov/x) or [click me](javascript:alert(1)) or [rel](/x).',
@@ -808,6 +805,107 @@ describe('sanitizeAssistantMarkdown', () => {
     expect(out).toContain('click me');
     expect(out).not.toContain('[rel]');
     expect(out).toContain('rel');
+  });
+});
+
+describe('MessageBubble — image safety', () => {
+  const renderAnswer = (content: string) =>
+    render(
+      <MessageBubble
+        message={baseMessage({ role: 'assistant', content })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+
+  it('renders no <img> for any image form in a finished answer, keeping the prose around it', () => {
+    const { container } = renderAnswer(
+      [
+        'one ![plain](http://evil.example/1) two',
+        'three ![x\\]y](http://evil.example/2) four',
+        'five ![x[y]z](http://evil.example/3) six',
+        'seven ![full][ref] eight',
+        'nine ![ref] ten',
+        'eleven ![ref][] twelve',
+        'a \\` ![bt](http://evil.example/5) `code`',
+        'thirteen ![data](data:image/png;base64,AAAA) fourteen',
+        'fifteen ![rel](/relative.png) sixteen',
+        '[ref]: http://evil.example/4',
+      ].join('\n\n'),
+    );
+
+    expect(container.querySelectorAll('img')).toHaveLength(0);
+    const text = container.textContent ?? '';
+    for (const word of [
+      'one',
+      'two',
+      'four',
+      'six',
+      'eight',
+      'ten',
+      'twelve',
+      'fourteen',
+      'sixteen',
+    ]) {
+      expect(text).toContain(word);
+    }
+    // Dropped whole: no alt text, no stray "!" from an image the string sanitizer handled.
+    for (const alt of ['plain', 'full', 'data', 'rel', '!']) {
+      expect(text).not.toContain(alt);
+    }
+    expect(text).not.toContain('evil.example');
+  });
+
+  it('shows image syntax inside code samples verbatim', () => {
+    const { container } = renderAnswer(
+      'Inline `![a](http://x/1)` sample.\n\n```md\n![b](http://x/2)\n```\n\n~~~\n![c](http://x/3)\n~~~',
+    );
+
+    expect(container.querySelectorAll('img')).toHaveLength(0);
+    const code = Array.from(container.querySelectorAll('code')).map(
+      node => node.textContent,
+    );
+    expect(code.join('\n')).toContain('![a](http://x/1)');
+    expect(code.join('\n')).toContain('![b](http://x/2)');
+    expect(code.join('\n')).toContain('![c](http://x/3)');
+  });
+
+  it('renders no <img> in an expanded failure reason', () => {
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          failureReason:
+            'Provider responded with HTTP 500: boom ![e](http://evil.example/provider-error) ![r]\n\n[r]: http://evil.example/ref',
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+    fireEvent.click(screen.getByText('Show reason'));
+
+    expect(
+      screen.getByText('Provider responded with HTTP 500: boom', {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+    expect(container.querySelectorAll('img')).toHaveLength(0);
+  });
+
+  it('error markdown drops images and still opens links in a new tab', () => {
+    const { container } = render(
+      <EuiMarkdownFormat processingPluginList={errorMarkdownProcessingPlugins}>
+        {
+          'Top up [here](https://billing.example/plan). ![x](http://evil.example/e)'
+        }
+      </EuiMarkdownFormat>,
+    );
+
+    expect(container.querySelectorAll('img')).toHaveLength(0);
+    const link = screen.getByText('here').closest('a');
+    expect(link?.getAttribute('href')).toBe('https://billing.example/plan');
+    expect(link?.getAttribute('target')).toBe('_blank');
   });
 });
 

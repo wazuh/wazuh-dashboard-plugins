@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import { EnrollmentTokenSummary } from '../../../services/enrollment-tokens';
 
 /* The three ways a token stops authorising enrollments are what the manager
@@ -53,8 +54,28 @@ export const ENROLLMENT_TOKEN_STATUS_LABEL: Record<
   EnrollmentTokenStatus,
   { label: string; color: string }
 > = {
-  active: { label: 'Active', color: 'success' },
-  revoked: { label: 'Revoked', color: 'danger' },
-  expired: { label: 'Expired', color: 'subdued' },
-  exhausted: { label: 'Exhausted', color: 'warning' },
+  active: {
+    label: i18n.translate('wazuh.enrollmentTokens.tokenStatus.active', {
+      defaultMessage: 'Active',
+    }),
+    color: 'success',
+  },
+  revoked: {
+    label: i18n.translate('wazuh.enrollmentTokens.tokenStatus.revoked', {
+      defaultMessage: 'Revoked',
+    }),
+    color: 'danger',
+  },
+  expired: {
+    label: i18n.translate('wazuh.enrollmentTokens.tokenStatus.expired', {
+      defaultMessage: 'Expired',
+    }),
+    color: 'subdued',
+  },
+  exhausted: {
+    label: i18n.translate('wazuh.enrollmentTokens.tokenStatus.exhausted', {
+      defaultMessage: 'Exhausted',
+    }),
+    color: 'warning',
+  },
 };

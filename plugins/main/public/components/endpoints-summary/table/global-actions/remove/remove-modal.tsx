@@ -13,6 +13,7 @@ import {
   EuiCallOut,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -49,10 +50,22 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
   }: RemoveAgentsModalProps) => {
     const getDeleteErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate('wazuh.endpointsSummary.bulkRemoveModal.unknownError', {
+          defaultMessage: 'Unknown error',
+        });
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to remove one or more selected agents. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.bulkRemoveModal.noPermissionsError',
+          {
+            defaultMessage:
+              'No permissions to remove one or more selected agents. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -86,7 +99,10 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: error.message || error,
-            title: `Could not get agents data`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkRemoveModal.getAgentsErrorTitle',
+              { defaultMessage: 'Could not get agents data' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -153,7 +169,10 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: errorMessage,
-            title: `Could not remove agents`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkRemoveModal.removeErrorTitle',
+              { defaultMessage: 'Could not remove agents' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -169,18 +188,34 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The changes will be applied to all agents that match the filters set in the list'
+              title={i18n.translate(
+                'wazuh.endpointsSummary.bulkRemoveModal.allAgentsWarning',
+                {
+                  defaultMessage:
+                    'The changes will be applied to all agents that match the filters set in the list',
+                },
+              )}
             />
           </EuiFormRow>
         ) : (
           <>
-            <EuiFormRow label='Selected agents'>
+            <EuiFormRow
+              label={i18n.translate(
+                'wazuh.endpointsSummary.bulkRemoveModal.selectedAgentsLabel',
+                { defaultMessage: 'Selected agents' },
+              )}
+            >
               <EuiText>{selectedAgents.length}</EuiText>
             </EuiFormRow>
             <EuiSpacer />
             <EuiCallOut color='warning'>
-              If any of the selected agents are still active and auto-enrollment
-              is enabled, they will automatically register again after deletion.
+              {i18n.translate(
+                'wazuh.endpointsSummary.bulkRemoveModal.autoEnrollmentWarning',
+                {
+                  defaultMessage:
+                    'If any of the selected agents are still active and auto-enrollment is enabled, they will automatically register again after deletion.',
+                },
+              )}
             </EuiCallOut>
           </>
         )}
@@ -190,7 +225,11 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
     return (
       <EuiModal onClose={onClose}>
         <EuiModalHeader>
-          <EuiModalHeaderTitle>Remove agents</EuiModalHeaderTitle>
+          <EuiModalHeaderTitle>
+            {i18n.translate('wazuh.endpointsSummary.bulkRemoveModal.title', {
+              defaultMessage: 'Remove agents',
+            })}
+          </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
           {!isResultVisible ? (
@@ -208,9 +247,17 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkRemoveModal.cancelButton',
+                  { defaultMessage: 'Cancel' },
+                )}
+              </EuiButtonEmpty>
               <EuiButton onClick={handleOnSave} fill color='danger'>
-                Remove
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkRemoveModal.removeButton',
+                  { defaultMessage: 'Remove' },
+                )}
               </EuiButton>
             </>
           ) : (
@@ -221,7 +268,10 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+              {i18n.translate(
+                'wazuh.endpointsSummary.bulkRemoveModal.closeButton',
+                { defaultMessage: 'Close' },
+              )}
             </EuiButton>
           )}
         </EuiModalFooter>

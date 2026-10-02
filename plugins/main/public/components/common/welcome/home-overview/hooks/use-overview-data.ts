@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { useEffect, useMemo, useState } from 'react';
 import { useDataSource } from '../../../data-source/hooks/use-data-source';
 import {
@@ -243,7 +244,9 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
       DataSource: OverviewDataSource,
       createRepository: () => new FindingsDataSourceRepository(),
       enabled: true,
-      label: 'Findings',
+      label: i18n.translate('wazuh.common.homeOverviewDataGroup.findings', {
+        defaultMessage: 'Findings',
+      }),
       fetch: async fetchData => {
         const response = await fetchData({
           aggs: {
@@ -293,7 +296,10 @@ export function useFindingsBreakdowns(
     DataSource: OverviewDataSource,
     createRepository: () => new FindingsDataSourceRepository(),
     enabled,
-    label: 'Findings breakdowns',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.findingsBreakdowns',
+      { defaultMessage: 'Findings breakdowns' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: {
@@ -321,7 +327,10 @@ export function useTopOperatingSystems(
     createRepository: () =>
       new SystemInventorySystemStatesDataSourceRepository(),
     enabled,
-    label: 'Top operating systems',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.topOperatingSystems',
+      { defaultMessage: 'Top operating systems' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildTopTermsAgg(AGG.topOs, HOST_OS_NAME_FIELD),
@@ -349,7 +358,10 @@ export function useTopNetworkServices(
     createRepository: () =>
       new SystemInventoryTrafficStatesDataSourceRepository(),
     enabled,
-    label: 'Top network services',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.topNetworkServices',
+      { defaultMessage: 'Top network services' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildTopTermsAgg(AGG.topServices, PROCESS_NAME_FIELD),
@@ -375,7 +387,9 @@ export function useAgentStatus(): DataGroupResult<AgentStatus> {
       return mapAgentStatus(response?.data?.data?.connection);
     },
     deps: [],
-    label: 'Agents status',
+    label: i18n.translate('wazuh.common.homeOverviewDataGroup.agentsStatus', {
+      defaultMessage: 'Agents status',
+    }),
   });
 }
 
@@ -386,7 +400,10 @@ export function useSCAOverview(
     DataSource: SCAStatesDataSource,
     createRepository: () => new SCAStatesDataSourceRepository(),
     enabled,
-    label: 'Configuration Assessment',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.configurationAssessment',
+      { defaultMessage: 'Configuration Assessment' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: { ...buildSCATilesAgg(), ...buildSCATopBenchmarksAgg() },
@@ -412,7 +429,10 @@ export function useFIMOverview(enabled: boolean): DataGroupResult<FimOverview> {
     DataSource: FIMFilesStatesDataSource,
     createRepository: () => new FIMFilesStatesDataSourceRepository(),
     enabled,
-    label: 'File Integrity Monitoring',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.fileIntegrityMonitoring',
+      { defaultMessage: 'File Integrity Monitoring' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: buildFIMTopFilesAgg(),
@@ -445,11 +465,23 @@ function useSecurityAnalyticsFetch<T>(
 
 /** Enabled rules count, across both the standard and custom content spaces. */
 export function useRulesCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchRulesCount, 'Rules');
+  return useSecurityAnalyticsFetch(
+    enabled,
+    fetchRulesCount,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.rules', {
+      defaultMessage: 'Rules',
+    }),
+  );
 }
 
 export function useDecodersCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchDecodersCount, 'Decoders');
+  return useSecurityAnalyticsFetch(
+    enabled,
+    fetchDecodersCount,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.decoders', {
+      defaultMessage: 'Decoders',
+    }),
+  );
 }
 
 export function useIntegrationsCount(
@@ -458,20 +490,40 @@ export function useIntegrationsCount(
   return useSecurityAnalyticsFetch(
     enabled,
     fetchIntegrationsCount,
-    'Integrations',
+    i18n.translate('wazuh.common.homeOverviewDataGroup.integrations', {
+      defaultMessage: 'Integrations',
+    }),
   );
 }
 
 export function useDetectorsCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchDetectorsCount, 'Detectors');
+  return useSecurityAnalyticsFetch(
+    enabled,
+    fetchDetectorsCount,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.detectors', {
+      defaultMessage: 'Detectors',
+    }),
+  );
 }
 
 export function useKvdbsCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchKvdbsCount, 'KVDBs');
+  return useSecurityAnalyticsFetch(
+    enabled,
+    fetchKvdbsCount,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.kvdbs', {
+      defaultMessage: 'KVDBs',
+    }),
+  );
 }
 
 export function useFiltersCount(enabled: boolean): DataGroupResult<number> {
-  return useSecurityAnalyticsFetch(enabled, fetchFiltersCount, 'Filters');
+  return useSecurityAnalyticsFetch(
+    enabled,
+    fetchFiltersCount,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.filters', {
+      defaultMessage: 'Filters',
+    }),
+  );
 }
 
 export function useVulnerabilityOverview(
@@ -481,7 +533,10 @@ export function useVulnerabilityOverview(
     DataSource: VulnerabilitiesDataSource,
     createRepository: () => new VulnerabilitiesDataSourceRepository(),
     enabled,
-    label: 'Vulnerabilities',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.vulnerabilities',
+      { defaultMessage: 'Vulnerabilities' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: {
@@ -525,7 +580,10 @@ export function useThreatIntelEnrichments(
     createRepository: () =>
       new ThreatIntelEnrichmentsStatesDataSourceRepository(),
     enabled,
-    label: 'Threat intelligence',
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.threatIntelligence',
+      { defaultMessage: 'Threat intelligence' },
+    ),
     fetch: async fetchData => {
       const response = await fetchData({
         aggs: {
@@ -591,7 +649,10 @@ export function useItHygieneOperatingSystemsCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventorySystemStatesDataSourceRepository(),
     enabled,
-    'IT Hygiene: operating systems',
+    i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.itHygieneOperatingSystems',
+      { defaultMessage: 'IT Hygiene: operating systems' },
+    ),
   );
 }
 
@@ -602,7 +663,9 @@ export function useItHygienePackagesCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventoryPackagesStatesDataSourceRepository(),
     enabled,
-    'IT Hygiene: packages',
+    i18n.translate('wazuh.common.homeOverviewDataGroup.itHygienePackages', {
+      defaultMessage: 'IT Hygiene: packages',
+    }),
   );
 }
 
@@ -613,7 +676,9 @@ export function useItHygieneUsersCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventoryUsersStatesDataSourceRepository(),
     enabled,
-    'IT Hygiene: users',
+    i18n.translate('wazuh.common.homeOverviewDataGroup.itHygieneUsers', {
+      defaultMessage: 'IT Hygiene: users',
+    }),
   );
 }
 
@@ -624,7 +689,9 @@ export function useItHygieneServicesCount(
     SystemInventoryStatesDataSource,
     () => new SystemInventoryServicesStatesDataSourceRepository(),
     enabled,
-    'IT Hygiene: services',
+    i18n.translate('wazuh.common.homeOverviewDataGroup.itHygieneServices', {
+      defaultMessage: 'IT Hygiene: services',
+    }),
   );
 }
 
@@ -635,7 +702,9 @@ export function useActiveResponseOverview(
     ActiveResponsesDataSource,
     () => new ActiveResponsesDataSourceRepository(),
     enabled,
-    'Active Response',
+    i18n.translate('wazuh.common.homeOverviewDataGroup.activeResponse', {
+      defaultMessage: 'Active Response',
+    }),
     LAST_24H,
   );
 }

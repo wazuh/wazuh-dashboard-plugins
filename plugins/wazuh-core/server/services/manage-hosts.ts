@@ -252,6 +252,16 @@ export class ManageHosts {
       allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
 
     try {
+      // Sent in parallel, read in order so a cluster info failure keeps allow_run_as
+      const requestClusterLocal = this.serverAPIClient.asInternalUser.request(
+        'GET',
+        `/cluster/local/info`,
+        {},
+        { apiHostID },
+      );
+      // Its error is handled when awaited below; this only avoids an unhandled rejection
+      requestClusterLocal.catch(() => {});
+
       // Get allow_run_as
       const responseAllowRunAs =
         await this.serverAPIClient.asInternalUser.request(
@@ -276,13 +286,7 @@ export class ManageHosts {
         allow_run_as = API_USER_STATUS_RUN_AS.HOST_DISABLED;
       }
 
-      const responseClusterLocal =
-        await this.serverAPIClient.asInternalUser.request(
-          'GET',
-          `/cluster/local/info`,
-          {},
-          { apiHostID },
-        );
+      const responseClusterLocal = await requestClusterLocal;
 
       if (this.isServerAPIClientResponseOk(responseClusterLocal)) {
         node = responseClusterLocal.data.data.affected_items[0].node;

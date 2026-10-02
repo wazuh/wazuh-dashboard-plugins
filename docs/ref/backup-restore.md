@@ -8,6 +8,7 @@ This guide focuses on the assets managed by the Wazuh dashboard itself.
 - Dashboard NodeJS options: `/etc/wazuh-dashboard/node.options`
 - Dashboard keystore: `/etc/wazuh-dashboard/opensearch_dashboards.keystore`
 - TLS certificates: `/etc/wazuh-dashboard/certs/`
+- Shared Wazuh root CA, when this host created it: `/etc/wazuh/ca/` (see [Credentials](getting-started/credentials.md#certificates)). It is shared with the other Wazuh components on the host, and its private key can issue certificates they trust. Back up the directory as a whole: it includes the `.wazuh-dashboard-bootstrap-ca` marker, which records that this dashboard created the CA.
 - Saved objects exported from the UI (dashboards, visualizations, index patterns)
 - Custom assets
 
@@ -33,6 +34,20 @@ rsync -aREz \
 $backup_folder
 ```
 
+> **Note:** If this host created the shared Wazuh root CA (see [What to back up](#what-to-back-up)
+> above), also back up `/etc/wazuh/ca/` as a whole — including the `.wazuh-dashboard-bootstrap-ca`
+> marker:
+>
+> ```
+> rsync -aREz /etc/wazuh/ca/ $backup_folder
+> ```
+
+> **Note:** The keystore holds the `kibanaserver` and `wazuh-wui` passwords and the AI Assistant
+> encryption key (`wazuh_ai_assistant.encryptionKey`). Without that key, the provider API keys
+> stored by the AI Assistant cannot be decrypted, so keep the keystore backup as protected as the
+> passwords themselves. `/etc/wazuh/credentials.env` does not need to be backed up for the
+> dashboard: once the passwords are in the keystore, the dashboard does not read it again.
+
 3. Export the saved objects
 
 3.1. Create the **saved_objects** directory
@@ -41,11 +56,17 @@ $backup_folder
 mkdir -p "$backup_folder/saved_objects"
 ```
 
-> Note: if multitenancy is used, exportthe saved objects of each tenant repeating the following steps, consider separating in directories by tenant.
+> Note: if multitenancy is used, export the saved objects of each tenant repeating the following steps, consider separating in directories by tenant.
 
-3.2. Open **Dashboard management** > **Dashboards Management** > **Saved objects**.
+3.2. Open **Dashboard management > Dashboards Management > Saved objects**.
 
 3.3. Export the required objects, or use **Export all objects**. Choose as destination the **saved_objects** directory.
+
+> **Note:** **Export all objects** does not include hidden saved object types, such as the
+> `wazuh-check-updates-*` objects created by `wazuh-check-updates` (see
+> [Persistence](architecture.md#persistence)) — they are not listed in **Saved objects**
+> management and have no export option there. The only way to back them up is an index or
+> snapshot backup of the OpenSearch Dashboards index itself, through the Wazuh indexer.
 
 4. Custom assets
 
@@ -85,6 +106,7 @@ Decompress the backup files and change the current working directory to the dire
 
 ```
 tar -xzvf wazuh-dashboard-backup.tar.gz
+backup_destination_folder=$(tar -tzf wazuh-dashboard-backup.tar.gz | head -1)
 cd $backup_destination_folder
 ```
 
@@ -94,12 +116,27 @@ cd $backup_destination_folder
 cp etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearch_dashboards.yml
 cp etc/wazuh-dashboard/node.options /etc/wazuh-dashboard/node.options
 cp etc/wazuh-dashboard/opensearch_dashboards.keystore /etc/wazuh-dashboard/opensearch_dashboards.keystore
-cp -r etc/wazuh-dashboard/certs/ /etc/wazuh-dashboard/certs/
+cp -r etc/wazuh-dashboard/certs/. /etc/wazuh-dashboard/certs/
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.yml
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/node.options
 chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.keystore
 chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
+chmod 500 /etc/wazuh-dashboard/certs
+chmod 400 /etc/wazuh-dashboard/certs/*
 ```
+
+If the backup includes the shared Wazuh root CA (`etc/wazuh/ca/`), restore it as a whole,
+including the `.wazuh-dashboard-bootstrap-ca` marker, before starting the dashboard. `cp -a` keeps
+the ownership and permissions the backup preserved:
+
+```
+mkdir -p /etc/wazuh/ca
+cp -a etc/wazuh/ca/. /etc/wazuh/ca/
+```
+
+The restored keystore entries take precedence over `/etc/wazuh/credentials.env`, so the dashboard
+uses the restored passwords. If the passwords changed since the backup, update them as described in
+[Rotation](getting-started/credentials.md#rotation).
 
 4. Restore the custom assets files
 
@@ -107,8 +144,12 @@ If some custom asset was backed, then for each one:
 
 ```
 cp <path/to/asset/> <destination_path>
-chown wazuh-dashboard:wazuh-dashboard <destination_path>
+chown root:root <destination_path>
 ```
+
+Custom assets hosted in the dashboard server (see [Custom branding](custom-branding/custom-branding.md#host-the-images-in-the-dashboard-server))
+live under `/usr/share/wazuh-dashboard/`, which the package installs as `root:root` — matching
+ownership here keeps it consistent with the rest of that tree.
 
 5. Restart the service:
 
@@ -124,6 +165,6 @@ systemctl restart wazuh-dashboard
 service wazuh-dashboard restart
 ```
 
-6. Import saved objects from **Dashboard management** > **Dashboards Management** > **Saved objects**.
+6. Import saved objects from **Dashboard management > Dashboards Management > Saved objects**.
 
 Import the saved object stored in `$backup_folder`. If using multitenancy, import the related saved objects into each tenant.

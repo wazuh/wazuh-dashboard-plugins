@@ -1,6 +1,6 @@
 # Normalization
 
-The **Normalization** module is part of the **Ruleset Management** section in the Wazuh Dashboard. It provides visibility and management over the components that govern how raw log data is parsed, enriched, and structured before it is used for detection and analysis.
+The **Normalization** module is part of the **Ruleset Management** section in the Wazuh dashboard. It provides visibility and management over the components that govern how raw log data is parsed, enriched, and structured before it is used for detection and analysis.
 
 This module exposes the following sections:
 
@@ -40,7 +40,7 @@ A **KVDB** (Key-Value Database) is a lookup table that can be referenced in deco
 
 ---
 
-## Use Case: Creating a Custom Decoder
+## Use case: Creating a custom decoder
 
 The following walkthrough demonstrates how to create a custom decoder for SSH authentication logs, validate it through the promotion lifecycle, and confirm it is working correctly via Log test.
 
@@ -52,9 +52,9 @@ Create Integration → Add Decoder → Enable policy → Promote to Test → Tes
 
 ---
 
-### Step 1: Create a Custom Integration
+### Step 1: Create a custom integration
 
-Navigate to **Ruleset Management → Overview** (space **Draft**), open the **Integrations** tab, and select **Actions → Create** to open the **Create integration** form. Complete it:
+Navigate to **Ruleset Management > Overview** (space **Draft**), open the **Integrations** tab, and select **Actions > Create** to open the **Create integration** form. Complete it:
 
 - **Title** _(required)_ — the integration identifier, e.g. `custom-ssh-auth`. Must be 2–50 characters using only lowercase letters, digits, hyphens, and underscores (no spaces or uppercase).
 - **Category** _(required)_ — routes classified events to the `wazuh-events-v5-<category>` index.
@@ -78,9 +78,9 @@ Once created, the new integration appears in the integrations list within the **
 
 ---
 
-### Step 2: Create a Custom Decoder
+### Step 2: Create a custom decoder
 
-Navigate to **Ruleset Management → Normalization → Decoders**, then select **Actions → Create**. In the creation form, choose the integration created in the previous step (`custom-ssh-auth`), and provide the decoder definition.
+Navigate to **Ruleset Management > Normalization > Decoders**, then select **Actions > Create**. In the creation form, choose the integration created in the previous step (`custom-ssh-auth`), and provide the decoder definition.
 
 <!-- IMAGE: Decoder creation form with integration chosen -->
 <!-- Suggested filename: images/normalization/03-create-decoder-yaml-editor.png -->
@@ -107,11 +107,12 @@ check:
 normalize:
   - map:
       - '@timestamp': get_date()
+      - event.action: 'authentication_failed'
 ```
 
 </details>
 
-The `check` block defines the condition that must be satisfied for this decoder to apply. The `normalize` block defines the field mappings applied when the condition matches.
+The `check` block defines the condition that must be satisfied for this decoder to apply. The `normalize` block defines the field mappings applied when the condition matches. The `event.action` mapping is required here: the [Detection](./detection.md) walkthrough's example rule matches on `event.action: authentication_failed`, and without this decoder setting that field, the rule never matches and no finding is produced.
 
 Click **Create decoder**. The definition is validated by the engine before it is saved — a decoder missing a required field is rejected (for example, omitting `name` fails with _'name' is required_). The form opens pre-filled with a placeholder decoder that must be replaced.
 
@@ -120,7 +121,7 @@ Click **Create decoder**. The definition is validated by the engine before it is
 
 ![Decoder schema validation](images/normalization/04-decoder-validation.png)
 
-Once valid, the decoder is created and appears under **Normalization → Decoders**.
+Once valid, the decoder is created and appears under **Normalization > Decoders**.
 
 ---
 
@@ -128,7 +129,7 @@ Once valid, the decoder is created and appears under **Normalization → Decoder
 
 The space's **space policy** defines the **root decoder** — the decoder the engine uses as the entry point for event processing — and whether the space is active (the **Status** toggle). A root decoder must be set before the space's content can be promoted.
 
-1. Navigate to **Ruleset Management → Overview** and ensure the **Draft** space is selected (top-right space selector).
+1. Navigate to **Ruleset Management > Overview** and ensure the **Draft** space is selected (top-right space selector).
 2. Open the space **Actions** menu (top-right) — it offers **Edit**, **Clear space** and **Promote** — and select **Edit** to open the **Edit Draft** flyout.
 
 <!-- IMAGE: Integration actions menu in the Draft space, Edit option highlighted -->
@@ -143,7 +144,7 @@ The space's **space policy** defines the **root decoder** — the decoder the en
 
 ![Space policy - Enabled with root decoder](images/normalization/06-enable-integration-status.png)
 
-After **Save**, the **Settings** tab reflects the change — **Status: Enabled** and **Root decoder: decoder/custom-ssh-auth/0** — confirmed by a _Successfully updated [draft] space_ toast.
+After **Save**, the **Settings** tab reflects the change — **Status: Enabled** and **Root decoder: decoder/custom-ssh-auth/0** — confirmed by a _Successfully updated \[draft\] space_ toast.
 
 ![Space policy saved](images/normalization/06b-space-policy-saved.png)
 
@@ -165,17 +166,17 @@ Once the **Draft** policy is **enabled** and the **root decoder** is set, the in
 
 ![Promote to Test - confirm](images/normalization/08b-promote-confirm-modal.png)
 
-A _Successfully promoted [draft] space_ toast confirms it, and the integration is now available in the **Test** space.
+A _Successfully promoted \[draft\] space_ toast confirms it, and the integration is now available in the **Test** space.
 
 ![Promote to Test - Success](images/normalization/09-promote-to-test-success.png)
 
 ---
 
-### Step 5: Validate with Log Test
+### Step 5: Validate with Log test
 
 With the integration promoted to the **Test** space, use **Log test** to verify that events are parsed correctly.
 
-Navigate to **Ruleset Management → Log test** and select the **Test** space (header space selector). Under **Normalization**, set **Location** to `/var/log/auth.log` _(optional)_; under **Detection**, set **Integration** to `custom-ssh-auth` (without it the Detection tab reports _Detection skipped — 'integration' field not provided_). Paste a representative event in **Log event**:
+Navigate to **Ruleset Management > Log test** and select the **Test** space (header space selector). Under **Normalization**, set **Location** to `/var/log/auth.log` _(optional)_; under **Detection**, set **Integration** to `custom-ssh-auth` (without it the Detection tab reports _Detection skipped — 'integration' field not provided_). Paste a representative event in **Log event**:
 
 ```
 Dec 19 12:00:00 host sshd[123]: Failed password for root from 10.0.0.1 port 12345 ssh2
@@ -219,11 +220,11 @@ Once promoted, the integration is active in the **Custom** space and the engine 
 
 ## Space policy settings
 
-Every space has a **space policy**. Its current values are shown read-only on the **Settings** and **Details** tabs of the policy card in **Ruleset Management → Overview** (in any space). To change them, select the space (top-right space selector) and choose **Actions → Edit** to open the **Edit &lt;space&gt;** flyout (titled, for example, **Edit Draft**).
+Every space has a **space policy**. Its current values are shown read-only on the **Settings** and **Details** tabs of the policy card in **Ruleset Management > Overview** (in any space). To change them, select the space (top-right space selector) and choose **Actions > Edit** to open the **Edit &lt;space&gt;** flyout (titled, for example, **Edit Draft**).
 
-**Where editing is available.** The **Actions → Edit** item is enabled only in **Draft** and **Standard**; in **Test** and **Custom** it is disabled. Which fields are editable also depends on the space:
+**Where editing is available.** The **Actions > Edit** item is enabled only in **Draft** and **Standard**; in **Test** and **Custom** it is disabled. Which fields are editable also depends on the space:
 
-| Space        | Actions → Edit | Editable fields                                                                                     |
+| Space        | Actions > Edit | Editable fields                                                                                     |
 | ------------ | -------------- | --------------------------------------------------------------------------------------------------- |
 | **Draft**    | Enabled        | All fields (Details + Settings)                                                                     |
 | **Standard** | Enabled        | Status, Index unclassified events, Index discarded events, Enrichments (all other fields read-only) |
@@ -263,7 +264,7 @@ Both toggles live in the space policy's **Settings** group (shown in the **Edit 
 
 **Enable or disable unclassified / discarded events indexing — exact UI steps:**
 
-1. Go to **Ruleset Management → Overview**.
+1. Go to **Ruleset Management > Overview**.
 2. Select the space (top-right space selector). These toggles are editable in **Draft** and **Standard** only (see [Space policy settings](#space-policy-settings)).
 3. Open the space **Actions** menu and select **Edit** to open the **Edit &lt;space&gt;** flyout.
 4. Under **Settings**, toggle **Index unclassified events** and/or **Index discarded events**.
@@ -271,6 +272,6 @@ Both toggles live in the space policy's **Settings** group (shown in the **Edit 
 
 These settings can be hidden from the UI via the `opensearch_security_analytics.disabledSettings` option (`index-unclassified-events`, `index-discarded-events`). See [Configuration](../../configuration.md).
 
-## Related Sections
+## Related sections
 
 - [Detection](./detection.md) — Manage and create rules that operate on normalized events.

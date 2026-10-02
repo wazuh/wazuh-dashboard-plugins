@@ -2,20 +2,12 @@
 
 ## Hardware requirements
 
-### Minimum specifications
+| Minimum RAM (GB) | Minimum CPU (cores) | Recommended RAM (GB) | Recommended CPU (cores) |
+| ---------------- | ------------------- | -------------------- | ----------------------- |
+| 4                | 2                   | 8                    | 4                       |
 
-- **CPU**: 2 cores
-- **RAM**: 4 GB
-- **Disk space**: 2 GB of free space
-
-### Recommended specifications
-
-For production environments:
-
-- **CPU**: 4+ cores
-- **RAM**: 8+ GB
-- **Disk space**: 10+ GB of free space
-- **Network**: 1 Gbps network interface
+- **Disk space**: 2 GB of free space minimum, 10+ GB recommended for production.
+- **Network**: 1 Gbps network interface recommended for production.
 
 > **Note**: Hardware requirements may vary based on the number of monitored agents, data retention policies, and dashboard usage patterns.
 
@@ -23,28 +15,23 @@ For production environments:
 
 ### Operating system
 
-Supported Linux distributions:
-
-- **Debian-based** (DEB packages):
-  - Debian 10, 11, 12
-  - Ubuntu 18.04, 20.04, 22.04, 24.04
-- **Red Hat-based** (RPM packages):
-  - RHEL 7, 8, 9
-  - CentOS 7, 8
-  - Amazon Linux 2, 2023
-  - Fedora 34+
+See the [Compatibility](../compatibility.md#supported-operating-systems) page for the list of
+supported operating system versions and architectures.
 
 ### System privileges
 
-- Root or sudo privileges to install packages and manage services
-- Write permissions to `/usr/share/wazuh-dashboard/`, `/etc/wazuh-dashboard/`, and `/var/lib/wazuh-dashboard/`
+- Root or sudo privileges to install packages and manage services. The package itself creates
+  `/usr/share/wazuh-dashboard/` as `root:root` (only `/usr/share/wazuh-dashboard/data/` is owned
+  by the `wazuh-dashboard` service user) and `/etc/wazuh-dashboard/` as
+  `wazuh-dashboard:wazuh-dashboard 0750` — do not grant broader write access to these paths
+  afterward. See [Security](../security.md#operational-practices).
 
 ### System dependencies
 
 Required packages (automatically installed with Wazuh dashboard):
 
-- **Debian/Ubuntu**: `tar`, `curl`, `libcap2-bin`
-- **RHEL/CentOS**: `libcap`
+- **Debian/Ubuntu**: `tar`, `curl`, `libcap2-bin`, `openssl`
+- **RHEL/CentOS**: `libcap`, `openssl`, `diffutils`, `util-linux`
 
 ## Network requirements
 
@@ -63,7 +50,7 @@ Ensure the following ports are accessible:
 
 ### TLS/SSL certificates
 
-- Valid TLS certificates for HTTPS communication
+- Valid TLS certificates for HTTPS communication. A fresh install issues them from the shared Wazuh root CA; see [Credentials](credentials.md#certificates)
 - Certificate files must be readable by the `wazuh-dashboard` user
 
 ## Component requirements
@@ -72,13 +59,15 @@ The Wazuh dashboard depends on:
 
 ### Wazuh indexer (OpenSearch)
 
-- Version compatibility: OpenSearch 2.x (check `package.json` for exact version)
+- Version compatibility: see the [Compatibility](../compatibility.md#version-compatibility) matrix
 - Connection type: HTTPS with TLS certificate verification
 - Required permissions: Read and write access to Wazuh indices
+- The password of the `kibanaserver` account (`WAZUH_INDEXER_KIBANASERVER_PASSWORD`)
 
 ### Wazuh manager API
 
-- Version compatibility: Wazuh 5.x
+- Version compatibility: see the [Compatibility](../compatibility.md#version-compatibility) matrix
+- The password of the `wazuh-wui` account (`WAZUH_MANAGER_WUI_PASSWORD`)
 - API user with appropriate permissions for:
   - Agent management
   - Configuration queries

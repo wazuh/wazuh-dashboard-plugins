@@ -1,10 +1,13 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 
 const getVisStateSeverityCritical = (indexPatternId: string) => {
   return {
     id: 'severity_critical_vulnerabilities',
-    title: 'Critical',
+    title: i18n.translate('wazuh.vulnerabilityDetection.kpi.critical.title', {
+      defaultMessage: 'Critical',
+    }),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -60,7 +63,10 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.kpi.critical.metricLabel',
+              { defaultMessage: 'Severity' },
+            ),
           },
           schema: 'metric',
         },
@@ -75,7 +81,10 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Critical"',
                   language: 'kuery',
                 },
-                label: 'Critical',
+                label: i18n.translate(
+                  'wazuh.vulnerabilityDetection.kpi.critical.filterLabel',
+                  { defaultMessage: 'Critical' },
+                ),
               },
             ],
           },
@@ -89,7 +98,9 @@ const getVisStateSeverityCritical = (indexPatternId: string) => {
 const getVisStateSeverityHigh = (indexPatternId: string) => {
   return {
     id: 'severity_high_vulnerabilities',
-    title: 'High',
+    title: i18n.translate('wazuh.vulnerabilityDetection.kpi.high.title', {
+      defaultMessage: 'High',
+    }),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -145,7 +156,10 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.kpi.high.metricLabel',
+              { defaultMessage: 'Severity' },
+            ),
           },
           schema: 'metric',
         },
@@ -160,7 +174,10 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"High"',
                   language: 'kuery',
                 },
-                label: 'High',
+                label: i18n.translate(
+                  'wazuh.vulnerabilityDetection.kpi.high.filterLabel',
+                  { defaultMessage: 'High' },
+                ),
               },
             ],
           },
@@ -174,7 +191,9 @@ const getVisStateSeverityHigh = (indexPatternId: string) => {
 const getVisStateSeverityMedium = (indexPatternId: string) => {
   return {
     id: 'severity_medium_vulnerabilities',
-    title: 'Medium',
+    title: i18n.translate('wazuh.vulnerabilityDetection.kpi.medium.title', {
+      defaultMessage: 'Medium',
+    }),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -230,7 +249,10 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.kpi.medium.metricLabel',
+              { defaultMessage: 'Severity' },
+            ),
           },
           schema: 'metric',
         },
@@ -245,7 +267,10 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Medium"',
                   language: 'kuery',
                 },
-                label: 'Medium',
+                label: i18n.translate(
+                  'wazuh.vulnerabilityDetection.kpi.medium.filterLabel',
+                  { defaultMessage: 'Medium' },
+                ),
               },
             ],
           },
@@ -259,7 +284,9 @@ const getVisStateSeverityMedium = (indexPatternId: string) => {
 const getVisStateSeverityLow = (indexPatternId: string) => {
   return {
     id: 'severity_low_vulnerabilities',
-    title: 'Low',
+    title: i18n.translate('wazuh.vulnerabilityDetection.kpi.low.title', {
+      defaultMessage: 'Low',
+    }),
     type: 'metric',
     params: {
       addTooltip: true,
@@ -315,7 +342,10 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Severity',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.kpi.low.metricLabel',
+              { defaultMessage: 'Severity' },
+            ),
           },
           schema: 'metric',
         },
@@ -330,7 +360,10 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
                   query: 'vulnerability.severity:"Low"',
                   language: 'kuery',
                 },
-                label: 'Low',
+                label: i18n.translate(
+                  'wazuh.vulnerabilityDetection.kpi.low.filterLabel',
+                  { defaultMessage: 'Low' },
+                ),
               },
             ],
           },
@@ -344,7 +377,9 @@ const getVisStateSeverityLow = (indexPatternId: string) => {
 const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
   return {
     id: 'vulnerabilities_evaluation_count',
-    title: 'Evaluation',
+    title: i18n.translate('wazuh.vulnerabilityDetection.kpi.evaluation.title', {
+      defaultMessage: 'Evaluation',
+    }),
     type: 'metric',
     params: {
       addLegend: false,
@@ -396,7 +431,10 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Evaluation',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.kpi.evaluation.metricLabel',
+              { defaultMessage: 'Evaluation' },
+            ),
           },
           schema: 'metric',
         },
@@ -411,7 +449,10 @@ const getVisStateEvaluatedEvaluationPending = (indexPatternId: string) => {
                   language: 'kuery',
                   query: 'vulnerability.under_evaluation:true',
                 },
-                label: 'Pending',
+                label: i18n.translate(
+                  'wazuh.vulnerabilityDetection.kpi.evaluation.pendingLabel',
+                  { defaultMessage: 'Pending' },
+                ),
               },
             ],
           },

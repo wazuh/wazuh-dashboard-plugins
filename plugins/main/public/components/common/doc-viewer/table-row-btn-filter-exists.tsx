@@ -47,18 +47,18 @@ export function DocViewTableRowBtnFilterExists({
   const tooltipContent = disabled ? (
     scripted ? (
       <FormattedMessage
-        id='discover.docViews.table.unableToFilterForPresenceOfScriptedFieldsTooltip'
+        id='wazuh.common.docViewer.filterExistsScriptedFieldTooltip'
         defaultMessage='Unable to filter for presence of scripted fields'
       />
     ) : (
       <FormattedMessage
-        id='discover.docViews.table.unableToFilterForPresenceOfMetaFieldsTooltip'
+        id='wazuh.common.docViewer.filterExistsMetaFieldTooltip'
         defaultMessage='Unable to filter for presence of meta fields'
       />
     )
   ) : (
     <FormattedMessage
-      id='discover.docViews.table.filterForFieldPresentButtonTooltip'
+      id='wazuh.common.docViewer.filterExistsTooltip'
       defaultMessage='Filter for field present'
     />
   );
@@ -67,7 +67,7 @@ export function DocViewTableRowBtnFilterExists({
     <EuiToolTip content={tooltipContent}>
       <EuiButtonIcon
         aria-label={i18n.translate(
-          'discover.docViews.table.filterForFieldPresentButtonAriaLabel',
+          'wazuh.common.docViewer.filterExistsAriaLabel',
           {
             defaultMessage: 'Filter for field present',
           },

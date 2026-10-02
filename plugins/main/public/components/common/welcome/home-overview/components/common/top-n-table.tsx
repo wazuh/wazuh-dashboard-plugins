@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiBasicTable, EuiBasicTableColumn } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { TabNumber } from './tab-number';
@@ -20,11 +21,17 @@ export interface TopNTableProps {
 export const TopNTable: React.FC<TopNTableProps> = ({
   items,
   keyColumnName,
-  countColumnName = 'Count',
+  countColumnName = i18n.translate(
+    'wazuh.common.homeOverviewTopNTable.countColumn',
+    { defaultMessage: 'Count' },
+  ),
   renderKey,
   noItemsMessage,
   totalSlots,
-  moreItemsMessage = 'No more items to display',
+  moreItemsMessage = i18n.translate(
+    'wazuh.common.homeOverviewList.noMoreItems',
+    { defaultMessage: 'No more items to display' },
+  ),
   ...rest
 }) => {
   const missingSlots = getMissingSlots(items.length, totalSlots);

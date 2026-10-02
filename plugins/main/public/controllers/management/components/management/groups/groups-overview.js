@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiPanel,
   EuiPage,
@@ -51,26 +52,35 @@ export class WzGroupsOverview extends Component {
     this.tableColumns = [
       {
         field: 'name',
-        name: 'Name',
+        name: i18n.translate('wazuh.endpointGroups.overview.nameColumn', {
+          defaultMessage: 'Name',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
       },
       {
         field: 'count',
-        name: 'Agents',
+        name: i18n.translate('wazuh.endpointGroups.overview.agentsColumn', {
+          defaultMessage: 'Agents',
+        }),
         align: 'left',
         searchable: true,
         sortable: true,
       },
       {
         field: 'configSum',
-        name: 'Configuration checksum',
+        name: i18n.translate(
+          'wazuh.endpointGroups.overview.configChecksumColumn',
+          { defaultMessage: 'Configuration checksum' },
+        ),
         align: 'left',
         searchable: true,
       },
       {
-        name: 'Actions',
+        name: i18n.translate('wazuh.endpointGroups.overview.actionsColumn', {
+          defaultMessage: 'Actions',
+        }),
         align: 'left',
         searchable: false,
         render: item => {
@@ -83,9 +93,18 @@ export class WzGroupsOverview extends Component {
                 ]}
                 tooltip={{
                   position: 'top',
-                  content: `View ${item.name} details`,
+                  content: i18n.translate(
+                    'wazuh.endpointGroups.overview.viewDetailsTooltip',
+                    {
+                      defaultMessage: 'View {groupName} details',
+                      values: { groupName: item.name },
+                    },
+                  ),
                 }}
-                aria-label='View group details'
+                aria-label={i18n.translate(
+                  'wazuh.endpointGroups.overview.viewDetailsAriaLabel',
+                  { defaultMessage: 'View group details' },
+                )}
                 iconType='eye'
                 onClick={async () => {
                   this.props.updateGroupDetail(item);
@@ -102,9 +121,15 @@ export class WzGroupsOverview extends Component {
                 ]}
                 tooltip={{
                   position: 'top',
-                  content: 'Edit group configuration',
+                  content: i18n.translate(
+                    'wazuh.endpointGroups.overview.editConfigurationTooltip',
+                    { defaultMessage: 'Edit group configuration' },
+                  ),
                 }}
-                aria-label='Edit group configuration'
+                aria-label={i18n.translate(
+                  'wazuh.endpointGroups.overview.editConfigurationAriaLabel',
+                  { defaultMessage: 'Edit group configuration' },
+                )}
                 iconType='pencil'
                 onClick={async ev => {
                   ev.stopPropagation();
@@ -120,10 +145,26 @@ export class WzGroupsOverview extends Component {
                   posiiton: 'top',
                   content:
                     item.name === 'default'
-                      ? `The ${item.name} group cannot be deleted`
-                      : `Delete ${item.name}`,
+                      ? i18n.translate(
+                          'wazuh.endpointGroups.overview.cannotDeleteTooltip',
+                          {
+                            defaultMessage:
+                              'The {groupName} group cannot be deleted',
+                            values: { groupName: item.name },
+                          },
+                        )
+                      : i18n.translate(
+                          'wazuh.endpointGroups.overview.deleteTooltip',
+                          {
+                            defaultMessage: 'Delete {groupName}',
+                            values: { groupName: item.name },
+                          },
+                        ),
                 }}
-                aria-label='Delete content'
+                aria-label={i18n.translate(
+                  'wazuh.endpointGroups.overview.deleteAriaLabel',
+                  { defaultMessage: 'Delete content' },
+                )}
                 iconType='trash'
                 onClick={async ev => {
                   ev.stopPropagation();
@@ -153,14 +194,27 @@ export class WzGroupsOverview extends Component {
       await Promise.all(promises);
       getToasts().add({
         color: 'success',
-        title: 'Success',
-        text: 'Deleted successfully',
+        title: i18n.translate(
+          'wazuh.endpointGroups.overview.deleteSuccessTitle',
+          { defaultMessage: 'Success' },
+        ),
+        text: i18n.translate(
+          'wazuh.endpointGroups.overview.deleteSuccessText',
+          {
+            defaultMessage: 'Deleted successfully',
+          },
+        ),
         toastLifeTimeMs: 3000,
       });
     } catch (error) {
       getToasts().add({
         color: 'danger',
-        title: 'Error',
+        title: i18n.translate(
+          'wazuh.endpointGroups.overview.deleteErrorTitle',
+          {
+            defaultMessage: 'Error',
+          },
+        ),
         text: error,
         toastLifeTimeMs: 3000,
       });
@@ -213,20 +267,42 @@ export class WzGroupsOverview extends Component {
           <TableWzAPI
             reload={this.state.reload}
             actionButtons={actionButtons}
-            title='Groups'
-            description='From here you can list and check your groups, its agents and
-            files.'
+            title={i18n.translate('wazuh.endpointGroups.overview.title', {
+              defaultMessage: 'Groups',
+            })}
+            description={i18n.translate(
+              'wazuh.endpointGroups.overview.description',
+              {
+                defaultMessage:
+                  'From here you can list and check your groups, its agents and files.',
+              },
+            )}
             tableColumns={this.tableColumns}
             tableInitialSortingField='name'
             searchTable={true}
             searchBarWQL={{
               suggestions: {
                 field: () => [
-                  { label: 'name', description: 'filter by name' },
-                  { label: 'count', description: 'filter by count' },
+                  {
+                    label: 'name',
+                    description: i18n.translate(
+                      'wazuh.endpointGroups.overview.filterByName',
+                      { defaultMessage: 'filter by name' },
+                    ),
+                  },
+                  {
+                    label: 'count',
+                    description: i18n.translate(
+                      'wazuh.endpointGroups.overview.filterByCount',
+                      { defaultMessage: 'filter by count' },
+                    ),
+                  },
                   {
                     label: 'configSum',
-                    description: 'filter by configuration checksum',
+                    description: i18n.translate(
+                      'wazuh.endpointGroups.overview.filterByConfigChecksum',
+                      { defaultMessage: 'filter by configuration checksum' },
+                    ),
                   },
                 ],
                 value: async (currentValue, { field }) => {
@@ -261,18 +337,30 @@ export class WzGroupsOverview extends Component {
         {this.props.state.showModal ? (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`Delete ${
-                this.props.state.itemList[0].file
-                  ? this.props.state.itemList[0].file
-                  : this.props.state.itemList[0].name
-              } group?`}
+              title={i18n.translate(
+                'wazuh.endpointGroups.overview.deleteModalTitle',
+                {
+                  defaultMessage: 'Delete {groupName} group?',
+                  values: {
+                    groupName: this.props.state.itemList[0].file
+                      ? this.props.state.itemList[0].file
+                      : this.props.state.itemList[0].name,
+                  },
+                },
+              )}
               onCancel={() => this.props.updateShowModal(false)}
               onConfirm={() => {
                 this.removeItems(this.props.state.itemList);
                 this.props.updateShowModal(false);
               }}
-              cancelButtonText='Cancel'
-              confirmButtonText='Delete'
+              cancelButtonText={i18n.translate(
+                'wazuh.endpointGroups.overview.deleteModalCancel',
+                { defaultMessage: 'Cancel' },
+              )}
+              confirmButtonText={i18n.translate(
+                'wazuh.endpointGroups.overview.deleteModalConfirm',
+                { defaultMessage: 'Delete' },
+              )}
               defaultFocusedButton='cancel'
               buttonColor='danger'
             ></EuiConfirmModal>
