@@ -6,6 +6,7 @@ import {
   EuiText,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 type MitreCategory = { id?: string[]; name?: string[] };
 
@@ -42,7 +43,14 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
     <EuiFlexGroup direction='column' gutterSize='m' style={{ padding: 16 }}>
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Description</h3>
+          <h3>
+            {i18n.translate(
+              'wazuh.configurationAssessment.checkDetails.descriptionTitle',
+              {
+                defaultMessage: 'Description',
+              },
+            )}
+          </h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -52,7 +60,14 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Rationale</h3>
+          <h3>
+            {i18n.translate(
+              'wazuh.configurationAssessment.checkDetails.rationaleTitle',
+              {
+                defaultMessage: 'Rationale',
+              },
+            )}
+          </h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -62,7 +77,14 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Remediation</h3>
+          <h3>
+            {i18n.translate(
+              'wazuh.configurationAssessment.checkDetails.remediationTitle',
+              {
+                defaultMessage: 'Remediation',
+              },
+            )}
+          </h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -72,7 +94,15 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Check (Condition: {check.condition})</h3>
+          <h3>
+            {i18n.translate(
+              'wazuh.configurationAssessment.checkDetails.checkTitle',
+              {
+                defaultMessage: 'Check (Condition: {condition})',
+                values: { condition: check.condition },
+              },
+            )}
+          </h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -86,7 +116,14 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Compliance</h3>
+          <h3>
+            {i18n.translate(
+              'wazuh.configurationAssessment.checkDetails.complianceTitle',
+              {
+                defaultMessage: 'Compliance',
+              },
+            )}
+          </h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
@@ -103,7 +140,14 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
 
       <EuiFlexItem>
         <EuiTitle size='s'>
-          <h3>Mitre</h3>
+          <h3>
+            {i18n.translate(
+              'wazuh.configurationAssessment.checkDetails.mitreTitle',
+              {
+                defaultMessage: 'Mitre',
+              },
+            )}
+          </h3>
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>

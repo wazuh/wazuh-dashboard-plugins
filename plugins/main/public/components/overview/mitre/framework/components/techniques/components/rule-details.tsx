@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiAccordion,
   EuiFlexGroup,
@@ -144,7 +145,16 @@ const RuleDetails = (props: Props) => {
 
   const renderCompliance = compliance => {
     if (!compliance || Object.keys(compliance).length === 0) {
-      return <div>No compliance information available</div>;
+      return (
+        <div>
+          {i18n.translate(
+            'wazuh.mitreAttack.ruleDetails.noComplianceInformation',
+            {
+              defaultMessage: 'No compliance information available',
+            },
+          )}
+        </div>
+      );
     }
 
     const styleTitle = { fontSize: '14px', fontWeight: 500 };
@@ -172,7 +182,10 @@ const RuleDetails = (props: Props) => {
                             Math.random() * (index - 0) + index
                           }`}
                           position='top'
-                          content={`Filter by this compliance`}
+                          content={i18n.translate(
+                            'wazuh.mitreAttack.ruleDetails.filterByComplianceTooltip',
+                            { defaultMessage: 'Filter by this compliance' },
+                          )}
                         >
                           <EuiBadge
                             color='hollow'
@@ -232,7 +245,13 @@ const RuleDetails = (props: Props) => {
           >
             <EuiToolTip
               position='top'
-              content={`Filter by this group: ${groupValue}`}
+              content={i18n.translate(
+                'wazuh.mitreAttack.ruleDetails.filterByGroupTooltip',
+                {
+                  defaultMessage: 'Filter by this group: {group}',
+                  values: { group: groupValue },
+                },
+              )}
             >
               <span>{groupValue}</span>
             </EuiToolTip>
@@ -252,16 +271,42 @@ const RuleDetails = (props: Props) => {
     return (
       <EuiFlexGrid columns={4}>
         <EuiFlexItem key='id' grow={1}>
-          <b style={{ paddingBottom: 6 }}>ID</b>
-          <EuiToolTip position='top' content={`Filter by this rule ID: ${id}`}>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate('wazuh.mitreAttack.ruleDetails.info.id', {
+              defaultMessage: 'ID',
+            })}
+          </b>
+          <EuiToolTip
+            position='top'
+            content={i18n.translate(
+              'wazuh.mitreAttack.ruleDetails.filterByRuleIdTooltip',
+              {
+                defaultMessage: 'Filter by this rule ID: {id}',
+                values: { id },
+              },
+            )}
+          >
             <EuiLink onClick={() => addFilter({ 'wazuh.rule.id': id })}>
               {id}
             </EuiLink>
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='level' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Level</b>
-          <EuiToolTip position='top' content={`Filter by this level: ${level}`}>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate('wazuh.mitreAttack.ruleDetails.info.level', {
+              defaultMessage: 'Level',
+            })}
+          </b>
+          <EuiToolTip
+            position='top'
+            content={i18n.translate(
+              'wazuh.mitreAttack.ruleDetails.filterByLevelTooltip',
+              {
+                defaultMessage: 'Filter by this level: {level}',
+                values: { level },
+              },
+            )}
+          >
             <EuiLink
               onClick={async () => addFilter({ 'wazuh.rule.level': level })}
             >
@@ -270,15 +315,27 @@ const RuleDetails = (props: Props) => {
           </EuiToolTip>
         </EuiFlexItem>
         <EuiFlexItem key='file' grow={1}>
-          <b style={{ paddingBottom: 6 }}>File</b>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate('wazuh.mitreAttack.ruleDetails.info.file', {
+              defaultMessage: 'File',
+            })}
+          </b>
           {file}
         </EuiFlexItem>
         <EuiFlexItem key='path' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Path</b>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate('wazuh.mitreAttack.ruleDetails.info.path', {
+              defaultMessage: 'Path',
+            })}
+          </b>
           {path}
         </EuiFlexItem>
         <EuiFlexItem key='Groups' grow={1}>
-          <b style={{ paddingBottom: 6 }}>Groups</b>
+          <b style={{ paddingBottom: 6 }}>
+            {i18n.translate('wazuh.mitreAttack.ruleDetails.info.groups', {
+              defaultMessage: 'Groups',
+            })}
+          </b>
           {renderGroups(groups)}
         </EuiFlexItem>
       </EuiFlexGrid>
@@ -292,7 +349,14 @@ const RuleDetails = (props: Props) => {
           id='Info'
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Information</h3>
+              <h3>
+                {i18n.translate(
+                  'wazuh.mitreAttack.ruleDetails.information.title',
+                  {
+                    defaultMessage: 'Information',
+                  },
+                )}
+              </h3>
             </EuiTitle>
           }
           extraAction={
@@ -304,7 +368,10 @@ const RuleDetails = (props: Props) => {
                 href={`${rules.id}#/manager/?tab=rules&redirectRule=${id}`}
               >
                 <EuiIcon type='popout' color='primary' />
-                &nbsp; View in Rules
+                &nbsp;{' '}
+                {i18n.translate('wazuh.mitreAttack.ruleDetails.viewInRules', {
+                  defaultMessage: 'View in Rules',
+                })}
               </EuiLink>
             </RedirectAppLinks>
           }
@@ -320,7 +387,11 @@ const RuleDetails = (props: Props) => {
           id='Details'
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Details</h3>
+              <h3>
+                {i18n.translate('wazuh.mitreAttack.ruleDetails.details.title', {
+                  defaultMessage: 'Details',
+                })}
+              </h3>
             </EuiTitle>
           }
           initialIsOpen={true}
@@ -333,7 +404,14 @@ const RuleDetails = (props: Props) => {
           id='Compliance'
           buttonContent={
             <EuiTitle size='s'>
-              <h3>Compliance</h3>
+              <h3>
+                {i18n.translate(
+                  'wazuh.mitreAttack.ruleDetails.compliance.title',
+                  {
+                    defaultMessage: 'Compliance',
+                  },
+                )}
+              </h3>
             </EuiTitle>
           }
           initialIsOpen={true}

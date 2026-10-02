@@ -11,7 +11,7 @@ and streams back a short answer plus the real result table.
 ## What it does
 
 - **Chat UI** (EUI/OUI) streaming over SSE end to end: provider → this plugin's server → browser.
-- **29 read-only tools** (`server/tools/catalog/`) covering findings, vulnerabilities, FIM,
+- **35 read-only tools** (`server/tools/catalog/`) covering findings, vulnerabilities, FIM,
   SCA, MITRE, PCI DSS, syscollector inventory and agent status, plus a general `search_wazuh_data`
   escape hatch. Every tool is `tier: 'T1'` — **there are no mutating tools**.
 - **Two-stage router** (`server/tools/router.ts`) that narrows the tool set per turn to cut tokens.
@@ -22,8 +22,10 @@ and streams back a short answer plus the real result table.
   full table. This keeps token cost bounded and independent of result size.
 - **Optional pseudonymisation** (`server/tools/privacy.ts`) of data leaving the cluster, with a
   per-turn badge in the UI. Off by default — see "What leaves the cluster" below.
-- **Persistent conversations** as owner-scoped saved objects, with optimistic concurrency.
-- **Provider settings** (admin-only) for two selectable adapters, each used purely as a transport:
+- **Persistent conversations** as owner-scoped documents in the `wazuh-ai-assistant-sessions`
+  data stream (written through the indexer's `/_plugins/_setup/ai_assistant/sessions` API), with
+  optimistic concurrency.
+- **Provider settings** (gated by indexer RBAC) for two selectable adapters, each used purely as a transport:
   OpenAI-compatible (OpenAI, Gemini, Bedrock, Ollama, vLLM, LiteLLM…) and Anthropic Messages API.
   A third adapter (the Wazuh AI Assistant hosted brain, n8n webhook) exists in the registry but
   isn't yet exposed as a selectable provider type. Provider API keys can be encrypted at rest. See
@@ -42,10 +44,11 @@ public/            Browser plugin: React app
 server/            Server plugin
   routes/              chat.ts (SSE orchestration), conversations.ts, settings.ts, route-helpers.ts
   tools/               registry, router, executor, guardrails, digest, privacy, schema-validator
-    catalog/           the 29 tool definitions
+    catalog/           the 35 tool definitions
   providers/           adapter interface + 3 adapters, url-guard (SSRF), retry/stall handling
   crypto/              api-key-cipher.ts (AES-256-GCM, enc:v1 read/write)
-  saved_objects/       provider-settings, conversation, assistant-settings (all hidden types)
+  settings/            indexer `_plugins/_setup/ai_assistant/*` clients, ISM retention policy
+  conversation-store.ts  conversation reads (sessions data stream) + writes (`_setup` sessions API)
   prompts.ts           the system prompt
 eval/              Test + measurement harness (see eval/README.md)
 docs/              ENCRYPTION.md (API-key encryption at rest), CI.md (test gates & harness)
@@ -88,16 +91,17 @@ The full security model is documented in `docs/ref/modules/ai-assistant/security
   whole design rests on.
 - **No mutating tools** and no code-execution sink; the worst an injected instruction (e.g. text
   smuggled in through an ingested finding) can achieve is another read the user could already do.
-- **Provider management is admin-gated** (create/update/set-default/delete/test). `GET /providers`
-  stays readable because the Chat tab needs the list; it never returns a key.
+- **Provider management is authorized by the indexer's own RBAC** on the calling user:
+  `plugin:wazuh/ai_assistant/settings/write` for create/update/set-default/delete,
+  `settings/read` for `GET /providers`, the connection test and chat. It never returns a key.
 - **SSRF guard** (`server/providers/url-guard.ts`) on every outbound provider fetch: http(s) only,
   cloud-metadata / link-local ranges blocked (including IPv4-mapped IPv6 and DNS names that
   _resolve_ into them), redirects disabled. Loopback/RFC1918 stay reachable on purpose — that is
   where self-hosted gateways live.
 - **API keys** are never returned by any route (only a `hasApiKey` boolean), never logged, and
-  redacted from upstream error echoes. `enc:v1` binds the ciphertext to its saved object via
-  AES-GCM AAD so a blob cannot be moved between providers. See `docs/ENCRYPTION.md` — prefer the
-  keystore for the key.
+  redacted from upstream error echoes. `enc:v1` binds the ciphertext to its provider record's
+  id via AES-GCM AAD so a blob cannot be moved between providers. See `docs/ENCRYPTION.md` —
+  prefer the keystore for the key.
 - **Concurrency cap**: 5 in-flight chat streams per user, 30 server-wide, and per-provider stall
   timeouts (30 s to first byte, 120 s idle).
 
@@ -133,7 +137,7 @@ of `eval/` is a zero-dependency harness (see `eval/README.md` for full usage):
 | -------------------- | ------------------------------------------------------------------- |
 | `run_lint.js`        | guardrail bypass corpus (adversarial DSL cases)                     |
 | `run_plumbing.js`    | full chat route against a scripted zero-token mock provider         |
-| `run_persistence.js` | conversation saved-object CRUD + owner scoping                      |
+| `run_persistence.js` | conversation CRUD + owner scoping                                   |
 | `run_live.js`        | live measurement set against a real provider                        |
 | `run_load.js`        | concurrency/footprint load driver (stream/tool/mixed/429 modes)     |
 | `browser_probe.mjs`  | headless-Chrome checks: per-tab heap, stream cap, stored-XSS render |
@@ -146,6 +150,7 @@ of `eval/` is a zero-dependency harness (see `eval/README.md` for full usage):
 - The chat route streams SSE; the browser client uses `window.fetch` with a manual
   `ReadableStream` reader — not `core.http.post` (buffers the whole response) and not
   `EventSource` (cannot send a POST body).
-- The three saved-object types are `hidden: true`, so they are invisible to the generic
-  saved-objects API — which also means they are **not** captured by the Saved Objects export UI;
-  back them up at the index/snapshot level.
+- The plugin registers no saved-object types: providers and settings live behind the indexer's
+  `/_plugins/_setup/ai_assistant/*` API and conversations in the `wazuh-ai-assistant-sessions`
+  data stream, so none of it is captured by the Saved Objects export UI; back it up at the
+  index/snapshot level.

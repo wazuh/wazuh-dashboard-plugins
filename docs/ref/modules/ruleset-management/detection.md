@@ -1,6 +1,6 @@
 # Detection
 
-The **Detection** module is part of the **Ruleset Management** section in the Wazuh Dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
+The **Detection** module is part of the **Ruleset Management** section in the Wazuh dashboard. It provides visibility and management over the rules that govern finding generation based on normalized events processed by the Wazuh Engine.
 
 This module exposes the following sections:
 
@@ -34,7 +34,7 @@ Create Rule (Draft) → Promote to Test → Test → Promote to Custom
 
 Rules are promoted as part of their parent integration. When an integration is promoted from Draft to Test, or from Test to Custom, all of its associated decoders and rules are promoted together.
 
-### Rule Anatomy
+### Rule anatomy
 
 A detection rule is composed of the following main blocks:
 
@@ -42,6 +42,8 @@ A detection rule is composed of the following main blocks:
 | ---------------- | ------------------------------------------------------------------------------------------------------- |
 | `id`             | Unique identifier for the rule.                                                                         |
 | `logsource`      | Binds the rule to a specific integration. The `product` field must match the integration title exactly. |
+| `status`         | Maturity of the rule: `experimental`, `test`, or `stable`.                                              |
+| `enabled`        | Whether the rule is active. A disabled rule is kept in the integration but never evaluated.             |
 | `detection`      | Defines the field conditions (`selection`) and the logical `condition` that triggers the finding.       |
 | `level`          | Severity level of the finding (`informational`, `low`, `medium`, `high`, `critical`).                   |
 | `tags`           | Free-form tags, commonly used for MITRE ATT&CK technique references.                                    |
@@ -52,21 +54,21 @@ A detection rule is composed of the following main blocks:
 
 ---
 
-## Use Case: Creating a Custom Detection Rule
+## Use case: Creating a custom detection rule
 
 The following walkthrough demonstrates how to create a detection rule for SSH brute force attempts in the **Draft** space, as part of the `custom-ssh-auth` integration created in the [Normalization](./normalization.md) use case.
 
-**Prerequisites:** The `custom-ssh-auth` integration exists in the **Draft** space with its decoder already defined.
+**Prerequisites:** The `custom-ssh-auth` integration and its decoder were already promoted to the **Test** space (the [Normalization](./normalization.md) walkthrough's Step 4). This walkthrough adds a new rule to that same integration in the **Draft** space, so the later promotion tags the integration as an update and the rule as an addition.
 
 ---
 
-### Step 1: Navigate to the Rules List
+### Step 1: Navigate to the rules list
 
-Navigate to **Ruleset Management → Detection → Rules** and ensure the **Draft** space is selected using the space selector (top right).
+Navigate to **Ruleset Management > Detection > Rules** and ensure the **Draft** space is selected using the space selector (top right).
 
 ---
 
-### Step 2: Create a Custom Rule
+### Step 2: Create a custom rule
 
 Select **Create rule**. In the creation form, choose between **Visual Editor** or the **YAML Editor** mode and select the target integration — in this case, `custom-ssh-auth`.
 
@@ -143,7 +145,7 @@ Click **Create rule**. The engine validates the definition automatically.
 
 ---
 
-### Step 3: Verify the Rule in the Draft List
+### Step 3: Verify the rule in the Draft list
 
 After creation, the rule appears in the **Rules** list under the **Draft** space, associated with the `custom-ssh-auth` integration.
 
@@ -151,7 +153,7 @@ After creation, the rule appears in the **Rules** list under the **Draft** space
 
 ### Step 4: Promote Draft → Test → Custom
 
-The promotion flow is identical to the one described in [Normalization — Step 4](./normalization.md#step-4-promote-draft--test). Navigate to **Ruleset Management → Overview**, ensure the **Draft** space is selected, and click **Actions → Promote**.
+The promotion flow is identical to the one described in [Normalization — Step 4](./normalization.md#step-4-promote-draft--test). Navigate to **Ruleset Management > Overview**, ensure the **Draft** space is selected, and click **Actions > Promote**.
 
 The **Promote** page lists each entity with the operation that will be applied. Because the integration already exists in **Test** and the rule is new, they are tagged **`custom-ssh-auth (update)`** and **`SSH Failed Password Detection (add)`**. Click **Promote**, then type `promote` in the confirmation dialog (**Promote to Test space?**) to confirm — the action is irreversible.
 
@@ -165,7 +167,7 @@ After promotion to **Custom**, the rule is active in the engine. Any incoming ev
 
 ---
 
-## Use Case: Defining a Detector
+## Use case: Defining a detector
 
 A **detector** connects detection rules to a specific data source (an index or alias) and runs continuously to identify security findings. Detectors operate on top of rules that are already active in the **Custom** or **Standard** space.
 
@@ -173,9 +175,9 @@ A **detector** connects detection rules to a specific data source (an index or a
 
 ---
 
-### Step 1: Open the Detector Creation Form
+### Step 1: Open the detector creation form
 
-Navigate to **Ruleset Management → Detection → Detectors**.
+Navigate to **Ruleset Management > Detection > Detectors**.
 
 <!-- IMAGE: Detectors list with Create detector button -->
 <!-- Suggested filename: images/detection/05-detectors-list.png -->
@@ -184,7 +186,7 @@ Navigate to **Ruleset Management → Detection → Detectors**.
 
 ---
 
-### Step 2: Configure Detector Details
+### Step 2: Configure detector details
 
 Click **+ Create detector** (top right) to open the **Define detector** form:
 
@@ -219,7 +221,7 @@ The **Selected rules** panel displays the rules that will be active for this det
 
 ---
 
-### Step 3: Review and Create
+### Step 3: Review and create
 
 Review the configuration and click **Create detector**. A _Detector created successfully_ toast confirms it, and the detector opens on its **Detector configuration** page with status **Active** — showing the **Detector details** and an **Active rules** table (here, `SSH Failed Password Detection`). The detector then runs on its schedule against the configured data source using the selected rules.
 
@@ -230,6 +232,6 @@ Review the configuration and click **Create detector**. A _Detector created succ
 
 ---
 
-## Related Sections
+## Related sections
 
 - [Normalization](./normalization.md) — Manage integrations, decoders, and KVDBs that prepare events for detection.

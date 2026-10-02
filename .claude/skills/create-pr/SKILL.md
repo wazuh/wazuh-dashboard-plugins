@@ -88,7 +88,8 @@ Every commit needs a `Signed-off-by:` trailer. If missing, re-commit with
 ### 3. Validate locally
 
 Invoke the **check-standards** skill (prettier + eslint on changed files, tests
-for touched plugins). Do not proceed to "Ready for review" until it passes.
+for touched plugins, documentation links). Do not proceed to "Ready for review"
+until it passes.
 
 ### 4. CHANGELOG entry
 

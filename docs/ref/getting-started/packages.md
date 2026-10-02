@@ -11,21 +11,22 @@ Two package formats are available:
 
 - **File pattern**: `wazuh-dashboard_<version>-<revision>_amd64.deb`
 - **Example**: `wazuh-dashboard_5.0.0-1_amd64.deb`
-- **Supported distributions**: Debian, Ubuntu
+- **Package format works on**: Debian, Ubuntu and derivatives — see [Compatibility](../compatibility.md) for the specific versions Wazuh tests and supports
 - **Package manager**: `apt`, `apt-get`, `dpkg`
 
 ### RPM (Red Hat-based distributions)
 
 - **File pattern**: `wazuh-dashboard-<version>-<revision>.x86_64.rpm`
 - **Example**: `wazuh-dashboard-5.0.0-1.x86_64.rpm`
-- **Supported distributions**: RHEL, CentOS, Fedora, Amazon Linux
+- **Package format works on**: RHEL, CentOS, Fedora, Amazon Linux and derivatives — see [Compatibility](../compatibility.md) for the specific versions Wazuh tests and supports
 - **Package manager**: `yum`, `dnf`, `rpm`
 
 ## Package name
 
 - **Package name**: `wazuh-dashboard`
-- **Current version**: 5.0.0 (alpha0)
-- **Architecture**: x86_64 (amd64)
+- **Current version**: 5.0.0 (rc1)
+- **Architecture**: 64-bit Intel/AMD (`amd64`/`x86_64`) and 64-bit ARM (`arm64`/`aarch64`) — see
+  the [package name table](#package-name-1) below
 
 ## Package contents
 
@@ -43,12 +44,17 @@ The Wazuh dashboard package includes:
 
 ### Installation paths
 
-- **Application files**: `/usr/share/wazuh-dashboard/`
+- **Application files**: `/usr/share/wazuh-dashboard/` (`root:root`)
 - **Configuration files**: `/etc/wazuh-dashboard/`
-- **Data directory**: `/var/lib/wazuh-dashboard/`
-- **Log files**: `/var/log/wazuh-dashboard/`
+- **Data directory**: `/usr/share/wazuh-dashboard/data/` (`wazuh-dashboard:wazuh-dashboard 0750`, the
+  only part of the installation directory the service user owns)
+- **Logs**: systemd journal (`journalctl -u wazuh-dashboard`); the package writes no log files
 - **Plugin directory**: `/usr/share/wazuh-dashboard/plugins/`
-- **Certificates**: `/etc/wazuh-dashboard/certs/`
+- **Certificates**: `/etc/wazuh-dashboard/certs/` (issued on a fresh install, see [Credentials](credentials.md#certificates))
+- **Credential resolver**: `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`)
+- **Shared credentials library**: `/usr/share/wazuh-dashboard/lib/wazuh-credentials.sh` (`root:root 0644`)
+- **Service environment file**: `/etc/default/wazuh-dashboard` (`root:wazuh-dashboard 0640`)
+- **Shared credentials file**: `/etc/wazuh/credentials.env` (created by the first Wazuh package on the host, not shipped)
 
 ### System integration
 
@@ -71,17 +77,24 @@ Automatically installed dependencies:
 - `tar`
 - `curl`
 - `libcap2-bin`
+- `openssl`
 
 ### RHEL/CentOS/Fedora
 
 - `libcap`
+- `openssl`
+- `diffutils`
+- `util-linux`
+
+`openssl` issues the dashboard TLS certificates, and `diffutils` (`cmp`) and `util-linux` (`flock`)
+are used by the shared credentials library. See [Credentials](credentials.md).
 
 ## Package repositories
 
 Official Wazuh repositories:
 
-- **APT repository**: `https://packages.wazuh.com/5.x/apt/`
-- **Yum repository**: `https://packages.wazuh.com/5.x/yum/`
+- **APT repository**: `https://packages.wazuh.com/production/5.x/apt/`
+- **Yum repository**: `https://packages.wazuh.com/production/5.x/yum/`
 - **GPG key**: `https://packages.wazuh.com/key/GPG-KEY-WAZUH`
 
 ## Version scheme
@@ -95,10 +108,7 @@ Wazuh dashboard follows semantic versioning:
 
 ### OpenSearch Dashboards compatibility
 
-Each Wazuh dashboard version is built for a specific OpenSearch Dashboards version:
-
-- **Wazuh 5.0.0**: OpenSearch Dashboards 3.3.0
-- Check `plugins/wazuh-core/package.json` for exact platform version
+Each Wazuh dashboard version is built for a specific OpenSearch Dashboards version. See the [version compatibility](../compatibility.md#version-compatibility) matrix.
 
 ## Installation methods
 
@@ -159,40 +169,46 @@ where:
 
 #### Production
 
-URL: `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+URL:
+
+- APT (Debian-based): `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/apt/pool/main/w/wazuh-dashboard/<PACKAGE_NAME>`
+- Yum (RHEL/CentOS-based): `https://packages.wazuh.com/production/<MAJOR_VERSION>.x/yum/<PACKAGE_NAME>`
 
 where:
 
 - `<MAJOR_VERSION>`: major version number, e.g. `5`
-- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
 - `<PACKAGE_NAME>`: package name
 
 The `<REVISION>` in the package name for production packages is usually `1`.
 
-Example: `https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-dashboard_5.0.0-1_amd64.deb`
+Example: `https://packages.wazuh.com/production/5.x/apt/pool/main/w/wazuh-dashboard/wazuh-dashboard_5.0.0-1_amd64.deb`
 
 #### Pre-release
 
-URL: `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+URL:
+
+- APT (Debian-based): `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/apt/pool/main/w/wazuh-dashboard/<PACKAGE_NAME>`
+- Yum (RHEL/CentOS-based): `https://packages-staging.xdrsiem.wazuh.info/pre-release/<MAJOR_VERSION>.x/yum/<PACKAGE_NAME>`
 
 where:
 
 - `<MAJOR_VERSION>`: major version number, e.g. `5`
-- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
 - `<PACKAGE_NAME>`: package name
 
 The `<REVISION>` in the package name for pre-release packages can be `alpha1`, `alpha2`, `beta1`, `rc1`, etc. e.g. `rc1`
 
-Example: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/apt/pool/main/w/wazuh-dashboard_5.0.0-alpha1_amd64.deb`
+Example: `https://packages-staging.xdrsiem.wazuh.info/pre-release/5.x/apt/pool/main/w/wazuh-dashboard/wazuh-dashboard_5.0.0-alpha1_amd64.deb`
 
 #### Nightly
 
-URL: `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/<PACKAGE_MANAGER>/pool/main/w/<PACKAGE_NAME>`
+URL:
+
+- APT (Debian-based): `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/apt/pool/main/w/wazuh-dashboard/<PACKAGE_NAME>`
+- Yum (RHEL/CentOS-based): `https://packages-staging.xdrsiem.wazuh.info/nightly/<VERSION>/yum/<PACKAGE_NAME>`
 
 where:
 
 - `<VERSION>`: version number, e.g. `5.0.0`
-- `<PACKAGE_MANAGER>`: `apt` (Debian-based) `yum` (RHEL/CentOS-based)
 - `<PACKAGE_NAME>`: package name
 
 The `<REVISION>` in the package name for nightly packages is `latest`.

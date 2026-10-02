@@ -296,6 +296,15 @@ const AI_ASSISTANT_APP_ID = 'wazuhAiAssistant';
  * `../components/quick-access/quick-access-menu.tsx`). */
 export const getAiAssistantUrl = () => getUrlForApp(AI_ASSISTANT_APP_ID);
 
+/**
+ * Whether the AI Assistant app is registered. It is not when its plugin is disabled
+ * (`wazuh_ai_assistant.enabled: false`) or not installed, and its URL then opens
+ * "Application Not Found".
+ */
+export const isAiAssistantRegistered = (
+  applications: ReadonlyMap<string, unknown>,
+): boolean => applications.has(AI_ASSISTANT_APP_ID);
+
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
 export const getDecodersUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);

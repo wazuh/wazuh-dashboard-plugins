@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { SavedObject } from '../../../../react-services/saved-objects';
 import {
   SavedDashboardSO,
@@ -104,7 +105,9 @@ export async function buildDashboardByValueInput(
     return {
       success: false,
       status: 'empty',
-      error: 'Dashboard ID is required.',
+      error: i18n.translate('wazuh.common.dashboardRenderer.error.idRequired', {
+        defaultMessage: 'Dashboard ID is required.',
+      }),
     };
   }
 
@@ -117,7 +120,9 @@ export async function buildDashboardByValueInput(
       return {
         success: false,
         status: 'not_found',
-        error: 'Requested dashboard not found.',
+        error: i18n.translate('wazuh.common.dashboardRenderer.error.notFound', {
+          defaultMessage: 'Requested dashboard not found.',
+        }),
       };
     }
 
@@ -133,7 +138,11 @@ export async function buildDashboardByValueInput(
     return {
       success: false,
       status: 'error',
-      error: err?.message || 'Error building dashboard input.',
+      error:
+        err?.message ||
+        i18n.translate('wazuh.common.dashboardRenderer.error.buildInput', {
+          defaultMessage: 'Error building dashboard input.',
+        }),
     };
   }
 }

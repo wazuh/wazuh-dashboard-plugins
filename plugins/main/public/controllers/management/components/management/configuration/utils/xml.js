@@ -10,6 +10,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
+
 const parser = new DOMParser();
 
 /**
@@ -87,7 +89,10 @@ export const validateXML = xml => {
   if (parsererror.length) {
     const xmlFullError = parsererror[0].textContent;
     return (
-      (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML'
+      (xmlFullError.match('error\\s.+\n') || [])[0] ||
+      i18n.translate('wazuh.configuration.xml.validationError', {
+        defaultMessage: 'Error validating XML',
+      })
     );
   }
   return false;

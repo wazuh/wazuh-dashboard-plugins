@@ -390,6 +390,10 @@ services:
       - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
+      # Seeded into rbac.db on first start. API_PASSWORD is the wazuh-wui one,
+      # shared with the agent services that authenticate as that user.
+      - API_PASSWORD=${API_PASSWORD:-wazuh-wui}
+      - API_WAZUH_PASSWORD=${API_WAZUH_PASSWORD:-wazuh}
     volumes:
       - wm_certs:/etc/server_certs
     ports:

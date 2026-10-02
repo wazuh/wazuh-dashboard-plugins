@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiCallOut } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 
 interface OsWarningProps {
@@ -7,60 +8,78 @@ interface OsWarningProps {
 }
 
 export default function OsCommandWarning(props: OsWarningProps) {
+  const title = i18n.translate('wazuh.endpointsSummary.osWarning.title', {
+    defaultMessage: 'Requirements',
+  });
+  const administratorPrivileges = i18n.translate(
+    'wazuh.endpointsSummary.osWarning.administratorPrivileges',
+    {
+      defaultMessage:
+        'You will need administrator privileges to perform this installation.',
+    },
+  );
+  const shellBashRequired = i18n.translate(
+    'wazuh.endpointsSummary.osWarning.shellBashRequired',
+    { defaultMessage: 'Shell Bash is required.' },
+  );
+  const shellBashTerminal = i18n.translate(
+    'wazuh.endpointsSummary.osWarning.shellBashTerminal',
+    {
+      defaultMessage:
+        'Keep in mind you need to run this command in a Shell Bash terminal.',
+    },
+  );
   const osSelector = {
     WINDOWS: (
-      <EuiCallOut title='Requirements' iconType='iInCircle'>
+      <EuiCallOut title={title} iconType='iInCircle'>
         <ul className='wz-callout-list'>
           <li>
-            <span>
-              You will need administrator privileges to perform this
-              installation.
-            </span>
+            <span>{administratorPrivileges}</span>
           </li>
           <li>
-            <span>PowerShell 3.0 or greater is required.</span>
+            <span>
+              {i18n.translate(
+                'wazuh.endpointsSummary.osWarning.powerShellRequired',
+                { defaultMessage: 'PowerShell 3.0 or greater is required.' },
+              )}
+            </span>
           </li>
         </ul>
         <p>
-          Keep in mind you need to run this command in a Windows PowerShell
-          terminal.
+          {i18n.translate(
+            'wazuh.endpointsSummary.osWarning.powerShellTerminal',
+            {
+              defaultMessage:
+                'Keep in mind you need to run this command in a Windows PowerShell terminal.',
+            },
+          )}
         </p>
       </EuiCallOut>
     ),
     LINUX: (
-      <EuiCallOut title='Requirements' iconType='iInCircle'>
+      <EuiCallOut title={title} iconType='iInCircle'>
         <ul className='wz-callout-list'>
           <li>
-            <span>
-              You will need administrator privileges to perform this
-              installation.
-            </span>
+            <span>{administratorPrivileges}</span>
           </li>
           <li>
-            <span>Shell Bash is required.</span>
+            <span>{shellBashRequired}</span>
           </li>
         </ul>
-        <p>
-          Keep in mind you need to run this command in a Shell Bash terminal.
-        </p>
+        <p>{shellBashTerminal}</p>
       </EuiCallOut>
     ),
     macOS: (
-      <EuiCallOut title='Requirements' iconType='iInCircle'>
+      <EuiCallOut title={title} iconType='iInCircle'>
         <ul className='wz-callout-list'>
           <li>
-            <span>
-              You will need administrator privileges to perform this
-              installation.
-            </span>
+            <span>{administratorPrivileges}</span>
           </li>
           <li>
-            <span>Shell Bash is required.</span>
+            <span>{shellBashRequired}</span>
           </li>
         </ul>
-        <p>
-          Keep in mind you need to run this command in a Shell Bash terminal.
-        </p>
+        <p>{shellBashTerminal}</p>
       </EuiCallOut>
     ),
   };

@@ -1,29 +1,47 @@
 # How to generate a container image
 
-This repository provides Dockerfiles for development images under
-[docker/images](../../docker/images). Use these to build local images that
-match the OpenSearch Dashboards version you are targeting.
+The development environment in `docker/osd-dev` at the repository root runs the
+`quay.io/wazuh/osd-dev` image. This repository does not contain the recipe for
+that image: the Dockerfile and the build script are in the `wazuh-dashboard`
+repository, under `dev-tools/build-dev-image`. The
+`dev-tools/build-dev-image/README.md` file at the `wazuh-dashboard` repository
+documents every build option.
 
 ## Prerequisites
 
-- Docker Desktop or Docker Engine
+- Docker Desktop or Docker Engine, with the `buildx` plugin
+- QEMU, to build images for an architecture other than the host one
 - Access to the internet for base image downloads
+- A local clone of the `wazuh-dashboard` repository
 
 ## Build an OpenSearch Dashboards dev image
 
-From the repository root:
+From the root of the `wazuh-dashboard` repository:
 
 ```bash
-cd docker/images
-docker build \
-	--build-arg NODE_VERSION=$(cat ../../.nvmrc) \
-	--build-arg OPENSEARCH_VERSION=3.3.0 \
-	-t quay.io/wazuh/osd-dev:3.3.0 \
-	-f osd-dev.Dockerfile .
+cd dev-tools/build-dev-image
+./build-multiarch.sh \
+	--node-version "$(cat ../../.nvmrc)" \
+	--opensearch-version 3.6.0.0 \
+	--wazuh-branch 5.0.0 \
+	--plugins-branch 5.0.0 \
+	--platform linux/amd64 \
+	--tag 3.6.0
 ```
 
-Adjust `OPENSEARCH_VERSION` and the output tag as needed for your target.
+Replace the OpenSearch Dashboards version, the branches, and the tag with the
+values of your target. The branch options that are not set (`--security-branch`,
+`--reporting-branch`, and the rest) default to `main`. The script builds a local
+image by default. Add `--push` to publish it to the registry.
 
-## Examples:
+The script builds for `linux/amd64,linux/arm64` by default. A local build of
+several platforms fails on the classic Docker image store, so the example sets
+`--platform` to one platform. Set it to the architecture of your host. When you
+publish the image with `--push`, you can omit `--platform` to build both.
 
-For additional image recipes and examples, see [docker/README.md](../../docker/README.md).
+## Use the image
+
+The development environment runs the `quay.io/wazuh/osd-dev:<osd_version>`
+image. The `-osd <osd_version>` option of `docker/osd-dev/dev.sh` selects the
+tag; without it, the version in `plugins/wazuh-core/package.json` is used. See
+`docker/osd-dev/README.md` at the repository root for the available options.

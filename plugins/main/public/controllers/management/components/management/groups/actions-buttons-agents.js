@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 // Eui components
 import { EuiFlexItem } from '@elastic/eui';
 
@@ -47,7 +48,9 @@ class WzGroupsActionButtonsAgents extends Component {
         iconType='folderOpen'
         onClick={() => this.showManageAgents()}
       >
-        Manage agents
+        {i18n.translate('wazuh.endpointGroups.detail.manageAgentsButton', {
+          defaultMessage: 'Manage agents',
+        })}
       </WzButtonPermissions>
     );
 

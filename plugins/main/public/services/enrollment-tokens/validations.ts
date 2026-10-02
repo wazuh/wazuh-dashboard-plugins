@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
 
 /* The manager takes the token lifetime as a plain number of seconds, or as a
 number followed by `d`, `h`, `m` or `s`. It is validated here because an
@@ -20,10 +21,15 @@ export const validateEnrollmentTokenTtl = (value: string) => {
   }
   const ttl = value.trim();
   if (!/^\d+[dhms]?$/.test(ttl)) {
-    return 'The lifetime must be a number of seconds, or a number followed by "d", "h", "m" or "s". For example: 30d, 12h, 3600.';
+    return i18n.translate('wazuh.enrollmentTokens.validation.ttlFormat', {
+      defaultMessage:
+        'The lifetime must be a number of seconds, or a number followed by "d", "h", "m" or "s". For example: 30d, 12h, 3600.',
+    });
   }
   if (Number.parseInt(ttl, 10) === 0) {
-    return 'The lifetime must be greater than 0.';
+    return i18n.translate('wazuh.enrollmentTokens.validation.ttlPositive', {
+      defaultMessage: 'The lifetime must be greater than 0.',
+    });
   }
   return undefined;
 };
@@ -35,7 +41,10 @@ export const validateEnrollmentTokenMaxUses = (value: string | number) => {
     return undefined;
   }
   if (!/^\d+$/.test(String(value).trim())) {
-    return 'The number of enrollments must be a whole number of 0 or more, where 0 means unlimited.';
+    return i18n.translate('wazuh.enrollmentTokens.validation.maxUses', {
+      defaultMessage:
+        'The number of enrollments must be a whole number of 0 or more, where 0 means unlimited.',
+    });
   }
   return undefined;
 };

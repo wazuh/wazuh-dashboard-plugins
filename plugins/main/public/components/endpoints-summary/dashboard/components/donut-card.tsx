@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiFlexGroup, EuiFlexItem, EuiCard } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { VisualizationBasic } from '../../../common/charts/visualizations/basic';
 
 interface DonutChartItem {
@@ -24,8 +25,13 @@ const DonutCard = ({
   title = '',
   description = '',
   betaBadgeLabel,
-  noDataTitle = 'No results',
-  noDataMessage = 'No results were found',
+  noDataTitle = i18n.translate('wazuh.endpointsSummary.donutCard.noDataTitle', {
+    defaultMessage: 'No results',
+  }),
+  noDataMessage = i18n.translate(
+    'wazuh.endpointsSummary.donutCard.noDataMessage',
+    { defaultMessage: 'No results were found' },
+  ),
   onClickLabel,
   data,
   isLoading = false,

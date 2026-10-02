@@ -2,47 +2,52 @@
 
 - [Introduction](README.md)
 
-# Development Documentation
+# Development documentation
 
 - [Introduction](dev/README.md)
-- [Setup Environment](dev/setup.md)
-- [Build Packages](dev/build-packages.md)
-- [Build Image](dev/build-image.md)
-- [Build from Sources](dev/build-sources.md)
-- [Run from Sources](dev/run-sources.md)
-- [Get external resouces](dev/get-external-resources.md)
-- [Run Tests](dev/run-tests.md)
-- [Pull Requests](dev/pull-requests.md)
-- [Repository Bumper](dev/bumper-repository.md)
-- [Modules](dev/modules/index.md)
+- [Set up environment](dev/setup.md)
+- [Run from sources](dev/run-sources.md)
+- [Get external resources](dev/get-external-resources.md)
+- [Run tests](dev/run-tests.md)
+- [Build from sources](dev/build-sources.md)
+- [Build packages](dev/build-packages.md)
+- [Build image](dev/build-image.md)
+- [Pull requests](dev/pull-requests.md)
+- [Credential and TLS resolution](dev/credentials.md)
+- [Repository bumper](dev/bumper-repository.md)
+- [Documentation installation and setup](INSTALLATION.md)
+- [Modules](dev/modules/README.md)
   - [Active responses](dev/modules/active-responses.md)
   - [Ruleset management](dev/modules/ruleset-management.md)
 
-# Reference Manual
+# Reference manual
 
 - [Introduction](ref/README.md)
   - [Description](ref/description.md)
   - [Architecture](ref/architecture.md)
   - [Compatibility](ref/compatibility.md)
-- [Getting Started](ref/getting-started/README.md)
+- [Getting started](ref/getting-started/README.md)
   - [Requirements](ref/getting-started/requirements.md)
   - [Packages](ref/getting-started/packages.md)
   - [Installation](ref/getting-started/installation.md)
-- [Agent Deploy One-Liner](ref/agent-deploy-one-liner.md)
+  - [Credentials](ref/getting-started/credentials.md)
+- [Agent deploy one-liner](ref/agent-deploy-one-liner.md)
 - [Configuration](ref/configuration.md)
-- [Single Sign-On](ref/sso.md)
-- [Custom Branding](ref/custom-branding/custom-branding.md)
+- [Single sign-on](ref/sso.md)
+- [Custom branding](ref/custom-branding/custom-branding.md)
 - [Modules](ref/modules/README.md)
   - [Health check](ref/modules/healthcheck.md)
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
-  - [Indexer Management Settings](ref/modules/indexer-settings.md)
+  - [Indexer management settings](ref/modules/indexer-settings.md)
+  - [Available updates](ref/modules/available-updates.md)
   - [Enrollment tokens](ref/modules/enrollment-tokens/README.md)
-  - [Active Response](ref/modules/active-response/index.md)
+  - [Saved objects for dashboards and visualizations](ref/modules/saved-objects-dashboards.md)
+  - [Active Response](ref/modules/active-response/README.md)
     - [Create an active response](ref/modules/active-response/create.md)
     - [Attach to an Alerting trigger](ref/modules/active-response/alerting-integration.md)
     - [Monitor executions](ref/modules/active-response/monitor-executions.md)
     - [Troubleshooting](ref/modules/active-response/troubleshooting.md)
-  - [Ruleset Management](ref/modules/ruleset-management/README.md)
+  - [Ruleset management](ref/modules/ruleset-management/README.md)
     - [Normalization](ref/modules/ruleset-management/normalization.md)
     - [Detection](ref/modules/ruleset-management/detection.md)
   - [AI Assistant](ref/modules/ai-assistant/README.md)
@@ -53,26 +58,24 @@
     - [Configuration](ref/modules/ai-assistant/configuration.md)
   - [Case Management](ref/modules/case-management/README.md)
   - [Incident Response](ref/modules/incident-response/README.md)
-- [External Integrations](ref/external-integrations.md)
+- [External integrations](ref/external-integrations.md)
 - [Release notes](ref/release-notes.md)
 - [Upgrade](ref/upgrade.md)
 - [Migration 4.x to 5.x](ref/migration-4x-5x.md)
 - [Uninstall](ref/uninstall.md)
+- [Back up and restore](ref/backup-restore.md)
+- [Security](ref/security.md)
+- [Performance](ref/performance.md)
+- [Glossary](ref/glossary.md)
 
-# Migration Guide
+# Migration guide
 
 - [Overview](guide/migration/README.md)
-
   - [Configuration](guide/migration/configuration.md)
   - [Custom dashboards and visualizations](guide/migration/dashboards.md)
   - [Reports](guide/migration/reports.md)
   - [Multi-manager environments](guide/migration/multi-manager.md)
 
-- [Back Up and Restore](ref/backup-restore.md)
-- [Security](ref/security.md)
-- [Performance](ref/performance.md)
-- [Glossary](ref/glossary.md)
+# Diagnostic documentation
 
-# Diagnostic Documentation
-
-- [Diagnostic Guide](diag/diagnostic.md)
+- [Diagnostic guide](diag/diagnostic.md)

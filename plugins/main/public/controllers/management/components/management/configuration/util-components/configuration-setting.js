@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 import {
   EuiFieldText,
   EuiSpacer,
@@ -104,7 +105,13 @@ class WzConfigurationSetting extends Component {
                   <EuiAccordion
                     key={`accordion_${groupIndex}`}
                     id={`accordionId_${groupIndex}`}
-                    buttonContent={`Group ${groupIndex + 1}`}
+                    buttonContent={i18n.translate(
+                      'wazuh.configuration.configurationSetting.groupAccordion',
+                      {
+                        defaultMessage: 'Group {groupNumber}',
+                        values: { groupNumber: groupIndex + 1 },
+                      },
+                    )}
                     paddingSize='l'
                   >
                     <div>

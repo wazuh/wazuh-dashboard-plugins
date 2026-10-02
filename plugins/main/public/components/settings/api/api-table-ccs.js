@@ -32,6 +32,8 @@ import {
   EuiButton,
   EuiInMemoryTable,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import {
   getWazuhCheckUpdatesPlugin,
   getWazuhCorePlugin,
@@ -65,19 +67,31 @@ export const ApiTableCCS = ({
 
   const API_UPDATES_STATUS_COLUMN = {
     upToDate: {
-      text: 'Up to date',
+      text: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.upToDate',
+        { defaultMessage: 'Up to date' },
+      ),
       color: 'success',
     },
     availableUpdates: {
-      text: 'Available updates',
+      text: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.availableUpdates',
+        { defaultMessage: 'Available updates' },
+      ),
       color: 'warning',
     },
     disabled: {
-      text: 'Checking updates disabled',
+      text: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.disabled',
+        { defaultMessage: 'Checking updates disabled' },
+      ),
       color: 'subdued',
     },
     error: {
-      text: 'Error checking updates',
+      text: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.error',
+        { defaultMessage: 'Error checking updates' },
+      ),
       color: 'danger',
     },
   };
@@ -85,7 +99,9 @@ export const ApiTableCCS = ({
   const columns = [
     {
       field: 'id',
-      name: 'ID',
+      name: i18n.translate('wazuh.dashboardsSettings.apiTableCcs.columns.id', {
+        defaultMessage: 'ID',
+      }),
       align: 'left',
       sortable: true,
       render: item => {
@@ -94,31 +110,46 @@ export const ApiTableCCS = ({
     },
     {
       field: 'cluster_info.cluster',
-      name: 'Cluster',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.cluster',
+        { defaultMessage: 'Cluster' },
+      ),
       align: 'left',
       sortable: true,
     },
     {
       field: 'url',
-      name: 'Host',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.host',
+        { defaultMessage: 'Host' },
+      ),
       align: 'left',
       sortable: true,
     },
     {
       field: 'port',
-      name: 'Port',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.port',
+        { defaultMessage: 'Port' },
+      ),
       align: 'left',
       sortable: true,
     },
     {
       field: 'username',
-      name: 'Username',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.username',
+        { defaultMessage: 'Username' },
+      ),
       align: 'left',
       sortable: true,
     },
     {
       field: 'status',
-      name: 'Status',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.status',
+        { defaultMessage: 'Status' },
+      ),
       align: 'left',
       sortable: true,
       render: item => {
@@ -126,14 +157,23 @@ export const ApiTableCCS = ({
           return (
             <span>
               <EuiLoadingSpinner size='s' />
-              <span>&nbsp;&nbsp;Checking</span>
+              <span>
+                &nbsp;&nbsp;
+                {i18n.translate(
+                  'wazuh.dashboardsSettings.apiTableCcs.status.checking',
+                  { defaultMessage: 'Checking' },
+                )}
+              </span>
             </span>
           );
         }
         if (item) {
           return item === 'online' ? (
             <EuiHealth color='success' style={{ wordBreak: 'normal' }}>
-              Online
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.status.online',
+                { defaultMessage: 'Online' },
+              )}
             </EuiHealth>
           ) : item.status === 'down' ? (
             <EuiFlexGroup
@@ -143,7 +183,10 @@ export const ApiTableCCS = ({
             >
               <EuiFlexItem grow={false}>
                 <EuiHealth color='warning' style={{ wordBreak: 'normal' }}>
-                  Warning
+                  {i18n.translate(
+                    'wazuh.dashboardsSettings.apiTableCcs.status.warning',
+                    { defaultMessage: 'Warning' },
+                  )}
                 </EuiHealth>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -151,7 +194,10 @@ export const ApiTableCCS = ({
                   <EuiButtonIcon
                     color='primary'
                     iconType='questionInCircle'
-                    aria-label='Info about the error'
+                    aria-label={i18n.translate(
+                      'wazuh.dashboardsSettings.apiTableCcs.errorInfoAriaLabel',
+                      { defaultMessage: 'Info about the error' },
+                    )}
                     onClick={() => copyToClipBoard(item.downReason)}
                   />
                 </EuiToolTip>
@@ -165,7 +211,10 @@ export const ApiTableCCS = ({
             >
               <EuiFlexItem grow={false}>
                 <EuiHealth color='danger' style={{ wordBreak: 'normal' }}>
-                  Offline
+                  {i18n.translate(
+                    'wazuh.dashboardsSettings.apiTableCcs.status.offline',
+                    { defaultMessage: 'Offline' },
+                  )}
                 </EuiHealth>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -173,7 +222,10 @@ export const ApiTableCCS = ({
                   <EuiButtonIcon
                     color='primary'
                     iconType='questionInCircle'
-                    aria-label='Info about the error'
+                    aria-label={i18n.translate(
+                      'wazuh.dashboardsSettings.apiTableCcs.errorInfoAriaLabel',
+                      { defaultMessage: 'Info about the error' },
+                    )}
                     onClick={() => copyToClipBoard(item.downReason)}
                   />
                 </EuiToolTip>
@@ -184,7 +236,10 @@ export const ApiTableCCS = ({
       },
     },
     {
-      name: 'Run as',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.runAs',
+        { defaultMessage: 'Run as' },
+      ),
       field: 'allow_run_as',
       align: 'center',
       sortable: true,
@@ -193,7 +248,13 @@ export const ApiTableCCS = ({
         return value === getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ENABLED ? (
           <EuiToolTip
             position='top'
-            content='The configured API user uses the authentication context.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTableCcs.runAs.enabledTooltip',
+              {
+                defaultMessage:
+                  'The configured API user uses the authentication context.',
+              },
+            )}
           >
             <EuiIcon type='check' />
           </EuiToolTip>
@@ -201,14 +262,26 @@ export const ApiTableCCS = ({
           getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED ? (
           <EuiToolTip
             position='top'
-            content='The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTableCcs.runAs.notAllowedTooltip',
+              {
+                defaultMessage:
+                  'The configured API user is not allowed to use run_as. Give it permissions or set run_as with false value in the host configuration.',
+              },
+            )}
           >
             <EuiIcon color='danger' type='alert' />
           </EuiToolTip>
         ) : (
           <EuiToolTip
             position='top'
-            content='The configured API user does not use authentication context.'
+            content={i18n.translate(
+              'wazuh.dashboardsSettings.apiTableCcs.runAs.disabledTooltip',
+              {
+                defaultMessage:
+                  'The configured API user does not use authentication context.',
+              },
+            )}
           >
             <p>-</p>
           </EuiToolTip>
@@ -216,7 +289,10 @@ export const ApiTableCCS = ({
       },
     },
     {
-      name: 'Verify CA',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.verifyCa',
+        { defaultMessage: 'Verify CA' },
+      ),
       field: 'verify_ca',
       align: 'center',
       sortable: true,
@@ -228,7 +304,10 @@ export const ApiTableCCS = ({
           return (
             <EuiToolTip
               position='top'
-              content='CA certificate verification is enabled.'
+              content={i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.verifyCa.enabledTooltip',
+                { defaultMessage: 'CA certificate verification is enabled.' },
+              )}
             >
               <EuiIcon type='check' />
             </EuiToolTip>
@@ -237,7 +316,13 @@ export const ApiTableCCS = ({
           return (
             <EuiToolTip
               position='top'
-              content='CA certificate verification is disabled. Either certificate paths are not configured.'
+              content={i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.verifyCa.disabledTooltip',
+                {
+                  defaultMessage:
+                    'CA certificate verification is disabled. Either certificate paths are not configured.',
+                },
+              )}
             >
               <p>-</p>
             </EuiToolTip>
@@ -246,7 +331,13 @@ export const ApiTableCCS = ({
           return (
             <EuiToolTip
               position='top'
-              content='CA certificate verification status is unknown.'
+              content={i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.verifyCa.unknownTooltip',
+                {
+                  defaultMessage:
+                    'CA certificate verification status is unknown.',
+                },
+              )}
             >
               <p>-</p>
             </EuiToolTip>
@@ -255,24 +346,53 @@ export const ApiTableCCS = ({
       },
     },
     {
-      name: 'Actions',
+      name: i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.columns.actions',
+        { defaultMessage: 'Actions' },
+      ),
       render: item => (
         <EuiFlexGroup>
           <WzButtonPermissions
             buttonType='icon'
-            tooltip={{ position: 'top', content: <p>Set as default</p> }}
+            tooltip={{
+              position: 'top',
+              content: (
+                <p>
+                  {i18n.translate(
+                    'wazuh.dashboardsSettings.apiTableCcs.actions.setAsDefaultTooltip',
+                    { defaultMessage: 'Set as default' },
+                  )}
+                </p>
+              ),
+            }}
             iconType={
               item.id === selectedAPIConnection ? 'starFilled' : 'starEmpty'
             }
-            aria-label='Set as default'
+            aria-label={i18n.translate(
+              'wazuh.dashboardsSettings.apiTableCcs.actions.setAsDefaultAriaLabel',
+              { defaultMessage: 'Set as default' },
+            )}
             onClick={async () => {
               const currentDefault = await setDefault(item);
               // state update is handled in ApiTable
             }}
           />
-          <EuiToolTip position='top' content={<p>Check connection</p>}>
+          <EuiToolTip
+            position='top'
+            content={
+              <p>
+                {i18n.translate(
+                  'wazuh.dashboardsSettings.apiTableCcs.actions.checkConnectionTooltip',
+                  { defaultMessage: 'Check connection' },
+                )}
+              </p>
+            }
+          >
             <EuiButtonIcon
-              aria-label='Check connection'
+              aria-label={i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.actions.checkConnectionAriaLabel',
+                { defaultMessage: 'Check connection' },
+              )}
               iconType='refresh'
               onClick={async () => await checkApi(item)}
               color='success'
@@ -286,7 +406,10 @@ export const ApiTableCCS = ({
   // optional column if Check Updates is enabled
   const currentVersionColumn = {
     field: 'current_version',
-    name: 'Version',
+    name: i18n.translate(
+      'wazuh.dashboardsSettings.apiTableCcs.columns.version',
+      { defaultMessage: 'Version' },
+    ),
     align: 'left',
     sortable: true,
   };
@@ -294,12 +417,20 @@ export const ApiTableCCS = ({
   // optional column if Check Updates is enabled
   const versionStatusColumn = {
     field: 'version_status',
-    name: 'Updates status',
+    name: i18n.translate(
+      'wazuh.dashboardsSettings.apiTableCcs.columns.updatesStatus',
+      { defaultMessage: 'Updates status' },
+    ),
     sortable: true,
     render: (item, api) => {
       const color = API_UPDATES_STATUS_COLUMN[item]?.color ?? 'subdued';
 
-      const content = API_UPDATES_STATUS_COLUMN[item]?.text ?? 'Never checked';
+      const content =
+        API_UPDATES_STATUS_COLUMN[item]?.text ??
+        i18n.translate(
+          'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.neverChecked',
+          { defaultMessage: 'Never checked' },
+        );
 
       if (!refreshingAvailableUpdates) {
         return (
@@ -315,7 +446,20 @@ export const ApiTableCCS = ({
                   position='top'
                   content={
                     <p>
-                      Click <b>Check updates</b> button to get information
+                      <FormattedMessage
+                        id='wazuh.dashboardsSettings.apiTableCcs.updatesStatus.neverCheckedTooltip'
+                        defaultMessage='Click {checkUpdates} button to get information'
+                        values={{
+                          checkUpdates: (
+                            <b>
+                              {i18n.translate(
+                                'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.neverCheckedTooltipButton',
+                                { defaultMessage: 'Check updates' },
+                              )}
+                            </b>
+                          ),
+                        }}
+                      />
                     </p>
                   }
                 >
@@ -329,8 +473,16 @@ export const ApiTableCCS = ({
             {item === 'availableUpdates' ? (
               <EuiFlexItem grow={false}>
                 <WzButtonOpenFlyout
-                  tooltip={{ content: 'View available updates' }}
-                  flyoutTitle={'Available updates'}
+                  tooltip={{
+                    content: i18n.translate(
+                      'wazuh.dashboardsSettings.apiTableCcs.updatesStatus.viewAvailableUpdatesTooltip',
+                      { defaultMessage: 'View available updates' },
+                    ),
+                  }}
+                  flyoutTitle={i18n.translate(
+                    'wazuh.dashboardsSettings.apiTableCcs.availableUpdatesFlyout.title',
+                    { defaultMessage: 'Available updates' },
+                  )}
                   flyoutBody={() => {
                     return <AvailableUpdatesFlyout updates={versionData} />;
                   }}
@@ -351,7 +503,10 @@ export const ApiTableCCS = ({
                   <EuiButtonIcon
                     color='primary'
                     iconType='questionInCircle'
-                    aria-label='Info about the error'
+                    aria-label={i18n.translate(
+                      'wazuh.dashboardsSettings.apiTableCcs.errorInfoAriaLabel',
+                      { defaultMessage: 'Info about the error' },
+                    )}
                     onClick={() => copyToClipBoard(api.error.detail)}
                   />
                 </EuiToolTip>
@@ -363,7 +518,13 @@ export const ApiTableCCS = ({
         return (
           <span>
             <EuiLoadingSpinner size='s' />
-            <span>&nbsp;&nbsp;Checking</span>
+            <span>
+              &nbsp;&nbsp;
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.status.checking',
+                { defaultMessage: 'Checking' },
+              )}
+            </span>
           </span>
         );
       }
@@ -390,7 +551,10 @@ export const ApiTableCCS = ({
       }
       isDisabled={refreshingEntries}
     >
-      Check connection
+      {i18n.translate(
+        'wazuh.dashboardsSettings.apiTableCcs.checkConnectionButton',
+        { defaultMessage: 'Check connection' },
+      )}
     </EuiButton>
   );
 
@@ -402,14 +566,22 @@ export const ApiTableCCS = ({
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>API Connections</h2>
+                  <h2>
+                    {i18n.translate(
+                      'wazuh.dashboardsSettings.apiTableCcs.title',
+                      { defaultMessage: 'API Connections' },
+                    )}
+                  </h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <WzButtonPermissionsOpenFlyout
-              flyoutTitle='Add API connection'
+              flyoutTitle={i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.addApiFlyout.title',
+                { defaultMessage: 'Add API connection' },
+              )}
               flyoutBody={() => <AddApi />}
               buttonProps={{
                 administrator: true,
@@ -417,7 +589,10 @@ export const ApiTableCCS = ({
                 iconType: 'plusInCircle',
               }}
             >
-              Add API connection
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.addApiButton',
+                { defaultMessage: 'Add API connection' },
+              )}
             </WzButtonPermissionsOpenFlyout>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -425,7 +600,10 @@ export const ApiTableCCS = ({
               iconType='refresh'
               onClick={async () => await refresh()}
             >
-              Refresh
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.refreshButton',
+                { defaultMessage: 'Refresh' },
+              )}
             </EuiButtonEmpty>
           </EuiFlexItem>
           {isUpdatesEnabled && (
@@ -438,9 +616,15 @@ export const ApiTableCCS = ({
                   }
                 >
                   <span>
-                    Check updates{' '}
+                    {i18n.translate(
+                      'wazuh.dashboardsSettings.apiTableCcs.checkUpdatesButton',
+                      { defaultMessage: 'Check updates' },
+                    )}{' '}
                     <EuiToolTip
-                      title='Last dashboard check'
+                      title={i18n.translate(
+                        'wazuh.dashboardsSettings.apiTableCcs.lastDashboardCheckTooltip',
+                        { defaultMessage: 'Last dashboard check' },
+                      )}
                       content={
                         availableUpdates?.last_check_date_dashboard
                           ? getWazuhCorePlugin().utils.formatUIDate(
@@ -463,8 +647,13 @@ export const ApiTableCCS = ({
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color='subdued' style={{ paddingBottom: '15px' }}>
-              From here you can manage and configure the API entries. You can
-              also check their connection and status.
+              {i18n.translate(
+                'wazuh.dashboardsSettings.apiTableCcs.description',
+                {
+                  defaultMessage:
+                    'From here you can manage and configure the API entries. You can also check their connection and status.',
+                },
+              )}
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -472,30 +661,52 @@ export const ApiTableCCS = ({
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiCallOut
-                title='The API connections could be down or inaccessible'
+                title={i18n.translate(
+                  'wazuh.dashboardsSettings.apiTableCcs.apiDownCallout.title',
+                  {
+                    defaultMessage:
+                      'The API connections could be down or inaccessible',
+                  },
+                )}
                 iconType='alert'
                 color='warning'
               >
                 <EuiFlexGroup>
                   <EuiFlexItem grow={false}>
                     <WzButtonOpenFlyout
-                      flyoutTitle={
-                        'The API connections could be down or inaccessible'
-                      }
+                      flyoutTitle={i18n.translate(
+                        'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.title',
+                        {
+                          defaultMessage:
+                            'The API connections could be down or inaccessible',
+                        },
+                      )}
                       flyoutBody={() => {
                         const steps = [
                           {
-                            title: 'Check the API server service status',
+                            title: i18n.translate(
+                              'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.checkServiceStep',
+                              {
+                                defaultMessage:
+                                  'Check the API server service status',
+                              },
+                            ),
                             children: (
                               <>
                                 {[
                                   {
-                                    label: 'For Systemd',
+                                    label: i18n.translate(
+                                      'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.systemdLabel',
+                                      { defaultMessage: 'For Systemd' },
+                                    ),
                                     command:
                                       'sudo systemctl status wazuh-manager',
                                   },
                                   {
-                                    label: 'For SysV Init',
+                                    label: i18n.translate(
+                                      'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.sysVInitLabel',
+                                      { defaultMessage: 'For SysV Init' },
+                                    ),
                                     command:
                                       'sudo service wazuh-manager status',
                                   },
@@ -519,8 +730,14 @@ export const ApiTableCCS = ({
                                             onClick={copy}
                                           >
                                             <p>
-                                              <EuiIcon type='copy' /> Copy
-                                              command
+                                              <EuiIcon type='copy' />{' '}
+                                              {i18n.translate(
+                                                'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.copyCommand',
+                                                {
+                                                  defaultMessage:
+                                                    'Copy command',
+                                                },
+                                              )}
                                             </p>
                                           </div>
                                         )}
@@ -533,10 +750,22 @@ export const ApiTableCCS = ({
                             ),
                           },
                           {
-                            title: 'Review the API hosts configuration',
+                            title: i18n.translate(
+                              'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.reviewConfigurationStep',
+                              {
+                                defaultMessage:
+                                  'Review the API hosts configuration',
+                              },
+                            ),
                           },
                           {
-                            title: 'Check the API hosts connection',
+                            title: i18n.translate(
+                              'wazuh.dashboardsSettings.apiTableCcs.troubleshootingFlyout.checkConnectionStep',
+                              {
+                                defaultMessage:
+                                  'Check the API hosts connection',
+                              },
+                            ),
                             children: checkAPIHostsConnectionButton,
                           },
                         ];
@@ -547,7 +776,10 @@ export const ApiTableCCS = ({
                         buttonType: 'empty',
                       }}
                     >
-                      Troubleshooting
+                      {i18n.translate(
+                        'wazuh.dashboardsSettings.apiTableCcs.troubleshootingButton',
+                        { defaultMessage: 'Troubleshooting' },
+                      )}
                     </WzButtonOpenFlyout>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
@@ -568,7 +800,12 @@ export const ApiTableCCS = ({
           loading={isLoading}
           tableLayout='auto'
           message={
-            !items.length ? 'No API connections. Add a new one.' : undefined
+            !items.length
+              ? i18n.translate(
+                  'wazuh.dashboardsSettings.apiTableCcs.table.noItemsMessage',
+                  { defaultMessage: 'No API connections. Add a new one.' },
+                )
+              : undefined
           }
         />
       </EuiPanel>

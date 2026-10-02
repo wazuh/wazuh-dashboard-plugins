@@ -12,6 +12,7 @@
 
 import React, { Fragment } from 'react';
 import { EuiEmptyPrompt, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { TUserPermissions, TUserIsAdministrator } from '../permissions/element';
 import { WzPermissionsFormatted } from './format';
 import { withErrorBoundary } from '../hocs/error-boundary/with-error-boundary';
@@ -26,20 +27,38 @@ export const WzEmptyPromptNoPermissions = withErrorBoundary(
     return (
       <EuiEmptyPrompt
         iconType='securityApp'
-        title={<h2>You have no permissions</h2>}
+        title={
+          <h2>
+            {i18n.translate('wazuh.common.permissionsPrompt.title', {
+              defaultMessage: 'You have no permissions',
+            })}
+          </h2>
+        }
         body={
           <Fragment>
             {permissions && (
               <div>
-                This section requires the{' '}
-                {permissions.length > 1 ? 'permissions' : 'permission'}:
+                {i18n.translate(
+                  'wazuh.common.permissionsPrompt.requiredPermissions',
+                  {
+                    defaultMessage:
+                      'This section requires the {count, plural, =0 {permission} one {permission} other {permissions}}:',
+                    values: { count: permissions.length },
+                  },
+                )}
                 {WzPermissionsFormatted(permissions)}
               </div>
             )}
             {permissions && administrator && <EuiSpacer />}
             {administrator && (
               <div>
-                This section requires administrator privilegies:{' '}
+                {i18n.translate(
+                  'wazuh.common.permissionsPrompt.requiredAdministrator',
+                  {
+                    defaultMessage:
+                      'This section requires administrator privilegies:',
+                  },
+                )}{' '}
                 <strong key={`empty-prompt-no-roles-administrator`}>
                   {administrator}
                 </strong>

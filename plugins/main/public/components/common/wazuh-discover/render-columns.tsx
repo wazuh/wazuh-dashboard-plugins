@@ -26,7 +26,10 @@ const renderLinksReference = (value: string) => {
           {!!index && ', '}
           <EuiToolTip
             position='top'
-            content='Navigate to the vulnerability reference'
+            content={i18n.translate(
+              'wazuh.common.wazuhDiscover.fieldLinkTooltip.vulnerabilityExternalReference',
+              { defaultMessage: 'Navigate to the vulnerability reference' },
+            )}
           >
             <EuiLink
               href={link}
@@ -113,7 +116,7 @@ const renderMitreTechnique = (technique: string, showLinkTooltip = true) => (
       showLinkTooltip
         ? {
             content: i18n.translate(
-              'discover.fieldLinkTooltip.mitreTechnique',
+              'wazuh.common.wazuhDiscover.fieldLinkTooltip.mitreTechnique',
               {
                 defaultMessage:
                   'Navigate to MITRE ATT&CK - Intelligence and see the technique details',
@@ -135,9 +138,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         appId={endpointSummary.id}
         path={`/agents?tab=welcome&agent=${value}`}
         toolTipProps={{
-          content: i18n.translate('discover.fieldLinkTooltip.agent', {
-            defaultMessage: 'Navigate to the agent details',
-          }),
+          content: i18n.translate(
+            'wazuh.common.wazuhDiscover.fieldLinkTooltip.agent',
+            {
+              defaultMessage: 'Navigate to the agent details',
+            },
+          ),
         }}
       >
         {value}
@@ -151,9 +157,12 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         appId={endpointSummary.id}
         path={`/agents?tab=welcome&agent=${row.wazuh.agent.id}`}
         toolTipProps={{
-          content: i18n.translate('discover.fieldLinkTooltip.agent', {
-            defaultMessage: 'Navigate to the agent details',
-          }),
+          content: i18n.translate(
+            'wazuh.common.wazuhDiscover.fieldLinkTooltip.agent',
+            {
+              defaultMessage: 'Navigate to the agent details',
+            },
+          ),
         }}
       >
         {value}
@@ -249,7 +258,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         <EuiToolTip
           position='top'
           content={i18n.translate(
-            'discover.fieldLinkTooltip.vulnerabilityScannerReference',
+            'wazuh.common.wazuhDiscover.fieldLinkTooltip.vulnerabilityReference',
             {
               defaultMessage: 'Navigate to the vulnerability CTI reference',
             },
@@ -282,7 +291,7 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
         <EuiToolTip
           position='top'
           content={i18n.translate(
-            'discover.fieldLinkTooltip.vulnerabilityScannerReference',
+            'wazuh.common.wazuhDiscover.fieldLinkTooltip.vulnerabilityReference',
             {
               defaultMessage: 'Navigate to the vulnerability CTI reference',
             },

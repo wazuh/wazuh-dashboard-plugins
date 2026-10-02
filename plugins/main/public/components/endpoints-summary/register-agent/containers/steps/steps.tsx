@@ -6,6 +6,8 @@ import {
   EuiButton,
   EuiCode,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import './steps.scss';
 import { OPERATING_SYSTEMS_OPTIONS } from '../../utils/register-agent-data';
 import {
@@ -46,6 +48,75 @@ import OsCommandWarning from '../../components/command-output/os-warning';
 import { endpointSummary } from '../../../../../utils/applications';
 import { SECTIONS } from '../../../../../sections';
 import NavigationService from '../../../../../react-services/navigation-service';
+
+/* The step and field labels are internal keys the status services return; the
+names shown in the warning callouts are looked up here. */
+const STEP_LABELS: Record<tFormStepsLabel, string> = {
+  [tFormStepsLabel.operatingSystemSelection]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.stepLabels.operatingSystem',
+    { defaultMessage: 'operating system' },
+  ),
+  [tFormStepsLabel.serverAddress]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.stepLabels.serverAddress',
+    { defaultMessage: 'server address' },
+  ),
+  [tFormStepsLabel.enrollmentToken]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.stepLabels.enrollmentToken',
+    { defaultMessage: 'enrollment token' },
+  ),
+};
+
+const FIELD_LABELS: Record<tFormFieldsLabel, string> = {
+  [tFormFieldsLabel.existingEnrollmentToken]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.existingEnrollmentToken',
+    { defaultMessage: 'existing enrollment token' },
+  ),
+  [tFormFieldsLabel.enrollmentTokenTtl]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.enrollmentTokenTtl',
+    { defaultMessage: 'enrollment token lifetime' },
+  ),
+  [tFormFieldsLabel.enrollmentTokenMaxUses]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.enrollmentTokenMaxUses',
+    { defaultMessage: 'enrollment token enrollments' },
+  ),
+  [tFormFieldsLabel.agentName]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.agentName',
+    { defaultMessage: 'agent name' },
+  ),
+  [tFormFieldsLabel.agentGroups]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.agentGroups',
+    { defaultMessage: 'agent groups' },
+  ),
+  [tFormFieldsLabel.serverAddress]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.serverAddress',
+    { defaultMessage: 'server address' },
+  ),
+  [tFormFieldsLabel.serverPort]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.serverPort',
+    { defaultMessage: 'server port' },
+  ),
+  [tFormFieldsLabel.serverPath]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.serverPath',
+    { defaultMessage: 'server path prefix' },
+  ),
+  [tFormFieldsLabel.managerCa]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.managerCa',
+    { defaultMessage: 'manager CA file path' },
+  ),
+};
+
+/* Joins the labels into one list, leaving the conjunction and the word order to
+the translation. */
+const joinLabels = (labels: string[]): string =>
+  labels.reduce((previous, next) =>
+    i18n.translate(
+      'wazuh.endpointsSummary.registerAgentSteps.labelListConjunction',
+      {
+        defaultMessage: '{previous} and {next}',
+        values: { previous, next },
+      },
+    ),
+  );
 
 interface IStepsProps {
   needsPassword: boolean;
@@ -100,7 +171,33 @@ export const Steps = ({
   const [registerAgentFormValues, setRegisterAgentFormValues] =
     useState<IParseRegisterFormValues>(initialParsedFormValues);
 
-  const FORM_MESSAGE_CONJUNTION = ' and ';
+  const missingStepsMessage = missingStepsName?.length
+    ? i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.missingStepsWarning',
+        {
+          defaultMessage: 'Please select the {steps}.',
+          values: {
+            steps: joinLabels(
+              missingStepsName.map(label => STEP_LABELS[label] ?? label),
+            ),
+          },
+        },
+      )
+    : '';
+  const invalidFieldsMessage = invalidFieldsName?.length
+    ? i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.invalidFieldsWarning',
+        {
+          defaultMessage:
+            'There are fields with errors. Please verify them: {fields}.',
+          values: {
+            fields: joinLabels(
+              invalidFieldsName.map(label => FIELD_LABELS[label] ?? label),
+            ),
+          },
+        },
+      )
+    : '';
 
   useEffect(() => {
     // get form values and parse them divided in OS and optional params
@@ -183,14 +280,30 @@ export const Steps = ({
     );
   }, [startCommandWasCopied]);
 
+  const passwordStepTitle = i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.passwordTitle',
+    { defaultMessage: 'Password' },
+  );
+
   const registerAgentFormSteps = [
     {
-      title: 'Select the package to download and install on your system:',
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.osSelectionTitle',
+        {
+          defaultMessage:
+            'Select the package to download and install on your system:',
+        },
+      ),
       children: osCard,
       status: getOSSelectorStepStatus(form.fields),
     },
     {
-      title: 'Server address:',
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.serverAddressTitle',
+        {
+          defaultMessage: 'Server address:',
+        },
+      ),
       children: (
         <ServerAddress
           formFields={{
@@ -205,7 +318,12 @@ export const Steps = ({
     ...(canCreateEnrollmentToken
       ? [
           {
-            title: 'Enrollment token:',
+            title: i18n.translate(
+              'wazuh.endpointsSummary.registerAgentSteps.enrollmentTokenTitle',
+              {
+                defaultMessage: 'Enrollment token:',
+              },
+            ),
             children: (
               <EnrollmentTokenInput
                 formFields={form.fields}
@@ -223,23 +341,32 @@ export const Steps = ({
     ...(!canCreateEnrollmentToken && needsPassword && !wazuhPassword
       ? [
           {
-            title: 'Password',
+            title: passwordStepTitle,
             children: (
               <EuiCallOut
                 color='warning'
                 title={
                   <span>
-                    The password is required but wasn't defined. Please check
-                    our{' '}
-                    <EuiLink
-                      target='_blank'
-                      href={webDocumentationLink(
-                        'user-manual/agent/agent-enrollment/security-options/using-password-authentication.html',
-                      )}
-                      rel='noopener noreferrer'
-                    >
-                      documentation
-                    </EuiLink>
+                    <FormattedMessage
+                      id='wazuh.endpointsSummary.registerAgentSteps.passwordUndefinedWarning'
+                      defaultMessage="The password is required but wasn't defined. Please check our {documentationLink}"
+                      values={{
+                        documentationLink: (
+                          <EuiLink
+                            target='_blank'
+                            href={webDocumentationLink(
+                              'user-manual/agent/agent-enrollment/security-options/using-password-authentication.html',
+                            )}
+                            rel='noopener noreferrer'
+                          >
+                            {i18n.translate(
+                              'wazuh.endpointsSummary.registerAgentSteps.passwordDocumentationLink',
+                              { defaultMessage: 'documentation' },
+                            )}
+                          </EuiLink>
+                        ),
+                      }}
+                    />
                   </span>
                 }
                 iconType='iInCircle'
@@ -253,16 +380,28 @@ export const Steps = ({
     ...(passwordPermissionMissing
       ? [
           {
-            title: 'Password',
+            title: passwordStepTitle,
             children: (
               <EuiCallOut
                 color='warning'
-                title='Missing permission to read the registration password'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.registerAgentSteps.passwordPermissionMissingTitle',
+                  {
+                    defaultMessage:
+                      'Missing permission to read the registration password',
+                  },
+                )}
                 iconType='iInCircle'
                 className='warningForAgentName'
               >
                 <p>
-                  Require <EuiCode>cluster:update_config</EuiCode> permission.
+                  <FormattedMessage
+                    id='wazuh.endpointsSummary.registerAgentSteps.passwordPermissionMissingDescription'
+                    defaultMessage='Require {permission} permission.'
+                    values={{
+                      permission: <EuiCode>cluster:update_config</EuiCode>,
+                    }}
+                  />
                 </p>
               </EuiCallOut>
             ),
@@ -271,7 +410,12 @@ export const Steps = ({
         ]
       : []),
     {
-      title: 'Optional settings:',
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.optionalSettingsTitle',
+        {
+          defaultMessage: 'Optional settings:',
+        },
+      ),
       children: <OptionalsInputs formFields={form.fields} />,
       status: getOptionalParameterStepStatus(
         form.fields,
@@ -279,16 +423,32 @@ export const Steps = ({
       ),
     },
     {
-      title: 'Run the following commands to download and install the agent:',
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.installCommandTitle',
+        {
+          defaultMessage:
+            'Run the following commands to download and install the agent:',
+        },
+      ),
       children: passwordPermissionMissing ? (
         <EuiCallOut
           color='warning'
-          title='Deployment commands hidden'
+          title={i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.installCommandHiddenTitle',
+            {
+              defaultMessage: 'Deployment commands hidden',
+            },
+          )}
           iconType='iInCircle'
         >
           <p>
-            Missing permissions to read the manager configuration required to
-            view the deployment commands.
+            {i18n.translate(
+              'wazuh.endpointsSummary.registerAgentSteps.installCommandHiddenDescription',
+              {
+                defaultMessage:
+                  'Missing permissions to read the manager configuration required to view the deployment commands.',
+              },
+            )}
           </p>
         </EuiCallOut>
       ) : (
@@ -296,18 +456,14 @@ export const Steps = ({
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={missingStepsMessage}
               iconType='iInCircle'
             />
           ) : null}
           {invalidFieldsName?.length ? (
             <EuiCallOut
               color='danger'
-              title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={invalidFieldsMessage}
               iconType='iInCircle'
               style={{ marginTop: '1rem' }}
             />
@@ -337,16 +493,31 @@ export const Steps = ({
       status: installCommandStepStatus,
     },
     {
-      title: 'Start the agent:',
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.startCommandTitle',
+        {
+          defaultMessage: 'Start the agent:',
+        },
+      ),
       children: passwordPermissionMissing ? (
         <EuiCallOut
           color='warning'
-          title='Start command hidden'
+          title={i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.startCommandHiddenTitle',
+            {
+              defaultMessage: 'Start command hidden',
+            },
+          )}
           iconType='iInCircle'
         >
           <p>
-            Missing permissions to read the manager configuration required to
-            view the start command.
+            {i18n.translate(
+              'wazuh.endpointsSummary.registerAgentSteps.startCommandHiddenDescription',
+              {
+                defaultMessage:
+                  'Missing permissions to read the manager configuration required to view the start command.',
+              },
+            )}
           </p>
         </EuiCallOut>
       ) : (
@@ -354,18 +525,14 @@ export const Steps = ({
           {missingStepsName?.length ? (
             <EuiCallOut
               color='warning'
-              title={`Please select the ${missingStepsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={missingStepsMessage}
               iconType='iInCircle'
             />
           ) : null}
           {invalidFieldsName?.length ? (
             <EuiCallOut
               color='danger'
-              title={`There are fields with errors. Please verify them: ${invalidFieldsName?.join(
-                FORM_MESSAGE_CONJUNTION,
-              )}.`}
+              title={invalidFieldsMessage}
               iconType='iInCircle'
               style={{ marginTop: '1rem' }}
             />
@@ -386,7 +553,12 @@ export const Steps = ({
       status: startCommandStepStatus,
     },
     {
-      title: 'Go to endpoints to verify the agent connection:',
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.verifyConnectionTitle',
+        {
+          defaultMessage: 'Go to endpoints to verify the agent connection:',
+        },
+      ),
       children: (
         <EuiButton
           color='primary'
@@ -404,9 +576,20 @@ export const Steps = ({
               path: `#/${SECTIONS.AGENTS_PREVIEW}`,
             },
           )}
-          aria-label={`Open ${endpointSummary.breadcrumbLabel}`}
+          aria-label={i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.backToAgentListAriaLabel',
+            {
+              defaultMessage: 'Open {appLabel}',
+              values: { appLabel: endpointSummary.breadcrumbLabel },
+            },
+          )}
         >
-          Back to agent list
+          {i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.backToAgentList',
+            {
+              defaultMessage: 'Back to agent list',
+            },
+          )}
         </EuiButton>
       ),
       status: startCommandStepStatus === 'complete' ? 'current' : 'disabled',

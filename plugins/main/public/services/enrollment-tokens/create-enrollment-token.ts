@@ -13,6 +13,7 @@
 import { WzRequest } from '../../react-services/wz-request';
 import { ENROLLMENT_TOKENS_ENDPOINT } from './constants';
 import { EnrollmentTokenRequest, MintedEnrollmentToken } from './types';
+import { i18n } from '@osd/i18n';
 
 const isEmpty = (value?: string | number) =>
   value === undefined || value === null || String(value).trim().length === 0;
@@ -94,7 +95,9 @@ export const createEnrollmentToken = async (
   if (!enrollmentToken?.token) {
     throw new Error(
       response?.data?.message ||
-        'The server API did not return an enrollment token.',
+        i18n.translate('wazuh.enrollmentTokens.service.createNoToken', {
+          defaultMessage: 'The server API did not return an enrollment token.',
+        }),
     );
   }
 

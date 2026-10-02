@@ -1,7 +1,7 @@
 {
   "entry": [
     "{public,server}/index.{js,ts}",
-    "{public,server}/**/*.test.{js,ts,tsx}"
+    "{public,server,common}/**/*.test.{js,ts,tsx}"
   ],
   "project": [
     "**/*.{js,ts,jsx,tsx}",

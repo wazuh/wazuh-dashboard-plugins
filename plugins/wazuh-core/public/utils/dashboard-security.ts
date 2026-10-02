@@ -1,10 +1,24 @@
+import { i18n } from '@osd/i18n';
 import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../common/constants';
 import { ILogger } from '../../common/services/configuration';
 
 export class DashboardSecurity {
   private securityPlatform: string = '';
+  private currentPlatformRequest?: Promise<string>;
   constructor(private logger: ILogger, private http) {}
-  private async fetchCurrentPlatform() {
+  // The platform does not change at runtime, so later callers reuse the first request
+  private fetchCurrentPlatform() {
+    if (!this.currentPlatformRequest) {
+      this.currentPlatformRequest = this.requestCurrentPlatform().catch(
+        error => {
+          this.currentPlatformRequest = undefined;
+          throw error;
+        },
+      );
+    }
+    return this.currentPlatformRequest;
+  }
+  private async requestCurrentPlatform() {
     try {
       this.logger.debug('Fetching the security platform');
       const response = await this.http.get(
@@ -35,7 +49,10 @@ export class DashboardSecurity {
     return {
       administrator: isAdministrator,
       administrator_requirements: !isAdministrator
-        ? 'User has no administrator role in the selected API connection.'
+        ? i18n.translate('wazuhCore.security.administrator.missingRole', {
+            defaultMessage:
+              'User has no administrator role in the selected API connection.',
+          })
         : null,
     };
   }

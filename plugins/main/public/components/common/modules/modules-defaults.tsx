@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
@@ -120,6 +121,45 @@ import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
+const TAB_NAMES = {
+  cases: i18n.translate('wazuh.common.moduleTabs.cases', {
+    defaultMessage: 'Cases',
+  }),
+  inventory: i18n.translate('wazuh.common.moduleTabs.inventory', {
+    defaultMessage: 'Inventory',
+  }),
+  panel: i18n.translate('wazuh.common.moduleTabs.panel', {
+    defaultMessage: 'Panel',
+  }),
+  intelligence: i18n.translate('wazuh.common.moduleTabs.intelligence', {
+    defaultMessage: 'Intelligence',
+  }),
+  framework: i18n.translate('wazuh.common.moduleTabs.framework', {
+    defaultMessage: 'Framework',
+  }),
+  controls: i18n.translate('wazuh.common.moduleTabs.controls', {
+    defaultMessage: 'Controls',
+  }),
+  system: i18n.translate('wazuh.common.moduleTabs.system', {
+    defaultMessage: 'System',
+  }),
+  software: i18n.translate('wazuh.common.moduleTabs.software', {
+    defaultMessage: 'Software',
+  }),
+  processes: i18n.translate('wazuh.common.moduleTabs.processes', {
+    defaultMessage: 'Processes',
+  }),
+  network: i18n.translate('wazuh.common.moduleTabs.network', {
+    defaultMessage: 'Network',
+  }),
+  identity: i18n.translate('wazuh.common.moduleTabs.identity', {
+    defaultMessage: 'Identity',
+  }),
+  services: i18n.translate('wazuh.common.moduleTabs.services', {
+    defaultMessage: 'Services',
+  }),
+};
+
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
   component: ButtonModuleGenerateReportComponent,
@@ -182,7 +222,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'cases',
-        name: 'Cases',
+        name: TAB_NAMES.cases,
         buttons: [ButtonExploreAgent],
         component: CaseManagementCases,
       },
@@ -200,7 +240,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: TAB_NAMES.inventory,
         buttons: [ButtonExploreAgent],
         component: InventoryFIM,
       },
@@ -299,7 +339,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: TAB_NAMES.inventory,
         buttons: [ButtonExploreAgent],
         component: SCAInventory,
       },
@@ -324,7 +364,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Panel',
+        name: TAB_NAMES.panel,
         buttons: [ButtonExploreAgent],
         component: OfficePanel,
       },
@@ -348,7 +388,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Panel',
+        name: TAB_NAMES.panel,
         buttons: [ButtonExploreAgent],
         component: GitHubPanel,
       },
@@ -381,7 +421,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Inventory',
+        name: TAB_NAMES.inventory,
         component: InventoryVuls,
         /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
         buttons: [
@@ -414,12 +454,12 @@ export const ModulesDefaults = {
       },
       {
         id: 'intelligence',
-        name: 'Intelligence',
+        name: TAB_NAMES.intelligence,
         component: ModuleMitreAttackIntelligence,
       },
       {
         id: 'inventory',
-        name: 'Framework',
+        name: TAB_NAMES.framework,
         buttons: [ButtonExploreAgent],
         component: MainMitre,
       },
@@ -464,7 +504,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: TAB_NAMES.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={PCIDSSDataSource} />
@@ -493,7 +533,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: TAB_NAMES.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={HIPAADataSource} />
@@ -521,7 +561,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: TAB_NAMES.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={NIST80053DataSource} />
@@ -550,7 +590,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: TAB_NAMES.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={GDPRDataSource} />
@@ -578,7 +618,7 @@ export const ModulesDefaults = {
       },
       {
         id: 'inventory',
-        name: 'Controls',
+        name: TAB_NAMES.controls,
         buttons: [ButtonExploreAgent],
         component: (props: any) => (
           <ComplianceTable {...props} DataSource={TSCDataSource} />
@@ -607,37 +647,37 @@ export const ModulesDefaults = {
       },
       {
         id: 'system',
-        name: 'System',
+        name: TAB_NAMES.system,
         buttons: [ButtonExploreAgent],
         component: ITHygieneSystemInventory,
       },
       {
         id: 'software',
-        name: 'Software',
+        name: TAB_NAMES.software,
         buttons: [ButtonExploreAgent],
         component: ITHygienePackagesInventory,
       },
       {
         id: 'processes',
-        name: 'Processes',
+        name: TAB_NAMES.processes,
         buttons: [ButtonExploreAgent],
         component: ITHygieneProcessesInventory,
       },
       {
         id: 'network',
-        name: 'Network',
+        name: TAB_NAMES.network,
         buttons: [ButtonExploreAgent],
         component: ITHygieneNetworksInventory,
       },
       {
         id: 'users',
-        name: 'Identity',
+        name: TAB_NAMES.identity,
         buttons: [ButtonExploreAgent],
         component: ITHygieneUsersInventory,
       },
       {
         id: 'services',
-        name: 'Services',
+        name: TAB_NAMES.services,
         buttons: [ButtonExploreAgent],
         component: ITHygieneServicesInventory,
       },
@@ -679,11 +719,17 @@ export const ModulesDefaults = {
             DataSource={ActiveResponsesDataSource}
             DataSourceRepository={ActiveResponsesDataSourceRepository}
             categoriesSampleData={[]}
-            flyoutTitle='Active response details'
+            flyoutTitle={i18n.translate(
+              'wazuh.common.moduleTabs.activeResponses.flyoutTitle',
+              { defaultMessage: 'Active response details' },
+            )}
             additionalDocumentDetailsTabs={({ document }) => [
               {
                 id: 'source-finding',
-                name: 'Source finding',
+                name: i18n.translate(
+                  'wazuh.common.moduleTabs.activeResponses.sourceFindingTab',
+                  { defaultMessage: 'Source finding' },
+                ),
                 content: <ActiveResponseFlyoutBody hit={document} />,
               },
             ]}

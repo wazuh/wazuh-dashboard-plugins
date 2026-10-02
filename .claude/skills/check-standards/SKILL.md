@@ -1,6 +1,6 @@
 ---
 name: check-standards
-description: Run the same code-quality checks CI runs (Prettier format, ESLint, typecheck, and unit tests) over the current diff before pushing or marking a PR ready. Use before opening/updating a PR, when the user asks to verify standards, lint, format, or check that CI will pass.
+description: Run the same code-quality checks CI runs (Prettier format, ESLint, typecheck, and unit tests), plus the documentation cross-repository link rule, over the current diff before pushing or marking a PR ready. Use before opening/updating a PR, when the user asks to verify standards, lint, format, or check that CI will pass.
 ---
 
 # Check standards (mirror CI locally)
@@ -20,7 +20,8 @@ commands (test runner, plugin folders, typecheck).
 - [ ] 3. ESLint (autofix with --fix)
 - [ ] 4. Typecheck
 - [ ] 5. Unit tests for touched plugins
-- [ ] 6. Report pass/fail summary
+- [ ] 6. Documentation links (no links to other Wazuh repositories)
+- [ ] 7. Report pass/fail summary
 ```
 
 ### 1. Compute changed files
@@ -85,7 +86,24 @@ npx eslint $CODE --fix
 Remember: unit tests are **colocated** (`*.test.ts` / `*.test.tsx` next to the
 source). New source files should ship with their colocated test.
 
-### 6. Report
+### 6. Documentation links
+
+Documentation never links to another Wazuh repository (`github.com/wazuh/<repo>/...`): those
+URLs point to a specific branch. Check the Markdown lines the change adds (the working tree
+included), ignoring inline code spans:
+
+```bash
+git diff -U0 "$(git merge-base "origin/$BASE" HEAD)" -- '*.md' \
+  | grep -E '^\+[^+]' | sed -E 's/`[^`]*`//g' \
+  | grep -E 'https?://github\.com/wazuh/' \
+  | grep -vE 'github\.com/wazuh/wazuh-dashboard-plugins([/#?)]|$)'
+```
+
+Any output is a failure. Replace each link with a literal reference, such as _Wazuh Manager >
+Getting Started > Installation > Options_. See the "References to other Wazuh repositories"
+section of [`docs/AGENTS.md`](../../../docs/AGENTS.md).
+
+### 7. Report
 
 Summarize each gate as pass/fail; if anything failed, list the offending files and
 either fix them or explain what needs manual attention:
@@ -95,6 +113,7 @@ Prettier: PASS
 ESLint:   FAIL (2 files) → public/components/foo.tsx, server/routes/bar.ts
 Typecheck: PASS
 Jest (plugins/main): PASS
+Doc links: PASS
 ```
 
 Only report "ready for review" once every applicable gate passes.

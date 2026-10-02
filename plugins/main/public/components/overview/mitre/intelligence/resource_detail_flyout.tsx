@@ -12,6 +12,7 @@
  */
 
 import React, { useRef, Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 import { MitreAttackResources } from './resources';
 import { ReferencesTable } from './resource_detail_references_table';
 
@@ -47,7 +48,11 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
     >
       <EuiFlyoutHeader hasBorder>
         <EuiTitle size='m'>
-          <h2 id='flyoutTitle'>Details</h2>
+          <h2 id='flyoutTitle'>
+            {i18n.translate('wazuh.mitreAttack.intelligenceFlyout.title', {
+              defaultMessage: 'Details',
+            })}
+          </h2>
         </EuiTitle>
       </EuiFlyoutHeader>
       <EuiFlyoutBody>
@@ -74,7 +79,12 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
         <EuiFlexGroup>
           <EuiFlexItem>
             <div>
-              <strong>Description</strong>
+              <strong>
+                {i18n.translate(
+                  'wazuh.mitreAttack.intelligenceFlyout.description',
+                  { defaultMessage: 'Description' },
+                )}
+              </strong>
             </div>
             <EuiText>
               {details.description ? (
@@ -91,6 +101,7 @@ export const ModuleMitreAttackIntelligenceFlyout = ({
               <Fragment key={`resource_${item.id}`}>
                 <ReferencesTable
                   referencesName={item.id}
+                  referencesLabel={item.label}
                   referencesArray={details[item.id]}
                   columns={item.tableColumnsCreator()}
                   backToTop={() => {

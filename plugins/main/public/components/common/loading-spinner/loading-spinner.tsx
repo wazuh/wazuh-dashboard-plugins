@@ -29,7 +29,7 @@ export function LoadingSpinner({ message }: LoadingSpinner) {
                 message
               ) : (
                 <FormattedMessage
-                  id='discover.searchingTitle'
+                  id='wazuh.common.loadingSpinner.title'
                   defaultMessage='Searching'
                 />
               )}

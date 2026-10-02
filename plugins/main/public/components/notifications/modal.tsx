@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
 import React, { Fragment, useState, useEffect } from 'react';
 
 import {
@@ -90,7 +91,9 @@ export const ToastNotificationsModal = compose(withErrorBoundary)(() => {
             <EuiCopy textToCopy={copyMessage}>
               {copy => (
                 <EuiButton fill onClick={copy}>
-                  Copy error
+                  {i18n.translate('wazuh.core.errorModal.copyError', {
+                    defaultMessage: 'Copy error',
+                  })}
                 </EuiButton>
               )}
             </EuiCopy>

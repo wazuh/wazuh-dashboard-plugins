@@ -11,6 +11,7 @@
  */
 
 import { WzRequest } from '../../../../../../react-services/wz-request';
+import { i18n } from '@osd/i18n';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
@@ -52,7 +53,13 @@ export default class GroupsHandler {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error deleting the group: ${error.message || error}`,
+          title: i18n.translate(
+            'wazuh.endpointGroups.handler.deleteGroupErrorTitle',
+            {
+              defaultMessage: 'Error deleting the group: {errorMessage}',
+              values: { errorMessage: error.message || error },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -98,9 +105,14 @@ export default class GroupsHandler {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the agents of the group: ${
-            error.message || error
-          }`,
+          title: i18n.translate(
+            'wazuh.endpointGroups.handler.agentsGroupErrorTitle',
+            {
+              defaultMessage:
+                'Error obtaining the agents of the group: {errorMessage}',
+              values: { errorMessage: error.message || error },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -158,9 +170,14 @@ export default class GroupsHandler {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error obtaining the content of groups files: ${
-            error.message || error
-          }`,
+          title: i18n.translate(
+            'wazuh.endpointGroups.handler.fileContentErrorTitle',
+            {
+              defaultMessage:
+                'Error obtaining the content of groups files: {errorMessage}',
+              values: { errorMessage: error.message || error },
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);

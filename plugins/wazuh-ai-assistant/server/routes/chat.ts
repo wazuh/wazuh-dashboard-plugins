@@ -48,6 +48,11 @@ import {
   ROUTER_ENABLED,
 } from '../tools/router';
 import { addUsage, toStreamUsage, ZERO_USAGE_TOTALS } from './chat-usage';
+import { withSseKeepalive } from './sse-keepalive';
+import {
+  isPermissionDeniedError,
+  withInternalErrorHandling,
+} from './route-helpers';
 import {
   resolveSuggestedDsl,
   SUGGEST_DISCOVER_QUERY_TOOL,
@@ -1359,6 +1364,11 @@ export async function* synthesizeNoTextFallback(
         }
         return { usage };
       }
+      if (event.type === 'reasoning_started') {
+        // The adapter signals this at most once per call, and this retry is one call.
+        yield thinkingStatus();
+        continue;
+      }
       if (event.type === 'delta') {
         // Reasoning-channel fallback text (openai-compatible.ts's `reasoningFallback`) is raw
         // deliberation, not an answer -- same reason the main loop's deferred-offer interception
@@ -1869,6 +1879,11 @@ function toSseFrame(event: StreamEvent): string {
   return `data: ${JSON.stringify(event)}\n\n`;
 }
 
+/** What an adapter's content-free `reasoning_started` signal becomes on the wire. */
+function thinkingStatus(): StreamEvent {
+  return { type: 'status', message: 'Thinking…', step: 'thinking' };
+}
+
 /** Minimal shape of the settings singleton this route needs (see
  * server/settings/types.ts's `AssistantSettingsAttributes`). */
 interface PrivacySettings {
@@ -2217,16 +2232,22 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         }),
       },
     },
-    async (context, request, response) => {
+    withInternalErrorHandling(async (context, request, response) => {
       const { providerId, messages } = request.body;
 
       // Reads go through the internal user (server/settings/ai-providers-client.ts's `get`) — see
       // that class's doc comment for why: the underlying endpoint requires
       // `plugin:wazuh/ai_assistant/settings/read`, but any authenticated dashboard user must be
       // able to chat with whichever provider they select.
+      // A permission denial is rethrown so the wrapper answers 403; any other failure is "unknown".
       const stored = await context.wazuh_ai_assistant.aiProviders
         .get(context, providerId)
-        .catch(() => undefined);
+        .catch(error => {
+          if (isPermissionDeniedError(error)) {
+            throw error;
+          }
+          return undefined;
+        });
       if (!stored) {
         logger.error(`wazuhAiAssistant: unknown provider ${providerId}`);
         return response.notFound({
@@ -2365,11 +2386,14 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         );
         nodeStream = Readable.from(
           releaseStreamSlotWhenDone(
-            streamSseFrames(orchestrationEvents, logger),
+            // Keep-alive frames so idle-socket timeouts do not close a long silent turn.
+            withSseKeepalive(streamSseFrames(orchestrationEvents, logger)),
             releaseStreamSlot,
           ),
           { objectMode: false },
         );
+        // However the stream ends (a destroy may skip `aborted$`), stop the provider work with it.
+        nodeStream.once('close', () => controller.abort());
 
         return response.ok({
           headers: {
@@ -2390,7 +2414,7 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
         releaseStreamSlot();
         throw error;
       }
-    },
+    }, logger),
   );
 }
 
@@ -2506,7 +2530,7 @@ export async function* runStage1Routing(
       break;
     }
     // Any stray 'delta'/'table' from a misbehaving stage-1 call: stage 1 must never leak partial
-    // text/tables to the browser, so these are deliberately swallowed.
+    // text/tables to the browser, so these are deliberately swallowed (so is `reasoning_started`).
   }
 
   if (!sawRouteCall || !routeArgs) {
@@ -3081,6 +3105,12 @@ export async function* orchestrate(
       signal,
       streamOptions,
     )) {
+      if (event.type === 'reasoning_started') {
+        // The adapter signals this at most once per call, and a round is one call.
+        yield thinkingStatus();
+        continue;
+      }
+
       if (event.type === 'delta') {
         if (event.reasoningFallback) {
           // See `roundHadReasoningFallback`'s declaration: reasoning-channel fallback text still

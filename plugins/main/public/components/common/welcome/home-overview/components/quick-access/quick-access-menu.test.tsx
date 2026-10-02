@@ -1,7 +1,9 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { BehaviorSubject } from 'rxjs';
 import '../../test-utils/setup-home-overview-test';
+import { getCore } from '../../../../../../kibana-services';
 import { QuickAccessMenu } from './quick-access-menu';
 import {
   getModuleUrl,
@@ -23,7 +25,21 @@ jest.mock('../../utils/navigation', () => ({
   getKvdbsUrl: jest.fn(() => '/mock/kvdbs'),
   getFiltersUrl: jest.fn(() => '/mock/sa-integrations#/filters'),
   getAiAssistantUrl: jest.fn(() => '/mock/wazuhAiAssistant'),
+  isAiAssistantRegistered: jest.fn((apps: ReadonlyMap<string, unknown>) =>
+    apps.has('wazuhAiAssistant'),
+  ),
 }));
+
+// The apps OSD has registered; `wazuhAiAssistant` is absent when its plugin is disabled.
+const mockRegisteredApps = (appIds: string[]) => {
+  (getCore as jest.Mock).mockReturnValue({
+    application: {
+      applications$: new BehaviorSubject(
+        new Map(appIds.map(id => [id, { id }])),
+      ),
+    },
+  });
+};
 
 const openMenu = () => {
   render(<QuickAccessMenu />);
@@ -31,6 +47,11 @@ const openMenu = () => {
 };
 
 describe('QuickAccessMenu', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRegisteredApps(['wazuhAiAssistant']);
+  });
+
   it('keeps the groups hidden until the trigger is clicked', () => {
     render(<QuickAccessMenu />);
     expect(screen.getByText('Quick access')).toBeInTheDocument();
@@ -84,6 +105,18 @@ describe('QuickAccessMenu', () => {
     expect(link).toHaveTextContent('AI Assistant');
     expect(link).toHaveAttribute('href', '/mock/wazuhAiAssistant');
     expect(getAiAssistantUrl).toHaveBeenCalled();
+  });
+
+  it('hides the AI Assistant shortcut when its app is not registered', () => {
+    mockRegisteredApps([]);
+    openMenu();
+    expect(screen.getByText('Endpoint security')).toBeInTheDocument();
+    expect(
+      document.querySelector(
+        '[data-test-subj="quick-access-ai-assistant-link"]',
+      ),
+    ).not.toBeInTheDocument();
+    expect(getAiAssistantUrl).not.toHaveBeenCalled();
   });
 
   it('keeps the AI Assistant shortcut hidden until the trigger is clicked', () => {

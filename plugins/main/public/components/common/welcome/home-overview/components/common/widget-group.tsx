@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiPanel,
   EuiTitle,
@@ -65,7 +66,9 @@ const ManageIndexPatternsLink: React.FC = () => (
         path: MANAGE_INDEX_PATTERNS_PATH,
       })}
     >
-      Manage index patterns
+      {i18n.translate('wazuh.common.homeOverviewWidget.manageIndexPatterns', {
+        defaultMessage: 'Manage index patterns',
+      })}
     </EuiLink>
   </RedirectAppLinks>
 );
@@ -104,7 +107,14 @@ export const WidgetGroupBody: React.FC<WidgetGroupBodyProps> = ({
   const isError = status === 'error';
   const testSubj = isError ? 'widget-group-error' : 'widget-group-unavailable';
   const label =
-    errorLabel ?? (isError ? 'Could not load data' : 'Not available');
+    errorLabel ??
+    (isError
+      ? i18n.translate('wazuh.common.homeOverviewWidget.loadError', {
+          defaultMessage: 'Could not load data',
+        })
+      : i18n.translate('wazuh.common.homeOverviewWidget.notAvailable', {
+          defaultMessage: 'Not available',
+        }));
   const errorColor = isPermissionDenied ? 'warning' : 'danger';
   const containerStyle = {
     minHeight: loadingMinHeight,
@@ -169,7 +179,13 @@ const WidgetGroupTitle: React.FC<{
   link: WidgetGroupTitleLink;
 }> = ({ title, link }) => (
   <RedirectAppLinks application={getCore().application}>
-    <EuiToolTip position='top' content={`Go to ${link.destination ?? title}`}>
+    <EuiToolTip
+      position='top'
+      content={i18n.translate('wazuh.common.homeOverviewWidget.goToTooltip', {
+        defaultMessage: 'Go to {destination}',
+        values: { destination: link.destination ?? title },
+      })}
+    >
       <EuiLink href={link.href} onClick={link.onClick}>
         {title}
       </EuiLink>

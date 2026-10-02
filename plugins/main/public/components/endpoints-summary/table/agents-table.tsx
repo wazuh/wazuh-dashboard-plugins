@@ -20,6 +20,7 @@ import {
   EuiButton,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzButtonPermissions } from '../../common/permissions/button';
 import { withErrorBoundary } from '../../common/hocs';
 import {
@@ -232,9 +233,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             <EuiFlexItem grow={false}>
               <EuiCallOut
                 size='s'
-                title={`${totalSelected} ${
-                  totalSelected === 1 ? 'agent' : 'agents'
-                } selected`}
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.agentsTable.selectedAgents',
+                  {
+                    defaultMessage:
+                      '{totalSelected} {totalSelected, plural, one {agent} other {agents}} selected',
+                    values: { totalSelected },
+                  },
+                )}
               />
             </EuiFlexItem>
             {showSelectAllItems ? (
@@ -245,8 +251,20 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   color={!allAgentsSelected ? 'primary' : 'danger'}
                 >
                   {!allAgentsSelected
-                    ? `Select all ${agentList.totalItems} agents`
-                    : `Clear ${agentList.totalItems} agents selected`}
+                    ? i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.selectAllAgents',
+                        {
+                          defaultMessage: 'Select all {totalItems} agents',
+                          values: { totalItems: agentList.totalItems },
+                        },
+                      )
+                    : i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.clearSelectedAgents',
+                        {
+                          defaultMessage: 'Clear {totalItems} agents selected',
+                          values: { totalItems: agentList.totalItems },
+                        },
+                      )}
                 </EuiButton>
               </EuiFlexItem>
             ) : null}
@@ -265,7 +283,9 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
         <EuiFlexItem>
           <TableWzAPI
             ref={tableRef}
-            title='Agents'
+            title={i18n.translate('wazuh.endpointsSummary.agentsTable.title', {
+              defaultMessage: 'Agents',
+            })}
             addOnTitle={selectedtemsRenderer}
             onPageOrSortChange={() => {
               pageOrSortChangeRef.current = true;
@@ -283,7 +303,10 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                     },
                   )}
                 >
-                  Deploy new agent
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.agentsTable.deployNewAgent',
+                    { defaultMessage: 'Deploy new agent' },
+                  )}
                 </WzButtonPermissions>
               </EuiFlexItem>
             }
@@ -345,31 +368,90 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                   return [
                     {
                       label: 'dateAdd',
-                      description: 'filter by registration date',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.dateAdd',
+                        { defaultMessage: 'filter by registration date' },
+                      ),
                     },
-                    { label: 'id', description: 'filter by ID' },
-                    { label: 'ip', description: 'filter by IP address' },
-                    { label: 'group', description: 'filter by group' },
+                    {
+                      label: 'id',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.id',
+                        { defaultMessage: 'filter by ID' },
+                      ),
+                    },
+                    {
+                      label: 'ip',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.ip',
+                        { defaultMessage: 'filter by IP address' },
+                      ),
+                    },
+                    {
+                      label: 'group',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.group',
+                        { defaultMessage: 'filter by group' },
+                      ),
+                    },
                     {
                       label: 'lastKeepAlive',
-                      description: 'filter by last keep alive',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.lastKeepAlive',
+                        { defaultMessage: 'filter by last keep alive' },
+                      ),
                     },
-                    { label: 'manager', description: 'filter by manager' },
-                    { label: 'name', description: 'filter by name' },
+                    {
+                      label: 'manager',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.manager',
+                        { defaultMessage: 'filter by manager' },
+                      ),
+                    },
+                    {
+                      label: 'name',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.name',
+                        { defaultMessage: 'filter by name' },
+                      ),
+                    },
                     {
                       label: 'os.name',
-                      description: 'filter by operating system name',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.osName',
+                        { defaultMessage: 'filter by operating system name' },
+                      ),
                     },
                     {
                       label: 'os.platform',
-                      description: 'filter by operating platform',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.osPlatform',
+                        { defaultMessage: 'filter by operating platform' },
+                      ),
                     },
                     {
                       label: 'os.version',
-                      description: 'filter by operating system version',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.osVersion',
+                        {
+                          defaultMessage: 'filter by operating system version',
+                        },
+                      ),
                     },
-                    { label: 'status', description: 'filter by status' },
-                    { label: 'version', description: 'filter by version' },
+                    {
+                      label: 'status',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.status',
+                        { defaultMessage: 'filter by status' },
+                      ),
+                    },
+                    {
+                      label: 'version',
+                      description: i18n.translate(
+                        'wazuh.endpointsSummary.agentsTable.searchSuggestions.version',
+                        { defaultMessage: 'filter by version' },
+                      ),
+                    },
                   ];
                 },
                 value: async (currentValue, { field }) => {
@@ -442,7 +524,14 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
                         value,
                       )
                         ? undefined
-                        : `"${value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.`;
+                        : i18n.translate(
+                            'wazuh.endpointsSummary.agentsTable.invalidDateFormat',
+                            {
+                              defaultMessage:
+                                '"{value}" is not a expected format. Valid formats: YYYY-MM-DD, YYYY-MM-DD HH:mm:ss, YYYY-MM-DDTHH:mm:ss, YYYY-MM-DDTHH:mm:ssZ.',
+                              values: { value },
+                            },
+                          );
                     }
                   }
                 },
@@ -473,15 +562,25 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
       {pendingUpgradeAgents.length ? (
         <>
           <EuiCallOut
-            title={`${pendingUpgradeAgents.length} ${
-              pendingUpgradeAgents.length === 1 ? 'agent is' : 'agents are'
-            } being upgraded`}
+            title={i18n.translate(
+              'wazuh.endpointsSummary.agentsTable.pendingUpgradeTitle',
+              {
+                defaultMessage:
+                  '{count} {count, plural, one {agent is} other {agents are}} being upgraded',
+                values: { count: pendingUpgradeAgents.length },
+              },
+            )}
             color='primary'
             iconType='iInCircle'
           >
             <p>
-              The upgrade request was sent. This list will refresh automatically
-              once each agent reports the new version.
+              {i18n.translate(
+                'wazuh.endpointsSummary.agentsTable.pendingUpgradeDescription',
+                {
+                  defaultMessage:
+                    'The upgrade request was sent. This list will refresh automatically once each agent reports the new version.',
+                },
+              )}
             </p>
           </EuiCallOut>
           <EuiSpacer size='m' />

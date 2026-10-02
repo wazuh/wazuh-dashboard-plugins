@@ -69,6 +69,14 @@ export const WAZUH_INDEXER_AI_ASSISTANT_SETTINGS_PATH =
 export const WAZUH_INDEXER_AI_ASSISTANT_PROVIDERS_PATH =
   '/_plugins/_setup/ai_assistant/providers';
 
+/** `POST` creates a session; `PUT`/`PATCH`/`DELETE {this path}/{id}` replace its transcript, rename
+ * or delete it. The caller's role holds no index-level `write` on
+ * `CONVERSATION_SESSIONS_INDEX_ALIAS`, so mutations go through this endpoint, authorized by the
+ * `plugin:wazuh/ai_assistant/session/write` cluster permission. The indexer stamps the owner and
+ * ignores any `user`/timestamp fields in the body. */
+export const WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH =
+  '/_plugins/_setup/ai_assistant/sessions';
+
 /** Namespacing label bound into the AAD of every provider API key's ciphertext
  * (server/crypto/api-key-cipher.ts's `buildAad`) — kept as its own named constant purely so that
  * derivation can't silently drift if this string is ever referenced from a second place. Its
@@ -125,6 +133,10 @@ export type { SeverityLevel } from './wazuh-fields';
 // that is wanted for answer quality); it only removes the shared-budget truncation risk.
 export const DEFAULT_ANTHROPIC_MAX_TOKENS = 16384;
 export const DEFAULT_ANTHROPIC_VERSION = '2023-06-01';
+
+/** Cap of the provider test route, which stops at the first content token. Shared with the client
+ * timeout message. */
+export const PROVIDER_TEST_TIMEOUT_MS = 30_000;
 
 /**
  * Persisted-conversation size limits, shared by the SERVER route schemas that enforce them

@@ -1,6 +1,7 @@
 import React from 'react';
 import { EuiButtonEmpty, EuiPopover, EuiText, EuiCode } from '@elastic/eui';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { i18n } from '@osd/i18n';
 
 type ITokenType =
   | 'field'
@@ -33,24 +34,42 @@ export const language = {
     // eslint-disable-next-line camelcase
     operator_compare: {
       literal: {
-        '=': 'equality',
-        '!=': 'not equality',
-        '>': 'bigger',
-        '<': 'smaller',
-        '~': 'like as',
+        '=': i18n.translate('wazuh.core.searchBar.aql.operatorEquality', {
+          defaultMessage: 'equality',
+        }),
+        '!=': i18n.translate('wazuh.core.searchBar.aql.operatorNotEquality', {
+          defaultMessage: 'not equality',
+        }),
+        '>': i18n.translate('wazuh.core.searchBar.aql.operatorBigger', {
+          defaultMessage: 'bigger',
+        }),
+        '<': i18n.translate('wazuh.core.searchBar.aql.operatorSmaller', {
+          defaultMessage: 'smaller',
+        }),
+        '~': i18n.translate('wazuh.core.searchBar.aql.operatorLike', {
+          defaultMessage: 'like as',
+        }),
       },
     },
     conjunction: {
       literal: {
-        ';': 'and',
-        ',': 'or',
+        ';': i18n.translate('wazuh.core.searchBar.aql.conjunctionAnd', {
+          defaultMessage: 'and',
+        }),
+        ',': i18n.translate('wazuh.core.searchBar.aql.conjunctionOr', {
+          defaultMessage: 'or',
+        }),
       },
     },
     // eslint-disable-next-line camelcase
     operator_group: {
       literal: {
-        '(': 'open group',
-        ')': 'close group',
+        '(': i18n.translate('wazuh.core.searchBar.aql.openGroup', {
+          defaultMessage: 'open group',
+        }),
+        ')': i18n.translate('wazuh.core.searchBar.aql.closeGroup', {
+          defaultMessage: 'close group',
+        }),
       },
     },
   },
@@ -307,8 +326,14 @@ export async function getSuggestions(
           ? [
               {
                 type: 'function_search',
-                label: 'Search',
-                description: 'run the search query',
+                label: i18n.translate(
+                  'wazuh.core.searchBar.aql.searchSuggestionLabel',
+                  { defaultMessage: 'Search' },
+                ),
+                description: i18n.translate(
+                  'wazuh.core.searchBar.aql.searchSuggestionDescription',
+                  { defaultMessage: 'run the search query' },
+                ),
               },
             ]
           : []),
@@ -437,7 +462,9 @@ function getOutput(input: string, options: { implicitQuery?: string } = {}) {
 export const AQL = {
   id: 'aql',
   label: 'AQL',
-  description: 'API Query Language (AQL) allows to do queries.',
+  description: i18n.translate('wazuh.core.searchBar.aql.description', {
+    defaultMessage: 'API Query Language (AQL) allows to do queries.',
+  }),
   documentationLink: webDocumentationLink(
     'user-manual/wazuh-dashboard/global-queries.html',
   ),
@@ -526,10 +553,16 @@ export const AQL = {
             }
           >
             <EuiText>
-              Implicit query:{' '}
+              {i18n.translate('wazuh.core.searchBar.aql.implicitQueryLabel', {
+                defaultMessage: 'Implicit query:',
+              })}{' '}
               <EuiCode>{params.queryLanguage.parameters.implicitQuery}</EuiCode>
             </EuiText>
-            <EuiText color='subdued'>This query is added to the input.</EuiText>
+            <EuiText color='subdued'>
+              {i18n.translate('wazuh.core.searchBar.aql.implicitQueryHelp', {
+                defaultMessage: 'This query is added to the input.',
+              })}
+            </EuiText>
           </EuiPopover>
         ) : null,
         // Disable the focus trap in the EuiInputPopover.

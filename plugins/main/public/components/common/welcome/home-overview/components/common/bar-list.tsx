@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiProgress, EuiLink, EuiText } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
@@ -29,7 +30,10 @@ export const BarList: React.FC<BarListProps> = ({
   onSelect,
   emptyMessage,
   totalSlots,
-  moreItemsMessage = 'No more items to display',
+  moreItemsMessage = i18n.translate(
+    'wazuh.common.homeOverviewList.noMoreItems',
+    { defaultMessage: 'No more items to display' },
+  ),
   barColor = HOME_OVERVIEW_COLOR.info,
   ...rest
 }) => {

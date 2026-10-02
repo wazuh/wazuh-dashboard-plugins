@@ -37,7 +37,7 @@ const updateObjectType: SavedObjectsFieldMapping = {
 
 export const availableUpdatesObject: SavedObjectsType = {
   name: SAVED_OBJECT_UPDATES,
-  hidden: false,
+  hidden: true,
   namespaceType: 'agnostic',
   mappings: {
     properties: {

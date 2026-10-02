@@ -31,6 +31,9 @@ There are two kinds of dataset, both used the same way from this CLI:
   timestamps and inject the manager/cluster params. `--count` cycles over the
   base documents.
 
+`findings-regulatory-compliance` is the one synthesized `findings-` dataset.
+See [Use case: regulatory compliance coverage](#use-case-regulatory-compliance-coverage).
+
 To list the available datasets: `node cli.js --help`, or:
 
 ```sh
@@ -107,6 +110,32 @@ For each target index, the CLI:
 > Note: if you intend to browse the sample data in a Wazuh dashboard, make
 > sure the cluster name field matches the value you are using. Add
 > `--param-cluster-name VALUE` with the expected value.
+
+### Use case: regulatory compliance coverage
+
+`findings-regulatory-compliance` synthesizes findings whose
+`wazuh.rule.compliance.<framework>` values are read from the requirement
+definitions the compliance views use
+(`plugins/main/common/compliance-requirements/`), so every generated value
+resolves to a documented requirement and none is counted under **Others**.
+
+Each document is tagged for all ten frameworks. The first requirement of each
+framework walks that framework's definitions in order, so generating as many
+documents as the largest framework defines (NIST 800-53, 1196) reaches every
+requirement of every framework at least once:
+
+```sh
+node cli.js --dataset findings-regulatory-compliance --count 1200 --output insert
+```
+
+The remaining requirements of a document are random, so requirements end up
+holding different numbers of findings.
+
+Two Jest tests guard this (`yarn test:jest --testPathPattern=sample-data` from
+`plugins/main`): one checks that this dataset only tags requirements the
+definitions resolve, the other checks the same for the pre-generated
+`findings-*` documents. They fail when a definition update leaves a sample
+value behind.
 
 ### Use case: dataset with no default index
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { OpenAiCompatibleAdapter } from './openai-compatible';
 import { ChatMessage, ProviderConfig, StreamEvent } from '../../common/types';
 import { PROVIDER_STREAM_TRUNCATED_MESSAGE } from './sse-utils';
+import { ProviderStreamEvent } from './types';
 
 // Covers this adapter's request/response handling:
 //  - the reasoning-channel fallback: some reasoning models (gpt-oss, qwen3.x) stream their
@@ -35,11 +36,13 @@ function sseBody(chunks: Array<Record<string, unknown>>): string {
 }
 
 async function drain(
-  iterable: AsyncIterable<StreamEvent>,
+  iterable: AsyncIterable<ProviderStreamEvent>,
 ): Promise<StreamEvent[]> {
+  // Typed as the wire union for the existing assertions; `reasoning_started` still appears in the
+  // array and is asserted explicitly where a stream carries reasoning.
   const events: StreamEvent[] = [];
   for await (const event of iterable) {
-    events.push(event);
+    events.push(event as StreamEvent);
   }
   return events;
 }
@@ -193,12 +196,12 @@ test('chatStream: a stream carrying only delta.reasoning (no delta.content at al
     );
   });
   assert.deepEqual(
-    events.map(event => event.type),
-    ['delta', 'done'],
+    events.map(event => event.type as string),
+    ['reasoning_started', 'delta', 'done'],
     'a reasoning-only stream must still surface non-empty text instead of an empty done',
   );
   assert.equal(
-    (events[0] as { content: string }).content,
+    (events[1] as { content: string }).content,
     'The user asks about hosts.',
   );
 });
@@ -229,14 +232,77 @@ test('chatStream: a normal delta.content stream is unchanged (regression) — no
     );
   });
   assert.deepEqual(
-    events.map(event => event.type),
-    ['delta', 'done'],
+    events.map(event => event.type as string),
+    ['reasoning_started', 'delta', 'done'],
     'exactly one delta must reach the caller -- the reasoning text must not be appended',
   );
   assert.equal(
-    (events[0] as { content: string }).content,
+    (events[1] as { content: string }).content,
     'The cluster is healthy.',
     'must be the content delta only, never the reasoning text mixed in',
+  );
+});
+
+test('chatStream: many reasoning chunks yield ONE content-free reasoning_started, before the answer; content alone yields none', async () => {
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { reasoning: 'secret HOST_1 step one' } }] },
+    { choices: [{ index: 0, delta: { reasoning: ' step two' } }] },
+    { choices: [{ index: 0, delta: { reasoning: ' step three' } }] },
+    { choices: [{ index: 0, delta: { content: 'Answer.' } }] },
+    // Reasoning AFTER content must not re-signal: the answer is already streaming.
+    { choices: [{ index: 0, delta: { reasoning: ' late thought' } }] },
+  ]);
+  const events = await withFakeFetch(body, () =>
+    drain(
+      new OpenAiCompatibleAdapter().chatStream(
+        BASE_CONFIG,
+        [userMessage('status?')],
+        new AbortController().signal,
+      ),
+    ),
+  );
+  assert.deepEqual(
+    events.map(event => event.type as string),
+    ['reasoning_started', 'delta', 'done'],
+  );
+  // Content-free: the event carries its type and nothing else.
+  assert.deepEqual(events[0], { type: 'reasoning_started' });
+
+  // A content-only stream never signals it.
+  const contentOnly = await withFakeFetch(
+    sseBody([{ choices: [{ index: 0, delta: { content: 'Hello.' } }] }]),
+    () =>
+      drain(
+        new OpenAiCompatibleAdapter().chatStream(
+          BASE_CONFIG,
+          [userMessage('hi')],
+          new AbortController().signal,
+        ),
+      ),
+  );
+  assert.deepEqual(
+    contentOnly.map(event => event.type as string),
+    ['delta', 'done'],
+  );
+});
+
+test('chatStream: reasoning_content (DeepSeek/vLLM channel) also signals reasoning_started', async () => {
+  const body = sseBody([
+    { choices: [{ index: 0, delta: { reasoning_content: 'hmm' } }] },
+    { choices: [{ index: 0, delta: { content: 'Done.' } }] },
+  ]);
+  const events = await withFakeFetch(body, () =>
+    drain(
+      new OpenAiCompatibleAdapter().chatStream(
+        BASE_CONFIG,
+        [userMessage('status?')],
+        new AbortController().signal,
+      ),
+    ),
+  );
+  assert.deepEqual(
+    events.map(event => event.type as string),
+    ['reasoning_started', 'delta', 'done'],
   );
 });
 
@@ -288,8 +354,8 @@ test('chatStream: reasoning deltas followed by a tool call, closed only by [DONE
     );
   });
   assert.deepEqual(
-    events.map(event => event.type),
-    ['tool_call', 'done'],
+    events.map(event => event.type as string),
+    ['reasoning_started', 'tool_call', 'done'],
     "no delta event must be emitted -- the buffered reasoning must not leak into a tool round's answer text",
   );
 });
@@ -641,8 +707,8 @@ test('chatStream: buffered reasoning ahead of a finish_reason:"tool_calls" round
     );
   });
   assert.deepEqual(
-    events.map(event => event.type),
-    ['tool_call', 'done'],
+    events.map(event => event.type as string),
+    ['reasoning_started', 'tool_call', 'done'],
     'the buffered reasoning must not leak into a tool round just because usage now arrives later',
   );
 });

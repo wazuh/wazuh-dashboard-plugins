@@ -18,11 +18,12 @@ A single token carries three things:
   talking to.
 - An **enrollment credential**, unless the token was minted without one.
 
-Because the token names the manager and carries the credential, it replaces both the
-`WAZUH_MANAGER_ENDPOINT` and the `WAZUH_REGISTRATION_PASSWORD` deployment variables rather than
-accompanying them. See
+`WAZUH_ENROLLMENT_TOKEN` is the only way the 5.0 agent installer registers an agent. The 4.x
+registration variables it replaced, such as `WAZUH_MANAGER_ENDPOINT` and
+`WAZUH_REGISTRATION_PASSWORD`, were removed in 5.0: the installer ignores them. See
+[Variables removed in 5.0](../../agent-deploy-one-liner.md#variables-removed-in-50), and
 [Agent deploy one-liner](../../agent-deploy-one-liner.md#enrollment-token) for how the wizard
-builds the deployment command around it.
+builds the deployment command around the token.
 
 > **Important**
 > The token text is returned only in the response that mints it. It is never part of the listing
@@ -132,7 +133,7 @@ permissions of the logged-in user.
 
 | Action             | Required permission       |
 | ------------------ | ------------------------- |
-| List and review    | Read access to the tokens |
+| List and review    | `enrollment_token:read`   |
 | **Create token**   | `enrollment_token:create` |
 | **Revoke** a token | `enrollment_token:delete` |
 | **Purge tokens**   | `enrollment_token:delete` |
