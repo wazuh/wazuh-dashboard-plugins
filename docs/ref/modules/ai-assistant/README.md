@@ -6,7 +6,8 @@ assistant turns it into **read-only** queries against the Wazuh Indexer and the 
 and streams back a short grounded answer together with the real result table.
 
 The module is delivered by its own plugin, `wazuh-ai-assistant` (plugin id `wazuhAiAssistant`),
-and appears in the left navigation as **AI Assistant** under the **Wazuh** category.
+and appears in the left navigation as **AI Assistant** under the **Home** category
+(`wz-category-home`) — the same category as the Overview app.
 
 This module exposes the following views:
 
@@ -32,9 +33,9 @@ five whitelisted sample rows); the full result renders locally as a table in the
 
 ## Reference pages
 
-- [Architecture](./architecture.md) — client/server split, the SSE chat pipeline, saved objects,
-  and the wazuh-core integration points.
-- [Tool catalog](./tool-catalog.md) — the 32 read-only tools, the in-process registry, and the
+- [Architecture](./architecture.md) — client/server split, the SSE chat pipeline, storage, and
+  the wazuh-core integration points.
+- [Tool catalog](./tool-catalog.md) — the 35 read-only tools, the in-process registry, and the
   two-stage router.
 - [Providers](./providers.md) — the provider adapters, which providers and models are verified
   working, retry/stall handling, and the SSRF guard on outbound traffic.
@@ -48,8 +49,10 @@ five whitelisted sample rows); the full result renders locally as a table in the
 
 ### Conversations
 
-Chat history is persisted as **owner-scoped saved objects** (`wazuh-ai-assistant-conversation`).
-Each user only ever sees their own conversations; a request for another owner's conversation
+Chat history is persisted **owner-scoped** in the `wazuh-ai-assistant-sessions` index, reached
+through the Wazuh indexer's own `/_plugins/_setup/ai_assistant/sessions` API — the plugin
+registers no saved-object types. Each user only ever sees their own conversations; a request for
+another owner's conversation
 returns `404` (never `403`), so cross-owner existence is not leaked. Updates use optimistic
 concurrency so two tabs cannot silently overwrite each other.
 
@@ -66,9 +69,13 @@ and can be encrypted at rest.
 
 ### Tools, digests, and tables
 
-The assistant cannot run free-form actions. It picks from a fixed catalog of 32 **read-only,
+The assistant cannot run free-form actions. It picks from a fixed catalog of 35 **read-only,
 declarative tools** (plus a guarded free-search escape hatch limited to `wazuh-events-v5-*`,
-`wazuh-findings-v5-*`, and `wazuh-states-*` indices). Every query is linted and clamped by
+`wazuh-findings-v5-*`, `wazuh-states-*`, `wazuh-metrics-*`, `.wazuh-cti-consumers`,
+`.wazuh-content-manager-jobs`, the raw threat-intel feeds `.wazuh-threatintel-vulnerabilities-a`
+and `wazuh-threatintel-enrichments-a`, and the `.opensearch-sap-*-findings`,
+`.opensearch-sap-pre-packaged-rules-config` and `.opensearch-sap-correlation-metadata` indices —
+see [Tool catalog](./tool-catalog.md#the-escape-hatch)). Every query is linted and clamped by
 server-side guardrails before execution. The model sees a **digest** capped at 6,000 characters;
 the user sees the **full table** (up to 500 rows) rendered from the tool's own `tableSpec` — the
 table shape is deterministic and never controlled by the model.

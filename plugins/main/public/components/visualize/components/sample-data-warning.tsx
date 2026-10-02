@@ -19,6 +19,8 @@ import { getCore } from '../../../kibana-services';
 import { sampleData } from '../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import NavigationService from '../../../react-services/navigation-service';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 
 export const SampleDataWarning = ({
   categoriesSampleData,
@@ -67,7 +69,9 @@ export const SampleDataWarning = ({
   if (isSampleData) {
     return (
       <EuiCallOut
-        title='This dashboard contains sample data'
+        title={i18n.translate('wazuh.sampleData.dashboardWarning.title', {
+          defaultMessage: 'This dashboard contains sample data',
+        })}
         color='warning'
         iconType='alert'
         style={{ margin: '0 8px 16px 8px' }}
@@ -76,14 +80,27 @@ export const SampleDataWarning = ({
       >
         <RedirectAppLinks application={getCore().application}>
           <p>
-            {'The data displayed may contain sample data. Go '}
-            <EuiLink
-              href={NavigationService.getInstance().getAppURL(sampleData.id)}
-              aria-label='go to configure sample data'
-            >
-              {'here'}
-            </EuiLink>
-            {' to configure the sample data.'}
+            <FormattedMessage
+              id='wazuh.sampleData.dashboardWarning.description'
+              defaultMessage='The data displayed may contain sample data. Go {link} to configure the sample data.'
+              values={{
+                link: (
+                  <EuiLink
+                    href={NavigationService.getInstance().getAppURL(
+                      sampleData.id,
+                    )}
+                    aria-label={i18n.translate(
+                      'wazuh.sampleData.dashboardWarning.linkAriaLabel',
+                      { defaultMessage: 'go to configure sample data' },
+                    )}
+                  >
+                    {i18n.translate('wazuh.sampleData.dashboardWarning.link', {
+                      defaultMessage: 'here',
+                    })}
+                  </EuiLink>
+                ),
+              }}
+            />
           </p>
         </RedirectAppLinks>
       </EuiCallOut>

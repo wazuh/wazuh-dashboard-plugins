@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import { EuiCodeEditor, EuiSpacer } from '@elastic/eui';
 
@@ -69,7 +70,10 @@ class WzCodeEditor extends Component {
                 behavioursEnabled: false,
               }
             }
-            aria-label='Code Editor'
+            aria-label={i18n.translate(
+              'wazuh.configuration.codeEditor.ariaLabel',
+              { defaultMessage: 'Code Editor' },
+            )}
           />
         </div>
       </Fragment>

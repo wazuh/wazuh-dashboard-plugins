@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { i18n } from '@osd/i18n';
 // Eui components
 import {
   EuiFlexGroup,
@@ -35,12 +36,16 @@ class WzGroupDetail extends Component {
     this.tabs = [
       {
         id: 'agents',
-        name: 'Agents',
+        name: i18n.translate('wazuh.endpointGroups.detail.agentsTab', {
+          defaultMessage: 'Agents',
+        }),
         disabled: false,
       },
       {
         id: 'files',
-        name: 'Files',
+        name: i18n.translate('wazuh.endpointGroups.detail.filesTab', {
+          defaultMessage: 'Files',
+        }),
         disabled: false,
       },
     ];
@@ -102,9 +107,18 @@ class WzGroupDetail extends Component {
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false} style={{ marginRight: 0 }}>
-                  <EuiToolTip position='right' content={`Back to groups`}>
+                  <EuiToolTip
+                    position='right'
+                    content={i18n.translate(
+                      'wazuh.endpointGroups.detail.backTooltip',
+                      { defaultMessage: 'Back to groups' },
+                    )}
+                  >
                     <EuiButtonIcon
-                      aria-label='Back'
+                      aria-label={i18n.translate(
+                        'wazuh.endpointGroups.detail.backAriaLabel',
+                        { defaultMessage: 'Back' },
+                      )}
                       style={{ paddingTop: 8 }}
                       color='primary'
                       iconSize='l'

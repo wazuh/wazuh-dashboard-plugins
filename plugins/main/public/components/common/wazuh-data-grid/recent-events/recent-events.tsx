@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useMemo } from 'react';
 import { getCore } from '../../../../kibana-services';
 import { PatternDataSourceFilterManager } from '../../data-source';
@@ -70,7 +71,10 @@ export const WazuhFlyoutDiscoverNewFilterManagerRecentEvents =
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                Explore events
+                {i18n.translate(
+                  'wazuh.common.wazuhDataGrid.exploreEventsLink',
+                  { defaultMessage: 'Explore events' },
+                )}
               </EuiLink>
             </EuiFlexItem>
           </EuiFlexGroup>

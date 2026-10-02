@@ -1,7 +1,7 @@
 # Configuration
 
 The AI Assistant needs **one initial setup step** before it is usable: configuring at least one
-provider under **AI Assistant → Settings**. Everything else has safe defaults. Who can take that
+provider under **AI Assistant > Settings**. Everything else has safe defaults. Who can take that
 step is decided by the Wazuh indexer's own RBAC — see
 [Security](./security.md#settings-and-providers-authorized-by-indexer-rbac).
 
@@ -15,13 +15,19 @@ Dashboards keystore:
 | ---------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `wazuh_ai_assistant.enabled`             | `true`  | Enables/disables the plugin.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | `wazuh_ai_assistant.encryptionKey`       | unset   | **Required to save provider API keys** — writes carrying a key are rejected without it. Base64-encoded 32-byte AES-256 key used to encrypt those keys at rest. Generate with `openssl rand -base64 32`. **Prefer the keystore** over the YAML file:                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `wazuh_ai_assistant.settingsReadOnly`    | `false` | Locks AI Assistant settings and providers so they cannot be created, edited, deleted, or changed from **AI Assistant → Settings** or the HTTP API — set once (keystore or YAML) to keep a fixed configuration across the environment, regardless of the calling user's own indexer RBAC. Read routes, `POST /providers/{id}/test`, and conversation history are unaffected. See [Settings view](#settings-view) and [HTTP API](#http-api).                                                                                                                                                                                                                                               |
-| `wazuh_ai_assistant.outOfCreditsMessage` | unset   | Replaces the chat error shown when a provider reports an out-of-credits condition (an HTTP 402, or a known billing message such as Anthropic's low credit balance or an OpenAI-compatible `insufficient_quota`) — set it to point users at your own credits or plan-upgrade flow instead of the provider's raw text. Transient rate limits are unaffected. An empty or whitespace-only value counts as unset. A Markdown link (`[label](https://...)`) renders as a link that opens in a new tab; raw HTML is stripped. One value per environment (not per provider), so it is set here rather than from **AI Assistant → Settings**. Unset leaves the provider's own message unchanged. |
+| `wazuh_ai_assistant.settingsReadOnly`    | `false` | Locks AI Assistant settings and providers so they cannot be created, edited, deleted, or changed from **AI Assistant > Settings** or the HTTP API — set once (keystore or YAML) to keep a fixed configuration across the environment, regardless of the calling user's own indexer RBAC. Read routes, `POST /providers/{id}/test`, and conversation history are unaffected. See [Settings view](#settings-view) and [HTTP API](#http-api).                                                                                                                                                                                                                                               |
+| `wazuh_ai_assistant.outOfCreditsMessage` | unset   | Replaces the chat error shown when a provider reports an out-of-credits condition (an HTTP 402, or a known billing message such as Anthropic's low credit balance or an OpenAI-compatible `insufficient_quota`) — set it to point users at your own credits or plan-upgrade flow instead of the provider's raw text. Transient rate limits are unaffected. An empty or whitespace-only value counts as unset. A Markdown link (`[label](https://...)`) renders as a link that opens in a new tab; raw HTML is stripped. One value per environment (not per provider), so it is set here rather than from **AI Assistant > Settings**. Unset leaves the provider's own message unchanged. |
 
 ```
 sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
   add wazuh_ai_assistant.encryptionKey
 ```
+
+The packages generate this key into the keystore (32 random bytes, base64) on a fresh install and
+at every service start when neither the keystore nor `opensearch_dashboards.yml` defines it. They
+never generate it on upgrade and never replace an existing key, because the key is required to
+decrypt the API keys already stored. Set it manually only for installations from sources, or to
+use a key of your own. See [Credentials](../../getting-started/credentials.md#ai-assistant-encryption-key).
 
 With no `encryptionKey` set, saving a provider API key is rejected — the Settings form warns
 before submit and the HTTP API refuses the write — and a warning is logged at startup. Providers
@@ -33,7 +39,7 @@ caveats.
 
 ## Settings view
 
-**AI Assistant → Settings** has three sections. Provider and privacy management are open to any
+**AI Assistant > Settings** has three sections. Provider and privacy management are open to any
 authenticated user. Whether a save actually succeeds depends on the calling user's own Wazuh
 indexer backend role carrying the relevant `plugin:wazuh/ai_assistant/settings/{read,write}`
 permission (see [Security](./security.md#required-indexer-permissions)); a caller without it gets
@@ -58,7 +64,7 @@ Create, edit, delete, and test providers, and choose the default one.
 | **Model**    | Model identifier passed through to the provider.                                                                                                                        |
 | **API key**  | Optional; write-only (the UI only ever shows whether a key is set). Saving one requires `encryptionKey` to be configured; always encrypted at rest.                     |
 
-**Test connection** performs a round-trip against the provider without sending any Wazuh data.
+**Test** performs a round-trip against the provider without sending any Wazuh data.
 
 ### Privacy
 
@@ -72,22 +78,25 @@ Create, edit, delete, and test providers, and choose the default one.
 
 ### Conversation history
 
-Retention and housekeeping for the caller's stored conversations (per-user cap: 500).
+A single global retention window, in days, for every user's stored conversations (`0` = keep
+forever; default `7`). Backed by the `ai-assistant-sessions-policy` ISM policy rather than the
+settings API — see [Security](./security.md#required-indexer-permissions). The per-user cap of
+500 conversations is a separate, fixed limit (see [Architecture](./architecture.md#server-side-limits)).
 
 ## HTTP API
 
 All routes live under `/api/wazuh_ai_assistant` and enforce the same rules as the UI (indexer RBAC
 on provider/settings reads and writes, owner scoping on conversations):
 
-| Route                                                           | Purpose                                                                                                                                                             |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `POST /chat`                                                    | Chat turn; responds as an SSE stream.                                                                                                                               |
-| `GET/POST /providers`, `GET/PUT/DELETE /providers/{id}`         | Provider CRUD (writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys). Writes also 403 when `settingsReadOnly` is set. |
-| `POST /providers/{id}/test`                                     | Connectivity test (same indexer write permission). Persists nothing, so it stays available even when `settingsReadOnly` is set.                                     |
-| `POST /providers/{id}/default`                                  | Set the default provider (same indexer write permission). 403 when `settingsReadOnly` is set.                                                                       |
-| `GET/PUT /settings`                                             | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access). PUT 403s when `settingsReadOnly` is set.          |
-| `GET /settings/access`                                          | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page, including `settingsLocked`.                        |
-| `GET/POST /conversations`, `GET/PUT/DELETE /conversations/{id}` | Owner-scoped conversation CRUD.                                                                                                                                     |
+| Route                                                                 | Purpose                                                                                                                                                                                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `POST /chat`                                                          | Chat turn; responds as an SSE stream.                                                                                                                                                                                                |
+| `GET/POST /providers`, `PUT/DELETE /providers/{id}`                   | Provider CRUD — no per-id `GET` exists (`GET /providers` is the only list/read). Writes need the indexer's `.../settings/write` permission; responses carry `hasApiKey`, never keys. Writes also 403 when `settingsReadOnly` is set. |
+| `POST /providers/{id}/test`                                           | Connectivity test (only reads the provider, so it needs `.../settings/read`). Persists nothing, so it stays available even when `settingsReadOnly` is set.                                                                           |
+| `POST /providers/{id}/default`                                        | Set the default provider (needs the indexer's `.../settings/write` permission). 403 when `settingsReadOnly` is set.                                                                                                                  |
+| `GET/PUT /settings`                                                   | Singleton assistant settings (PUT needs the same indexer write permission; GET creates defaults on first access). PUT 403s when `settingsReadOnly` is set.                                                                           |
+| `GET /settings/access`                                                | Non-403 Manager-session liveness probe (not an authorization check) plus capability flags for the Settings page, including `settingsLocked`.                                                                                         |
+| `GET/POST /conversations`, `GET/PUT/PATCH/DELETE /conversations/{id}` | Owner-scoped conversation CRUD (`PATCH` renames a conversation's title; `PUT` replaces it).                                                                                                                                          |
 
 ## Internationalization
 
@@ -101,9 +110,10 @@ a single localized plugin is inconsistent for users and puts a translation cost 
 PR. The plugin did previously carry `en-US.json` and `es-ES.json`, but neither ever reached a user —
 `en-US` is never consulted for the default locale `en`, and `es-ES` was not registered on packaged
 installs because the archive did not include the plugin's `.i18nrc.json` — while both had drifted
-badly from the source. `plugins/wazuh-ai-assistant/common/i18n-strings.test.ts` now keeps the source
-strings sound (namespaced ids, no id reused for two messages, every message valid ICU) and fails if
-a catalog is reintroduced outside that wider effort.
+badly from the source. `plugins/wazuh-ai-assistant/common/i18n-strings.test.ts` now runs the i18n
+gate shared by every Wazuh plugin (`plugins/wazuh-core/test/i18n/i18n-strings-gate.ts`), which keeps the
+source strings sound (namespaced ids, no id reused for two messages, every message valid ICU) and
+fails if a catalog is reintroduced without being declared.
 
 **Model answers are a separate matter and are not affected.** The system prompt instructs the
 assistant to answer in the language of the user's most recent message, so a Spanish question gets a

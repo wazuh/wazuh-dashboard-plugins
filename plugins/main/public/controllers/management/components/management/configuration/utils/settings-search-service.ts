@@ -11,6 +11,7 @@
  */
 
 import { get } from 'lodash';
+import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../../../../react-services/wz-request';
 import { getFullEndpointConfig, handleError } from './wz-fetch';
 import { getAgentReportedConfiguration } from './agent-config-service';
@@ -103,7 +104,12 @@ const fetchManagerData = async (
         } catch (error) {
           const errorMsg = await handleError(
             error,
-            'Fetch configuration',
+            i18n.translate(
+              'wazuh.configuration.settingsSearch.fetchConfigurationLocation',
+              {
+                defaultMessage: 'Fetch configuration',
+              },
+            ),
             updateWazuhNotReadyYet,
             node,
           );

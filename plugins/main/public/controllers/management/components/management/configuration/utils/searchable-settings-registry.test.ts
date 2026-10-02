@@ -219,6 +219,18 @@ describe('searchableSettingsRegistry', () => {
     expect(list.itemFields).toEqual([{ field: '', label: 'Path' }]);
   });
 
+  it('renders the command status from the inverted `disabled` setting', () => {
+    const list = searchableSettingsRegistry.find(
+      f => f.id === 'commands.command',
+    );
+    if (!list || list.kind !== 'list') {
+      throw new Error('Missing or wrong-kind: commands.command');
+    }
+    const status = list.itemFields.find(f => f.field === 'disabled');
+    expect(status?.render?.('no')).toBe('enabled');
+    expect(status?.render?.('yes')).toBe('disabled');
+  });
+
   it('unwraps vulnerabilities.enabled out of the wmodules array', () => {
     const field = findField('vulnerabilities.enabled');
     const raw = {

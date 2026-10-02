@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { WzFieldSearchDelay } from '../../../../components/common/search';
 import { MitreAttackResources } from './resources';
 import { ModuleMitreAttackIntelligenceResourceButton } from './resource_button';
@@ -28,11 +29,17 @@ export const ModuleMitreAttackIntelligenceLeftPanel = ({
         <WzFieldSearchDelay
           delay={1000}
           fullWidth
-          placeholder='Search in all resources'
+          placeholder={i18n.translate(
+            'wazuh.mitreAttack.intelligenceSearch.placeholder',
+            { defaultMessage: 'Search in all resources' },
+          )}
           onChange={onSearchTermAllResourcesChange}
           onSearch={onSearchTermAllResourcesSearch}
           isClearable
-          aria-label='Search in all resources'
+          aria-label={i18n.translate(
+            'wazuh.mitreAttack.intelligenceSearch.ariaLabel',
+            { defaultMessage: 'Search in all resources' },
+          )}
         />
       </div>
       {MitreAttackResources.map(resource => (

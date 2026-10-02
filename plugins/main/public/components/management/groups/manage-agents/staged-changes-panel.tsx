@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiPanel,
   EuiFlexGroup,
@@ -46,7 +47,13 @@ const stagedRow = (
       <EuiFlexItem grow={false}>
         <EuiButtonIcon
           data-test-subj={`unstage-${agent.id}`}
-          aria-label={`Unstage ${agent.name}`}
+          aria-label={i18n.translate(
+            'wazuh.endpointGroups.stagedChanges.unstageAriaLabel',
+            {
+              defaultMessage: 'Unstage {agentName}',
+              values: { agentName: agent.name },
+            },
+          )}
           iconType='cross'
           size='xs'
           onClick={() => onUnstage(agent.id)}
@@ -93,16 +100,29 @@ export const StagedChangesPanel = ({
           <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
             <EuiFlexItem>
               <EuiText size='s'>
-                <strong>Pending changes</strong>
+                <strong>
+                  {i18n.translate('wazuh.endpointGroups.stagedChanges.title', {
+                    defaultMessage: 'Pending changes',
+                  })}
+                </strong>
               </EuiText>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiText size='xs' color='subdued'>
-                {hasPending
-                  ? `${total} staged, nothing written yet`
-                  : 'nothing written yet'}
-              </EuiText>
-            </EuiFlexItem>
+            {/* Only while something is staged: an empty panel also follows a
+                successful Apply, where "nothing written" would be false. */}
+            {hasPending ? (
+              <EuiFlexItem grow={false}>
+                <EuiText size='xs' color='subdued'>
+                  {i18n.translate(
+                    'wazuh.endpointGroups.stagedChanges.stagedSummary',
+                    {
+                      defaultMessage:
+                        '{total, plural, other {{total} staged, nothing written yet}}',
+                      values: { total },
+                    },
+                  )}
+                </EuiText>
+              </EuiFlexItem>
+            ) : null}
           </EuiFlexGroup>
         </EuiFlexItem>
 
@@ -119,8 +139,13 @@ export const StagedChangesPanel = ({
             >
               <EuiFlexItem grow={false}>
                 <EuiText size='m' color='subdued' textAlign='center'>
-                  Nothing staged yet. Click a row in the table to stage it for
-                  adding or removing.
+                  {i18n.translate(
+                    'wazuh.endpointGroups.stagedChanges.emptyState',
+                    {
+                      defaultMessage:
+                        "Nothing staged yet. Select a row's checkbox in the table to stage it for adding or removing.",
+                    },
+                  )}
                 </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -134,7 +159,16 @@ export const StagedChangesPanel = ({
             {adds.length ? (
               <>
                 <EuiText size='xs' color='success'>
-                  <strong>Adding {adds.length}</strong>
+                  <strong>
+                    {i18n.translate(
+                      'wazuh.endpointGroups.stagedChanges.addingHeading',
+                      {
+                        defaultMessage:
+                          '{count, plural, other {Adding {count}}}',
+                        values: { count: adds.length },
+                      },
+                    )}
+                  </strong>
                 </EuiText>
                 <EuiSpacer size='xs' />
                 {adds.map(agent => stagedRow(agent, '+', 'success', onUnstage))}
@@ -145,7 +179,16 @@ export const StagedChangesPanel = ({
               <>
                 <EuiSpacer size='s' />
                 <EuiText size='xs' color='danger'>
-                  <strong>Removing {removes.length}</strong>
+                  <strong>
+                    {i18n.translate(
+                      'wazuh.endpointGroups.stagedChanges.removingHeading',
+                      {
+                        defaultMessage:
+                          '{count, plural, other {Removing {count}}}',
+                        values: { count: removes.length },
+                      },
+                    )}
+                  </strong>
                 </EuiText>
                 <EuiSpacer size='xs' />
                 {removes.map(agent =>
@@ -160,7 +203,13 @@ export const StagedChangesPanel = ({
                 <EuiCallOut
                   size='s'
                   color='warning'
-                  title='Applying these changes will leave this group with no agents.'
+                  title={i18n.translate(
+                    'wazuh.endpointGroups.stagedChanges.emptiesGroupWarning',
+                    {
+                      defaultMessage:
+                        'Applying these changes will leave this group with no agents.',
+                    },
+                  )}
                 />
               </>
             ) : null}
@@ -177,7 +226,10 @@ export const StagedChangesPanel = ({
                 isDisabled={!hasPending}
                 onClick={onDiscardAll}
               >
-                Discard all
+                {i18n.translate(
+                  'wazuh.endpointGroups.stagedChanges.discardAllButton',
+                  { defaultMessage: 'Discard all' },
+                )}
               </EuiButtonEmpty>
             </EuiFlexItem>
             <EuiFlexItem grow={false} style={{ marginLeft: 'auto' }}>
@@ -188,7 +240,14 @@ export const StagedChangesPanel = ({
                 isDisabled={!hasPending}
                 onClick={onApply}
               >
-                {`Apply ${total} changes`}
+                {i18n.translate(
+                  'wazuh.endpointGroups.stagedChanges.applyButton',
+                  {
+                    defaultMessage:
+                      '{total, plural, one {Apply {total} change} other {Apply {total} changes}}',
+                    values: { total },
+                  },
+                )}
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>

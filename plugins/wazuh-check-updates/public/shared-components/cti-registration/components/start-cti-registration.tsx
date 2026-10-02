@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { EuiButtonEmpty, EuiButtonIcon, EuiToolTip } from '@elastic/eui';
 import { LinkCtiProps } from '../types';
@@ -39,7 +40,10 @@ export const StartCtiRegistration: React.FC<
       }
     >
       <EuiButtonIcon
-        aria-label='Wazuh XDR registration'
+        aria-label={i18n.translate(
+          'wazuhCheckUpdates.ctiRegistration.registerButtonAriaLabel',
+          { defaultMessage: 'Wazuh XDR registration' },
+        )}
         color='text'
         iconType='globe'
         onClick={() => handleModalToggle()}

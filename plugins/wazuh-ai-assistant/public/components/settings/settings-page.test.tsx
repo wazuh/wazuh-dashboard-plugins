@@ -1931,6 +1931,58 @@ describe('SettingsPage — provider table feedback and retention validation', ()
     expect(document.querySelector('.wzStatusChip__spinner')).not.toBeNull();
   });
 
+  describe('Status badge for a finished test (latencyMs = time to first response)', () => {
+    async function renderWithTestResult(result: {
+      success: boolean;
+      latencyMs: number;
+    }): Promise<HTMLElement> {
+      mockService.list.mockResolvedValue([PROVIDER]);
+      mockService.test.mockResolvedValue(result);
+      render(
+        <SettingsPageWithRouter
+          core={coreWithToasts}
+          onProvidersChanged={jest.fn()}
+        />,
+      );
+      await waitFor(() =>
+        expect(
+          document.querySelector('.wzStatusChip:not(.wzStatusChip--testing)'),
+        ).not.toBeNull(),
+      );
+      // Settled on a final state, not the auto-probe's in-flight one.
+      await waitFor(() =>
+        expect(document.querySelector('.wzStatusChip--testing')).toBeNull(),
+      );
+      return document.querySelector('.wzStatusChip') as HTMLElement;
+    }
+
+    it('shows seconds with one decimal from one second on', async () => {
+      const chip = await renderWithTestResult({
+        success: true,
+        latencyMs: 1234,
+      });
+      expect(chip).toHaveTextContent('OK (1.2 s)');
+      expect(chip).toHaveClass('wzStatusChip--ok');
+    });
+
+    it('shows Slow, in the warning tint, with an explaining tooltip from 5 s on', async () => {
+      const chip = await renderWithTestResult({
+        success: true,
+        latencyMs: 14069,
+      });
+      expect(chip).toHaveTextContent('Slow (14.1 s)');
+      expect(chip).toHaveClass('wzStatusChip--slow');
+      expect(chip).not.toHaveClass('wzStatusChip--ok');
+
+      fireEvent.mouseOver(chip);
+      expect(
+        await screen.findByText(
+          /The first response took 14\.1 s\. This is typical of reasoning models/,
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
   it('rejects an unparseable retention value instead of clamping it to 0', async () => {
     // Clamping sent the field to 0 — the one value that means "keep everything forever" — for any
     // input the old `Number()` parse did not like.

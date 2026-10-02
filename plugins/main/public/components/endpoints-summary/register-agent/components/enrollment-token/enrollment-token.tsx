@@ -15,6 +15,8 @@ import {
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { UseFormReturn } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
 import AdvancedOptions from '../advanced-options/advanced-options';
@@ -46,8 +48,24 @@ type TokenSource = 'generate' | 'existing';
 both, so the two are read one at a time rather than side by side with whichever
 one is not in use disabled. The open tab is the whole of the step. */
 const TOKEN_SOURCE_TABS: { id: TokenSource; name: string }[] = [
-  { id: 'generate', name: 'Generate a new token' },
-  { id: 'existing', name: 'Use an existing token' },
+  {
+    id: 'generate',
+    name: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenInput.tabs.generate',
+      {
+        defaultMessage: 'Generate a new token',
+      },
+    ),
+  },
+  {
+    id: 'existing',
+    name: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenInput.tabs.existing',
+      {
+        defaultMessage: 'Use an existing token',
+      },
+    ),
+  },
 ];
 
 const formatExpiration = (expires: string) => {
@@ -190,7 +208,13 @@ const EnrollmentTokenInput = ({
       setGeneratedToken(null);
       onEnrollmentTokenChange(null);
       setError(
-        requestError?.message || 'The enrollment token could not be generated.',
+        requestError?.message ||
+          i18n.translate(
+            'wazuh.endpointsSummary.enrollmentTokenInput.generateErrorFallback',
+            {
+              defaultMessage: 'The enrollment token could not be generated.',
+            },
+          ),
       );
     } finally {
       setIsGenerating(false);
@@ -204,7 +228,15 @@ const EnrollmentTokenInput = ({
           <EuiFlexItem key={index}>
             <EuiText className='stepSubtitle'>
               {data.subtitle}{' '}
-              <EuiToolTip content={`Navigate to ${enrollmentTokens.title}`}>
+              <EuiToolTip
+                content={i18n.translate(
+                  'wazuh.endpointsSummary.enrollmentTokenInput.navigateTooltip',
+                  {
+                    defaultMessage: 'Navigate to {appTitle}',
+                    values: { appTitle: enrollmentTokens.title },
+                  },
+                )}
+              >
                 <EuiLink
                   href={NavigationService.getInstance().getAppURL(
                     enrollmentTokens.id,
@@ -213,7 +245,12 @@ const EnrollmentTokenInput = ({
                   rel='noopener noreferrer'
                   external
                 >
-                  {`Manage the minted tokens`}
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.manageTokensLink',
+                    {
+                      defaultMessage: 'Manage the minted tokens',
+                    },
+                  )}
                 </EuiLink>
               </EuiToolTip>
             </EuiText>
@@ -240,18 +277,33 @@ const EnrollmentTokenInput = ({
               <InputForm
                 {...existingTokenField}
                 label={
-                  <span className='registerAgentLabels'>Enrollment token</span>
+                  <span className='registerAgentLabels'>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenLabel',
+                      {
+                        defaultMessage: 'Enrollment token',
+                      },
+                    )}
+                  </span>
                 }
                 footer={
                   <EuiText size='xs' color='subdued'>
-                    Paste a token kept from an earlier deployment to reuse it.
-                    The server returns a token once, so one that was not saved
-                    cannot be recovered and a new one has to be generated on the
-                    other tab.
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenHelp',
+                      {
+                        defaultMessage:
+                          'Paste a token kept from an earlier deployment to reuse it. The server returns a token once, so one that was not saved cannot be recovered and a new one has to be generated on the other tab.',
+                      },
+                    )}
                   </EuiText>
                 }
                 fullWidth={false}
-                placeholder='Paste a stored enrollment token'
+                placeholder={i18n.translate(
+                  'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenPlaceholder',
+                  {
+                    defaultMessage: 'Paste a stored enrollment token',
+                  },
+                )}
               />
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -260,16 +312,23 @@ const EnrollmentTokenInput = ({
               <EuiSpacer size='m' />
               <EuiCallOut
                 color='success'
-                title='Using the token provided'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenInUseTitle',
+                  {
+                    defaultMessage: 'Using the token provided',
+                  },
+                )}
                 iconType='check'
                 className='warningForAgentName'
               >
                 <p>
-                  The deployment command below installs the agent with this
-                  token. Its manager address, its lifetime and the enrollments
-                  it has left are not shown here: the server returns them only
-                  when it mints a token, and it is the server that refuses an
-                  expired or exhausted one at enrollment time.
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenInUseDescription',
+                    {
+                      defaultMessage:
+                        'The deployment command below installs the agent with this token. Its manager address, its lifetime and the enrollments it has left are not shown here: the server returns them only when it mints a token, and it is the server that refuses an expired or exhausted one at enrollment time.',
+                    },
+                  )}
                 </p>
               </EuiCallOut>
             </>
@@ -289,16 +348,36 @@ const EnrollmentTokenInput = ({
                   {...formFields.enrollmentTokenTtl}
                   label={
                     <span className='registerAgentLabels'>
-                      {'Lifetime - '}
-                      <em>optional</em>
+                      <FormattedMessage
+                        id='wazuh.endpointsSummary.enrollmentTokenInput.lifetimeLabel'
+                        defaultMessage='Lifetime - {optional}'
+                        values={{
+                          optional: (
+                            <em>
+                              {i18n.translate(
+                                'wazuh.endpointsSummary.enrollmentTokenInput.lifetimeOptional',
+                                {
+                                  defaultMessage: 'optional',
+                                },
+                              )}
+                            </em>
+                          ),
+                        }}
+                      />
                     </span>
                   }
                   footer={
                     <EuiText size='xs' color='subdued'>
-                      Seconds, or a number followed by <EuiCode>d</EuiCode>,{' '}
-                      <EuiCode>h</EuiCode>, <EuiCode>m</EuiCode> or{' '}
-                      <EuiCode>s</EuiCode>. If left empty, the server default of
-                      30 days is used.
+                      <FormattedMessage
+                        id='wazuh.endpointsSummary.enrollmentTokenInput.lifetimeHelp'
+                        defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}. If left empty, the server default of 30 days is used.'
+                        values={{
+                          days: <EuiCode>d</EuiCode>,
+                          hours: <EuiCode>h</EuiCode>,
+                          minutes: <EuiCode>m</EuiCode>,
+                          seconds: <EuiCode>s</EuiCode>,
+                        }}
+                      />
                     </EuiText>
                   }
                   fullWidth={false}
@@ -310,18 +389,42 @@ const EnrollmentTokenInput = ({
                   {...formFields.enrollmentTokenMaxUses}
                   label={
                     <span className='registerAgentLabels'>
-                      {'Enrollments allowed - '}
-                      <em>optional</em>
+                      <FormattedMessage
+                        id='wazuh.endpointsSummary.enrollmentTokenInput.maxUsesLabel'
+                        defaultMessage='Enrollments allowed - {optional}'
+                        values={{
+                          optional: (
+                            <em>
+                              {i18n.translate(
+                                'wazuh.endpointsSummary.enrollmentTokenInput.maxUsesOptional',
+                                {
+                                  defaultMessage: 'optional',
+                                },
+                              )}
+                            </em>
+                          ),
+                        }}
+                      />
                     </span>
                   }
                   footer={
                     <EuiText size='xs' color='subdued'>
-                      How many agents the token can enroll. If left empty, or
-                      set to 0, the token allows unlimited enrollments.
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.enrollmentTokenInput.maxUsesHelp',
+                        {
+                          defaultMessage:
+                            'How many agents the token can enroll. If left empty, or set to 0, the token allows unlimited enrollments.',
+                        },
+                      )}
                     </EuiText>
                   }
                   fullWidth={false}
-                  placeholder='Unlimited'
+                  placeholder={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.maxUsesPlaceholder',
+                    {
+                      defaultMessage: 'Unlimited',
+                    },
+                  )}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -332,19 +435,42 @@ const EnrollmentTokenInput = ({
                   {...formFields.enrollmentTokenDescription}
                   label={
                     <span className='registerAgentLabels'>
-                      {'Description - '}
-                      <em>optional</em>
+                      <FormattedMessage
+                        id='wazuh.endpointsSummary.enrollmentTokenInput.descriptionLabel'
+                        defaultMessage='Description - {optional}'
+                        values={{
+                          optional: (
+                            <em>
+                              {i18n.translate(
+                                'wazuh.endpointsSummary.enrollmentTokenInput.descriptionOptional',
+                                {
+                                  defaultMessage: 'optional',
+                                },
+                              )}
+                            </em>
+                          ),
+                        }}
+                      />
                     </span>
                   }
                   footer={
                     <EuiText size='xs' color='subdued'>
-                      Kept with the token on the server so it can be told apart
-                      from the others when they are listed later. It is not sent
-                      to the agent.
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.enrollmentTokenInput.descriptionHelp',
+                        {
+                          defaultMessage:
+                            'Kept with the token on the server so it can be told apart from the others when they are listed later. It is not sent to the agent.',
+                        },
+                      )}
                     </EuiText>
                   }
                   fullWidth={false}
-                  placeholder='What this token is for'
+                  placeholder={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.descriptionPlaceholder',
+                    {
+                      defaultMessage: 'What this token is for',
+                    },
+                  )}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -356,11 +482,27 @@ const EnrollmentTokenInput = ({
             <EuiFlexGroup wrap>
               <EuiFlexItem grow={true} className='registerAgentFormColumn'>
                 <EuiFormRow
-                  label='Embed CA'
-                  helpText='Carries the CA certificate inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.'
+                  label={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.embedCaLabel',
+                    {
+                      defaultMessage: 'Embed CA',
+                    },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.embedCaHelp',
+                    {
+                      defaultMessage:
+                        'Carries the CA certificate inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.',
+                    },
+                  )}
                 >
                   <EuiSwitch
-                    label='Carry the CA certificate in the token'
+                    label={i18n.translate(
+                      'wazuh.endpointsSummary.enrollmentTokenInput.embedCaSwitch',
+                      {
+                        defaultMessage: 'Carry the CA certificate in the token',
+                      },
+                    )}
                     checked={embedCa}
                     onChange={event => setEmbedCa(event.target.checked)}
                   />
@@ -368,13 +510,27 @@ const EnrollmentTokenInput = ({
               </EuiFlexItem>
               <EuiFlexItem grow={true} className='registerAgentFormColumn'>
                 <EuiFormRow
-                  label='Without credential'
-                  helpText={
-                    'Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment. If you enable it, check that the Wazuh manager configuration has <use_password> set to "no".'
-                  }
+                  label={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.noCredentialLabel',
+                    {
+                      defaultMessage: 'Without credential',
+                    },
+                  )}
+                  helpText={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.noCredentialHelp',
+                    {
+                      defaultMessage:
+                        'Mints a token carrying only the address and the pin. It can point an agent at the manager but cannot authenticate its enrollment. If you enable it, check that the Wazuh manager configuration has <use_password> set to "no".',
+                    },
+                  )}
                 >
                   <EuiSwitch
-                    label='Mint the token without a credential'
+                    label={i18n.translate(
+                      'wazuh.endpointsSummary.enrollmentTokenInput.noCredentialSwitch',
+                      {
+                        defaultMessage: 'Mint the token without a credential',
+                      },
+                    )}
                     checked={noCredential}
                     onChange={event => setNoCredential(event.target.checked)}
                   />
@@ -392,8 +548,18 @@ const EnrollmentTokenInput = ({
                 onClick={generateEnrollmentToken}
               >
                 {enrollmentToken?.source === 'generated'
-                  ? 'Generate a new token'
-                  : 'Generate token'}
+                  ? i18n.translate(
+                      'wazuh.endpointsSummary.enrollmentTokenInput.regenerateButton',
+                      {
+                        defaultMessage: 'Generate a new token',
+                      },
+                    )
+                  : i18n.translate(
+                      'wazuh.endpointsSummary.enrollmentTokenInput.generateButton',
+                      {
+                        defaultMessage: 'Generate token',
+                      },
+                    )}
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -402,7 +568,13 @@ const EnrollmentTokenInput = ({
               <EuiSpacer size='m' />
               <EuiCallOut
                 color='warning'
-                title='Enter a valid server address before generating the token.'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.enrollmentTokenInput.invalidEndpointWarning',
+                  {
+                    defaultMessage:
+                      'Enter a valid server address before generating the token.',
+                  },
+                )}
                 iconType='iInCircle'
                 className='warningForAgentName'
               />
@@ -413,7 +585,13 @@ const EnrollmentTokenInput = ({
               <EuiSpacer size='m' />
               <EuiCallOut
                 color='danger'
-                title='The server refused to generate the enrollment token'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.enrollmentTokenInput.generateErrorTitle',
+                  {
+                    defaultMessage:
+                      'The server refused to generate the enrollment token',
+                  },
+                )}
                 iconType='alert'
                 className='warningForAgentName'
               >
@@ -426,29 +604,56 @@ const EnrollmentTokenInput = ({
               <EuiSpacer size='m' />
               <EuiCallOut
                 color='success'
-                title='Enrollment token generated'
+                title={i18n.translate(
+                  'wazuh.endpointsSummary.enrollmentTokenInput.generatedTitle',
+                  {
+                    defaultMessage: 'Enrollment token generated',
+                  },
+                )}
                 iconType='check'
                 className='warningForAgentName'
               >
                 <p>
-                  Token successfully generated, valid until{' '}
-                  {formatExpiration(enrollmentToken.expires)}.
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.generatedValidUntil',
+                    {
+                      defaultMessage:
+                        'Token successfully generated, valid until {expiration}.',
+                      values: {
+                        expiration: formatExpiration(enrollmentToken.expires),
+                      },
+                    },
+                  )}
                 </p>
                 <p>
-                  The token itself is returned once and cannot be retrieved
-                  again. It is not shown here: copy it, or the deployment
-                  command below, before leaving this page.
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.generatedDescription',
+                    {
+                      defaultMessage:
+                        'The token itself is returned once and cannot be retrieved again. It is not shown here: copy it, or the deployment command below, before leaving this page.',
+                    },
+                  )}
                 </p>
                 {/* The token authenticates the enrollment, so it is handed over
                 through the clipboard rather than rendered where it can be read
                 off the screen. */}
                 <EuiCopy
                   textToCopy={enrollmentToken.token}
-                  beforeMessage='Copy the token to the clipboard'
+                  beforeMessage={i18n.translate(
+                    'wazuh.endpointsSummary.enrollmentTokenInput.copyTokenTooltip',
+                    {
+                      defaultMessage: 'Copy the token to the clipboard',
+                    },
+                  )}
                 >
                   {copy => (
                     <EuiButton size='s' iconType='copy' onClick={copy}>
-                      Copy token
+                      {i18n.translate(
+                        'wazuh.endpointsSummary.enrollmentTokenInput.copyTokenButton',
+                        {
+                          defaultMessage: 'Copy token',
+                        },
+                      )}
                     </EuiButton>
                   )}
                 </EuiCopy>

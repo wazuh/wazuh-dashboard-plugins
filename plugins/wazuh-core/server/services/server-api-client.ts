@@ -83,6 +83,8 @@ export class ServerAPIClient {
   private configDir: string;
   private _sslConfigLogged: Set<string> = new Set();
   private _httpsAgentCache: Map<string, https.Agent> = new Map();
+  // In-flight internal user logins by API host ID, shared by parallel requests
+  private _pendingInternalUserAuth: Map<string, Promise<string>> = new Map();
   constructor(
     private logger: Logger, // TODO: add logger as needed
     private manageHosts: ManageHosts,
@@ -476,10 +478,18 @@ export class ServerAPIClient {
    * @param apiHostID Server API ID
    * @returns
    */
-  private async _authenticateInternalUser(apiHostID: string): Promise<string> {
-    const token = await this._authenticate(apiHostID, { useRunAs: false });
-    this._CacheInternalUserAPIHostToken.set(apiHostID, token);
-    return token;
+  private _authenticateInternalUser(apiHostID: string): Promise<string> {
+    let pending = this._pendingInternalUserAuth.get(apiHostID);
+    if (!pending) {
+      pending = this._authenticate(apiHostID, { useRunAs: false })
+        .then(token => {
+          this._CacheInternalUserAPIHostToken.set(apiHostID, token);
+          return token;
+        })
+        .finally(() => this._pendingInternalUserAuth.delete(apiHostID));
+      this._pendingInternalUserAuth.set(apiHostID, pending);
+    }
+    return pending;
   }
 
   /**

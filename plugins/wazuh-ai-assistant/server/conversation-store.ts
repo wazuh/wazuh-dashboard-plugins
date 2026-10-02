@@ -1,5 +1,8 @@
 import { RequestHandlerContext } from '../../../src/core/server';
-import { CONVERSATION_SESSIONS_INDEX_ALIAS } from '../common/constants';
+import {
+  CONVERSATION_SESSIONS_INDEX_ALIAS,
+  WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH,
+} from '../common/constants';
 import { PersistedChatMessage } from '../common/types';
 
 /** The real, request-scoped OpenSearch client type — resolved via indexed access from
@@ -49,25 +52,18 @@ export interface ConversationDocument {
   updated_at: string;
   messages: PersistedChatMessage[];
   /**
-   * Required by the data stream itself: `wazuh-ai-assistant-sessions` maps `@timestamp` as its
-   * `data_stream.timestamp_field` (the OpenSearch/Elasticsearch data-stream convention), and a
-   * write without it fails indexer-side with a mapping error, not an application-level one. Always
-   * set equal to `created_at` (server/routes/conversations.ts stamps both from the same value on
-   * create, and re-sends the original `created_at` on update) — this field exists for the data
-   * stream's own bookkeeping, not to track "last touched", which `updated_at` already covers.
+   * The data stream's `data_stream.timestamp_field`, always equal to `created_at`. The indexer
+   * stamps it, along with `user`, `created_at` and `updated_at`.
    */
   '@timestamp': string;
 }
 
 /**
- * One conversation document plus the OpenSearch bookkeeping needed to update or delete it again:
- * `index` is the CONCRETE backing index holding the doc (never the alias itself — see
- * `findConversationHit`'s doc comment), `seqNo`/`primaryTerm` are the optimistic-concurrency pair
- * the update API keys its `if_seq_no`/`if_primary_term` checks on.
+ * One conversation document plus the `seqNo`/`primaryTerm` pair that `encodeVersion` turns into the
+ * opaque `version` token the sessions endpoint's `expected_version` check uses.
  */
 export interface ConversationHit {
   id: string;
-  index: string;
   seqNo: number;
   primaryTerm: number;
   source: ConversationDocument;
@@ -78,7 +74,6 @@ function client(context: RequestHandlerContext): OpenSearchClient {
 }
 
 interface SearchHit {
-  _index: string;
   _id: string;
   _source: ConversationDocument;
   _seq_no?: number;
@@ -88,7 +83,6 @@ interface SearchHit {
 function toHit(hit: SearchHit): ConversationHit {
   return {
     id: hit._id,
-    index: hit._index,
     seqNo: hit._seq_no ?? 0,
     primaryTerm: hit._primary_term ?? 0,
     source: hit._source,
@@ -165,9 +159,8 @@ export async function countConversations(
  * stream whose backing index rolls over daily (wazuh-indexer-plugins#1422), and the get-by-id API
  * can only target one concrete index — it has no way to know which backing index holds a given id
  * without being told. A `search` filtered on `_id` fans out across every backing index the alias
- * currently points to and reports which one actually holds it (`_index` on the hit), which the
- * update/delete calls below need. `seq_no_primary_term: true` is requested so the hit can also
- * drive optimistic-concurrency updates without a second round trip.
+ * currently points to. `seq_no_primary_term: true` makes the hit carry the version the write
+ * endpoints check against.
  */
 export async function findConversationHit(
   context: RequestHandlerContext,
@@ -189,100 +182,90 @@ export async function findConversationHit(
   return hit ? toHit(hit) : undefined;
 }
 
-/**
- * Creates a new conversation document. `op_type: 'create'` is mandatory when writing to a data
- * stream's alias — backing indices only accept appends, never a plain overwrite-by-id `index`
- * request — and, combined with no explicit `id`, is what makes OpenSearch mint a fresh id for it.
- *
- * `refresh: 'wait_for'` on every write function in this file (this one, `updateConversation`,
- * `deleteConversation`): every read here — `listConversations`, `countConversations`,
- * `findConversationHit` — goes through `search`, not a direct get-by-id (this alias is a data
- * stream; see `findConversationHit`'s doc comment for why a plain get can't be used at all). A
- * search only sees a write once the shard has refreshed, which by default happens on its own
- * timer (`index.refresh_interval`, 1s unless configured otherwise) — NOT synchronously with the
- * write. Without `wait_for`, a delete followed immediately by a list (or a create followed by the
- * second-save update the same conversation gets moments later, itself a `search`-based lookup via
- * `findConversationHit`) can race: the write already succeeded, but the very next search still
- * reflects the pre-write state. `wait_for` blocks the response until the next scheduled refresh
- * has incorporated this write, so by the time this function returns, every subsequent search is
- * guaranteed to reflect it — no client-visible race, and (unlike `refresh: true`) no forced
- * out-of-cycle refresh on every write either.
- */
+// Writes go through the indexer's sessions endpoint as the current user: the caller's role holds no
+// index-level `write` on the sessions alias, only the cluster permission behind this endpoint. The
+// indexer stamps `user` and owns the timestamps, so none are sent.
+//
+// Failures reject with the OpenSearch client's `ResponseError` (`.statusCode` set): 403 without the
+// permission, 404 for a session that is missing or not the caller's, 409 for a version conflict on
+// `updateConversation` or the per-user session cap on `createConversation`.
+
+function sessionPath(id?: string): string {
+  return id === undefined
+    ? WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH
+    : `${WAZUH_INDEXER_AI_ASSISTANT_SESSIONS_PATH}/${encodeURIComponent(id)}`;
+}
+
+/** The sessions endpoint's reply for a stored session; `version` is in `encodeVersion` format. */
+export interface StoredSession {
+  title: string;
+  created_at: string;
+  updated_at: string;
+  messages: PersistedChatMessage[];
+  version: string;
+}
+
+/** Creates a new conversation; the indexer mints its id. */
 export async function createConversation(
   context: RequestHandlerContext,
-  document: ConversationDocument,
-): Promise<string> {
-  const response = await client(context).index({
-    index: CONVERSATION_SESSIONS_INDEX_ALIAS,
-    op_type: 'create',
-    refresh: 'wait_for',
-    body: document,
+  document: Pick<ConversationDocument, 'title' | 'messages'>,
+): Promise<StoredSession & { id: string }> {
+  const response = await client(context).transport.request({
+    method: 'POST',
+    path: sessionPath(),
+    body: { title: document.title, messages: document.messages },
   });
-  const body = response.body as { _id: string };
-  return body._id;
+  return response.body as StoredSession & { id: string };
 }
 
 /**
- * Full overwrite of an already-resolved hit's document. Always targets `hit.index` — the
- * CONCRETE backing index — never the alias: see `findConversationHit`'s doc comment. A document
- * never moves to a different backing index once written, so a `hit` resolved moments earlier in
- * the same request is still valid to update against.
- *
- * Deliberately a full `index` (replace), NOT the partial `_update` API: this alias has OpenSearch
- * Document Level Security configured for per-user isolation (see `ConversationDocument`'s doc
- * comment), and the Security plugin unconditionally rejects `_update` for any role DLS/FLS/
- * field-masking applies to — `security_exception: Update is not supported when FLS or DLS or
- * Fieldmasking is activated` — regardless of what the update itself would touch. A plain `index`
- * overwrite has no such restriction, so the caller must always pass the document's FULL shape
- * (typically `{...previouslyFetchedSource, ...changedFields}`), not a partial patch — there is no
- * server-side merge to fall back on for whatever the caller omits.
- *
- * `occ` is REQUIRED, not optional: a data stream separately rejects a plain (unconditional)
- * `index` request sent directly against one of its backing indices —
- * `illegal_argument_exception: index request with op_type=index and no if_primary_term and
- * if_seq_no set targeting backing indices is disallowed` — so there is no "unconditional
- * overwrite" available here at all, unlike a plain index. When the caller has no
- * client-supplied version to check against, it must still pass the seq_no/primary_term it just
- * read (e.g. from the same request's own `findConversationHit` call) purely to satisfy this
- * requirement — see conversations.ts's PUT route for how the two cases (client-supplied
- * `expectedVersion` vs. this request's own fresh read) are told apart for the 409 message.
- *
- * Rejects with the OpenSearch client's `ResponseError`, whose `.statusCode` getter reads the
- * response body's numeric `status` — 409 on a real conflict — the exact shape
- * `isVersionConflictError` (conversations.ts) already recognizes, so that helper needs no change.
- *
- * `refresh: 'wait_for'` — see `createConversation`'s doc comment for why every write here needs it.
+ * Full replace of `messages`, checked against `expectedVersion` (an `encodeVersion` token): a newer
+ * write rejects with a 409. An absent `title` keeps the stored one, so an auto-save never reverts a
+ * rename.
  */
 export async function updateConversation(
   context: RequestHandlerContext,
-  hit: Pick<ConversationHit, 'id' | 'index'>,
-  document: ConversationDocument,
-  occ: { ifSeqNo: number; ifPrimaryTerm: number },
-): Promise<{ seqNo: number; primaryTerm: number }> {
-  const response = await client(context).index({
-    index: hit.index,
-    id: hit.id,
-    if_seq_no: occ.ifSeqNo,
-    if_primary_term: occ.ifPrimaryTerm,
-    refresh: 'wait_for',
-    body: document,
+  id: string,
+  document: Pick<ConversationDocument, 'messages'> & { title?: string },
+  expectedVersion: string,
+): Promise<StoredSession> {
+  const response = await client(context).transport.request({
+    method: 'PUT',
+    path: sessionPath(id),
+    body: {
+      messages: document.messages,
+      title: document.title,
+      expected_version: expectedVersion,
+    },
   });
-  const body = response.body as { _seq_no: number; _primary_term: number };
-  return { seqNo: body._seq_no, primaryTerm: body._primary_term };
+  return response.body as StoredSession;
 }
 
-/** Targets `hit.index` for the same reason `updateConversation` does. `refresh: 'wait_for'` — see
- * `createConversation`'s doc comment for why every write here needs it (without it, a delete
- * followed immediately by the list route's `listConversations` search could still show the
- * just-deleted conversation). */
+/** Title-only update. The indexer trims the title and leaves `updated_at` alone, since a rename
+ * is not conversation activity. */
+export async function renameConversation(
+  context: RequestHandlerContext,
+  id: string,
+  title: string,
+): Promise<Pick<StoredSession, 'title' | 'updated_at' | 'version'>> {
+  const response = await client(context).transport.request({
+    method: 'PATCH',
+    path: sessionPath(id),
+    body: { title },
+  });
+  return response.body as Pick<
+    StoredSession,
+    'title' | 'updated_at' | 'version'
+  >;
+}
+
 export async function deleteConversation(
   context: RequestHandlerContext,
-  hit: Pick<ConversationHit, 'id' | 'index'>,
+  id: string,
 ): Promise<void> {
-  await client(context).delete({
-    index: hit.index,
-    id: hit.id,
-    refresh: 'wait_for',
+  await client(context).transport.request({
+    method: 'DELETE',
+    path: sessionPath(id),
   });
 }
 

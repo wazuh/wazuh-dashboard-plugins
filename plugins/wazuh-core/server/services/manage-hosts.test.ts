@@ -12,6 +12,8 @@
 
 import { ManageHosts } from './manage-hosts';
 import { IConfiguration } from '../../common/services/configuration';
+import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
+import { ServerAPIClient } from './server-api-client';
 
 const mockLogger = {
   debug: jest.fn(),
@@ -173,4 +175,90 @@ describe('ManageHosts Service', () => {
       expect(result[0].id).toBe('default2');
     });
   });
+
+  /* eslint-disable camelcase -- Wazuh Server API field names */
+  describe('getRegistryDataByHost', () => {
+    const USERS_ME = {
+      status: 200,
+      data: { data: { affected_items: [{ allow_run_as: true }] } },
+    };
+    const CLUSTER_LOCAL_INFO = {
+      status: 200,
+      data: {
+        data: { affected_items: [{ node: 'node01', cluster: 'wazuh' }] },
+      },
+    };
+
+    const getRegistryDataByHost = (options: { throwError: boolean }) => {
+      manageHosts.setServerAPIClient(
+        mockServerAPIClient as unknown as ServerAPIClient,
+      );
+
+      return (
+        manageHosts as unknown as {
+          getRegistryDataByHost: (
+            host: unknown,
+            options: unknown,
+          ) => Promise<unknown>;
+        }
+      ).getRegistryDataByHost({ id: 'default', run_as: true }, options);
+    };
+
+    beforeEach(() => mockServerAPIClient.asInternalUser.request.mockReset());
+
+    it('requests the API user and the cluster info in parallel', async () => {
+      const resolvers: Record<string, (value: unknown) => void> = {};
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        (_method: string, path: string) =>
+          new Promise(resolve => {
+            resolvers[path] = resolve;
+          }),
+      );
+
+      const registryData = getRegistryDataByHost({ throwError: true });
+
+      expect(Object.keys(resolvers).sort()).toEqual([
+        '/cluster/local/info',
+        '/security/users/me',
+      ]);
+
+      resolvers['/security/users/me'](USERS_ME);
+      resolvers['/cluster/local/info'](CLUSTER_LOCAL_INFO);
+
+      await expect(registryData).resolves.toMatchObject({
+        node: 'node01',
+        cluster: 'wazuh',
+        allow_run_as: API_USER_STATUS_RUN_AS.ENABLED,
+      });
+    });
+
+    it('keeps allow_run_as when the cluster info request fails', async () => {
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        (_method: string, path: string) =>
+          path === '/security/users/me'
+            ? Promise.resolve(USERS_ME)
+            : Promise.reject(new Error('cluster not ready')),
+      );
+
+      await expect(
+        getRegistryDataByHost({ throwError: false }),
+      ).resolves.toMatchObject({
+        node: null,
+        cluster: null,
+        allow_run_as: API_USER_STATUS_RUN_AS.ENABLED,
+      });
+    });
+
+    it('throws the API user error when both requests fail', async () => {
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        (_method: string, path: string) =>
+          Promise.reject(new Error(`${path} failed`)),
+      );
+
+      await expect(getRegistryDataByHost({ throwError: true })).rejects.toThrow(
+        '/security/users/me failed',
+      );
+    });
+  });
+  /* eslint-enable camelcase */
 });

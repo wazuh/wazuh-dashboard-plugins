@@ -2,6 +2,7 @@ import { i18n } from '@osd/i18n';
 import { IBasePath } from '../../../../src/core/public';
 import { API_PATHS } from '../../common/constants';
 import { describeError } from '../../common/errors';
+import { getHttpErrorBodyMessage } from '../../common/http-status';
 import { ChatMessage, ChatRequest, StreamEvent } from '../../common/types';
 
 /**
@@ -73,6 +74,13 @@ export class ChatService {
         return;
       }
       const bodyText = await safeReadText(response);
+      // A permission denial carries an actionable message of its own; the raw body would bury it.
+      const deniedMessage =
+        response.status === 403 ? bodyMessageOf(bodyText) : undefined;
+      if (deniedMessage) {
+        yield { type: 'error', message: deniedMessage };
+        return;
+      }
       yield {
         type: 'error',
         message: i18n.translate('wazuhAiAssistant.chat.error.requestFailed', {
@@ -143,5 +151,13 @@ async function safeReadText(response: Response): Promise<string> {
     return await response.text();
   } catch {
     return '<unreadable body>';
+  }
+}
+
+function bodyMessageOf(bodyText: string): string | undefined {
+  try {
+    return getHttpErrorBodyMessage({ body: JSON.parse(bodyText) });
+  } catch {
+    return undefined;
   }
 }

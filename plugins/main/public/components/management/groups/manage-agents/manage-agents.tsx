@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -30,10 +31,42 @@ import {
 } from '../../../../../common/constants';
 
 const searchBarWQLFieldSuggestions = [
-  { label: 'id', description: 'filter by ID' },
-  { label: 'name', description: 'filter by name' },
-  { label: 'status', description: 'filter by status' },
-  { label: 'group', description: 'filter by group' },
+  {
+    label: 'id',
+    description: i18n.translate(
+      'wazuh.endpointGroups.manageAgents.filterById',
+      {
+        defaultMessage: 'filter by ID',
+      },
+    ),
+  },
+  {
+    label: 'name',
+    description: i18n.translate(
+      'wazuh.endpointGroups.manageAgents.filterByName',
+      {
+        defaultMessage: 'filter by name',
+      },
+    ),
+  },
+  {
+    label: 'status',
+    description: i18n.translate(
+      'wazuh.endpointGroups.manageAgents.filterByStatus',
+      {
+        defaultMessage: 'filter by status',
+      },
+    ),
+  },
+  {
+    label: 'group',
+    description: i18n.translate(
+      'wazuh.endpointGroups.manageAgents.filterByGroup',
+      {
+        defaultMessage: 'filter by group',
+      },
+    ),
+  },
 ];
 
 // Any WQL field named in tableColumns needs an entry here, or `run()`
@@ -239,8 +272,19 @@ export const ManageAgents = withErrorBoundary(
 
         const hasFailures = totalFailed > 0;
         const title = hasFailures
-          ? `Applied ${succeededCount} of ${total} change(s) — ${totalFailed} failed, see below`
-          : `Applied ${succeededCount} of ${total} change(s)`;
+          ? i18n.translate(
+              'wazuh.endpointGroups.manageAgents.applyPartialResult',
+              {
+                defaultMessage:
+                  'Applied {succeededCount} of {total, plural, other {{total} change(s)}} — {totalFailed} failed, see below',
+                values: { succeededCount, total, totalFailed },
+              },
+            )
+          : i18n.translate('wazuh.endpointGroups.manageAgents.applyResult', {
+              defaultMessage:
+                'Applied {succeededCount} of {total, plural, other {{total} change(s)}}',
+              values: { succeededCount, total },
+            });
 
         setApplyState({ status: 'complete', title, hasFailures, errorAgents });
 
@@ -254,8 +298,13 @@ export const ManageAgents = withErrorBoundary(
       } catch (error: any) {
         setApplyState({
           status: 'danger',
-          title:
-            'Could not apply changes. Check the server API status and try again.',
+          title: i18n.translate(
+            'wazuh.endpointGroups.manageAgents.applyErrorTitle',
+            {
+              defaultMessage:
+                'Could not apply changes. Check the server API status and try again.',
+            },
+          ),
           hasFailures: false,
           errorAgents: [],
         });
@@ -271,15 +320,28 @@ export const ManageAgents = withErrorBoundary(
           ...manageAgentsColumns(),
           {
             field: '_membership',
-            name: 'Membership',
+            name: i18n.translate(
+              'wazuh.endpointGroups.manageAgents.membershipColumn',
+              { defaultMessage: 'Membership' },
+            ),
             show: true,
             width: '24%',
             // Reflects current membership only, never a pending stage.
             render: (_value: unknown, agent: Agent) =>
               memberIds.has(agent.id) ? (
-                <EuiHealth color='success'>In this group</EuiHealth>
+                <EuiHealth color='success'>
+                  {i18n.translate(
+                    'wazuh.endpointGroups.manageAgents.inThisGroup',
+                    { defaultMessage: 'In this group' },
+                  )}
+                </EuiHealth>
               ) : (
-                <EuiHealth color='subdued'>Not in this group</EuiHealth>
+                <EuiHealth color='subdued'>
+                  {i18n.translate(
+                    'wazuh.endpointGroups.manageAgents.notInThisGroup',
+                    { defaultMessage: 'Not in this group' },
+                  )}
+                </EuiHealth>
               ),
           },
         ];
@@ -300,7 +362,10 @@ export const ManageAgents = withErrorBoundary(
           <EuiFlexGroup alignItems='center' gutterSize='s'>
             <EuiFlexItem grow={false}>
               <EuiButtonIcon
-                aria-label='Back'
+                aria-label={i18n.translate(
+                  'wazuh.endpointGroups.manageAgents.backAriaLabel',
+                  { defaultMessage: 'Back' },
+                )}
                 color='primary'
                 iconType='arrowLeft'
                 onClick={cancelButton}
@@ -308,7 +373,12 @@ export const ManageAgents = withErrorBoundary(
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTitle size='m'>
-                <h1>Manage agents of group {currentGroup.name}</h1>
+                <h1>
+                  {i18n.translate('wazuh.endpointGroups.manageAgents.title', {
+                    defaultMessage: 'Manage agents of group {groupName}',
+                    values: { groupName: currentGroup.name },
+                  })}
+                </h1>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
@@ -329,13 +399,26 @@ export const ManageAgents = withErrorBoundary(
             <EuiFlexItem style={{ minWidth: 0 }} grow={4}>
               <TableWzAPI
                 ref={tableRef}
-                title={showMembersOnly ? 'Members' : 'All agents'}
+                title={
+                  showMembersOnly
+                    ? i18n.translate(
+                        'wazuh.endpointGroups.manageAgents.membersTableTitle',
+                        { defaultMessage: 'Members' },
+                      )
+                    : i18n.translate(
+                        'wazuh.endpointGroups.manageAgents.allAgentsTableTitle',
+                        { defaultMessage: 'All agents' },
+                      )
+                }
                 endpoint='/agents'
                 filters={tableFilters}
                 addOnTitle={
                   <EuiSwitch
                     data-test-subj='showMembersOnlySwitch'
-                    label='Show only members'
+                    label={i18n.translate(
+                      'wazuh.endpointGroups.manageAgents.showOnlyMembersSwitch',
+                      { defaultMessage: 'Show only members' },
+                    )}
                     checked={showMembersOnly}
                     onChange={e => setShowMembersOnly(e.target.checked)}
                   />
@@ -361,7 +444,15 @@ export const ManageAgents = withErrorBoundary(
                     onSelectionChange,
                     selectable: () => !membershipLoading,
                     selectableMessage: (selectable: boolean) =>
-                      selectable ? '' : 'Group membership is still loading',
+                      selectable
+                        ? ''
+                        : i18n.translate(
+                            'wazuh.endpointGroups.manageAgents.membershipLoading',
+                            {
+                              defaultMessage:
+                                'Group membership is still loading',
+                            },
+                          ),
                   },
                 }}
               />

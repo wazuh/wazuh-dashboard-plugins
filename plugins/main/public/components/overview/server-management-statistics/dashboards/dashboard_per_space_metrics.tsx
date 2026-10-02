@@ -7,6 +7,7 @@ import {
   EuiFlexItem,
   EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import DashboardRenderer from '../../../common/dashboards/dashboard-renderer/dashboard-renderer';
 import { withErrorBoundary } from '../../../common/hocs/error-boundary/with-error-boundary';
 import { tFilter } from '../../../common/data-source';
@@ -59,7 +60,11 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
     <EuiPanel paddingSize='m' style={{ marginTop: 16 }}>
       <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false}>
         <EuiFlexItem grow={false}>
-          <EuiText size='s'>Space:</EuiText>
+          <EuiText size='s'>
+            {i18n.translate('wazuh.statistics.perSpaceMetrics.spaceLabel', {
+              defaultMessage: 'Space:',
+            })}
+          </EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false} style={{ minWidth: 200 }}>
           <EuiSelect
@@ -67,7 +72,12 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
             value={selectedSpace}
             onChange={e => onSelectSpace(e.target.value)}
             disabled={!spaces.length}
-            aria-label='Select space'
+            aria-label={i18n.translate(
+              'wazuh.statistics.perSpaceMetrics.selectSpaceAriaLabel',
+              {
+                defaultMessage: 'Select space',
+              },
+            )}
             compressed
           />
         </EuiFlexItem>

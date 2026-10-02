@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { UI_COLOR_STATUS } from '../../../../../../common/constants';
@@ -5,7 +6,10 @@ import { UI_COLOR_STATUS } from '../../../../../../common/constants';
 const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
   return {
     id: 'most_detected_vulnerabilities',
-    title: 'Most common vulnerability score',
+    title: i18n.translate(
+      'wazuh.vulnerabilityDetection.vulnerabilityScorePanel.title',
+      { defaultMessage: 'Most common vulnerability score' },
+    ),
     type: 'horizontal_bar',
     params: {
       addLegend: false,
@@ -42,7 +46,10 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
         {
           data: {
             id: '1',
-            label: 'Count',
+            label: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilityScorePanel.seriesLabel',
+              { defaultMessage: 'Count' },
+            ),
           },
           drawLinesBetweenPoints: true,
           lineWidth: 2,
@@ -80,7 +87,10 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
           show: true,
           style: {},
           title: {
-            text: 'Count',
+            text: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilityScorePanel.valueAxisTitle',
+              { defaultMessage: 'Count' },
+            ),
           },
           type: 'value',
         },
@@ -120,10 +130,19 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilityScorePanel.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Vulnerability base score',
+            missingBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilityScorePanel.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilityScorePanel.baseScoreLabel',
+              { defaultMessage: 'Vulnerability base score' },
+            ),
           },
           schema: 'segment',
         },
@@ -135,7 +154,10 @@ const getVisStateTopVulnerabilitiesScore = (indexPatternId: string) => {
 const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
   return {
     id: 'most_vulnerable_endpoints_vulnerabilities',
-    title: 'Most vulnerable OS types',
+    title: i18n.translate(
+      'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.title',
+      { defaultMessage: 'Most vulnerable OS types' },
+    ),
     type: 'horizontal_bar',
     params: {
       type: 'histogram',
@@ -180,7 +202,10 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.valueAxisTitle',
+              { defaultMessage: 'Count' },
+            ),
           },
         },
       ],
@@ -190,7 +215,10 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.seriesLabel',
+              { defaultMessage: 'Count' },
+            ),
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -240,7 +268,10 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
           enabled: true,
           type: 'count',
           params: {
-            customLabel: 'Count',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.countLabel',
+              { defaultMessage: 'Count' },
+            ),
           },
           schema: 'metric',
         },
@@ -254,10 +285,19 @@ const getVisStateTopVulnerableOSTypes = (indexPatternId: string) => {
             order: 'desc',
             size: 10,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
-            customLabel: 'Host OS type',
+            missingBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerableOsTypesPanel.hostOsTypeLabel',
+              { defaultMessage: 'Host OS type' },
+            ),
           },
           schema: 'segment',
         },
@@ -271,7 +311,10 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
 ) => {
   return {
     id: 'vulnerabilities_by_year_of_publication',
-    title: 'Vulnerabilities by year of publication',
+    title: i18n.translate(
+      'wazuh.vulnerabilityDetection.vulnerabilitiesByYearPanel.title',
+      { defaultMessage: 'Vulnerabilities by year of publication' },
+    ),
     type: 'histogram',
     params: {
       type: 'histogram',
@@ -316,7 +359,10 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             truncate: 100,
           },
           title: {
-            text: 'Count',
+            text: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilitiesByYearPanel.valueAxisTitle',
+              { defaultMessage: 'Count' },
+            ),
           },
         },
       ],
@@ -326,7 +372,10 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilitiesByYearPanel.seriesLabel',
+              { defaultMessage: 'Count' },
+            ),
             id: '1',
           },
           valueAxis: 'ValueAxis-1',
@@ -404,7 +453,10 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             drop_partials: false,
             min_doc_count: 1,
             extended_bounds: {},
-            customLabel: 'Year published',
+            customLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilitiesByYearPanel.yearPublishedLabel',
+              { defaultMessage: 'Year published' },
+            ),
           },
           schema: 'segment',
         },
@@ -418,9 +470,15 @@ const getVisStateAccumulationMostDetectedVulnerabilities = (
             order: 'desc',
             size: 5,
             otherBucket: false,
-            otherBucketLabel: 'Other',
+            otherBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilitiesByYearPanel.otherBucketLabel',
+              { defaultMessage: 'Other' },
+            ),
             missingBucket: false,
-            missingBucketLabel: 'Missing',
+            missingBucketLabel: i18n.translate(
+              'wazuh.vulnerabilityDetection.vulnerabilitiesByYearPanel.missingBucketLabel',
+              { defaultMessage: 'Missing' },
+            ),
           },
           schema: 'group',
         },

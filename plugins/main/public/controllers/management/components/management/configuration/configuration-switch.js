@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import WzConfigurationOverview from './configuration-overview';
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
@@ -197,7 +198,14 @@ class WzConfigurationSwitch extends Component {
           <EuiPanel>
             {agent?.group?.length ? (
               <Fragment>
-                <span>Groups:</span>
+                <span>
+                  {i18n.translate(
+                    'wazuh.configuration.configurationSwitch.groupsLabel',
+                    {
+                      defaultMessage: 'Groups:',
+                    },
+                  )}
+                </span>
                 <RedirectAppLinks application={getCore().application}>
                   {agent.group.map((group, key) => (
                     <EuiButtonEmpty

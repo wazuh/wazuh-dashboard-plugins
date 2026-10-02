@@ -813,7 +813,8 @@ describe('ChatPage — restoring the open conversation', () => {
 
 describe('ChatPage — a resumed conversation is the same conversation', () => {
   it('restores past timestamps rather than stamping everything with the resume time', async () => {
-    const savedAt = Date.parse('2024-01-01T09:00:00.000Z');
+    // Three hours back: never the same HH:MM label as "now", whatever time the suite runs.
+    const savedAt = Date.now() - 3 * 60 * 60 * 1000;
     mockConversationsService.get.mockResolvedValue(
       conversationRecord({
         messages: [
@@ -3687,6 +3688,37 @@ describe('ChatPage — a failed turn stays visible after the next question', () 
     // The whole point: the marker survives the next question.
     expect(screen.getByText('This turn failed')).toBeInTheDocument();
     expect(screen.getByText('Ask again')).toBeInTheDocument();
+  });
+
+  it('renders no <img> for an image in the error text, in the banner or the expanded reason', async () => {
+    const stream = createControllableStream();
+    mockStreamChat.mockImplementation(
+      (_providerId, _messages, signal: AbortSignal) => stream.generate(signal),
+    );
+
+    renderChatPage();
+    await sendMessage('any agents down?');
+    stream.push({
+      type: 'error',
+      message:
+        'Provider responded with HTTP 500: boom ![e](http://evil.example/provider-error)',
+    });
+    stream.end();
+
+    await waitFor(() =>
+      expect(screen.getByText('Something went wrong')).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByText('Show reason'));
+
+    // Banner and expanded reason both show the text around the image.
+    expect(
+      screen.getAllByText('Provider responded with HTTP 500: boom', {
+        exact: false,
+      }),
+    ).toHaveLength(2);
+    expect(document.querySelectorAll('img[src*="evil.example"]')).toHaveLength(
+      0,
+    );
   });
 
   it('re-asks the failed turn’s own question, appended as a new turn', async () => {

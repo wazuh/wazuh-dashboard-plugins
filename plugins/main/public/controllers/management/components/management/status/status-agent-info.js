@@ -20,6 +20,7 @@ import {
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { connect } from 'react-redux';
+import { i18n } from '@osd/i18n';
 import { API_NAME_AGENT_STATUS } from '../../../../../../common/constants';
 import { agentStatusLabelByAgentStatus } from '../../../../../../common/services/wz_agent_status';
 
@@ -61,32 +62,56 @@ export class WzStatusAgentInfo extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle size='m'>
-                  <h2>Last registered agent</h2>
+                  <h2>
+                    {i18n.translate('wazuh.serverStatus.agentInfo.title', {
+                      defaultMessage: 'Last registered agent',
+                    })}
+                  </h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Name</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate('wazuh.serverStatus.agentInfo.nameLabel', {
+              defaultMessage: 'Name',
+            })}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.name}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>ID</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate('wazuh.serverStatus.agentInfo.idLabel', {
+              defaultMessage: 'ID',
+            })}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.id}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Status</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate('wazuh.serverStatus.agentInfo.statusLabel', {
+              defaultMessage: 'Status',
+            })}
+          </EuiFlexItem>
           <EuiFlexItem style={{ ...greyStyle }}>
             {agentStatusLabelByAgentStatus(agentInfo.status)}
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>IP address</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate('wazuh.serverStatus.agentInfo.ipAddressLabel', {
+              defaultMessage: 'IP address',
+            })}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.ip}</EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>Date added</EuiFlexItem>
+          <EuiFlexItem>
+            {i18n.translate('wazuh.serverStatus.agentInfo.dateAddedLabel', {
+              defaultMessage: 'Date added',
+            })}
+          </EuiFlexItem>
           <EuiFlexItem style={greyStyle}>
             {formatUIDate(agentInfo.dateAdd)}
           </EuiFlexItem>
@@ -94,19 +119,37 @@ export class WzStatusAgentInfo extends Component {
         {status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
           <div>
             <EuiFlexGroup>
-              <EuiFlexItem>Version</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate('wazuh.serverStatus.agentInfo.versionLabel', {
+                  defaultMessage: 'Version',
+                })}
+              </EuiFlexItem>
               <EuiFlexItem style={greyStyle}>
                 {agentInfo.version || '-'}
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
-              <EuiFlexItem>Last keep alive</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'wazuh.serverStatus.agentInfo.lastKeepAliveLabel',
+                  {
+                    defaultMessage: 'Last keep alive',
+                  },
+                )}
+              </EuiFlexItem>
               <EuiFlexItem style={greyStyle}>
                 {formatUIDate(agentInfo.lastKeepAlive)}
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
-              <EuiFlexItem>Operating system</EuiFlexItem>
+              <EuiFlexItem>
+                {i18n.translate(
+                  'wazuh.serverStatus.agentInfo.operatingSystemLabel',
+                  {
+                    defaultMessage: 'Operating system',
+                  },
+                )}
+              </EuiFlexItem>
               <EuiFlexItem style={greyStyle}>
                 {operatingSystem || '-'}
               </EuiFlexItem>

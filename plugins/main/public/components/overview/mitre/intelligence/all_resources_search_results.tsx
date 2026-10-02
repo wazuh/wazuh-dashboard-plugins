@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 
 import {
   EuiAccordion,
@@ -42,13 +43,25 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
             extraAction={
               item.loadMoreResults ? (
                 <EuiButton onClick={item.loadMoreResults} size='s'>
-                  See more results
+                  {i18n.translate(
+                    'wazuh.mitreAttack.intelligenceSearchResults.seeMoreResults',
+                    { defaultMessage: 'See more results' },
+                  )}
                 </EuiButton>
               ) : undefined
             }
             buttonContent={
               <span>
-                {item.name} ({item.totalResults})
+                {i18n.translate(
+                  'wazuh.mitreAttack.intelligenceSearchResults.resourceTitle',
+                  {
+                    defaultMessage: '{name} ({totalResults})',
+                    values: {
+                      name: item.name,
+                      totalResults: item.totalResults,
+                    },
+                  },
+                )}
               </span>
             }
             paddingSize='none'
@@ -68,6 +81,12 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
       )
       .reduce((accum, cur) => [accum, <EuiSpacer size='m' />, cur])
   ) : (
-    <EuiCallOut title='No results found' color='warning' />
+    <EuiCallOut
+      title={i18n.translate(
+        'wazuh.mitreAttack.intelligenceSearchResults.noResults',
+        { defaultMessage: 'No results found' },
+      )}
+      color='warning'
+    />
   );
 });

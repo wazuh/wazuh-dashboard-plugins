@@ -10,6 +10,7 @@ import type { CurrentStateStore } from './services/state-adapter';
 import { DefaultCurrentStateStore } from './services/state-adapter';
 import type { JsonLinter } from './services/json-linter';
 import { DefaultJsonLinter } from './services/json-linter';
+import { i18n } from '@osd/i18n';
 
 /**
  * Service that encapsulates request grouping logic and related UI hooks.
@@ -294,7 +295,10 @@ export class GroupingService {
             );
             advice.id = String(new Date().getTime() / 1000);
             advice.innerText =
-              (error?.message as string) || 'Error parsing query';
+              (error?.message as string) ||
+              i18n.translate('wazuh.devTools.editor.errorParsingQuery', {
+                defaultMessage: 'Error parsing query',
+              });
             advice.className = 'lint-block-wz';
           };
 

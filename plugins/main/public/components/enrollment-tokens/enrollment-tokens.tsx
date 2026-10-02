@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   EuiFlexGroup,
@@ -103,12 +104,17 @@ export const EnrollmentTokens = () => {
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Enrollment tokens</h2>
+            <h2>
+              {i18n.translate('wazuh.enrollmentTokens.page.title', {
+                defaultMessage: 'Enrollment tokens',
+              })}
+            </h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Credentials an agent uses to enroll with the manager. The token text
-            can only be read at the moment it is created; it is never shown
-            again afterwards.
+            {i18n.translate('wazuh.enrollmentTokens.page.description', {
+              defaultMessage:
+                'Credentials an agent uses to enroll with the manager. The token text can only be read at the moment it is created; it is never shown again afterwards.',
+            })}
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -125,7 +131,9 @@ export const EnrollmentTokens = () => {
                 fill
                 onClick={() => setIsCreateFlyoutVisible(true)}
               >
-                Create token
+                {i18n.translate('wazuh.enrollmentTokens.page.createButton', {
+                  defaultMessage: 'Create token',
+                })}
               </WzButtonPermissions>
             </EuiFlexItem>
           </EuiFlexGroup>

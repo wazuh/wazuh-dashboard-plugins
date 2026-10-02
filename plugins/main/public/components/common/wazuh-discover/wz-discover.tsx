@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   EuiDataGrid,
@@ -126,7 +127,10 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   const DocViewInspectButton = ({
     rowIndex,
   }: EuiDataGridCellValueElementProps) => {
-    const inspectHintMsg = 'Inspect document details';
+    const inspectHintMsg = i18n.translate(
+      'wazuh.common.wazuhDiscover.inspectDocumentDetails',
+      { defaultMessage: 'Inspect document details' },
+    );
     return (
       <EuiToolTip content={inspectHintMsg}>
         <EuiButtonIcon
@@ -180,7 +184,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       .catch(error => {
         const searchError = ErrorFactory.create(HttpError, {
           error,
-          message: 'Error fetching data',
+          message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
+            defaultMessage: 'Error fetching data',
+          }),
         });
         ErrorHandler.handleError(searchError);
       });
@@ -230,7 +236,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     } catch (error) {
       const searchError = ErrorFactory.create(HttpError, {
         error,
-        message: 'Error downloading csv report',
+        message: i18n.translate('wazuh.common.wazuhDiscover.exportCsvError', {
+          defaultMessage: 'Error downloading csv report',
+        }),
       });
       ErrorHandler.handleError(searchError);
     } finally {

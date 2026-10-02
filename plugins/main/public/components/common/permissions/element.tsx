@@ -13,6 +13,7 @@
 import React, { Fragment } from 'react';
 import { useUserPermissionsRequirements } from '../hooks/useUserPermissions';
 import { EuiToolTip, EuiSpacer } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { WzPermissionsFormatted } from './format';
 import { useUserPermissionsIsAdminRequirements } from '../hooks/use-user-is-admin';
 
@@ -72,11 +73,14 @@ export const WzElementPermissions = ({
       {userPermissionRequirements && (
         <div>
           <div>
-            Require the{' '}
-            {userPermissionRequirements.length === 1
-              ? 'permission'
-              : 'permissions'}
-            :
+            {i18n.translate(
+              'wazuh.common.permissionsElement.requiredPermissions',
+              {
+                defaultMessage:
+                  'Require the {count, plural, one {permission} other {permissions}}:',
+                values: { count: userPermissionRequirements.length },
+              },
+            )}
           </div>
           {WzPermissionsFormatted(userPermissionRequirements)}
         </div>
@@ -86,8 +90,14 @@ export const WzElementPermissions = ({
       )}
       {administrator && userRequireAdministratorRequirements && (
         <div>
-          Require administrator privilegies:{' '}
-          {userRequireAdministratorRequirements}
+          {i18n.translate(
+            'wazuh.common.permissionsElement.requiredAdministrator',
+            {
+              defaultMessage:
+                'Require administrator privilegies: {administrator}',
+              values: { administrator: userRequireAdministratorRequirements },
+            },
+          )}
         </div>
       )}
     </Fragment>

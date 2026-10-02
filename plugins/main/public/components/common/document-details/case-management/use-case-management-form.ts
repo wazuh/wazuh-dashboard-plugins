@@ -11,6 +11,7 @@
  */
 
 import { useCallback, useEffect, useReducer } from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiComboBoxOptionOption } from '@elastic/eui';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import {
@@ -463,15 +464,33 @@ export function useCaseManagementForm(
       return;
     }
 
-    const missingRequiredField = [
-      ['Status', state.status],
-      ['Title', state.title.trim()],
-      ['Severity', state.severity],
-    ].find(([, value]) => !value)?.[0];
-    if (missingRequiredField) {
+    const missingRequiredFieldMessage = [
+      {
+        value: state.status,
+        message: i18n.translate(
+          'wazuh.common.caseManagementForm.statusRequired',
+          { defaultMessage: 'Status is required' },
+        ),
+      },
+      {
+        value: state.title.trim(),
+        message: i18n.translate(
+          'wazuh.common.caseManagementForm.titleRequired',
+          { defaultMessage: 'Title is required' },
+        ),
+      },
+      {
+        value: state.severity,
+        message: i18n.translate(
+          'wazuh.common.caseManagementForm.severityRequired',
+          { defaultMessage: 'Severity is required' },
+        ),
+      },
+    ].find(({ value }) => !value)?.message;
+    if (missingRequiredFieldMessage) {
       getToasts().add({
         color: 'warning',
-        title: `${missingRequiredField} is required`,
+        title: missingRequiredFieldMessage,
         toastLifeTimeMs: 3000,
       });
       return;
@@ -515,7 +534,13 @@ export function useCaseManagementForm(
       onSaveSuccess?.(savedCase);
       getToasts().add({
         color: 'success',
-        title: isNewCase ? 'Case created' : 'Case updated',
+        title: isNewCase
+          ? i18n.translate('wazuh.common.caseManagementToast.caseCreated', {
+              defaultMessage: 'Case created',
+            })
+          : i18n.translate('wazuh.common.caseManagementToast.caseUpdated', {
+              defaultMessage: 'Case updated',
+            }),
         toastLifeTimeMs: 3000,
       });
     } catch (error: unknown) {
@@ -527,8 +552,14 @@ export function useCaseManagementForm(
         error: {
           error,
           message:
-            error instanceof Error ? error.message : 'Could not save case data',
-          title: 'Case management error',
+            error instanceof Error
+              ? error.message
+              : i18n.translate('wazuh.common.caseManagementToast.saveError', {
+                  defaultMessage: 'Could not save case data',
+                }),
+          title: i18n.translate('wazuh.common.caseManagementToast.errorTitle', {
+            defaultMessage: 'Case management error',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -570,7 +601,9 @@ export function useCaseManagementForm(
       onSaveSuccess?.(cleanedCase);
       getToasts().add({
         color: 'success',
-        title: 'Case cleaned',
+        title: i18n.translate('wazuh.common.caseManagementToast.caseCleaned', {
+          defaultMessage: 'Case cleaned',
+        }),
         toastLifeTimeMs: 3000,
       });
     } catch (error: unknown) {
@@ -584,8 +617,12 @@ export function useCaseManagementForm(
           message:
             error instanceof Error
               ? error.message
-              : 'Could not clean case data',
-          title: 'Case management error',
+              : i18n.translate('wazuh.common.caseManagementToast.cleanError', {
+                  defaultMessage: 'Could not clean case data',
+                }),
+          title: i18n.translate('wazuh.common.caseManagementToast.errorTitle', {
+            defaultMessage: 'Case management error',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -645,8 +682,14 @@ export function useCaseManagementForm(
             message:
               error instanceof Error
                 ? error.message
-                : 'Could not save the comment',
-            title: 'Case management error',
+                : i18n.translate(
+                    'wazuh.common.caseManagementToast.commentSaveError',
+                    { defaultMessage: 'Could not save the comment' },
+                  ),
+            title: i18n.translate(
+              'wazuh.common.caseManagementToast.errorTitle',
+              { defaultMessage: 'Case management error' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -673,7 +716,9 @@ export function useCaseManagementForm(
     }
     const saved = await submitComment(
       { newComment: trimmed },
-      'Comment added',
+      i18n.translate('wazuh.common.caseManagementToast.commentAdded', {
+        defaultMessage: 'Comment added',
+      }),
       'CaseManagementTab.handleCommentAdd',
     );
     if (saved) {
@@ -698,7 +743,9 @@ export function useCaseManagementForm(
       }
       return submitComment(
         { editedComments: [{ created_at: createdAt, comment: trimmed }] },
-        'Comment updated',
+        i18n.translate('wazuh.common.caseManagementToast.commentUpdated', {
+          defaultMessage: 'Comment updated',
+        }),
         'CaseManagementTab.handleCommentEditSave',
       );
     },
@@ -713,7 +760,9 @@ export function useCaseManagementForm(
       }
       return submitComment(
         { deletedComments: [createdAt] },
-        'Comment deleted',
+        i18n.translate('wazuh.common.caseManagementToast.commentDeleted', {
+          defaultMessage: 'Comment deleted',
+        }),
         'CaseManagementTab.handleCommentDelete',
       );
     },

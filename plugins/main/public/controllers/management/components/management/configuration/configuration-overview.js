@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import './configuration-overview.scss';
 
@@ -55,15 +56,27 @@ import { updateWazuhNotReadyYet } from '../../../../../redux/actions/appStateAct
 
 const helpLinks = [
   {
-    text: 'Server administration',
+    text: i18n.translate(
+      'wazuh.configuration.overview.serverAdministrationHelpLink',
+      {
+        defaultMessage: 'Server administration',
+      },
+    ),
     href: webDocumentationLink('user-manual/manager/index.html'),
   },
   {
-    text: 'Capabilities',
+    text: i18n.translate('wazuh.configuration.overview.capabilitiesHelpLink', {
+      defaultMessage: 'Capabilities',
+    }),
     href: webDocumentationLink('user-manual/capabilities/index.html'),
   },
   {
-    text: 'Local configuration reference',
+    text: i18n.translate(
+      'wazuh.configuration.overview.localConfigurationReferenceHelpLink',
+      {
+        defaultMessage: 'Local configuration reference',
+      },
+    ),
     href: webDocumentationLink('user-manual/manager/reference.html'),
   },
 ];
@@ -177,16 +190,21 @@ class WzConfigurationOverview extends Component {
       );
     }, SEARCH_BAR_DEBOUNCE_UPDATE_TIME);
   };
-  entryMatchesQuery(entry, q, values) {
+  entryMatchesQuery(entry, q, values, categoryTitle) {
     if (!q) {
       return true;
     }
     const value = values?.[entry.id];
+    /* `label`/`description`/`title` are already translated. `category` is an
+    untranslated key, so the translated category title the user sees is
+    matched too (identical to `category` in English, so English results are
+    unchanged). `tab` is never displayed as-is -- kept only as before. */
     const haystack = [
       entry.label,
       entry.description,
       entry.category,
       entry.tab,
+      categoryTitle,
     ];
     if (entry.kind === 'list') {
       haystack.push(entry.title, entry.description);
@@ -252,7 +270,7 @@ class WzConfigurationOverview extends Component {
                 this.entryMatchesPlatform(entry, agentPlatform),
             );
             const matching = entries.filter(entry =>
-              this.entryMatchesQuery(entry, q, values),
+              this.entryMatchesQuery(entry, q, values, setting.name),
             );
             if (matching.length === 0) {
               return null;
@@ -390,7 +408,11 @@ class WzConfigurationOverview extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle>
-              <span>Configuration</span>
+              <span>
+                {i18n.translate('wazuh.configuration.overview.title', {
+                  defaultMessage: 'Configuration',
+                })}
+              </span>
             </EuiTitle>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
@@ -433,13 +455,28 @@ class WzConfigurationOverview extends Component {
                       onClick={() =>
                         this.props.updateConfigurationSection(
                           'edit-configuration',
-                          `Cluster configuration`,
+                          i18n.translate(
+                            'wazuh.configuration.overview.editConfigurationViewTitle',
+                            {
+                              defaultMessage: 'Cluster configuration',
+                            },
+                          ),
                           '',
-                          'Edit configuration',
+                          i18n.translate(
+                            'wazuh.configuration.overview.editConfigurationViewDescription',
+                            {
+                              defaultMessage: 'Edit configuration',
+                            },
+                          ),
                         )
                       }
                     >
-                      Edit configuration
+                      {i18n.translate(
+                        'wazuh.configuration.overview.editConfigurationButton',
+                        {
+                          defaultMessage: 'Edit configuration',
+                        },
+                      )}
                     </WzButtonPermissions>
                   </EuiFlexItem>
                   {this.props.clusterNodes &&
@@ -462,7 +499,12 @@ class WzConfigurationOverview extends Component {
               isClearable
               isLoading={searchLoading}
               disabled={searchLoading}
-              placeholder='Search settings...'
+              placeholder={i18n.translate(
+                'wazuh.configuration.overview.searchPlaceholder',
+                {
+                  defaultMessage: 'Search settings...',
+                },
+              )}
               value={query}
               onChange={this.onChangeQuery}
             />
@@ -471,8 +513,21 @@ class WzConfigurationOverview extends Component {
                 <EuiSpacer size='xs' />
                 <EuiText size='xs' color={searchError ? 'danger' : 'subdued'}>
                   {searchError
-                    ? "Couldn't load settings to search. Try Refresh, or search again shortly."
-                    : `${matchCount} of ${indexedCount} settings`}
+                    ? i18n.translate(
+                        'wazuh.configuration.overview.searchLoadError',
+                        {
+                          defaultMessage:
+                            "Couldn't load settings to search. Try Refresh, or search again shortly.",
+                        },
+                      )
+                    : i18n.translate(
+                        'wazuh.configuration.overview.searchMatchCount',
+                        {
+                          defaultMessage:
+                            '{matchCount} of {indexedCount} settings',
+                          values: { matchCount, indexedCount },
+                        },
+                      )}
                 </EuiText>
               </Fragment>
             )}
@@ -491,7 +546,17 @@ class WzConfigurationOverview extends Component {
             {groupedSettings.length === 0 && query ? (
               <EuiEmptyPrompt
                 titleSize='s'
-                title={<h3>No settings match &quot;{query}&quot;</h3>}
+                title={
+                  <h3>
+                    {i18n.translate(
+                      'wazuh.configuration.overview.noSettingsMatch',
+                      {
+                        defaultMessage: 'No settings match "{query}"',
+                        values: { query },
+                      },
+                    )}
+                  </h3>
+                }
               />
             ) : (
               selectedCategory && (

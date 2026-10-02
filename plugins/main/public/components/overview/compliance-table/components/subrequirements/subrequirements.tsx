@@ -26,7 +26,12 @@ import {
   EuiIcon,
   EuiLoadingSpinner,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RequirementFlyout } from '../requirement-flyout';
+import {
+  PatternDataSourceFilterManager,
+  FILTER_OPERATOR,
+} from '../../../../common/data-source';
 import { getDataPlugin } from '../../../../../kibana-services';
 import NavigationService from '../../../../../react-services/navigation-service';
 import {
@@ -37,18 +42,30 @@ import {
   WAZUH_MODULES_ID,
 } from '../../../../../../common/constants';
 import { WAZUH_MODULES } from '../../../../../../common/wazuh-modules';
+import {
+  getRequirementLabel,
+  getRequirementName,
+} from '../../../../../../common/compliance-requirements/requirement-text';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
 // real requirement codes or looked up in `descriptions`.
 const OTHERS_REQUIREMENT_ID = 'others';
-const OTHERS_REQUIREMENT_LABEL = 'Others';
+const OTHERS_REQUIREMENT_LABEL = i18n.translate(
+  'wazuh.complianceTable.subrequirements.othersLabel',
+  {
+    defaultMessage: 'Others',
+  },
+);
 
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
   state: {};
 
-  props!: {};
+  props!: {
+    requirementCounts?: Record<string, number>;
+    requirementCodes?: Record<string, string[]>;
+  };
 
   constructor(props) {
     super(props);
@@ -72,20 +89,33 @@ export class ComplianceSubrequirements extends Component {
    */
   addFilter(filter) {
     const { filterManager } = getDataPlugin().query;
-    const matchPhrase = {};
-    matchPhrase[filter.key] = filter.value;
-    const newFilter = {
-      meta: {
-        disabled: false,
-        key: filter.key,
-        params: { query: filter.value },
-        type: 'phrase',
-        negate: filter.negate || false,
-        index: this.props.indexPatternId,
-      },
-      query: { match_phrase: matchPhrase },
-      $state: { store: 'appState' },
-    };
+    // The ruleset can name the requirement in its own notation, so the filter
+    // accepts every code of the requirement, like the flyout does. Otherwise
+    // the view it opens holds fewer findings than the tile counts.
+    const values = this.props.requirementCodes?.[filter.value] || [
+      filter.value,
+    ];
+    const [value] = values;
+    const newFilter =
+      values.length > 1
+        ? PatternDataSourceFilterManager.createFilter(
+            FILTER_OPERATOR.IS_ONE_OF,
+            filter.key,
+            values,
+            this.props.indexPatternId,
+          )
+        : {
+            meta: {
+              disabled: false,
+              key: filter.key,
+              params: { query: value },
+              type: 'phrase',
+              negate: filter.negate || false,
+              index: this.props.indexPatternId,
+            },
+            query: { match_phrase: { [filter.key]: value } },
+            $state: { store: 'appState' },
+          };
     filterManager.addFilters([newFilter]);
   }
 
@@ -129,7 +159,7 @@ export class ComplianceSubrequirements extends Component {
 
   renderFacet() {
     const { complianceObject } = this.props;
-    const { requirementsCount } = this.props;
+    const requirementCounts = this.props.requirementCounts || {};
     const tacticsToRender: Array<any> = [];
     const showTechniques = {};
 
@@ -139,16 +169,19 @@ export class ComplianceSubrequirements extends Component {
         currentTechniques.forEach((technique, idx) => {
           if (
             !showTechniques[technique] &&
+            // Matched against the identifier and the name shown on the tile
+            // only: the description of a titled requirement holds its full
+            // text, where a common word matches nearly every requirement.
             (technique
               .toLowerCase()
               .includes(this.state.searchValue.toLowerCase()) ||
-              this.props.descriptions[technique]
+              getRequirementName(this.props.descriptions[technique])
                 .toLowerCase()
                 .includes(this.state.searchValue.toLowerCase()))
           ) {
-            const quantity =
-              (requirementsCount.find(item => item.key === technique) || {})
-                .doc_count || 0;
+            // Counted over every code of the requirement, so a finding that
+            // carries several of them counts once.
+            const quantity = requirementCounts[technique] || 0;
             if (
               !this.state.hideAlerts ||
               (this.state.hideAlerts && quantity > 0)
@@ -156,7 +189,10 @@ export class ComplianceSubrequirements extends Component {
               showTechniques[technique] = true;
               tacticsToRender.push({
                 id: technique,
-                label: `${technique} - ${this.props.descriptions[technique]}`,
+                label: getRequirementLabel(
+                  technique,
+                  this.props.descriptions[technique],
+                ),
                 quantity,
               });
             }
@@ -191,10 +227,26 @@ export class ComplianceSubrequirements extends Component {
       .sort((a, b) => b.quantity - a.quantity)
       .map((item, idx) => {
         const tooltipContent = item.isOthers
-          ? 'View details of Others. This count sums occurrences of unknown requirement values — a finding tagged with more than one unknown value is counted once per value, so the total can exceed the number of distinct findings.'
-          : `View details of ${item.id}`;
-        const tooltipNoOthersContent =
-          'There are no findings matching this requirement';
+          ? i18n.translate(
+              'wazuh.complianceTable.subrequirements.othersTooltip',
+              {
+                defaultMessage:
+                  'View details of Others. This count sums occurrences of unknown requirement values — a finding tagged with more than one unknown value is counted once per value, so the total can exceed the number of distinct findings.',
+              },
+            )
+          : i18n.translate(
+              'wazuh.complianceTable.subrequirements.viewDetailsTooltip',
+              {
+                defaultMessage: 'View details of {requirement}',
+                values: { requirement: item.id },
+              },
+            );
+        const tooltipNoOthersContent = i18n.translate(
+          'wazuh.complianceTable.subrequirements.noFindingsTooltip',
+          {
+            defaultMessage: 'There are no findings matching this requirement',
+          },
+        );
         const toolTipAnchorClass =
           'wz-display-inline-grid' +
           (this.state.hover === item.id ? ' wz-mitre-width' : ' ');
@@ -245,9 +297,7 @@ export class ComplianceSubrequirements extends Component {
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {item.isOthers
-                        ? item.label
-                        : `${item.id} - ${this.props.descriptions[item.id]}`}
+                      {item.label}
                     </span>
                   </EuiToolTip>
 
@@ -257,7 +307,16 @@ export class ComplianceSubrequirements extends Component {
                     >
                       <EuiToolTip
                         position='top'
-                        content={`Show ${item.id} in ${TAB_VIEW_NAME_DASHBOARD}`}
+                        content={i18n.translate(
+                          'wazuh.complianceTable.subrequirements.showInDashboardTooltip',
+                          {
+                            defaultMessage: 'Show {requirement} in {view}',
+                            values: {
+                              requirement: item.id,
+                              view: TAB_VIEW_NAME_DASHBOARD,
+                            },
+                          },
+                        )}
                       >
                         <EuiIcon
                           onMouseDown={e => {
@@ -271,7 +330,16 @@ export class ComplianceSubrequirements extends Component {
                       &nbsp;
                       <EuiToolTip
                         position='top'
-                        content={`Inspect ${item.id} in ${TAB_VIEW_NAME_EVENTS}`}
+                        content={i18n.translate(
+                          'wazuh.complianceTable.subrequirements.inspectInEventsTooltip',
+                          {
+                            defaultMessage: 'Inspect {requirement} in {view}',
+                            values: {
+                              requirement: item.id,
+                              view: TAB_VIEW_NAME_EVENTS,
+                            },
+                          },
+                        )}
                       >
                         <EuiIcon
                           onMouseDown={e => {
@@ -317,7 +385,12 @@ export class ComplianceSubrequirements extends Component {
     } else {
       return (
         <EuiCallOut
-          title='There are no results.'
+          title={i18n.translate(
+            'wazuh.complianceTable.subrequirements.noResultsTitle',
+            {
+              defaultMessage: 'There are no results.',
+            },
+          )}
           iconType='help'
           color='warning'
         ></EuiCallOut>
@@ -341,13 +414,39 @@ export class ComplianceSubrequirements extends Component {
     });
   }
 
+  getFlyoutTitle(requirement) {
+    // The title is the short name of the requirement, when it has one.
+    return requirement?.title
+      ? i18n.translate(
+          'wazuh.complianceTable.subrequirements.flyoutTitleWithName',
+          {
+            defaultMessage: 'Requirement {requirement} - {title}',
+            values: {
+              requirement: this.state.selectedRequirement,
+              title: requirement.title,
+            },
+          },
+        )
+      : i18n.translate('wazuh.complianceTable.subrequirements.flyoutTitle', {
+          defaultMessage: 'Requirement {requirement}',
+          values: { requirement: this.state.selectedRequirement },
+        });
+  }
+
   render() {
+    const selectedRequirement =
+      this.props.descriptions[this.state.selectedRequirement];
+
     return (
       <div style={{ padding: 10 }}>
         <EuiFlexGroup>
           <EuiFlexItem grow={true}>
             <EuiTitle size='m'>
-              <h1>Requirements</h1>
+              <h1>
+                {i18n.translate('wazuh.complianceTable.subrequirements.title', {
+                  defaultMessage: 'Requirements',
+                })}
+              </h1>
             </EuiTitle>
           </EuiFlexItem>
 
@@ -355,7 +454,15 @@ export class ComplianceSubrequirements extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiText grow={false}>
-                  <span>Hide requirements with no findings </span> &nbsp;
+                  <span>
+                    {i18n.translate(
+                      'wazuh.complianceTable.subrequirements.hideNoFindingsLabel',
+                      {
+                        defaultMessage: 'Hide requirements with no findings',
+                      },
+                    )}{' '}
+                  </span>{' '}
+                  &nbsp;
                   <EuiSwitch
                     label=''
                     checked={this.state.hideAlerts}
@@ -370,11 +477,21 @@ export class ComplianceSubrequirements extends Component {
 
         <EuiFieldSearch
           fullWidth={true}
-          placeholder='Filter requirements'
+          placeholder={i18n.translate(
+            'wazuh.complianceTable.subrequirements.searchPlaceholder',
+            {
+              defaultMessage: 'Filter requirements',
+            },
+          )}
           value={this.state.searchValue}
           onChange={e => this.onSearchValueChange(e)}
           isClearable={true}
-          aria-label='Use aria labels when no actual label is in use'
+          aria-label={i18n.translate(
+            'wazuh.complianceTable.subrequirements.searchAriaLabel',
+            {
+              defaultMessage: 'Use aria labels when no actual label is in use',
+            },
+          )}
         />
         <EuiSpacer size='s' />
 
@@ -394,7 +511,7 @@ export class ComplianceSubrequirements extends Component {
               />
             </EuiFlexItem>
           ) : (
-            this.props.requirementsCount && this.renderFacet()
+            this.renderFacet()
           )}
         </div>
 
@@ -403,8 +520,13 @@ export class ComplianceSubrequirements extends Component {
             currentRequirement={this.state.selectedRequirement}
             title={
               this.state.isOthersSelected
-                ? 'Other requirements'
-                : `Requirement ${this.state.selectedRequirement}`
+                ? i18n.translate(
+                    'wazuh.complianceTable.subrequirements.othersFlyoutTitle',
+                    {
+                      defaultMessage: 'Other requirements',
+                    },
+                  )
+                : this.getFlyoutTitle(selectedRequirement)
             }
             isOthers={this.state.isOthersSelected}
             othersBuckets={
@@ -414,10 +536,18 @@ export class ComplianceSubrequirements extends Component {
             onChangeFlyout={this.onChangeFlyout}
             description={
               this.state.isOthersSelected
-                ? `Findings whose compliance requirement value does not match any of the known, documented ${
-                    WAZUH_MODULES[this.props.section]?.title || ''
-                  } requirement identifiers.`
-                : this.props.descriptions[this.state.selectedRequirement]
+                ? i18n.translate(
+                    'wazuh.complianceTable.subrequirements.othersDescription',
+                    {
+                      defaultMessage:
+                        'Findings whose compliance requirement value does not match any of the known, documented {framework} requirement identifiers.',
+                      values: {
+                        framework:
+                          WAZUH_MODULES[this.props.section]?.title || '',
+                      },
+                    },
+                  )
+                : selectedRequirement?.description || ''
             }
             getRequirementKey={() => {
               return this.getRequirementKey();

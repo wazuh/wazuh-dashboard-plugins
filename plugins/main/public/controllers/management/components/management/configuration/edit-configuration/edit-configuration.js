@@ -12,6 +12,8 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 
 import {
   EuiButton,
@@ -89,8 +91,11 @@ class WzEditConfiguration extends Component {
             <EuiIcon type='check' />
             &nbsp;
             <span>
-              <b>{this.props.clusterNodeSelected}</b> configuration has been
-              updated
+              <FormattedMessage
+                id='wazuh.configuration.editConfiguration.savedToast'
+                defaultMessage='{nodeName} configuration has been updated'
+                values={{ nodeName: <b>{this.props.clusterNodeSelected}</b> }}
+              />
             </span>
           </Fragment>
         ),
@@ -100,7 +105,14 @@ class WzEditConfiguration extends Component {
       let errorMessage;
       if (error instanceof Error) {
         errorMessage = error.details
-          ? `Configuration saved, but some validation errors were found.\n${error.details}`
+          ? i18n.translate(
+              'wazuh.configuration.editConfiguration.savedWithValidationErrors',
+              {
+                defaultMessage:
+                  'Configuration saved, but some validation errors were found.\n{details}',
+                values: { details: error.details },
+              },
+            )
           : String(error);
       }
       this.setState({ saving: false, infoChangesAfterRestart: false });
@@ -111,7 +123,10 @@ class WzEditConfiguration extends Component {
         error: {
           error: error,
           message: errorMessage || error,
-          title: 'Error found saving the file.',
+          title: i18n.translate(
+            'wazuh.configuration.editConfiguration.saveErrorTitle',
+            { defaultMessage: 'Error found saving the file.' },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -183,8 +198,13 @@ class WzEditConfiguration extends Component {
               <EuiIcon type='iInCircle' />
               &nbsp;
               <span>
-                Nodes could take some time to restart, it may be necessary to
-                perform a refresh to see them all.
+                {i18n.translate(
+                  'wazuh.configuration.editConfiguration.restartNodesToast',
+                  {
+                    defaultMessage:
+                      'Nodes could take some time to restart, it may be necessary to perform a refresh to see them all.',
+                  },
+                )}
               </span>
             </Fragment>
           ),
@@ -224,7 +244,9 @@ class WzEditConfiguration extends Component {
       );
       this.props.updateConfigurationSection(
         'edit-configuration',
-        'Cluster configuration',
+        i18n.translate('wazuh.configuration.editConfiguration.title', {
+          defaultMessage: 'Cluster configuration',
+        }),
       );
     } catch (error) {
       this.props.updateClusterNodes(false);
@@ -245,7 +267,9 @@ class WzEditConfiguration extends Component {
     return (
       <Fragment>
         <WzConfigurationPath
-          title='Cluster configuration'
+          title={i18n.translate('wazuh.configuration.editConfiguration.title', {
+            defaultMessage: 'Cluster configuration',
+          })}
           updateConfigurationSection={this.props.updateConfigurationSection}
           hasChanges={this.state.hasChanges}
         >
@@ -255,7 +279,10 @@ class WzEditConfiguration extends Component {
           <EuiFlexItem grow={false}>
             {xmlError ? (
               <EuiButton iconType='alert' isDisabled>
-                XML format error
+                {i18n.translate(
+                  'wazuh.configuration.editConfiguration.xmlFormatErrorButton',
+                  { defaultMessage: 'XML format error' },
+                )}
               </EuiButton>
             ) : (
               <WzButtonPermissions
@@ -273,7 +300,10 @@ class WzEditConfiguration extends Component {
                 iconType='save'
                 onClick={() => this.editorSave()}
               >
-                Save
+                {i18n.translate(
+                  'wazuh.configuration.editConfiguration.saveButton',
+                  { defaultMessage: 'Save' },
+                )}
               </WzButtonPermissions>
             )}
           </EuiFlexItem>
@@ -291,7 +321,21 @@ class WzEditConfiguration extends Component {
               isDisabled={disableSaveRestartButtons || restarting}
               isLoading={restarting}
             >
-              {restarting ? 'Restarting' : 'Restart'} {clusterNodeSelected}
+              {restarting
+                ? i18n.translate(
+                    'wazuh.configuration.editConfiguration.restartingButton',
+                    {
+                      defaultMessage: 'Restarting {nodeName}',
+                      values: { nodeName: clusterNodeSelected },
+                    },
+                  )
+                : i18n.translate(
+                    'wazuh.configuration.editConfiguration.restartButton',
+                    {
+                      defaultMessage: 'Restart {nodeName}',
+                      values: { nodeName: clusterNodeSelected },
+                    },
+                  )}
             </WzButtonPermissions>
           </EuiFlexItem>
         </WzConfigurationPath>
@@ -310,11 +354,23 @@ class WzEditConfiguration extends Component {
         {restart && !restarting && (
           <EuiOverlayMask>
             <EuiConfirmModal
-              title={`${clusterNodeSelected} will be restarted`}
+              title={i18n.translate(
+                'wazuh.configuration.editConfiguration.restartModalTitle',
+                {
+                  defaultMessage: '{nodeName} will be restarted',
+                  values: { nodeName: clusterNodeSelected },
+                },
+              )}
               onCancel={() => this.toggleRestart()}
               onConfirm={() => this.confirmRestart()}
-              cancelButtonText='Cancel'
-              confirmButtonText='Confirm'
+              cancelButtonText={i18n.translate(
+                'wazuh.configuration.editConfiguration.restartModalCancel',
+                { defaultMessage: 'Cancel' },
+              )}
+              confirmButtonText={i18n.translate(
+                'wazuh.configuration.editConfiguration.restartModalConfirm',
+                { defaultMessage: 'Confirm' },
+              )}
               defaultFocusedButton='cancel'
             />
           </EuiOverlayMask>
@@ -404,25 +460,47 @@ const WzEditorConfiguration = compose(
           {!this.props.errorXMLFetched ? (
             <Fragment>
               <EuiText>
-                Edit{' '}
-                <span style={{ fontWeight: 'bold' }}>wazuh-manager.conf</span>{' '}
-                of{' '}
-                <span style={{ fontWeight: 'bold' }}>
-                  {clusterNodeSelected}
-                  {existsClusterCurrentNodeSelected && clusterNodes
-                    ? ' (' +
-                      clusterNodes.find(
-                        node => node.name === clusterNodeSelected,
-                      ).type +
-                      ')'
-                    : ''}
-                </span>
+                <FormattedMessage
+                  id='wazuh.configuration.editConfiguration.editFileTitle'
+                  defaultMessage='Edit {fileName} of {nodeName}'
+                  values={{
+                    fileName: (
+                      <span style={{ fontWeight: 'bold' }}>
+                        wazuh-manager.conf
+                      </span>
+                    ),
+                    nodeName: (
+                      <span style={{ fontWeight: 'bold' }}>
+                        {existsClusterCurrentNodeSelected && clusterNodes
+                          ? i18n.translate(
+                              'wazuh.configuration.editConfiguration.nodeWithType',
+                              {
+                                defaultMessage: '{nodeName} ({nodeType})',
+                                values: {
+                                  nodeName: clusterNodeSelected,
+                                  nodeType: clusterNodes.find(
+                                    node => node.name === clusterNodeSelected,
+                                  ).type,
+                                },
+                              },
+                            )
+                          : clusterNodeSelected}
+                      </span>
+                    ),
+                  }}
+                />
                 {xmlError && <span style={{ color: 'red' }}> {xmlError}</span>}
               </EuiText>
               {infoChangesAfterRestart && (
                 <EuiCallOut
                   iconType='iInCircle'
-                  title='Changes will not take effect until a restart is performed.'
+                  title={i18n.translate(
+                    'wazuh.configuration.editConfiguration.restartRequiredCallout',
+                    {
+                      defaultMessage:
+                        'Changes will not take effect until a restart is performed.',
+                    },
+                  )}
                 />
               )}
               <EuiSpacer size='s' />

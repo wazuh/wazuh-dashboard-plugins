@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import { i18n } from '@osd/i18n';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
@@ -60,7 +61,10 @@ class WzGroups extends Component {
           error: {
             error: error,
             message: error.message || error,
-            title: `Error accessing the group`,
+            title: i18n.translate(
+              'wazuh.endpointGroups.main.errorAccessingGroupTitle',
+              { defaultMessage: 'Error accessing the group' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);

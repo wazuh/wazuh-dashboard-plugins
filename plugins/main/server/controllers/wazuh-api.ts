@@ -19,8 +19,11 @@ import {
 } from '../../common/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../lib/api-errors-equivalence';
 import apiRequestList from '../../common/api-info/endpoints';
-import { HTTP_STATUS_CODES } from '../../common/constants';
-import { addJobToQueue } from '../start/queue';
+import {
+  HTTP_STATUS_CODES,
+  WAZUH_QUEUE_MAX_DELAY_MS,
+} from '../../common/constants';
+import { addJobToQueue, isValidJobDelay } from '../start/queue';
 import jwtDecode from 'jwt-decode';
 import {
   OpenSearchDashboardsRequest,
@@ -36,8 +39,34 @@ import { extractErrorMessage } from '../lib/extract-error-message';
 import { detectCCS } from '../lib/ccs-detector';
 import { neutralizeCsvFormulaValues } from '../../common/services/neutralize-csv-formula';
 
+const INVALID_DELAY_MESSAGE = `Request delay is not valid. It must be an integer from 0 to ${WAZUH_QUEUE_MAX_DELAY_MS} milliseconds.`;
+// Shared owner of the delayed requests whose user cannot be resolved
+const UNKNOWN_DELAYED_JOB_OWNER = 'unknown';
+
 export class WazuhApiCtrl {
   constructor() {}
+
+  private async getDelayedJobOwner(
+    context: RequestHandlerContext,
+    request?: OpenSearchDashboardsRequest,
+  ): Promise<string> {
+    try {
+      const { username } = await context.wazuh.security.getCurrentUser(
+        request,
+        context,
+      );
+      if (typeof username === 'string' && username) {
+        return username;
+      }
+    } catch (error) {
+      context.wazuh.logger.warn(
+        `Could not resolve the current user for a delayed request: ${
+          error?.message ?? error
+        }`,
+      );
+    }
+    return UNKNOWN_DELAYED_JOB_OWNER;
+  }
 
   private async resolveHostId(
     context: RequestHandlerContext,
@@ -162,50 +191,23 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`${id} exists`);
 
-      // Fetch needed information about the cluster local node
-      const responseClusterInfo =
-        await context.wazuh.api.client.asInternalUser.request(
-          'get',
-          `/cluster/local/info`,
-          {},
-          { apiHostID: id, forceRefresh: true },
-        );
-
-      // Look for socket-related errors
-      if (this.checkResponseIsDown(context, responseClusterInfo)) {
-        return ErrorResponse(
-          `ERROR3099 - ${responseClusterInfo.detail || 'Server not ready yet'}`,
-          3099,
-          HTTP_STATUS_CODES.SERVICE_UNAVAILABLE,
-          response,
-        );
-      }
-
-      // If we have a valid response from the Wazuh API
-      try {
-        const { node, cluster } =
-          await context.wazuh_core.manageHosts.getRegistryDataByHost(
-            apiHostData,
-            {
-              throwError: true,
-            },
-          );
-
-        api.cluster_info = { node, cluster };
-
-        return response.ok({
-          body: {
-            statusCode: HTTP_STATUS_CODES.OK,
-            data: api,
-            idChanged: request.body.idChanged || null,
+      const { node, cluster } =
+        await context.wazuh_core.manageHosts.getRegistryDataByHost(
+          apiHostData,
+          {
+            throwError: true,
           },
-        });
-      } catch (error) {
-        // If we have an invalid response from the Wazuh API
-        throw new Error(
-          responseClusterInfo.detail || `${api.url}:${api.port} is unreachable`,
         );
-      }
+
+      api.cluster_info = { node, cluster };
+
+      return response.ok({
+        body: {
+          statusCode: HTTP_STATUS_CODES.OK,
+          data: api,
+          idChanged: request.body.idChanged || null,
+        },
+      });
     } catch (error) {
       if (error.code === 'EPROTO') {
         return response.ok({
@@ -421,9 +423,33 @@ export class WazuhApiCtrl {
    * @param {Object} response
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(context, method, path, data, id, response) {
+  async makeRequest(
+    context,
+    method,
+    path,
+    data,
+    id,
+    response,
+    request?: OpenSearchDashboardsRequest,
+  ) {
     const devTools = !!(data || {}).devTools;
     try {
+      const hasDelay =
+        typeof data === 'object' &&
+        data !== null &&
+        !Array.isArray(data) &&
+        Object.prototype.hasOwnProperty.call(data, 'delay');
+      // A null delay sends the request right away
+      const delay = hasDelay ? data.delay ?? 0 : 0;
+      if (!isValidJobDelay(delay)) {
+        return ErrorResponse(
+          INVALID_DELAY_MESSAGE,
+          3015,
+          HTTP_STATUS_CODES.BAD_REQUEST,
+          response,
+        );
+      }
+
       let api;
       try {
         api = await context.wazuh_core.manageHosts.get(id, {
@@ -480,15 +506,15 @@ export class WazuhApiCtrl {
         data.headers['content-type'] = 'application/octet-stream';
         delete data.origin;
       }
-      const delay = (data || {}).delay || 0;
-      if (delay) {
-        // Remove the delay parameter that is used to add the sever API request to the queue job.
-        // This assumes the delay parameter is not used as part of the server API request. If it
-        // was expected to do a request with a 'delay' parameter then we would have to search a
-        // way to differenciate if the parameter is related to job queue or API request.
+      // The delay parameter only schedules the request, so it is never sent to the server API.
+      if (hasDelay) {
         delete data.delay;
-        addJobToQueue({
+      }
+      if (delay) {
+        const owner = await this.getDelayedJobOwner(context, request);
+        const admission = addJobToQueue({
           startAt: new Date(Date.now() + delay),
+          owner,
           run: async contextJob => {
             try {
               await context.wazuh.api.client.asCurrentUser.request(
@@ -506,6 +532,19 @@ export class WazuhApiCtrl {
             }
           },
         });
+        if (admission.added === false) {
+          context.wazuh.logger.warn(
+            `Delayed request rejected (${admission.reason}) for user [${owner}]: ${method} ${path}`,
+          );
+          return ErrorResponse(
+            admission.reason === 'owner_queue_full'
+              ? 'Too many delayed requests are pending for the current user. Try again later.'
+              : 'Too many delayed requests are pending. Try again later.',
+            3017,
+            HTTP_STATUS_CODES.TOO_MANY_REQUESTS,
+            response,
+          );
+        }
         return response.ok({
           body: { error: 0, message: 'Success' },
         });
@@ -762,6 +801,7 @@ export class WazuhApiCtrl {
         request.body.body,
         apiHostId,
         response,
+        request,
       );
     }
   }

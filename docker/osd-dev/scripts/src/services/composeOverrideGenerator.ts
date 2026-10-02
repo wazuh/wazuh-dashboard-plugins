@@ -117,6 +117,10 @@ export function generateOverrideFile(
       - ${PROFILES.SERVER_LOCAL_WITHOUT} # server profile to use the local packages without agent
     environment:
       - OPENSEARCH_PATH_CONF=/etc/wazuh-indexer
+      # Passwords the entrypoint hashes into internal_users.yml on each start.
+      - INDEXER_ADMIN_PASSWORD=\${INDEXER_ADMIN_PASSWORD:-admin}
+      - INDEXER_KIBANASERVER_PASSWORD=\${INDEXER_KIBANASERVER_PASSWORD:-kibanaserver}
+      - INDEXER_MANAGER_PASSWORD=\${INDEXER_MANAGER_PASSWORD:-wazuh-manager}
     ulimits:
       memlock:
         soft: -1
@@ -138,7 +142,7 @@ export function generateOverrideFile(
     healthcheck:
       test: [
           'CMD-SHELL',
-          "curl -sk -u admin:admin --cacert /etc/wazuh-indexer/certs/root-ca.pem https://wazuh.indexer:9200 -o /dev/null -w '%{http_code}' | grep -q '200'",
+          "curl -sk -u admin:$$INDEXER_ADMIN_PASSWORD --cacert /etc/wazuh-indexer/certs/root-ca.pem https://wazuh.indexer:9200 -o /dev/null -w '%{http_code}' | grep -q '200'",
         ]
       interval: 1s
       timeout: 5s

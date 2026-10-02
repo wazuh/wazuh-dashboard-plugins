@@ -38,54 +38,87 @@ export const shortenDottedString = (input: string) =>
 export const getFieldTypeName = (type: string) => {
   switch (type) {
     case 'boolean':
-      return i18n.translate('discover.fieldNameIcons.booleanAriaLabel', {
-        defaultMessage: 'Boolean field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.boolean',
+        {
+          defaultMessage: 'Boolean field',
+        },
+      );
     case 'conflict':
-      return i18n.translate('discover.fieldNameIcons.conflictFieldAriaLabel', {
-        defaultMessage: 'Conflicting field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.conflict',
+        {
+          defaultMessage: 'Conflicting field',
+        },
+      );
     case 'date':
-      return i18n.translate('discover.fieldNameIcons.dateFieldAriaLabel', {
+      return i18n.translate('wazuh.common.docViewer.fieldIconAriaLabel.date', {
         defaultMessage: 'Date field',
       });
     case 'geo_point':
-      return i18n.translate('discover.fieldNameIcons.geoPointFieldAriaLabel', {
-        defaultMessage: 'Geo point field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.geoPoint',
+        {
+          defaultMessage: 'Geo point field',
+        },
+      );
     case 'geo_shape':
-      return i18n.translate('discover.fieldNameIcons.geoShapeFieldAriaLabel', {
-        defaultMessage: 'Geo shape field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.geoShape',
+        {
+          defaultMessage: 'Geo shape field',
+        },
+      );
     case 'ip':
-      return i18n.translate('discover.fieldNameIcons.ipAddressFieldAriaLabel', {
-        defaultMessage: 'IP address field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.ipAddress',
+        {
+          defaultMessage: 'IP address field',
+        },
+      );
     case 'murmur3':
-      return i18n.translate('discover.fieldNameIcons.murmur3FieldAriaLabel', {
-        defaultMessage: 'Murmur3 field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.murmur3',
+        {
+          defaultMessage: 'Murmur3 field',
+        },
+      );
     case 'number':
-      return i18n.translate('discover.fieldNameIcons.numberFieldAriaLabel', {
-        defaultMessage: 'Number field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.number',
+        {
+          defaultMessage: 'Number field',
+        },
+      );
     case 'source':
       // Note that this type is currently not provided, type for _source is undefined
-      return i18n.translate('discover.fieldNameIcons.sourceFieldAriaLabel', {
-        defaultMessage: 'Source field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.source',
+        {
+          defaultMessage: 'Source field',
+        },
+      );
     case 'string':
-      return i18n.translate('discover.fieldNameIcons.stringFieldAriaLabel', {
-        defaultMessage: 'String field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.string',
+        {
+          defaultMessage: 'String field',
+        },
+      );
     case 'nested':
-      return i18n.translate('discover.fieldNameIcons.nestedFieldAriaLabel', {
-        defaultMessage: 'Nested field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.nested',
+        {
+          defaultMessage: 'Nested field',
+        },
+      );
     default:
-      return i18n.translate('discover.fieldNameIcons.unknownFieldAriaLabel', {
-        defaultMessage: 'Unknown field',
-      });
+      return i18n.translate(
+        'wazuh.common.docViewer.fieldIconAriaLabel.unknown',
+        {
+          defaultMessage: 'Unknown field',
+        },
+      );
   }
 };
 

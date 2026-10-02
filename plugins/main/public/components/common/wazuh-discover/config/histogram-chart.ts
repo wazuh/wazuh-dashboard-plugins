@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { DashboardPanelState } from '../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../src/plugins/embeddable/public';
 import { ViewMode } from '../../../../../../../src/plugins/embeddable/public';
@@ -34,7 +35,12 @@ const hitsHistogram = (indexPatternId: string) => {
           style: {},
           scale: { type: 'linear', mode: 'normal' },
           labels: { show: true, rotate: 0, filter: false, truncate: 100 },
-          title: { text: 'Count' },
+          title: {
+            text: i18n.translate(
+              'wazuh.common.wazuhDiscover.histogramValueAxisTitle',
+              { defaultMessage: 'Count' },
+            ),
+          },
         },
       ],
       seriesParams: [
@@ -43,7 +49,10 @@ const hitsHistogram = (indexPatternId: string) => {
           type: 'histogram',
           mode: 'stacked',
           data: {
-            label: 'Count',
+            label: i18n.translate(
+              'wazuh.common.wazuhDiscover.histogramSeriesLabel',
+              { defaultMessage: 'Count' },
+            ),
             id: '1',
           },
           valueAxis: 'ValueAxis-1',

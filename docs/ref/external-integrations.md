@@ -8,9 +8,21 @@ The Wazuh dashboard supports integration with:
 
 - **Slack** - Team communication and notifications
 - **PagerDuty** - Incident management and on-call alerting
+- **Jira** - Issue creation for security events
 - **Shuffle** - Security orchestration and workflow automation
 
-Notification integrations (Slack, PagerDuty, Shuffle) use OpenSearch Dashboards Notifications and Alerting plugins.
+Notification integrations (Slack, PagerDuty, Jira, Shuffle) use OpenSearch Dashboards
+Notifications and Alerting plugins.
+
+### Default channels provisioned by the indexer
+
+When the Notifications plugin is present, the Wazuh indexer notifications plugin provisions one
+disabled channel per integration above (`default_slack_channel`, `default_pagerduty_channel`,
+`default_jira_channel`, `default_shuffle_channel`), and the `integrations:default-notifications-channels`
+Health Check task verifies they exist. Configuring one of these existing channels with real
+credentials and enabling it is equivalent to creating a new channel from scratch in the sections
+below. See [Notifications and Alerting](modules/notifications-alerting.md) for the full table and
+the steps to complete their configuration.
 
 ---
 
@@ -26,7 +38,7 @@ Slack integration enables real-time security alerts and notifications to be sent
 ### Step 1: Create a Slack incoming webhook
 
 1. Go to https://api.slack.com/apps
-2. Click **Create New App** > **From scratch**
+2. Click **Create New App > From scratch**
 3. Enter app name (e.g., "Wazuh Alerts") and select your workspace
 4. In the app settings, go to **Incoming Webhooks** and activate it
 5. Click **Add New Webhook to Workspace**
@@ -51,8 +63,9 @@ Slack integration enables real-time security alerts and notifications to be sent
 2. Click **Create monitor**
 3. Configure the monitor:
    - **Monitor name**: `High Priority Security Events`
-   - **Data source**: Select your Wazuh indices pattern
-   - **Query**: Define conditions (e.g., `rule.level >= 12` for high-severity alerts)
+   - **Monitor type**: `Per document monitor`
+   - **Index**: `wazuh-findings-v5-security` (a per document monitor takes concrete indices; index patterns such as `wazuh-findings-v5*` are rejected)
+   - **Query**: Define conditions (e.g., `wazuh.rule.level is critical` for high-severity findings)
    - **Trigger conditions**: Set thresholds for alerting
 4. In the **Notifications** section:
    - Select your Slack channel
@@ -69,15 +82,24 @@ Slack integration enables real-time security alerts and notifications to be sent
 
 ### Slack message customization
 
-Customize alert messages with Mustache templates:
+Customize alert messages with Mustache templates. `ctx.trigger` exposes `id`, `name` and
+`severity` — there is no `ctx.trigger.rule_id`, `rule_description`, `agent_name` or `timestamp`.
+The per document monitor created in Step 3 leaves `ctx.results` empty: each alert in
+`ctx.alerts` carries the matched documents in `sample_documents`, so fields from the finding
+(rule, agent, timestamp) are reached through `_source.<field>` inside that section:
 
 ```
 🚨 *Wazuh Security Alert*
+*Trigger*: {{ctx.trigger.name}}
 *Severity*: {{ctx.trigger.severity}}
-*Rule ID*: {{ctx.trigger.rule_id}}
-*Description*: {{ctx.trigger.rule_description}}
-*Agent*: {{ctx.trigger.agent_name}}
-*Time*: {{ctx.trigger.timestamp}}
+{{#ctx.alerts}}
+{{#sample_documents}}
+*Rule ID*: {{_source.wazuh.rule.id}}
+*Rule*: {{_source.wazuh.rule.title}}
+*Agent*: {{_source.wazuh.agent.name}}
+*Time*: {{_source.@timestamp}}
+{{/sample_documents}}
+{{/ctx.alerts}}
 ```
 
 ### Troubleshooting
@@ -112,12 +134,18 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
 
 ### Step 2: Configure PagerDuty in Wazuh dashboard
 
+There is no dedicated PagerDuty channel type — PagerDuty is configured as a generic **Webhook**
+channel. There is no separate "Integration Key" field either: the key travels in an
+`X-Routing-Key` header, as in the pre-provisioned `default_pagerduty_channel` described in
+[Default channels provisioned by the indexer](#default-channels-provisioned-by-the-indexer):
+
 1. Navigate to **☰ Menu > Explore > Notifications > Channels**
 2. Click **Create channel**
 3. Configure the channel:
    - **Name**: `PagerDuty Critical Incidents`
-   - **Webhook URL**: Add Europe extension if needed: `https://events.eu.pagerduty...`
-   - **Integration Key**: Paste the integration key from Step 1
+   - **Channel type**: `Webhook`
+   - **Webhook URL**: `https://events.pagerduty.com/v2/enqueue` (or the EU region's enqueue URL if applicable)
+   - **Headers**: `Content-Type: application/json` and `X-Routing-Key: <integration_key>`
    - **Description**: (optional) `Critical security incidents to on-call team`
 4. Click **Save**
 5. Toggle the channel to **Unmuted**
@@ -138,14 +166,14 @@ PagerDuty integration enables automatic incident creation and on-call alerting f
    - **Channel**: Select PagerDuty channel
    - **Message**: Create the content based on the PagerDuty documentation:
      - [PagerDuty docs](https://developer.pagerduty.com/docs/send-alert-event)
-     - Example message: `{"event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}`
+     - Example message: `{"event_action":"trigger","payload":{"summary":"⚠️ Security Alert","source":"Wazuh","severity":"critical"}}`
 5. Click **Create**
 
 ### Step 4: Test incident creation
 
 > **⚠️ Warning:** The **Send test message** doesn't work yet because PagerDuty expects a custom payload
 
-1. Use `Indexer Management > Dev Tools` to create a document that will trigger the monitor:
+1. Use **Indexer Management > Dev Tools** to create a document that will trigger the monitor:
 
 ```json
 POST /wazuh-findings-v5-security/_doc
@@ -186,6 +214,60 @@ Customize incident payload with contextual information:
 
 ---
 
+## Jira integration
+
+Jira integration enables automatic issue creation for security events.
+
+### Prerequisites
+
+- Jira Cloud account with permissions to create API tokens and issues
+- Wazuh dashboard with Notifications plugin enabled
+
+### Step 1: Create a Jira API token
+
+1. Log in to https://id.atlassian.com/manage-profile/security/api-tokens
+2. Click **Create API token**, name it (e.g., "Wazuh Alerts") and copy the token
+3. Note your Atlassian account email and your Jira instance URL (e.g., `https://<org>.atlassian.net`)
+
+### Step 2: Configure Jira in Wazuh dashboard
+
+There is no dedicated Jira channel type — Jira is configured as a generic **Webhook** channel
+that posts to the Jira REST API, authenticated with HTTP Basic auth:
+
+1. Navigate to **☰ Menu > Explore > Notifications > Channels**, or open the pre-provisioned
+   `default_jira_channel` described in [Default channels provisioned by the indexer](#default-channels-provisioned-by-the-indexer)
+2. Configure the channel:
+   - **Webhook URL**: `<jira-instance-url>/rest/api/3/issue`
+   - **Headers**: `Authorization: Basic <base64(email:api_token)>`
+3. Save and toggle the channel to **Unmuted**
+
+### Step 3: Create a monitor for issue creation
+
+1. Navigate to **☰ Menu > Explore > Alerting > Monitors**
+2. Configure a per document monitor on `wazuh-findings-v5-security` with the trigger condition
+   for the events that should open an issue
+3. In **Notifications**, select the Jira channel and set the message body to a valid Jira
+   `issue` payload, for example:
+
+```json
+{
+  "fields": {
+    "project": { "key": "SEC" },
+    "summary": "Wazuh alert: {{ctx.trigger.name}}",
+    "issuetype": { "name": "Bug" }
+  }
+}
+```
+
+### Troubleshooting
+
+- **401 Unauthorized**: verify the base64-encoded `email:api_token` pair and that the token has
+  not expired
+- **Issue not created**: confirm the `project.key` and `issuetype.name` exist in the target Jira
+  project
+
+---
+
 ## Shuffle integration
 
 Shuffle is a security orchestration platform that automates response workflows for security events.
@@ -201,7 +283,7 @@ Shuffle is a security orchestration platform that automates response workflows f
 2. Navigate to **Workflows**
 3. Create a new workflow or select an existing one
 4. Add a **Webhook** trigger node:
-   - Click **+ Add Node** > **Trigger** > **Webhook**
+   - Click **+ Add Node > Trigger > Webhook**
    - Name: `Wazuh Security Events`
 5. Copy the webhook URL (format: `https://shuffler.io/api/v1/hooks/webhook_<id>`)
 6. Configure workflow actions (e.g., enrich data, send to SIEM, create tickets)
@@ -225,8 +307,10 @@ Shuffle is a security orchestration platform that automates response workflows f
 1. Navigate to **☰ Menu > Explore > Alerting > Monitors**
 2. Click **Create monitor**
 3. Configure for events requiring automation:
-   - **Monitor name**: `Malware Detection Workflow`
-   - **Query**: `rule.groups: "malware" OR rule.groups: "rootcheck"`
+   - **Monitor name**: `Critical Security Findings Workflow`
+   - **Monitor type**: `Per document monitor`
+   - **Index**: `wazuh-findings-v5-security`
+   - **Query**: `wazuh.rule.level is critical`
    - **Trigger conditions**: Match any event
 4. In **Notifications**:
    - Select your Shuffle channel
@@ -276,8 +360,14 @@ Monitor the health and performance of external integrations:
 
 3. **Audit integration logs**:
 
-   - Wazuh manager: `/var/ossec/logs/integrations.log`
-   - OpenSearch Dashboards: `/var/log/wazuh-dashboard/opensearch_dashboards.log`
+   - Wazuh indexer: `/var/log/wazuh-indexer/wazuh-cluster.log`. Monitors run and notifications
+     are sent by the Alerting and Notifications plugins on the indexer, so delivery errors appear
+     here. The file is named after `cluster.name` in `/etc/wazuh-indexer/opensearch.yml`.
+   - Wazuh dashboard: `journalctl -u wazuh-dashboard`. The dashboard logs to the systemd journal
+     by default.
+
+   > **Note:** The Wazuh manager does not take part in these integrations. `wazuh-integratord`
+   > was removed in 5.0.0, so there is no manager integrations log.
 
 4. **Performance metrics**:
    - Alert delivery latency
@@ -314,4 +404,5 @@ Monitor the health and performance of external integrations:
 - Official integrations documentation:
   - Slack API: https://api.slack.com/messaging/webhooks
   - PagerDuty: https://developer.pagerduty.com/docs/ZG9jOjExMDI5NTgw-events-api-v2-overview
+  - Jira REST API: https://developer.atlassian.com/cloud/jira/platform/rest/v2/api-group-issues/#api-rest-api-2-issue-post
   - Shuffle: https://shuffler.io/docs/workflows

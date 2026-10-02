@@ -11,14 +11,33 @@
  */
 
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiEmptyPrompt } from '@elastic/eui';
 
-export const PromptAgentFeatureVersion = ({ version = '' }: { version: string }) => {
+export const PromptAgentFeatureVersion = ({
+  version = '',
+}: {
+  version: string;
+}) => {
   return (
     <EuiEmptyPrompt
-      iconType="watchesApp"
-      title={<h2>{`Agent doesn't support this feature`}</h2>}
-      body={`This feature is only available for agents with ${version}.`}
+      iconType='watchesApp'
+      title={
+        <h2>
+          {i18n.translate(
+            'wazuh.endpointsSummary.promptAgentFeatureVersion.title',
+            { defaultMessage: "Agent doesn't support this feature" },
+          )}
+        </h2>
+      }
+      body={i18n.translate(
+        'wazuh.endpointsSummary.promptAgentFeatureVersion.body',
+        {
+          defaultMessage:
+            'This feature is only available for agents with equal or higher version than {version}.',
+          values: { version },
+        },
+      )}
     />
   );
 };

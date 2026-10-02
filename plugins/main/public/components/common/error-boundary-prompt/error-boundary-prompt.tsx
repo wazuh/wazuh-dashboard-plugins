@@ -14,6 +14,7 @@
 
 import React from 'react';
 import { EuiEmptyPrompt } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import './error-boundary-prompt.scss';
 
 export const ErrorComponentPrompt = (props: {
@@ -32,11 +33,17 @@ export const ErrorComponentPrompt = (props: {
 
   return (
     <EuiEmptyPrompt
-      iconType="faceSad"
-      title={<h2>Something went wrong.</h2>}
+      iconType='faceSad'
+      title={
+        <h2>
+          {i18n.translate('wazuh.common.errorBoundaryPrompt.title', {
+            defaultMessage: 'Something went wrong.',
+          })}
+        </h2>
+      }
       body={
         <div style={props.style || styles.error}>
-          <details className="wz-error-boundary__details">
+          <details className='wz-error-boundary__details'>
             <span>{props.errorTitle && props.errorTitle.toString()}</span>
             <br />
             <span>{props.errorInfo?.componentStack || ''}</span>
