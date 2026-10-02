@@ -156,3 +156,68 @@ describe('WazuhApiCtrl.csv', () => {
     },
   );
 });
+
+describe('WazuhApiCtrl.checkStoredAPI', () => {
+  const API_HOST = {
+    id: 'default',
+    url: 'https://server-api',
+    port: 55000,
+    username: 'wazuh-wui',
+  };
+
+  const checkStoredAPI = async (getRegistryDataByHost: jest.Mock) => {
+    const internalRequest = jest.fn();
+    const context = {
+      wazuh: {
+        logger: { debug: jest.fn(), error: jest.fn() },
+        api: { client: { asInternalUser: { request: internalRequest } } },
+      },
+      // eslint-disable-next-line camelcase -- OSD request context key
+      wazuh_core: {
+        manageHosts: {
+          getEntries: jest.fn().mockResolvedValue([]),
+          get: jest.fn().mockResolvedValue(API_HOST),
+          getRegistryDataByHost,
+        },
+      },
+    } as unknown as RequestHandlerContext;
+    const response = makeResponse();
+
+    await new WazuhApiCtrl().checkStoredAPI(
+      context,
+      { body: { id: 'default' } } as unknown as OpenSearchDashboardsRequest,
+      response as unknown as OpenSearchDashboardsResponseFactory,
+    );
+
+    return { internalRequest, response };
+  };
+
+  it('gets the cluster info from the registry data only', async () => {
+    const getRegistryDataByHost = jest
+      .fn()
+      .mockResolvedValue({ node: 'node01', cluster: 'wazuh' });
+
+    const { internalRequest, response } = await checkStoredAPI(
+      getRegistryDataByHost,
+    );
+
+    expect(getRegistryDataByHost).toHaveBeenCalledTimes(1);
+    expect(internalRequest).not.toHaveBeenCalled();
+    expect(response.ok.mock.calls[0][0].body.data.cluster_info).toEqual({
+      node: 'node01',
+      cluster: 'wazuh',
+    });
+  });
+
+  it('reports the API as down when the connection is refused', async () => {
+    const getRegistryDataByHost = jest
+      .fn()
+      .mockRejectedValue(
+        Object.assign(new Error('refused'), { code: 'ECONNREFUSED' }),
+      );
+
+    const { response } = await checkStoredAPI(getRegistryDataByHost);
+
+    expect(response.ok.mock.calls[0][0].body.data).toEqual({ apiIsDown: true });
+  });
+});
