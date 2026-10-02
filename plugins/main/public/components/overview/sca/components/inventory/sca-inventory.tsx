@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   WAZUH_SAMPLE_SECURITY_CONFIGURATION_ASSESSMENT,
   CONFIGURATION_ASSESSMENT_INVENTORY_ID,
@@ -55,9 +56,25 @@ export const SCAInventory: React.FC<{}> = compose(
       additionalDocumentDetailsTabs={({ document }) => [
         {
           id: 'sca-dashboard-tab',
-          title: 'Security Configuration Assessment dashboard',
-          description: 'Dashboard of the Security Configuration Assessment',
-          name: 'Check Details',
+          title: i18n.translate(
+            'wazuh.configurationAssessment.checkDetailsTab.title',
+            {
+              defaultMessage: 'Security Configuration Assessment dashboard',
+            },
+          ),
+          description: i18n.translate(
+            'wazuh.configurationAssessment.checkDetailsTab.description',
+            {
+              defaultMessage:
+                'Dashboard of the Security Configuration Assessment',
+            },
+          ),
+          name: i18n.translate(
+            'wazuh.configurationAssessment.checkDetailsTab.name',
+            {
+              defaultMessage: 'Check Details',
+            },
+          ),
           content: <CheckDetails check={document?._source?.check} />,
         },
       ]}

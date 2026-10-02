@@ -8,7 +8,7 @@ An active response only runs when an Alerting trigger invokes it. This walkthrou
 
 ## Step 1: Open Alerting and create a monitor
 
-Navigate to **Alerting → Monitors → Create monitor**. If no monitors exist yet, the Alerts tab looks like this:
+Navigate to **Alerting > Monitors > Create monitor**. If no monitors exist yet, the Alerts tab looks like this:
 
 ![Alerting - Alerts empty state](images/08-alerting-alerts-empty.png)
 
@@ -16,17 +16,19 @@ Navigate to **Alerting → Monitors → Create monitor**. If no monitors exist y
 
 ## Step 2: Select **Active Response**
 
-In the **Monitor type** selector, choose **Active Response**. This is mandatory: any other monitor type (Per query, Per bucket, Per cluster metrics, Composite) will hide the **Add active response** button in the trigger step.
+In the **Monitor type** selector, choose **Active Response monitor**. This is mandatory: any other monitor type (Per query, Per bucket, Per cluster metrics, Per document, Composite, and PPL when PPL alerting is enabled) will hide the **Add active response** button in the trigger step.
 
 ![Monitor type - Active Response](images/09-monitor-type-active-response.png)
 
-Give the monitor a name — for this use case, `Block-IP-monitor` — and pick a **Schedule** (for example, `By interval`, every `1` minute).
+Give the monitor a name — for this use case, `Block-IP-monitor` — and pick a **Schedule** (for
+example, `By interval`, every `1` minute). Active Response monitors cap the schedule interval at
+**60 seconds**: the form rejects a larger value and shows the maximum for the selected unit.
 
 ---
 
 ## Step 3: Configure the data source
 
-Under **Select data**, pick the findings index that holds the events to watch. For this SSH root-login use case, select `wazuh-findings-v5-system-activity*` — the access-management findings index, which carries authentication events such as SSH logins. Other findings indices (`wazuh-findings-v5-security*`, `wazuh-findings-v5-network-activity*`, etc.) cover different categories; pick the one that matches the rules driving your active response.
+Under **Select data**, pick the findings index that holds the events to watch. For this SSH root-login use case, select `wazuh-findings-v5-access-management` — the access-management findings index, which carries authentication events such as SSH logins. Other findings indices (`wazuh-findings-v5-security`, `wazuh-findings-v5-network-activity`, etc.) cover different categories; pick the one that matches the rules driving your active response. Select concrete indices: active response monitors reject index patterns such as `wazuh-findings-v5*`.
 
 ![Select data - Index picker](images/10-monitor-select-index.png)
 
@@ -118,6 +120,6 @@ Within about one minute, a finding with `wazuh.rule.title: SSH root login via pa
 Once the use case has been validated, roll back the lab setup:
 
 1. From the monitor overview, **disable** or **delete** `Block-IP-monitor`.
-2. From **Explore → Active Responses**, delete `Block-IP-stateful-response`. The confirmation dialog requires typing the literal word `delete`.
+2. From **Explore > Active Responses**, delete `Block-IP-stateful-response`. The confirmation dialog requires typing the literal word `delete`.
 3. Restore the original `sshd_config` on the agent — in particular revert `PermitRootLogin yes` and `PasswordAuthentication yes` if you enabled them — and restart `sshd`.
 4. Verify on the agent that no leftover firewall rule remains (`firewall-cmd --reload` or `iptables -F WAZUH_ACTIVE_RESPONSE`). The stateful timeout should have reverted the rule, but confirm before closing the session.

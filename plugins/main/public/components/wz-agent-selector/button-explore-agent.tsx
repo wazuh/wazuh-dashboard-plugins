@@ -10,6 +10,7 @@ import './button-explore-agent.scss';
 import { getAgentVersion } from '../../../common/services/wz-agent';
 
 import clsx from 'clsx';
+import { i18n } from '@osd/i18n';
 
 interface ButtonPinnedAgentProps {
   showExploreAgentModalGlobal: (shouldShow: boolean) => void;
@@ -53,7 +54,13 @@ const ButtonPinnedAgent = ({
           color='warning'
           size='l'
           isDisabled={!outdatedAgentPinned}
-          message='Agent version is below 5.0.0. Some features may not be available.'
+          message={i18n.translate(
+            'wazuh.core.agentSelector.outdatedAgentWarning',
+            {
+              defaultMessage:
+                'Agent version is below 5.0.0. Some features may not be available.',
+            },
+          )}
         />
       </EuiFlexItem>
       <EuiFlexItem grow={false}>
@@ -64,16 +71,26 @@ const ButtonPinnedAgent = ({
           tooltip={{
             position: 'bottom',
             content: !avaliableForAgent
-              ? 'This module is not supported for agents.'
+              ? i18n.translate('wazuh.core.agentSelector.moduleNotSupported', {
+                  defaultMessage: 'This module is not supported for agents.',
+                })
               : agent
-              ? 'Change agent selected'
-              : 'Select an agent to explore its modules',
+              ? i18n.translate('wazuh.core.agentSelector.changeAgent', {
+                  defaultMessage: 'Change agent selected',
+                })
+              : i18n.translate('wazuh.core.agentSelector.selectAgent', {
+                  defaultMessage: 'Select an agent to explore its modules',
+                }),
           }}
           className={clsx({ 'wz-unpin-agent-bg': agent })}
           iconType='watchesApp'
           onClick={() => showExploreAgentModalGlobal(true)}
         >
-          {agent ? `${agent.name} (${agent.id})` : 'Explore agent'}
+          {agent
+            ? `${agent.name} (${agent.id})`
+            : i18n.translate('wazuh.core.agentSelector.exploreAgent', {
+                defaultMessage: 'Explore agent',
+              })}
         </WzButton>
       </EuiFlexItem>
       {agent ? (
@@ -83,8 +100,15 @@ const ButtonPinnedAgent = ({
             className='wz-unpin-agent wz-unpin-agent-bg'
             iconType='pinFilled'
             onClick={unPinAgentHandler}
-            tooltip={{ position: 'bottom', content: 'Unpin agent' }}
-            aria-label='Unpin agent'
+            tooltip={{
+              position: 'bottom',
+              content: i18n.translate('wazuh.core.agentSelector.unpinAgent', {
+                defaultMessage: 'Unpin agent',
+              }),
+            }}
+            aria-label={i18n.translate('wazuh.core.agentSelector.unpinAgent', {
+              defaultMessage: 'Unpin agent',
+            })}
           />
         </EuiFlexItem>
       ) : null}

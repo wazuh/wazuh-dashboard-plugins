@@ -8,6 +8,7 @@ import {
   EuiText,
   EuiEmptyPrompt,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { UsersTable } from './components/users-table';
 import { CreateUser } from './components/create-user';
 import { EditUser } from './components/edit-user';
@@ -89,8 +90,20 @@ export const Users = withUserAuthorizationPrompt([
     return (
       <EuiEmptyPrompt
         iconType='securityApp'
-        title={<h2>You need permission to manage users</h2>}
-        body={<p>Contact your system administrator.</p>}
+        title={
+          <h2>
+            {i18n.translate('wazuh.security.users.noPermission.title', {
+              defaultMessage: 'You need permission to manage users',
+            })}
+          </h2>
+        }
+        body={
+          <p>
+            {i18n.translate('wazuh.security.users.noPermission.body', {
+              defaultMessage: 'Contact your system administrator.',
+            })}
+          </p>
+        }
       />
     );
   }
@@ -134,10 +147,16 @@ export const Users = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Users</h2>
+            <h2>
+              {i18n.translate('wazuh.security.users.title', {
+                defaultMessage: 'Users',
+              })}
+            </h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Manage the users of the manager API.
+            {i18n.translate('wazuh.security.users.description', {
+              defaultMessage: 'Manage the users of the manager API.',
+            })}
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -150,7 +169,9 @@ export const Users = withUserAuthorizationPrompt([
                 ]}
                 onClick={() => setIsCreateFlyoutVisible(true)}
               >
-                Create user
+                {i18n.translate('wazuh.security.users.createButton', {
+                  defaultMessage: 'Create user',
+                })}
               </WzButtonPermissions>
               {createFlyout}
             </div>

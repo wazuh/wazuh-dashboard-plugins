@@ -7,6 +7,7 @@ import {
   EuiTitle,
   EuiText,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { RolesTable } from './roles-table';
 import { WzRequest } from '../../../react-services/wz-request';
 import { CreateRole } from './create-role';
@@ -119,10 +120,16 @@ export const Roles = withUserAuthorizationPrompt([
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
-            <h2>Roles</h2>
+            <h2>
+              {i18n.translate('wazuh.security.roles.title', {
+                defaultMessage: 'Roles',
+              })}
+            </h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            Manage the roles of the manager API.
+            {i18n.translate('wazuh.security.roles.description', {
+              defaultMessage: 'Manage the roles of the manager API.',
+            })}
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>
@@ -133,7 +140,9 @@ export const Roles = withUserAuthorizationPrompt([
                 permissions={[{ action: 'security:create', resource: '*:*:*' }]}
                 onClick={() => setIsFlyoutVisible(true)}
               >
-                Create role
+                {i18n.translate('wazuh.security.roles.createButton', {
+                  defaultMessage: 'Create role',
+                })}
               </WzButtonPermissions>
               {flyout}
               {editFlyout}

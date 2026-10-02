@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useMemo } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiButtonIcon,
   EuiFlexGrid,
@@ -97,19 +98,38 @@ const PinApplicationButton = ({
 }: PinApplicationButtonProps) => {
   const isDisabled = isPinned ? !canUnpin : !canPin;
   const label = isPinned
-    ? `Unpin ${application.title}`
-    : `Pin ${application.title}`;
+    ? i18n.translate('wazuh.common.agentWelcomeMenu.unpinApplication', {
+        defaultMessage: 'Unpin {applicationTitle}',
+        values: { applicationTitle: application.title },
+      })
+    : i18n.translate('wazuh.common.agentWelcomeMenu.pinApplication', {
+        defaultMessage: 'Pin {applicationTitle}',
+        values: { applicationTitle: application.title },
+      });
 
   let tooltip: string;
 
   if (isPinned) {
     tooltip = canUnpin
-      ? 'Unpin from the agent header'
-      : 'At least one application must stay pinned';
+      ? i18n.translate('wazuh.common.agentWelcomeMenu.unpinTooltip', {
+          defaultMessage: 'Unpin from the agent header',
+        })
+      : i18n.translate('wazuh.common.agentWelcomeMenu.unpinDisabledTooltip', {
+          defaultMessage: 'At least one application must stay pinned',
+        });
   } else {
     tooltip = canPin
-      ? 'Pin to the agent header'
-      : `Pin limit reached (${MAX_PINNED_APPLICATIONS}). Unpin an application to pin ${application.title}`;
+      ? i18n.translate('wazuh.common.agentWelcomeMenu.pinTooltip', {
+          defaultMessage: 'Pin to the agent header',
+        })
+      : i18n.translate('wazuh.common.agentWelcomeMenu.pinLimitReached', {
+          defaultMessage:
+            'Pin limit reached ({maxPinnedApplications}). Unpin an application to pin {applicationTitle}',
+          values: {
+            maxPinnedApplications: MAX_PINNED_APPLICATIONS,
+            applicationTitle: application.title,
+          },
+        });
   }
 
   return (

@@ -13,6 +13,7 @@ import {
   EuiText,
   EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import { UI_LOGGER_LEVELS } from '../../../../../../common/constants';
@@ -66,10 +67,23 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
   }: EditAgentsGroupsModalProps) => {
     const getEditGroupsErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
-      const message = apiMessage || error?.message || 'Unknown error';
+      const message =
+        apiMessage ||
+        error?.message ||
+        i18n.translate(
+          'wazuh.endpointsSummary.bulkEditGroupsModal.unknownError',
+          { defaultMessage: 'Unknown error' },
+        );
 
       if (/permission denied/i.test(message)) {
-        return `No permissions to modify groups for one or more selected agents. ${message}`;
+        return i18n.translate(
+          'wazuh.endpointsSummary.bulkEditGroupsModal.noPermissionsError',
+          {
+            defaultMessage:
+              'No permissions to modify groups for one or more selected agents. {message}',
+            values: { message },
+          },
+        );
       }
 
       return message;
@@ -98,7 +112,10 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
         error: {
           error: errorGetGroups,
           message: errorGetGroups.message || errorGetGroups,
-          title: `Could not get groups`,
+          title: i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsModal.getGroupsErrorTitle',
+            { defaultMessage: 'Could not get groups' },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -125,7 +142,10 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: error.message || error,
-            title: `Could not get agents data`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkEditGroupsModal.getAgentsErrorTitle',
+              { defaultMessage: 'Could not get agents data' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -201,8 +221,16 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
                 message: errorMessage,
                 title:
                   addOrRemove === 'add'
-                    ? `Could not add agents to group`
-                    : `Could not remove agents from group`,
+                    ? i18n.translate(
+                        'wazuh.endpointsSummary.bulkEditGroupsModal.addAgentsErrorTitle',
+                        { defaultMessage: 'Could not add agents to group' },
+                      )
+                    : i18n.translate(
+                        'wazuh.endpointsSummary.bulkEditGroupsModal.removeAgentsErrorTitle',
+                        {
+                          defaultMessage: 'Could not remove agents from group',
+                        },
+                      ),
               },
             };
             getErrorOrchestrator().handleError(options);
@@ -222,7 +250,10 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
           error: {
             error,
             message: error.message || error,
-            title: `Could not save agents groups`,
+            title: i18n.translate(
+              'wazuh.endpointsSummary.bulkEditGroupsModal.saveErrorTitle',
+              { defaultMessage: 'Could not save agents groups' },
+            ),
           },
         };
         getErrorOrchestrator().handleError(options);
@@ -233,8 +264,14 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
 
     const groupsText =
       addOrRemove === 'add'
-        ? 'Select groups to add'
-        : 'Select groups to remove';
+        ? i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsModal.selectGroupsToAdd',
+            { defaultMessage: 'Select groups to add' },
+          )
+        : i18n.translate(
+            'wazuh.endpointsSummary.bulkEditGroupsModal.selectGroupsToRemove',
+            { defaultMessage: 'Select groups to remove' },
+          );
 
     const handleOnChangeGroupsSelect = (selectedGroups: Option[]) => {
       setSelectedGroups(selectedGroups);
@@ -247,11 +284,22 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='alert'
-              title='The changes will be applied to all agents that match the filters set in the list'
+              title={i18n.translate(
+                'wazuh.endpointsSummary.bulkEditGroupsModal.allAgentsWarning',
+                {
+                  defaultMessage:
+                    'The changes will be applied to all agents that match the filters set in the list',
+                },
+              )}
             />
           </EuiFormRow>
         ) : (
-          <EuiFormRow label='Selected agents'>
+          <EuiFormRow
+            label={i18n.translate(
+              'wazuh.endpointsSummary.bulkEditGroupsModal.selectedAgentsLabel',
+              { defaultMessage: 'Selected agents' },
+            )}
+          >
             <EuiText>{selectedAgents.length}</EuiText>
           </EuiFormRow>
         )}
@@ -271,7 +319,13 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='danger'
               iconType='alert'
-              title='Could not load groups. Check your permissions.'
+              title={i18n.translate(
+                'wazuh.endpointsSummary.bulkEditGroupsModal.loadGroupsError',
+                {
+                  defaultMessage:
+                    'Could not load groups. Check your permissions.',
+                },
+              )}
             />
           </EuiFormRow>
         ) : !isGroupsLoading && !groups?.length ? (
@@ -279,7 +333,10 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
             <EuiCallOut
               color='warning'
               iconType='iInCircle'
-              title='No groups available for your permissions.'
+              title={i18n.translate(
+                'wazuh.endpointsSummary.bulkEditGroupsModal.noGroupsAvailable',
+                { defaultMessage: 'No groups available for your permissions.' },
+              )}
             />
           </EuiFormRow>
         ) : null}
@@ -291,8 +348,14 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
         <EuiModalHeader>
           <EuiModalHeaderTitle>
             {addOrRemove === 'add'
-              ? 'Add groups to agents'
-              : 'Remove groups from agents'}
+              ? i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsModal.addTitle',
+                  { defaultMessage: 'Add groups to agents' },
+                )
+              : i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsModal.removeTitle',
+                  { defaultMessage: 'Remove groups from agents' },
+                )}
           </EuiModalHeaderTitle>
         </EuiModalHeader>
         <EuiModalBody>
@@ -313,13 +376,21 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
         <EuiModalFooter>
           {!isResultVisible ? (
             <>
-              <EuiButtonEmpty onClick={onClose}>Cancel</EuiButtonEmpty>
+              <EuiButtonEmpty onClick={onClose}>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsModal.cancelButton',
+                  { defaultMessage: 'Cancel' },
+                )}
+              </EuiButtonEmpty>
               <EuiButton
                 onClick={handleOnSave}
                 fill
                 disabled={isGroupsLoading || !selectedGroups?.length}
               >
-                Save
+                {i18n.translate(
+                  'wazuh.endpointsSummary.bulkEditGroupsModal.saveButton',
+                  { defaultMessage: 'Save' },
+                )}
               </EuiButton>
             </>
           ) : (
@@ -330,7 +401,10 @@ export const EditAgentsGroupsModal = compose(withErrorBoundary)(
                 getAgentsStatus === 'loading' || saveChangesStatus === 'loading'
               }
             >
-              Close
+              {i18n.translate(
+                'wazuh.endpointsSummary.bulkEditGroupsModal.closeButton',
+                { defaultMessage: 'Close' },
+              )}
             </EuiButton>
           )}
         </EuiModalFooter>

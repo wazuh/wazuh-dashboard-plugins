@@ -8,6 +8,7 @@ import {
   EuiCallOut,
   EuiSpacer,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { Users } from './users/users';
 import { Roles } from './roles/roles';
 import { Policies } from './policies/policies';
@@ -37,22 +38,30 @@ import NavigationService from '../../react-services/navigation-service';
 const tabs = [
   {
     id: 'users',
-    name: 'Users',
+    name: i18n.translate('wazuh.security.tabs.users', {
+      defaultMessage: 'Users',
+    }),
     disabled: false,
   },
   {
     id: 'roles',
-    name: 'Roles',
+    name: i18n.translate('wazuh.security.tabs.roles', {
+      defaultMessage: 'Roles',
+    }),
     disabled: false,
   },
   {
     id: 'policies',
-    name: 'Policies',
+    name: i18n.translate('wazuh.security.tabs.policies', {
+      defaultMessage: 'Policies',
+    }),
     disabled: false,
   },
   {
     id: 'roleMapping',
-    name: 'Roles mapping',
+    name: i18n.translate('wazuh.security.tabs.rolesMapping', {
+      defaultMessage: 'Roles mapping',
+    }),
     disabled: false,
   },
 ];
@@ -120,18 +129,42 @@ export const WzSecurity = compose(
     let runAsWarningTxt = '';
     switch (allowRunAs) {
       case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.HOST_DISABLED:
-        runAsWarningTxt = `For the role mapping to take effect, enable run_as in the API host configuration, restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        runAsWarningTxt = i18n.translate(
+          'wazuh.security.runAsWarning.hostDisabled',
+          {
+            defaultMessage:
+              'For the role mapping to take effect, enable run_as in the API host configuration, restart the {pluginPlatformName} service and clear your browser cache and cookies.',
+            values: { pluginPlatformName: PLUGIN_PLATFORM_NAME },
+          },
+        );
         break;
       case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.USER_NOT_ALLOWED:
-        runAsWarningTxt =
-          'The role mapping has no effect because the current API user has allow_run_as disabled.';
+        runAsWarningTxt = i18n.translate(
+          'wazuh.security.runAsWarning.userNotAllowed',
+          {
+            defaultMessage:
+              'The role mapping has no effect because the current API user has allow_run_as disabled.',
+          },
+        );
         break;
       case getWazuhCorePlugin().API_USER_STATUS_RUN_AS.ALL_DISABLED:
-        runAsWarningTxt = `For the role mapping to take effect, enable run_as in the API host configuration and set the current API user allow_run_as to true. Restart the ${PLUGIN_PLATFORM_NAME} service and clear your browser cache and cookies.`;
+        runAsWarningTxt = i18n.translate(
+          'wazuh.security.runAsWarning.allDisabled',
+          {
+            defaultMessage:
+              'For the role mapping to take effect, enable run_as in the API host configuration and set the current API user allow_run_as to true. Restart the {pluginPlatformName} service and clear your browser cache and cookies.',
+            values: { pluginPlatformName: PLUGIN_PLATFORM_NAME },
+          },
+        );
         break;
       default:
-        runAsWarningTxt =
-          'The role mapping has no effect because the current API user has run_as disabled.';
+        runAsWarningTxt = i18n.translate(
+          'wazuh.security.runAsWarning.runAsDisabled',
+          {
+            defaultMessage:
+              'The role mapping has no effect because the current API user has run_as disabled.',
+          },
+        );
         break;
     }
 

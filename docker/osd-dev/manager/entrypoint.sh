@@ -87,6 +87,39 @@ install -o wazuh-manager -g wazuh-manager -m 640 \
   "$certs_out/$CERTS_NODE_NAME-remoted-key.pem" /var/wazuh-manager/etc/certs/remoted-key.pem
 rm -rf "$certs_out"
 
+# Server API users. wazuh-manager-resolve-credentials (run by
+# wazuh-manager-control start) seeds rbac.db with generated passwords, or with
+# supplied ones that pass its policy: 12+ characters of mixed classes, which the
+# fixed development passwords do not. Seed it here instead, through the same
+# ORM call rbac_control makes once it has validated them; the resolver leaves an
+# already seeded rbac.db untouched. Only a new container gets here: a restarted
+# one keeps its rbac.db, and its users, as they are.
+RBAC_DB=/var/wazuh-manager/api/configuration/security/rbac.db
+if [ ! -s "$RBAC_DB" ]; then
+  if ! API_WAZUH_PASSWORD="${API_WAZUH_PASSWORD:-wazuh}" \
+    API_WUI_PASSWORD="${API_PASSWORD:-wazuh-wui}" \
+    /var/wazuh-manager/framework/python/bin/python3 -c '
+import os
+from wazuh.core.common import wazuh_gid, wazuh_uid
+
+# As rbac_control does: rbac.db is created by the service user, never by root.
+os.setgroups([])
+os.setgid(wazuh_gid())
+os.setuid(wazuh_uid())
+
+from wazuh.rbac.orm import check_database_integrity
+
+check_database_integrity(passwords={
+    "wazuh": os.environ["API_WAZUH_PASSWORD"],
+    "wazuh-wui": os.environ["API_WUI_PASSWORD"],
+})
+'; then
+    echo "ERROR: could not seed $RBAC_DB with the Server API users."
+    rm -f "$RBAC_DB"
+    exit 1
+  fi
+fi
+
 # Clean up stale PID and socket files from previous unclean shutdowns
 # (e.g. after docker stop + docker start without recreating the container)
 find /var/wazuh-manager/var/run -name "*.pid" -delete 2>/dev/null || true

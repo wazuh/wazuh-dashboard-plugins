@@ -181,6 +181,62 @@ describe('ChatService', () => {
       ]);
     });
 
+    it('a 403 shows the message the server sent instead of the raw body', async () => {
+      const message =
+        'You do not have permission to perform this action. Missing indexer permission: cluster:admin/opendistro/ism/policy/get.';
+      window.fetch = jest
+        .fn()
+        .mockResolvedValue(
+          failedResponse(403, () =>
+            Promise.resolve(
+              JSON.stringify({ statusCode: 403, error: 'Forbidden', message }),
+            ),
+          ),
+        );
+      const service = new ChatService(basePath);
+
+      const events = await collect(
+        service.streamChat('openai', messages, new AbortController().signal),
+      );
+
+      expect(events).toEqual([{ type: 'error', message }]);
+    });
+
+    it.each([
+      ['a body that is not JSON', 'Forbidden'],
+      ['a JSON body without a message', '{"statusCode":403}'],
+      ['a blank message', '{"message":"  "}'],
+    ])('a 403 with %s keeps the generic error text', async (_name, body) => {
+      window.fetch = jest
+        .fn()
+        .mockResolvedValue(failedResponse(403, () => Promise.resolve(body)));
+      const service = new ChatService(basePath);
+
+      const events = await collect(
+        service.streamChat('openai', messages, new AbortController().signal),
+      );
+
+      expect(events).toEqual([
+        { type: 'error', message: `Request failed (HTTP 403): ${body}` },
+      ]);
+    });
+
+    it('a 500 keeps the raw body even when it carries a message', async () => {
+      const body = '{"statusCode":500,"message":"An internal error occurred."}';
+      window.fetch = jest
+        .fn()
+        .mockResolvedValue(failedResponse(500, () => Promise.resolve(body)));
+      const service = new ChatService(basePath);
+
+      const events = await collect(
+        service.streamChat('openai', messages, new AbortController().signal),
+      );
+
+      expect(events).toEqual([
+        { type: 'error', message: `Request failed (HTTP 500): ${body}` },
+      ]);
+    });
+
     it('falls back to a placeholder detail when reading the error body itself throws', async () => {
       window.fetch = jest
         .fn()

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 // @ts-ignore
 import { EuiEmptyPrompt, EuiLoadingSpinner } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { getPlugins } from '../../../../kibana-services';
 import {
   buildDashboardByValueInput,
@@ -8,6 +9,11 @@ import {
 } from './dashboard-renderer-service';
 import { Status, DashboardByValueInput } from './types';
 import DashboardRendererErrorPrompt from './dashboard-renderer-error-prompt';
+
+const getUnknownErrorMessage = () =>
+  i18n.translate('wazuh.common.dashboardRenderer.error.unknown', {
+    defaultMessage: 'Unknown error',
+  });
 
 type DashboardRendererProps = {
   dashboardId: string;
@@ -69,7 +75,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <DashboardRendererErrorPrompt
         errorType='error'
-        errorMessage={error || 'Unknown error'}
+        errorMessage={error || getUnknownErrorMessage()}
         onRetry={buildByValueInputHandler}
       />
     );
@@ -79,7 +85,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <DashboardRendererErrorPrompt
         errorType='empty'
-        errorMessage={error || 'Unknown error'}
+        errorMessage={error || getUnknownErrorMessage()}
         dashboardId={dashboardId}
         agentDashboardId={agentDashboardId}
         hasPinnedAgent={hasPinnedAgent}
@@ -91,7 +97,7 @@ export const DashboardRenderer: React.FC<DashboardRendererProps> = ({
     return (
       <DashboardRendererErrorPrompt
         errorType='not_found'
-        errorMessage={error || 'Unknown error'}
+        errorMessage={error || getUnknownErrorMessage()}
         dashboardId={dashboardId}
         agentDashboardId={agentDashboardId}
         hasPinnedAgent={hasPinnedAgent}

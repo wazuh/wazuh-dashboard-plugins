@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { EuiDescriptionList, EuiText } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
@@ -25,24 +26,47 @@ import {
 const settings = [
   {
     field: 'enabled',
-    label: 'Service status',
+    label: i18n.translate(
+      'wazuh.office365.moduleConfiguration.serviceStatusLabel',
+      {
+        defaultMessage: 'Service status',
+      },
+    ),
     render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',
-    label: 'Collect events generated since Wazuh manager was started',
+    label: i18n.translate(
+      'wazuh.office365.moduleConfiguration.onlyFutureEventsLabel',
+      {
+        defaultMessage:
+          'Collect events generated since Wazuh manager was started',
+      },
+    ),
   },
   {
     field: 'curl_max_size',
-    label: 'Maximum size allowed for the Office 365 API response',
+    label: i18n.translate(
+      'wazuh.office365.moduleConfiguration.curlMaxSizeLabel',
+      {
+        defaultMessage: 'Maximum size allowed for the Office 365 API response',
+      },
+    ),
   },
   {
     field: 'interval',
-    label: 'Interval between Office 365 wodle executions in seconds',
+    label: i18n.translate('wazuh.office365.moduleConfiguration.intervalLabel', {
+      defaultMessage: 'Interval between Office 365 wodle executions in seconds',
+    }),
   },
   {
     field: 'api_auth',
-    label: 'Tenant IDs',
+    label: i18n.translate(
+      'wazuh.office365.moduleConfiguration.tenantIdsLabel',
+      {
+        defaultMessage: 'Tenant IDs',
+      },
+    ),
     render: value => {
       const tenantIDs = toApiAuthEntries(value)
         .map(v => v.tenant_id)
@@ -58,13 +82,25 @@ const settings = [
           </EuiDescriptionList>
         ))
       ) : (
-        <EuiText>No tenant IDs configured</EuiText>
+        <EuiText>
+          {i18n.translate(
+            'wazuh.office365.moduleConfiguration.noTenantIdsConfigured',
+            {
+              defaultMessage: 'No tenant IDs configured',
+            },
+          )}
+        </EuiText>
       );
     },
   },
   {
     field: 'subscriptions',
-    label: 'Subscriptions',
+    label: i18n.translate(
+      'wazuh.office365.moduleConfiguration.subscriptionsLabel',
+      {
+        defaultMessage: 'Subscriptions',
+      },
+    ),
     render: value =>
       toListEntries(value).map(v => (
         <EuiDescriptionList key={`module_configuration_subscriptions_${v}`}>
@@ -104,20 +140,32 @@ export const ModuleConfiguration = props => (
         ? mapModuleContentToRenderProperties(
             response,
             'office365',
-            'Agent',
+            i18n.translate('wazuh.office365.moduleConfiguration.agentEntity', {
+              defaultMessage: 'Agent',
+            }),
             params.name,
           )
         : type === 'cluster_node'
         ? mapWModuleConfigurationToRenderProperties(
             response.data.data.affected_items[0].wmodules,
             'office365',
-            'Manager',
+            i18n.translate(
+              'wazuh.office365.moduleConfiguration.managerEntity',
+              {
+                defaultMessage: 'Manager',
+              },
+            ),
             params.name,
           )
         : mapWModuleConfigurationToRenderProperties(
             response.data.data.affected_items[0].wmodules,
             'office365',
-            'Manager',
+            i18n.translate(
+              'wazuh.office365.moduleConfiguration.managerEntity',
+              {
+                defaultMessage: 'Manager',
+              },
+            ),
           );
     }}
   />

@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiNotificationBadge,
   EuiCard,
@@ -42,7 +43,13 @@ export const CloudSecurityCards: React.FC<CloudSecurityCardsProps> = ({
               <span
                 style={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}
               >
-                <EuiToolTip position='top' content='Findings, last 24h'>
+                <EuiToolTip
+                  position='top'
+                  content={i18n.translate(
+                    'wazuh.common.homeOverviewCloudSecurity.findingsBadgeTooltip',
+                    { defaultMessage: 'Findings, last 24h' },
+                  )}
+                >
                   <EuiNotificationBadge
                     size='m'
                     color={count ? 'accent' : 'subdued'}

@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { useState, useEffect, useRef } from 'react';
+import { i18n } from '@osd/i18n';
 import { I18nProvider } from '@osd/i18n/react';
 import { Tactics, Techniques } from './components';
 import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
@@ -149,7 +150,12 @@ const MitreComponent = compose(
         error: {
           error: error,
           message: error.message || error,
-          title: `Mitre data could not be fetched`,
+          title: i18n.translate(
+            'wazuh.mitreAttack.framework.errorFetchingData',
+            {
+              defaultMessage: 'Mitre data could not be fetched',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);

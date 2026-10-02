@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 import GroupsHandler from '../utils/groups-handler';
 import beautifier from '../../../../../../utils/json-beautifier';
@@ -40,28 +41,44 @@ export default class GroupsFilesColumns {
       this.columns = [
         {
           field: 'filename',
-          name: 'File',
+          name: i18n.translate('wazuh.endpointGroups.filesTable.fileColumn', {
+            defaultMessage: 'File',
+          }),
           align: 'left',
           searchable: true,
           sortable: true,
         },
         {
           field: 'hash',
-          name: 'Checksum',
+          name: i18n.translate(
+            'wazuh.endpointGroups.filesTable.checksumColumn',
+            { defaultMessage: 'Checksum' },
+          ),
           align: 'left',
           searchable: true,
           sortable: true,
         },
       ];
       this.columns.push({
-        name: 'Actions',
+        name: i18n.translate('wazuh.endpointGroups.filesTable.actionsColumn', {
+          defaultMessage: 'Actions',
+        }),
         align: 'left',
         render: item => {
           return (
             <div>
-              <EuiToolTip position='top' content={`See file content`}>
+              <EuiToolTip
+                position='top'
+                content={i18n.translate(
+                  'wazuh.endpointGroups.filesTable.seeFileContentTooltip',
+                  { defaultMessage: 'See file content' },
+                )}
+              >
                 <EuiButtonIcon
-                  aria-label='See file content'
+                  aria-label={i18n.translate(
+                    'wazuh.endpointGroups.filesTable.seeFileContentAriaLabel',
+                    { defaultMessage: 'See file content' },
+                  )}
                   iconType='eye'
                   onClick={() => this.actionFile(item, false)}
                   color='primary'
@@ -70,7 +87,10 @@ export default class GroupsFilesColumns {
               {item.filename === 'agent.conf' && (
                 <WzButtonPermissions
                   buttonType='icon'
-                  aria-label='Edit content'
+                  aria-label={i18n.translate(
+                    'wazuh.endpointGroups.filesTable.editContentAriaLabel',
+                    { defaultMessage: 'Edit content' },
+                  )}
                   iconType='pencil'
                   permissions={[
                     {
@@ -80,7 +100,13 @@ export default class GroupsFilesColumns {
                   ]}
                   tooltip={{
                     position: 'top',
-                    content: `Edit ${item.filename}`,
+                    content: i18n.translate(
+                      'wazuh.endpointGroups.filesTable.editFileTooltip',
+                      {
+                        defaultMessage: 'Edit {fileName}',
+                        values: { fileName: item.filename },
+                      },
+                    ),
                   }}
                   onClick={() => this.actionFile(item, true)}
                   color='primary'

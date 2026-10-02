@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiButtonEmpty,
   EuiFlexGroup,
@@ -53,7 +54,13 @@ export function AgentStatTable({
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiText>
-            <EuiIcon type='calendar' /> Start:{' '}
+            <EuiIcon type='calendar' />{' '}
+            {i18n.translate(
+              'wazuh.endpointsSummary.agentStatsTable.startLabel',
+              {
+                defaultMessage: 'Start:',
+              },
+            )}{' '}
             {loading ? (
               <EuiLoadingSpinner size='s' />
             ) : start ? (
@@ -61,7 +68,10 @@ export function AgentStatTable({
             ) : (
               '-'
             )}{' '}
-            - End:{' '}
+            -{' '}
+            {i18n.translate('wazuh.endpointsSummary.agentStatsTable.endLabel', {
+              defaultMessage: 'End:',
+            })}{' '}
             {loading ? (
               <EuiLoadingSpinner size='s' />
             ) : end ? (
@@ -87,7 +97,10 @@ export function AgentStatTable({
             iconType='importAction'
             isDisabled={loading || !tableItems.length}
           >
-            Download CSV
+            {i18n.translate(
+              'wazuh.endpointsSummary.agentStatsTable.downloadCsvButton',
+              { defaultMessage: 'Download CSV' },
+            )}
           </EuiButtonEmpty>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -115,8 +128,20 @@ async function downloadCsv(columns: any[], data: any[], filename: string) {
       severity: UI_ERROR_SEVERITIES.BUSINESS as UIErrorSeverity,
       error: {
         error: error,
-        message: `Error generating CSV: ${error.message}`,
-        title: `CSV: ${error.name}`,
+        message: i18n.translate(
+          'wazuh.endpointsSummary.agentStatsTable.downloadCsvErrorMessage',
+          {
+            defaultMessage: 'Error generating CSV: {errorMessage}',
+            values: { errorMessage: error.message },
+          },
+        ),
+        title: i18n.translate(
+          'wazuh.endpointsSummary.agentStatsTable.downloadCsvErrorTitle',
+          {
+            defaultMessage: 'CSV: {errorName}',
+            values: { errorName: error.name },
+          },
+        ),
       },
     };
     getErrorOrchestrator().handleError(options);

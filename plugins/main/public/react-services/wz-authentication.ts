@@ -28,16 +28,31 @@ import {
   UILogLevel,
 } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
+import { i18n } from '@osd/i18n';
 
 const MESSAGES = {
-  NO_API_LOGIN_CCS:
-    'Cannot login: no server API selected. Ensure a server API is selected and is online.',
-  NO_API_LOGIN:
-    'Cannot login: no server API selected. Go to Dashboard Management > Server API to verify the connection.',
-  NO_API_PERMISSIONS_CCS:
-    'Cannot get user permissions: no server API selected. Ensure a server API is selected and is online.',
-  NO_API_PERMISSIONS:
-    'Cannot get user permissions: no server API selected. Go to Dashboard Management > Server API to verify the connection.',
+  NO_API_LOGIN_CCS: i18n.translate('wazuh.core.authentication.noApiLoginCcs', {
+    defaultMessage:
+      'Cannot login: no server API selected. Ensure a server API is selected and is online.',
+  }),
+  NO_API_LOGIN: i18n.translate('wazuh.core.authentication.noApiLogin', {
+    defaultMessage:
+      'Cannot login: no server API selected. Go to Dashboard Management > Server API to verify the connection.',
+  }),
+  NO_API_PERMISSIONS_CCS: i18n.translate(
+    'wazuh.core.authentication.noApiPermissionsCcs',
+    {
+      defaultMessage:
+        'Cannot get user permissions: no server API selected. Ensure a server API is selected and is online.',
+    },
+  ),
+  NO_API_PERMISSIONS: i18n.translate(
+    'wazuh.core.authentication.noApiPermissions',
+    {
+      defaultMessage:
+        'Cannot get user permissions: no server API selected. Go to Dashboard Management > Server API to verify the connection.',
+    },
+  ),
 };
 
 /**
@@ -117,7 +132,11 @@ export class WzAuthentication {
         error: {
           error: error,
           message: error.message || error,
-          title: `${error.name}: Error getting the authorization token`,
+          title: i18n.translate('wazuh.core.authentication.refreshError', {
+            defaultMessage:
+              '{errorName}: Error getting the authorization token',
+            values: { errorName: error.name },
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);

@@ -12,6 +12,7 @@
 
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 import {
   EuiText,
   EuiSpacer,
@@ -30,7 +31,11 @@ const WzConfigurationCategoryRail = ({
   selectedCategoryId,
   onSelectCategory,
 }) => (
-  <nav aria-label='Configuration categories'>
+  <nav
+    aria-label={i18n.translate('wazuh.configuration.categoryRail.ariaLabel', {
+      defaultMessage: 'Configuration categories',
+    })}
+  >
     {groups.map(group => (
       <Fragment key={`rail-group-${group.title}`}>
         <EuiText size='xs' color='subdued'>

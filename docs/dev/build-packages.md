@@ -5,7 +5,7 @@ Wazuh dashboard, including all required plugins and dependencies.
 
 > **Note**: This builds **complete installation packages**. If you only need to
 > build the plugins from this repository for development, see
-> [Build from Sources](build-sources.md).
+> [Build from sources](build-sources.md).
 
 ## Step by step
 
@@ -17,7 +17,7 @@ Ensure that these dependencies are installed on the system.
 
 - **Docker**: refer to the [Docker installation guide](https://docs.docker.com/engine/install/)
 - **nvm (node version manager)**: refer to the [NVM installation guide](https://github.com/nvm-sh/nvm#installing-and-updating)
-- **yarn v1.22.22 (node version manager)**: refer to the [Yarn installation guide](https://classic.yarnpkg.com/en/docs/install/)
+- **yarn v1.22.22 (package manager)**: refer to the [Yarn installation guide](https://classic.yarnpkg.com/en/docs/install/)
 - **Utilities**. Ensure that the following are installed:
   - `zip`
   - `unzip`
@@ -25,6 +25,8 @@ Ensure that these dependencies are installed on the system.
   - `brotli`
   - `curl`
   - `jq`
+- **Network access** to `raw.githubusercontent.com`, to download the shared credentials library (see
+  [Credentials resolver](#credentials-resolver)).
 
 ### Generating zip packages
 
@@ -40,7 +42,7 @@ To use the `build-packages.sh` script, you first need to generate the packages f
 
 Follow the steps below to build the packages:
 
-1. Clone the [wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, navigate to the `wazuh-dashboard/` directory, and build the application:
+1. Clone the `wazuh-dashboard` repository, navigate to the `wazuh-dashboard/` directory, and build the application:
 
 > Replace the `GIT_REF` by the Wazuh dashboard branch or tag in the `wazuh-dashboard` repository, e.g. `v5.0.0`.
 
@@ -55,12 +57,13 @@ yarn build-platform --linux --skip-os-packages --release
 
 > Note: for `arm` architecture uses `--linux-arm` instead of `--linux`.
 
-2. Clone the [wazuh-security-dashboards-plugin](https://github.com/wazuh/wazuh-security-dashboards-plugin.git) repository in the `wazuh-dashboard/plugins` folder and build the plugin:
+2. Clone the `wazuh-security-dashboards-plugin` repository in the `wazuh-dashboard/plugins` folder and build the plugin:
 
 > Run the following commands while in the `wazuh-dashboard/` directory.
 > Replace the `GIT_REF` by the branch or tag for the security plugin, e.g. `v5.0.0`.
 
 ```bash
+GIT_REF=<REPLACE_PLACEHOLDER>
 cd plugins/
 git clone -b $GIT_REF https://github.com/wazuh/wazuh-security-dashboards-plugin.git
 cd wazuh-security-dashboards-plugin/
@@ -68,7 +71,7 @@ yarn
 yarn build
 ```
 
-3. Clone the [wazuh-dashboard-plugins](https://github.com/wazuh/wazuh-dashboard-plugins.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-plugins/` folder, and build the plugins:
+3. Clone the `wazuh-dashboard-plugins` repository (this repository) in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-plugins/` folder, and build the plugins:
 
 > The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh dashboard plugins, e.g. `v5.0.0`.
@@ -83,7 +86,7 @@ nvm use $(cat .nvmrc)
 cp -r plugins/* ../
 ```
 
-The plugin in the `main` directory needs a git reference to an existent branch or tag in the [`wazuh-indexer-repository`](https://github.com/wazuh/wazuh-indexer-plugins) to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
+The plugin in the `main` directory needs a git reference to an existent branch or tag in the `wazuh-indexer-plugins` repository to download and generate some resources, ensure the provided git reference exists and it is compatible with the plugin.
 
 ```bash
 cd ../main
@@ -100,7 +103,7 @@ yarn
 OPENSEARCH_DASHBOARDS_VERSION=$(jq -r .pluginPlatform.version package.json) yarn build
 ```
 
-4. Clone the [wazuh-dashboard-reporting](https://github.com/wazuh/wazuh-dashboard-reporting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
+4. Clone the `wazuh-dashboard-reporting` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-reporting/` folder, and build the plugin:
 
 > The `yarn build` command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh reporting plugin, e.g. `v5.0.0`.
@@ -114,7 +117,7 @@ yarn
 yarn build
 ```
 
-5. Clone the [wazuh-dashboard-security-analytics](https://github.com/wazuh/wazuh-dashboard-security-analytics.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-security-analytics/` folder, and build the plugin:
+5. Clone the `wazuh-dashboard-security-analytics` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-security-analytics/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh Ruleset Management plugin, e.g. `v5.0.0`.
@@ -128,7 +131,7 @@ yarn
 yarn build
 ```
 
-6. Clone the [wazuh-dashboard-alerting](https://github.com/wazuh/wazuh-dashboard-alerting.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-alerting/` folder, and build the plugin:
+6. Clone the `wazuh-dashboard-alerting` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-alerting/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh alerting plugin, e.g. `v5.0.0`.
@@ -142,7 +145,7 @@ yarn
 yarn build
 ```
 
-7. Clone the [wazuh-dashboard-notifications](https://github.com/wazuh/wazuh-dashboard-notifications.git) repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-notifications/` folder, and build the plugin:
+7. Clone the `wazuh-dashboard-notifications` repository in the `wazuh-dashboard/plugins` folder, move into the `wazuh-dashboard-notifications/` folder, and build the plugin:
 
 > The yarn build command requires an entry specifying the OpenSearch Dashboard version. This version can be obtained from the `package.json` file of the plugin.
 > Replace the `GIT_REF` by the branch or tag for the Wazuh notifications plugin, e.g. `v5.0.0`.
@@ -183,18 +186,18 @@ After completing the previous steps, you will have the following packages in the
 - `security-package.zip`
 - `wazuh-package.zip`
 
-9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script requires the following parameters:
+9. Run the `build-packages.sh` script in the `dev-tools/build-packages/` folder of the `wazuh-dashboard` repository. The script accepts the following parameters. The package options take a URL (`http(s)://`, `ftp://` or `file://`), not a bare path, so local files are passed as `file://<absolute path>`:
 
-- `-c`, `--commit-sha`: Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below).
-- `-r`: Revision of the package.
+- `-c`, `--commit-sha`: _(Optional)_ Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below). Defaults to the short SHA of the current `wazuh-dashboard` commit.
+- `-r`, `--revision`: _(Optional)_ Revision of the package. Defaults to `1`.
 - `--deb` or `--rpm`: Distribution of the package.
-- `-a`: Path to the `wazuh-package.zip`.
-- `-b`: Path to the `dashboard-package.zip`.
-- `-rp`: Path to the `reporting-package.zip`.
-- `-s`: Path to the `security-package.zip`.
-- `-sa`: Path to the `security-analytics-package.zip`.
-- `-al`: Path to the `alerting-package.zip`.
-- `-no`: Path to the `notifications-package.zip`.
+- `-a`: URL of the `wazuh-package.zip`.
+- `-b`, `--base`: URL of the `dashboard-package.zip`.
+- `-rp`: URL of the `reporting-package.zip`.
+- `-s`: URL of the `security-package.zip`.
+- `-sa`: URL of the `security-analytics-package.zip`.
+- `-al`: URL of the `alerting-package.zip`.
+- `-no`: URL of the `notifications-package.zip`.
 
 ```bash
 cd ../wazuh-dashboard/dev-tools/build-packages/
@@ -209,6 +212,39 @@ cd ../wazuh-dashboard/dev-tools/build-packages/
 ```
 
 The script generates the package in the `output` folder of the same directory where it is located. To see the generated package, run the command: `ls output`.
+
+### Credentials resolver
+
+The package includes the credential resolver described in [Credentials](../ref/getting-started/credentials.md)
+and, for the two-halves design, [Credential and TLS resolution](credentials.md). This section only
+covers the build-time download mechanism for the shared half (`wazuh-credentials.sh`), which is not
+committed to `wazuh-dashboard`.
+
+`build-packages.sh` downloads the library from
+`https://raw.githubusercontent.com/wazuh/wazuh-installation-assistant/<ref>/credentials_lib/wazuh-credentials.sh`,
+trying these refs in order and using the first one that exists:
+
+1. `WAZUH_CREDENTIALS_LIB_REF`, when set.
+2. The tag being built (`GITHUB_REF_NAME` when `GITHUB_REF_TYPE=tag`, else
+   `git describe --tags --exact-match`). A tag build tries **only** this ref after the override, so
+   a release never falls back to a branch that keeps moving.
+3. The branch being built. A feature branch that does not exist in wazuh-installation-assistant is
+   skipped.
+4. The version branch (for example `5.0.0`), then the version tag (for example `v5.0.0`).
+
+| Variable                       | Description                                                           |
+| ------------------------------ | --------------------------------------------------------------------- |
+| `WAZUH_CREDENTIALS_LIB_REF`    | Git ref of wazuh-installation-assistant to download the library from. |
+| `WAZUH_CREDENTIALS_LIB_SHA256` | Expected SHA-256 of the downloaded library. Checked when set.         |
+
+A failed download or a checksum mismatch fails the build. There is no bundled fallback.
+
+For example, to build against a specific library ref and pin its checksum, replace `<REF>` and
+`<SHA256>`:
+
+```bash
+WAZUH_CREDENTIALS_LIB_REF=<REF> WAZUH_CREDENTIALS_LIB_SHA256=<SHA256> ./build-packages.sh ...
+```
 
 ### Generating commit SHA
 
@@ -243,8 +279,8 @@ Example:
 ```bash
 cd wazuh-dashboard
 DASHBOARD_COMMIT_SHA=$(git rev-parse --short HEAD)
-PLUGINS_COMMIT_SHA=$(git -C plugins/wazuh-security-dashboards-plugin rev-parse --short HEAD)
-SECURITY_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-plugins rev-parse --short HEAD)
+PLUGINS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-plugins rev-parse --short HEAD)
+SECURITY_COMMIT_SHA=$(git -C plugins/wazuh-security-dashboards-plugin rev-parse --short HEAD)
 REPORTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-reporting rev-parse --short HEAD)
 SECURITY_ANALYTICS_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-security-analytics rev-parse --short HEAD)
 ALERTING_COMMIT_SHA=$(git -C plugins/wazuh-dashboard-alerting rev-parse --short HEAD)
@@ -268,7 +304,7 @@ Ensure that these dependencies are installed on the system.
 
 ### Building the Wazuh dashboard package using Docker
 
-1. Clone the [wazuh-dashboard](https://github.com/wazuh/wazuh-dashboard) repository, navigate to the `wazuh-dashboard/dev-tools/build-packages/base-packages-to-base` directory, and build the application.
+1. Clone the `wazuh-dashboard` repository, navigate to the `wazuh-dashboard/dev-tools/build-packages/base-packages-to-base` directory, and build the application.
 
 ```bash
 WAZUH_DASHBOARDS_BRANCH=<REPLACE_PLACEHOLDER>
@@ -276,17 +312,21 @@ git clone -b $WAZUH_DASHBOARDS_BRANCH https://github.com/wazuh/wazuh-dashboard.g
 cd wazuh-dashboard/dev-tools/build-packages/base-packages-to-base/
 ```
 
-2. Build the Docker image with the following parameters:
-   - `NODE_VERSION`: Node version to use in the `.nvmrc` file.
-   - `WAZUH_DASHBOARDS_BRANCH`: Branch of the Wazuh dashboards repository.
-   - `WAZUH_DASHBOARDS_PLUGINS`: Branch of the Wazuh dashboards Plugins repository.
-   - `WAZUH_SECURITY_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Security Dashboards Plugin repository.
-   - `WAZUH_REPORTING_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh reporting plugin repository.
-   - `WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH`: Branch of the Wazuh Ruleset Management plugin repository.
-   - `WAZUH_DASHBOARD_ALERTING_BRANCH`: Branch of the Wazuh alerting plugin repository.
-   - `WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH`: Branch of the Wazuh notifications plugin repository.
-   - `OPENSEARCH_DASHBOARDS_VERSION`: Version of the OpenSearch Dashboards. You can find the version in the `package.json` file of the Wazuh dashboards repository.
-   - `-t`: Tag of the image.
+2. Build the Docker image. `run-docker-compose.sh` (`base-packages-to-base/run-docker-compose.sh`)
+   accepts these parameters — there is no `-t`/tag option, and the OpenSearch Dashboards version
+   cannot be passed (it is fixed by `OPENSEARCH_DASHBOARDS_VERSION` in
+   `base-packages-to-base/docker-compose.yml` and `base-packages.Dockerfile`):
+   - `-b`, `--base`: Branch of the `wazuh-dashboard` repository.
+   - `-a`, `--app`: Branch of the `wazuh-dashboard-plugins` repository.
+   - `-s`, `--security`: Branch of the `wazuh-security-dashboards-plugin` repository.
+   - `-r`, `--reporting`: Branch of the `wazuh-dashboard-reporting` repository.
+   - `-sa`, `--securityAnalytics`: Branch of the `wazuh-dashboard-security-analytics` repository.
+   - `-al`, `--alerting`: Branch of the `wazuh-dashboard-alerting` repository.
+   - `-no`, `--notifications`: Branch of the `wazuh-dashboard-notifications` repository.
+   - `--arm`: _(Optional)_ Build for arm64 instead of x64.
+   - `--node-version`: _(Optional)_ Node version to use; defaults to the script's own pinned
+     version — pass `$(cat ../../../.nvmrc)` to match the repository's `.nvmrc` instead of
+     hardcoding it.
 
 ```bash
 WAZUH_DASHBOARDS_BRANCH='<REPLACE_PLACEHOLDER>' && \
@@ -304,7 +344,7 @@ bash run-docker-compose.sh \
     --securityAnalytics $WAZUH_SECURITY_ANALYTICS_DASHBOARDS_PLUGIN_BRANCH \
     --alerting $WAZUH_DASHBOARD_ALERTING_BRANCH \
     --notifications $WAZUH_DASHBOARD_NOTIFICATIONS_BRANCH \
-    --node-version 22.22.0
+    --node-version $(cat ../../../.nvmrc)
 ```
 
 > Note: for `arm` package adds the `--arm` option.
@@ -326,10 +366,10 @@ WZD_ZIPPED_PACKAGES_DIR=$(pwd)
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/dashboard-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard/opensearch-dashboards-3.*.*-linux-*.tar.gz
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-dashboards-plugin/security-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/reporting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-reporting/reportsDashboards-3.*.*.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-security-analytics/security-analytics-dashboards-3.*.*.0.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/security-analytics-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-security-analytics-plugin/security-analytics-dashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/alerting-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-alerting/alertingDashboards-3.*.*.0.zip
 zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/notifications-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-notifications/notifications-dashboards-3.*.*.0.zip
-zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip
+zip -r -j "$WZD_ZIPPED_PACKAGES_DIR/wazuh-dashboard-plugins-package.zip" $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCheckUpdates-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuh-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhCore-3.*.*.zip $WZD_TARGET_PACKAGES_DIR/wazuh-dashboard-plugins/wazuhAiAssistant-3.*.*.zip
 ```
 
 3.2 Build the system package

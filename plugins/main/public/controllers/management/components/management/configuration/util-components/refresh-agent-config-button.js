@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import { EuiButtonEmpty } from '@elastic/eui';
 
@@ -65,7 +66,9 @@ class WzRefreshAgentConfigButton extends Component {
         onClick={this.refresh}
         isDisabled={this.state.isLoading}
       >
-        Refresh
+        {i18n.translate('wazuh.configuration.refreshAgentConfig.button', {
+          defaultMessage: 'Refresh',
+        })}
       </EuiButtonEmpty>
     );
   }

@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { InventoryFIMFiles } from './inventories';
 import { ModuleSubTabs } from '../../../common/tabs';
@@ -7,17 +8,29 @@ import { InventoryFIMRegistryValues } from './inventories/registry-values/invent
 const tabs = [
   {
     id: 'files',
-    name: 'Files',
+    name: i18n.translate('wazuh.fileIntegrityMonitoring.inventoryTabs.files', {
+      defaultMessage: 'Files',
+    }),
     component: InventoryFIMFiles,
   },
   {
     id: 'registry-keys',
-    name: 'Registry keys',
+    name: i18n.translate(
+      'wazuh.fileIntegrityMonitoring.inventoryTabs.registryKeys',
+      {
+        defaultMessage: 'Registry keys',
+      },
+    ),
     component: InventoryFIMRegistryKeys,
   },
   {
     id: 'registry-values',
-    name: 'Registry values',
+    name: i18n.translate(
+      'wazuh.fileIntegrityMonitoring.inventoryTabs.registryValues',
+      {
+        defaultMessage: 'Registry values',
+      },
+    ),
     component: InventoryFIMRegistryValues,
   },
 ];

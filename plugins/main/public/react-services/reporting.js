@@ -18,6 +18,7 @@ import { UI_ERROR_SEVERITIES } from './error-orchestrator/types';
 import { getErrorOrchestrator } from './common-services';
 import store from '../redux/store';
 import { PatternDataSourceFilterManager } from '../components/common/data-source/pattern/pattern-data-source-filter-manager';
+import { i18n } from '@osd/i18n';
 
 export class ReportingService {
   constructor() {
@@ -82,7 +83,9 @@ export class ReportingService {
         error: {
           error: error,
           message: error.message || error,
-          title: `Error creating the report`,
+          title: i18n.translate('wazuh.core.reporting.errorTitle', {
+            defaultMessage: 'Error creating the report',
+          }),
         },
       };
       getErrorOrchestrator().handleError(options);

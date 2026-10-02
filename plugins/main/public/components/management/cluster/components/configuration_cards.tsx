@@ -12,6 +12,7 @@ import {
   WzRibbonPanel,
   WzRibbonTitle,
 } from '../../../common/ribbon/ribbon';
+import { i18n } from '@osd/i18n';
 
 interface ConfigurationCardsProps {
   goBack: () => void;
@@ -25,37 +26,54 @@ export const ConfigurationCards = ({
   const configurationItemsList = [
     {
       key: 'hidden',
-      label: 'Hidden',
+      label: i18n.translate('wazuh.cluster.configurationCards.hiddenLabel', {
+        defaultMessage: 'Hidden',
+      }),
       value: String(configuration?.hidden),
     },
     {
       key: 'name',
-      label: 'Name',
+      label: i18n.translate('wazuh.cluster.configurationCards.nameLabel', {
+        defaultMessage: 'Name',
+      }),
       value: configuration?.name,
     },
     {
       key: 'node-name',
-      label: 'Node name',
+      label: i18n.translate('wazuh.cluster.configurationCards.nodeNameLabel', {
+        defaultMessage: 'Node name',
+      }),
       value: configuration?.node_name,
     },
     {
       key: 'node-type',
-      label: 'Node type',
+      label: i18n.translate('wazuh.cluster.configurationCards.nodeTypeLabel', {
+        defaultMessage: 'Node type',
+      }),
       value: configuration?.node_type,
     },
     {
       key: 'bind-address',
-      label: 'Bind address',
+      label: i18n.translate(
+        'wazuh.cluster.configurationCards.bindAddressLabel',
+        {
+          defaultMessage: 'Bind address',
+        },
+      ),
       value: configuration?.bind_addr,
     },
     {
       key: 'ip',
-      label: 'IP',
+      label: i18n.translate('wazuh.cluster.configurationCards.ipLabel', {
+        defaultMessage: 'IP',
+      }),
       value: configuration?.nodes?.[0],
     },
     {
       key: 'port',
-      label: 'Port',
+      label: i18n.translate('wazuh.cluster.configurationCards.portLabel', {
+        defaultMessage: 'Port',
+      }),
       value: configuration?.port,
     },
   ];
@@ -66,20 +84,33 @@ export const ConfigurationCards = ({
         title={
           <EuiFlexGroup alignItems='center' gutterSize='s'>
             <EuiFlexItem grow={false}>
-              <EuiToolTip content='Go back' position='bottom'>
+              <EuiToolTip
+                content={i18n.translate(
+                  'wazuh.cluster.configurationCards.goBackTooltip',
+                  { defaultMessage: 'Go back' },
+                )}
+                position='bottom'
+              >
                 <EuiButtonIcon
                   color='primary'
                   size='s'
                   display='empty'
                   iconType='arrowLeft'
-                  aria-label='Back'
+                  aria-label={i18n.translate(
+                    'wazuh.cluster.configurationCards.backAriaLabel',
+                    { defaultMessage: 'Back' },
+                  )}
                   onClick={goBack}
                 />
               </EuiToolTip>
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTitle>
-                <h2>Overview</h2>
+                <h2>
+                  {i18n.translate('wazuh.cluster.configurationCards.title', {
+                    defaultMessage: 'Overview',
+                  })}
+                </h2>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>

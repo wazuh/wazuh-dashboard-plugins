@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { i18n } from '@osd/i18n';
+
 const parser = new DOMParser();
 
 /**
@@ -23,13 +25,11 @@ const readErrorPosition = text => {
     column: text.match(/column\s*:?\s*(\d+)/i),
   };
   if (named.line) {
-    return named.column
-      ? `line ${named.line[1]}, column ${named.column[1]}`
-      : `line ${named.line[1]}`;
+    return { line: named.line[1], column: named.column?.[1] };
   }
 
   const prefixed = text.match(/^\s*(\d+):(\d+):/);
-  return prefixed ? `line ${prefixed[1]}, column ${prefixed[2]}` : undefined;
+  return prefixed ? { line: prefixed[1], column: prefixed[2] } : undefined;
 };
 
 /**
@@ -52,7 +52,19 @@ export const validateManagerXML = xml => {
     return false;
   }
   const position = readErrorPosition(parsererror[0].textContent);
-  return position
-    ? `XML is not well-formed at ${position}`
-    : 'Error validating XML';
+  if (!position) {
+    return i18n.translate('wazuh.configuration.xmlManager.validationError', {
+      defaultMessage: 'Error validating XML',
+    });
+  }
+  return position.column
+    ? i18n.translate('wazuh.configuration.xmlManager.notWellFormedAtColumn', {
+        defaultMessage:
+          'XML is not well-formed at line {line}, column {column}',
+        values: { line: position.line, column: position.column },
+      })
+    : i18n.translate('wazuh.configuration.xmlManager.notWellFormedAtLine', {
+        defaultMessage: 'XML is not well-formed at line {line}',
+        values: { line: position.line },
+      });
 };

@@ -12,6 +12,7 @@
 
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 
 import { EuiButtonEmpty, EuiPopover, EuiText } from '@elastic/eui';
 
@@ -43,7 +44,9 @@ class WzHelpButtonPopover extends Component {
       >
         <div style={{ width: '300px' }}>
           <EuiText color='subdued' style={{ padding: '0 8px' }}>
-            More info about this section
+            {i18n.translate('wazuh.configuration.helpButtonPopover.moreInfo', {
+              defaultMessage: 'More info about this section',
+            })}
           </EuiText>
           <>
             {info ? (

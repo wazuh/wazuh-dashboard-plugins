@@ -5,8 +5,9 @@ import {
   EuiCodeBlock,
   EuiText,
   EuiCode,
-  EuiCallOut,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { withErrorBoundary } from '../../common/hocs';
 import { getWazuhCorePlugin } from '../../../kibana-services';
 
@@ -36,8 +37,13 @@ export const AddApi = withErrorBoundary(() => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiText>
-            Modify <EuiCode>opensearch_dashboards.yml</EuiCode> to set the
-            connection information.
+            <FormattedMessage
+              id='wazuh.dashboardsSettings.addApi.modifyConfigurationFile'
+              defaultMessage='Modify {configurationFile} to set the connection information.'
+              values={{
+                configurationFile: <EuiCode>opensearch_dashboards.yml</EuiCode>,
+              }}
+            />
           </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -48,7 +54,11 @@ export const AddApi = withErrorBoundary(() => {
       </EuiFlexGroup>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiText>Where:</EuiText>
+          <EuiText>
+            {i18n.translate('wazuh.dashboardsSettings.addApi.whereLabel', {
+              defaultMessage: 'Where:',
+            })}
+          </EuiText>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiFlexGroup>
@@ -60,16 +70,6 @@ export const AddApi = withErrorBoundary(() => {
               </li>
             ))}
           </ul>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiCallOut title='Warning' color='warning' iconType='alert'>
-            <p>
-              The changes of the API connections in the configuration file could
-              need some time to take effect due to the cache of configuration.
-            </p>
-          </EuiCallOut>
         </EuiFlexItem>
       </EuiFlexGroup>
     </>

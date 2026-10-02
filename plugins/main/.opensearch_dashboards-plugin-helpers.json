@@ -4,7 +4,8 @@
     "yarn.lock",
     "opensearch_dashboards.json",
     "LICENSE",
-    "{common,server,target}/**/*",
+    ".i18nrc.json",
+    "{common,server,target,translations}/**/*",
     "!*test*",
     "CHANGELOG.md"
   ]

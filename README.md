@@ -6,7 +6,7 @@
 [![Forum](https://img.shields.io/badge/chat-on%20forums-blue)](https://groups.google.com/forum/#!forum/wazuh)
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
 [![Web](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
-[![GH Pages](https://github.com/wazuh/wazuh-dashboard-plugins/actions/workflows/deploy-docs.yml/badge.svg)](https://github.com/wazuh/wazuh-dashboard-plugins/actions/workflows/deploy-docs.yml)
+[![GH Pages](https://github.com/wazuh/wazuh-dashboard-plugins/actions/workflows/6_documentation_deploy-to-gh-pages.yml/badge.svg)](https://github.com/wazuh/wazuh-dashboard-plugins/actions/workflows/6_documentation_deploy-to-gh-pages.yml)
 
 - [Welcome](#welcome)
 - [Project resources](#project-resources)

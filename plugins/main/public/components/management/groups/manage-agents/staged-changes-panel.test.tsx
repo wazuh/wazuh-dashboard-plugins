@@ -15,7 +15,13 @@ describe('StagedChangesPanel', () => {
       />,
     );
 
-    expect(wrapper.text()).toContain('Nothing staged yet');
+    expect(wrapper.text()).toContain(
+      "Nothing staged yet. Select a row's checkbox in the table to stage it",
+    );
+    expect(wrapper.text()).not.toContain('Click a row');
+    // Nothing staged also follows a successful Apply, so the header must not
+    // claim that nothing was written.
+    expect(wrapper.text()).not.toContain('nothing written yet');
     expect(
       wrapper
         .find('button[data-test-subj="discardAllButton"]')
@@ -196,5 +202,49 @@ describe('StagedChangesPanel', () => {
 
     wrapper.find('button[data-test-subj="discardAllButton"]').simulate('click');
     expect(onDiscardAll).toHaveBeenCalled();
+  });
+
+  it('uses the singular for a single staged change', () => {
+    const wrapper = mount(
+      <StagedChangesPanel
+        adds={[{ id: '014', name: 'srv-web-014.corp' }]}
+        removes={[]}
+        memberTotal={1}
+        onUnstage={jest.fn()}
+        onDiscardAll={jest.fn()}
+        onApply={jest.fn()}
+      />,
+    );
+
+    expect(
+      wrapper.find('button[data-test-subj="applyChangesButton"]').text(),
+    ).toBe('Apply 1 change');
+  });
+
+  it('prints large counts without digit grouping', () => {
+    const agents = (count: number, prefix: string) =>
+      Array.from({ length: count }, (_, i) => ({
+        id: `${prefix}${i}`,
+        name: `${prefix}-agent-${i}`,
+      }));
+    const wrapper = mount(
+      <StagedChangesPanel
+        adds={agents(1000, 'a')}
+        removes={agents(234, 'r')}
+        memberTotal={5000}
+        onUnstage={jest.fn()}
+        onDiscardAll={jest.fn()}
+        onApply={jest.fn()}
+      />,
+    );
+
+    const text = wrapper.text();
+    expect(text).toContain('Adding 1000');
+    expect(text).toContain('Removing 234');
+    expect(text).toContain('1234 staged, nothing written yet');
+    expect(
+      wrapper.find('button[data-test-subj="applyChangesButton"]').text(),
+    ).toBe('Apply 1234 changes');
+    expect(text).not.toMatch(/\d,\d{3}/);
   });
 });

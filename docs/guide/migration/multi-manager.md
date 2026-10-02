@@ -54,9 +54,13 @@ Identify the purpose of each host in your 4.x configuration and choose the migra
 
 ### Option A: Single manager (recommended for most deployments)
 
-If the multiple entries connected to managers in a **Wazuh cluster**, or if one manager was the primary operational target, configure a single host entry pointing to that manager or the cluster's virtual IP or load balancer address.
+If the multiple entries connected to managers in a **Wazuh cluster**, or if one manager was the
+primary operational target, configure a single host entry pointing to that manager, or — when the
+managers are members of a Wazuh cluster — to the cluster's virtual IP address or the load balancer
+in front of the cluster nodes.
 
-In `opensearch_dashboards.yml`:
+In `opensearch_dashboards.yml`. Do not set `password` here for the `default` host — the package
+resolves it into the keystore from `/etc/wazuh/credentials.env` instead:
 
 ```yaml
 wazuh_core.hosts:
@@ -64,7 +68,6 @@ wazuh_core.hosts:
     url: https://<WAZUH_MANAGER_IP_OR_HOSTNAME>
     port: 55000
     username: wazuh-wui
-    password: <YOUR_PASSWORD>
     run_as: false
 ```
 
@@ -72,9 +75,21 @@ wazuh_core.hosts:
 
 If the multiple entries served genuinely independent Wazuh deployments (for example, different customer environments or separate security domains), deploy a **separate Wazuh dashboard instance for each manager**.
 
-Each instance is configured with a single `wazuh_core.hosts` entry pointing to its respective Wazuh manager:
+Each instance is configured with a single `wazuh_core.hosts` entry pointing to its respective Wazuh
+manager. Only the literal `default` host name gets its password resolved automatically from
+`/etc/wazuh/credentials.env`; a differently-named host like `production` or `staging` does not, so
+avoid writing its password in plain text in `opensearch_dashboards.yml` — add it to the keystore
+of each instance instead, under the matching dotted path (see
+[Passwords in the keystore](../../ref/configuration.md#passwords-in-the-keystore)).
 
-**Instance 1** (`opensearch_dashboards.yml`):
+**Instance 1**: add the password to the keystore, and type it when prompted:
+
+```bash
+sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.production.password
+```
+
+Then configure the host in `opensearch_dashboards.yml`:
 
 ```yaml
 wazuh_core.hosts:
@@ -82,11 +97,17 @@ wazuh_core.hosts:
     url: https://wazuh-manager-prod
     port: 55000
     username: wazuh-wui
-    password: <PROD_PASSWORD>
     run_as: false
 ```
 
-**Instance 2** (`opensearch_dashboards.yml`):
+**Instance 2**: add the password to the keystore, and type it when prompted:
+
+```bash
+sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.staging.password
+```
+
+Then configure the host in `opensearch_dashboards.yml`:
 
 ```yaml
 wazuh_core.hosts:
@@ -94,27 +115,10 @@ wazuh_core.hosts:
     url: https://wazuh-manager-staging
     port: 55000
     username: wazuh-wui
-    password: <STAGING_PASSWORD>
     run_as: false
 ```
 
 Each instance operates independently and connects only to its designated manager.
-
-### Option C: Wazuh cluster with a load balancer
-
-If the managers were members of a **Wazuh cluster**, configure a single host entry pointing to the cluster's virtual IP address or the load balancer in front of the cluster nodes:
-
-```yaml
-wazuh_core.hosts:
-  cluster:
-    url: https://<CLUSTER_VIP_OR_LB>
-    port: 55000
-    username: wazuh-wui
-    password: <YOUR_PASSWORD>
-    run_as: false
-```
-
-This approach maintains a single dashboard instance while providing access to the full cluster.
 
 ### Option D: Cross-Cluster Search with multiple manager APIs
 
@@ -155,7 +159,18 @@ When CCS is active, the dashboard:
 
    A non-empty response confirms that CCS is configured.
 
-3. Define one host entry per manager in `opensearch_dashboards.yml`:
+3. Add the password of each host to the keystore (see
+   [Passwords in the keystore](../../ref/configuration.md#passwords-in-the-keystore)), and type it
+   when prompted:
+
+   ```bash
+   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+     add wazuh_core.hosts.production.password
+   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+     add wazuh_core.hosts.staging.password
+   ```
+
+   Then define one host entry per manager in `opensearch_dashboards.yml`:
 
    ```yaml
    wazuh_core.hosts:
@@ -163,13 +178,11 @@ When CCS is active, the dashboard:
        url: https://wazuh-manager-prod
        port: 55000
        username: wazuh-wui
-       password: <PROD_PASSWORD>
        run_as: false
      staging:
        url: https://wazuh-manager-staging
        port: 55000
        username: wazuh-wui
-       password: <STAGING_PASSWORD>
        run_as: false
    ```
 
@@ -181,7 +194,7 @@ When CCS is active, the dashboard:
 
 5. In the Wazuh dashboard, create an index pattern that spans multiple clusters:
 
-   - Navigate to **☰ Menu > Dashboard Management > Index patterns**.
+   - Navigate to **☰ Menu > Dashboard management > Dashboards Management > Index patterns**.
    - Create a new pattern such as `*:wazuh-events*` to include all registered remote clusters, or use `cluster-b:wazuh-events*` to target a specific one.
 
 6. Build dashboards and visualizations using the cross-cluster index pattern.
@@ -196,7 +209,7 @@ For full configuration details and prerequisites (TLS, transport layer settings,
 
 2. **Select the appropriate option** from the list above.
 
-3. **Update `opensearch_dashboards.yml`** on each dashboard instance. Use a single entry for Options A–C; use multiple entries only for Option D after CCS is configured. See [Configuration migration](./configuration.md) for the full settings reference.
+3. **Update `opensearch_dashboards.yml`** on each dashboard instance. Use a single entry for Option A or B; use multiple entries only for Option D after CCS is configured. See [Configuration migration](./configuration.md) for the full settings reference.
 
 4. **Export saved objects** from the 4.x instance before decommissioning it. See [Custom dashboards and visualizations](./dashboards.md).
 

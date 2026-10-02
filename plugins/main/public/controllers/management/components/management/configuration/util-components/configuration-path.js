@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { i18n } from '@osd/i18n';
 import { connect } from 'react-redux';
 
 import {
@@ -57,17 +58,32 @@ class WzConfigurationPath extends Component {
       modal = (
         <EuiOverlayMask>
           <EuiConfirmModal
-            title='Unsubmitted changes'
+            title={i18n.translate(
+              'wazuh.configuration.configurationPath.unsavedModalTitle',
+              { defaultMessage: 'Unsubmitted changes' },
+            )}
             onConfirm={() => {
               closeModal;
               updateConfigurationSection('');
             }}
             onCancel={closeModal}
-            cancelButtonText="No, don't do it"
-            confirmButtonText='Yes, do it'
+            cancelButtonText={i18n.translate(
+              'wazuh.configuration.configurationPath.unsavedModalCancel',
+              { defaultMessage: "No, don't do it" },
+            )}
+            confirmButtonText={i18n.translate(
+              'wazuh.configuration.configurationPath.unsavedModalConfirm',
+              { defaultMessage: 'Yes, do it' },
+            )}
           >
             <p style={{ textAlign: 'center' }}>
-              There are unsaved changes. Are you sure you want to proceed?
+              {i18n.translate(
+                'wazuh.configuration.configurationPath.unsavedModalBody',
+                {
+                  defaultMessage:
+                    'There are unsaved changes. Are you sure you want to proceed?',
+                },
+              )}
             </p>
           </EuiConfirmModal>
         </EuiOverlayMask>
@@ -80,7 +96,13 @@ class WzConfigurationPath extends Component {
           <EuiFlexItem>
             <EuiFlexGroup alignItems='center'>
               <span style={{ margin: '0 6px' }}>
-                <EuiToolTip content='Back to configuration' position='right'>
+                <EuiToolTip
+                  content={i18n.translate(
+                    'wazuh.configuration.configurationPath.backTooltip',
+                    { defaultMessage: 'Back to configuration' },
+                  )}
+                  position='right'
+                >
                   <EuiButtonIcon
                     style={{ padding: 0 }}
                     iconType='arrowLeft'
@@ -92,7 +114,10 @@ class WzConfigurationPath extends Component {
                         updateConfigurationSection('');
                       }
                     }}
-                    aria-label='back to configuration'
+                    aria-label={i18n.translate(
+                      'wazuh.configuration.configurationPath.backAriaLabel',
+                      { defaultMessage: 'back to configuration' },
+                    )}
                   />
                 </EuiToolTip>
               </span>

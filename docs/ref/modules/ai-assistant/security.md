@@ -12,7 +12,7 @@ for it.
 
 ## Read-only by construction
 
-All 32 tools are read-only and there is no code-execution sink. Indirect prompt injection —
+All 35 tools are read-only and there is no code-execution sink. Indirect prompt injection —
 attacker-controlled text arriving through an ingested alert and being interpreted by the model —
 is bounded by the same fact: the worst it can trigger is another read the user was already
 allowed to perform. Answers are rendered through EUI's markdown component with raw HTML disabled
@@ -25,8 +25,10 @@ writes run as the calling user (`asCurrentUser`) against the Wazuh indexer's own
 `/_plugins/_setup/ai_assistant/...` endpoints — the indexer's own
 `plugin:wazuh/ai_assistant/settings/{read,write}` permissions on that identity's backend role are
 what authorize each request (see [Required indexer permissions](#required-indexer-permissions)
-below). `GET /providers` stays readable by any authenticated user regardless, because the Chat
-view needs the provider list — it never returns a key, only `hasApiKey`.
+below), including `GET /providers` in the Settings view. It never returns a key, only
+`hasApiKey`. The Chat view's own provider lookup (`server/routes/chat.ts`) goes through the same
+current-user read, so chatting also requires `settings/read` — a user without it gets `403` (see
+[AI chat](#ai-chat) below).
 
 An operator can additionally lock every settings/provider write with
 `wazuh_ai_assistant.settingsReadOnly` (see
@@ -57,11 +59,12 @@ aren't defined in this repo but are required all the same.
 Chat reads run `asCurrentUser`, never a privileged internal identity, so every permission below is
 checked against the chatting user's own backend role, not just an admin's.
 
-| Permission                                                                                                                                                                                                                                        | Type    | Why                                                                                                                                                                                                                                                                |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Index `read` (dls: `{"term": {"user": "${user.name}"}}`) + `write` (dsl: `{"term": {"user": "${user.name}"}}`) on `wazuh-ai-assistant-sessions*`, `.ds-wazuh-ai-assistant-sessions-*` — or a bundled `wazuh_ai_assistant` role providing the same | Index   | Persist and retrieve the caller's own conversation turns. Enforced twice: indexer document-level security (a `{"term": {"user": "${user.name}"}}` filter on the role) **and** an application-level `user` filter on every query — defense in depth, not either/or. |
-| `plugin:wazuh/ai_assistant/settings/read`                                                                                                                                                                                                         | Cluster | Resolve the default provider and privacy settings needed to start or continue a turn (`GET /_plugins/_setup/ai_assistant/settings`).                                                                                                                               |
-| `cluster:admin/opendistro/ism/policy/get`                                                                                                                                                                                                         | Cluster | Read the `ai-assistant-sessions-policy` ISM policy — extract the value for `conversationsRetentionDays` setting                                                                                                                                                    |
+| Permission                                                                                                                                                                                  | Type    | Why                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Index `read` (dls: `{"term": {"user": "${user.name}"}}`) on `wazuh-ai-assistant-sessions*`, `.ds-wazuh-ai-assistant-sessions-*` — or a bundled `wazuh_ai_assistant` role providing the same | Index   | Retrieve the caller's own conversation turns (writes go through the indexer's `/_plugins/_setup/ai_assistant/sessions` API instead, see below). Enforced twice: indexer document-level security (a `{"term": {"user": "${user.name}"}}` filter on the role) **and** an application-level `user` filter on every query — defense in depth, not either/or. |
+| `plugin:wazuh/ai_assistant/session/write`                                                                                                                                                   | Cluster | Create, update and delete the caller's own AI assistant sessions through `/_plugins/_setup/ai_assistant/sessions` — bundled into the `wazuh_ai_assistant` role alongside the index permission above.                                                                                                                                                     |
+| `plugin:wazuh/ai_assistant/settings/read`                                                                                                                                                   | Cluster | Resolve the selected provider and the privacy settings needed to start or continue a turn (`GET /_plugins/_setup/ai_assistant/{providers,settings}`).                                                                                                                                                                                                    |
+| `cluster:admin/opendistro/ism/policy/get`                                                                                                                                                   | Cluster | Read the `ai-assistant-sessions-policy` ISM policy — extract the value for `conversationRetentionDays` setting                                                                                                                                                                                                                                           |
 
 ### Manage settings (providers, privacy, conversation history)
 
@@ -92,11 +95,11 @@ Provider API keys can be encrypted with **AES-256-GCM** using a key supplied thr
 dashboard configuration (`wazuh_ai_assistant.encryptionKey`; prefer the OpenSearch Dashboards
 keystore). The implementation is Node's builtin `crypto` only — no new dependency.
 
-- The format, `enc:v1:`, binds each ciphertext to its own saved object via GCM
-  **Additional Authenticated Data** (`wazuh-ai-assistant-provider:<saved object id>:apiKey`).
-  Copying an encrypted blob into another provider's field — via saved-objects import, restore,
-  or any write path that bypasses the plugin — fails decryption hard instead of silently handing
-  the wrong provider a working key.
+- The format, `enc:v1:`, binds each ciphertext to its own provider record via GCM
+  **Additional Authenticated Data** (`wazuh-ai-assistant-provider:<provider id>:apiKey`). Copying
+  an encrypted blob into another provider's field — via a direct indexer write or any path that
+  bypasses the plugin — fails decryption hard instead of silently handing the wrong provider a
+  working key.
 - Unset by default, but required to save API keys: without a key configured, provider writes
   carrying an API key are rejected (a startup warning is also logged). Plaintext keys are never
   supported or managed: a value stored by an earlier pre-release build fails decryption and must
@@ -114,7 +117,7 @@ Full format and threat-model details: `plugins/wazuh-ai-assistant/docs/ENCRYPTIO
   [Tool catalog](./tool-catalog.md#guardrails)): injected timeout, size clamps, bounded time
   windows, aggregation caps, script/regexp/leading-wildcard blocks, index-pattern allowlist.
 - **Storage caps**: 500 conversations per user; title/message/count limits prevent unbounded
-  saved-object growth.
+  growth of stored conversations.
 
 ## What leaves the cluster
 
@@ -136,8 +139,10 @@ privacy on/off badge.
 ## Conversation isolation
 
 Conversations are owner-scoped: list endpoints return only the caller's summaries, and requests
-for another owner's conversation return `404` — existence is never leaked across owners. The
-saved-object types are `hidden: true`, invisible to the generic saved-objects API and export UI.
+for another owner's conversation return `404` — existence is never leaked across owners.
+Conversations are not saved objects — the plugin registers none — so they never appear in the
+generic saved-objects API or export UI; isolation is enforced by the indexer's own
+document-level security plus an application-level `user` filter on every query.
 
 A saved conversation stores what the user actually saw, so that resuming one restores the same
 conversation rather than a summary of it: the prose turns, their timestamps, the result tables

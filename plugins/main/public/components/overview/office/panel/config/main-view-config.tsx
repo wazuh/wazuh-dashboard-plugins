@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React from 'react';
 import { AggTable } from '../../../../common/modules/panel/';
 import { EuiFlexItem } from '@elastic/eui';
@@ -38,9 +39,19 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top users'
+                  tableTitle={i18n.translate(
+                    'wazuh.office365.topUsersTable.title',
+                    {
+                      defaultMessage: 'Top users',
+                    },
+                  )}
                   aggTerm='user.name'
-                  aggLabel='User'
+                  aggLabel={i18n.translate(
+                    'wazuh.office365.topUsersTable.column',
+                    {
+                      defaultMessage: 'User',
+                    },
+                  )}
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
@@ -53,9 +64,19 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top client IP address'
+                  tableTitle={i18n.translate(
+                    'wazuh.office365.topClientIpAddressTable.title',
+                    {
+                      defaultMessage: 'Top client IP address',
+                    },
+                  )}
                   aggTerm='client.ip'
-                  aggLabel='Client IP address'
+                  aggLabel={i18n.translate(
+                    'wazuh.office365.topClientIpAddressTable.column',
+                    {
+                      defaultMessage: 'Client IP address',
+                    },
+                  )}
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
@@ -72,9 +93,19 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top actions'
+                  tableTitle={i18n.translate(
+                    'wazuh.office365.topActionsTable.title',
+                    {
+                      defaultMessage: 'Top actions',
+                    },
+                  )}
                   aggTerm='event.action'
-                  aggLabel='Action'
+                  aggLabel={i18n.translate(
+                    'wazuh.office365.topActionsTable.column',
+                    {
+                      defaultMessage: 'Action',
+                    },
+                  )}
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}
@@ -87,9 +118,19 @@ export const MainViewConfig = (props: ModuleConfigProps) => {
             component: props => (
               <EuiFlexItem grow={props.grow}>
                 <AggTable
-                  tableTitle='Top event types'
+                  tableTitle={i18n.translate(
+                    'wazuh.office365.topEventTypesTable.title',
+                    {
+                      defaultMessage: 'Top event types',
+                    },
+                  )}
                   aggTerm='event.type'
-                  aggLabel='Event Type'
+                  aggLabel={i18n.translate(
+                    'wazuh.office365.topEventTypesTable.column',
+                    {
+                      defaultMessage: 'Event Type',
+                    },
+                  )}
                   maxRows={5}
                   onRowClick={(field, value) => props.onRowClick(field, value)}
                   searchParams={searchParams}

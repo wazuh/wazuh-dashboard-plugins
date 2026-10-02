@@ -7,10 +7,10 @@ import { MenuItemPosition, TopNavMenuItem } from './top-nav-menu';
 export const topNavItems = {
   exportItem: onClick => ({
     id: 'export',
-    label: i18n.translate('dev-tools.exportTabLabel', {
+    label: i18n.translate('wazuh.devTools.topNav.exportLabel', {
       defaultMessage: 'Export',
     }),
-    description: i18n.translate('dev-tools.exportTabDescription', {
+    description: i18n.translate('wazuh.devTools.topNav.exportDescription', {
       defaultMessage: 'Export',
     }),
     onClick: () => {
@@ -19,7 +19,7 @@ export const topNavItems = {
     testId: 'consoleExportButton',
     render: commonProps => (
       <EuiSmallButton minWidth='unset' {...commonProps}>
-        {i18n.translate('dev-tools.exportTabLabel', {
+        {i18n.translate('wazuh.devTools.topNav.exportLabel', {
           defaultMessage: 'Export',
         })}
       </EuiSmallButton>
@@ -28,12 +28,15 @@ export const topNavItems = {
   }),
   apiReferenceItem: onClick => ({
     id: 'api-reference',
-    label: i18n.translate('dev-tools.apiReferenceTabLabel', {
+    label: i18n.translate('wazuh.devTools.topNav.apiReferenceLabel', {
       defaultMessage: 'API Reference',
     }),
-    description: i18n.translate('dev-tools.apiReferenceTabDescription', {
-      defaultMessage: 'API Reference',
-    }),
+    description: i18n.translate(
+      'wazuh.devTools.topNav.apiReferenceDescription',
+      {
+        defaultMessage: 'API Reference',
+      },
+    ),
     onClick: () => {
       onClick();
     },
@@ -58,7 +61,7 @@ export const topNavItems = {
         target='_blank'
         rel='noopener noreferrer'
       >
-        {i18n.translate('dev-tools.apiReferenceTabLabel', {
+        {i18n.translate('wazuh.devTools.topNav.apiReferenceLabel', {
           defaultMessage: 'API Reference',
         })}
       </EuiSmallButton>

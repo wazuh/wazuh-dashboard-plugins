@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -108,7 +109,16 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
                 position='top'
                 content={
                   segment.tooltip ??
-                  `${segment.label}: ${formatUINumber(segment.count)}`
+                  i18n.translate(
+                    'wazuh.common.homeOverviewDistributionBar.segmentTooltip',
+                    {
+                      defaultMessage: '{label}: {count}',
+                      values: {
+                        label: segment.label,
+                        count: formatUINumber(segment.count),
+                      },
+                    },
+                  )
                 }
                 display='block'
               >

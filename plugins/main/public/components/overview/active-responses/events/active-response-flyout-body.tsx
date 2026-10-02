@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import React, { useEffect, useState } from 'react';
 import {
   EuiEmptyPrompt,
@@ -66,7 +67,16 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
     return (
       <EuiEmptyPrompt
         icon={<EuiLoadingSpinner size='xl' />}
-        title={<EuiText>Loading original finding...</EuiText>}
+        title={
+          <EuiText>
+            {i18n.translate(
+              'wazuh.activeResponses.sourceFindingFlyout.loadingTitle',
+              {
+                defaultMessage: 'Loading original finding...',
+              },
+            )}
+          </EuiText>
+        }
       />
     );
   }
@@ -77,11 +87,25 @@ export const ActiveResponseFlyoutBody = ({ hit }: { hit: any }) => {
         <EuiSpacer size='l' />
         <EuiEmptyPrompt
           iconType='search'
-          title={<h3>Missing source finding</h3>}
+          title={
+            <h3>
+              {i18n.translate(
+                'wazuh.activeResponses.sourceFindingFlyout.notFoundTitle',
+                {
+                  defaultMessage: 'Missing source finding',
+                },
+              )}
+            </h3>
+          }
           body={
             <EuiText size='s'>
-              The source finding for this active response could not be found. It
-              may have been deleted from its index.
+              {i18n.translate(
+                'wazuh.activeResponses.sourceFindingFlyout.notFoundDescription',
+                {
+                  defaultMessage:
+                    'The source finding for this active response could not be found. It may have been deleted from its index.',
+                },
+              )}
             </EuiText>
           }
         />

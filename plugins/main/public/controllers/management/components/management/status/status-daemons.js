@@ -22,6 +22,7 @@ import {
 import { sortBy } from 'lodash';
 
 import { connect } from 'react-redux';
+import { i18n } from '@osd/i18n';
 
 const statusColors = {
   ok: '#00a69b',
@@ -65,7 +66,11 @@ export class WzStatusDaemons extends Component {
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiTitle size='m'>
-                  <h2>Daemons</h2>
+                  <h2>
+                    {i18n.translate('wazuh.serverStatus.daemons.title', {
+                      defaultMessage: 'Daemons',
+                    })}
+                  </h2>
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem
@@ -77,11 +82,27 @@ export class WzStatusDaemons extends Component {
                     type='dot'
                     color={generalStatus ? statusColors.ok : statusColors.warn}
                     size='l'
-                    aria-label='Daemon status general'
-                    content={`ready: ${generalStatus ? 'yes' : 'no'}`}
+                    aria-label={i18n.translate(
+                      'wazuh.serverStatus.daemons.generalStatusAriaLabel',
+                      { defaultMessage: 'Daemon status general' },
+                    )}
+                    content={i18n.translate(
+                      'wazuh.serverStatus.daemons.generalStatusTooltip',
+                      {
+                        defaultMessage:
+                          'ready: {ready, select, yes {yes} other {no}}',
+                        values: { ready: generalStatus ? 'yes' : 'no' },
+                      },
+                    )}
                   />
                   <span style={textStyle}>
-                    {generalStatus ? 'ready' : 'not ready'}
+                    {generalStatus
+                      ? i18n.translate('wazuh.serverStatus.daemons.ready', {
+                          defaultMessage: 'ready',
+                        })
+                      : i18n.translate('wazuh.serverStatus.daemons.notReady', {
+                          defaultMessage: 'not ready',
+                        })}
                   </span>
                 </EuiText>
               </EuiFlexItem>
@@ -111,10 +132,21 @@ export class WzStatusDaemons extends Component {
                       type='dot'
                       color={statusColor}
                       size='m'
-                      aria-label='Daemon status info'
-                      content={`ready:  ${ready ? 'yes' : 'no'}, running: ${
-                        running ? 'yes' : 'no'
-                      }`}
+                      aria-label={i18n.translate(
+                        'wazuh.serverStatus.daemons.daemonStatusAriaLabel',
+                        { defaultMessage: 'Daemon status info' },
+                      )}
+                      content={i18n.translate(
+                        'wazuh.serverStatus.daemons.daemonStatusTooltip',
+                        {
+                          defaultMessage:
+                            'ready:  {ready, select, yes {yes} other {no}}, running: {running, select, yes {yes} other {no}}',
+                          values: {
+                            ready: ready ? 'yes' : 'no',
+                            running: running ? 'yes' : 'no',
+                          },
+                        },
+                      )}
                     />
                     <span style={textStyle}>{daemon.key}</span>
                   </EuiText>

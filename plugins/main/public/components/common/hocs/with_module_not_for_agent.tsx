@@ -12,25 +12,36 @@
 
 import React from 'react';
 import { compose } from 'redux';
+import { i18n } from '@osd/i18n';
 import { connect } from 'react-redux';
 import { withGuard } from './withGuard';
 import { PromptModuleNotForAgent } from '../../agents/prompts';
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   agent: state.appStateReducers.currentAgentData,
 });
 
-export const withModuleNotForAgent = (WrappedComponent) =>
+export const withModuleNotForAgent = WrappedComponent =>
   compose(
     connect(mapStateToProps),
     withGuard(
       ({ agent }) => agent?.id,
-      (props) => (
+      props => (
         <PromptModuleNotForAgent
-          title="Module not available for agents"
-          body="Remove the pinned agent."
+          title={i18n.translate(
+            'wazuh.common.withModuleNotForAgent.prompt.title',
+            {
+              defaultMessage: 'Module not available for agents',
+            },
+          )}
+          body={i18n.translate(
+            'wazuh.common.withModuleNotForAgent.prompt.body',
+            {
+              defaultMessage: 'Remove the pinned agent.',
+            },
+          )}
           {...props}
         />
-      )
-    )
+      ),
+    ),
   )(WrappedComponent);

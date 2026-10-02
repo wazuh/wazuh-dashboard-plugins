@@ -1,3 +1,4 @@
+import { i18n } from '@osd/i18n';
 import { RegisterAgentData } from '../interfaces/types';
 import LinuxDarkIcon from '../../../../../public/assets/images/themes/dark/linux-icon.svg';
 import LinuxLightIcon from '../../../../../public/assets/images/themes/light/linux-icon.svg';
@@ -32,24 +33,45 @@ export const OPERATING_SYSTEMS_OPTIONS: RegisterAgentData[] = [
 
 export const SERVER_ADDRESS_TEXTS = [
   {
-    title: 'Server address',
-    subtitle:
-      'The agent reaches the server at a single endpoint built from an address, a port, and a path prefix. Only the address is required: the other two are under the advanced options, and left empty the agent falls back to its own defaults.',
+    title: i18n.translate('wazuh.endpointsSummary.serverAddressStep.title', {
+      defaultMessage: 'Server address',
+    }),
+    subtitle: i18n.translate(
+      'wazuh.endpointsSummary.serverAddressStep.subtitle',
+      {
+        defaultMessage:
+          'The agent reaches the server at a single endpoint built from an address, a port, and a path prefix. Only the address is required: the other two are under the advanced options, and left empty the agent falls back to its own defaults.',
+      },
+    ),
   },
 ];
 
 export const OPTIONAL_PARAMETERS_TEXT = [
   {
-    title: 'Optional settings',
-    subtitle:
-      'The agent verifies the manager certificate by default, against the endpoint system CA store or against a manager CA file given below. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
+    title: i18n.translate('wazuh.endpointsSummary.optionalSettingsStep.title', {
+      defaultMessage: 'Optional settings',
+    }),
+    subtitle: i18n.translate(
+      'wazuh.endpointsSummary.optionalSettingsStep.subtitle',
+      {
+        defaultMessage:
+          'The agent verifies the manager certificate by default, against the endpoint system CA store or against a manager CA file given below. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
+      },
+    ),
   },
 ];
 
 export const ENROLLMENT_TOKEN_TEXTS = [
   {
-    title: 'Enrollment token',
-    subtitle:
-      'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, open the advanced options to set those values yourself, or reuse a token kept from an earlier deployment.',
+    title: i18n.translate('wazuh.endpointsSummary.enrollmentTokenStep.title', {
+      defaultMessage: 'Enrollment token',
+    }),
+    subtitle: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenStep.subtitle',
+      {
+        defaultMessage:
+          'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, open the advanced options to set those values yourself, or reuse a token kept from an earlier deployment.',
+      },
+    ),
   },
 ];

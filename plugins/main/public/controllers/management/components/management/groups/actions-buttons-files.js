@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { i18n } from '@osd/i18n';
 // Eui components
 import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 
@@ -63,7 +64,9 @@ class WzGroupsActionButtonsFiles extends Component {
         iconType='documentEdit'
         onClick={() => this.showGroupConfiguration()}
       >
-        Edit group configuration
+        {i18n.translate('wazuh.endpointGroups.detail.editConfigurationButton', {
+          defaultMessage: 'Edit group configuration',
+        })}
       </WzButtonPermissions>
     );
 

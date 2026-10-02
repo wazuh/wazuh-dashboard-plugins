@@ -1,4 +1,5 @@
 import React from 'react';
+import { FormattedMessage } from '@osd/i18n/react';
 import { EuiText } from '@elastic/eui';
 import { formatValueSafely } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
@@ -14,7 +15,15 @@ export const ThreatCatalogTiles: React.FC<ThreatCatalogTilesProps> = ({
   const value = iocs.status === 'available' ? iocs.data : undefined;
   return (
     <EuiText size='s' data-test-subj='threat-catalog-tile-iocs'>
-      <strong className='tab-num'>{formatValueSafely(value)}</strong> IOCs
+      <FormattedMessage
+        id='wazuh.common.homeOverviewThreatCatalog.iocsCount'
+        defaultMessage='{count} IOCs'
+        values={{
+          count: (
+            <strong className='tab-num'>{formatValueSafely(value)}</strong>
+          ),
+        }}
+      />
     </EuiText>
   );
 };

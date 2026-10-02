@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import { i18n } from '@osd/i18n';
 import React, { useState, useEffect, useRef } from 'react';
 import { EuiBasicTable } from '@elastic/eui';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
@@ -94,7 +95,10 @@ export function TableDefault({
           error: {
             error: error,
             message: error.message || error,
-            title: `${error.name}: Error fetching items`,
+            title: i18n.translate('wazuh.common.tables.fetchItemsError', {
+              defaultMessage: '{errorName}: Error fetching items',
+              values: { errorName: error.name },
+            }),
           },
         };
         getErrorOrchestrator().handleError(options);

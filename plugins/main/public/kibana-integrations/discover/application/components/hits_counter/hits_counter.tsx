@@ -71,7 +71,7 @@ export function HitsCounter({
               {formatNumWithCommas(hits)}
             </strong>{' '}
             <FormattedMessage
-              id='discover.hitsPluralTitle'
+              id='wazuh.common.hitsCounter.hits'
               defaultMessage='{hits, plural, one {hit} other {hits}}'
               values={{
                 hits,
@@ -86,7 +86,12 @@ export function HitsCounter({
                   tabIndex={0}
                   style={{ width: '19px', height: '19px', marginBottom: '2px' }}
                   type={tooltip.iconType || 'iInCircle'}
-                  aria-label={tooltip.ariaLabel || 'Info'}
+                  aria-label={
+                    tooltip.ariaLabel ||
+                    i18n.translate('wazuh.common.hitsCounter.infoAriaLabel', {
+                      defaultMessage: 'Info',
+                    })
+                  }
                 />
               </EuiToolTip>
             )}
@@ -99,12 +104,15 @@ export function HitsCounter({
               data-test-subj='resetSavedSearch'
               onClick={onResetQuery}
               size='s'
-              aria-label={i18n.translate('discover.reloadSavedSearchButton', {
-                defaultMessage: 'Reset search',
-              })}
+              aria-label={i18n.translate(
+                'wazuh.common.hitsCounter.resetSearchButton',
+                {
+                  defaultMessage: 'Reset search',
+                },
+              )}
             >
               <FormattedMessage
-                id='discover.reloadSavedSearchButton'
+                id='wazuh.common.hitsCounter.resetSearchButton'
                 defaultMessage='Reset search'
               />
             </EuiButtonEmpty>

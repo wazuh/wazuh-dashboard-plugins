@@ -1,4 +1,5 @@
 import React from 'react';
+import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -56,16 +57,31 @@ const SecurityOperationsSectionComponent: React.FC<
   return (
     <div ref={sectionRef}>
       <SectionHeader
-        title='Security operations'
-        description='Fleet inventory scale, automated response activity, and the regulatory frameworks you can jump to.'
+        title={i18n.translate(
+          'wazuh.common.homeOverviewSecurityOperations.title',
+          { defaultMessage: 'Security operations' },
+        )}
+        description={i18n.translate(
+          'wazuh.common.homeOverviewSecurityOperations.description',
+          {
+            defaultMessage:
+              'Fleet inventory scale, automated response activity, and the regulatory frameworks you can jump to.',
+          },
+        )}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
-            title='IT Hygiene'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSecurityOperations.itHygieneTitle',
+              { defaultMessage: 'IT Hygiene' },
+            )}
             titleLink={{ href: getItHygieneUrl() }}
-            caption='Current state'
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionCurrentState',
+              { defaultMessage: 'Current state' },
+            )}
             centerBody
             data-test-subj='home-overview-it-hygiene'
           >
@@ -87,9 +103,15 @@ const SecurityOperationsSectionComponent: React.FC<
             isPermissionDenied={
               activeResponse.error?.kind === 'permission-denied'
             }
-            title='Incident Response'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSecurityOperations.incidentResponseTitle',
+              { defaultMessage: 'Incident Response' },
+            )}
             titleLink={{ href: getActiveResponseUrl() }}
-            caption='Last 24 hours'
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionLast24Hours',
+              { defaultMessage: 'Last 24 hours' },
+            )}
             centerBody
             data-test-subj='home-overview-active-response'
           >
@@ -108,7 +130,10 @@ const SecurityOperationsSectionComponent: React.FC<
                   </EuiLink>
                 </RedirectAppLinks>
               }
-              label='Actions triggered, last 24 hours'
+              label={i18n.translate(
+                'wazuh.common.homeOverviewSecurityOperations.actionsTriggered',
+                { defaultMessage: 'Actions triggered, last 24 hours' },
+              )}
               data-test-subj='active-response-stat'
             />
           </WidgetGroup>
@@ -116,9 +141,15 @@ const SecurityOperationsSectionComponent: React.FC<
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
-            title='Regulatory Compliance'
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSecurityOperations.regulatoryComplianceTitle',
+              { defaultMessage: 'Regulatory Compliance' },
+            )}
             titleLink={{ href: getRegulatoryComplianceUrlHome() }}
-            caption='Controls implicated, last 24 hours'
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewSecurityOperations.regulatoryComplianceCaption',
+              { defaultMessage: 'Controls implicated, last 24 hours' },
+            )}
             centerBody
             data-test-subj='home-overview-regulatory-compliance'
           >
@@ -138,9 +169,21 @@ const SecurityOperationsSectionComponent: React.FC<
               topOs.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={topOs.error?.kind === 'permission-denied'}
-            title='Top 5 operating systems'
-            caption='Current state'
-            titleLink={{ href: getItHygieneUrl(), destination: 'IT Hygiene' }}
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSecurityOperations.topOperatingSystemsTitle',
+              { defaultMessage: 'Top 5 operating systems' },
+            )}
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionCurrentState',
+              { defaultMessage: 'Current state' },
+            )}
+            titleLink={{
+              href: getItHygieneUrl(),
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewSecurityOperations.itHygieneDestination',
+                { defaultMessage: 'IT Hygiene' },
+              ),
+            }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             centerBody
             data-test-subj='home-overview-top-os'
@@ -148,10 +191,19 @@ const SecurityOperationsSectionComponent: React.FC<
             {topOs.data && (
               <BarList
                 items={topOs.data}
-                emptyMessage='No operating systems found'
-                title='OS name'
+                emptyMessage={i18n.translate(
+                  'wazuh.common.homeOverviewSecurityOperations.noOperatingSystems',
+                  { defaultMessage: 'No operating systems found' },
+                )}
+                title={i18n.translate(
+                  'wazuh.common.homeOverviewSecurityOperations.osNameColumn',
+                  { defaultMessage: 'OS name' },
+                )}
                 totalSlots={5}
-                moreItemsMessage='No more operating systems to display'
+                moreItemsMessage={i18n.translate(
+                  'wazuh.common.homeOverviewSecurityOperations.noMoreOperatingSystems',
+                  { defaultMessage: 'No more operating systems to display' },
+                )}
                 getHref={item =>
                   getItHygieneSystemOsUrl(item.key, topOs.indexPatternId)
                 }
@@ -168,9 +220,21 @@ const SecurityOperationsSectionComponent: React.FC<
               topServices.error?.kind === 'index-pattern-missing'
             }
             isPermissionDenied={topServices.error?.kind === 'permission-denied'}
-            title='Top 5 network services'
-            caption='Current state'
-            titleLink={{ href: getItHygieneUrl(), destination: 'IT Hygiene' }}
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSecurityOperations.topNetworkServicesTitle',
+              { defaultMessage: 'Top 5 network services' },
+            )}
+            caption={i18n.translate(
+              'wazuh.common.homeOverviewWidget.captionCurrentState',
+              { defaultMessage: 'Current state' },
+            )}
+            titleLink={{
+              href: getItHygieneUrl(),
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewSecurityOperations.itHygieneDestination',
+                { defaultMessage: 'IT Hygiene' },
+              ),
+            }}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             data-test-subj='home-overview-top-network-services'
           >

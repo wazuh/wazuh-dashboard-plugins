@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { clusterNodes } from '../../../../../controllers/management/components/management/configuration/utils/wz-fetch';
 import { WzRequest } from '../../../../../react-services';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
@@ -54,7 +56,12 @@ export const ModuleEnabledCheck = () => {
         error: {
           error: error,
           message: error.message || error,
-          title: 'Error checking if the module is enabled',
+          title: i18n.translate(
+            'wazuh.vulnerabilityDetection.moduleEnabledCheck.errorChecking',
+            {
+              defaultMessage: 'Error checking if the module is enabled',
+            },
+          ),
         },
       };
       getErrorOrchestrator().handleError(options);
@@ -70,21 +77,40 @@ export const ModuleEnabledCheck = () => {
   }, [userPermissionRequirements]);
 
   return data?.enabled === false ? (
-    <EuiCallOut title='Warning' color='warning' iconType='alert'>
+    <EuiCallOut
+      title={i18n.translate(
+        'wazuh.vulnerabilityDetection.moduleEnabledCheck.callout.title',
+        {
+          defaultMessage: 'Warning',
+        },
+      )}
+      color='warning'
+      iconType='alert'
+    >
       <p>
-        Vulnerabilies detection module is not enabled. You can learn to how to
-        configure following the{' '}
-        <EuiLink
-          href={webDocumentationLink(
-            'user-manual/capabilities/vulnerability-detection/configuring-scans.html#configuration',
-          )}
-          external
-          target='_blank'
-          rel='noopener noreferrer'
-        >
-          documentation
-        </EuiLink>
-        .
+        <FormattedMessage
+          id='wazuh.vulnerabilityDetection.moduleEnabledCheck.callout.description'
+          defaultMessage='Vulnerabilies detection module is not enabled. You can learn to how to configure following the {documentationLink}.'
+          values={{
+            documentationLink: (
+              <EuiLink
+                href={webDocumentationLink(
+                  'user-manual/capabilities/vulnerability-detection/configuring-scans.html#configuration',
+                )}
+                external
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                {i18n.translate(
+                  'wazuh.vulnerabilityDetection.moduleEnabledCheck.callout.documentationLink',
+                  {
+                    defaultMessage: 'documentation',
+                  },
+                )}
+              </EuiLink>
+            ),
+          }}
+        />
       </p>
     </EuiCallOut>
   ) : null;

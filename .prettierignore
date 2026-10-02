@@ -1,3 +1,6 @@
-# NDJSON sample data: one JSON object per line, not a single JSON document.
-# Prettier's JSON parser expects one value per file and fails on these.
-plugins/*/server/lib/sample-data/dataset/**/*.json
+# The style guide shows "bad" examples on purpose; formatting its code blocks would rewrite them
+# into the "good" form they are contrasted with.
+STYLEGUIDE.md
+
+# Sample-data datasets are NDJSON (one document per line), which Prettier cannot parse as JSON.
+plugins/main/server/lib/sample-data/dataset/**/*.json

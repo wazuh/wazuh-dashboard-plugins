@@ -208,29 +208,10 @@ To setup the credentials (**this only has to be done once**):
 2. Click on `CLI Password: Generate Encrypted Password`
 3. In the new window that opens, click on `Docker Configuration` and follow the steps.
 
-To build an image, use the docker build command like:
-
-Use the `--build-arg` flag to specify the version of Node and the version of
-the platform. The version of Node to use is defined in the `.nvmrc` file. Use
-the Node version defined in that file for the target platform version, as the
-version of Node might be increased between platform's versions.
-
-For example, to build the image for OpenSearch Dashboards `2.6.0`:
-
-```bash
-cd images
-docker build --build-arg NODE_VERSION=14.20.1 --build-arg OPENSEARCH_VERSION=2.6.0 -t quay.io/wazuh/osd-dev:2.6.0 -f osd-dev.Dockerfile .
-cd ..
-```
-
-Push the image to Quay:
-
-```bash
-docker push quay.io/wazuh/image-name:version
-```
-
-If you're creating a new image, copy one of the ones already present
-in the directory, and adapt it to the new version.
+The development image (`quay.io/wazuh/osd-dev`) is built from the
+`dev-tools/build-dev-image` directory at the `wazuh-dashboard` repository. See
+[How to generate a container image](../docs/dev/build-image.md) for the build
+and push steps.
 
 ## [Imposter-cli](https://github.com/gatehill/imposter-cli)
 

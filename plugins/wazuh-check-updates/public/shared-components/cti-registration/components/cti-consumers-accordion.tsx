@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import {
   EuiAccordion,
   EuiButton,
@@ -25,24 +26,70 @@ const CTI_CONSUMER_FIELDS: Array<{
   isLink?: boolean;
   dataTestSubj?: string;
 }> = [
-  { key: 'name', label: 'Name' },
-  { key: 'context', label: 'Context' },
-  { key: 'type', label: 'Type' },
+  {
+    key: 'name',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.name', {
+      defaultMessage: 'Name',
+    }),
+  },
+  {
+    key: 'context',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.context', {
+      defaultMessage: 'Context',
+    }),
+  },
+  {
+    key: 'type',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.type', {
+      defaultMessage: 'Type',
+    }),
+  },
   {
     key: 'resource',
-    label: 'Resource',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.resource', {
+      defaultMessage: 'Resource',
+    }),
     isLink: true,
     dataTestSubj: 'ctiConsumersResourceItem',
   },
-  { key: 'is_public', label: 'Public' },
-  { key: 'status', label: 'Status' },
-  { key: 'local_offset', label: 'Local offset' },
-  { key: 'remote_offset', label: 'Remote offset' },
+  {
+    key: 'is_public',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.isPublic', {
+      defaultMessage: 'Public',
+    }),
+  },
+  {
+    key: 'status',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.status', {
+      defaultMessage: 'Status',
+    }),
+  },
+  {
+    key: 'local_offset',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.localOffset', {
+      defaultMessage: 'Local offset',
+    }),
+  },
+  {
+    key: 'remote_offset',
+    label: i18n.translate(
+      'wazuhCheckUpdates.ctiConsumers.fields.remoteOffset',
+      {
+        defaultMessage: 'Remote offset',
+      },
+    ),
+  },
 ];
 
 function formatFieldValue(value: unknown): string {
   if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
+    return value
+      ? i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.booleanTrue', {
+          defaultMessage: 'Yes',
+        })
+      : i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.booleanFalse', {
+          defaultMessage: 'No',
+        });
   }
   return String(value ?? '');
 }
@@ -96,7 +143,12 @@ export const CtiConsumersAccordion: React.FC = () => {
       setConsumers(response.data ?? []);
     } catch (fetchError: any) {
       setConsumers(null);
-      setError(fetchError?.message || 'Could not load consumers');
+      setError(
+        fetchError?.message ||
+          i18n.translate('wazuhCheckUpdates.ctiConsumers.error.fallback', {
+            defaultMessage: 'Could not load consumers',
+          }),
+      );
     } finally {
       setLoading(false);
     }
@@ -107,13 +159,23 @@ export const CtiConsumersAccordion: React.FC = () => {
   }, [fetchConsumers]);
 
   return (
-    <EuiAccordion id='cti-consumers-accordion' buttonContent='Consumers'>
+    <EuiAccordion
+      id='cti-consumers-accordion'
+      buttonContent={i18n.translate(
+        'wazuhCheckUpdates.ctiConsumers.accordion.title',
+        {
+          defaultMessage: 'Consumers',
+        },
+      )}
+    >
       <EuiSpacer size='m' />
       {loading ? (
         <EuiLoadingSpinner size='m' data-test-subj='ctiConsumersLoading' />
       ) : error ? (
         <EuiCallOut
-          title='Could not load consumers'
+          title={i18n.translate('wazuhCheckUpdates.ctiConsumers.error.title', {
+            defaultMessage: 'Could not load consumers',
+          })}
           color='danger'
           iconType='error'
           data-test-subj='ctiConsumersError'
@@ -125,12 +187,19 @@ export const CtiConsumersAccordion: React.FC = () => {
             iconType='refresh'
             onClick={fetchConsumers}
           >
-            Retry
+            {i18n.translate(
+              'wazuhCheckUpdates.ctiConsumers.error.retryButton',
+              {
+                defaultMessage: 'Retry',
+              },
+            )}
           </EuiButton>
         </EuiCallOut>
       ) : !consumers || consumers.length === 0 ? (
         <EuiText color='subdued' data-test-subj='ctiConsumersEmpty'>
-          No consumers
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.list.empty', {
+            defaultMessage: 'No consumers',
+          })}
         </EuiText>
       ) : (
         consumers.map(consumer => (

@@ -15,6 +15,7 @@ import {
   EuiConfirmModal,
   EuiPanel,
 } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -104,14 +105,25 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
           !password.match(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,64}$/,
           )
-            ? 'The password must contain a length between 12 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.'
+            ? i18n.translate(
+                'wazuh.security.editUser.validation.passwordComplexity',
+                {
+                  defaultMessage:
+                    'The password must contain a length between 12 and 64 characters, and must contain at least one upper and lower case letter, a number and a symbol.',
+                },
+              )
             : '',
       },
     ],
     confirmPassword: [
       {
         fn: () =>
-          confirmPassword !== password ? `Passwords don't match.` : '',
+          confirmPassword !== password
+            ? i18n.translate(
+                'wazuh.security.editUser.validation.passwordsMismatch',
+                { defaultMessage: "Passwords don't match." },
+              )
+            : '',
       },
     ],
   };
@@ -136,7 +148,11 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
 
   const editUser = async () => {
     if (!isValidForm()) {
-      ErrorHandler.warning('Please resolve the incorrect fields.');
+      ErrorHandler.warning(
+        i18n.translate('wazuh.security.editUser.invalidFormWarning', {
+          defaultMessage: 'Please resolve the incorrect fields.',
+        }),
+      );
       return;
     }
 
@@ -160,7 +176,11 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     try {
       await Promise.all([userPromises]);
 
-      ErrorHandler.info('User was successfully updated');
+      ErrorHandler.info(
+        i18n.translate('wazuh.security.editUser.updateSuccess', {
+          defaultMessage: 'User was successfully updated',
+        }),
+      );
       closeFlyout(true);
     } catch (error) {
       const options = {
@@ -219,18 +239,33 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
     modal = (
       <EuiOverlayMask>
         <EuiConfirmModal
-          title='Unsubmitted changes'
+          title={i18n.translate(
+            'wazuh.security.editUser.unsavedChangesModal.title',
+            { defaultMessage: 'Unsubmitted changes' },
+          )}
           onConfirm={() => {
             setIsModalVisible(false);
             closeFlyout(false);
             setHasChanges(false);
           }}
           onCancel={() => setIsModalVisible(false)}
-          cancelButtonText="No, don't do it"
-          confirmButtonText='Yes, do it'
+          cancelButtonText={i18n.translate(
+            'wazuh.security.editUser.unsavedChangesModal.cancelButton',
+            { defaultMessage: "No, don't do it" },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.editUser.unsavedChangesModal.confirmButton',
+            { defaultMessage: 'Yes, do it' },
+          )}
         >
           <p style={{ textAlign: 'center' }}>
-            There are unsaved changes. Are you sure you want to proceed?
+            {i18n.translate(
+              'wazuh.security.editUser.unsavedChangesModal.body',
+              {
+                defaultMessage:
+                  'There are unsaved changes. Are you sure you want to proceed?',
+              },
+            )}
           </p>
         </EuiConfirmModal>
       </EuiOverlayMask>
@@ -260,9 +295,17 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
         <EuiFlyoutHeader hasBorder={false}>
           <EuiTitle size='m'>
             <h2>
-              Edit {currentUser.username} user &nbsp; &nbsp;
+              {i18n.translate('wazuh.security.editUser.title', {
+                defaultMessage: 'Edit {username} user',
+                values: { username: currentUser.username },
+              })}{' '}
+              &nbsp; &nbsp;
               {WzAPIUtils.isReservedID(currentUser.id) && (
-                <EuiBadge color='primary'>Reserved</EuiBadge>
+                <EuiBadge color='primary'>
+                  {i18n.translate('wazuh.security.editUser.reservedBadge', {
+                    defaultMessage: 'Reserved',
+                  })}
+                </EuiBadge>
               )}
             </h2>
           </EuiTitle>
@@ -271,15 +314,25 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
           <EuiForm component='form' style={{ padding: 24 }}>
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>Run as</h2>
+                <h2>
+                  {i18n.translate('wazuh.security.editUser.runAsTitle', {
+                    defaultMessage: 'Run as',
+                  })}
+                </h2>
               </EuiTitle>
               <EuiFormRow
                 label=''
-                helpText='Set if the user is able to use run as'
+                helpText={i18n.translate(
+                  'wazuh.security.editUser.allowRunAsHelpText',
+                  { defaultMessage: 'Set if the user is able to use run as' },
+                )}
               >
                 <WzButtonPermissions
                   buttonType='switch'
-                  label='Allow run as'
+                  label={i18n.translate(
+                    'wazuh.security.editUser.allowRunAsSwitchLabel',
+                    { defaultMessage: 'Allow run as' },
+                  )}
                   showLabel={true}
                   checked={allowRunAs}
                   permissions={[
@@ -294,16 +347,26 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>Password</h2>
+                <h2>
+                  {i18n.translate('wazuh.security.editUser.passwordTitle', {
+                    defaultMessage: 'Password',
+                  })}
+                </h2>
               </EuiTitle>
               <EuiFormRow
                 label=''
                 isInvalid={!!formErrors.password}
                 error={formErrors.password}
-                helpText='Introduce a new password for the user.'
+                helpText={i18n.translate(
+                  'wazuh.security.editUser.passwordHelpText',
+                  { defaultMessage: 'Introduce a new password for the user.' },
+                )}
               >
                 <EuiFieldPassword
-                  placeholder='Password'
+                  placeholder={i18n.translate(
+                    'wazuh.security.editUser.passwordPlaceholder',
+                    { defaultMessage: 'Password' },
+                  )}
                   value={password}
                   onChange={e => onChangePassword(e)}
                   aria-label=''
@@ -315,10 +378,16 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                 label=''
                 isInvalid={!!formErrors.confirmPassword}
                 error={formErrors.confirmPassword}
-                helpText='Confirm the new password.'
+                helpText={i18n.translate(
+                  'wazuh.security.editUser.confirmPasswordHelpText',
+                  { defaultMessage: 'Confirm the new password.' },
+                )}
               >
                 <EuiFieldPassword
-                  placeholder='Confirm Password'
+                  placeholder={i18n.translate(
+                    'wazuh.security.editUser.confirmPasswordPlaceholder',
+                    { defaultMessage: 'Confirm Password' },
+                  )}
                   value={confirmPassword}
                   onChange={e => onChangeConfirmPassword(e)}
                   aria-label=''
@@ -330,11 +399,24 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
             <EuiSpacer />
             <EuiPanel>
               <EuiTitle size='s'>
-                <h2>Roles</h2>
+                <h2>
+                  {i18n.translate('wazuh.security.editUser.rolesTitle', {
+                    defaultMessage: 'Roles',
+                  })}
+                </h2>
               </EuiTitle>
-              <EuiFormRow label='' helpText='Assign roles to the selected user'>
+              <EuiFormRow
+                label=''
+                helpText={i18n.translate(
+                  'wazuh.security.editUser.rolesHelpText',
+                  { defaultMessage: 'Assign roles to the selected user' },
+                )}
+              >
                 <EuiComboBox
-                  placeholder='Select roles'
+                  placeholder={i18n.translate(
+                    'wazuh.security.editUser.rolesPlaceholder',
+                    { defaultMessage: 'Select roles' },
+                  )}
                   options={rolesOptions}
                   selectedOptions={selectedRoles}
                   isLoading={rolesLoading || isLoading}
@@ -372,7 +454,9 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                   }
                   onClick={editUser}
                 >
-                  Apply
+                  {i18n.translate('wazuh.security.editUser.applyButton', {
+                    defaultMessage: 'Apply',
+                  })}
                 </WzButtonPermissions>
               </EuiFlexItem>
             </EuiFlexGroup>
