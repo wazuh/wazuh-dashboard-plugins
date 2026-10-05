@@ -3,7 +3,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { WzAppHeading } from './wz-app-heading';
 import { getWzCurrentAppID } from '../../kibana-services';
-import { overview, threatHunting } from '../../utils/applications';
+import {
+  endpointSummary,
+  overview,
+  threatHunting,
+} from '../../utils/applications';
 
 jest.mock('../../kibana-services', () => ({
   getWzCurrentAppID: jest.fn(),
@@ -18,6 +22,14 @@ describe('WzAppHeading', () => {
     render(<WzAppHeading />);
     expect(
       screen.getByRole('heading', { level: 1, name: threatHunting.title }),
+    ).toBeInTheDocument();
+  });
+
+  it('uses the tab title when the app has one', () => {
+    mockAppId(endpointSummary.id);
+    render(<WzAppHeading />);
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Agents summary' }),
     ).toBeInTheDocument();
   });
 
