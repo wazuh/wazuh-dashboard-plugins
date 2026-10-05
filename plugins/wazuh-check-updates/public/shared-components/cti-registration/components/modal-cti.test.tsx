@@ -131,7 +131,7 @@ describe('ModalCti component', () => {
     );
 
     expect(
-      await screen.findByText('Wazuh Console temporarily unreachable'),
+      await screen.findByText('CTI temporarily unreachable'),
     ).toBeInTheDocument();
   });
 
@@ -154,7 +154,7 @@ describe('ModalCti component', () => {
 
     await screen.findByRole('button', { name: 'Consumers' });
     expect(
-      screen.queryByText('Wazuh Console temporarily unreachable'),
+      screen.queryByText('CTI temporarily unreachable'),
     ).not.toBeInTheDocument();
   });
 

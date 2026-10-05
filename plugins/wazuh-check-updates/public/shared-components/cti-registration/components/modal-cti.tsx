@@ -466,7 +466,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                     title={
                       <FormattedMessage
                         id='wazuhCheckUpdates.ctiRegistration.ctiUnreachableTitle'
-                        defaultMessage='Wazuh Console temporarily unreachable'
+                        defaultMessage='CTI temporarily unreachable'
                       />
                     }
                     color='warning'
@@ -475,7 +475,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                   >
                     <FormattedMessage
                       id='wazuhCheckUpdates.ctiRegistration.ctiUnreachableBody'
-                      defaultMessage='Your registration is unchanged. Plan details will refresh once the Wazuh Console is reachable again.'
+                      defaultMessage='Your registration is unchanged. Plan details will refresh once CTI is reachable again.'
                     />
                   </EuiCallOut>
                 </>
