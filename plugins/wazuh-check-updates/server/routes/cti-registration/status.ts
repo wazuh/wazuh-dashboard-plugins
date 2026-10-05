@@ -74,7 +74,11 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
               inProgress: false,
             },
           );
-          if (!completedBody.subscription?.message?.is_registered) {
+          const subscriptionMessage = completedBody.subscription?.message;
+          const confirmedUnregistered =
+            Boolean(subscriptionMessage) && !subscriptionMessage?.is_registered;
+
+          if (confirmedUnregistered) {
             store.clear(environmentUuid);
             return response.ok({
               body: { ...completedBody, registrationComplete: false },

@@ -119,6 +119,45 @@ describe('ModalCti component', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the CTI unreachable call-out when registered but the subscription status is unknown (502)', async () => {
+    ctiFlowState.setSubscription({ message: null, status: 502 });
+
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    expect(
+      await screen.findByText('Wazuh Console temporarily unreachable'),
+    ).toBeInTheDocument();
+  });
+
+  it('does not show the CTI unreachable call-out when the subscription confirms the plan', async () => {
+    ctiFlowState.setSubscription({
+      message: {
+        plan: { name: 'basic', is_public: true },
+        is_registered: true,
+      },
+      status: 200,
+    });
+
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    await screen.findByRole('button', { name: 'Consumers' });
+    expect(
+      screen.queryByText('Wazuh Console temporarily unreachable'),
+    ).not.toBeInTheDocument();
+  });
+
   it('reopens to in-progress links when refetch restores server snapshot', async () => {
     mockRefetchStatus.mockImplementation(async () => {
       ctiFlowState.setRegistrationComplete(false);

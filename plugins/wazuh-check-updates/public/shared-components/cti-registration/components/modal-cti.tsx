@@ -248,6 +248,9 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const subscriptionPlanName =
     ctiFlowState.getSubscription()?.message?.plan?.name;
 
+  const ctiTemporarilyUnreachable =
+    showSuccess && ctiFlowState.getSubscription()?.message === null;
+
   return (
     <EuiModal onClose={handleModalToggle}>
       <EuiModalHeader>
@@ -456,6 +459,27 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                   </span>
                 </>
               ) : null}
+              {ctiTemporarilyUnreachable && (
+                <>
+                  <EuiSpacer size='m' />
+                  <EuiCallOut
+                    title={
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.ctiRegistration.ctiUnreachableTitle'
+                        defaultMessage='Wazuh Console temporarily unreachable'
+                      />
+                    }
+                    color='warning'
+                    iconType='alert'
+                    data-test-subj='ctiRegistrationUnreachableCallOut'
+                  >
+                    <FormattedMessage
+                      id='wazuhCheckUpdates.ctiRegistration.ctiUnreachableBody'
+                      defaultMessage='Your registration is unchanged. Plan details will refresh once the Wazuh Console is reachable again.'
+                    />
+                  </EuiCallOut>
+                </>
+              )}
               <EuiSpacer size='m' />
               <CtiConsumersAccordion />
             </div>
