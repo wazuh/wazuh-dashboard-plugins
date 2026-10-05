@@ -266,7 +266,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
             data-test-subj='wz-table-data-grid-with-search-bar-title'
             size='s'
           >
-            <h1>{title}</h1>
+            <h2>{title}</h2>
           </EuiTitle>
         </Padding>
       )}

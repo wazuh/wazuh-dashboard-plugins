@@ -28,6 +28,7 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
+import { WzAppHeading } from './components/common/wz-app-heading';
 
 const SyncPrimaryApiWhenNotCCS = () => {
   const isCCS = useSelector(
@@ -115,6 +116,7 @@ export const Application = withGuardAsync(
       <WzCtiUpsellNotification />
       <WzUpdatesNotification />
       <main className='wz-app-main'>
+        <WzAppHeading />
         <Switch>
           <Route
             path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}

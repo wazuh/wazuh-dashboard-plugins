@@ -129,7 +129,7 @@ class WzGroupDetail extends Component {
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   <EuiTitle size='s'>
-                    <h1>{itemDetail.name}</h1>
+                    <h2>{itemDetail.name}</h2>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>

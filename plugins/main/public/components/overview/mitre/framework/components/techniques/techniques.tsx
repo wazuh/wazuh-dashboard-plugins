@@ -640,11 +640,11 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       <EuiFlexGroup>
         <EuiFlexItem grow={true}>
           <EuiTitle size='m'>
-            <h1>
+            <h2>
               {i18n.translate('wazuh.mitreAttack.techniques.title', {
                 defaultMessage: 'Techniques',
               })}
-            </h1>
+            </h2>
           </EuiTitle>
         </EuiFlexItem>
 
