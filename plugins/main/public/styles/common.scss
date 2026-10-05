@@ -1620,6 +1620,14 @@ iframe.width-changed {
   }
 }
 
+/* Keep the views laid out as before, as flex items of the app wrapper */
+.wz-app-main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-height: 0;
+}
+
 /* Vulnerabilities under evaluation filter */
 .button-group-filter {
   border-radius: 2px;

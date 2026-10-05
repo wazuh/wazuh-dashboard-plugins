@@ -786,7 +786,8 @@ export const TableDataGridDiscover: React.FunctionComponent<WzTableDiscoverProps
             fullHeight={true}
             grow
             paddingSize='none'
-            pageContentProps={{ color: 'transparent' }}
+            // The app root renders the main landmark
+            pageContentProps={{ color: 'transparent', role: null }}
           >
             {children}
           </EuiPageTemplate>
