@@ -3,10 +3,7 @@ import { EuiScreenReaderOnly } from '@elastic/eui';
 import { getWzCurrentAppID } from '../../kibana-services';
 import { Applications, overview } from '../../utils/applications';
 
-/**
- * Hidden h1 naming the current app, so every page has one. Page titles shown
- * on screen are h2. Overview shows its own h1 with the same name.
- */
+/** Hidden h1 naming the current app; Overview shows its own instead. */
 export const WzAppHeading = () => {
   const app = Applications.find(({ id }) => getWzCurrentAppID() === id);
 

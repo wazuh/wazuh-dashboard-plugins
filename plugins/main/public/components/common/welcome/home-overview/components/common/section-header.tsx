@@ -16,12 +16,7 @@ export interface SectionHeaderProps {
   headingLevel?: 'h1' | 'h2';
 }
 
-/**
- * Section heading shared by every Home overview section. The title is a real
- * heading drawn as a badge, with the description sitting beside it on the same
- * line, giving the on-page sections a lighter, navigation-style treatment. On
- * narrow widths the description wraps below the badge.
- */
+/** Home overview heading: a real heading drawn as a badge, description beside it. */
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   description,
