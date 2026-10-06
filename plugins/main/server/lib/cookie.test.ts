@@ -17,7 +17,7 @@ import { PluginSetup } from '../types';
 const pluginsWith = (secure?: boolean): PluginSetup =>
   ({
     securityDashboards: { config$: of({ cookie: { secure } }) },
-  }) as PluginSetup;
+  } as PluginSetup);
 
 describe('resolveCookieSecure', () => {
   it('derives true from an HTTPS listener when the setting is unset', async () => {
