@@ -137,11 +137,11 @@ export const renderValueNoThenEnabled = value =>
   value === 'no' ? 'enabled' : 'disabled';
 
 /**
- * Return 'enabled' if value = 'yes', or 'disabled'
+ * Return 'enabled' if value = 'yes' or 1, or 'disabled'
  * @param {value} value Value
  */
 export const renderValueYesThenEnabled = value =>
-  value === 'yes' ? 'enabled' : 'disabled';
+  value === 'yes' || value === 1 ? 'enabled' : 'disabled';
 
 /**
  * Return value if isn't falsy or 'all'

@@ -13,14 +13,14 @@
 import React from 'react';
 import { EuiDescriptionList, EuiPanel } from '@elastic/eui';
 import { PanelModuleConfiguration } from '../../../../common/modules/panel';
-import { renderValueNoThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
+import { renderValueYesThenEnabled } from '../../../../../controllers/management/components/management/configuration/utils/utils';
 import { LogoGitHub } from '../../../../common/logos';
 
 const settings = [
   {
     field: 'enabled',
     label: 'Service status',
-    render: renderValueNoThenEnabled,
+    render: renderValueYesThenEnabled,
   },
   {
     field: 'only_future_events',

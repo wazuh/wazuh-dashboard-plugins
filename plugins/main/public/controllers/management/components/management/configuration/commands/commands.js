@@ -23,12 +23,18 @@ import { webDocumentationLink } from '../../../../../../../common/services/web_d
 const helpLinks = [
   {
     text: 'Command module reference',
-    href: webDocumentationLink('user-manual/reference/ossec-conf/wodle-command.html')
-  }
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/wodle-command.html',
+    ),
+  },
 ];
 
 const mainSettings = [
-  { field: 'disabled', label: 'Command status', renderValueNoThenEnabled },
+  {
+    field: 'disabled',
+    label: 'Command status',
+    render: renderValueNoThenEnabled,
+  },
   { field: 'tag', label: 'Command name' },
   { field: 'command', label: 'Command to execute' },
   { field: 'interval', label: 'Interval between executions' },
@@ -38,7 +44,7 @@ const mainSettings = [
   { field: 'verify_md5', label: 'Verify MD5 sum' },
   { field: 'verify_sha1', label: 'Verify SHA1 sum' },
   { field: 'verify_sha256', label: 'Verify SHA256 sum' },
-  { field: 'skip_verification', label: 'Ignore checksum verification' }
+  { field: 'skip_verification', label: 'Ignore checksum verification' },
 ];
 
 class WzConfigurationCommands extends Component {
@@ -48,7 +54,7 @@ class WzConfigurationCommands extends Component {
       this.props.currentConfig &&
       !isString(this.props.currentConfig['wmodules-wmodules'])
         ? this.props.currentConfig['wmodules-wmodules'].wmodules.filter(
-            item => item['command']
+            item => item['command'],
           )
         : [];
   }
@@ -56,7 +62,10 @@ class WzConfigurationCommands extends Component {
     const { currentConfig } = this.props;
     const items =
       this.wodleConfig && this.wodleConfig.length
-        ? settingsListBuilder(this.wodleConfig.map(item => item.command), ['tag','command'])
+        ? settingsListBuilder(
+            this.wodleConfig.map(item => item.command),
+            ['tag', 'command'],
+          )
         : false;
     return (
       <Fragment>
@@ -70,14 +79,14 @@ class WzConfigurationCommands extends Component {
         {currentConfig &&
           !items &&
           !isString(currentConfig['wmodules-wmodules']) && (
-            <WzNoConfig error="not-present" help={helpLinks} />
+            <WzNoConfig error='not-present' help={helpLinks} />
           )}
         {currentConfig &&
         items &&
         !isString(currentConfig['wmodules-wmodules']) ? (
           <WzConfigurationSettingsHeader
-            title="Command definitions"
-            description="Find here all the currently defined commands"
+            title='Command definitions'
+            description='Find here all the currently defined commands'
             help={helpLinks}
           >
             <WzConfigurationSettingsListSelector
