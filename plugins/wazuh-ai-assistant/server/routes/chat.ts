@@ -2203,6 +2203,13 @@ export const chatRequestMessageSchema = schema.object({
   privacyEnabled: schema.maybe(schema.boolean()),
 });
 
+/** Limits on the client-held pseudonym map (`privacy.map`). Far above what a real conversation
+ * mints (field values are truncated to a few hundred characters, pseudonyms are `KIND_n`); they
+ * only stop an unbounded map from being sent. */
+const PRIVACY_MAP_MAX_ENTRIES = 10_000;
+const PRIVACY_MAP_MAX_VALUE_LENGTH = 4096;
+const PRIVACY_MAP_MAX_PSEUDONYM_LENGTH = 64;
+
 export function registerChatRoutes(router: IRouter, logger: Logger): void {
   router.post(
     {
@@ -2219,12 +2226,18 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
           privacy: schema.maybe(
             schema.object({
               enabled: schema.maybe(schema.boolean()),
+              // Bounded because every entry feeds the privacy scrub run over this request.
               map: schema.maybe(
                 schema.arrayOf(
                   schema.object({
-                    value: schema.string(),
-                    pseudonym: schema.string(),
+                    value: schema.string({
+                      maxLength: PRIVACY_MAP_MAX_VALUE_LENGTH,
+                    }),
+                    pseudonym: schema.string({
+                      maxLength: PRIVACY_MAP_MAX_PSEUDONYM_LENGTH,
+                    }),
                   }),
+                  { maxSize: PRIVACY_MAP_MAX_ENTRIES },
                 ),
               ),
             }),
