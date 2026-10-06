@@ -155,6 +155,103 @@ describe('WazuhApiCtrl.csv', () => {
       expect(filename).toMatch(/^[\w.-]+$/);
     },
   );
+
+  // `params` is mutated in place across pagination calls, so a mock that only
+  // resolves a value can't tell what it looked like at call time: snapshot it
+  // synchronously instead.
+  const makeSnapshottingContext = (
+    affectedItems: Record<string, unknown>[],
+    uiSettings: Record<string, unknown>,
+  ) => {
+    const paramsSnapshots: Record<string, unknown>[] = [];
+    const request = jest.fn((...args: unknown[]) => {
+      const options = args[2] as { params: Record<string, unknown> };
+
+      paramsSnapshots.push({ ...options.params });
+
+      return Promise.resolve({
+        data: {
+          data: {
+            /* eslint-disable camelcase -- Wazuh Server API response field names */
+            total_affected_items: affectedItems.length,
+            affected_items: affectedItems,
+            /* eslint-enable camelcase */
+          },
+        },
+      });
+    });
+
+    return {
+      context: {
+        core: {
+          uiSettings: {
+            client: {
+              get: jest.fn((key: string) => Promise.resolve(uiSettings[key])),
+            },
+          },
+        },
+        wazuh: {
+          logger: { debug: jest.fn(), error: jest.fn() },
+          api: { client: { asCurrentUser: { request } } },
+        },
+      } as unknown as RequestHandlerContext,
+      paramsSnapshots,
+    };
+  };
+
+  // A `limit` filter must never override the server-enforced page size:
+  // doing so turns one request into thousands of Manager API calls.
+  it('ignores a caller-supplied limit filter and keeps the page size at 500', async () => {
+    const totalItems = 50;
+    const affectedItems = Array.from({ length: totalItems }, (_, index) => ({
+      ...AGENT_WITH_FORMULA_OS_NAME,
+      id: `${index}`,
+    }));
+    const ctrl = new WazuhApiCtrl();
+    const { context, paramsSnapshots } = makeSnapshottingContext(
+      affectedItems,
+      { 'reports.csv.maxRows': 10_000 },
+    );
+    const response = makeResponse();
+
+    await ctrl.csv(
+      context,
+      {
+        body: {
+          path: '/agents',
+          id: 'default',
+          filters: [{ name: 'limit', value: 1 }],
+        },
+      } as unknown as OpenSearchDashboardsRequest,
+      response as unknown as OpenSearchDashboardsResponseFactory,
+    );
+
+    expect(paramsSnapshots.length).toBeGreaterThan(0);
+    expect(paramsSnapshots.every(params => params.limit === 500)).toBe(true);
+  });
+
+  it('ignores a caller-supplied offset filter on the first page request', async () => {
+    const { context, paramsSnapshots } = makeSnapshottingContext(
+      [AGENT_WITH_FORMULA_OS_NAME],
+      { 'reports.csv.maxRows': 10_000 },
+    );
+    const ctrl = new WazuhApiCtrl();
+    const response = makeResponse();
+
+    await ctrl.csv(
+      context,
+      {
+        body: {
+          path: '/agents',
+          id: 'default',
+          filters: [{ name: 'offset', value: 999 }],
+        },
+      } as unknown as OpenSearchDashboardsRequest,
+      response as unknown as OpenSearchDashboardsResponseFactory,
+    );
+
+    expect(paramsSnapshots[0].offset).toBeUndefined();
+  });
 });
 
 describe('WazuhApiCtrl.checkStoredAPI', () => {
