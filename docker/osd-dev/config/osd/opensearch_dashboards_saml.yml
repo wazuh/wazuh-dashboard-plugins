@@ -30,26 +30,26 @@ wazuh_core.hosts:
   imposter:
     url: 'http://imposter'
     port: 8080
-    username: wazuh-wui
+    username: wazuh-internal-client
     password: MyS3cr37P450r.*-
     run_as: false
   manager:
     url: 'https://wazuh.manager'
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     password: MyS3cr37P450r.*-
     run_as: true
   imposter-cli:
     url: 'http://<ip-local>'
     port: 8080
-    username: wazuh-wui
+    username: wazuh-internal-client
     password: MyS3cr37P450r.*-
     run_as: false
   manager-local:
     url: 'https://wazuh.manager.local'
     port: 55000
-    username: wazuh-wui
-    password: wazuh-wui
+    username: wazuh-internal-client
+    password: wazuh-internal-client
     run_as: true
 wazuh_core.healthCheckCertificateExpiryWarningDays: 30
 wazuh_core.healthCheckCertificateExpiryCriticalDays: 7

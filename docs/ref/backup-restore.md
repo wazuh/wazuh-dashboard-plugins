@@ -42,7 +42,7 @@ $backup_folder
 > rsync -aREz /etc/wazuh/ca/ $backup_folder
 > ```
 
-> **Note:** The keystore holds the `kibanaserver` and `wazuh-wui` passwords and the AI Assistant
+> **Note:** The keystore holds the `kibanaserver` and `wazuh-internal-client` passwords and the AI Assistant
 > encryption key (`wazuh_ai_assistant.encryptionKey`). Without that key, the provider API keys
 > stored by the AI Assistant cannot be decrypted, so keep the keystore backup as protected as the
 > passwords themselves. `/etc/wazuh/credentials.env` does not need to be backed up for the

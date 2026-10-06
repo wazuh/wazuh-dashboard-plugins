@@ -478,24 +478,24 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
 #       # Host / API port
 #       port: 55000
 #       # Host / API username
-#       username: wazuh-wui
+#       username: wazuh-internal-client
 #       # Host / API password
-#       password: wazuh-wui
-#       # Use RBAC or not. If set to true, the username must be "wazuh-wui".
+#       password: wazuh-internal-client
+#       # Use RBAC or not. If set to true, the username must be "wazuh-internal-client".
 #       run_as: true
 #   - env-2:
 #       url: https://env-2.example
 #       port: 55000
-#       username: wazuh-wui
-#       password: wazuh-wui
+#       username: wazuh-internal-client
+#       password: wazuh-internal-client
 #       run_as: true
 
 hosts:
   - default:
       url: https://localhost
       port: 55000
-      username: wazuh-wui
-      password: wazuh-wui
+      username: wazuh-internal-client
+      password: wazuh-internal-client
       run_as: true`,
   */
   hosts: {
@@ -559,7 +559,7 @@ hosts:
             },
           ),
           type: EpluginSettingType.text,
-          defaultValue: 'wazuh-wui',
+          defaultValue: 'wazuh-internal-client',
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,
@@ -578,7 +578,7 @@ hosts:
             },
           ),
           type: EpluginSettingType.password,
-          defaultValue: 'wazuh-wui',
+          defaultValue: 'wazuh-internal-client',
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,

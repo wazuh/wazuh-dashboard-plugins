@@ -126,10 +126,10 @@ Navigate to **☰ Menu > Dashboard management > Health Check** and verify that t
 
 ### Server API connection
 
-Run the following commands from the dashboard server, with `WAZUH_MANAGER_WUI_PASSWORD` set to the password of the `wazuh-wui` account:
+Run the following commands from the dashboard server, with `WAZUH_MANAGER_WUI_PASSWORD` set to the password of the `wazuh-internal-client` account:
 
 ```bash
-TOKEN=$(curl -sk -u wazuh-wui:$WAZUH_MANAGER_WUI_PASSWORD -X POST "https://localhost:55000/security/user/authenticate?raw=true")
+TOKEN=$(curl -sk -u wazuh-internal-client:$WAZUH_MANAGER_WUI_PASSWORD -X POST "https://localhost:55000/security/user/authenticate?raw=true")
 curl -sk -H "Authorization: Bearer $TOKEN" https://localhost:55000/
 ```
 
@@ -149,7 +149,7 @@ Expected response:
 }
 ```
 
-If the authentication request returns an error instead of a token, the `wazuh-wui` credentials are wrong: make sure the password matches the one of the `wazuh-wui` account on the Server API, and see [Credentials](../../ref/getting-started/credentials.md) for where the dashboard reads it from.
+If the authentication request returns an error instead of a token, the `wazuh-internal-client` credentials are wrong: make sure the password matches the one of the `wazuh-internal-client` account on the Server API, and see [Credentials](../../ref/getting-started/credentials.md) for where the dashboard reads it from.
 
 ### Index patterns
 

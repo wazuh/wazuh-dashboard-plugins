@@ -55,8 +55,8 @@ describe('ManageHosts Service', () => {
         'new-host-id': {
           url: 'https://localhost',
           port: 55000,
-          username: 'wazuh-wui',
-          password: 'wazuh-wui',
+          username: 'wazuh-internal-client',
+          password: 'wazuh-internal-client',
           run_as: false,
         },
       };
@@ -95,8 +95,8 @@ describe('ManageHosts Service', () => {
         'existing-host': {
           url: 'https://localhost',
           port: 55000,
-          username: 'wazuh-wui',
-          password: 'wazuh-wui',
+          username: 'wazuh-internal-client',
+          password: 'wazuh-internal-client',
           run_as: false,
         },
       };
@@ -143,8 +143,8 @@ describe('ManageHosts Service', () => {
         default2: {
           url: 'https://localhost',
           port: 55000,
-          username: 'wazuh-wui',
-          password: 'wazuh-wui',
+          username: 'wazuh-internal-client',
+          password: 'wazuh-internal-client',
           run_as: false,
         },
       };

@@ -97,7 +97,7 @@ rm -rf "$certs_out"
 RBAC_DB=/var/wazuh-manager/api/configuration/security/rbac.db
 if [ ! -s "$RBAC_DB" ]; then
   if ! API_WAZUH_PASSWORD="${API_WAZUH_PASSWORD:-wazuh}" \
-    API_WUI_PASSWORD="${API_PASSWORD:-wazuh-wui}" \
+    API_WUI_PASSWORD="${API_PASSWORD:-wazuh-internal-client}" \
     /var/wazuh-manager/framework/python/bin/python3 -c '
 import os
 from wazuh.core.common import wazuh_gid, wazuh_uid
@@ -111,7 +111,7 @@ from wazuh.rbac.orm import check_database_integrity
 
 check_database_integrity(passwords={
     "wazuh": os.environ["API_WAZUH_PASSWORD"],
-    "wazuh-wui": os.environ["API_WUI_PASSWORD"],
+    "wazuh-internal-client": os.environ["API_WUI_PASSWORD"],
 })
 '; then
     echo "ERROR: could not seed $RBAC_DB with the Server API users."

@@ -135,12 +135,13 @@ export const RolesMappingTable = ({
                   content={i18n.translate(
                     'wazuh.security.rolesMappingTable.wuiRulesTooltip',
                     {
-                      defaultMessage: 'wui_ rules belong to wazuh-wui API user',
+                      defaultMessage:
+                        'wui_ rules belong to wazuh-internal-client API user',
                     },
                   )}
                 >
                   <EuiBadge color='accent' title='' style={{ marginLeft: 10 }}>
-                    wazuh-wui
+                    wazuh-internal-client
                   </EuiBadge>
                 </EuiToolTip>
               </EuiFlexGroup>

@@ -80,7 +80,7 @@ wazuh_core.hosts:
   default:
     url: https://localhost
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
 ```
 
@@ -89,7 +89,7 @@ wazuh_core.hosts:
 The package resolves the dashboard credentials and its TLS certificates during installation, and
 checks the credentials again immediately before the service starts. No default password is shipped.
 
-- **Passwords**: the dashboard stores the `kibanaserver` (indexer) and `wazuh-wui` (Server API)
+- **Passwords**: the dashboard stores the `kibanaserver` (indexer) and `wazuh-internal-client` (Server API)
   passwords in its keystore, reading them from `/etc/wazuh/credentials.env`. It never generates
   them.
 - **Certificates**: a fresh install issues `dashboard.pem` and `dashboard-key.pem`, and installs
@@ -103,7 +103,7 @@ dashboard could not resolve at install time is resolved when it starts.
 
 If they run on other hosts, supply the passwords before starting the service. Replace
 `<KIBANASERVER_PASSWORD>` and `<WAZUH_WUI_PASSWORD>` with the passwords of the `kibanaserver` account
-on the indexer and the `wazuh-wui` account on the Server API:
+on the indexer and the `wazuh-internal-client` account on the Server API:
 
 ```bash
 install -d -m 0700 -o root -g root /etc/wazuh

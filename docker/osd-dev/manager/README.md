@@ -46,10 +46,10 @@ development ones do not. So, on a container's first start, `entrypoint.sh` seeds
 `rbac.db` itself through the same ORM call `rbac_control seed` makes after
 validating:
 
-| Variable             | User        | Default     |
-| -------------------- | ----------- | ----------- |
-| `API_PASSWORD`       | `wazuh-wui` | `wazuh-wui` |
-| `API_WAZUH_PASSWORD` | `wazuh`     | `wazuh`     |
+| Variable             | User                    | Default                 |
+| -------------------- | ----------------------- | ----------------------- |
+| `API_PASSWORD`       | `wazuh-internal-client` | `wazuh-internal-client` |
+| `API_WAZUH_PASSWORD` | `wazuh`                 | `wazuh`                 |
 
 It also stores `INDEXER_USERNAME`/`INDEXER_PASSWORD` in the keystore. The
 `--prestart` step that `wazuh-manager-control start` runs then finds both
