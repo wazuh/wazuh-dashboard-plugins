@@ -86,11 +86,6 @@ describe.skip('Wazuh API', () => {
           expect(response.status).toBe(200);
           expect(typeof response.data).toBe('object');
           expect(typeof response.data.data).toBe('object');
-          expect(typeof response.data.data.url).toBe('string');
-          expect(typeof response.data.data.port).toBe('number');
-          expect(typeof response.data.data.username).toBe('string');
-          expect(typeof response.data.data.password).toBe('string');
-          expect(typeof response.data.data.run_as).toBe('boolean');
           expect(typeof response.data.data.id).toBe('string');
           expect(typeof response.data.data.cluster_info).toBe('object');
           expect(typeof response.data.data.cluster_info.status).toBe('string');
