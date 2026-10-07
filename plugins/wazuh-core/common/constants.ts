@@ -44,6 +44,8 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
+// Server API user the dashboard authenticates with (reserved ID 2)
+export const WAZUH_API_INTERNAL_CLIENT_USERNAME = 'wazuh-internal-client';
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds
@@ -468,36 +470,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       SettingsValidator.serverEndpointPathPrefix,
     ),
   },
-  /* `# The following configuration is the default structure to define a host.
-#
-# hosts:
-#   # Host ID / name,
-#   - env-1:
-#       # Host URL
-#       url: https://env-1.example
-#       # Host / API port
-#       port: 55000
-#       # Host / API username
-#       username: wazuh-internal-client
-#       # Host / API password
-#       password: wazuh-internal-client
-#       # Use RBAC or not. If set to true, the username must be "wazuh-internal-client".
-#       run_as: true
-#   - env-2:
-#       url: https://env-2.example
-#       port: 55000
-#       username: wazuh-internal-client
-#       password: wazuh-internal-client
-#       run_as: true
-
-hosts:
-  - default:
-      url: https://localhost
-      port: 55000
-      username: wazuh-internal-client
-      password: wazuh-internal-client
-      run_as: true`,
-  */
   hosts: {
     title: i18n.translate('wazuhCore.settings.hosts.title', {
       defaultMessage: 'Server hosts',
@@ -559,7 +531,7 @@ hosts:
             },
           ),
           type: EpluginSettingType.text,
-          defaultValue: 'wazuh-internal-client',
+          defaultValue: WAZUH_API_INTERNAL_CLIENT_USERNAME,
           validate: SettingsValidator.compose(
             SettingsValidator.isString,
             SettingsValidator.isNotEmptyString,

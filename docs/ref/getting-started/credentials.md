@@ -103,15 +103,16 @@ the handoff between components, and the record of generated passwords.
 
 When the indexer and the manager run on the same host, their packages publish the keys the dashboard
 reads, and there is nothing to do. When they run on other hosts, add the keys before starting the
-dashboard. Replace `<KIBANASERVER_PASSWORD>` and `<WAZUH_WUI_PASSWORD>` with the passwords of the
-`kibanaserver` account on the indexer and the `wazuh-internal-client` account on the Server API:
+dashboard. Replace `<KIBANASERVER_PASSWORD>` and `<WAZUH_INTERNAL_CLIENT_PASSWORD>` with the
+passwords of the `kibanaserver` account on the indexer and the `wazuh-internal-client` account on
+the Server API:
 
 ```bash
 sudo install -d -m 0700 -o root -g root /etc/wazuh
 sudo touch /etc/wazuh/credentials.env && sudo chmod 0600 /etc/wazuh/credentials.env
 sudo tee -a /etc/wazuh/credentials.env > /dev/null <<'EOF'
 WAZUH_INDEXER_KIBANASERVER_PASSWORD='<KIBANASERVER_PASSWORD>'
-WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_WUI_PASSWORD>'
+WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>'
 EOF
 ```
 
@@ -140,10 +141,10 @@ maintainer script:
 
 ```bash
 # Correct
-sudo WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_WUI_PASSWORD>' apt-get install wazuh-dashboard
+sudo WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>' apt-get install wazuh-dashboard
 
 # Silently dropped: env_reset discards it
-export WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_WUI_PASSWORD>'
+export WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>'
 sudo apt-get install wazuh-dashboard
 ```
 
