@@ -20,10 +20,16 @@ export const UiLogsRoutes = (router: IRouter) => {
     {
       path: '/utils/logs/ui',
       validate: {
+        // Bounded, allow-listed input: mitigates log injection (CWE-117).
         body: schema.object({
-          message: schema.string(),
-          level: schema.string(),
-          location: schema.string(),
+          message: schema.string({ maxLength: 2048 }),
+          level: schema.oneOf([
+            schema.literal('error'),
+            schema.literal('warn'),
+            schema.literal('info'),
+            schema.literal('debug'),
+          ]),
+          location: schema.string({ maxLength: 512 }),
         }),
       },
     },
