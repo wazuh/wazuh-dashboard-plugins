@@ -225,11 +225,11 @@ export const Tactics = (props: tTacticsProps) => {
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiTitle size='m'>
-            <h1>
+            <h2>
               {i18n.translate('wazuh.mitreAttack.tactics.title', {
                 defaultMessage: 'Tactics',
               })}
-            </h1>
+            </h2>
           </EuiTitle>
         </EuiFlexItem>
 

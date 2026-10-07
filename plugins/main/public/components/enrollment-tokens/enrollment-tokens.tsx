@@ -100,7 +100,10 @@ export const EnrollmentTokens = () => {
   const reload = () => getData(0, pageSize);
 
   return (
-    <EuiPageContent>
+    <EuiPageContent
+      // The app root renders the main landmark
+      role={null}
+    >
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>
