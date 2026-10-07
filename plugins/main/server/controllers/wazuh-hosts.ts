@@ -17,6 +17,18 @@ import {
 } from 'src/core/server';
 import { ErrorResponse } from '../lib/error-response';
 import { detectCCS, invalidateCCSCache } from '../lib/ccs-detector';
+import { pick } from 'lodash';
+
+// Host fields the UI reads; the rest of the config (TLS paths, run_as) stays on the server
+const HOST_ENTRY_PUBLIC_FIELDS = [
+  'id',
+  'url',
+  'port',
+  'username',
+  'allow_run_as',
+  'verify_ca',
+  'cluster_info',
+];
 
 export class WazuhHostsCtrl {
   constructor() {}
@@ -34,9 +46,12 @@ export class WazuhHostsCtrl {
     response: OpenSearchDashboardsResponseFactory,
   ) {
     try {
-      const result = await context.wazuh_core.manageHosts.getEntries({
+      const entries = await context.wazuh_core.manageHosts.getEntries({
         excludePassword: true,
       });
+      const result = entries.map(entry =>
+        pick(entry, HOST_ENTRY_PUBLIC_FIELDS),
+      );
       if (!result.length) {
         return response.ok({ body: [] });
       }
