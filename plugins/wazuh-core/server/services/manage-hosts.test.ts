@@ -261,4 +261,26 @@ describe('ManageHosts Service', () => {
     });
   });
   /* eslint-enable camelcase */
+
+  describe('get', () => {
+    it('does not log the host credentials', async () => {
+      mockConfiguration.get.mockResolvedValue({
+        default: {
+          url: 'https://localhost',
+          port: 55000,
+          username: 'wazuh-wui',
+          password: 'secret-password',
+        },
+      });
+
+      await manageHosts.get('default', { excludePassword: true });
+
+      const logged = mockLogger.debug.mock.calls.flat().join('\n');
+
+      expect(logged).toContain(
+        'API connections: [{"default":{"url":"https://localhost","port":55000,"username":"wazuh-wui"}}]',
+      );
+      expect(logged).not.toContain('secret-password');
+    });
+  });
 });

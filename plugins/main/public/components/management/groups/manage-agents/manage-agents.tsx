@@ -373,12 +373,12 @@ export const ManageAgents = withErrorBoundary(
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               <EuiTitle size='m'>
-                <h1>
+                <h2>
                   {i18n.translate('wazuh.endpointGroups.manageAgents.title', {
                     defaultMessage: 'Manage agents of group {groupName}',
                     values: { groupName: currentGroup.name },
                   })}
-                </h1>
+                </h2>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>

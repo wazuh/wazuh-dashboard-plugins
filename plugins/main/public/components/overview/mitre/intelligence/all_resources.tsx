@@ -34,11 +34,11 @@ export const ModuleMitreAttackIntelligenceAllResources = ({
   return (
     <>
       <EuiTitle>
-        <h1>
+        <h2>
           {i18n.translate('wazuh.mitreAttack.intelligenceSearchResults.title', {
             defaultMessage: 'Search results',
           })}
-        </h1>
+        </h2>
       </EuiTitle>
       <EuiSpacer />
       <ModuleMitreAttackIntelligenceAllResourcesSearchResults

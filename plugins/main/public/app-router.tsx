@@ -28,6 +28,7 @@ import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
 import { WzRequest } from './react-services/wz-request';
+import { WzAppHeading } from './components/common/wz-app-heading';
 
 const SyncPrimaryApiWhenNotCCS = () => {
   const isCCS = useSelector(
@@ -114,42 +115,49 @@ export const Application = withGuardAsync(
       <WzAgentSelectorWrapper />
       <WzCtiUpsellNotification />
       <WzUpdatesNotification />
-      <Switch>
-        <Route
-          path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
-          exact
-          render={RegisterAgent}
-        ></Route>
-        <Route path={`/${SECTIONS.AGENTS}`} exact render={AgentView}></Route>
-        <Route
-          path={`/${SECTIONS.AGENTS_PREVIEW}/`}
-          exact
-          render={MainEndpointsSummary}
-        ></Route>
-        <Route
-          path={`/${SECTIONS.ENROLLMENT_TOKENS}/`}
-          exact
-          render={MainEnrollmentTokens}
-        ></Route>
-        <Route
-          path={`/${SECTIONS.MANAGER}`}
-          exact
-          render={WzManagement}
-        ></Route>
-        <Route
-          path={`/${SECTIONS.OVERVIEW}`}
-          exact
-          render={props => <Overview {...props} />}
-        ></Route>
-        <Route path={`/${SECTIONS.SETTINGS}`} exact render={Settings}></Route>
-        <Route path={`/${SECTIONS.SECURITY}`} exact render={WzSecurity}></Route>
-        <Route
-          path={`/${SECTIONS.WAZUH_DEV}`}
-          exact
-          render={props => <ToolsRouter {...props} />}
-        ></Route>
-        <Redirect from='/' to={getWzMainParams()} />
-      </Switch>
+      <main className='wz-app-main'>
+        <WzAppHeading />
+        <Switch>
+          <Route
+            path={`/${SECTIONS.AGENTS_PREVIEW}/deploy`}
+            exact
+            render={RegisterAgent}
+          ></Route>
+          <Route path={`/${SECTIONS.AGENTS}`} exact render={AgentView}></Route>
+          <Route
+            path={`/${SECTIONS.AGENTS_PREVIEW}/`}
+            exact
+            render={MainEndpointsSummary}
+          ></Route>
+          <Route
+            path={`/${SECTIONS.ENROLLMENT_TOKENS}/`}
+            exact
+            render={MainEnrollmentTokens}
+          ></Route>
+          <Route
+            path={`/${SECTIONS.MANAGER}`}
+            exact
+            render={WzManagement}
+          ></Route>
+          <Route
+            path={`/${SECTIONS.OVERVIEW}`}
+            exact
+            render={props => <Overview {...props} />}
+          ></Route>
+          <Route path={`/${SECTIONS.SETTINGS}`} exact render={Settings}></Route>
+          <Route
+            path={`/${SECTIONS.SECURITY}`}
+            exact
+            render={WzSecurity}
+          ></Route>
+          <Route
+            path={`/${SECTIONS.WAZUH_DEV}`}
+            exact
+            render={props => <ToolsRouter {...props} />}
+          ></Route>
+          <Redirect from='/' to={getWzMainParams()} />
+        </Switch>
+      </main>
     </Router>
   );
 });

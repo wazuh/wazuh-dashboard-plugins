@@ -265,7 +265,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
             fullHeight={true}
             grow
             paddingSize='none'
-            pageContentProps={{ color: 'transparent' }}
+            // The app root renders the main landmark
+            pageContentProps={{ color: 'transparent', role: null }}
           >
             {/* TODO: Using a page template wrapping these components causes different y render position
             of data source error prompt. We should unify the different views. In the Dashboard tab, the
