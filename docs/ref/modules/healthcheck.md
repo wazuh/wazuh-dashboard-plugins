@@ -14,7 +14,7 @@ This defines a service that is integrated with the core lifecycle of the applica
 
 1. Setup the health check using the provided or default configuration.
 2. The plugins register the tasks to run
-3. If the health check is enabled and there are some enabled checks (configurable with the `healthcheck.checks_enabled` setting), this runs an initial check. If some check fails, the enabled checks are retried if this is configured.
+3. If the health check is enabled and there are some enabled checks (configurable with the `healthcheck.checks_enabled` setting), this runs an initial check. If a **critical** check fails, the enabled checks are retried (configurable with the `healthcheck.max_retries` and `healthcheck.retries_delay` settings). A failed non-critical check is not retried; it runs again on the next scheduled check.
 4. Once the health check pass, if this is enabled, this sets a scheduled task using the specified interval (configurable with the `healthcheck.interval` setting) to run and update the status of the enabled checks. This can be seen in the dashboard logs as:
 
 ```log

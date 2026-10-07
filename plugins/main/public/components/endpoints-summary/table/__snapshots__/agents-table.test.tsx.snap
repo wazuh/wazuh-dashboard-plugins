@@ -30,7 +30,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <h1
+                    <h2
                       class="euiTitle euiTitle--small"
                       data-test-subj="table-wz-api-title"
                     >
@@ -38,7 +38,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                       <span>
                         (0)
                       </span>
-                    </h1>
+                    </h2>
                   </div>
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -607,7 +607,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <h1
+                    <h2
                       class="euiTitle euiTitle--small"
                       data-test-subj="table-wz-api-title"
                     >
@@ -615,7 +615,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                       <span>
                         (0)
                       </span>
-                    </h1>
+                    </h2>
                   </div>
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
@@ -1184,7 +1184,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <h1
+                    <h2
                       class="euiTitle euiTitle--small"
                       data-test-subj="table-wz-api-title"
                     >
@@ -1192,7 +1192,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                       <span>
                         (0)
                       </span>
-                    </h1>
+                    </h2>
                   </div>
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"

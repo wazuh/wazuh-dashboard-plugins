@@ -131,7 +131,11 @@ export class ManageHosts {
 
       const hosts = await this.configuration.get('hosts');
 
-      this.logger.debug(`API connections: [${JSON.stringify(hosts)}]`);
+      this.logger.debug(
+        `API connections: [${JSON.stringify(hosts, (key, value) =>
+          key === 'password' ? undefined : value,
+        )}]`,
+      );
 
       if (hostID) {
         const host = hosts[hostID];
