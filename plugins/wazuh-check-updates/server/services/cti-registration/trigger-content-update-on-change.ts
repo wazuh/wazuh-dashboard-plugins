@@ -61,6 +61,18 @@ export async function triggerContentUpdateOnChange(
   environmentUuid: string,
   subscription: CtiSubscriptionSnapshot,
 ): Promise<CtiContentUpdateOutcome> {
+  // An unknown subscription status (e.g. a 502, CTI Console unreachable)
+  // carries no registration signal: skip the diff entirely so neither the
+  // outage nor the later recovery is read as a registration flip, and the
+  // stored snapshot still reflects the last known-good observation.
+  if (subscription.message === null) {
+    return {
+      triggered: false,
+      failed: false,
+      reason: ctiContentUpdateReasons.NONE,
+    };
+  }
+
   const store = CtiRegistrationStore.getInstance();
   const priorSnapshot = store.getSubscriptionSnapshot(environmentUuid);
   const nextSnapshot = toSnapshot(subscription);
