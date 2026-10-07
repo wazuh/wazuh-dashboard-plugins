@@ -145,7 +145,8 @@ const InventoryDashboard = compose(
                 fullHeight={true}
                 grow
                 paddingSize='none'
-                pageContentProps={{ color: 'transparent' }}
+                // The app root renders the main landmark
+                pageContentProps={{ color: 'transparent', role: null }}
               >
                 <TableDataGridWithSearchBarInspectedHit
                   dataSource={dataSource}

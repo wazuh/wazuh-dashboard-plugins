@@ -364,11 +364,11 @@ export const RuleEditor = ({
     <>
       <EuiPanel>
         <EuiTitle>
-          <h1>
+          <h2>
             {i18n.translate('wazuh.security.ruleEditor.title', {
               defaultMessage: 'Mapping rules',
             })}
-          </h1>
+          </h2>
         </EuiTitle>
         <EuiFlexGroup>
           <EuiFlexItem>
