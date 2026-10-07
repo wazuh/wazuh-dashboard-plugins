@@ -15,7 +15,6 @@ import {
   WAZUH_SAMPLE_ALERTS_INDEX_REPLICAS,
   WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA,
   WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS,
-  WAZUH_INDEXER_NAME,
   HTTP_STATUS_CODES,
   WAZUH_ENGINE_SETTINGS_INDEX,
 } from '../../common/constants';
@@ -94,98 +93,6 @@ export class WazuhElasticCtrl {
       })),
     );
     return getUniqueEntriesByIndiceDatasetPar(indexNames);
-  }
-
-  /**
-   * This retrieves a template from Elasticsearch
-   * @param {Object} context
-   * @param {Object} request
-   * @param {Object} response
-   * @returns {Object} template or ErrorResponse
-   */
-  async getTemplate(
-    context: RequestHandlerContext,
-    request: OpenSearchDashboardsRequest<{ pattern: string }>,
-    response: OpenSearchDashboardsResponseFactory,
-  ) {
-    try {
-      const data =
-        await context.core.opensearch.client.asInternalUser.cat.templates();
-
-      const templates = data.body;
-      if (!templates || typeof templates !== 'string') {
-        throw new Error(
-          `An unknown error occurred when fetching templates from ${WAZUH_INDEXER_NAME}`,
-        );
-      }
-
-      const lastChar =
-        request.params.pattern[request.params.pattern.length - 1];
-
-      // Split into separate patterns
-      const tmpdata = templates.match(/\[.*\]/g);
-      const tmparray = [];
-      for (let item of tmpdata) {
-        // A template might use more than one pattern
-        if (item.includes(',')) {
-          item = item.substr(1).slice(0, -1);
-          const subItems = item.split(',');
-          for (const subitem of subItems) {
-            tmparray.push(`[${subitem.trim()}]`);
-          }
-        } else {
-          tmparray.push(item);
-        }
-      }
-
-      // Ensure we are handling just patterns
-      const array = tmparray.filter(
-        item => item.includes('[') && item.includes(']'),
-      );
-
-      const pattern =
-        lastChar === '*'
-          ? request.params.pattern.slice(0, -1)
-          : request.params.pattern;
-      const isIncluded = array.filter(item => {
-        item = item.slice(1, -1);
-        const lastChar = item[item.length - 1];
-        item = lastChar === '*' ? item.slice(0, -1) : item;
-        return item.includes(pattern) || pattern.includes(item);
-      });
-      context.wazuh.logger.debug(
-        `Template is valid: ${
-          isIncluded && Array.isArray(isIncluded) && isIncluded.length
-            ? 'yes'
-            : 'no'
-        }`,
-      );
-      return isIncluded && Array.isArray(isIncluded) && isIncluded.length
-        ? response.ok({
-            body: {
-              statusCode: 200,
-              status: true,
-              data: `Template found for ${request.params.pattern}`,
-            },
-          })
-        : response.ok({
-            body: {
-              statusCode: 200,
-              status: false,
-              data: `No template found for ${request.params.pattern}`,
-            },
-          });
-    } catch (error) {
-      context.wazuh.logger.error(error.message || error);
-      return ErrorResponse(
-        `Could not retrieve templates from ${WAZUH_INDEXER_NAME} due to ${
-          error.message || error
-        }`,
-        4002,
-        500,
-        response,
-      );
-    }
   }
 
   /**
