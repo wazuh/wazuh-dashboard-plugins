@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed override of Server API authorization header [#9141](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9141)
+- Fixed the enabled status shown for active response commands, the GitHub module and the Command wodle [#9313](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9313)
 
 ## Wazuh v4.14.8 - OpenSearch Dashboards 2.19.6 - Revision 02
 

@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
 import WzNoConfig from '../util-components/no-config';
 import WzConfigurationSettingsHeader from '../util-components/configuration-settings-header';
 import WzConfigurationSettingsListSelector from '../util-components/configuration-settings-list-selector';
-import { isString, renderValueNoThenEnabled } from '../utils/utils';
+import { isString, renderValueYesThenEnabled } from '../utils/utils';
 import { settingsListBuilder } from '../utils/builders';
 
 import { connect } from 'react-redux';
@@ -46,7 +46,7 @@ const mainSettings = [
   {
     field: 'timeout_allowed',
     label: 'Allow this command to be reverted',
-    render: renderValueNoThenEnabled,
+    render: renderValueYesThenEnabled,
   },
 ];
 
