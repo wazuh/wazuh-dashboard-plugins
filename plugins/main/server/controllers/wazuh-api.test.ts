@@ -163,6 +163,11 @@ describe('WazuhApiCtrl.checkStoredAPI', () => {
     url: 'https://server-api',
     port: 55000,
     username: 'wazuh-wui',
+    // eslint-disable-next-line camelcase -- API host setting name
+    run_as: false,
+    key: '/etc/wazuh/key.pem',
+    cert: '/etc/wazuh/cert.pem',
+    ca: '/etc/wazuh/ca.pem',
   };
 
   const checkStoredAPI = async (getRegistryDataByHost: jest.Mock) => {
@@ -206,6 +211,20 @@ describe('WazuhApiCtrl.checkStoredAPI', () => {
     expect(response.ok.mock.calls[0][0].body.data.cluster_info).toEqual({
       node: 'node01',
       cluster: 'wazuh',
+    });
+  });
+
+  it('returns only the host id and cluster info', async () => {
+    const getRegistryDataByHost = jest
+      .fn()
+      .mockResolvedValue({ node: 'node01', cluster: 'wazuh' });
+
+    const { response } = await checkStoredAPI(getRegistryDataByHost);
+
+    expect(response.ok.mock.calls[0][0].body.data).toEqual({
+      id: 'default',
+      // eslint-disable-next-line camelcase -- response field name
+      cluster_info: { node: 'node01', cluster: 'wazuh' },
     });
   });
 

@@ -184,9 +184,8 @@ export class WazuhApiCtrl {
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
       });
-      const api = { ...apiHostData };
       context.wazuh.logger.debug(
-        `Server API host data: ${JSON.stringify(api)}`,
+        `Server API host data: ${JSON.stringify(apiHostData)}`,
       );
 
       context.wazuh.logger.debug(`${id} exists`);
@@ -199,12 +198,11 @@ export class WazuhApiCtrl {
           },
         );
 
-      api.cluster_info = { node, cluster };
-
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: api,
+          // eslint-disable-next-line camelcase -- field name the UI reads
+          data: { id, cluster_info: { node, cluster } },
           idChanged: request.body.idChanged || null,
         },
       });
