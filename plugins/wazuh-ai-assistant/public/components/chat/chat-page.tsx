@@ -3475,14 +3475,15 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     <EuiEmptyPrompt
                       iconType='machineLearningApp'
                       title={
-                        <h2>
+                        // The view's h1 while no provider is set
+                        <h1>
                           {i18n.translate(
                             'wazuhAiAssistant.chat.noProvider.title',
                             {
                               defaultMessage: 'No AI provider configured',
                             },
                           )}
-                        </h2>
+                        </h1>
                       }
                       body={
                         <p>

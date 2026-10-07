@@ -442,11 +442,11 @@ export class ComplianceSubrequirements extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={true}>
             <EuiTitle size='m'>
-              <h1>
+              <h2>
                 {i18n.translate('wazuh.complianceTable.subrequirements.title', {
                   defaultMessage: 'Requirements',
                 })}
-              </h1>
+              </h2>
             </EuiTitle>
           </EuiFlexItem>
 
