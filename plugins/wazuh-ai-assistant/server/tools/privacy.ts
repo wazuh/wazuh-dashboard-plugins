@@ -793,14 +793,160 @@ export function deepMapStrings(
   return value;
 }
 
-/** Escapes every regex metacharacter in `value` so it can be embedded literally inside a
- * dynamically-built `RegExp`, because a raw attacker/data-controlled value cannot be interpolated
- * into a regex source without first escaping it. Two callers below need it: `Pseudonymizer
- * .applyToText`, which (unlike a plain `split`/`join`) must express a word-boundary condition, and
- * `scrubKnownEntities`, which needs actual regex features (case insensitivity, `\b`-style boundary
- * lookarounds) that only a real `RegExp` gives it. */
-function escapeRegExpLiteral(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function isAsciiAlphanumeric(code: number): boolean {
+  return (
+    (code >= 48 && code <= 57) ||
+    (code >= 65 && code <= 90) ||
+    (code >= 97 && code <= 122)
+  );
+}
+
+/** Single-unit case fold: ASCII by arithmetic, anything else through `toLowerCase` only when that
+ * keeps it one UTF-16 unit, so folded text keeps the same indices as the original. */
+function foldCharCode(code: number): number {
+  if (code >= 65 && code <= 90) {
+    return code + 32;
+  }
+  if (code < 128) {
+    return code;
+  }
+  const lower = String.fromCharCode(code).toLowerCase();
+  return lower.length === 1 ? lower.charCodeAt(0) : code;
+}
+
+/** Virtual symbol fed to the automaton after every non-alphanumeric character (and once at the
+ * start), so "the preceding character is a boundary" becomes an ordinary transition. */
+const BOUNDARY_SYMBOL = -1;
+
+/**
+ * Replaces every known value in a text with its pseudonym in ONE linear pass, whatever the number
+ * of values. It replaced a loop that built and ran one `RegExp` per known value, which cost
+ * O(values x text) synchronously on the event loop: a request carrying tens of thousands of
+ * `privacy.map` entries (all client-supplied) blocked the dashboard for tens of seconds.
+ *
+ * Matching rules (unchanged from the per-value regexes it replaces): a value matches only as a
+ * WHOLE token, i.e. the characters around it are non-alphanumeric or the start/end of the text
+ * (see `Pseudonymizer.applyToText` for why `_`/`-` count as boundaries), and at each position the
+ * LONGEST matching value wins, so a shorter value never corrupts a longer one that contains it.
+ * Matches never overlap and replaced text is never re-scanned, so a value can no longer match
+ * inside a pseudonym inserted by an earlier replacement.
+ *
+ * How: an Aho-Corasick automaton over the REVERSED values, run over the reversed text. At each
+ * reversed position the automaton yields the longest value that starts at the matching original
+ * position, with both boundaries already enforced: the original "before" boundary is checked per
+ * position, the original "after" boundary is encoded with `BOUNDARY_SYMBOL`. A forward scan then
+ * takes the leftmost match, jumping past it.
+ */
+class KnownValueMatcher {
+  private readonly next: Array<Map<number, number>> = [new Map()];
+  private readonly fail: number[] = [0];
+  /** Value index ending at this node, or -1. */
+  private readonly terminal: number[] = [-1];
+  /** Longest value ending at this node or along its failure chain, or -1. */
+  private readonly output: number[] = [];
+  private readonly lengths: number[] = [];
+  private readonly pseudonyms: string[] = [];
+
+  /** `entries` in priority order: when two values fold to the same key, the first one wins. */
+  constructor(
+    entries: Iterable<[string, string]>,
+    private readonly ignoreCase: boolean,
+  ) {
+    for (const [value, pseudonym] of entries) {
+      if (!value) {
+        continue;
+      }
+      let node = this.step(0, BOUNDARY_SYMBOL, true);
+      for (let i = value.length - 1; i >= 0; i--) {
+        node = this.feed(node, value.charCodeAt(i), true);
+      }
+      if (this.terminal[node] === -1) {
+        this.terminal[node] = this.lengths.length;
+        this.lengths.push(value.length);
+        this.pseudonyms.push(pseudonym);
+      }
+    }
+    this.output[0] = -1;
+    const queue = [...this.next[0].values()];
+    for (const child of queue) {
+      this.fail[child] = 0;
+    }
+    for (let head = 0; head < queue.length; head++) {
+      const node = queue[head];
+      const failed = this.fail[node];
+      this.output[node] =
+        this.terminal[node] === -1 ? this.output[failed] : this.terminal[node];
+      for (const [symbol, child] of this.next[node]) {
+        this.fail[child] = this.step(failed, symbol, false);
+        queue.push(child);
+      }
+    }
+  }
+
+  replace(text: string): string {
+    if (!text || this.lengths.length === 0) {
+      return text;
+    }
+    const n = text.length;
+    // Value index + 1 of the longest match starting at each original position (0 = none).
+    const matchAt = new Int32Array(n);
+    let node = this.step(0, BOUNDARY_SYMBOL, false);
+    for (let i = n - 1; i >= 0; i--) {
+      node = this.feed(node, text.charCodeAt(i), false);
+      if (
+        this.output[node] !== -1 &&
+        (i === 0 || !isAsciiAlphanumeric(text.charCodeAt(i - 1)))
+      ) {
+        matchAt[i] = this.output[node] + 1;
+      }
+    }
+    let out = '';
+    let copied = 0;
+    for (let i = 0; i < n; ) {
+      const match = matchAt[i] - 1;
+      if (match === -1) {
+        i++;
+        continue;
+      }
+      out += text.slice(copied, i) + this.pseudonyms[match];
+      i += this.lengths[match];
+      copied = i;
+    }
+    return copied === 0 ? text : out + text.slice(copied);
+  }
+
+  /** Feeds one character, plus `BOUNDARY_SYMBOL` after it when it is a boundary character. */
+  private feed(node: number, code: number, build: boolean): number {
+    const symbol = this.ignoreCase ? foldCharCode(code) : code;
+    const after = this.step(node, symbol, build);
+    return isAsciiAlphanumeric(code)
+      ? after
+      : this.step(after, BOUNDARY_SYMBOL, build);
+  }
+
+  /** Building: walks the trie, adding the missing child. Scanning (and computing failure links):
+   * the automaton transition, falling back along failure links. */
+  private step(node: number, symbol: number, build: boolean): number {
+    let current = node;
+    for (;;) {
+      const child = this.next[current].get(symbol);
+      if (child !== undefined) {
+        return child;
+      }
+      if (build) {
+        const created = this.next.length;
+        this.next.push(new Map());
+        this.fail.push(0);
+        this.terminal.push(-1);
+        this.next[current].set(symbol, created);
+        return created;
+      }
+      if (current === 0) {
+        return 0;
+      }
+      current = this.fail[current];
+    }
+  }
 }
 
 /**
@@ -822,6 +968,9 @@ export class Pseudonymizer {
   };
   /** Entries minted THIS request only (not the seeded ones) — see `newEntries()`. */
   private readonly minted: PseudonymEntry[] = [];
+  /** Matchers built from the current map, reused across the many scrub calls of one request and
+   * dropped whenever a mint changes the map. */
+  private readonly matchers = new Map<string, KnownValueMatcher>();
 
   constructor(seed: PseudonymEntry[] = []) {
     for (const entry of seed) {
@@ -863,6 +1012,7 @@ export class Pseudonymizer {
     this.valueToPseudonym.set(value, pseudonym);
     this.pseudonymToValue.set(pseudonym, value);
     this.minted.push({ value, pseudonym });
+    this.matchers.clear();
     return pseudonym;
   }
 
@@ -892,31 +1042,37 @@ export class Pseudonymizer {
    * satisfy this boundary check here — this only ever REJECTS matches the previous plain
    * `split`/`join` wrongly accepted, never one it correctly accepted.
    *
-   * This now needs a real `RegExp` (to express the boundary condition) instead of the previous
-   * plain `split`/`join` — every value is escaped first via `escapeRegExpLiteral` since values
-   * here are attacker/data-controlled text, never safe to interpolate into a regex source
-   * unescaped. An empty value is skipped outright: an empty pattern's zero-width match would
-   * otherwise insert a pseudonym at every non-alphanumeric-adjacent position in the text.
+   * Runs as one linear pass through a cached `KnownValueMatcher` (see its doc comment), never one
+   * regex per known value: the map is client-supplied and may be large. An empty value is skipped
+   * outright: it would otherwise match at every boundary position in the text.
    */
   applyToText(text: string): string {
+    return this.replaceKnownValues(text, 'exact', false);
+  }
+
+  /** Replaces, in one pass, every known value `filter` keeps with its pseudonym (whole tokens,
+   * longest match first — see `KnownValueMatcher`). The matcher is cached under `cacheKey` until
+   * the next mint, so every call sharing a key must pass the same `ignoreCase` and `filter`. */
+  replaceKnownValues(
+    text: string,
+    cacheKey: string,
+    ignoreCase: boolean,
+    filter: (entry: PseudonymEntry) => boolean = () => true,
+  ): string {
     if (!text || this.valueToPseudonym.size === 0) {
       return text;
     }
-    const values = [...this.valueToPseudonym.keys()].sort(
-      (a, b) => b.length - a.length,
-    );
-    let out = text;
-    for (const value of values) {
-      if (!value || !out.includes(value)) {
-        continue;
-      }
-      const pattern = new RegExp(
-        `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
-        'g',
+    let matcher = this.matchers.get(cacheKey);
+    if (!matcher) {
+      matcher = new KnownValueMatcher(
+        this.knownEntities()
+          .filter(filter)
+          .map(({ value, pseudonym }) => [value, pseudonym]),
+        ignoreCase,
       );
-      out = out.replace(pattern, this.valueToPseudonym.get(value) as string);
+      this.matchers.set(cacheKey, matcher);
     }
-    return out;
+    return matcher.replace(text);
   }
 
   /** Deep-maps every string value of a JSON-like structure (e.g. a tool call's `arguments`)
@@ -1712,29 +1868,17 @@ export function scrubKnownEntities(
   pseudonymizer: Pseudonymizer,
   options: ScrubKnownEntitiesOptions = {},
 ): string {
-  if (!text) {
-    return text;
-  }
-  let entities = pseudonymizer
-    .knownEntities()
-    .filter(entry => entry.value.length > 0);
   if (options.identifiersOnly) {
-    entities = entities.filter(
+    return pseudonymizer.replaceKnownValues(
+      text,
+      'ignore-case-identifiers',
+      true,
       entry =>
         isRecoverableIdentifierPseudonym(entry.pseudonym) &&
         looksLikeIdentifierValue(entry.value, entry.pseudonym),
     );
   }
-  entities = entities.sort((a, b) => b.value.length - a.value.length);
-  let out = text;
-  for (const { value, pseudonym } of entities) {
-    const pattern = new RegExp(
-      `(?<![A-Za-z0-9])${escapeRegExpLiteral(value)}(?![A-Za-z0-9])`,
-      'gi',
-    );
-    out = out.replace(pattern, pseudonym);
-  }
-  return out;
+  return pseudonymizer.replaceKnownValues(text, 'ignore-case', true);
 }
 
 /** Resolves the policy entry for `field` (optionally scoped to `toolName`). Tool-scoped entries
