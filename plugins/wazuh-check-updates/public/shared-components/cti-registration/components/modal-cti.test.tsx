@@ -223,6 +223,9 @@ describe('ModalCti component', () => {
       );
     });
     expect(screen.getByText('WZH-999')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-test-subj="ctiCopyUserCode"]'),
+    ).toBeInTheDocument();
     expect(window.open).toHaveBeenCalledWith(
       'https://example.test/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
