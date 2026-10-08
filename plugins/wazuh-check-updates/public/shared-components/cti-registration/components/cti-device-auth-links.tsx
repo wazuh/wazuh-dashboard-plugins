@@ -2,12 +2,12 @@ import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiButtonEmpty,
-  EuiCallOut,
   EuiCode,
   EuiCopy,
   EuiLink,
   EuiSpacer,
   EuiText,
+  EuiTitle,
 } from '@elastic/eui';
 import { CtiDeviceAuthorization } from '../types';
 
@@ -16,16 +16,16 @@ type Props = {
 };
 
 export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
-  <EuiCallOut
-    title={
-      <FormattedMessage
-        id='wazuhCheckUpdates.ctiRegistration.deviceAuthTitle'
-        defaultMessage='Your user code and activation link'
-      />
-    }
-    color='primary'
-    iconType='globe'
-  >
+  <>
+    <EuiTitle size='xs'>
+      <h3>
+        <FormattedMessage
+          id='wazuhCheckUpdates.ctiRegistration.deviceAuthTitle'
+          defaultMessage='Your user code and activation link'
+        />
+      </h3>
+    </EuiTitle>
+    <EuiSpacer size='s' />
     <EuiText size='s'>
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.userCodeLabel'
@@ -65,5 +65,5 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
         </EuiButtonEmpty>
       )}
     </EuiCopy>
-  </EuiCallOut>
+  </>
 );
