@@ -14,6 +14,7 @@ import { WzAPIUtils } from '../../../../react-services/wz-api-utils';
 import RulesServices from '../../rules/services';
 import {
   UI_LOGGER_LEVELS,
+  WAZUH_API_INTERNAL_CLIENT_USERNAME,
   WAZUH_API_RESERVED_WUI_SECURITY_RULES,
 } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
@@ -135,12 +136,13 @@ export const RolesMappingTable = ({
                   content={i18n.translate(
                     'wazuh.security.rolesMappingTable.wuiRulesTooltip',
                     {
-                      defaultMessage: 'wui_ rules belong to wazuh-wui API user',
+                      defaultMessage: 'wui_ rules belong to {user} API user',
+                      values: { user: WAZUH_API_INTERNAL_CLIENT_USERNAME },
                     },
                   )}
                 >
                   <EuiBadge color='accent' title='' style={{ marginLeft: 10 }}>
-                    wazuh-wui
+                    {WAZUH_API_INTERNAL_CLIENT_USERNAME}
                   </EuiBadge>
                 </EuiToolTip>
               </EuiFlexGroup>

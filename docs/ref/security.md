@@ -5,7 +5,7 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 ## Access control
 
 - Do not keep a default or publicly known password on any indexer or Server API account. The
-  `kibanaserver` and `wazuh-wui` passwords the dashboard uses are not shipped defaults: they come
+  `kibanaserver` and `wazuh-internal-client` passwords the dashboard uses are not shipped defaults: they come
   from `/etc/wazuh/credentials.env` and are stored in the dashboard keystore. See
   [Credentials](getting-started/credentials.md).
 - Delete `/etc/wazuh/credentials.env` once every Wazuh component is installed and running: it holds

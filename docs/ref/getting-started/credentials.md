@@ -19,10 +19,10 @@ Certificates are the exception to "every start", so note this before reading on:
 The dashboard owns neither account it connects with. Each password belongs to the component that
 holds the account:
 
-| Key                                   | Environment-only alias | Account                        | Owner   | Written to the keystore as                                    |
-| ------------------------------------- | ---------------------- | ------------------------------ | ------- | ------------------------------------------------------------- |
-| `WAZUH_INDEXER_KIBANASERVER_PASSWORD` | `INDEXER_PASSWORD`     | `kibanaserver` (Wazuh indexer) | Indexer | `opensearch.username` (`kibanaserver`), `opensearch.password` |
-| `WAZUH_MANAGER_WUI_PASSWORD`          | `API_PASSWORD`         | `wazuh-wui` (Server API)       | Manager | `wazuh_core.hosts.default.password`                           |
+| Key                                   | Environment-only alias | Account                              | Owner   | Written to the keystore as                                    |
+| ------------------------------------- | ---------------------- | ------------------------------------ | ------- | ------------------------------------------------------------- |
+| `WAZUH_INDEXER_KIBANASERVER_PASSWORD` | `INDEXER_PASSWORD`     | `kibanaserver` (Wazuh indexer)       | Indexer | `opensearch.username` (`kibanaserver`), `opensearch.password` |
+| `WAZUH_MANAGER_WUI_PASSWORD`          | `API_PASSWORD`         | `wazuh-internal-client` (Server API) | Manager | `wazuh_core.hosts.default.password`                           |
 
 The dashboard **consumes** both. It never generates them and never writes them to the credentials
 file: a password the dashboard made up would not be accepted by the indexer or the Server API. So
@@ -36,6 +36,11 @@ It **owns** two local assets, which nobody else reads:
 
 The aliases keep the variable names used by `wazuh-docker`. They are read from the process
 environment only, never from the file.
+
+`wazuh-internal-client` is a service account: the dashboard backend uses it to call the Server API
+on behalf of the indexer user who logged in (`run_as`). It is not an account to log into the
+dashboard with. It was named `wazuh-wui` before Wazuh 5.0.0; the credentials key keeps its
+`WUI` name.
 
 ## The resolution order
 
@@ -60,7 +65,7 @@ value. So a setting in the file counts as resolved:
 - If `opensearch.username` is set in `opensearch_dashboards.yml`, the resolver stores only
   `opensearch.password`. It never writes `kibanaserver` over your username.
 - If `wazuh_core.hosts.default.password` is set, or `wazuh_core.hosts` has no `default` entry, the
-  `wazuh-wui` password is not needed. Passwords for other hosts are configured as described in
+  `wazuh-internal-client` password is not needed. Passwords for other hosts are configured as described in
   [Define Wazuh server hosts](../configuration.md#define-wazuh-server-hosts).
 
 The resolver reads `opensearch_dashboards.yml` with the dashboard's own configuration loader. That
@@ -98,15 +103,16 @@ the handoff between components, and the record of generated passwords.
 
 When the indexer and the manager run on the same host, their packages publish the keys the dashboard
 reads, and there is nothing to do. When they run on other hosts, add the keys before starting the
-dashboard. Replace `<KIBANASERVER_PASSWORD>` and `<WAZUH_WUI_PASSWORD>` with the passwords of the
-`kibanaserver` account on the indexer and the `wazuh-wui` account on the Server API:
+dashboard. Replace `<KIBANASERVER_PASSWORD>` and `<WAZUH_INTERNAL_CLIENT_PASSWORD>` with the
+passwords of the `kibanaserver` account on the indexer and the `wazuh-internal-client` account on
+the Server API:
 
 ```bash
 sudo install -d -m 0700 -o root -g root /etc/wazuh
 sudo touch /etc/wazuh/credentials.env && sudo chmod 0600 /etc/wazuh/credentials.env
 sudo tee -a /etc/wazuh/credentials.env > /dev/null <<'EOF'
 WAZUH_INDEXER_KIBANASERVER_PASSWORD='<KIBANASERVER_PASSWORD>'
-WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_WUI_PASSWORD>'
+WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>'
 EOF
 ```
 
@@ -135,10 +141,10 @@ maintainer script:
 
 ```bash
 # Correct
-sudo WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_WUI_PASSWORD>' apt-get install wazuh-dashboard
+sudo WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>' apt-get install wazuh-dashboard
 
 # Silently dropped: env_reset discards it
-export WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_WUI_PASSWORD>'
+export WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>'
 sudo apt-get install wazuh-dashboard
 ```
 
@@ -185,7 +191,7 @@ $ sudo systemctl enable --now wazuh-dashboard
 Job for wazuh-dashboard.service failed.
 
 $ journalctl -u wazuh-dashboard -n 50
-  resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-wui account)
+  resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-internal-client account)
   resolve-credentials:         set it in /etc/wazuh/credentials.env, or install wazuh-manager on this host first
 ```
 
@@ -197,7 +203,7 @@ $ journalctl -u wazuh-dashboard -n 50
 | Message                                       | Meaning                                                                                                                         |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `MISSING WAZUH_INDEXER_KIBANASERVER_PASSWORD` | No source gives the `kibanaserver` password. Set it in the file, or install `wazuh-indexer` on this host first.                 |
-| `MISSING WAZUH_MANAGER_WUI_PASSWORD`          | No source gives the `wazuh-wui` password. Set it in the file, or install `wazuh-manager` on this host first.                    |
+| `MISSING WAZUH_MANAGER_WUI_PASSWORD`          | No source gives the `wazuh-internal-client` password. Set it in the file, or install `wazuh-manager` on this host first.        |
 | `INVALID <KEY>`                               | The value is JSON or has surrounding whitespace. Correct it in the file and start the service again.                            |
 | `REFUSED /etc/wazuh/credentials.env`          | The file or a directory above it fails the ownership, mode or format rules. The reason is logged just above it. Fix it by hand. |
 | `MISSING keystore`                            | `/etc/wazuh-dashboard/opensearch_dashboards.keystore` could not be created or read.                                             |
@@ -403,9 +409,9 @@ counts as present. A CA relocated with `WAZUH_CA_DIR` is not removed.
 Use `wazuh-passwords-tool.sh` to change a password on a running deployment. No rotation path updates
 `/etc/wazuh/credentials.env`, so a value left there after a change is stale.
 
-After the password of `kibanaserver` or `wazuh-wui` changes on the indexer or the Server API, update
+After the password of `kibanaserver` or `wazuh-internal-client` changes on the indexer or the Server API, update
 the matching keystore entry as the service user and restart the dashboard. For example, for
-`wazuh-wui`:
+`wazuh-internal-client`:
 
 ```bash
 sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \

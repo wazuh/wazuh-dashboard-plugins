@@ -19,8 +19,8 @@ const API_HOST = {
   id: 'default',
   url: 'https://server-api',
   port: 55000,
-  username: 'wazuh-wui',
-  password: 'wazuh-wui',
+  username: 'wazuh-internal-client',
+  password: 'wazuh-internal-client',
 };
 
 interface RequestOptions {

@@ -5,11 +5,11 @@
 ### The Wazuh dashboard service does not start
 
 Before the dashboard starts, the service runs `resolve-credentials --prestart`, which resolves the
-`kibanaserver` and `wazuh-wui` passwords into the keystore. If a password is missing or invalid, the
+`kibanaserver` and `wazuh-internal-client` passwords into the keystore. If a password is missing or invalid, the
 service refuses to start and the journal names the key:
 
 ```
-resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-wui account)
+resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-internal-client account)
 resolve-credentials:         set it in /etc/wazuh/credentials.env, or install wazuh-manager on this host first
 ```
 
@@ -47,7 +47,7 @@ See [Credentials](../ref/getting-started/credentials.md#when-the-dashboard-does-
 
 The start check validates that the passwords are present and well formed, not that they are
 correct. A password that is present but wrong fails at runtime with a `401`. This happens when the
-password of `kibanaserver` or `wazuh-wui` changed after the dashboard stored it in its keystore:
+password of `kibanaserver` or `wazuh-internal-client` changed after the dashboard stored it in its keystore:
 editing `/etc/wazuh/credentials.env` afterwards has no effect, because the keystore entry takes
 precedence.
 

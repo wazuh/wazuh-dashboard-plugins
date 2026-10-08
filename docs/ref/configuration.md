@@ -53,7 +53,7 @@ wazuh_core.hosts:
   default:
     url: https://localhost
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
 ```
 
@@ -64,12 +64,12 @@ wazuh_core.hosts:
   default:
     url: https://localhost
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
   another_host:
     url: https://another_host_dns
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
     key: '/etc/wazuh-dashboard/certs/dashboard-another-host.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-another-host.crt'
@@ -161,7 +161,7 @@ wazuh_core.hosts:
   production:
     url: 'https://wazuh.example.com'
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
     key: '/etc/wazuh-dashboard/certs/dashboard-client.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-client.crt'
@@ -175,7 +175,7 @@ wazuh_core.hosts:
   default:
     url: 'https://localhost'
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
 ```
 

@@ -350,7 +350,7 @@ services:
       - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/wazuh/root-ca.pem
       - SSL_CERTIFICATE=/etc/ssl/wazuh/server.pem
       - SSL_KEY=/etc/ssl/wazuh/server-key.pem
-      - API_USERNAME=wazuh-wui
+      - API_USERNAME=wazuh-internal-client
       - API_PASSWORD=MyS3cr37P450r.*-
     volumes:
       - wm_certs:/etc/ssl/wazuh
@@ -390,9 +390,9 @@ services:
       - INDEXER_SSL_CA=/etc/server_certs/root-ca.pem
       - INDEXER_SSL_CERTIFICATE=/etc/server_certs/server.pem
       - INDEXER_SSL_CERTIFICATE_KEY=/etc/server_certs/server-key.pem
-      # Seeded into rbac.db on first start. API_PASSWORD is the wazuh-wui one,
+      # Seeded into rbac.db on first start. API_PASSWORD is the wazuh-internal-client one,
       # shared with the agent services that authenticate as that user.
-      - API_PASSWORD=${API_PASSWORD:-wazuh-wui}
+      - API_PASSWORD=${API_PASSWORD:-wazuh-internal-client}
       - API_WAZUH_PASSWORD=${API_WAZUH_PASSWORD:-wazuh}
     volumes:
       - wm_certs:/etc/server_certs
@@ -414,8 +414,8 @@ services:
       - os-dev
       - mon
     environment:
-      - API_USERNAME=${API_USERNAME:-wazuh-wui}
-      - API_PASSWORD=${API_PASSWORD:-wazuh-wui}
+      - API_USERNAME=${API_USERNAME:-wazuh-internal-client}
+      - API_PASSWORD=${API_PASSWORD:-wazuh-internal-client}
     volumes:
       - ./agents:/packages-agents
       # The manager's root CA, so the agent can verify the manager certificate
@@ -506,8 +506,8 @@ services:
       - os-dev
       - mon
     environment:
-      - API_USERNAME=${API_USERNAME:-wazuh-wui}
-      - API_PASSWORD=${API_PASSWORD:-wazuh-wui}
+      - API_USERNAME=${API_USERNAME:-wazuh-internal-client}
+      - API_PASSWORD=${API_PASSWORD:-wazuh-internal-client}
     volumes:
       - ./agents:/packages-agents
       # The manager's root CA, so the agent can verify the manager certificate

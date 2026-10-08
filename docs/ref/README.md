@@ -10,10 +10,10 @@ or running end-to-end tests.
 Command examples authenticate with the passwords generated or supplied during installation, which
 are unique to each deployment, never with a shipped default:
 
-| Variable                        | Account                             |
-| ------------------------------- | ----------------------------------- |
-| `$WAZUH_INDEXER_ADMIN_PASSWORD` | `admin` on the Wazuh indexer        |
-| `$WAZUH_MANAGER_WUI_PASSWORD`   | `wazuh-wui` on the Wazuh server API |
+| Variable                        | Account                                         |
+| ------------------------------- | ----------------------------------------------- |
+| `$WAZUH_INDEXER_ADMIN_PASSWORD` | `admin` on the Wazuh indexer                    |
+| `$WAZUH_MANAGER_WUI_PASSWORD`   | `wazuh-internal-client` on the Wazuh server API |
 
 Load them into your shell before running the examples, on a host where `/etc/wazuh/credentials.env`
 holds them:

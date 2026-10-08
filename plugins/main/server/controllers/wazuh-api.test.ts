@@ -259,7 +259,7 @@ describe('WazuhApiCtrl.checkStoredAPI', () => {
     id: 'default',
     url: 'https://server-api',
     port: 55000,
-    username: 'wazuh-wui',
+    username: 'wazuh-internal-client',
     // eslint-disable-next-line camelcase -- API host setting name
     run_as: false,
     key: '/etc/wazuh/key.pem',

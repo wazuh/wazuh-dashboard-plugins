@@ -67,7 +67,7 @@ The Wazuh dashboard depends on:
 ### Wazuh manager API
 
 - Version compatibility: see the [Compatibility](../compatibility.md#version-compatibility) matrix
-- The password of the `wazuh-wui` account (`WAZUH_MANAGER_WUI_PASSWORD`)
+- The password of the `wazuh-internal-client` account (`WAZUH_MANAGER_WUI_PASSWORD`)
 - API user with appropriate permissions for:
   - Agent management
   - Configuration queries
