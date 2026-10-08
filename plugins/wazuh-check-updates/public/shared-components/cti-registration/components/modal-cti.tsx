@@ -411,6 +411,22 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               </EuiText>
               <EuiLoadingSpinner size='m' />
             </div>
+            {/*
+             * When Wazuh Cloud rejects the code because this environment is still
+             * registered there, it leaves the code pending, so polling only ever sees
+             * `authorization_pending`. Explain the rejection and the way out here.
+             */}
+            <EuiSpacer size='m' />
+            <EuiText
+              size='s'
+              color='subdued'
+              data-test-subj='ctiRegistrationEnvironmentExistsHint'
+            >
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.environmentExistsHint'
+                defaultMessage='If Wazuh Cloud shows "Environment already exists", this deployment is still registered there. Delete it from Deployments in Wazuh Cloud, then enter the same user code again.'
+              />
+            </EuiText>
           </>
         )}
         {showSuccess && (

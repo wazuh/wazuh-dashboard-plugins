@@ -255,6 +255,11 @@ describe('ModalCti component', () => {
       expect(
         document.querySelector('[data-test-subj="ctiRegistrationInProgress"]'),
       ).toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '[data-test-subj="ctiRegistrationEnvironmentExistsHint"]',
+        ),
+      ).toHaveTextContent('Environment already exists');
     });
   });
 
