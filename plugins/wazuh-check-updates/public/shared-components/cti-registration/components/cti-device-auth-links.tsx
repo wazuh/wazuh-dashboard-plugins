@@ -69,6 +69,7 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
         defaultMessage='Activation link:'
       />{' '}
       <EuiLink
+        className='eui-textBreakWord'
         href={deviceAuth.verification_uri_complete}
         target='_blank'
         rel='noopener noreferrer'
