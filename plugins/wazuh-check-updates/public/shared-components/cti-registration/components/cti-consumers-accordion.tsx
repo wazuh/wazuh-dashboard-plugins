@@ -84,17 +84,78 @@ const CTI_CONSUMER_FIELDS: Array<{
   },
 ];
 
-// The only real status value observed in practice (see
-// plugins/wazuh-ai-assistant/server/tools/catalog/get-cti-status.ts); the
-// server route passes `status` through verbatim with no validated enum.
+// `status` has no validated enum — the server route passes it through
+// verbatim. 'ready', 'running' and 'failed' are the only literal values this
+// component gives meaning to (see
+// plugins/wazuh-ai-assistant/server/tools/catalog/get-cti-status.ts for
+// 'ready'); anything else falls back to showing the raw value.
 const CTI_CONSUMER_STATUS_READY = 'ready';
+const CTI_CONSUMER_STATUS_RUNNING = 'running';
+const CTI_CONSUMER_STATUS_FAILED = 'failed';
 
-function isConsumerUpToDate(consumer: CtiConsumer): boolean {
-  return (
+type ConsumerSyncState =
+  | { kind: 'upToDate' }
+  | { kind: 'syncing' }
+  | { kind: 'failed' }
+  | { kind: 'unknown'; rawStatus: string };
+
+function getConsumerSyncState(consumer: CtiConsumer): ConsumerSyncState {
+  if (
     consumer.status === CTI_CONSUMER_STATUS_READY &&
     consumer.local_offset === consumer.remote_offset
-  );
+  ) {
+    return { kind: 'upToDate' };
+  }
+  if (consumer.status === CTI_CONSUMER_STATUS_RUNNING) {
+    return { kind: 'syncing' };
+  }
+  if (consumer.status === CTI_CONSUMER_STATUS_FAILED) {
+    return { kind: 'failed' };
+  }
+  return { kind: 'unknown', rawStatus: consumer.status };
 }
+
+const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
+  const syncState = getConsumerSyncState(consumer);
+
+  switch (syncState.kind) {
+    case 'upToDate':
+      return (
+        <EuiBadge color='success' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate(
+            'wazuhCheckUpdates.ctiConsumers.syncStatus.upToDate',
+            {
+              defaultMessage: 'Up to date',
+            },
+          )}
+        </EuiBadge>
+      );
+    case 'syncing':
+      return (
+        <EuiBadge color='warning' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.syncing', {
+            defaultMessage: 'Syncing',
+          })}
+        </EuiBadge>
+      );
+    case 'failed':
+      return (
+        <EuiBadge color='danger' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.failed', {
+            defaultMessage: 'Failed',
+          })}
+        </EuiBadge>
+      );
+    case 'unknown':
+      return (
+        <EuiBadge color='hollow' data-test-subj='ctiConsumerSyncStatus'>
+          {syncState.rawStatus}
+        </EuiBadge>
+      );
+    default:
+      return null;
+  }
+};
 
 function formatFieldValue(value: unknown): string {
   if (typeof value === 'boolean') {
@@ -234,7 +295,6 @@ export const CtiConsumersAccordion: React.FC = () => {
       ) : (
         consumers.map(consumer => {
           const isExpanded = expandedConsumers.has(consumer.name);
-          const upToDate = isConsumerUpToDate(consumer);
           return (
             <EuiPanel
               key={consumer.name}
@@ -259,24 +319,7 @@ export const CtiConsumersAccordion: React.FC = () => {
                       </EuiTitle>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
-                      <EuiBadge
-                        color={upToDate ? 'success' : 'warning'}
-                        data-test-subj='ctiConsumerSyncStatus'
-                      >
-                        {upToDate
-                          ? i18n.translate(
-                              'wazuhCheckUpdates.ctiConsumers.syncStatus.upToDate',
-                              {
-                                defaultMessage: 'Up to date',
-                              },
-                            )
-                          : i18n.translate(
-                              'wazuhCheckUpdates.ctiConsumers.syncStatus.syncing',
-                              {
-                                defaultMessage: 'Syncing',
-                              },
-                            )}
-                      </EuiBadge>
+                      <SyncStatusBadge consumer={consumer} />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 </EuiFlexItem>

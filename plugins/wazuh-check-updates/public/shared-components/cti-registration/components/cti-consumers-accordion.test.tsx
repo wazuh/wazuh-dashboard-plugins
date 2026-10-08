@@ -99,7 +99,7 @@ describe('CtiConsumersAccordion', () => {
     expect(await screen.findByText('Up to date')).toBeInTheDocument();
   });
 
-  it('shows a "Syncing" badge when the offsets differ', async () => {
+  it('shows a "Syncing" badge when the status is running', async () => {
     /* eslint-disable camelcase -- CtiConsumer fixture matches the CTI API's snake_case fields */
     mockedHttpGet.mockResolvedValue({
       data: [
@@ -109,7 +109,7 @@ describe('CtiConsumersAccordion', () => {
           type: 'type-1',
           resource: 'https://example.test/resource-1',
           is_public: true,
-          status: 'ready',
+          status: 'running',
           local_offset: 8,
           remote_offset: 10,
         },
@@ -120,6 +120,54 @@ describe('CtiConsumersAccordion', () => {
     render(<CtiConsumersAccordion />);
 
     expect(await screen.findByText('Syncing')).toBeInTheDocument();
+  });
+
+  it('shows a "Failed" badge when the status is failed', async () => {
+    /* eslint-disable camelcase -- CtiConsumer fixture matches the CTI API's snake_case fields */
+    mockedHttpGet.mockResolvedValue({
+      data: [
+        {
+          name: 'consumer-1',
+          context: 'ctx-1',
+          type: 'type-1',
+          resource: 'https://example.test/resource-1',
+          is_public: true,
+          status: 'failed',
+          local_offset: 8,
+          remote_offset: 10,
+        },
+      ],
+    });
+    /* eslint-enable camelcase */
+
+    render(<CtiConsumersAccordion />);
+
+    expect(await screen.findByText('Failed')).toBeInTheDocument();
+  });
+
+  it('falls back to showing the raw status for an unrecognized value', async () => {
+    /* eslint-disable camelcase -- CtiConsumer fixture matches the CTI API's snake_case fields */
+    mockedHttpGet.mockResolvedValue({
+      data: [
+        {
+          name: 'consumer-1',
+          context: 'ctx-1',
+          type: 'type-1',
+          resource: 'https://example.test/resource-1',
+          is_public: true,
+          status: 'some-unrecognized-value',
+          local_offset: 8,
+          remote_offset: 10,
+        },
+      ],
+    });
+    /* eslint-enable camelcase */
+
+    render(<CtiConsumersAccordion />);
+
+    expect(
+      await screen.findByText('some-unrecognized-value'),
+    ).toBeInTheDocument();
   });
 
   it('shows an empty state when no consumers are returned', async () => {
