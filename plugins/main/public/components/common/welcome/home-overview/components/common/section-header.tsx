@@ -1,5 +1,4 @@
 import React from 'react';
-import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -13,18 +12,16 @@ export interface SectionHeaderProps {
   description: React.ReactNode;
   /** Optional right-aligned content, e.g. the page-level Quick access menu. */
   actions?: React.ReactNode;
+  /** `h1` for the page title, `h2` for the sections under it. */
+  headingLevel?: 'h1' | 'h2';
 }
 
-/**
- * Section heading shared by every Home overview section. The title renders as
- * a breadcrumb rather than a plain heading, with the description sitting beside
- * it on the same line, giving the on-page sections a lighter, navigation-style
- * treatment. On narrow widths the description wraps below the breadcrumb.
- */
+/** Home overview heading: a real heading drawn as a badge, description beside it. */
 export const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   description,
   actions,
+  headingLevel: Heading = 'h2',
 }) => (
   <>
     <EuiFlexGroup
@@ -41,15 +38,8 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           responsive={false}
           wrap
         >
-          <EuiFlexItem grow={false}>
-            <EuiBetaBadge
-              color='subdued'
-              label={`${title}`}
-              aria-label={i18n.translate(
-                'wazuh.common.homeOverviewSectionHeader.ariaLabel',
-                { defaultMessage: '{title} section', values: { title } },
-              )}
-            />
+          <EuiFlexItem grow={false} component={Heading}>
+            <EuiBetaBadge color='subdued' label={title} />
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiText size='s' color='subdued'>

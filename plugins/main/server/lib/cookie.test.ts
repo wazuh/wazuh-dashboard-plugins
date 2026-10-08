@@ -11,7 +11,7 @@
  */
 
 import { of, throwError } from 'rxjs';
-import { resolveCookieSecure } from './cookie';
+import { getCookieValueByName, resolveCookieSecure } from './cookie';
 import { PluginSetup } from '../types';
 
 const pluginsWith = (secure?: boolean): PluginSetup =>
@@ -60,5 +60,34 @@ describe('resolveCookieSecure', () => {
       securityDashboards: { config$: throwError(new Error('boom')) },
     } as unknown as PluginSetup;
     await expect(resolveCookieSecure(plugins, true)).resolves.toBe(true);
+  });
+});
+
+describe('getCookieValueByName', () => {
+  it.each`
+    cookie                               | name          | expected
+    ${'wz-token=abc'}                    | ${'wz-token'} | ${'abc'}
+    ${'a=1; wz-api=host-1; b=2'}         | ${'wz-api'}   | ${'host-1'}
+    ${'  wz-user = admin%40x ;a=1'}      | ${'wz-user'}  | ${'admin%40x'}
+    ${'jwt=a.b=c; wz-token=x=y'}         | ${'wz-token'} | ${'x=y'}
+    ${'wz-token=first; wz-token=second'} | ${'wz-token'} | ${'first'}
+    ${'xwz-token=evil; a=1'}             | ${'wz-token'} | ${undefined}
+    ${'wz-token=; a=1'}                  | ${'wz-token'} | ${undefined}
+    ${'wz-token; a=1'}                   | ${'wz-token'} | ${undefined}
+    ${'a=1; b=2'}                        | ${'wz-token'} | ${undefined}
+    ${''}                                | ${'wz-token'} | ${undefined}
+    ${undefined}                         | ${'wz-token'} | ${undefined}
+  `(
+    'returns $expected for $name in "$cookie"',
+    ({ cookie, name, expected }) => {
+      expect(getCookieValueByName(cookie, name)).toBe(expected);
+    },
+  );
+
+  it('parses a 64 KB header without the cookie in linear time', () => {
+    const cookie = `x=${'a'.repeat(30)}; `.repeat(2000);
+    const start = Date.now();
+    expect(getCookieValueByName(cookie, 'wz-token')).toBeUndefined();
+    expect(Date.now() - start).toBeLessThan(100);
   });
 });

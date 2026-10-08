@@ -150,20 +150,6 @@ export function WazuhElasticRoutes(router: IRouter) {
       ctrl.cleanFindingsCase(context, request, response),
   );
 
-  // TODO: this seems that is unused and could be removed
-  router.get(
-    {
-      path: '/elastic/template/{pattern}',
-      validate: {
-        params: schema.object({
-          pattern: schema.string(),
-        }),
-      },
-    },
-    async (context, request, response) =>
-      ctrl.getTemplate(context, request, response),
-  );
-
   // TODO: this seems to be deprecated in 4.9 so it could be removed
   router.get(
     {

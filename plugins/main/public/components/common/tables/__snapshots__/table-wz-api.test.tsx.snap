@@ -90,7 +90,7 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                             data-test-subj="table-wz-api-title"
                             size="s"
                           >
-                            <h1
+                            <h2
                               className="euiTitle euiTitle--small"
                               data-test-subj="table-wz-api-title"
                             >
@@ -103,7 +103,7 @@ exports[`Table WZ API component renders correctly to match the snapshot 1`] = `
                                   className="euiLoadingSpinner euiLoadingSpinner--small"
                                 />
                               </EuiLoadingSpinner>
-                            </h1>
+                            </h2>
                           </EuiTitle>
                         </div>
                       </EuiFlexItem>

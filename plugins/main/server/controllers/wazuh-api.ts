@@ -184,9 +184,8 @@ export class WazuhApiCtrl {
       const apiHostData = await context.wazuh_core.manageHosts.get(id, {
         excludePassword: true,
       });
-      const api = { ...apiHostData };
       context.wazuh.logger.debug(
-        `Server API host data: ${JSON.stringify(api)}`,
+        `Server API host data: ${JSON.stringify(apiHostData)}`,
       );
 
       context.wazuh.logger.debug(`${id} exists`);
@@ -199,12 +198,11 @@ export class WazuhApiCtrl {
           },
         );
 
-      api.cluster_info = { node, cluster };
-
       return response.ok({
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
-          data: api,
+          // eslint-disable-next-line camelcase -- field name the UI reads
+          data: { id, cluster_info: { node, cluster } },
           idChanged: request.body.idChanged || null,
         },
       });
@@ -840,15 +838,21 @@ export class WazuhApiCtrl {
       if (!tmpPath) throw new Error('An error occurred parsing path field');
 
       context.wazuh.logger.debug(`Report ${tmpPath}`);
-      // Real limit, regardless the user query
-      const params = { limit: 500 };
+      const filterParams = {};
 
       if (filters.length) {
         for (const filter of filters) {
           if (!filter.name || !filter.value) continue;
-          params[filter.name] = filter.value;
+          if (filter.name === 'limit' || filter.name === 'offset') {
+            continue;
+          }
+          filterParams[filter.name] = filter.value;
         }
       }
+
+      // Real limit, regardless the user query. Spread last so caller filters
+      // can never override the server-enforced page size.
+      const params = { ...filterParams, limit: 500 };
 
       let itemsArray = [];
 

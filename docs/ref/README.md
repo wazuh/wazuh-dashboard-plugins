@@ -19,7 +19,8 @@ Load them into your shell before running the examples, on a host where `/etc/waz
 holds them:
 
 ```bash
-eval "$(sudo cat /etc/wazuh/credentials.env)"
+WAZUH_INDEXER_ADMIN_PASSWORD=$(sudo grep '^WAZUH_INDEXER_ADMIN_PASSWORD=' /etc/wazuh/credentials.env | cut -d= -f2- | tr -d '\"')
+WAZUH_MANAGER_WUI_PASSWORD=$(sudo grep '^WAZUH_MANAGER_WUI_PASSWORD=' /etc/wazuh/credentials.env | cut -d= -f2- | tr -d '\"')
 ```
 
 `source` cannot read the file directly: it is `0600 root:root`, and `source` is a shell builtin, so

@@ -6,7 +6,11 @@ import {
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from '../../../../src/core/server';
-import { API_PATHS, CONVERSATION_OWNER_FALLBACK } from '../../common/constants';
+import {
+  API_PATHS,
+  CONVERSATION_MAX_MESSAGES,
+  CONVERSATION_OWNER_FALLBACK,
+} from '../../common/constants';
 import {
   ChatMessage,
   ProviderConfig,
@@ -2067,13 +2071,40 @@ export function scrubMessagesForProvider(
   messages: ChatMessage[],
   pseudonymizer: Pseudonymizer,
 ): ChatMessage[] {
-  return messages.map(message => {
+  // Two passes: mint every shape-detected value across ALL messages first, then scrub. A mint
+  // invalidates the pseudonymizer's cached matcher, so interleaving mint and scrub per message
+  // rebuilt the matcher over the whole map once per message (event-loop stall on long histories).
+  // Minting first builds it once per request; it also lets an earlier message be scrubbed of a
+  // value first minted in a later one.
+  const minted = messages.map(message => {
     if (message.role === 'system') {
       return message;
     }
     // user content is free text -> flat scan; tool content is (normally) digest JSON whose keys
     // are dotted ECS field paths -> JSON-aware scan of string VALUES only, so field names are
     // never minted as hostnames (see prescanAndMintToolContent's doc comment).
+    return {
+      ...message,
+      content:
+        message.role === 'tool'
+          ? prescanAndMintToolContent(message.content, pseudonymizer)
+          : prescanAndMint(message.content, pseudonymizer),
+      ...(message.toolCalls
+        ? {
+            toolCalls: message.toolCalls.map(call => ({
+              ...call,
+              arguments: deepMapStrings(call.arguments, value =>
+                prescanAndMint(value, pseudonymizer),
+              ) as Record<string, unknown>,
+            })),
+          }
+        : {}),
+    };
+  });
+  return minted.map(message => {
+    if (message.role === 'system') {
+      return message;
+    }
     let content: string;
     if (message.role === 'user') {
       // Shape scan (prescanAndMint) THEN known-entity dictionary scan (scrubKnownEntities,
@@ -2086,15 +2117,11 @@ export function scrubMessagesForProvider(
       // closes). The general, UNFILTERED `applyToText` pass is deliberately NOT run for `user`
       // content — see this function's doc comment above for why that reintroduces the same
       // corruption `identifiersOnly` closes.
-      content = scrubKnownEntities(
-        prescanAndMint(message.content, pseudonymizer),
-        pseudonymizer,
-        { identifiersOnly: true },
-      );
+      content = scrubKnownEntities(message.content, pseudonymizer, {
+        identifiersOnly: true,
+      });
     } else if (message.role === 'tool') {
-      content = pseudonymizer.applyToText(
-        prescanAndMintToolContent(message.content, pseudonymizer),
-      );
+      content = pseudonymizer.applyToText(message.content);
     } else {
       // This is `assistant` content — the model's OWN prior narration,
       // which the client resends verbatim on every subsequent turn as part of the accumulated
@@ -2114,9 +2141,7 @@ export function scrubMessagesForProvider(
       // client-replayed content to already be protected — every inbound role gets an
       // unconditional shape scan; the pseudonym map is a REUSE/consistency optimization on top of
       // that, never the sole mechanism a boundary depends on.
-      content = pseudonymizer.applyToText(
-        prescanAndMint(message.content, pseudonymizer),
-      );
+      content = pseudonymizer.applyToText(message.content);
     }
     return {
       ...message,
@@ -2140,11 +2165,7 @@ export function scrubMessagesForProvider(
               // `prescanAndMint` (reusing `Pseudonymizer.applyToObject`'s own deep-map machinery,
               // just with the shape scan as the mapping function) before the existing
               // map-substitution pass.
-              arguments: pseudonymizer.applyToObject(
-                deepMapStrings(call.arguments, value =>
-                  prescanAndMint(value, pseudonymizer),
-                ) as Record<string, unknown>,
-              ),
+              arguments: pseudonymizer.applyToObject(call.arguments),
             })),
           }
         : {}),
@@ -2203,6 +2224,17 @@ export const chatRequestMessageSchema = schema.object({
   privacyEnabled: schema.maybe(schema.boolean()),
 });
 
+/** Limits on the client-held pseudonym map (`privacy.map`). Far above what a real conversation
+ * mints (field values are truncated to a few hundred characters, pseudonyms are `KIND_n`); they
+ * only stop an unbounded map from being sent. */
+const PRIVACY_MAP_MAX_ENTRIES = 10_000;
+const PRIVACY_MAP_MAX_VALUE_LENGTH = 4096;
+const PRIVACY_MAP_MAX_PSEUDONYM_LENGTH = 64;
+/** Limit on the request `messages`. A persisted conversation keeps at most
+ * `CONVERSATION_MAX_MESSAGES`; the extra headroom covers the tool-call/tool-result pairs
+ * `buildOutgoingMessages` adds back for the newest turns. */
+const CHAT_REQUEST_MAX_MESSAGES = CONVERSATION_MAX_MESSAGES * 2;
+
 export function registerChatRoutes(router: IRouter, logger: Logger): void {
   router.post(
     {
@@ -2210,7 +2242,9 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
       validate: {
         body: schema.object({
           providerId: schema.string({ minLength: 1 }),
-          messages: schema.arrayOf(chatRequestMessageSchema),
+          messages: schema.arrayOf(chatRequestMessageSchema, {
+            maxSize: CHAT_REQUEST_MAX_MESSAGES,
+          }),
           // Privacy mode (common/types.ts's
           // `ChatRequest['privacy']`): the pseudonym map is client-held and stateless
           // server-side — `map` reseeds this request's Pseudonymizer, `enabled` is honored only
@@ -2219,12 +2253,18 @@ export function registerChatRoutes(router: IRouter, logger: Logger): void {
           privacy: schema.maybe(
             schema.object({
               enabled: schema.maybe(schema.boolean()),
+              // Bounded because every entry feeds the privacy scrub run over this request.
               map: schema.maybe(
                 schema.arrayOf(
                   schema.object({
-                    value: schema.string(),
-                    pseudonym: schema.string(),
+                    value: schema.string({
+                      maxLength: PRIVACY_MAP_MAX_VALUE_LENGTH,
+                    }),
+                    pseudonym: schema.string({
+                      maxLength: PRIVACY_MAP_MAX_PSEUDONYM_LENGTH,
+                    }),
                   }),
+                  { maxSize: PRIVACY_MAP_MAX_ENTRIES },
                 ),
               ),
             }),

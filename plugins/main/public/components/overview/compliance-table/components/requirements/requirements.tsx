@@ -217,7 +217,7 @@ export class ComplianceRequirements extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiTitle size='m'>
-              <h1>{title}</h1>
+              <h2>{title}</h2>
             </EuiTitle>
           </EuiFlexItem>
 

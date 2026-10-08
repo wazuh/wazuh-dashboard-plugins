@@ -19,10 +19,14 @@ shipped `wazuh-manager.conf` already expects, leaving that file untouched:
 | File                                                 | Read by                                                                        |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `etc/certs/remoted.pem`, `etc/certs/remoted-key.pem` | `<remote><https>` (the listener agents enroll and report through) and `<auth>` |
+| `etc/certs/apid.pem`, `etc/certs/apid-key.pem`       | The Server API (`55000`), through `https.cert` / `https.key` in `api.yaml`     |
 | `etc/certs/root-ca.pem`                              | `<remote><https><ca_certificate>`                                              |
 
-The listener certificate carries a SAN covering the address agents connect to,
-which the self-signed one the package used to generate did not.
+Both pairs are the same leaf. The Server API no longer generates a self-signed
+certificate and refuses to start (error `2003`) without `apid.pem`; the manager
+installer issues that pair with the same profile as `remoted.pem`, so this
+environment reuses the listener leaf, as the wazuh devContainer does. Its SAN
+covers the addresses agents and the dashboard connect to (`wazuh.manager.local`).
 
 It signs with the root CA the `generator` service publishes into the shared
 `wm_certs` volume rather than minting a new one: that CA is the trust anchor the

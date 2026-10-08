@@ -336,14 +336,14 @@ export const RegisterAgent = compose(
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
                         <EuiTitle size='s'>
-                          <h1>
+                          <h2>
                             {i18n.translate(
                               'wazuh.endpointsSummary.registerAgent.title',
                               {
                                 defaultMessage: 'Deploy new agent',
                               },
                             )}
-                          </h1>
+                          </h2>
                         </EuiTitle>
                       </EuiFlexItem>
                     </EuiFlexGroup>

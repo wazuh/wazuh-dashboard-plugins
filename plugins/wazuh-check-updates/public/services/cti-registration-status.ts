@@ -53,10 +53,11 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
 
   ctiFlowState.setSubscription(body.subscription ?? null);
 
-  if (
-    body.registrationComplete &&
-    Boolean(body.subscription?.message?.is_registered)
-  ) {
+  if (body.registrationComplete) {
+    // The server already decided this registration is still valid (it only
+    // clears a completed registration when the CTI Console confirms it's
+    // unregistered, not on an unknown/502 subscription read), so trust it
+    // without re-requiring `is_registered` here too.
     ctiFlowState.setRegistrationComplete(true);
     return;
   }

@@ -76,15 +76,24 @@ fi
 # absolute path into the shared certificate volume is reported as "missing or
 # unreadable" and the manager refuses to start.
 #
-# Ownership follows the deployment model: remoted and authd open the pair after
-# dropping privileges, while the CA only has to be group-readable.
+# The Server API (55000) reads etc/certs/apid.pem / apid-key.pem and no longer
+# generates a self-signed pair: without them it refuses to start with error
+# 2003. The manager installer issues that pair with the same profile as
+# remoted.pem (serverAuth, leaf followed by the CA), so the listener leaf is
+# installed under both names, as the wazuh devContainer does. Its SAN covers
+# wazuh.manager.local, the address the dashboard connects to.
+#
+# Ownership follows the deployment model: remoted, authd and the API open the
+# pairs after dropping privileges, while the CA only has to be group-readable.
 mkdir -p /var/wazuh-manager/etc/certs
 install -o root -g wazuh-manager -m 640 \
   "$CERTS_CA" /var/wazuh-manager/etc/certs/root-ca.pem
-install -o wazuh-manager -g wazuh-manager -m 640 \
-  "$certs_out/$CERTS_NODE_NAME-remoted.pem" /var/wazuh-manager/etc/certs/remoted.pem
-install -o wazuh-manager -g wazuh-manager -m 640 \
-  "$certs_out/$CERTS_NODE_NAME-remoted-key.pem" /var/wazuh-manager/etc/certs/remoted-key.pem
+for pair in remoted apid; do
+  install -o wazuh-manager -g wazuh-manager -m 640 \
+    "$certs_out/$CERTS_NODE_NAME-remoted.pem" "/var/wazuh-manager/etc/certs/$pair.pem"
+  install -o wazuh-manager -g wazuh-manager -m 640 \
+    "$certs_out/$CERTS_NODE_NAME-remoted-key.pem" "/var/wazuh-manager/etc/certs/$pair-key.pem"
+done
 rm -rf "$certs_out"
 
 # Server API users. wazuh-manager-resolve-credentials (run by
