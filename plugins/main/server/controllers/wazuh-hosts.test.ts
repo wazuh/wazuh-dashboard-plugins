@@ -58,7 +58,7 @@ describe('WazuhHostsCtrl', () => {
         id: 'manager',
         url: 'https://manager',
         port: 55000,
-        username: 'wazuh-wui',
+        username: 'wazuh-internal-client',
         allow_run_as: 2,
         verify_ca: true,
         cluster_info: { node: 'node01', cluster: 'wazuh' },
