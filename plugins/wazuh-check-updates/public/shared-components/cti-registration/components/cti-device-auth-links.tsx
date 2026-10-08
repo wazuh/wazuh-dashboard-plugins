@@ -5,6 +5,8 @@ import {
   EuiCallOut,
   EuiCode,
   EuiCopy,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiLink,
   EuiSpacer,
   EuiText,
@@ -33,24 +35,33 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
       />
     </EuiText>
     <EuiSpacer size='xs' />
-    <EuiCode className='ctiDeviceUserCode' data-test-subj='ctiDeviceUserCode'>
-      {deviceAuth.user_code}
-    </EuiCode>
-    <EuiCopy textToCopy={deviceAuth.user_code}>
-      {(copy: () => void) => (
-        <EuiButtonEmpty
-          size='xs'
-          iconType='copyClipboard'
-          onClick={copy}
-          data-test-subj='ctiCopyUserCode'
+    <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false} wrap>
+      <EuiFlexItem grow={false}>
+        <EuiCode
+          className='ctiDeviceUserCode'
+          data-test-subj='ctiDeviceUserCode'
         >
-          <FormattedMessage
-            id='wazuhCheckUpdates.ctiRegistration.copyUserCode'
-            defaultMessage='Copy user code'
-          />
-        </EuiButtonEmpty>
-      )}
-    </EuiCopy>
+          {deviceAuth.user_code}
+        </EuiCode>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiCopy textToCopy={deviceAuth.user_code}>
+          {(copy: () => void) => (
+            <EuiButtonEmpty
+              size='xs'
+              iconType='copyClipboard'
+              onClick={copy}
+              data-test-subj='ctiCopyUserCode'
+            >
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.copyUserCode'
+                defaultMessage='Copy user code'
+              />
+            </EuiButtonEmpty>
+          )}
+        </EuiCopy>
+      </EuiFlexItem>
+    </EuiFlexGroup>
     <EuiSpacer size='m' />
     <EuiText size='s'>
       <FormattedMessage

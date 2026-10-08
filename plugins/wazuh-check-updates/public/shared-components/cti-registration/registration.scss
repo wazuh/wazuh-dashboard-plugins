@@ -8,7 +8,21 @@
   gap: 12px;
 }
 
+// Not using $euiFontSizeXL: it resolves to 24-31.5px depending on the active
+// OSD theme version (v7/v8/v9), and this size needs to stay legible and
+// consistent regardless of theme.
+$cti-device-user-code-font-size: 32px;
+
+// Three-class selector needed: EuiCode merges this class onto the same
+// element as OUI's own .euiCodeBlock--inline/--fontSmall modifiers, whose
+// compound selector otherwise wins over a single-class one.
 .euiCodeBlock.euiCodeBlock--inline.ctiDeviceUserCode {
-  font-size: 32px;
+  font-size: $cti-device-user-code-font-size;
+}
+
+// OUI resets letter-spacing to `normal` on the inner <code> element
+// (.euiCodeBlock .euiCodeBlock__code), so it must be targeted directly —
+// it does not inherit from the outer .euiCodeBlock span like font-size does.
+.ctiDeviceUserCode .euiCodeBlock__code {
   letter-spacing: 4px;
 }

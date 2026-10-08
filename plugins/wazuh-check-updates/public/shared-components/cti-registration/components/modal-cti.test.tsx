@@ -83,6 +83,7 @@ describe('ModalCti component', () => {
       writable: true,
       value: jest.fn(),
     });
+    document.execCommand = jest.fn().mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -223,9 +224,22 @@ describe('ModalCti component', () => {
       );
     });
     expect(screen.getByText('WZH-999')).toBeInTheDocument();
-    expect(
-      document.querySelector('[data-test-subj="ctiCopyUserCode"]'),
-    ).toBeInTheDocument();
+    const copyUserCodeButton = document.querySelector(
+      '[data-test-subj="ctiCopyUserCode"]',
+    ) as HTMLElement;
+    expect(copyUserCodeButton).toBeInTheDocument();
+
+    let copiedText = '';
+    (document.execCommand as jest.Mock).mockImplementation(() => {
+      copiedText = window.getSelection()?.toString() ?? '';
+      return true;
+    });
+    act(() => {
+      fireEvent.click(copyUserCodeButton);
+    });
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
+    expect(copiedText).toBe('WZH-999');
+
     expect(window.open).toHaveBeenCalledWith(
       'https://example.test/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
