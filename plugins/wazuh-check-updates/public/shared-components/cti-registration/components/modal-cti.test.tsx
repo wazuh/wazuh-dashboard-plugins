@@ -119,6 +119,23 @@ describe('ModalCti component', () => {
     ).toBeInTheDocument();
   });
 
+  it('closes on Escape on the success screen, even without focus inside the modal', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    await screen.findByText('Your Wazuh XDR registration is complete');
+
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(handleModalToggleMock).toHaveBeenCalled();
+  });
+
   it('shows the CTI unreachable call-out when registered but the subscription status is unknown (502)', async () => {
     ctiFlowState.setSubscription({ message: null, status: 502 });
 
@@ -230,6 +247,27 @@ describe('ModalCti component', () => {
     expect(ctiFlowState.getDeviceAuthLinks()?.verification_uri_complete).toBe(
       'https://example.test/platform/environments/register?user_code=WZH-999',
     );
+  });
+
+  it('closes on Escape after Register is clicked, even without focus inside the modal', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    const button = await screen.findByRole('button', { name: 'Register' });
+    act(() => {
+      fireEvent.click(button);
+    });
+
+    await screen.findByText('Complete activation in Wazuh Cloud');
+
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(handleModalToggleMock).toHaveBeenCalled();
   });
 
   it('starts device flow polling schedule and shows in-progress copy', async () => {

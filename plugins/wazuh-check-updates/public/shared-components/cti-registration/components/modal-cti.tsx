@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
@@ -137,6 +137,23 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       setDeviceAuth(latestDeviceAuth);
     }
   }, [statusCTI, deviceAuth]);
+
+  const handleModalToggleRef = useRef(handleModalToggle);
+  handleModalToggleRef.current = handleModalToggle;
+
+  useEffect(() => {
+    // EUI's own Escape handler lives on the modal's wrapper div, so it only
+    // fires while focus is inside. Each flow transition here (register ->
+    // device-flow -> success) unmounts the previously focused element,
+    // dropping focus to document.body and silently breaking Escape.
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        handleModalToggleRef.current();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleStartRegistration = async () => {
     setError(null);
