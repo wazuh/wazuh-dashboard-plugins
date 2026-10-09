@@ -21,6 +21,7 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+  CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC,
   statusCodes,
 } from '../../../../common/constants';
 import { fetchCtiRegistrationPermission } from '../../../services/cti-registration-permission';
@@ -255,11 +256,184 @@ describe('ModalCti component', () => {
       expect(
         document.querySelector('[data-test-subj="ctiRegistrationInProgress"]'),
       ).toBeInTheDocument();
+    });
+    expect(
+      document.querySelector(
+        '[data-test-subj="ctiRegistrationEnvironmentExistsHelp"]',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  describe('environment already exists in Wazuh Cloud', () => {
+    const restorePendingFlow = (pendingForSec: number) => {
+      mockRefetchStatus.mockImplementation(() => {
+        ctiFlowState.setDeviceCode('dc-pending');
+        ctiFlowState.setDeviceAuthPendingFor(pendingForSec);
+        /* eslint-disable camelcase -- OAuth device authorization fields use snake_case */
+        ctiFlowState.setDeviceAuthLinks({
+          user_code: 'WZH-OLD',
+          verification_uri: 'https://example.test/act',
+          verification_uri_complete:
+            'https://example.test/act?user_code=WZH-OLD',
+        });
+        /* eslint-enable camelcase */
+        return Promise.resolve();
+      });
+    };
+
+    const queryHelp = () =>
+      document.querySelector(
+        '[data-test-subj="ctiRegistrationEnvironmentExistsHelp"]',
+      );
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('explains the rejection once the code has been pending past the delay', async () => {
+      jest.useFakeTimers();
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+      const registerBtn = await screen.findByRole('button', {
+        name: 'Register',
+      });
+      fireEvent.click(registerBtn);
+      await waitFor(() => {
+        expect(
+          document.querySelector(
+            '[data-test-subj="ctiRegistrationInProgress"]',
+          ),
+        ).toBeInTheDocument();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(
+          (CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC - 1) * 1000,
+        );
+      });
+      expect(queryHelp()).not.toBeInTheDocument();
+
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+      expect(queryHelp()).toHaveTextContent(
+        'Did Wazuh Cloud show "Environment already exists"?',
+      );
+      expect(queryHelp()).toHaveTextContent('CTI > Deployments');
+    });
+
+    it('shows the help right away when a restored code is already past the delay', async () => {
+      restorePendingFlow(CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC + 30);
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(queryHelp()).toBeInTheDocument();
+      });
+    });
+
+    it('names the deployment to delete and asks for the same code again', async () => {
+      restorePendingFlow(CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC + 30);
+      ctiFlowState.setEnvironmentUid('env-uuid-1');
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(queryHelp()).toBeInTheDocument();
+      });
       expect(
         document.querySelector(
-          '[data-test-subj="ctiRegistrationEnvironmentExistsHint"]',
+          '[data-test-subj="ctiRegistrationDeploymentId"]',
         ),
-      ).toHaveTextContent('Environment already exists');
+      ).toHaveTextContent('env-uuid-1');
+      expect(
+        screen.getByRole('button', { name: 'Copy deployment ID' }),
+      ).toBeInTheDocument();
+      expect(queryHelp()).toHaveTextContent('Enter the same user code again.');
+      expect(
+        screen.queryByRole('button', { name: /new code/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('asks to delete this deployment when its ID is unknown', async () => {
+      restorePendingFlow(CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC + 30);
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(queryHelp()).toHaveTextContent(
+          'In Wazuh Cloud, go to CTI > Deployments and delete this deployment.',
+        );
+      });
+      expect(
+        screen.queryByRole('button', { name: 'Copy deployment ID' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('explains an expired code in the failed state', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={{
+            status: statusCodes.REGISTRATION_FAILED,
+            message: 'expired_token: The device code has expired',
+          }}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByText('Registration could not be completed'),
+      ).toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '[data-test-subj="ctiRegistrationFailedMessage"]',
+        ),
+      ).toHaveTextContent(
+        'The user code expired before the activation was completed in Wazuh Cloud.',
+      );
+    });
+
+    it('keeps other failure messages as reported', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={{
+            status: statusCodes.REGISTRATION_FAILED,
+            message: 'access_denied: The user denied the authorization request',
+          }}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByText(
+          'access_denied: The user denied the authorization request',
+        ),
+      ).toBeInTheDocument();
     });
   });
 

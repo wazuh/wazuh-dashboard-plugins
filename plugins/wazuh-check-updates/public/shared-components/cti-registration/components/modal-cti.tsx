@@ -7,6 +7,7 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiCode,
+  EuiCopy,
   EuiIcon,
   EuiLink,
   EuiLoadingSpinner,
@@ -25,6 +26,7 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+  CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC,
   WAZUH_CLOUD_PORTAL_HREF,
   routes,
   statusCodes,
@@ -37,6 +39,11 @@ type CtiHrefLinkProps = {
   href: string;
   children: React.ReactNode;
 };
+
+/** Whether a failed-status message carries the given OAuth `error` (alone or as `error: description`). */
+function isOAuthError(message: string, error: string): boolean {
+  return message === error || message.startsWith(`${error}:`);
+}
 
 const CtiHrefLink: React.FC<CtiHrefLinkProps> = ({ href, children }) => {
   const placeholder = href.length === 0;
@@ -74,6 +81,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const permission = useCtiRegistrationPermission(!alreadyRegistered);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [showEnvironmentExistsHelp, setShowEnvironmentExistsHelp] =
+    React.useState(false);
   const [deviceAuth, setDeviceAuth] =
     React.useState<CtiDeviceAuthorization | null>(() =>
       ctiFlowState.getDeviceAuthLinks(),
@@ -174,6 +183,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           ? rawExpires
           : CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC;
       ctiFlowState.setDeviceAuthExpiry(expiresInSec);
+      ctiFlowState.setDeviceAuthPendingFor(0);
 
       const verificationUri =
         ctiResponse.verification_uri ??
@@ -224,10 +234,53 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     statusCTI.status === statusCodes.NOT_FOUND &&
     !ctiFlowState.isRegistrationComplete();
 
+  /*
+   * Wazuh Cloud rejects the user code with "Environment already exists" when a
+   * deployment with this environment UID is still registered there. The rejection rolls
+   * back, so the code stays pending and polling only ever sees `authorization_pending`
+   * until it expires. The dashboard cannot detect the rejection, so once the code has
+   * been pending longer than a normal activation takes, explain it and the way out:
+   * delete that deployment, then enter the same code again (Wazuh Cloud hands out the
+   * same pending code until it expires, so a new one cannot be requested).
+   */
+  useEffect(() => {
+    if (!showInProgress) {
+      setShowEnvironmentExistsHelp(false);
+      return undefined;
+    }
+    const pendingMs = ctiFlowState.getDeviceAuthPendingMs();
+    const remainingMs =
+      pendingMs === null
+        ? 0
+        : CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC * 1000 - pendingMs;
+    if (remainingMs <= 0) {
+      setShowEnvironmentExistsHelp(true);
+      return undefined;
+    }
+    setShowEnvironmentExistsHelp(false);
+    const timeoutId = setTimeout(
+      () => setShowEnvironmentExistsHelp(true),
+      remainingMs,
+    );
+    return () => clearTimeout(timeoutId);
+  }, [showInProgress]);
+
+  const environmentUid = ctiFlowState.getEnvironmentUid();
+
   const showSuccess = statusCTI.status === statusCodes.SUCCESS;
 
   const showRegistrationFailed =
     statusCTI.status === statusCodes.REGISTRATION_FAILED;
+
+  const registrationFailedMessage = isOAuthError(
+    statusCTI.message,
+    'expired_token',
+  )
+    ? i18n.translate('wazuhCheckUpdates.ctiRegistration.failedExpiredBody', {
+        defaultMessage:
+          'The user code expired before the activation was completed in Wazuh Cloud. If Wazuh Cloud showed "Environment already exists", delete this deployment in CTI > Deployments in Wazuh Cloud, then register again.',
+      })
+    : statusCTI.message;
 
   const showPermissionDenied =
     serverSnapshotReady &&
@@ -411,22 +464,74 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               </EuiText>
               <EuiLoadingSpinner size='m' />
             </div>
-            {/*
-             * When Wazuh Cloud rejects the code because this environment is still
-             * registered there, it leaves the code pending, so polling only ever sees
-             * `authorization_pending`. Explain the rejection and the way out here.
-             */}
-            <EuiSpacer size='m' />
-            <EuiText
-              size='s'
-              color='subdued'
-              data-test-subj='ctiRegistrationEnvironmentExistsHint'
-            >
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.environmentExistsHint'
-                defaultMessage='If Wazuh Cloud shows "Environment already exists", this deployment is still registered there. Delete it from Deployments in Wazuh Cloud, then enter the same user code again.'
-              />
-            </EuiText>
+            {showEnvironmentExistsHelp ? (
+              <>
+                <EuiSpacer size='m' />
+                <EuiCallOut
+                  size='s'
+                  color='primary'
+                  iconType='questionInCircle'
+                  data-test-subj='ctiRegistrationEnvironmentExistsHelp'
+                  title={
+                    <FormattedMessage
+                      id='wazuhCheckUpdates.ctiRegistration.environmentExistsTitle'
+                      defaultMessage='Did Wazuh Cloud show "Environment already exists"?'
+                    />
+                  }
+                >
+                  <EuiText size='s'>
+                    <p>
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.ctiRegistration.environmentExistsBody'
+                        defaultMessage='This deployment is still registered in Wazuh Cloud. Wazuh Cloud does not report it to the dashboard, so the activation stays pending until the user code expires. To register again:'
+                      />
+                    </p>
+                    <ol>
+                      <li>
+                        {environmentUid ? (
+                          <>
+                            <FormattedMessage
+                              id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepDeleteId'
+                              defaultMessage='In Wazuh Cloud, go to CTI > Deployments and delete the deployment with this ID:'
+                            />
+                            <br />
+                            <EuiCode data-test-subj='ctiRegistrationDeploymentId'>
+                              {environmentUid}
+                            </EuiCode>
+                            <EuiCopy textToCopy={environmentUid}>
+                              {(copy: () => void) => (
+                                <EuiButtonEmpty
+                                  size='xs'
+                                  iconType='copyClipboard'
+                                  onClick={copy}
+                                  data-test-subj='ctiRegistrationCopyDeploymentId'
+                                >
+                                  <FormattedMessage
+                                    id='wazuhCheckUpdates.ctiRegistration.copyDeploymentId'
+                                    defaultMessage='Copy deployment ID'
+                                  />
+                                </EuiButtonEmpty>
+                              )}
+                            </EuiCopy>
+                          </>
+                        ) : (
+                          <FormattedMessage
+                            id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepDelete'
+                            defaultMessage='In Wazuh Cloud, go to CTI > Deployments and delete this deployment.'
+                          />
+                        )}
+                      </li>
+                      <li>
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepRetry'
+                          defaultMessage='Enter the same user code again. The registration then completes here.'
+                        />
+                      </li>
+                    </ol>
+                  </EuiText>
+                </EuiCallOut>
+              </>
+            ) : null}
           </>
         )}
         {showSuccess && (
@@ -514,8 +619,10 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               color='danger'
               iconType='alert'
             >
-              {statusCTI.message ? (
-                <EuiText size='s'>{statusCTI.message}</EuiText>
+              {registrationFailedMessage ? (
+                <EuiText size='s' data-test-subj='ctiRegistrationFailedMessage'>
+                  {registrationFailedMessage}
+                </EuiText>
               ) : null}
             </EuiCallOut>
           </>
