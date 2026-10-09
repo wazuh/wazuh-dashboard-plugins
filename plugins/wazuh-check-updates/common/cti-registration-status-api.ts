@@ -30,4 +30,11 @@ export interface CtiRegistrationStatusApiBody {
   poll_interval_sec?: number;
   /** Seconds remaining for the device code (derived from server expiry). */
   expires_in_remaining_sec?: number;
+  /** Seconds since the device code was issued. */
+  pending_for_sec?: number;
+  /**
+   * Environment UID sent as `client_id`. Wazuh Cloud shows it as the deployment ID, which
+   * identifies the deployment to delete after an "Environment already exists" rejection.
+   */
+  environment_uid?: string;
 }

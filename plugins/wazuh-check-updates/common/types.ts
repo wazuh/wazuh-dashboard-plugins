@@ -34,6 +34,7 @@ export interface UserPreferencesDimissedUpdate {
 export interface UserPreferences {
   last_dismissed_updates?: UserPreferencesDimissedUpdate;
   hide_update_notifications?: boolean;
+  hide_cti_upsell?: boolean;
 }
 
 export interface AvailableUpdates extends ResponseIndexerAvailableUpdates {
