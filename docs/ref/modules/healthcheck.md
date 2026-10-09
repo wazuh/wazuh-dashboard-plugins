@@ -47,6 +47,10 @@ For details about the default notification channels the Wazuh indexer provisions
 
 For details about the task that provisions dashboard and visualization saved objects from the repository definitions, see [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md).
 
+### Server API rate limiting
+
+When the server API answers `429 Too Many Requests`, the dashboard retries the request up to three times, waiting 1 s, 2 s and 4 s, or the time the `Retry-After` header requests (up to 10 s). If the rate limiting persists, `server-api:connection-compatibility`, `server-api:run-as` and `server-api:certificate-validity` do not report an error. They log a `warning` that says that the server API is rate limiting the requests of the dashboard (status code 429) and turn yellow, and they run again on the next scheduled run. The `run_as` permission is checked again the next time the API hosts are read, so a rate limited start does not keep it unchecked until the dashboard restarts. Any other failure, such as an unreachable host or a `run_as` setting that is not enabled, keeps its own message.
+
 ### Server certificate validity
 
 The `server-api:certificate-validity` check reports the state of the TLS certificates of every Wazuh manager node: the certificate the agent listener serves and the CA bundle the manager publishes to agents. It reports the worst state it finds and names the affected nodes.
@@ -117,6 +121,7 @@ wazuh_core.healthCheckCertificateExpiryCriticalDays: 14
 - **The check still reports a certificate after you replace it**: the manager serves the listener certificate it loaded when `remoted` started, so replacing `remoted.pem` on disk has no effect until `remoted` restarts. The action line of the message states the date the manager loaded the current certificate.
 - **No CA chains to the listener certificate**: the CA bundle does not contain the CA that issued the certificate the listener serves, so the manager refuses to serve the bundle to agents. Add the issuing CA to the bundle with `wazuh-manager-certs add`, or replace the listener certificate with one issued by a CA already in the bundle.
 - **The manager cannot read the bundle**: if the manager read the file before, the reported certificates describe that last copy. If it never read it, the response carries no certificates. Verify that the file exists and that the manager can read it.
+- **The server API is rate limiting the requests**: the check reports that the state could not be determined because of the rate limiting (status code 429) and runs again on the next scheduled run. If only some nodes are rate limited, the message names them. See [Server API rate limiting](#server-api-rate-limiting).
 - **The manager cannot list its nodes**: the check reports an undetermined state and logs the cause:
 
 ```

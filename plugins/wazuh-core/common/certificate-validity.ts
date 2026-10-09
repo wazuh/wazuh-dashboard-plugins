@@ -83,6 +83,8 @@ export type CertificateValidityOutcome =
   | { kind: 'notFound'; node: string }
   /** The API user lacks `cluster:read` on this node. */
   | { kind: 'forbidden'; node: string }
+  /** The server API rate limits the requests of the dashboard (status code 429). */
+  | { kind: 'rateLimited'; node: string }
   /** The manager answered and told us the node could not describe its certificates. */
   | { kind: 'unavailable'; node: string; reason: string }
   /** The manager answered with a body we do not recognise. */

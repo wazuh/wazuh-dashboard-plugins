@@ -4,6 +4,7 @@ import {
 } from '../../common/constants';
 import type { CertificateValidityOutcome } from '../../../wazuh-core/common/certificate-validity';
 import type { InitializationTaskRunContext } from './types';
+import { isRateLimitError } from './server-api';
 import {
   CertificateEvaluation,
   CertificateFinding,
@@ -60,11 +61,20 @@ async function readThresholds(
   };
 }
 
+const RATE_LIMITED_MESSAGE =
+  'The state of the server certificates could not be determined because the server API is rate limiting the requests of the dashboard (status code 429). The check runs again on the next scheduled run.';
+
+interface CollectedOutcomes {
+  outcomes: CertificateValidityOutcome[];
+  /** The server API rate limited the listing of the nodes, or the request of every node. */
+  rateLimited: boolean;
+}
+
 /** Returns no outcome when the manager cannot list its nodes; the evaluator reports that as undetermined. */
 async function collectOutcomes(
   ctx: InitializationTaskRunContext,
   services: CertificateValidityServices,
-): Promise<CertificateValidityOutcome[]> {
+): Promise<CollectedOutcomes> {
   try {
     const hosts = await services.manageHosts.get(undefined, {
       excludePassword: true,
@@ -75,24 +85,36 @@ async function collectOutcomes(
     if (!apiHostID) {
       ctx.logger.debug('No server API host configured');
 
-      return [];
+      return { outcomes: [], rateLimited: false };
     }
 
     const nodes = await services.certificateValidityClient.getNodes(apiHostID);
-
-    return await Promise.all(
+    const outcomes = await Promise.all(
       nodes.map(node =>
         services.certificateValidityClient.getNodeTls(apiHostID, node),
       ),
     );
+
+    return {
+      outcomes,
+      rateLimited:
+        outcomes.length > 0 &&
+        outcomes.every(outcome => outcome.kind === 'rateLimited'),
+    };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
 
-    ctx.logger.warn(
-      `Could not list the manager nodes to check their certificates: ${message}`,
-    );
+    const rateLimited = isRateLimitError(error);
+    const failure = `Could not list the manager nodes to check their certificates: ${message}`;
 
-    return [];
+    // The task reports the rate limiting, so it is not logged twice
+    if (rateLimited) {
+      ctx.logger.debug(failure);
+    } else {
+      ctx.logger.warn(failure);
+    }
+
+    return { outcomes: [], rateLimited };
   }
 }
 
@@ -187,7 +209,15 @@ export const initializationTaskCreatorCertificateValidity = ({
     ctx.logger.debug('Starting check of the server certificates validity');
 
     const thresholds = await readThresholds(services);
-    const outcomes = await collectOutcomes(ctx, services);
+    const { outcomes, rateLimited } = await collectOutcomes(ctx, services);
+
+    // Rate limiting is temporary, it is not a problem of the certificates or the nodes
+    if (rateLimited) {
+      ctx.logger.warn(RATE_LIMITED_MESSAGE);
+
+      return ctx.taskResult.warning(RATE_LIMITED_MESSAGE);
+    }
+
     const evaluation = evaluateCertificateValidity(outcomes, {
       now: Math.floor(Date.now() / 1000),
       ...thresholds,

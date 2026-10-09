@@ -289,6 +289,88 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     });
   });
 
+  describe('when the server API rate limits the requests', () => {
+    const rateLimitError = () =>
+      Object.assign(
+        new Error(
+          'The server API [manager-local] is rate limiting the requests of the dashboard (status code 429)',
+        ),
+        { response: { status: 429 } },
+      );
+    const RATE_LIMITED_MESSAGE =
+      'The state of the server certificates could not be determined because the server API is rate limiting the requests of the dashboard (status code 429). The check runs again on the next scheduled run.';
+
+    it('warns about the rate limiting when the cluster cannot be listed', async () => {
+      const services = buildServices({
+        getNodes: jest.fn().mockRejectedValue(rateLimitError()),
+      });
+
+      const { result, logger } = await runTaskWithContext(services);
+
+      expect(result).toMatchObject({
+        status: 'warning',
+        message: RATE_LIMITED_MESSAGE,
+      });
+      expect(logger.warn).toHaveBeenCalledWith(RATE_LIMITED_MESSAGE);
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+
+    it('warns about the rate limiting when every node is rate limited', async () => {
+      const services = buildServices({
+        nodes: ['node01', 'worker-02'],
+        outcomes: {
+          node01: { kind: 'rateLimited', node: 'node01' },
+          'worker-02': { kind: 'rateLimited', node: 'worker-02' },
+        },
+      });
+
+      const { result, logger } = await runTaskWithContext(services);
+
+      expect(result).toMatchObject({
+        status: 'warning',
+        message: RATE_LIMITED_MESSAGE,
+      });
+      expect(logger.error).not.toHaveBeenCalled();
+    });
+
+    it('keeps evaluating the nodes when only some are rate limited', async () => {
+      const services = buildServices({
+        nodes: ['node01', 'worker-02'],
+        outcomes: { 'worker-02': { kind: 'rateLimited', node: 'worker-02' } },
+      });
+
+      const { result } = await runTaskWithContext(services);
+
+      expect(result).toMatchObject({
+        status: 'warning',
+        message: expect.stringContaining(
+          'Node worker-02 could not report its certificate state: the server API is rate limiting the requests of the dashboard (status code 429).',
+        ),
+      });
+      expect((result as { message: string }).message).not.toBe(
+        RATE_LIMITED_MESSAGE,
+      );
+    });
+
+    it('keeps the undetermined message when the cluster cannot be listed for another reason', async () => {
+      const services = buildServices({
+        getNodes: jest.fn().mockRejectedValue(new Error('boom')),
+      });
+
+      const { result, logger } = await runTaskWithContext(services);
+
+      expect(result).toMatchObject({
+        status: 'warning',
+        message: expect.stringContaining(
+          'Ensure every manager node is reachable and exposes the certificate validity resource.',
+        ),
+      });
+      expect(logger.warn).toHaveBeenCalledWith(
+        'Could not list the manager nodes to check their certificates: boom',
+      );
+    });
+  });
+
   it('accepts a single host object, not only a list', async () => {
     const services = buildServices({ hosts: { id: 'manager-local' } });
 
