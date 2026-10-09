@@ -177,6 +177,138 @@ describe('ManageHosts Service', () => {
   });
 
   /* eslint-disable camelcase -- Wazuh Server API field names */
+  describe('rate limited registry data (Issue #9333)', () => {
+    const HOST_ID = 'default';
+    const COOLDOWN_MS = 60000;
+    const USERS_ME = {
+      status: 200,
+      data: { data: { affected_items: [{ allow_run_as: true }] } },
+    };
+    const CLUSTER_LOCAL_INFO = {
+      status: 200,
+      data: {
+        data: { affected_items: [{ node: 'node01', cluster: 'wazuh' }] },
+      },
+    };
+    const rateLimitError = Object.assign(new Error('Too Many Requests'), {
+      response: { status: 429 },
+    });
+    const otherError = new Error('connect ECONNREFUSED');
+    const answer = (
+      usersMe: unknown,
+      clusterInfo: unknown = CLUSTER_LOCAL_INFO,
+    ) =>
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        (_method: string, path: string) => {
+          const response =
+            path === '/security/users/me' ? usersMe : clusterInfo;
+
+          return response instanceof Error
+            ? Promise.reject(response)
+            : Promise.resolve(response);
+        },
+      );
+    const usersMeCalls = () =>
+      mockServerAPIClient.asInternalUser.request.mock.calls.filter(
+        ([, path]) => path === '/security/users/me',
+      ).length;
+    let now = 0;
+
+    beforeEach(() => {
+      mockServerAPIClient.asInternalUser.request.mockReset();
+      mockConfiguration.get.mockResolvedValue({
+        [HOST_ID]: {
+          url: 'https://localhost',
+          port: 55000,
+          username: 'wazuh-internal-client',
+          password: 'secret-password',
+          run_as: true,
+        },
+      });
+      manageHosts.setServerAPIClient(
+        mockServerAPIClient as unknown as ServerAPIClient,
+      );
+      now = 0;
+      jest.spyOn(Date, 'now').mockImplementation(() => now);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it.each`
+      failure            | error             | level      | rateLimited | calls
+      ${'a 429'}         | ${rateLimitError} | ${'warn'}  | ${true}     | ${2}
+      ${'another error'} | ${otherError}     | ${'debug'} | ${false}    | ${1}
+    `(
+      'logs $failure at $level level and requests the entry again after the cooldown only when rate limited',
+      async ({ error, level, rateLimited, calls }) => {
+        answer(error);
+        await manageHosts.getEntries();
+
+        expect(mockLogger[level]).toHaveBeenCalledWith(
+          `Could not get the registry data of the host [${HOST_ID}]: ${error.message}`,
+        );
+        expect(mockLogger.warn).toHaveBeenCalledTimes(rateLimited ? 1 : 0);
+        expect(JSON.stringify(mockLogger[level].mock.calls)).not.toContain(
+          'secret-password',
+        );
+        expect(manageHosts.isRateLimited(HOST_ID)).toBe(rateLimited);
+
+        answer(USERS_ME);
+        now = COOLDOWN_MS - 1;
+        await manageHosts.getEntries();
+
+        expect(usersMeCalls()).toBe(1);
+
+        now = COOLDOWN_MS;
+        await manageHosts.getEntries();
+
+        expect(usersMeCalls()).toBe(calls);
+      },
+    );
+
+    it('shares one refresh between concurrent calls', async () => {
+      answer(rateLimitError);
+      await manageHosts.getEntries();
+      answer(USERS_ME);
+      now = COOLDOWN_MS;
+
+      const [, [second]] = await Promise.all([
+        manageHosts.getEntries(),
+        manageHosts.getEntries(),
+      ]);
+
+      expect(usersMeCalls()).toBe(2);
+      expect(second.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+    });
+
+    it('keeps the last known run_as, without the internal fields, while the refresh is rate limited', async () => {
+      answer(USERS_ME, rateLimitError);
+      await manageHosts.getEntries();
+      answer(rateLimitError, rateLimitError);
+      now = COOLDOWN_MS;
+
+      const [partialEntry] = await manageHosts.getEntries();
+
+      expect(usersMeCalls()).toBe(2);
+      expect(partialEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+      expect(partialEntry.cluster_info).toEqual({ node: null, cluster: null });
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
+
+      answer(USERS_ME);
+      now = 2 * COOLDOWN_MS;
+
+      const [completeEntry] = await manageHosts.getEntries();
+
+      expect(completeEntry.cluster_info).toEqual({
+        node: 'node01',
+        cluster: 'wazuh',
+      });
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
+    });
+  });
+
   describe('getRegistryDataByHost', () => {
     const USERS_ME = {
       status: 200,

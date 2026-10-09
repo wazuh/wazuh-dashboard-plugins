@@ -150,6 +150,7 @@ function undeterminedFinding(
   const detail = {
     notFound: `Node ${node} does not expose the certificate validity resource, so its certificate state could not be determined.`,
     forbidden: `The dashboard does not have permission to read the certificate state of node ${node}.`,
+    rateLimited: `Node ${node} could not report its certificate state: the server API is rate limiting the requests of the dashboard (status code 429).`,
     unavailable: `Node ${node} could not report its certificate state: ${
       (outcome as { reason?: string }).reason
     }.`,

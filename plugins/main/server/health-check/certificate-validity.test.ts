@@ -136,17 +136,25 @@ const runTask = (services: Services, settings?: Record<string, number>) =>
     services: withConfiguration(services, settings),
   }).run(buildContext() as unknown as InitializationTaskRunContext);
 
+const rateLimitRerunMock = () => ({
+  schedule: jest.fn(() => true),
+  clear: jest.fn(),
+  stop: jest.fn(),
+});
+
 const runTaskWithContext = async (
   services: Services,
   settings?: Record<string, number>,
+  rateLimitRerun?: ReturnType<typeof rateLimitRerunMock>,
 ) => {
   const context = buildContext();
   const result = await initializationTaskCreatorCertificateValidity({
     taskName: TASK_NAME,
     services: withConfiguration(services, settings),
+    rateLimitRerun,
   }).run(context as unknown as InitializationTaskRunContext);
 
-  return { result, logger: context.logger };
+  return { result, logger: context.logger, context };
 };
 
 describe('initializationTaskCreatorCertificateValidity', () => {
@@ -286,6 +294,76 @@ describe('initializationTaskCreatorCertificateValidity', () => {
     await expect(runTask(services)).resolves.toMatchObject({
       status: 'warning',
       message: expect.stringMatching(/could not be determined/i),
+    });
+  });
+
+  describe('when the server API rate limits the requests', () => {
+    it.each([
+      [
+        'the cluster cannot be listed',
+        () =>
+          buildServices({
+            getNodes: jest.fn().mockRejectedValue(
+              Object.assign(new Error('Too Many Requests'), {
+                response: { status: 429 },
+              }),
+            ),
+          }),
+      ],
+      [
+        'every node is rate limited',
+        () =>
+          buildServices({
+            nodes: ['node01', 'worker-02'],
+            outcomes: {
+              node01: { kind: 'rateLimited', node: 'node01' },
+              'worker-02': { kind: 'rateLimited', node: 'worker-02' },
+            },
+          }),
+      ],
+    ])(
+      'warns and schedules a re-run when %s',
+      async (_description, services) => {
+        const rateLimitRerun = rateLimitRerunMock();
+        const message =
+          'The state of the server certificates could not be determined because the server API is rate limiting the requests of the dashboard (status code 429). The check runs again in about a minute.';
+
+        const { result, logger, context } = await runTaskWithContext(
+          services(),
+          undefined,
+          rateLimitRerun,
+        );
+
+        expect(result).toMatchObject({ status: 'warning', message });
+        expect(logger.warn).toHaveBeenCalledWith(message);
+        expect(logger.error).not.toHaveBeenCalled();
+        expect(rateLimitRerun.schedule).toHaveBeenCalledWith(
+          TASK_NAME,
+          context,
+        );
+      },
+    );
+
+    it('evaluates the nodes and clears the re-run when only some are rate limited', async () => {
+      const rateLimitRerun = rateLimitRerunMock();
+
+      const { result } = await runTaskWithContext(
+        buildServices({
+          nodes: ['node01', 'worker-02'],
+          outcomes: { 'worker-02': { kind: 'rateLimited', node: 'worker-02' } },
+        }),
+        undefined,
+        rateLimitRerun,
+      );
+
+      expect(result).toMatchObject({
+        status: 'warning',
+        message: expect.stringContaining(
+          'Node worker-02 could not report its certificate state: the server API is rate limiting the requests of the dashboard (status code 429).',
+        ),
+      });
+      expect(rateLimitRerun.schedule).not.toHaveBeenCalled();
+      expect(rateLimitRerun.clear).toHaveBeenCalledWith(TASK_NAME);
     });
   });
 

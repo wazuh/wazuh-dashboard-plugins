@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -18,6 +18,10 @@ import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
 import { ManageHosts, IAPIHost } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
+import {
+  isRateLimitError,
+  RATE_LIMIT_STATUS_CODE,
+} from '../../common/rate-limit';
 
 /**
  * Request headers a caller is allowed to set on the outbound Server API
@@ -247,7 +251,9 @@ export class ServerAPIClient {
     api: IAPIHost,
   ): Error {
     if (error.response) {
-      return error;
+      return isRateLimitError(error)
+        ? this._createRateLimitError(error, apiHostID)
+        : error;
     }
 
     const host = `${api.url}:${api.port}`;
@@ -270,6 +276,21 @@ export class ServerAPIClient {
     (enhanced as any).code = code;
     (enhanced as any).response = error.response;
     return enhanced;
+  }
+
+  /**
+   * Build the error of a rate limited request
+   * @param error Original error of the request, with the 429 response
+   * @param apiHostID Server API ID
+   * @returns Error that keeps the response and code of the original one
+   */
+  private _createRateLimitError(error: AxiosError, apiHostID: string): Error {
+    return Object.assign(
+      new Error(
+        `The server API [${apiHostID}] is rate limiting the requests of the dashboard (status code ${RATE_LIMIT_STATUS_CODE})`,
+      ),
+      { code: error.code, response: error.response },
+    );
   }
 
   private _inferErrorCode(message: string): string {

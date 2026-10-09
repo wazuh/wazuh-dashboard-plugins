@@ -201,3 +201,173 @@ describe('initializationTaskCreatorServerAPIRunAs', () => {
     ]);
   });
 });
+
+const RATE_LIMIT_TASK = 'server-api:check';
+const tooManyRequests = Object.assign(new Error('Too Many Requests'), {
+  response: { status: 429 },
+});
+const rateLimited = () => Promise.reject(tooManyRequests);
+const unreachable = () => Promise.reject(new Error('connect ECONNREFUSED'));
+const compatible = () =>
+  Promise.resolve({ data: { data: { api_version: appVersion } } });
+
+const buildRateLimitTask = (
+  createTask: typeof initializationTaskCreatorServerAPIRunAs,
+  services: Record<string, unknown>,
+  hostCount: number,
+  scheduled = true,
+) => {
+  const ctx = buildTaskContext();
+  const rateLimitRerun = {
+    schedule: jest.fn(() => scheduled),
+    clear: jest.fn(),
+    stop: jest.fn(),
+  };
+
+  if (hostCount > 1) {
+    (
+      ctx.context.services.core.opensearch.client.asInternalUser.transport
+        .request as jest.Mock
+    ).mockResolvedValue({ body: { remote: {} } });
+  }
+
+  const run = () =>
+    createTask({ taskName: RATE_LIMIT_TASK, services, rateLimitRerun }).run(
+      ctx,
+    );
+
+  return { ctx, rateLimitRerun, run };
+};
+
+const connectionTask = (
+  requests: Record<string, () => Promise<unknown>>,
+  scheduled?: boolean,
+) =>
+  buildRateLimitTask(
+    initializationTaskCreatorServerAPIConnectionCompatibility,
+    {
+      manageHosts: {
+        get: jest
+          .fn()
+          .mockResolvedValue(Object.keys(requests).map(id => ({ id }))),
+      },
+      serverAPIClient: {
+        asInternalUser: {
+          request: jest.fn(
+            (_method: string, _path: string, _body: unknown, { apiHostID }) =>
+              requests[apiHostID](),
+          ),
+        },
+      },
+    },
+    Object.keys(requests).length,
+    scheduled,
+  );
+
+const runAsTask = (
+  entries: { id: string; allow_run_as: number }[],
+  isRateLimited?: (id: string) => boolean,
+) =>
+  buildRateLimitTask(
+    initializationTaskCreatorServerAPIRunAs,
+    {
+      manageHosts: {
+        getEntries: jest.fn().mockResolvedValue(entries),
+        ...(isRateLimited && { isRateLimited }),
+      },
+      API_USER_STATUS_RUN_AS: RUN_AS,
+    },
+    entries.length,
+  );
+
+describe('server API tasks when the server API rate limits the requests', () => {
+  const UNABLE_TO_CHECK = { allow_run_as: RUN_AS.UNABLE_TO_CHECK };
+
+  it.each([
+    [
+      'the connection check',
+      () => connectionTask({ 'manager-local': rateLimited }),
+      'The server API is rate limiting the requests of the dashboard (status code 429), so its connection and compatibility could not be checked. The check runs again in about a minute.',
+    ],
+    [
+      'the connection check of several hosts',
+      () =>
+        connectionTask(
+          { 'manager-1': rateLimited, 'manager-2': rateLimited },
+          false,
+        ),
+      'The server API hosts are rate limiting the requests of the dashboard (status code 429), so their connection and compatibility could not be checked. The check runs again on the next scheduled run.',
+    ],
+    [
+      'the run_as check',
+      () =>
+        runAsTask([{ id: 'manager-local', ...UNABLE_TO_CHECK }], () => true),
+      'The server API is rate limiting the requests of the dashboard (status code 429), so the run_as permission of the API user could not be checked. The check runs again in about a minute.',
+    ],
+  ])(
+    'returns a warning and schedules a re-run in %s',
+    async (_task, buildTask, message) => {
+      const { ctx, rateLimitRerun, run } = buildTask();
+
+      await expect(run()).resolves.toMatchObject({
+        status: 'warning',
+        message,
+      });
+      expect(ctx.logger.warn).toHaveBeenCalledWith(message);
+      expect(ctx.logger.error).not.toHaveBeenCalled();
+      expect(rateLimitRerun.schedule).toHaveBeenCalledWith(
+        RATE_LIMIT_TASK,
+        ctx,
+      );
+    },
+  );
+
+  it.each([
+    [
+      'a rate limited host is mixed with an unreachable one',
+      () =>
+        connectionTask({ 'manager-1': rateLimited, 'manager-2': unreachable }),
+      'No server API hosts available to connect.',
+    ],
+    [
+      'run_as could not be checked for another reason',
+      () =>
+        runAsTask([{ id: 'manager-local', ...UNABLE_TO_CHECK }], () => false),
+      'manager-local (Unable to check user run as permission)',
+    ],
+    [
+      'another host does not have run_as enabled',
+      () =>
+        runAsTask(
+          [
+            { id: 'manager-1', ...UNABLE_TO_CHECK },
+            { id: 'manager-2', allow_run_as: RUN_AS.HOST_DISABLED },
+          ],
+          () => true,
+        ),
+      'manager-1 (Unable to check user run as permission), manager-2 (Run as disabled in host)',
+    ],
+  ])('keeps throwing when %s', async (_description, buildTask, error) => {
+    const { ctx, run } = buildTask();
+
+    await expect(run()).rejects.toThrow(error);
+    expect(ctx.logger.error).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    [
+      'the connection check',
+      () =>
+        connectionTask({ 'manager-1': rateLimited, 'manager-2': compatible }),
+    ],
+    [
+      'the run_as check',
+      () => runAsTask([{ id: 'manager-local', allow_run_as: RUN_AS.ENABLED }]),
+    ],
+  ])('clears the re-run when %s passes', async (_task, buildTask) => {
+    const { rateLimitRerun, run } = buildTask();
+
+    await expect(run()).resolves.toMatchObject({ status: 'ok' });
+    expect(rateLimitRerun.clear).toHaveBeenCalledWith(RATE_LIMIT_TASK);
+  });
+});

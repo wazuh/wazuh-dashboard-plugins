@@ -1,5 +1,6 @@
 import { Logger } from 'opensearch-dashboards/server';
 import { ServerAPIClient } from './server-api-client';
+import { isRateLimitError } from '../../common/rate-limit';
 import {
   CertificateValidityOutcome,
   CertificateValiditySnapshot,
@@ -127,6 +128,10 @@ export class CertificateValidityClient {
 
     if (status === 403) {
       return { kind: 'forbidden', node };
+    }
+
+    if (isRateLimitError(error)) {
+      return { kind: 'rateLimited', node };
     }
 
     if (status !== undefined) {

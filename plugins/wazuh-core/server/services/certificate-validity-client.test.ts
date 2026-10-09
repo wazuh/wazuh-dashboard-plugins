@@ -122,6 +122,15 @@ describe('CertificateValidityClient.getNodeTls', () => {
     });
   });
 
+  it('maps 429 to rateLimited, so the rate limiting is not a malformed answer', async () => {
+    const client = buildClient(jest.fn().mockRejectedValue(httpError(429)));
+
+    await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
+      kind: 'rateLimited',
+      node: 'node01',
+    });
+  });
+
   it.each([
     'remoted not running',
     'admin socket unreachable',
