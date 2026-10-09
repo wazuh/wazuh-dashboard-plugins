@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import {
   EuiBottomBar,
@@ -13,6 +13,7 @@ import { ModalCti } from './modal-cti';
 import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
 import { ctiFlowState } from '../../../services/cti-flow-state';
+import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { getWazuhCore } from '../../../plugin-services';
 
 const UPSELL_DISMISSED_KEY = 'wazuh.cti.upsell.dismissed';
@@ -46,6 +47,17 @@ export const CtiUpsellNotification = () => {
     !deviceFlowActive &&
     (statusCTI.status === statusCodes.NOT_FOUND ||
       statusCTI.status === statusCodes.REGISTRATION_FAILED);
+
+  const holdsBottomBar =
+    !dismissed &&
+    !isRegistered &&
+    (loading || isRegisterModalOpen || shouldShowBar);
+
+  useEffect(() => {
+    ctiUpsellBarVisible$.next(holdsBottomBar);
+  }, [holdsBottomBar]);
+
+  useEffect(() => () => ctiUpsellBarVisible$.next(false), []);
 
   const handleDismiss = () => {
     try {
