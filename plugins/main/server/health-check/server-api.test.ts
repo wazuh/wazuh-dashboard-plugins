@@ -184,6 +184,12 @@ const rateLimitError = () =>
     { response: { status: 429 } },
   );
 
+const rateLimitRerunMock = () => ({
+  schedule: jest.fn(() => true),
+  clear: jest.fn(),
+  stop: jest.fn(),
+});
+
 describe('serverAPIConnectionCompatibility rate limiting', () => {
   const check = (error: Error) => {
     const logger = {
@@ -232,6 +238,7 @@ describe('initializationTaskCreatorServerAPIConnectionCompatibility rate limitin
   const runTask = (
     requests: Record<string, () => Promise<unknown>>,
     hosts = Object.keys(requests),
+    rateLimitRerun?: ReturnType<typeof rateLimitRerunMock>,
   ) => {
     const ctx = buildTaskContext();
     // Several hosts are only checked with the cross cluster search
@@ -258,6 +265,7 @@ describe('initializationTaskCreatorServerAPIConnectionCompatibility rate limitin
       initializationTaskCreatorServerAPIConnectionCompatibility({
         taskName: 'server-api:connection-compatibility',
         services,
+        rateLimitRerun,
       }).run(ctx);
 
     return { ctx, run };
@@ -316,6 +324,35 @@ describe('initializationTaskCreatorServerAPIConnectionCompatibility rate limitin
     expect(result.status).toBe('ok');
   });
 
+  it('schedules a re-run when rate limited and clears it when available', async () => {
+    const rateLimitRerun = rateLimitRerunMock();
+    const { ctx, run } = runTask(
+      { 'manager-local': rateLimited },
+      undefined,
+      rateLimitRerun,
+    );
+
+    const result = (await run()) as unknown as Record<PropertyKey, unknown>;
+
+    expect(rateLimitRerun.schedule).toHaveBeenCalledWith(
+      'server-api:connection-compatibility',
+      ctx,
+    );
+    expect(result.message).toMatch(
+      /could not be checked\. The check runs again in about a minute\.$/,
+    );
+
+    await runTask(
+      { 'manager-local': compatible },
+      undefined,
+      rateLimitRerun,
+    ).run();
+
+    expect(rateLimitRerun.clear).toHaveBeenCalledWith(
+      'server-api:connection-compatibility',
+    );
+  });
+
   it('returns a warning result when every host is rate limited', async () => {
     const { ctx, run } = runTask({
       'manager-1': rateLimited,
@@ -361,6 +398,7 @@ describe('initializationTaskCreatorServerAPIRunAs', () => {
     const runRunAs = (
       entries: { id: string; allow_run_as: number }[],
       isRateLimited?: (id: string) => boolean,
+      rateLimitRerun?: ReturnType<typeof rateLimitRerunMock>,
     ) => {
       const ctx = buildTaskContext();
       // Several hosts are only checked with the cross cluster search
@@ -380,6 +418,7 @@ describe('initializationTaskCreatorServerAPIRunAs', () => {
             },
             API_USER_STATUS_RUN_AS: RUN_AS,
           },
+          rateLimitRerun,
         }).run(ctx);
 
       return { ctx, run };
@@ -400,6 +439,33 @@ describe('initializationTaskCreatorServerAPIRunAs', () => {
       );
       expect(ctx.logger.warn).toHaveBeenCalledWith(result.message);
       expect(ctx.logger.error).not.toHaveBeenCalled();
+    });
+
+    it('schedules a re-run when rate limited and clears it when checked', async () => {
+      const rateLimitRerun = rateLimitRerunMock();
+      const { ctx, run } = runRunAs(
+        [{ id: 'manager-local', allow_run_as: RUN_AS.UNABLE_TO_CHECK }],
+        () => true,
+        rateLimitRerun,
+      );
+
+      const result = (await run()) as unknown as Record<PropertyKey, unknown>;
+
+      expect(rateLimitRerun.schedule).toHaveBeenCalledWith(
+        'server-api:run-as',
+        ctx,
+      );
+      expect(result.message).toMatch(
+        /could not be checked\. The check runs again in about a minute\.$/,
+      );
+
+      await runRunAs(
+        [{ id: 'manager-local', allow_run_as: RUN_AS.ENABLED }],
+        undefined,
+        rateLimitRerun,
+      ).run();
+
+      expect(rateLimitRerun.clear).toHaveBeenCalledWith('server-api:run-as');
     });
 
     it.each([

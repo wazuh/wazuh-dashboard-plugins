@@ -5,6 +5,7 @@ import {
 import type { CertificateValidityOutcome } from '../../../wazuh-core/common/certificate-validity';
 import type { InitializationTaskRunContext } from './types';
 import { isRateLimitError } from './server-api';
+import { nextRunMessage, type RateLimitRerun } from './rate-limit-rerun';
 import {
   CertificateEvaluation,
   CertificateFinding,
@@ -61,8 +62,8 @@ async function readThresholds(
   };
 }
 
-const RATE_LIMITED_MESSAGE =
-  'The state of the server certificates could not be determined because the server API is rate limiting the requests of the dashboard (status code 429). The check runs again on the next scheduled run.';
+const rateLimitedMessage = (nextRun: string) =>
+  `The state of the server certificates could not be determined because the server API is rate limiting the requests of the dashboard (status code 429). ${nextRun}`;
 
 interface CollectedOutcomes {
   outcomes: CertificateValidityOutcome[];
@@ -198,9 +199,11 @@ function reportEvaluation(
 export const initializationTaskCreatorCertificateValidity = ({
   taskName,
   services,
+  rateLimitRerun,
 }: {
   taskName: string;
   services: CertificateValidityServices;
+  rateLimitRerun?: RateLimitRerun;
 }) => ({
   name: taskName,
   async run(ctx: InitializationTaskRunContext) {
@@ -210,10 +213,16 @@ export const initializationTaskCreatorCertificateValidity = ({
     const { outcomes, rateLimited } = await collectOutcomes(ctx, services);
 
     if (rateLimited) {
-      ctx.logger.warn(RATE_LIMITED_MESSAGE);
+      const message = rateLimitedMessage(
+        nextRunMessage(rateLimitRerun?.schedule(taskName, ctx) === true),
+      );
 
-      return ctx.taskResult.warning(RATE_LIMITED_MESSAGE);
+      ctx.logger.warn(message);
+
+      return ctx.taskResult.warning(message);
     }
+
+    rateLimitRerun?.clear(taskName);
 
     const evaluation = evaluateCertificateValidity(outcomes, {
       now: Math.floor(Date.now() / 1000),

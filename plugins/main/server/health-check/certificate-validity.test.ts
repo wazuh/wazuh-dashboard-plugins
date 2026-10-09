@@ -136,17 +136,25 @@ const runTask = (services: Services, settings?: Record<string, number>) =>
     services: withConfiguration(services, settings),
   }).run(buildContext() as unknown as InitializationTaskRunContext);
 
+const rateLimitRerunMock = () => ({
+  schedule: jest.fn(() => true),
+  clear: jest.fn(),
+  stop: jest.fn(),
+});
+
 const runTaskWithContext = async (
   services: Services,
   settings?: Record<string, number>,
+  rateLimitRerun?: ReturnType<typeof rateLimitRerunMock>,
 ) => {
   const context = buildContext();
   const result = await initializationTaskCreatorCertificateValidity({
     taskName: TASK_NAME,
     services: withConfiguration(services, settings),
+    rateLimitRerun,
   }).run(context as unknown as InitializationTaskRunContext);
 
-  return { result, logger: context.logger };
+  return { result, logger: context.logger, context };
 };
 
 describe('initializationTaskCreatorCertificateValidity', () => {
@@ -313,6 +321,28 @@ describe('initializationTaskCreatorCertificateValidity', () => {
       });
       expect(logger.warn).toHaveBeenCalledWith(RATE_LIMITED_MESSAGE);
       expect(logger.error).not.toHaveBeenCalled();
+    });
+
+    it('schedules a re-run when rate limited and clears it when evaluated', async () => {
+      const rateLimitRerun = rateLimitRerunMock();
+      const { result, context } = await runTaskWithContext(
+        buildServices({
+          getNodes: jest.fn().mockRejectedValue(rateLimitError()),
+        }),
+        undefined,
+        rateLimitRerun,
+      );
+
+      expect(rateLimitRerun.schedule).toHaveBeenCalledWith(TASK_NAME, context);
+      expect(result).toMatchObject({
+        message: expect.stringMatching(
+          /\(status code 429\)\. The check runs again in about a minute\.$/,
+        ),
+      });
+
+      await runTaskWithContext(buildServices(), undefined, rateLimitRerun);
+
+      expect(rateLimitRerun.clear).toHaveBeenCalledWith(TASK_NAME);
     });
 
     it('warns about the rate limiting when every node is rate limited', async () => {
