@@ -28,11 +28,6 @@ const MESSAGES = {
 
 const RATE_LIMIT_STATUS_CODE = 429;
 
-/**
- * Whether the error of a server API request is the rate limiting answer. This
- * is the check of the `isRateLimitError` of wazuh-core, which this plugin
- * cannot import at runtime because the plugins are built separately.
- */
 export function isRateLimitError(error: unknown): boolean {
   return (
     (error as { response?: { status?: number } } | null | undefined)?.response
@@ -112,7 +107,6 @@ export async function serverAPIConnectionCompatibility(
     compatibility,
     api_version: apiVersion,
     id: apiHostID,
-    // Only present when the server API rate limited the request
     ...(rateLimited && { rateLimited: true }),
   };
 }
@@ -190,7 +184,6 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
 
       const isCCS = results?.length > 1;
 
-      // Rate limiting is temporary, it is not a connection or compatibility problem
       if (results?.length > 0 && results.every(result => result.rateLimited)) {
         const message = isCCS
           ? MESSAGES.RATE_LIMITED_CCS
@@ -275,7 +268,6 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           result.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
       );
 
-      // Rate limiting is temporary, it is not a problem of the run_as permission
       if (
         notEnabledHosts.length > 0 &&
         notEnabledHosts.every(

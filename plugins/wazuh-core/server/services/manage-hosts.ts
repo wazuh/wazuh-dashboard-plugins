@@ -34,8 +34,6 @@ interface IAPIHostRegistry {
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
   verify_ca: boolean | null;
-  /* the registry data could not be fetched because the Server API rate limited
-  the requests (429). It is internal: it is not exposed in the API host entries */
   rateLimited?: boolean;
 }
 
@@ -187,13 +185,10 @@ export class ManageHosts {
       this.logger.debug('Getting registry');
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
 
-      // A host whose registry data was rate limited is fetched again, so a 429
-      // on startup is not kept until a restart
       const hostsNeedingRegistry = hosts.filter(
         host => !registry[host.id] || registry[host.id].rateLimited === true,
       );
       const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
-        // The rate limited flag is internal: it is not part of the entry
         const entry = Object.fromEntries(
           Object.entries(registryData || {}).filter(
             ([field]) => field !== 'rateLimited',

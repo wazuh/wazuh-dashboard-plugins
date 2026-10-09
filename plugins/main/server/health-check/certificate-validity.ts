@@ -66,7 +66,6 @@ const RATE_LIMITED_MESSAGE =
 
 interface CollectedOutcomes {
   outcomes: CertificateValidityOutcome[];
-  /** The server API rate limited the listing of the nodes, or the request of every node. */
   rateLimited: boolean;
 }
 
@@ -107,7 +106,6 @@ async function collectOutcomes(
     const rateLimited = isRateLimitError(error);
     const failure = `Could not list the manager nodes to check their certificates: ${message}`;
 
-    // The task reports the rate limiting, so it is not logged twice
     if (rateLimited) {
       ctx.logger.debug(failure);
     } else {
@@ -211,7 +209,6 @@ export const initializationTaskCreatorCertificateValidity = ({
     const thresholds = await readThresholds(services);
     const { outcomes, rateLimited } = await collectOutcomes(ctx, services);
 
-    // Rate limiting is temporary, it is not a problem of the certificates or the nodes
     if (rateLimited) {
       ctx.logger.warn(RATE_LIMITED_MESSAGE);
 

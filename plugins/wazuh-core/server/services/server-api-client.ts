@@ -36,13 +36,7 @@ import {
  */
 const ALLOWED_REQUEST_HEADERS = new Set(['content-type']);
 
-/**
- * The Server API rate limits the requests with a `429 Too Many Requests`
- * answer. A request that gets it is retried once per delay of this list, so the
- * number of delays is the maximum number of retries.
- */
 const RATE_LIMIT_RETRY_DELAYS_MS = [1000, 2000, 4000];
-// Upper bound of the delay requested by the `Retry-After` header of the answer
 const RATE_LIMIT_MAX_RETRY_AFTER_MS = 10000;
 
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
