@@ -14,14 +14,10 @@ import { cancelCtiRegistration } from '../../services/cti-registration-status';
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
-  const { statusCTI, loading, refetchStatus } = useCtiStatus(
+  const { statusCTI, loading, deviceFlowActive, refetchStatus } = useCtiStatus(
     deviceFlowNonce,
     getCtiRegistrationStatusPollIntervalSec(),
   );
-
-  const deviceFlowActive =
-    Boolean(ctiFlowState.getDeviceCode()) &&
-    !ctiFlowState.isRegistrationComplete();
 
   const cancelPendingActivation = async () => {
     try {

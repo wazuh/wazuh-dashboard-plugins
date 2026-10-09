@@ -97,9 +97,14 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
           });
         }
 
+        const now = Date.now();
         const expires_in_remaining_sec = Math.max(
           0,
-          Math.floor((rec.deviceAuthExpiresAtMs - Date.now()) / 1000),
+          Math.floor((rec.deviceAuthExpiresAtMs - now) / 1000),
+        );
+        const pendingForSec = Math.max(
+          0,
+          Math.floor((now - rec.deviceAuthStartedAtMs) / 1000),
         );
 
         return response.ok({
@@ -112,6 +117,10 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             verification_uri_complete: rec.verification_uri_complete,
             poll_interval_sec: rec.poll_interval_sec,
             expires_in_remaining_sec,
+            /* eslint-disable camelcase -- status API body uses snake_case */
+            pending_for_sec: pendingForSec,
+            environment_uid: environmentUuid,
+            /* eslint-enable camelcase */
           }),
         });
       } catch (error) {

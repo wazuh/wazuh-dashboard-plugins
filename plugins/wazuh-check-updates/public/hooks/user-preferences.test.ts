@@ -60,6 +60,25 @@ describe('useUserPreferences hook', () => {
     expect(result.current.isLoading).toBeFalsy();
   });
 
+  it('should keep the other preferences after a partial update', async () => {
+    const { result } = renderHook(() => useUserPreferences());
+
+    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
+
+    act(() => {
+      result.current.updateUserPreferences({ hide_cti_upsell: true });
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBeFalsy());
+    expect(result.current.userPreferences).toEqual({
+      last_dismissed_updates: {
+        last_patch: '4.3.1',
+      },
+      hide_update_notifications: false,
+      hide_cti_upsell: true,
+    });
+  });
+
   it('should handle error while fetching data', async () => {
     jest.setTimeout(30000);
     const mockErrorMessage = 'Some error occurred';

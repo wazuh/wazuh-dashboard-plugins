@@ -85,6 +85,10 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     ) {
       ctiFlowState.setDeviceAuthExpiry(body.expires_in_remaining_sec);
     }
+    if (typeof body.pending_for_sec === 'number') {
+      ctiFlowState.setDeviceAuthPendingFor(body.pending_for_sec);
+    }
+    ctiFlowState.setEnvironmentUid(body.environment_uid);
     const links = buildDeviceAuthLinksFromStatusBody(body);
     ctiFlowState.setDeviceAuthLinks(links);
     return;
