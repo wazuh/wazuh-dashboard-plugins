@@ -1,42 +1,38 @@
 import React from 'react';
 import '@testing-library/jest-dom';
-import { screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { WzCtiUpsellNotification } from '.';
-import { renderWithProviders } from '../../redux/render-with-redux-provider';
 import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
 
 jest.mock('../../kibana-services', () => ({
   getWazuhCheckUpdatesPlugin: jest.fn(),
 }));
 
-const renderWith = (ctiRegistrationUiEnabled: boolean, data?: object) => {
+const renderWith = (
+  ctiRegistrationUiEnabled: boolean,
+  ctiUpsellEnabled: boolean,
+) => {
   (getWazuhCheckUpdatesPlugin as jest.Mock).mockReturnValue({
     ctiRegistrationUiEnabled,
+    ctiUpsellEnabled,
     CtiUpsellNotification: () => <div>CTI upsell</div>,
   });
-  renderWithProviders(<WzCtiUpsellNotification />, {
-    preloadedState: data ? { appConfig: { data } } : undefined,
-  });
+  render(<WzCtiUpsellNotification />);
 };
 
 describe('WzCtiUpsellNotification', () => {
-  test('renders the upsell when the setting does not hide it', () => {
-    renderWith(true, { 'wazuh.cti.upsell.disabled': false });
+  test('renders the upsell when the CTI UI and the upsell are enabled', () => {
+    renderWith(true, true);
     expect(screen.getByText('CTI upsell')).toBeInTheDocument();
   });
 
-  test('hides the upsell when the admin disabled it', () => {
-    renderWith(true, { 'wazuh.cti.upsell.disabled': true });
-    expect(screen.queryByText('CTI upsell')).not.toBeInTheDocument();
-  });
-
-  test('hides the upsell while the configuration is not loaded', () => {
-    renderWith(true);
+  test('hides the upsell when the upsell is disabled', () => {
+    renderWith(true, false);
     expect(screen.queryByText('CTI upsell')).not.toBeInTheDocument();
   });
 
   test('hides the upsell when the CTI registration UI is off', () => {
-    renderWith(false, { 'wazuh.cti.upsell.disabled': false });
+    renderWith(false, true);
     expect(screen.queryByText('CTI upsell')).not.toBeInTheDocument();
   });
 });

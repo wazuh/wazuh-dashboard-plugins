@@ -646,23 +646,6 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
     defaultValue: true,
     validate: SettingsValidator.isBoolean,
   },
-  'wazuh.cti.upsell.disabled': {
-    title: i18n.translate('wazuhCore.settings.wazuhCtiUpsellDisabled.title', {
-      defaultMessage: 'Hide CTI registration notice',
-    }),
-    description: i18n.translate(
-      'wazuhCore.settings.wazuhCtiUpsellDisabled.description',
-      {
-        defaultMessage:
-          'Hide the bottom bar that invites users to register this environment for CTI. The CTI button in the header stays available.',
-      },
-    ),
-    source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
-    type: EpluginSettingType.switch,
-    defaultValue: false,
-    validate: SettingsValidator.isBoolean,
-  },
   healthCheckCertificateExpiryWarningDays: {
     title: i18n.translate(
       'wazuhCore.settings.healthCheckCertificateExpiryWarningDays.title',
