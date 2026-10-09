@@ -18,6 +18,10 @@ import { Logger } from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
 import { ManageHosts, IAPIHost } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
+import {
+  isRateLimitError,
+  RATE_LIMIT_STATUS_CODE,
+} from '../../common/rate-limit';
 
 /**
  * Request headers a caller is allowed to set on the outbound Server API
@@ -32,7 +36,6 @@ const ALLOWED_REQUEST_HEADERS = new Set(['content-type']);
  * answer. A request that gets it is retried once per delay of this list, so the
  * number of delays is the maximum number of retries.
  */
-const RATE_LIMIT_STATUS_CODE = 429;
 const RATE_LIMIT_RETRY_DELAYS_MS = [1000, 2000, 4000];
 // Upper bound of the delay requested by the `Retry-After` header of the answer
 const RATE_LIMIT_MAX_RETRY_AFTER_MS = 10000;
@@ -257,7 +260,7 @@ export class ServerAPIClient {
     api: IAPIHost,
   ): Error {
     if (error.response) {
-      return error.response.status === RATE_LIMIT_STATUS_CODE
+      return isRateLimitError(error)
         ? this._createRateLimitError(error, apiHostID)
         : error;
     }
@@ -334,7 +337,7 @@ export class ServerAPIClient {
       return await this._axios(options);
     } catch (error: any) {
       if (
-        error?.response?.status !== RATE_LIMIT_STATUS_CODE ||
+        !isRateLimitError(error) ||
         retry >= RATE_LIMIT_RETRY_DELAYS_MS.length
       ) {
         throw error;

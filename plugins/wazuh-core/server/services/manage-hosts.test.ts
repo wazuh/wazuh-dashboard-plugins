@@ -177,6 +177,130 @@ describe('ManageHosts Service', () => {
   });
 
   /* eslint-disable camelcase -- Wazuh Server API field names */
+  describe('rate limited registry data (Issue #9333)', () => {
+    const HOST_ID = 'default';
+    const USERS_ME = {
+      status: 200,
+      data: { data: { affected_items: [{ allow_run_as: true }] } },
+    };
+    const CLUSTER_LOCAL_INFO = {
+      status: 200,
+      data: {
+        data: { affected_items: [{ node: 'node01', cluster: 'wazuh' }] },
+      },
+    };
+    const rateLimitError = () =>
+      Object.assign(
+        new Error(
+          `The server API [${HOST_ID}] is rate limiting the requests of the dashboard (status code 429)`,
+        ),
+        { response: { status: 429 } },
+      );
+    const answerRequests = (usersMe: () => Promise<unknown>) =>
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        (_method: string, path: string) =>
+          path === '/security/users/me'
+            ? usersMe()
+            : Promise.resolve(CLUSTER_LOCAL_INFO),
+      );
+    const usersMeCalls = () =>
+      mockServerAPIClient.asInternalUser.request.mock.calls.filter(
+        ([, path]) => path === '/security/users/me',
+      ).length;
+
+    beforeEach(() => {
+      mockServerAPIClient.asInternalUser.request.mockReset();
+      mockConfiguration.get.mockResolvedValue({
+        [HOST_ID]: {
+          url: 'https://localhost',
+          port: 55000,
+          username: 'wazuh-internal-client',
+          password: 'secret-password',
+          run_as: true,
+        },
+      });
+      manageHosts.setServerAPIClient(
+        mockServerAPIClient as unknown as ServerAPIClient,
+      );
+    });
+
+    it('refreshes the entry that could not check run_as on the next call', async () => {
+      answerRequests(() => Promise.reject(rateLimitError()));
+
+      const [rateLimitedEntry] = await manageHosts.getEntries();
+
+      expect(rateLimitedEntry.allow_run_as).toBe(
+        API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+      );
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
+
+      answerRequests(() => Promise.resolve(USERS_ME));
+
+      const [recoveredEntry] = await manageHosts.getEntries();
+
+      expect(recoveredEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
+      expect(manageHosts.isEnabledAuthWithRunAs(HOST_ID)).toBe(true);
+    });
+
+    it('does not request again the entry that checked run_as', async () => {
+      answerRequests(() => Promise.resolve(USERS_ME));
+
+      await manageHosts.getEntries();
+      await manageHosts.getEntries();
+
+      expect(usersMeCalls()).toBe(1);
+    });
+
+    it('refreshes the entry that could not check run_as for a reason other than the rate limit', async () => {
+      answerRequests(() => Promise.reject(new Error('connect ECONNREFUSED')));
+
+      await manageHosts.getEntries();
+
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
+
+      await manageHosts.getEntries();
+
+      expect(usersMeCalls()).toBe(2);
+    });
+
+    it('logs the cause of the failure without the credentials', async () => {
+      answerRequests(() => Promise.reject(rateLimitError()));
+
+      await manageHosts.getEntries();
+
+      const warned = mockLogger.warn.mock.calls.flat().join('\n');
+
+      expect(warned).toContain(
+        `Could not get the registry data of the host [${HOST_ID}]`,
+      );
+      expect(warned).toContain('rate limiting the requests of the dashboard');
+      expect(warned).not.toContain('secret-password');
+    });
+
+    it('does not expose the rate limit flag in the entries', async () => {
+      answerRequests(() => Promise.reject(rateLimitError()));
+
+      const [entry] = await manageHosts.getEntries({ excludePassword: true });
+
+      expect(entry.cluster_info).toEqual({ node: null, cluster: null });
+      expect(Object.keys(entry).sort()).toEqual([
+        'allow_run_as',
+        'cluster_info',
+        'id',
+        'port',
+        'run_as',
+        'url',
+        'username',
+        'verify_ca',
+      ]);
+    });
+
+    it('reports a host without registry data as not rate limited', () => {
+      expect(manageHosts.isRateLimited('unknown')).toBe(false);
+    });
+  });
+
   describe('getRegistryDataByHost', () => {
     const USERS_ME = {
       status: 200,
