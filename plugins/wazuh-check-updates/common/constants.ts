@@ -40,6 +40,13 @@ export const CTI_MAX_DEVICE_POLL_INTERVAL_SEC = 24 * 60 * SECONDS_PER_MINUTE;
 export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
 
 /**
+ * Seconds a device code stays pending before the registration modal explains the
+ * "Environment already exists" rejection. Wazuh Cloud never reports that rejection to
+ * the token endpoint, so the help is shown once a normal activation should be done.
+ */
+export const CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC = 60;
+
+/**
  * Body returned to the browser on successful device-token poll.
  * Upstream `access_token` / `refresh_token` / etc. stay server-side only.
  */

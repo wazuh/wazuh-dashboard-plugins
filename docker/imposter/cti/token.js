@@ -6,10 +6,17 @@
 //   2. Access Token Polling         -> `grant_type`, `client_id`, `device_code`.
 //
 // The polling response can be forced via the `X-Mock-Scenario` header with
-// one of: `pending`, `slow_down`, `access_denied`, `expired_token`, `success`.
+// one of: `pending`, `slow_down`, `access_denied`, `expired_token`, `success`,
+// `environment_exists`. The dashboard server does not forward that header, so
+// the same scenarios can also be stored with `POST /mock/cti/scenario`
+// (see scenario.js); the header wins over the stored scenario.
 //
-// When the header is not provided, the mock returns `authorization_pending`
-// for the first 2 polls and `success` (200 with access_token) afterwards.
+// `environment_exists` mirrors the real CTI Console when it rejects a user code
+// with "Environment already exists": the rejection is never reported, the code
+// stays pending and every poll answers `authorization_pending`.
+//
+// With no scenario, the mock returns `authorization_pending` for the first 2
+// polls and `success` (200 with access_token) afterwards.
 
 var RESPONSES_DIR = 'responses/';
 
@@ -54,7 +61,7 @@ function parseBody(rawBody) {
     var value = idx === -1 ? '' : pairs[i].substring(idx + 1);
     try {
       result[decodeURIComponent(key)] = decodeURIComponent(
-        value.replace(/\+/g, ' ')
+        value.replace(/\+/g, ' '),
       );
     } catch (e) {
       result[key] = value;
@@ -74,6 +81,9 @@ if (context.request.headers) {
     // Try lowercase variant
     scenario = context.request.headers['x-mock-scenario'];
   }
+}
+if (!scenario) {
+  scenario = store.load('scenario');
 }
 
 var hasDeviceCode = !!body.device_code;
@@ -98,6 +108,7 @@ if (!hasDeviceCode && !hasGrantType) {
         break;
       case 'pending':
       case 'authorization_pending':
+      case 'environment_exists':
         respond().withStatusCode(400).withFile(FILES.pending);
         break;
       case 'slow_down':
