@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -293,13 +298,13 @@ export class ServerAPIClient {
    * @param apiHostID Server API ID
    * @returns Error that keeps the response and code of the original one
    */
-  private _createRateLimitError(error: any, apiHostID: string): Error {
-    const rateLimitError = new Error(
-      `The server API [${apiHostID}] is rate limiting the requests of the dashboard (status code ${RATE_LIMIT_STATUS_CODE})`,
+  private _createRateLimitError(error: AxiosError, apiHostID: string): Error {
+    return Object.assign(
+      new Error(
+        `The server API [${apiHostID}] is rate limiting the requests of the dashboard (status code ${RATE_LIMIT_STATUS_CODE})`,
+      ),
+      { code: error.code, response: error.response },
     );
-    (rateLimitError as any).code = error.code;
-    (rateLimitError as any).response = error.response;
-    return rateLimitError;
   }
 
   /**
@@ -308,7 +313,7 @@ export class ServerAPIClient {
    * @param retry Number of the retry, starting at 0
    * @returns Delay in milliseconds
    */
-  private _getRateLimitRetryDelay(error: any, retry: number): number {
+  private _getRateLimitRetryDelay(error: AxiosError, retry: number): number {
     const retryAfter = error.response?.headers?.['retry-after'];
     const retryAfterSeconds =
       retryAfter === undefined || retryAfter === null || retryAfter === ''
@@ -335,14 +340,14 @@ export class ServerAPIClient {
   ): Promise<AxiosResponse> {
     try {
       return await this._axios(options);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (
         !isRateLimitError(error) ||
         retry >= RATE_LIMIT_RETRY_DELAYS_MS.length
       ) {
         throw error;
       }
-      const delay = this._getRateLimitRetryDelay(error, retry);
+      const delay = this._getRateLimitRetryDelay(error as AxiosError, retry);
       this.logger.warn(
         `Server API [${apiHostID}] answered ${RATE_LIMIT_STATUS_CODE} (rate limited), retrying in ${delay}ms (attempt ${
           retry + 1

@@ -193,15 +193,14 @@ export class ManageHosts {
         host => !registry[host.id] || registry[host.id].rateLimited === true,
       );
       const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
-        const {
-          allow_run_as,
-          verify_ca,
-          ca,
-          cert,
-          key,
-          rateLimited,
-          ...cluster_info
-        } = registryData || {};
+        // The rate limited flag is internal: it is not part of the entry
+        const entry = Object.fromEntries(
+          Object.entries(registryData || {}).filter(
+            ([field]) => field !== 'rateLimited',
+          ),
+        );
+        const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
+          entry;
         return {
           ...host,
           allow_run_as,
