@@ -96,6 +96,9 @@ checks the credentials again immediately before the service starts. No default p
   `root-ca.pem`, in `/etc/wazuh-dashboard/certs/`, from the Wazuh root CA shared with the other
   components (`/etc/wazuh/ca`). If no component has created that CA yet, the install creates it.
 - **AI Assistant**: a fresh install generates `wazuh_ai_assistant.encryptionKey` in the keystore.
+- **Session cookie**: a fresh install generates a random `opensearch_security.cookie.password` in the
+  keystore, so each installation seals its session cookie with its own value. Nodes behind a load
+  balancer must share one value: see [Session cookie password](credentials.md#session-cookie-password).
 
 If the Wazuh indexer and the Wazuh manager are installed on the same host, their packages publish
 the passwords themselves and there is nothing to do. Install order does not matter: whatever the
