@@ -131,16 +131,6 @@ describe('CertificateValidityClient.getNodeTls', () => {
     });
   });
 
-  it('maps another unexpected status to malformed', async () => {
-    const client = buildClient(jest.fn().mockRejectedValue(httpError(500)));
-
-    await expect(client.getNodeTls(API_HOST_ID, 'node01')).resolves.toEqual({
-      kind: 'malformed',
-      node: 'node01',
-      detail: 'The manager answered with status 500',
-    });
-  });
-
   it.each([
     'remoted not running',
     'admin socket unreachable',

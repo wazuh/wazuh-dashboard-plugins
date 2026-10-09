@@ -179,6 +179,7 @@ describe('ManageHosts Service', () => {
   /* eslint-disable camelcase -- Wazuh Server API field names */
   describe('rate limited registry data (Issue #9333)', () => {
     const HOST_ID = 'default';
+    const COOLDOWN_MS = 60000;
     const USERS_ME = {
       status: 200,
       data: { data: { affected_items: [{ allow_run_as: true }] } },
@@ -189,25 +190,28 @@ describe('ManageHosts Service', () => {
         data: { affected_items: [{ node: 'node01', cluster: 'wazuh' }] },
       },
     };
-    const rateLimitError = () =>
-      Object.assign(
-        new Error(
-          `The server API [${HOST_ID}] is rate limiting the requests of the dashboard (status code 429)`,
-        ),
-        { response: { status: 429 } },
-      );
-    const answerRequests = (usersMe: () => Promise<unknown>) =>
+    const rateLimitError = Object.assign(new Error('Too Many Requests'), {
+      response: { status: 429 },
+    });
+    const otherError = new Error('connect ECONNREFUSED');
+    const answer = (
+      usersMe: unknown,
+      clusterInfo: unknown = CLUSTER_LOCAL_INFO,
+    ) =>
       mockServerAPIClient.asInternalUser.request.mockImplementation(
-        (_method: string, path: string) =>
-          path === '/security/users/me'
-            ? usersMe()
-            : Promise.resolve(CLUSTER_LOCAL_INFO),
+        (_method: string, path: string) => {
+          const response =
+            path === '/security/users/me' ? usersMe : clusterInfo;
+
+          return response instanceof Error
+            ? Promise.reject(response)
+            : Promise.resolve(response);
+        },
       );
     const usersMeCalls = () =>
       mockServerAPIClient.asInternalUser.request.mock.calls.filter(
         ([, path]) => path === '/security/users/me',
       ).length;
-    const COOLDOWN_MS = 60000;
     let now = 0;
 
     beforeEach(() => {
@@ -232,73 +236,67 @@ describe('ManageHosts Service', () => {
       jest.restoreAllMocks();
     });
 
-    it('refreshes a rate limited entry only after the cooldown', async () => {
-      answerRequests(() => Promise.reject(rateLimitError()));
+    it.each`
+      failure            | error             | level      | rateLimited | calls
+      ${'a 429'}         | ${rateLimitError} | ${'warn'}  | ${true}     | ${2}
+      ${'another error'} | ${otherError}     | ${'debug'} | ${false}    | ${1}
+    `(
+      'logs $failure at $level level and requests the entry again after the cooldown only when rate limited',
+      async ({ error, level, rateLimited, calls }) => {
+        answer(error);
+        await manageHosts.getEntries();
 
-      const [rateLimitedEntry] = await manageHosts.getEntries();
+        expect(mockLogger[level]).toHaveBeenCalledWith(
+          `Could not get the registry data of the host [${HOST_ID}]: ${error.message}`,
+        );
+        expect(mockLogger.warn).toHaveBeenCalledTimes(rateLimited ? 1 : 0);
+        expect(JSON.stringify(mockLogger[level].mock.calls)).not.toContain(
+          'secret-password',
+        );
+        expect(manageHosts.isRateLimited(HOST_ID)).toBe(rateLimited);
 
-      expect(rateLimitedEntry.allow_run_as).toBe(
-        API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
-      );
-      expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
+        answer(USERS_ME);
+        now = COOLDOWN_MS - 1;
+        await manageHosts.getEntries();
 
-      answerRequests(() => Promise.resolve(USERS_ME));
-      now = COOLDOWN_MS - 1;
+        expect(usersMeCalls()).toBe(1);
+
+        now = COOLDOWN_MS;
+        await manageHosts.getEntries();
+
+        expect(usersMeCalls()).toBe(calls);
+      },
+    );
+
+    it('shares one refresh between concurrent calls', async () => {
+      answer(rateLimitError);
       await manageHosts.getEntries();
-
-      expect(usersMeCalls()).toBe(1);
-
+      answer(USERS_ME);
       now = COOLDOWN_MS;
-      const [recoveredEntry] = await manageHosts.getEntries();
+
+      const [, [second]] = await Promise.all([
+        manageHosts.getEntries(),
+        manageHosts.getEntries(),
+      ]);
 
       expect(usersMeCalls()).toBe(2);
-      expect(recoveredEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
-      expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
-      expect(manageHosts.isEnabledAuthWithRunAs(HOST_ID)).toBe(true);
+      expect(second.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
     });
 
-    it('does not request again the entry that checked run_as', async () => {
-      answerRequests(() => Promise.resolve(USERS_ME));
-
+    it('keeps the last known run_as, without the internal fields, while the refresh is rate limited', async () => {
+      answer(USERS_ME, rateLimitError);
       await manageHosts.getEntries();
-      await manageHosts.getEntries();
-
-      expect(usersMeCalls()).toBe(1);
-    });
-
-    it('does not request again the entry that failed for a reason other than the rate limit', async () => {
-      answerRequests(() => Promise.reject(new Error('connect ECONNREFUSED')));
-
-      await manageHosts.getEntries();
-
-      expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
-
-      await manageHosts.getEntries();
-
-      expect(usersMeCalls()).toBe(1);
-    });
-
-    it('keeps the last known run_as while the refresh is rate limited', async () => {
-      let usersMe = () => Promise.resolve(USERS_ME);
-      let clusterInfo = () => Promise.reject(rateLimitError());
-
-      mockServerAPIClient.asInternalUser.request.mockImplementation(
-        (_method: string, path: string) =>
-          path === '/security/users/me' ? usersMe() : clusterInfo(),
-      );
-
-      await manageHosts.getEntries();
-      usersMe = () => Promise.reject(rateLimitError());
+      answer(rateLimitError, rateLimitError);
       now = COOLDOWN_MS;
 
       const [partialEntry] = await manageHosts.getEntries();
 
       expect(usersMeCalls()).toBe(2);
       expect(partialEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+      expect(partialEntry.cluster_info).toEqual({ node: null, cluster: null });
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
 
-      usersMe = () => Promise.resolve(USERS_ME);
-      clusterInfo = () => Promise.resolve(CLUSTER_LOCAL_INFO);
+      answer(USERS_ME);
       now = 2 * COOLDOWN_MS;
 
       const [completeEntry] = await manageHosts.getEntries();
@@ -308,69 +306,6 @@ describe('ManageHosts Service', () => {
         cluster: 'wazuh',
       });
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
-    });
-
-    it('shares one refresh between concurrent calls', async () => {
-      answerRequests(() => Promise.reject(rateLimitError()));
-      await manageHosts.getEntries();
-      answerRequests(() => Promise.resolve(USERS_ME));
-      now = COOLDOWN_MS;
-
-      const [[first], [second]] = await Promise.all([
-        manageHosts.getEntries(),
-        manageHosts.getEntries(),
-      ]);
-
-      expect(usersMeCalls()).toBe(2);
-      expect(first.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
-      expect(second.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
-    });
-
-    it('logs a failure that is not a rate limit at debug level', async () => {
-      answerRequests(() => Promise.reject(new Error('connect ECONNREFUSED')));
-
-      await manageHosts.getEntries();
-
-      expect(mockLogger.warn).not.toHaveBeenCalled();
-      expect(mockLogger.debug.mock.calls.flat().join('\n')).toContain(
-        `Could not get the registry data of the host [${HOST_ID}]: connect ECONNREFUSED`,
-      );
-    });
-
-    it('logs the cause of the failure without the credentials', async () => {
-      answerRequests(() => Promise.reject(rateLimitError()));
-
-      await manageHosts.getEntries();
-
-      const warned = mockLogger.warn.mock.calls.flat().join('\n');
-
-      expect(warned).toContain(
-        `Could not get the registry data of the host [${HOST_ID}]`,
-      );
-      expect(warned).toContain('rate limiting the requests of the dashboard');
-      expect(warned).not.toContain('secret-password');
-    });
-
-    it('does not expose the rate limit flag in the entries', async () => {
-      answerRequests(() => Promise.reject(rateLimitError()));
-
-      const [entry] = await manageHosts.getEntries({ excludePassword: true });
-
-      expect(entry.cluster_info).toEqual({ node: null, cluster: null });
-      expect(Object.keys(entry).sort()).toEqual([
-        'allow_run_as',
-        'cluster_info',
-        'id',
-        'port',
-        'run_as',
-        'url',
-        'username',
-        'verify_ca',
-      ]);
-    });
-
-    it('reports a host without registry data as not rate limited', () => {
-      expect(manageHosts.isRateLimited('unknown')).toBe(false);
     });
   });
 

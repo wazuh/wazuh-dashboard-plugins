@@ -1,4 +1,4 @@
-import { createRateLimitRerun, nextRunMessage } from './rate-limit-rerun';
+import { createRateLimitRerun } from './rate-limit-rerun';
 import type { InitializationTaskRunContext } from './types';
 
 const ctx = {
@@ -67,12 +67,6 @@ describe('createRateLimitRerun', () => {
     rerun.clear('task-a');
 
     expect(rerun.schedule('task-a', ctx)).toBe(true);
-    expect(nextRunMessage(true)).toBe(
-      'The check runs again in about a minute.',
-    );
-    expect(nextRunMessage(false)).toBe(
-      'The check runs again on the next scheduled run.',
-    );
   });
 
   it('cancels the pending runs on stop', () => {
@@ -87,11 +81,7 @@ describe('createRateLimitRerun', () => {
 
   it('logs at debug level a run that fails', async () => {
     const { rerun, logger } = setup(
-      jest
-        .fn()
-        .mockRejectedValue(
-          new Error('Another instance of task task-a is running'),
-        ),
+      jest.fn().mockRejectedValue(new Error('busy')),
     );
 
     rerun.schedule('task-a', ctx);
@@ -99,7 +89,7 @@ describe('createRateLimitRerun', () => {
     await flushPromises();
 
     expect(logger.debug).toHaveBeenCalledWith(
-      'Could not run again the task [task-a]: Another instance of task task-a is running',
+      'Could not run again the task [task-a]: busy',
     );
   });
 });

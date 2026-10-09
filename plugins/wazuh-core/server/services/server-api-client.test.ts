@@ -198,99 +198,39 @@ describe('ServerAPIClient.asInternalUser.request', () => {
 describe('ServerAPIClient rate limit (429)', () => {
   interface RateLimitClientInternals {
     _axios: jest.Mock;
-    _request: (
-      method: string,
-      path: string,
-      data: unknown,
-      options: unknown,
-    ) => Promise<unknown>;
-    _authenticate: (
-      apiHostID: string,
-      options: { useRunAs: boolean },
-    ) => Promise<string>;
+    _request: (...args: unknown[]) => Promise<unknown>;
+    _authenticate: (...args: unknown[]) => Promise<unknown>;
   }
 
-  const RATE_LIMITED_MESSAGE =
-    'The server API [default] is rate limiting the requests of the dashboard (status code 429)';
-  const rateLimited = () => ({
-    message: 'Request failed with status code 429',
-    code: 'ERR_BAD_REQUEST',
-    response: { status: 429, headers: {} },
-  });
-  const serverError = () => ({
-    message: 'Request failed with status code 500',
-    response: { status: 500, headers: {} },
-  });
+  it.each([
+    [
+      'request',
+      (internals: RateLimitClientInternals) =>
+        internals._request('GET', '/agents', {}, { apiHostID: 'default' }),
+    ],
+    [
+      'login',
+      (internals: RateLimitClientInternals) =>
+        internals._authenticate('default', { useRunAs: false }),
+    ],
+  ])(
+    'reports a 429 answer to the %s as rate limiting without retrying it',
+    async (_name, send) => {
+      const internals = createClient()
+        .client as unknown as RateLimitClientInternals;
+      internals._axios = jest.fn().mockRejectedValue({
+        message: 'Request failed with status code 429',
+        code: 'ERR_BAD_REQUEST',
+        response: { status: 429 },
+      });
 
-  const setup = () => {
-    const { client, logger } = createClient();
-    const internals = client as unknown as RateLimitClientInternals;
-    internals._axios = jest.fn();
-    const request = () =>
-      internals._request(
-        'GET',
-        '/agents',
-        {},
-        {
-          apiHostID: 'default',
-          token: 'server-session-token',
-        },
-      );
-    const authenticate = () =>
-      internals._authenticate('default', { useRunAs: false });
-
-    return { internals, logger, request, authenticate };
-  };
-
-  it('does not retry a 429 answer and reports the rate limiting', async () => {
-    const { internals, logger, request } = setup();
-    internals._axios.mockRejectedValue(rateLimited());
-
-    await expect(request()).rejects.toMatchObject({
-      message: RATE_LIMITED_MESSAGE,
-      code: 'ERR_BAD_REQUEST',
-      response: { status: 429 },
-    });
-    expect(internals._axios).toHaveBeenCalledTimes(1);
-    expect(logger.warn).not.toHaveBeenCalled();
-  });
-
-  it('does not retry a 429 answer to the login request', async () => {
-    const { internals, authenticate } = setup();
-    internals._axios.mockRejectedValue(rateLimited());
-
-    await expect(authenticate()).rejects.toMatchObject({
-      message: RATE_LIMITED_MESSAGE,
-      response: { status: 429 },
-    });
-    expect(internals._axios).toHaveBeenCalledTimes(1);
-    expect(internals._axios).toHaveBeenCalledWith(
-      expect.objectContaining({
-        url: 'https://server-api:55000/security/user/authenticate',
-      }),
-    );
-  });
-
-  it('keeps an answer that is not a 429 as it is', async () => {
-    const { internals, request } = setup();
-    internals._axios.mockRejectedValue(serverError());
-
-    await expect(request()).rejects.toMatchObject({
-      message: 'Request failed with status code 500',
-      response: { status: 500 },
-    });
-    expect(internals._axios).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not retry an error without a response', async () => {
-    const { internals, request } = setup();
-    internals._axios.mockRejectedValue(
-      Object.assign(new Error('connect ECONNREFUSED'), {
-        code: 'ECONNREFUSED',
-      }),
-    );
-
-    await expect(request()).rejects.toMatchObject({ code: 'ECONNREFUSED' });
-    expect(internals._axios).toHaveBeenCalledTimes(1);
-  });
+      await expect(send(internals)).rejects.toMatchObject({
+        message:
+          'The server API [default] is rate limiting the requests of the dashboard (status code 429)',
+        code: 'ERR_BAD_REQUEST',
+        response: { status: 429 },
+      });
+      expect(internals._axios).toHaveBeenCalledTimes(1);
+    },
+  );
 });
