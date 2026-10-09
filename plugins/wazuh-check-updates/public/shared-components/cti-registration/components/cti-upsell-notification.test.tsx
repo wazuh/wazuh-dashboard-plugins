@@ -18,6 +18,7 @@ import {
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
+import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { routes } from '../../../../common/constants';
 import { CtiUpsellNotification } from './cti-upsell-notification';
 
@@ -88,6 +89,7 @@ describe('CtiUpsellNotification', () => {
     });
 
     expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+    expect(ctiUpsellBarVisible$.getValue()).toBe(false);
   });
 
   test('shows the upsell bar when CM confirms the instance is not registered', async () => {
@@ -127,5 +129,41 @@ describe('CtiUpsellNotification', () => {
       });
     });
     await act(() => mockHttpPatch.mock.results[0].value);
+  });
+
+  test('holds the bottom bar slot while shown and releases it on dismiss', async () => {
+    mockResponses(NOT_REGISTERED_STATUS);
+
+    render(<CtiUpsellNotification />);
+
+    // Held while the status loads, so the updates bar never flashes first.
+    expect(ctiUpsellBarVisible$.getValue()).toBe(true);
+    fireEvent.click(await screen.findByText("Don't show again"));
+    expect(ctiUpsellBarVisible$.getValue()).toBe(false);
+    await act(() => mockHttpPatch.mock.results[0].value);
+  });
+
+  test('releases the bottom bar slot when the user dismissed it before', async () => {
+    mockResponses(NOT_REGISTERED_STATUS, { hide_cti_upsell: true });
+
+    render(<CtiUpsellNotification />);
+
+    // Held while the preferences load, then released for the updates bar.
+    expect(ctiUpsellBarVisible$.getValue()).toBe(true);
+    await waitFor(() => {
+      expect(ctiUpsellBarVisible$.getValue()).toBe(false);
+    });
+    expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+  });
+
+  test('releases the bottom bar slot on unmount', async () => {
+    mockResponses(NOT_REGISTERED_STATUS);
+
+    const { unmount } = render(<CtiUpsellNotification />);
+    await screen.findByText('Register now');
+    expect(ctiUpsellBarVisible$.getValue()).toBe(true);
+
+    unmount();
+    expect(ctiUpsellBarVisible$.getValue()).toBe(false);
   });
 });
