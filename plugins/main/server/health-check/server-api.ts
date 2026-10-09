@@ -16,7 +16,29 @@ const MESSAGES = {
     `The configured server API hosts have not enabled run_as, or the API user cannot use it: ${summary}. Ensure all configured API hosts allow run_as for the API user.`,
   RUN_AS_NOT_ENABLED: (summary: string) =>
     `The configured server API host has not enabled run_as, or the API user cannot use it: ${summary}. Ensure the configured API host allows run_as for the API user.`,
+  RATE_LIMITED_CCS:
+    'The server API hosts are rate limiting the requests of the dashboard (status code 429), so their connection and compatibility could not be checked. The check runs again on the next scheduled run.',
+  RATE_LIMITED:
+    'The server API is rate limiting the requests of the dashboard (status code 429), so its connection and compatibility could not be checked. The check runs again on the next scheduled run.',
+  RUN_AS_RATE_LIMITED_CCS:
+    'The server API hosts are rate limiting the requests of the dashboard (status code 429), so the run_as permission of the API user could not be checked. The check runs again on the next scheduled run.',
+  RUN_AS_RATE_LIMITED:
+    'The server API is rate limiting the requests of the dashboard (status code 429), so the run_as permission of the API user could not be checked. The check runs again on the next scheduled run.',
 };
+
+const RATE_LIMIT_STATUS_CODE = 429;
+
+/**
+ * Whether the error of a server API request is the rate limiting answer. This
+ * is the check of the `isRateLimitError` of wazuh-core, which this plugin
+ * cannot import at runtime because the plugins are built separately.
+ */
+export function isRateLimitError(error: unknown): boolean {
+  return (
+    (error as { response?: { status?: number } } | null | undefined)?.response
+      ?.status === RATE_LIMIT_STATUS_CODE
+  );
+}
 
 export function checkAppServerCompatibility(
   appVersion: string,
@@ -41,7 +63,8 @@ export async function serverAPIConnectionCompatibility(
 ) {
   let connection = null,
     compatibility = null,
-    apiVersion = null;
+    apiVersion = null,
+    rateLimited = false;
 
   try {
     ctx.logger.debug(
@@ -78,6 +101,7 @@ export async function serverAPIConnectionCompatibility(
       );
     }
   } catch (error) {
+    rateLimited = isRateLimitError(error);
     ctx.logger.warn(
       `Error checking the connection and compatibility with server API [${apiHostID}]: ${error.message}`,
     );
@@ -88,6 +112,8 @@ export async function serverAPIConnectionCompatibility(
     compatibility,
     api_version: apiVersion,
     id: apiHostID,
+    // Only present when the server API rate limited the request
+    ...(rateLimited && { rateLimited: true }),
   };
 }
 
@@ -163,6 +189,18 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
       }
 
       const isCCS = results?.length > 1;
+
+      // Rate limiting is temporary, it is not a connection or compatibility problem
+      if (results?.length > 0 && results.every(result => result.rateLimited)) {
+        const message = isCCS
+          ? MESSAGES.RATE_LIMITED_CCS
+          : MESSAGES.RATE_LIMITED;
+
+        ctx.logger.warn(message);
+
+        return ctx.taskResult.warning(message, results);
+      }
+
       throw new Error(
         isCCS ? MESSAGES.NO_SERVER_AVAILABLE_CCS : MESSAGES.NO_SERVER_AVAILABLE,
       );
@@ -236,6 +274,24 @@ export const initializationTaskCreatorServerAPIRunAs = ({
         (result: { allow_run_as: number }) =>
           result.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
       );
+
+      // Rate limiting is temporary, it is not a problem of the run_as permission
+      if (
+        notEnabledHosts.length > 0 &&
+        notEnabledHosts.every(
+          (result: { id: string; allow_run_as: number }) =>
+            result.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK &&
+            services.manageHosts.isRateLimited?.(result.id) === true,
+        )
+      ) {
+        const message = isCCS
+          ? MESSAGES.RUN_AS_RATE_LIMITED_CCS
+          : MESSAGES.RUN_AS_RATE_LIMITED;
+
+        ctx.logger.warn(message);
+
+        return ctx.taskResult.warning(message, results);
+      }
 
       if (notEnabledHosts.length > 0) {
         const notEnabledSummary = notEnabledHosts

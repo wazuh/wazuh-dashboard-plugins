@@ -176,6 +176,162 @@ describe('initializationTaskCreatorServerAPIConnectionCompatibility', () => {
   });
 });
 
+const rateLimitError = () =>
+  Object.assign(
+    new Error(
+      'The server API [manager-local] is rate limiting the requests of the dashboard (status code 429)',
+    ),
+    { response: { status: 429 } },
+  );
+
+describe('serverAPIConnectionCompatibility rate limiting', () => {
+  const check = (error: Error) => {
+    const logger = {
+      debug: jest.fn(),
+      info: jest.fn(),
+      warn: jest.fn(),
+      error: jest.fn(),
+    };
+
+    return serverAPIConnectionCompatibility(
+      { logger } as unknown as InitializationTaskRunContext,
+      {
+        serverAPIClient: {
+          asInternalUser: { request: jest.fn().mockRejectedValue(error) },
+        },
+      },
+      'manager-local',
+      appVersion,
+    );
+  };
+
+  it('flags the result when the server API rate limits the request', async () => {
+    await expect(check(rateLimitError())).resolves.toEqual({
+      connection: null,
+      compatibility: null,
+      api_version: null,
+      id: 'manager-local',
+      rateLimited: true,
+    });
+  });
+
+  it('does not add the flag when the request fails for another reason', async () => {
+    const result = await check(new Error('connect ECONNREFUSED'));
+
+    expect(result).toEqual({
+      connection: null,
+      compatibility: null,
+      api_version: null,
+      id: 'manager-local',
+    });
+    expect(result).not.toHaveProperty('rateLimited');
+  });
+});
+
+describe('initializationTaskCreatorServerAPIConnectionCompatibility rate limiting', () => {
+  const runTask = (
+    requests: Record<string, () => Promise<unknown>>,
+    hosts = Object.keys(requests),
+  ) => {
+    const ctx = buildTaskContext();
+    // Several hosts are only checked with the cross cluster search
+    if (hosts.length > 1) {
+      (
+        ctx.context.services.core.opensearch.client.asInternalUser.transport
+          .request as jest.Mock
+      ).mockResolvedValue({ body: { remote: {} } });
+    }
+    const services = {
+      manageHosts: {
+        get: jest.fn().mockResolvedValue(hosts.map(id => ({ id }))),
+      },
+      serverAPIClient: {
+        asInternalUser: {
+          request: jest.fn(
+            (_method: string, _path: string, _body: unknown, { apiHostID }) =>
+              requests[apiHostID](),
+          ),
+        },
+      },
+    };
+    const run = () =>
+      initializationTaskCreatorServerAPIConnectionCompatibility({
+        taskName: 'server-api:connection-compatibility',
+        services,
+      }).run(ctx);
+
+    return { ctx, run };
+  };
+  const compatible = () =>
+    Promise.resolve({ data: { data: { api_version: appVersion } } });
+  const rateLimited = () => Promise.reject(rateLimitError());
+  const unreachable = () => Promise.reject(new Error('connect ECONNREFUSED'));
+
+  it('returns a warning result, without an error log, when the server API rate limits the request', async () => {
+    const { ctx, run } = runTask({ 'manager-local': rateLimited });
+
+    const result = (await run()) as unknown as Record<PropertyKey, unknown>;
+
+    expect(result[TASK_RESULT]).toBe(true);
+    expect(result.status).toBe('warning');
+    expect(result.message).toBe(
+      'The server API is rate limiting the requests of the dashboard (status code 429), so its connection and compatibility could not be checked. The check runs again on the next scheduled run.',
+    );
+    expect(result.data).toEqual([
+      expect.objectContaining({ id: 'manager-local', rateLimited: true }),
+    ]);
+    expect(ctx.logger.warn).toHaveBeenCalledWith(result.message);
+    expect(ctx.logger.error).not.toHaveBeenCalled();
+  });
+
+  it('keeps throwing when the only failure is not a rate limit', async () => {
+    const { ctx, run } = runTask({ 'manager-local': unreachable });
+
+    await expect(run()).rejects.toThrow(
+      'Error checking server API connection and compatibility: No server API available to connect. Ensure the server API host is reachable and compatible with the dashboard.',
+    );
+    expect(ctx.logger.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps throwing when the rate limited host is mixed with another failure', async () => {
+    const { ctx, run } = runTask({
+      'manager-1': rateLimited,
+      'manager-2': unreachable,
+    });
+
+    await expect(run()).rejects.toThrow(
+      'No server API hosts available to connect.',
+    );
+    expect(ctx.logger.error).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns the available hosts when another host is rate limited', async () => {
+    const { run } = runTask({
+      'manager-1': rateLimited,
+      'manager-2': compatible,
+    });
+
+    const result = (await run()) as unknown as Record<PropertyKey, unknown>;
+
+    expect(result.status).toBe('ok');
+  });
+
+  it('returns a warning result when every host is rate limited', async () => {
+    const { ctx, run } = runTask({
+      'manager-1': rateLimited,
+      'manager-2': rateLimited,
+    });
+
+    const result = (await run()) as unknown as Record<PropertyKey, unknown>;
+
+    expect(result.status).toBe('warning');
+    expect(result.message).toBe(
+      'The server API hosts are rate limiting the requests of the dashboard (status code 429), so their connection and compatibility could not be checked. The check runs again on the next scheduled run.',
+    );
+    expect(ctx.logger.error).not.toHaveBeenCalled();
+  });
+});
+
 describe('initializationTaskCreatorServerAPIRunAs', () => {
   it('returns a branded result carrying the hosts that allow run_as', async () => {
     const services = {
@@ -199,5 +355,80 @@ describe('initializationTaskCreatorServerAPIRunAs', () => {
     expect(result.data).toEqual([
       { id: 'manager-local', allow_run_as: RUN_AS.ENABLED, enabled: true },
     ]);
+  });
+
+  describe('when the run_as permission could not be checked', () => {
+    const runRunAs = (
+      entries: { id: string; allow_run_as: number }[],
+      isRateLimited?: (id: string) => boolean,
+    ) => {
+      const ctx = buildTaskContext();
+      // Several hosts are only checked with the cross cluster search
+      if (entries.length > 1) {
+        (
+          ctx.context.services.core.opensearch.client.asInternalUser.transport
+            .request as jest.Mock
+        ).mockResolvedValue({ body: { remote: {} } });
+      }
+      const run = () =>
+        initializationTaskCreatorServerAPIRunAs({
+          taskName: 'server-api:run-as',
+          services: {
+            manageHosts: {
+              getEntries: jest.fn().mockResolvedValue(entries),
+              ...(isRateLimited ? { isRateLimited } : {}),
+            },
+            API_USER_STATUS_RUN_AS: RUN_AS,
+          },
+        }).run(ctx);
+
+      return { ctx, run };
+    };
+
+    it('returns a warning result, without an error log, when the server API rate limits the requests', async () => {
+      const { ctx, run } = runRunAs(
+        [{ id: 'manager-local', allow_run_as: RUN_AS.UNABLE_TO_CHECK }],
+        id => id === 'manager-local',
+      );
+
+      const result = (await run()) as unknown as Record<PropertyKey, unknown>;
+
+      expect(result[TASK_RESULT]).toBe(true);
+      expect(result.status).toBe('warning');
+      expect(result.message).toBe(
+        'The server API is rate limiting the requests of the dashboard (status code 429), so the run_as permission of the API user could not be checked. The check runs again on the next scheduled run.',
+      );
+      expect(ctx.logger.warn).toHaveBeenCalledWith(result.message);
+      expect(ctx.logger.error).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      ['it is not rate limited', () => false],
+      ['the service does not report it', undefined],
+    ])('keeps throwing when %s', async (_description, isRateLimited) => {
+      const { ctx, run } = runRunAs(
+        [{ id: 'manager-local', allow_run_as: RUN_AS.UNABLE_TO_CHECK }],
+        isRateLimited,
+      );
+
+      await expect(run()).rejects.toThrow(
+        'Error checking server API allow_run_as: The configured server API host has not enabled run_as, or the API user cannot use it: manager-local (Unable to check user run as permission). Ensure the configured API host allows run_as for the API user.',
+      );
+      expect(ctx.logger.error).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps throwing when another host does not have run_as enabled', async () => {
+      const { run } = runRunAs(
+        [
+          { id: 'manager-1', allow_run_as: RUN_AS.UNABLE_TO_CHECK },
+          { id: 'manager-2', allow_run_as: RUN_AS.HOST_DISABLED },
+        ],
+        () => true,
+      );
+
+      await expect(run()).rejects.toThrow(
+        'manager-1 (Unable to check user run as permission), manager-2 (Run as disabled in host)',
+      );
+    });
   });
 });
