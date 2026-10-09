@@ -312,7 +312,7 @@ export class ManageHosts {
       }
 
       rateLimited = isRateLimitError(error);
-      this.logger.warn(
+      this.logger[rateLimited ? 'warn' : 'debug'](
         `Could not get the registry data of the host [${apiHostID}]: ${
           error instanceof Error ? error.message : String(error)
         }`,

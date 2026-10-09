@@ -292,6 +292,17 @@ describe('ManageHosts Service', () => {
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
     });
 
+    it('logs a failure that is not a rate limit at debug level', async () => {
+      answerRequests(() => Promise.reject(new Error('connect ECONNREFUSED')));
+
+      await manageHosts.getEntries();
+
+      expect(mockLogger.warn).not.toHaveBeenCalled();
+      expect(mockLogger.debug.mock.calls.flat().join('\n')).toContain(
+        `Could not get the registry data of the host [${HOST_ID}]: connect ECONNREFUSED`,
+      );
+    });
+
     it('logs the cause of the failure without the credentials', async () => {
       answerRequests(() => Promise.reject(rateLimitError()));
 
