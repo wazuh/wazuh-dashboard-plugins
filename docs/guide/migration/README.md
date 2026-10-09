@@ -83,7 +83,7 @@ Export only the dashboards and visualizations you created or modified. Default W
 2. Select the checkboxes next to each custom dashboard, visualization and saved search, and next to each custom index pattern they use. Do not select the 4.x default Wazuh index patterns (`wazuh-alerts-*`, `wazuh-monitoring-*`, `wazuh-statistics-*` and the `wazuh-states-*-*` patterns): 5.x replaces them (see [Resolve index pattern conflicts](./dashboards.md#step-4-resolve-index-pattern-conflicts)).
 3. Click **Export**, disable **Include related objects** (it would add the referenced 4.x default index patterns back), and save the resulting `.ndjson` file to a secure location.
 
-If you export all objects as a fallback, remove the 4.x default Wazuh index patterns from the file with the `jq` command below, and use the **Check for existing objects** conflict strategy when importing into 5.x. See [Custom dashboards and visualizations](./dashboards.md) for details.
+If you export all objects as a fallback, remove the 4.x default Wazuh index patterns from the file with the `jq` command below, and import it into 5.x with **Check for existing objects** and **Request action on conflict**, skipping each conflict. See [Custom dashboards and visualizations](./dashboards.md) for details.
 
 Alternatively, use the API. Run the following command from **any machine with network access to the 4.x dashboard**, replacing `<DASHBOARD_HOST>` with the 4.x dashboard hostname or IP, `<DASHBOARD_PORT>` with the dashboard port, and `<PASSWORD>` with the admin password. The output file is saved in the current working directory:
 
