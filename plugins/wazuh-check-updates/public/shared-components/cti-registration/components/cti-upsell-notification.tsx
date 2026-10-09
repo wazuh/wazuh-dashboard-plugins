@@ -14,24 +14,20 @@ import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
 import { ctiFlowState } from '../../../services/cti-flow-state';
 import { getWazuhCore } from '../../../plugin-services';
-
-const UPSELL_DISMISSED_KEY = 'wazuh.cti.upsell.dismissed';
-
-const isDismissed = (): boolean => {
-  try {
-    return localStorage.getItem(UPSELL_DISMISSED_KEY) === 'true';
-  } catch {
-    return false;
-  }
-};
+import { useUserPreferences } from '../../../hooks';
 
 export const CtiUpsellNotification = () => {
-  const [dismissed, setDismissed] = useState<boolean>(isDismissed);
+  const [dismissed, setDismissed] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
 
   const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
   const { statusCTI, loading, refetchStatus } = useCtiStatus(deviceFlowNonce);
+  const {
+    userPreferences,
+    isLoading: isLoadingPreferences,
+    updateUserPreferences,
+  } = useUserPreferences();
 
   const isRegistered = statusCTI.status === statusCodes.SUCCESS;
   const deviceFlowActive =
@@ -40,7 +36,9 @@ export const CtiUpsellNotification = () => {
 
   const shouldShowBar =
     !loading &&
+    !isLoadingPreferences &&
     !dismissed &&
+    !userPreferences.hide_cti_upsell &&
     !isRegistered &&
     !isRegisterModalOpen &&
     !deviceFlowActive &&
@@ -48,12 +46,8 @@ export const CtiUpsellNotification = () => {
       statusCTI.status === statusCodes.REGISTRATION_FAILED);
 
   const handleDismiss = () => {
-    try {
-      localStorage.setItem(UPSELL_DISMISSED_KEY, 'true');
-    } catch (error: unknown) {
-      console.warn('Failed to persist CTI upsell dismiss preference:', error);
-    }
     setDismissed(true);
+    void updateUserPreferences({ hide_cti_upsell: true });
   };
 
   const handleOpenRegister = () => {

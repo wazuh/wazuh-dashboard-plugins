@@ -1,6 +1,7 @@
 import { SavedObjectsType } from 'opensearch-dashboards/server';
 import { SAVED_OBJECT_USER_PREFERENCES } from '../../../../common/constants';
 
+// Per-user preferences of this plugin, not only update notifications.
 export const userPreferencesObject: SavedObjectsType = {
   name: SAVED_OBJECT_USER_PREFERENCES,
   hidden: true,
@@ -22,6 +23,9 @@ export const userPreferencesObject: SavedObjectsType = {
         },
       },
       hide_update_notifications: {
+        type: 'boolean',
+      },
+      hide_cti_upsell: {
         type: 'boolean',
       },
     },

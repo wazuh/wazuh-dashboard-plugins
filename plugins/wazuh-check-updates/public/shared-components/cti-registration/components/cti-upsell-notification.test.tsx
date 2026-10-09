@@ -8,7 +8,13 @@ jest.mock('../../../plugin-services', () => ({
 }));
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
@@ -34,24 +40,38 @@ jest.mock('@osd/i18n/react', () => ({
 }));
 
 const mockHttpGet = jest.fn();
+const mockHttpPatch = jest.fn();
+
+const NOT_REGISTERED_STATUS = {
+  registrationComplete: false,
+  inProgress: false,
+  subscription: {
+    message: { plan: { name: '', is_public: true }, is_registered: false },
+    status: 200,
+  },
+};
+
+const mockResponses = (ctiStatus: object, userPreferences: object = {}) => {
+  mockHttpGet.mockImplementation((path: string) =>
+    Promise.resolve(
+      path === routes.userPreferences ? userPreferences : ctiStatus,
+    ),
+  );
+};
 
 describe('CtiUpsellNotification', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     ctiFlowState.reset();
-    try {
-      localStorage.clear();
-    } catch {
-      // ignore
-    }
+    mockHttpPatch.mockResolvedValue({});
 
     (getCore as jest.Mock).mockReturnValue({
-      http: { get: mockHttpGet },
+      http: { get: mockHttpGet, patch: mockHttpPatch },
     });
   });
 
   test('does not show the upsell bar when the subscription status is unknown (502) but registration is complete', async () => {
-    mockHttpGet.mockResolvedValue({
+    mockResponses({
       registrationComplete: true,
       inProgress: false,
       subscription: { message: null, status: 502 },
@@ -71,17 +91,41 @@ describe('CtiUpsellNotification', () => {
   });
 
   test('shows the upsell bar when CM confirms the instance is not registered', async () => {
-    mockHttpGet.mockResolvedValue({
-      registrationComplete: false,
-      inProgress: false,
-      subscription: {
-        message: { plan: { name: '', is_public: true }, is_registered: false },
-        status: 200,
-      },
-    });
+    mockResponses(NOT_REGISTERED_STATUS);
 
     render(<CtiUpsellNotification />);
 
     expect(await screen.findByText('Register now')).toBeInTheDocument();
+  });
+
+  test('does not show the upsell bar when the user dismissed it before', async () => {
+    mockResponses(NOT_REGISTERED_STATUS, { hide_cti_upsell: true });
+
+    render(<CtiUpsellNotification />);
+
+    await waitFor(() => {
+      expect(mockHttpGet).toHaveBeenCalledWith(routes.userPreferences);
+    });
+    await waitFor(() => {
+      expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus);
+    });
+
+    expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+  });
+
+  test('stores the dismissal in the user preferences', async () => {
+    mockResponses(NOT_REGISTERED_STATUS);
+
+    render(<CtiUpsellNotification />);
+
+    fireEvent.click(await screen.findByText("Don't show again"));
+
+    expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(mockHttpPatch).toHaveBeenCalledWith(routes.userPreferences, {
+        body: JSON.stringify({ hide_cti_upsell: true }),
+      });
+    });
+    await act(() => mockHttpPatch.mock.results[0].value);
   });
 });
