@@ -91,6 +91,21 @@ describe('ModalCti component', () => {
     cleanup();
   });
 
+  it('marks a registration modal as open while mounted', async () => {
+    const { unmount } = render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    await screen.findByText('Wazuh XDR registration');
+    expect(ctiFlowState.isModalOpen()).toBe(true);
+
+    unmount();
+    expect(ctiFlowState.isModalOpen()).toBe(false);
+  });
+
   it('should render correctly', async () => {
     render(
       <ModalCti
@@ -211,6 +226,11 @@ describe('ModalCti component', () => {
     expect(
       queryByText('Complete activation in Wazuh Cloud'),
     ).toBeInTheDocument();
+    // Closing cancels the pending activation, so the footer says so.
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Close' }),
+    ).not.toBeInTheDocument();
   });
 
   it('should handle button click, show activation URL, and open verification URI', async () => {
@@ -282,10 +302,50 @@ describe('ModalCti component', () => {
 
     await screen.findByText('Complete activation in Wazuh Cloud');
 
+    // A pending activation asks for confirmation before cancelling.
     act(() => {
       fireEvent.keyDown(document, { key: 'Escape' });
     });
-    expect(handleModalToggleMock).toHaveBeenCalled();
+    expect(handleModalToggleMock).not.toHaveBeenCalled();
+    expect(
+      document.querySelector('[data-test-subj="ctiCancelConfirmMessage"]'),
+    ).toBeInTheDocument();
+
+    // Escape again backs out of the confirmation.
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(
+      document.querySelector('[data-test-subj="ctiCancelConfirmMessage"]'),
+    ).not.toBeInTheDocument();
+    expect(handleModalToggleMock).not.toHaveBeenCalled();
+  });
+
+  it('asks for confirmation before cancelling a pending activation', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    const registerButton = await screen.findByRole('button', {
+      name: 'Register',
+    });
+    act(() => {
+      fireEvent.click(registerButton);
+    });
+    await screen.findByText('Complete activation in Wazuh Cloud');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Keep waiting' }));
+    expect(handleModalToggleMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Cancel registration' }),
+    );
+    expect(handleModalToggleMock).toHaveBeenCalledTimes(1);
   });
 
   it('starts device flow polling schedule and shows in-progress copy', async () => {

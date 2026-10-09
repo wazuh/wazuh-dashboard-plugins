@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
@@ -147,8 +147,21 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   }, [statusCTI, deviceAuth]);
 
-  const handleModalToggleRef = useRef(handleModalToggle);
-  handleModalToggleRef.current = handleModalToggle;
+  useEffect(() => ctiFlowState.openModal(), []);
+
+  // Closing during a pending activation cancels it, so ask first. Requesting
+  // a close again while the confirmation is shown backs out of it.
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const requestClose = () => {
+    if (!deviceAuth) {
+      handleModalToggle();
+      return;
+    }
+    setConfirmingCancel(confirming => !confirming);
+  };
+
+  const requestCloseRef = useRef(requestClose);
+  requestCloseRef.current = requestClose;
 
   useEffect(() => {
     // EUI's own Escape handler lives on the modal's wrapper div, so it only
@@ -157,7 +170,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     // dropping focus to document.body and silently breaking Escape.
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        handleModalToggleRef.current();
+        requestCloseRef.current();
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -322,7 +335,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     showSuccess && ctiFlowState.getSubscription()?.message === null;
 
   return (
-    <EuiModal onClose={handleModalToggle}>
+    <EuiModal onClose={requestClose}>
       <EuiModalHeader>
         <div>
           <EuiModalHeaderTitle>
@@ -659,6 +672,21 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             {error}
           </EuiCallOut>
         )}
+        {deviceAuth && confirmingCancel && (
+          <EuiCallOut
+            size='s'
+            color='warning'
+            iconType='alert'
+            data-test-subj='ctiCancelConfirmMessage'
+            title={
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalCancelConfirmMessage'
+                defaultMessage='Are you sure you want to cancel the registration? The activation code will stop working.'
+              />
+            }
+            style={{ marginTop: 16 }}
+          />
+        )}
       </EuiModalBody>
 
       <EuiModalFooter>
@@ -676,7 +704,29 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               defaultMessage='Close'
             />
           </EuiButtonEmpty>
-        ) : deviceAuth || showPermissionDenied ? (
+        ) : deviceAuth && confirmingCancel ? (
+          <>
+            <EuiButtonEmpty onClick={() => setConfirmingCancel(false)}>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalButtonKeepWaiting'
+                defaultMessage='Keep waiting'
+              />
+            </EuiButtonEmpty>
+            <EuiButton color='danger' onClick={handleModalToggle} fill>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalButtonConfirmCancel'
+                defaultMessage='Cancel registration'
+              />
+            </EuiButton>
+          </>
+        ) : deviceAuth ? (
+          <EuiButtonEmpty onClick={requestClose}>
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.modalButtonCancel'
+              defaultMessage='Cancel'
+            />
+          </EuiButtonEmpty>
+        ) : showPermissionDenied ? (
           <EuiButtonEmpty onClick={handleModalToggle}>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'

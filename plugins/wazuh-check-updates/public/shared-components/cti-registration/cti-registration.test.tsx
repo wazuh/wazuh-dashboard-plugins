@@ -4,7 +4,7 @@ jest.mock('../../plugin-services', () => ({
 }));
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../plugin-services';
 import { ctiFlowState } from '../../services/cti-flow-state';
@@ -44,6 +44,7 @@ jest.mock('@osd/i18n/react', () => ({
 const mockUiSettingsGet = jest.fn();
 const mockHttpGet = jest.fn();
 const mockHttpPost = jest.fn();
+const mockHttpDelete = jest.fn();
 
 describe('CtiRegistration', () => {
   beforeEach(() => {
@@ -67,7 +68,7 @@ describe('CtiRegistration', () => {
     );
 
     (getCore as jest.Mock).mockReturnValue({
-      http: { get: mockHttpGet, post: mockHttpPost },
+      http: { get: mockHttpGet, post: mockHttpPost, delete: mockHttpDelete },
       uiSettings: { get: mockUiSettingsGet },
     });
   });
@@ -125,5 +126,87 @@ describe('CtiRegistration', () => {
       }),
     ).toBeInTheDocument();
     expect(mockHttpPost).not.toHaveBeenCalled();
+  });
+
+  describe('pending activation', () => {
+    const notRegistered = {
+      registrationComplete: false,
+      inProgress: false,
+      subscription: { message: { is_registered: false }, status: 200 },
+    };
+
+    beforeEach(() => {
+      mockHttpGet.mockResolvedValue({
+        ...notRegistered,
+        inProgress: true,
+        device_code: 'dc-pending',
+        user_code: 'WZH-PEND',
+        verification_uri: 'https://example.test/act',
+        poll_interval_sec: 5,
+        expires_in_remaining_sec: 3575,
+      });
+      mockHttpPost.mockResolvedValue({ error: 'authorization_pending' });
+      mockHttpDelete.mockResolvedValue({ success: true });
+    });
+
+    const openModal = async () => {
+      render(<CtiRegistration />);
+      const navButton = await screen.findByRole('button', {
+        name: 'View pending to start CTI registration',
+      });
+      fireEvent.click(navButton);
+      return screen.findByRole('button', { name: 'Cancel' });
+    };
+
+    test('confirming the cancellation cancels the pending activation', async () => {
+      const cancelButton = await openModal();
+      mockHttpGet.mockResolvedValue(notRegistered);
+
+      fireEvent.click(cancelButton);
+      expect(mockHttpDelete).not.toHaveBeenCalled();
+      fireEvent.click(
+        screen.getByRole('button', { name: 'Cancel registration' }),
+      );
+
+      await waitFor(() => {
+        expect(mockHttpDelete).toHaveBeenCalledWith(routes.token);
+        expect(ctiFlowState.getDeviceCode()).toBeNull();
+        expect(
+          document.querySelector(
+            '[data-test-subj="ctiStatusBackgroundSpinner"]',
+          ),
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    test('Escape asks for confirmation too', async () => {
+      await openModal();
+      mockHttpGet.mockResolvedValue(notRegistered);
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Cancel registration' }),
+      );
+
+      await waitFor(() => {
+        expect(mockHttpDelete).toHaveBeenCalledWith(routes.token);
+        expect(ctiFlowState.getDeviceCode()).toBeNull();
+      });
+    });
+  });
+
+  test('closing the modal without a pending activation does not cancel anything', async () => {
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: false,
+      subscription: { message: { is_registered: false }, status: 200 },
+    });
+    render(<CtiRegistration />);
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Wazuh XDR registration' }),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+
+    expect(mockHttpDelete).not.toHaveBeenCalled();
   });
 });

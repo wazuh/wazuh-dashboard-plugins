@@ -9,22 +9,36 @@ import { useCtiStatus } from './hooks/useCtiStatus';
 import { statusCodes } from '../../../common/constants';
 import { ctiFlowState } from '../../services/cti-flow-state';
 import { getCtiRegistrationStatusPollIntervalSec } from '../../plugin-services';
+import { cancelCtiRegistration } from '../../services/cti-registration-status';
 
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
-  const { statusCTI, loading, refetchStatus } = useCtiStatus(
+  const { statusCTI, loading, deviceFlowActive, refetchStatus } = useCtiStatus(
     deviceFlowNonce,
     getCtiRegistrationStatusPollIntervalSec(),
   );
 
-  const handleModalToggle = () => {
-    setIsModalOpen(!isModalOpen);
+  const cancelPendingActivation = async () => {
+    try {
+      await cancelCtiRegistration();
+    } catch {
+      // The refetch below rehydrates whatever state the server still holds.
+    }
+    ctiFlowState.reset();
+    // Re-run the polling effect so its pending timeout is cleared.
+    setDeviceFlowNonce(n => n + 1);
+    await refetchStatus();
   };
 
-  const deviceFlowActive =
-    Boolean(ctiFlowState.getDeviceCode()) &&
-    !ctiFlowState.isRegistrationComplete();
+  const handleModalToggle = () => {
+    // Every close path (button, X, overlay, Escape) routes here: closing the
+    // modal during a pending activation cancels it.
+    if (isModalOpen && deviceFlowActive && !ctiFlowState.isRegistered()) {
+      cancelPendingActivation();
+    }
+    setIsModalOpen(!isModalOpen);
+  };
 
   const isSuccess = statusCTI.status === statusCodes.SUCCESS;
   const isFailed = statusCTI.status === statusCodes.REGISTRATION_FAILED;
