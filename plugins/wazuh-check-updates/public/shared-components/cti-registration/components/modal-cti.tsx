@@ -138,6 +138,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   }, [statusCTI, deviceAuth]);
 
+  useEffect(() => ctiFlowState.openModal(), []);
+
   const handleModalToggleRef = useRef(handleModalToggle);
   handleModalToggleRef.current = handleModalToggle;
 

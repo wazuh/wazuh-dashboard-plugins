@@ -30,7 +30,7 @@ export const CtiUpsellNotification = () => {
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
 
   const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
-  const { statusCTI, loading, deviceFlowActive, refetchStatus } =
+  const { statusCTI, loading, deviceFlowActive, modalOpen, refetchStatus } =
     useCtiStatus(deviceFlowNonce);
 
   const isRegistered = statusCTI.status === statusCodes.SUCCESS;
@@ -38,7 +38,7 @@ export const CtiUpsellNotification = () => {
     !loading &&
     !dismissed &&
     !isRegistered &&
-    !isRegisterModalOpen &&
+    !modalOpen &&
     !deviceFlowActive &&
     (statusCTI.status === statusCodes.NOT_FOUND ||
       statusCTI.status === statusCodes.REGISTRATION_FAILED);

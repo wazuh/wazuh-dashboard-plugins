@@ -104,6 +104,20 @@ describe('CtiUpsellNotification', () => {
       expect(screen.getByText('Register now')).toBeInTheDocument();
     });
 
+    test('hides while a registration modal is open and shows again when it closes', async () => {
+      render(<CtiUpsellNotification />);
+      expect(await screen.findByText('Register now')).toBeInTheDocument();
+
+      let closeModal = () => {};
+      act(() => {
+        closeModal = ctiFlowState.openModal();
+      });
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+
+      act(() => closeModal());
+      expect(screen.getByText('Register now')).toBeInTheDocument();
+    });
+
     test('hides once registration completes', async () => {
       render(<CtiUpsellNotification />);
       expect(await screen.findByText('Register now')).toBeInTheDocument();

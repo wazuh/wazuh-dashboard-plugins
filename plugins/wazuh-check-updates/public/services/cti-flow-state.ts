@@ -14,13 +14,14 @@ let deviceAuthExpiresAt: number | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
 let subscription: CtiSubscriptionSnapshot | null = null;
 let lastStatusFetchAtMs: number | null = null;
+let openModals = 0;
 let version = 0;
 const listeners = new Set<() => void>();
 
 const flowKey = () =>
   `${deviceCode}|${registrationComplete}|${Boolean(
     subscription?.message?.is_registered,
-  )}`;
+  )}|${openModals}`;
 
 /** Runs `change` and notifies subscribers if the flow or registration state moved. */
 const track = (change: () => void): void => {
@@ -43,6 +44,21 @@ export const ctiFlowState = {
 
   getVersion(): number {
     return version;
+  },
+
+  /** Marks a registration modal as open; call the returned function on close. */
+  openModal(): () => void {
+    track(() => {
+      openModals++;
+    });
+    return () =>
+      track(() => {
+        openModals--;
+      });
+  },
+
+  isModalOpen(): boolean {
+    return openModals > 0;
   },
 
   /** Whether CM subscription reports this environment as registered. */

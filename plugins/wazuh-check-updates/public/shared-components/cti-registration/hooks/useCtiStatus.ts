@@ -84,6 +84,7 @@ export const useCtiStatus = (
   const deviceFlowActive =
     Boolean(ctiFlowState.getDeviceCode()) &&
     !ctiFlowState.isRegistrationComplete();
+  const modalOpen = ctiFlowState.isModalOpen();
 
   const fetchStatus = useCallback(async (options?: { silent?: boolean }) => {
     ctiFlowState.markStatusFetched();
@@ -267,5 +268,11 @@ export const useCtiStatus = (
       document.removeEventListener('visibilitychange', onVisibilityChange);
   }, [fetchStatus, pollIntervalSec]);
 
-  return { statusCTI, loading, deviceFlowActive, refetchStatus: fetchStatus };
+  return {
+    statusCTI,
+    loading,
+    deviceFlowActive,
+    modalOpen,
+    refetchStatus: fetchStatus,
+  };
 };

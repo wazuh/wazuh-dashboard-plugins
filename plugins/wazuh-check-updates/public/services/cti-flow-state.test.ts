@@ -32,6 +32,19 @@ describe('ctiFlowState.subscribe', () => {
     unsubscribe();
   });
 
+  it('tracks open registration modals and notifies on open and close', () => {
+    const listener = jest.fn();
+    const unsubscribe = ctiFlowState.subscribe(listener);
+
+    const close = ctiFlowState.openModal();
+    expect(ctiFlowState.isModalOpen()).toBe(true);
+
+    close();
+    expect(ctiFlowState.isModalOpen()).toBe(false);
+    expect(listener).toHaveBeenCalledTimes(2);
+    unsubscribe();
+  });
+
   it('stops notifying after unsubscribe', () => {
     const listener = jest.fn();
     ctiFlowState.subscribe(listener)();

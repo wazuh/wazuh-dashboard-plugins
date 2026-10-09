@@ -90,6 +90,21 @@ describe('ModalCti component', () => {
     cleanup();
   });
 
+  it('marks a registration modal as open while mounted', async () => {
+    const { unmount } = render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    await screen.findByText('Wazuh XDR registration');
+    expect(ctiFlowState.isModalOpen()).toBe(true);
+
+    unmount();
+    expect(ctiFlowState.isModalOpen()).toBe(false);
+  });
+
   it('should render correctly', async () => {
     render(
       <ModalCti
