@@ -67,7 +67,7 @@ If you need to export everything at once as a fallback:
 
 1. Select **Export X objects** (the button label shows the total count).
 2. Save the file, then remove the 4.x default Wazuh index patterns from it with the `jq` command of [Using the API](#using-the-api) below.
-3. When importing into 5.x, use the **Check for existing objects** conflict strategy (see Step 3) to avoid overwriting default Wazuh objects that were already provisioned.
+3. When importing into 5.x, select **Check for existing objects** and **Request action on conflict**, and skip each conflict (see Step 3), to avoid overwriting default Wazuh objects that were already provisioned.
 
 ### Using the API
 
@@ -104,10 +104,16 @@ Complete the Wazuh 5.x installation and verify that the dashboard is accessible 
 1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects**.
 2. Click **Import**.
 3. Select the `.ndjson` file exported from the 4.x deployment.
-4. Choose a conflict resolution strategy:
-   - **Check for existing objects** (recommended): Skips objects that already exist. Preserves any objects already provisioned by the health check.
-   - **Automatically overwrite all conflicts**: Replaces any existing objects with the same ID. Use with caution if Wazuh default dashboards have already been provisioned.
+4. Under **Import options**, select **Check for existing objects**, and then select **Request action on conflict** (recommended).
 5. Click **Import**.
+6. For each object whose ID already exists, the dashboard asks whether to overwrite it. Click **Skip** to keep the existing object, such as an object already provisioned by the health check.
+
+The other import options do not preserve existing objects:
+
+| Option                                                                    | Behavior                                                                                                                                        |
+| :------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Create new objects with unique IDs** (selected by default)              | Imports every object with a new ID. Objects that already exist are duplicated instead of skipped.                                               |
+| **Check for existing objects** with **Automatically overwrite conflicts** | Replaces every existing object with the same ID, without asking. This sub-option is preselected when you select **Check for existing objects**. |
 
 ### Using the API
 
