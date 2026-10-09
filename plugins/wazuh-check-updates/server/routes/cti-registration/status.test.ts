@@ -169,7 +169,10 @@ describe('CTI registration status route', () => {
       expires_in: 600,
       interval: 8,
     });
-    CtiRegistrationStore.getInstance().setInProgress('env-uuid-1', parsed);
+    CtiRegistrationStore.getInstance().setInProgress('env-uuid-1', {
+      ...parsed,
+      deviceAuthStartedAtMs: Date.now() - 90 * 1000,
+    });
 
     const response = await supertest(innerServer.listener)
       .get(routes.ctiRegistrationStatus)
@@ -181,6 +184,8 @@ describe('CTI registration status route', () => {
     expect(response.body.user_code).toBe('WZH-9');
     expect(response.body.poll_interval_sec).toBe(8);
     expect(typeof response.body.expires_in_remaining_sec).toBe('number');
+    expect(response.body.pending_for_sec).toBe(90);
+    expect(response.body.environment_uid).toBe('env-uuid-1');
     expect(response.body.subscription).toEqual({
       message: null,
       status: null,

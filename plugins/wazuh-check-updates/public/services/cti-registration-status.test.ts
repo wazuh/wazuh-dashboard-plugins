@@ -69,4 +69,28 @@ describe('hydrateCtiFlowFromServer', () => {
     expect(ctiFlowState.isRegistrationComplete()).toBe(false);
     expect(ctiFlowState.isRegistered()).toBe(false);
   });
+
+  it('restores how long an in-progress device code has been pending', async () => {
+    /* eslint-disable camelcase -- status API body uses snake_case */
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: true,
+      device_code: 'dc-pending',
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      expires_in_remaining_sec: 600,
+      pending_for_sec: 90,
+      environment_uid: 'env-uuid-1',
+      subscription: { message: null, status: null },
+    });
+    /* eslint-enable camelcase */
+
+    await hydrateCtiFlowFromServer();
+
+    expect(ctiFlowState.getDeviceCode()).toBe('dc-pending');
+    expect(ctiFlowState.getDeviceAuthPendingMs()).toBeGreaterThanOrEqual(
+      90 * 1000,
+    );
+    expect(ctiFlowState.getEnvironmentUid()).toBe('env-uuid-1');
+  });
 });

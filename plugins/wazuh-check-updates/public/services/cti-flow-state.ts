@@ -11,6 +11,8 @@ let deviceCode: string | null = null;
 let registrationComplete = false;
 let pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
 let deviceAuthExpiresAt: number | null = null;
+let deviceAuthStartedAt: number | null = null;
+let environmentUid: string | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
 let subscription: CtiSubscriptionSnapshot | null = null;
 let lastStatusFetchAtMs: number | null = null;
@@ -107,6 +109,7 @@ export const ctiFlowState = {
       if (complete) {
         deviceCode = null;
         deviceAuthExpiresAt = null;
+        deviceAuthStartedAt = null;
         deviceAuthLinks = null;
       }
     });
@@ -147,6 +150,28 @@ export const ctiFlowState = {
     return deviceAuthExpiresAt != null && Date.now() > deviceAuthExpiresAt;
   },
 
+  /** Records how long the current device code has been pending (0 for a new one). */
+  setDeviceAuthPendingFor(pendingForSec: number): void {
+    deviceAuthStartedAt =
+      Date.now() - Math.max(0, Math.floor(pendingForSec)) * 1000;
+  },
+
+  /** Milliseconds the current device code has been pending, or `null` when unknown. */
+  getDeviceAuthPendingMs(): number | null {
+    return deviceAuthStartedAt === null
+      ? null
+      : Date.now() - deviceAuthStartedAt;
+  },
+
+  /** Environment UID sent as `client_id`: the deployment ID in Wazuh Cloud. */
+  getEnvironmentUid(): string | null {
+    return environmentUid;
+  },
+
+  setEnvironmentUid(uid: string | null | undefined): void {
+    environmentUid = uid && uid.length > 0 ? uid : null;
+  },
+
   /** Kept on this module-level singleton so it survives a component remount. */
   getLastStatusFetchAtMs(): number | null {
     return lastStatusFetchAtMs;
@@ -162,6 +187,8 @@ export const ctiFlowState = {
       registrationComplete = false;
       pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
       deviceAuthExpiresAt = null;
+      deviceAuthStartedAt = null;
+      environmentUid = null;
       deviceAuthLinks = null;
       subscription = null;
       lastStatusFetchAtMs = null;

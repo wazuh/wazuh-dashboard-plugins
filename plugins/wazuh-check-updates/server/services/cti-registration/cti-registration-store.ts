@@ -11,6 +11,7 @@ export type CtiRegistrationStoreRecord = {
   user_code: string;
   verification_uri: string;
   verification_uri_complete: string;
+  deviceAuthStartedAtMs: number;
   deviceAuthExpiresAtMs: number;
   poll_interval_sec: number;
 };
@@ -75,12 +76,14 @@ export function parseDeviceAuthorizationForStore(
     CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
   );
 
+  const now = Date.now();
   return {
     device_code,
     user_code,
     verification_uri: verification_uri || verification_uri_complete,
     verification_uri_complete,
-    deviceAuthExpiresAtMs: Date.now() + expiresInSec * 1000,
+    deviceAuthStartedAtMs: now,
+    deviceAuthExpiresAtMs: now + expiresInSec * 1000,
     poll_interval_sec,
   };
 }
