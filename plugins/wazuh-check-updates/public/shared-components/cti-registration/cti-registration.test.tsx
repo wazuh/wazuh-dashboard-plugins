@@ -152,7 +152,7 @@ describe('CtiRegistration', () => {
     const openModal = async () => {
       render(<CtiRegistration />);
       const navButton = await screen.findByRole('button', {
-        name: 'View pending to start CTI registration',
+        name: 'Wazuh Cloud activation pending. View activation details.',
       });
       fireEvent.click(navButton);
       return screen.findByRole('button', { name: 'Cancel' });
