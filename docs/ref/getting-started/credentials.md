@@ -29,9 +29,10 @@ file: a password the dashboard made up would not be accepted by the indexer or t
 the dashboard is the component most likely to be left unresolved on a fresh host, until the indexer
 and the manager publish their keys or you supply them.
 
-It **owns** two local assets, which nobody else reads:
+It **owns** three local assets, which nobody else reads:
 
 - The [AI Assistant encryption key](#ai-assistant-encryption-key) (`wazuh_ai_assistant.encryptionKey`).
+- The [session cookie password](#session-cookie-password) (`opensearch_security.cookie.password`).
 - Its [TLS certificate pair](#certificates).
 
 The aliases keep the variable names used by `wazuh-docker`. They are read from the process
@@ -170,11 +171,11 @@ Install order does not matter. A dashboard installed before the indexer or the m
 nothing at install time. When you start it, the resolver runs the whole order again (not only a
 check), picks up the keys published since, and stores them.
 
-| Moment                | Resolver mode | Passwords                                 | AI Assistant key    | Certificates      |
-| --------------------- | ------------- | ----------------------------------------- | ------------------- | ----------------- |
-| Fresh package install | `--install`   | resolved; never fails                     | generated if absent | issued if missing |
-| Package upgrade       | `--upgrade`   | resolved; never fails                     | not generated       | not touched       |
-| Every service start   | `--prestart`  | resolved; **refuses to start** if missing | generated if absent | not touched       |
+| Moment                | Resolver mode | Passwords                                 | AI Assistant key and cookie password | Certificates      |
+| --------------------- | ------------- | ----------------------------------------- | ------------------------------------ | ----------------- |
+| Fresh package install | `--install`   | resolved; never fails                     | generated if absent                  | issued if missing |
+| Package upgrade       | `--upgrade`   | resolved; never fails                     | not generated                        | not touched       |
+| Every service start   | `--prestart`  | resolved; **refuses to start** if missing | generated if absent                  | not touched       |
 
 The start step runs from `ExecStartPre=+` in `wazuh-dashboard.service`, and from the `start` action of
 the SysV init script. The unit also sets `StartLimitBurst=3` and `StartLimitIntervalSec=60`, so a
@@ -230,6 +231,49 @@ straight into the keystore:
 
 The key is never written to the credentials file and never printed. If it cannot be generated, a
 warning is logged and the dashboard starts anyway, because the AI Assistant is optional.
+
+## Session cookie password
+
+The dashboard seals the session cookie with `opensearch_security.cookie.password`. The security
+plugin ships a built-in default for it, the same on every installation, so the resolver generates a
+value of its own (32 random bytes, base64) straight into the keystore:
+
+- At a fresh install and at every start, when neither the keystore nor `opensearch_dashboards.yml`
+  has it.
+- Never at upgrade: an upgrade adds no secret you did not already have, so the first start after
+  upgrading from a version without the entry generates it. That start ends the open sessions, and
+  users log in again once.
+- Never as a replacement for an existing value, and a restart never rotates it.
+
+The value is never written to the credentials file and never printed. If it cannot be generated, a
+warning is logged and the dashboard starts anyway, but it then keeps the built-in default until you
+set one.
+
+**Several nodes behind a load balancer must share one value.** A request that lands on a node with a
+different value cannot open the session cookie, and the user is logged out. The value must be 32
+characters or more and must not look like JSON (a number, `true`, a quoted string...); a value that
+breaks these rules makes the dashboard fail its configuration validation at start. Keep it in a file
+that only root can read and feed it to the keystore as the service user, so it never appears in a
+command line or in the shell history:
+
+```bash
+runuser -u wazuh-dashboard -- \
+  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore add \
+  opensearch_security.cookie.password --force --stdin < /root/cookie-password
+sudo systemctl restart wazuh-dashboard
+```
+
+- On a **new installation** the package has already generated a value, so `--force` is required to
+  replace it. Without it, `add --stdin` leaves an existing entry untouched.
+- When **upgrading existing nodes**, run the same command **before** upgrading each node and omit
+  `--force`, because the entry does not exist yet. A value in the keystore or in
+  `opensearch_dashboards.yml` counts as already set, so nothing is generated.
+- A value in `opensearch_dashboards.yml` does not take effect while the keystore holds an entry,
+  because the keystore is merged over the file. To keep it in the file, remove the entry first with
+  `runuser -u wazuh-dashboard -- /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore remove opensearch_security.cookie.password`
+  and restart.
+
+For the setting itself, see [Cookies, headers, and cross-origin requests](../security.md#cookies-headers-and-cross-origin-requests).
 
 ## Certificates
 
@@ -355,9 +399,9 @@ Removing the package can still delete it with the rest of `/etc/wazuh`: see
 ## Container images
 
 An image built by installing the package carries whatever the `postinst` resolved on the build host:
-keystore entries, the AI Assistant key, the certificates and, when the install minted it, a
-bootstrap CA **including its private key**. Every container started from that image would share
-them. Clear them at the end of the image build:
+keystore entries, the AI Assistant key, the cookie password, the certificates and, when the install
+minted it, a bootstrap CA **including its private key**. Every container started from that image
+would share them. Clear them at the end of the image build:
 
 ```dockerfile
 RUN /usr/share/wazuh-dashboard/bin/resolve-credentials --clear
@@ -371,8 +415,8 @@ start. It is idempotent, so a restarted container that already resolved is a no-
 ```
 
 `--clear` removes the `opensearch.username`, `opensearch.password` and
-`wazuh_core.hosts.default.password` keystore entries, the AI Assistant key, the dashboard
-certificates, and any staging directory an interrupted install left in `certs/`. It removes the
+`wazuh_core.hosts.default.password` keystore entries, the AI Assistant key, the cookie password, the
+dashboard certificates, and any staging directory an interrupted install left in `certs/`. It removes the
 shared CA only when this dashboard minted it, as recorded by `.wazuh-dashboard-bootstrap-ca` in the
 CA directory, and removes that marker with it. Any other CA is kept, and the output says why: one
 with a private key but no marker was staged by you, and one without a private key was issued
@@ -385,7 +429,7 @@ running.
 
 An upgrade resolves only what the keystore does not already hold. Once both entries exist, step 1
 applies to both and nothing changes, whatever the credentials file contains. An upgrade never
-generates the AI Assistant key and never looks at the certificates.
+generates the AI Assistant key or the cookie password and never looks at the certificates.
 
 > **Note:** If you upgrade from a build that kept `wazuh_core.hosts.default.password` in
 > `opensearch_dashboards.yml` and you accept the new packaged file, that password is gone from the
