@@ -681,7 +681,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             title={
               <FormattedMessage
                 id='wazuhCheckUpdates.ctiRegistration.modalCancelConfirmMessage'
-                defaultMessage='Are you sure you want to cancel the registration? The activation code will stop working.'
+                defaultMessage='Are you sure you want to cancel the registration?'
               />
             }
             style={{ marginTop: 16 }}
