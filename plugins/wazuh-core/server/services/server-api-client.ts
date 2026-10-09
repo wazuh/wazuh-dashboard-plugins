@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -26,6 +26,16 @@ import { ISecurityFactory } from './security-factory';
  * upstream.
  */
 const ALLOWED_REQUEST_HEADERS = new Set(['content-type']);
+
+/**
+ * The Server API rate limits the requests with a `429 Too Many Requests`
+ * answer. A request that gets it is retried once per delay of this list, so the
+ * number of delays is the maximum number of retries.
+ */
+const RATE_LIMIT_STATUS_CODE = 429;
+const RATE_LIMIT_RETRY_DELAYS_MS = [1000, 2000, 4000];
+// Upper bound of the delay requested by the `Retry-After` header of the answer
+const RATE_LIMIT_MAX_RETRY_AFTER_MS = 10000;
 
 type RequestHTTPMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT';
 type RequestPath = string;
@@ -247,7 +257,9 @@ export class ServerAPIClient {
     api: IAPIHost,
   ): Error {
     if (error.response) {
-      return error;
+      return error.response.status === RATE_LIMIT_STATUS_CODE
+        ? this._createRateLimitError(error, apiHostID)
+        : error;
     }
 
     const host = `${api.url}:${api.port}`;
@@ -270,6 +282,72 @@ export class ServerAPIClient {
     (enhanced as any).code = code;
     (enhanced as any).response = error.response;
     return enhanced;
+  }
+
+  /**
+   * Build the error of a request that is still rate limited after the retries
+   * @param error Original error of the request, with the 429 response
+   * @param apiHostID Server API ID
+   * @returns Error that keeps the response and code of the original one
+   */
+  private _createRateLimitError(error: any, apiHostID: string): Error {
+    const rateLimitError = new Error(
+      `The server API [${apiHostID}] is rate limiting the requests of the dashboard (status code ${RATE_LIMIT_STATUS_CODE})`,
+    );
+    (rateLimitError as any).code = error.code;
+    (rateLimitError as any).response = error.response;
+    return rateLimitError;
+  }
+
+  /**
+   * Get the time to wait before retrying a rate limited request
+   * @param error Error of the request, with the 429 response
+   * @param retry Number of the retry, starting at 0
+   * @returns Delay in milliseconds
+   */
+  private _getRateLimitRetryDelay(error: any, retry: number): number {
+    const retryAfter = error.response?.headers?.['retry-after'];
+    const retryAfterSeconds =
+      retryAfter === undefined || retryAfter === null || retryAfter === ''
+        ? NaN
+        : Number(retryAfter);
+
+    return Number.isFinite(retryAfterSeconds) && retryAfterSeconds >= 0
+      ? Math.min(retryAfterSeconds * 1000, RATE_LIMIT_MAX_RETRY_AFTER_MS)
+      : RATE_LIMIT_RETRY_DELAYS_MS[retry];
+  }
+
+  /**
+   * Send a request to the Server API, retrying it when it is rate limited. Any
+   * other error is thrown as it is.
+   * @param options Axios request options
+   * @param apiHostID Server API ID
+   * @param retry Number of retries already done
+   * @returns
+   */
+  private async _sendRequest(
+    options: AxiosRequestConfig,
+    apiHostID: string,
+    retry = 0,
+  ): Promise<AxiosResponse> {
+    try {
+      return await this._axios(options);
+    } catch (error: any) {
+      if (
+        error?.response?.status !== RATE_LIMIT_STATUS_CODE ||
+        retry >= RATE_LIMIT_RETRY_DELAYS_MS.length
+      ) {
+        throw error;
+      }
+      const delay = this._getRateLimitRetryDelay(error, retry);
+      this.logger.warn(
+        `Server API [${apiHostID}] answered ${RATE_LIMIT_STATUS_CODE} (rate limited), retrying in ${delay}ms (attempt ${
+          retry + 1
+        } of ${RATE_LIMIT_RETRY_DELAYS_MS.length})`,
+      );
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return await this._sendRequest(options, apiHostID, retry + 1);
+    }
   }
 
   private _inferErrorCode(message: string): string {
@@ -344,7 +422,7 @@ export class ServerAPIClient {
       options,
     );
     try {
-      return await this._axios(optionsRequest);
+      return await this._sendRequest(optionsRequest, options.apiHostID);
     } catch (error: any) {
       const api = (await this.manageHosts.get(options.apiHostID)) as IAPIHost;
       throw this._enhanceConnectionError(error, options.apiHostID, api);
@@ -465,7 +543,10 @@ export class ServerAPIClient {
     };
 
     try {
-      const response: AxiosResponse = await this._axios(optionsRequest);
+      const response: AxiosResponse = await this._sendRequest(
+        optionsRequest,
+        apiHostID,
+      );
       const token: string = (((response || {}).data || {}).data || {}).token;
       return token;
     } catch (error: any) {

@@ -194,3 +194,193 @@ describe('ServerAPIClient.asInternalUser.request', () => {
     expect(internals._authenticate).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('ServerAPIClient rate limit (429) retries', () => {
+  interface RateLimitClientInternals {
+    _axios: jest.Mock;
+    _request: (
+      method: string,
+      path: string,
+      data: unknown,
+      options: unknown,
+    ) => Promise<unknown>;
+    _authenticate: (
+      apiHostID: string,
+      options: { useRunAs: boolean },
+    ) => Promise<string>;
+  }
+
+  const rateLimited = (headers: Record<string, string> = {}) => ({
+    message: 'Request failed with status code 429',
+    response: { status: 429, headers },
+  });
+  const serverError = () => ({
+    message: 'Request failed with status code 500',
+    response: { status: 500, headers: {} },
+  });
+
+  const setup = () => {
+    const { client, logger } = createClient();
+    const internals = client as unknown as RateLimitClientInternals;
+    internals._axios = jest.fn();
+    const request = () =>
+      internals._request(
+        'GET',
+        '/agents',
+        {},
+        {
+          apiHostID: 'default',
+          token: 'server-session-token',
+        },
+      );
+    const authenticate = () =>
+      internals._authenticate('default', { useRunAs: false });
+
+    return { internals, logger, request, authenticate };
+  };
+
+  /* Jest 28 has no async timer advance: flush the pending promises with the
+     real setImmediate so the retry timer is registered, advance the clock and
+     flush again to let the retry run. */
+  const { setImmediate: realSetImmediate } = jest.requireActual('timers');
+  const flushPromises = () => new Promise(resolve => realSetImmediate(resolve));
+  const advanceTime = async (ms: number) => {
+    await flushPromises();
+    jest.advanceTimersByTime(ms);
+    await flushPromises();
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('retries a 429 answer and resolves when a later attempt succeeds', async () => {
+    const { internals, logger, request } = setup();
+    internals._axios
+      .mockRejectedValueOnce(rateLimited())
+      .mockRejectedValueOnce(rateLimited())
+      .mockResolvedValueOnce({ status: 200 });
+
+    const result = request();
+    await advanceTime(1000);
+    expect(internals._axios).toHaveBeenCalledTimes(2);
+    await advanceTime(2000);
+
+    await expect(result).resolves.toEqual({ status: 200 });
+    expect(internals._axios).toHaveBeenCalledTimes(3);
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Server API [default] answered 429 (rate limited), retrying in 1000ms (attempt 1 of 3)',
+    );
+    expect(logger.warn).toHaveBeenCalledWith(
+      'Server API [default] answered 429 (rate limited), retrying in 2000ms (attempt 2 of 3)',
+    );
+  });
+
+  it('waits the Retry-After seconds before retrying', async () => {
+    const { internals, request } = setup();
+    internals._axios
+      .mockRejectedValueOnce(rateLimited({ 'retry-after': '3' }))
+      .mockResolvedValueOnce({ status: 200 });
+
+    const result = request();
+    await advanceTime(2999);
+    expect(internals._axios).toHaveBeenCalledTimes(1);
+    await advanceTime(1);
+
+    await expect(result).resolves.toEqual({ status: 200 });
+    expect(internals._axios).toHaveBeenCalledTimes(2);
+  });
+
+  it('caps the Retry-After delay', async () => {
+    const { internals, request } = setup();
+    internals._axios
+      .mockRejectedValueOnce(rateLimited({ 'retry-after': '120' }))
+      .mockResolvedValueOnce({ status: 200 });
+
+    const result = request();
+    await advanceTime(9999);
+    expect(internals._axios).toHaveBeenCalledTimes(1);
+    await advanceTime(1);
+
+    await expect(result).resolves.toEqual({ status: 200 });
+    expect(internals._axios).toHaveBeenCalledTimes(2);
+  });
+
+  it('uses the default backoff when Retry-After is not a number', async () => {
+    const { internals, request } = setup();
+    internals._axios
+      .mockRejectedValueOnce(
+        rateLimited({ 'retry-after': 'Wed, 21 Oct 2026 07:28:00 GMT' }),
+      )
+      .mockResolvedValueOnce({ status: 200 });
+
+    const result = request();
+    await advanceTime(1000);
+
+    await expect(result).resolves.toEqual({ status: 200 });
+    expect(internals._axios).toHaveBeenCalledTimes(2);
+  });
+
+  it('gives up after the maximum retries and reports the rate limiting', async () => {
+    const { internals, request } = setup();
+    internals._axios.mockRejectedValue(rateLimited());
+
+    const result = request();
+    const assertion = expect(result).rejects.toMatchObject({
+      message:
+        'The server API [default] is rate limiting the requests of the dashboard (status code 429)',
+      response: { status: 429 },
+    });
+    await advanceTime(1000);
+    await advanceTime(2000);
+    await advanceTime(4000);
+
+    await assertion;
+    expect(internals._axios).toHaveBeenCalledTimes(4);
+  });
+
+  it('does not retry an answer that is not a 429', async () => {
+    const { internals, logger, request } = setup();
+    internals._axios.mockRejectedValue(serverError());
+
+    await expect(request()).rejects.toMatchObject({
+      response: { status: 500 },
+    });
+    expect(internals._axios).toHaveBeenCalledTimes(1);
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
+
+  it('does not retry an error without a response', async () => {
+    const { internals, request } = setup();
+    internals._axios.mockRejectedValue(
+      Object.assign(new Error('connect ECONNREFUSED'), {
+        code: 'ECONNREFUSED',
+      }),
+    );
+
+    await expect(request()).rejects.toMatchObject({ code: 'ECONNREFUSED' });
+    expect(internals._axios).toHaveBeenCalledTimes(1);
+  });
+
+  it('retries a 429 answer to the login request', async () => {
+    const { internals, authenticate } = setup();
+    internals._axios
+      .mockRejectedValueOnce(rateLimited())
+      .mockResolvedValueOnce({ data: { data: { token: 'new-token' } } });
+
+    const result = authenticate();
+    await advanceTime(1000);
+
+    await expect(result).resolves.toBe('new-token');
+    expect(internals._axios).toHaveBeenCalledTimes(2);
+    expect(internals._axios).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        url: 'https://server-api:55000/security/user/authenticate',
+      }),
+    );
+  });
+});
