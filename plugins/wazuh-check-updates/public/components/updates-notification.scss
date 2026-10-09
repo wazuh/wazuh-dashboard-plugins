@@ -1,3 +1,13 @@
 .wz-check-updates-bottom-bar {
   margin-left: 320px;
 }
+
+// EUI pads <body> for the bar, but the page scrolls past the fixed-height body.
+.wz-check-updates-has-bottom-bar > #opensearch-dashboards-body {
+  padding-bottom: inherit;
+}
+
+// A global `:focus { outline: none !important }` hides the default ring.
+.wz-check-updates-bar .euiButtonEmpty:focus-visible {
+  box-shadow: 0 0 0 2px currentColor;
+}

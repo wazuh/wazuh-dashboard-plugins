@@ -532,6 +532,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                               {(copy: () => void) => (
                                 <EuiButtonEmpty
                                   size='xs'
+                                  color='text'
                                   iconType='copyClipboard'
                                   onClick={copy}
                                   data-test-subj='ctiRegistrationCopyDeploymentId'

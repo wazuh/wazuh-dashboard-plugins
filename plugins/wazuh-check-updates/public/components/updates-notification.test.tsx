@@ -91,6 +91,11 @@ describe('UpdatesNotification component', () => {
 
     const checkUpdatesButton = getByRole('button', { name: 'Dismiss' });
     expect(checkUpdatesButton).toBeInTheDocument();
+
+    expect(
+      getByRole('region', { name: 'New release notification' }),
+    ).toBeInTheDocument();
+    expect(document.body).toHaveClass('wz-check-updates-has-bottom-bar');
   });
 
   test('should return null when user close notification', async () => {
