@@ -7,13 +7,12 @@ import { StatusCtiRegistration } from './components/status-cti-registration';
 import { ModalCti } from './components/modal-cti';
 import { useCtiStatus } from './hooks/useCtiStatus';
 import { statusCodes } from '../../../common/constants';
-import { ctiFlowState } from '../../services/cti-flow-state';
 import { getCtiRegistrationStatusPollIntervalSec } from '../../plugin-services';
 
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
-  const { statusCTI, loading, refetchStatus } = useCtiStatus(
+  const { statusCTI, loading, deviceFlowActive, refetchStatus } = useCtiStatus(
     deviceFlowNonce,
     getCtiRegistrationStatusPollIntervalSec(),
   );
@@ -21,10 +20,6 @@ export const CtiRegistration = () => {
   const handleModalToggle = () => {
     setIsModalOpen(!isModalOpen);
   };
-
-  const deviceFlowActive =
-    Boolean(ctiFlowState.getDeviceCode()) &&
-    !ctiFlowState.isRegistrationComplete();
 
   const isSuccess = statusCTI.status === statusCodes.SUCCESS;
   const isFailed = statusCTI.status === statusCodes.REGISTRATION_FAILED;

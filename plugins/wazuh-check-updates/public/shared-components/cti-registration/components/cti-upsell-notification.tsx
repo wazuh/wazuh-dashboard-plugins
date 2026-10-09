@@ -12,7 +12,6 @@ import {
 import { ModalCti } from './modal-cti';
 import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
-import { ctiFlowState } from '../../../services/cti-flow-state';
 import { getWazuhCore } from '../../../plugin-services';
 
 const UPSELL_DISMISSED_KEY = 'wazuh.cti.upsell.dismissed';
@@ -31,13 +30,10 @@ export const CtiUpsellNotification = () => {
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
 
   const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
-  const { statusCTI, loading, refetchStatus } = useCtiStatus(deviceFlowNonce);
+  const { statusCTI, loading, deviceFlowActive, refetchStatus } =
+    useCtiStatus(deviceFlowNonce);
 
   const isRegistered = statusCTI.status === statusCodes.SUCCESS;
-  const deviceFlowActive =
-    Boolean(ctiFlowState.getDeviceCode()) &&
-    !ctiFlowState.isRegistrationComplete();
-
   const shouldShowBar =
     !loading &&
     !dismissed &&

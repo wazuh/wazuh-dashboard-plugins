@@ -8,7 +8,7 @@ jest.mock('../../../plugin-services', () => ({
 }));
 
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
@@ -34,6 +34,16 @@ jest.mock('@osd/i18n/react', () => ({
 }));
 
 const mockHttpGet = jest.fn();
+
+const notRegisteredStatus = {
+  registrationComplete: false,
+  inProgress: false,
+  subscription: {
+    // eslint-disable-next-line camelcase -- CM API field names
+    message: { plan: { name: '', is_public: true }, is_registered: false },
+    status: 200,
+  },
+};
 
 describe('CtiUpsellNotification', () => {
   beforeEach(() => {
@@ -71,17 +81,36 @@ describe('CtiUpsellNotification', () => {
   });
 
   test('shows the upsell bar when CM confirms the instance is not registered', async () => {
-    mockHttpGet.mockResolvedValue({
-      registrationComplete: false,
-      inProgress: false,
-      subscription: {
-        message: { plan: { name: '', is_public: true }, is_registered: false },
-        status: 200,
-      },
-    });
+    mockHttpGet.mockResolvedValue(notRegisteredStatus);
 
     render(<CtiUpsellNotification />);
 
     expect(await screen.findByText('Register now')).toBeInTheDocument();
+  });
+
+  describe('when another CTI control changes the flow', () => {
+    beforeEach(() => {
+      mockHttpGet.mockResolvedValue(notRegisteredStatus);
+    });
+
+    test('hides while a device flow is in progress and shows again when it ends', async () => {
+      render(<CtiUpsellNotification />);
+      expect(await screen.findByText('Register now')).toBeInTheDocument();
+
+      act(() => ctiFlowState.setDeviceCode('device-code'));
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+
+      act(() => ctiFlowState.reset());
+      expect(screen.getByText('Register now')).toBeInTheDocument();
+    });
+
+    test('hides once registration completes', async () => {
+      render(<CtiUpsellNotification />);
+      expect(await screen.findByText('Register now')).toBeInTheDocument();
+
+      act(() => ctiFlowState.setDeviceCode('device-code'));
+      act(() => ctiFlowState.setRegistrationComplete(true));
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+    });
   });
 });

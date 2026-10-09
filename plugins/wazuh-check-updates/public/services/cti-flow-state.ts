@@ -14,15 +14,46 @@ let deviceAuthExpiresAt: number | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
 let subscription: CtiSubscriptionSnapshot | null = null;
 let lastStatusFetchAtMs: number | null = null;
+let version = 0;
+const listeners = new Set<() => void>();
+
+const flowKey = () =>
+  `${deviceCode}|${registrationComplete}|${Boolean(
+    subscription?.message?.is_registered,
+  )}`;
+
+/** Runs `change` and notifies subscribers if the flow or registration state moved. */
+const track = (change: () => void): void => {
+  const before = flowKey();
+  change();
+  if (flowKey() !== before) {
+    version++;
+    listeners.forEach(listener => listener());
+  }
+};
 
 export const ctiFlowState = {
+  /** Lets every mounted CTI control re-render when another one changes the flow. */
+  subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  },
+
+  getVersion(): number {
+    return version;
+  },
+
   /** Whether CM subscription reports this environment as registered. */
   isRegistered(): boolean {
     return Boolean(subscription?.message?.is_registered);
   },
 
   setSubscription(value: CtiSubscriptionSnapshot | null): void {
-    subscription = value;
+    track(() => {
+      subscription = value;
+    });
   },
 
   getSubscription(): CtiSubscriptionSnapshot | null {
@@ -34,10 +65,12 @@ export const ctiFlowState = {
   },
 
   setDeviceCode(code: string | null): void {
-    deviceCode = code && code.length > 0 ? code : null;
-    if (!deviceCode) {
-      deviceAuthLinks = null;
-    }
+    track(() => {
+      deviceCode = code && code.length > 0 ? code : null;
+      if (!deviceCode) {
+        deviceAuthLinks = null;
+      }
+    });
   },
 
   getDeviceAuthLinks(): CtiDeviceAuthorization | null {
@@ -53,12 +86,14 @@ export const ctiFlowState = {
   },
 
   setRegistrationComplete(complete: boolean): void {
-    registrationComplete = complete;
-    if (complete) {
-      deviceCode = null;
-      deviceAuthExpiresAt = null;
-      deviceAuthLinks = null;
-    }
+    track(() => {
+      registrationComplete = complete;
+      if (complete) {
+        deviceCode = null;
+        deviceAuthExpiresAt = null;
+        deviceAuthLinks = null;
+      }
+    });
   },
 
   getPollIntervalSec(): number {
@@ -106,12 +141,14 @@ export const ctiFlowState = {
   },
 
   reset(): void {
-    deviceCode = null;
-    registrationComplete = false;
-    pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
-    deviceAuthExpiresAt = null;
-    deviceAuthLinks = null;
-    subscription = null;
-    lastStatusFetchAtMs = null;
+    track(() => {
+      deviceCode = null;
+      registrationComplete = false;
+      pollIntervalSeconds = CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC;
+      deviceAuthExpiresAt = null;
+      deviceAuthLinks = null;
+      subscription = null;
+      lastStatusFetchAtMs = null;
+    });
   },
 };
