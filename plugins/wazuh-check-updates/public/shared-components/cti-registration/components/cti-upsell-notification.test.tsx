@@ -166,4 +166,57 @@ describe('CtiUpsellNotification', () => {
     unmount();
     expect(ctiUpsellBarVisible$.getValue()).toBe(false);
   });
+
+  describe('when another CTI control changes the flow', () => {
+    beforeEach(() => {
+      mockResponses(NOT_REGISTERED_STATUS);
+    });
+
+    test('hides while a device flow is in progress and shows again when it ends', async () => {
+      render(<CtiUpsellNotification />);
+      expect(await screen.findByText('Register now')).toBeInTheDocument();
+
+      act(() => ctiFlowState.setDeviceCode('device-code'));
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+
+      act(() => ctiFlowState.reset());
+      expect(screen.getByText('Register now')).toBeInTheDocument();
+    });
+
+    test('hides while a registration modal is open and shows again when it closes', async () => {
+      render(<CtiUpsellNotification />);
+      expect(await screen.findByText('Register now')).toBeInTheDocument();
+
+      let closeModal = () => {};
+      act(() => {
+        closeModal = ctiFlowState.openModal();
+      });
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+
+      act(() => closeModal());
+      expect(screen.getByText('Register now')).toBeInTheDocument();
+    });
+
+    test('keeps the bottom bar slot while a registration modal is open', async () => {
+      render(<CtiUpsellNotification />);
+      await screen.findByText('Register now');
+
+      let closeModal = () => {};
+      act(() => {
+        closeModal = ctiFlowState.openModal();
+      });
+      const heldWhileOpen = ctiUpsellBarVisible$.getValue();
+      act(() => closeModal());
+      expect(heldWhileOpen).toBe(true);
+    });
+
+    test('hides once registration completes', async () => {
+      render(<CtiUpsellNotification />);
+      expect(await screen.findByText('Register now')).toBeInTheDocument();
+
+      act(() => ctiFlowState.setDeviceCode('device-code'));
+      act(() => ctiFlowState.setRegistrationComplete(true));
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+    });
+  });
 });

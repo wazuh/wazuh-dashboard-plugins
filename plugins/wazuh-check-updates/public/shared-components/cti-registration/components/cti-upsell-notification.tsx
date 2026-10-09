@@ -12,7 +12,6 @@ import {
 import { ModalCti } from './modal-cti';
 import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
-import { ctiFlowState } from '../../../services/cti-flow-state';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { getWazuhCore } from '../../../plugin-services';
 import { useUserPreferences } from '../../../hooks';
@@ -23,7 +22,8 @@ export const CtiUpsellNotification = () => {
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
 
   const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
-  const { statusCTI, loading, refetchStatus } = useCtiStatus(deviceFlowNonce);
+  const { statusCTI, loading, deviceFlowActive, modalOpen, refetchStatus } =
+    useCtiStatus(deviceFlowNonce);
   const {
     userPreferences,
     isLoading: isLoadingPreferences,
@@ -31,17 +31,13 @@ export const CtiUpsellNotification = () => {
   } = useUserPreferences();
 
   const isRegistered = statusCTI.status === statusCodes.SUCCESS;
-  const deviceFlowActive =
-    Boolean(ctiFlowState.getDeviceCode()) &&
-    !ctiFlowState.isRegistrationComplete();
-
   const shouldShowBar =
     !loading &&
     !isLoadingPreferences &&
     !dismissed &&
     !userPreferences.hide_cti_upsell &&
     !isRegistered &&
-    !isRegisterModalOpen &&
+    !modalOpen &&
     !deviceFlowActive &&
     (statusCTI.status === statusCodes.NOT_FOUND ||
       statusCTI.status === statusCodes.REGISTRATION_FAILED);
@@ -50,7 +46,7 @@ export const CtiUpsellNotification = () => {
     !dismissed &&
     !userPreferences.hide_cti_upsell &&
     !isRegistered &&
-    (loading || isLoadingPreferences || isRegisterModalOpen || shouldShowBar);
+    (loading || isLoadingPreferences || modalOpen || shouldShowBar);
 
   useEffect(() => {
     ctiUpsellBarVisible$.next(holdsBottomBar);
