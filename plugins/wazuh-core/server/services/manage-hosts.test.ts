@@ -264,6 +264,34 @@ describe('ManageHosts Service', () => {
       expect(usersMeCalls()).toBe(1);
     });
 
+    it('keeps run_as when only the cluster info is rate limited and fetches it again', async () => {
+      let clusterInfo: () => Promise<unknown> = () =>
+        Promise.reject(rateLimitError());
+
+      mockServerAPIClient.asInternalUser.request.mockImplementation(
+        (_method: string, path: string) =>
+          path === '/security/users/me'
+            ? Promise.resolve(USERS_ME)
+            : clusterInfo(),
+      );
+
+      const [partialEntry] = await manageHosts.getEntries();
+
+      expect(partialEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
+
+      clusterInfo = () => Promise.resolve(CLUSTER_LOCAL_INFO);
+
+      const [completeEntry] = await manageHosts.getEntries();
+
+      expect(completeEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+      expect(completeEntry.cluster_info).toEqual({
+        node: 'node01',
+        cluster: 'wazuh',
+      });
+      expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
+    });
+
     it('logs the cause of the failure without the credentials', async () => {
       answerRequests(() => Promise.reject(rateLimitError()));
 
