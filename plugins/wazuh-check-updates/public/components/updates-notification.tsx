@@ -8,6 +8,7 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useUserPreferences } from '../hooks';
 import { areThereNewUpdates } from '../utils';
@@ -92,7 +93,14 @@ export const UpdatesNotification = () => {
   return mustNotifyUser ? (
     <I18nProvider>
       <EuiBottomBar
-        className={sideNavDocked ? 'wz-check-updates-bottom-bar' : ''}
+        className={`wz-check-updates-bar${
+          sideNavDocked ? ' wz-check-updates-bottom-bar' : ''
+        }`}
+        bodyClassName='wz-check-updates-has-bottom-bar'
+        landmarkHeading={i18n.translate(
+          'wazuhCheckUpdates.updatesNotification.landmarkHeading',
+          { defaultMessage: 'New release notification' },
+        )}
       >
         <EuiFlexGroup
           justifyContent='spaceBetween'

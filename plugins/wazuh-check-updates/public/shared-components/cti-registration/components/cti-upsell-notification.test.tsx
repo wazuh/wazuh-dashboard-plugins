@@ -100,6 +100,17 @@ describe('CtiUpsellNotification', () => {
     expect(await screen.findByText('Register now')).toBeInTheDocument();
   });
 
+  test('names the bar landmark and pads the page while it shows', async () => {
+    mockResponses(NOT_REGISTERED_STATUS);
+
+    render(<CtiUpsellNotification />);
+
+    expect(
+      await screen.findByRole('region', { name: 'Wazuh Cloud registration' }),
+    ).toBeInTheDocument();
+    expect(document.body).toHaveClass('wz-check-updates-has-bottom-bar');
+  });
+
   test('does not show the upsell bar when the user dismissed it before', async () => {
     mockResponses(NOT_REGISTERED_STATUS, { hide_cti_upsell: true });
 

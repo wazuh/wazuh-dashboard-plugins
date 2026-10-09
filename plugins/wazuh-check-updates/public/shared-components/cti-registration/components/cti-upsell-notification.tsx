@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import {
   EuiBottomBar,
@@ -73,7 +74,14 @@ export const CtiUpsellNotification = () => {
       <>
         {shouldShowBar && (
           <EuiBottomBar
-            className={sideNavDocked ? 'wz-check-updates-bottom-bar' : ''}
+            className={`wz-check-updates-bar${
+              sideNavDocked ? ' wz-check-updates-bottom-bar' : ''
+            }`}
+            bodyClassName='wz-check-updates-has-bottom-bar'
+            landmarkHeading={i18n.translate(
+              'wazuhCheckUpdates.ctiUpsell.landmarkHeading',
+              { defaultMessage: 'Wazuh Cloud registration' },
+            )}
             data-test-subj='ctiUpsellBar'
           >
             <EuiFlexGroup
