@@ -7,7 +7,9 @@ import { StatusCtiRegistration } from './components/status-cti-registration';
 import { ModalCti } from './components/modal-cti';
 import { useCtiStatus } from './hooks/useCtiStatus';
 import { statusCodes } from '../../../common/constants';
+import { ctiFlowState } from '../../services/cti-flow-state';
 import { getCtiRegistrationStatusPollIntervalSec } from '../../plugin-services';
+import { cancelCtiRegistration } from '../../services/cti-registration-status';
 
 export const CtiRegistration = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,7 +19,24 @@ export const CtiRegistration = () => {
     getCtiRegistrationStatusPollIntervalSec(),
   );
 
+  const cancelPendingActivation = async () => {
+    try {
+      await cancelCtiRegistration();
+    } catch {
+      // The refetch below rehydrates whatever state the server still holds.
+    }
+    ctiFlowState.reset();
+    // Re-run the polling effect so its pending timeout is cleared.
+    setDeviceFlowNonce(n => n + 1);
+    await refetchStatus();
+  };
+
   const handleModalToggle = () => {
+    // Every close path (button, X, overlay, Escape) routes here: closing the
+    // modal during a pending activation cancels it.
+    if (isModalOpen && deviceFlowActive && !ctiFlowState.isRegistered()) {
+      cancelPendingActivation();
+    }
     setIsModalOpen(!isModalOpen);
   };
 
