@@ -207,6 +207,8 @@ describe('ManageHosts Service', () => {
       mockServerAPIClient.asInternalUser.request.mock.calls.filter(
         ([, path]) => path === '/security/users/me',
       ).length;
+    const COOLDOWN_MS = 60000;
+    let now = 0;
 
     beforeEach(() => {
       mockServerAPIClient.asInternalUser.request.mockReset();
@@ -222,9 +224,15 @@ describe('ManageHosts Service', () => {
       manageHosts.setServerAPIClient(
         mockServerAPIClient as unknown as ServerAPIClient,
       );
+      now = 0;
+      jest.spyOn(Date, 'now').mockImplementation(() => now);
     });
 
-    it('refreshes the entry that could not check run_as on the next call', async () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('refreshes a rate limited entry only after the cooldown', async () => {
       answerRequests(() => Promise.reject(rateLimitError()));
 
       const [rateLimitedEntry] = await manageHosts.getEntries();
@@ -235,9 +243,15 @@ describe('ManageHosts Service', () => {
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
 
       answerRequests(() => Promise.resolve(USERS_ME));
+      now = COOLDOWN_MS - 1;
+      await manageHosts.getEntries();
 
+      expect(usersMeCalls()).toBe(1);
+
+      now = COOLDOWN_MS;
       const [recoveredEntry] = await manageHosts.getEntries();
 
+      expect(usersMeCalls()).toBe(2);
       expect(recoveredEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
       expect(manageHosts.isEnabledAuthWithRunAs(HOST_ID)).toBe(true);
@@ -264,32 +278,52 @@ describe('ManageHosts Service', () => {
       expect(usersMeCalls()).toBe(1);
     });
 
-    it('keeps run_as when only the cluster info is rate limited and fetches it again', async () => {
-      let clusterInfo: () => Promise<unknown> = () =>
-        Promise.reject(rateLimitError());
+    it('keeps the last known run_as while the refresh is rate limited', async () => {
+      let usersMe = () => Promise.resolve(USERS_ME);
+      let clusterInfo = () => Promise.reject(rateLimitError());
 
       mockServerAPIClient.asInternalUser.request.mockImplementation(
         (_method: string, path: string) =>
-          path === '/security/users/me'
-            ? Promise.resolve(USERS_ME)
-            : clusterInfo(),
+          path === '/security/users/me' ? usersMe() : clusterInfo(),
       );
+
+      await manageHosts.getEntries();
+      usersMe = () => Promise.reject(rateLimitError());
+      now = COOLDOWN_MS;
 
       const [partialEntry] = await manageHosts.getEntries();
 
+      expect(usersMeCalls()).toBe(2);
       expect(partialEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(true);
 
+      usersMe = () => Promise.resolve(USERS_ME);
       clusterInfo = () => Promise.resolve(CLUSTER_LOCAL_INFO);
+      now = 2 * COOLDOWN_MS;
 
       const [completeEntry] = await manageHosts.getEntries();
 
-      expect(completeEntry.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
       expect(completeEntry.cluster_info).toEqual({
         node: 'node01',
         cluster: 'wazuh',
       });
       expect(manageHosts.isRateLimited(HOST_ID)).toBe(false);
+    });
+
+    it('shares one refresh between concurrent calls', async () => {
+      answerRequests(() => Promise.reject(rateLimitError()));
+      await manageHosts.getEntries();
+      answerRequests(() => Promise.resolve(USERS_ME));
+      now = COOLDOWN_MS;
+
+      const [[first], [second]] = await Promise.all([
+        manageHosts.getEntries(),
+        manageHosts.getEntries(),
+      ]);
+
+      expect(usersMeCalls()).toBe(2);
+      expect(first.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
+      expect(second.allow_run_as).toBe(API_USER_STATUS_RUN_AS.ENABLED);
     });
 
     it('logs a failure that is not a rate limit at debug level', async () => {
