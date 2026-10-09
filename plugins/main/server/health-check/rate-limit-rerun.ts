@@ -41,7 +41,9 @@ export const createRateLimitRerun = ({
       });
     } catch (error) {
       logger.debug(
-        `Could not run again the task [${taskName}]: ${error.message}`,
+        `Could not run again the task [${taskName}]: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
       );
     }
   };
@@ -63,7 +65,6 @@ export const createRateLimitRerun = ({
         delayMs + staggerMs * timers.size,
       );
 
-      timer.unref?.();
       timers.set(taskName, timer);
       reruns.set(taskName, count + 1);
 
