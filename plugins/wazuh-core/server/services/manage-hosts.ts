@@ -187,13 +187,10 @@ export class ManageHosts {
       this.logger.debug('Getting registry');
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
 
-      // A host whose run_as could not be checked is fetched again, so a failure
-      // such as a rate limited request on startup is not kept until a restart
+      // A host whose registry data was rate limited is fetched again, so a 429
+      // on startup is not kept until a restart
       const hostsNeedingRegistry = hosts.filter(
-        host =>
-          !registry[host.id] ||
-          registry[host.id].allow_run_as ===
-            API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+        host => !registry[host.id] || registry[host.id].rateLimited === true,
       );
       const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
         const {
@@ -214,7 +211,7 @@ export class ManageHosts {
       };
       if (hostsNeedingRegistry.length > 0) {
         this.logger.debug(
-          `Found ${hostsNeedingRegistry.length} hosts without registry data or unable to check run_as, updating cache`,
+          `Found ${hostsNeedingRegistry.length} hosts without registry data or rate limited, updating cache`,
         );
 
         await Promise.allSettled(

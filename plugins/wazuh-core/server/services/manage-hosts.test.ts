@@ -252,7 +252,7 @@ describe('ManageHosts Service', () => {
       expect(usersMeCalls()).toBe(1);
     });
 
-    it('refreshes the entry that could not check run_as for a reason other than the rate limit', async () => {
+    it('does not request again the entry that failed for a reason other than the rate limit', async () => {
       answerRequests(() => Promise.reject(new Error('connect ECONNREFUSED')));
 
       await manageHosts.getEntries();
@@ -261,7 +261,7 @@ describe('ManageHosts Service', () => {
 
       await manageHosts.getEntries();
 
-      expect(usersMeCalls()).toBe(2);
+      expect(usersMeCalls()).toBe(1);
     });
 
     it('logs the cause of the failure without the credentials', async () => {
