@@ -46,6 +46,11 @@ function buildDeviceAuthLinksFromStatusBody(
   };
 }
 
+/** Cancels the pending device-flow activation on the server. */
+export async function cancelCtiRegistration(): Promise<void> {
+  await getCore().http.delete(routes.token);
+}
+
 export async function hydrateCtiFlowFromServer(): Promise<void> {
   const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
     routes.ctiRegistrationStatus,
