@@ -98,6 +98,9 @@ describe('CtiUpsellNotification', () => {
     render(<CtiUpsellNotification />);
 
     expect(await screen.findByText('Register now')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your instance already gets the Open feed/),
+    ).toBeInTheDocument();
   });
 
   test('names the bar landmark and pads the page while it shows', async () => {

@@ -120,6 +120,9 @@ describe('ModalCti component', () => {
     expect(
       screen.getByRole('button', { name: 'Register' }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your instance already gets the Open feed/),
+    ).toBeInTheDocument();
   });
 
   it('renders the Consumers accordion in the success view', async () => {
@@ -635,7 +638,7 @@ describe('ModalCti component', () => {
         ).toBeInTheDocument();
       });
       expect(
-        screen.queryByText(/Register your Wazuh XDR to receive/),
+        screen.queryByText(/Your instance already gets the Open feed/),
       ).not.toBeInTheDocument();
     });
 
