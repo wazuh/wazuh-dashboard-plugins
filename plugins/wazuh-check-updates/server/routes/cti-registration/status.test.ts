@@ -169,7 +169,10 @@ describe('CTI registration status route', () => {
       expires_in: 600,
       interval: 8,
     });
-    CtiRegistrationStore.getInstance().setInProgress('env-uuid-1', parsed);
+    CtiRegistrationStore.getInstance().setInProgress('env-uuid-1', {
+      ...parsed,
+      deviceAuthStartedAtMs: Date.now() - 90 * 1000,
+    });
 
     const response = await supertest(innerServer.listener)
       .get(routes.ctiRegistrationStatus)
@@ -181,6 +184,8 @@ describe('CTI registration status route', () => {
     expect(response.body.user_code).toBe('WZH-9');
     expect(response.body.poll_interval_sec).toBe(8);
     expect(typeof response.body.expires_in_remaining_sec).toBe('number');
+    expect(response.body.pending_for_sec).toBe(90);
+    expect(response.body.environment_uid).toBe('env-uuid-1');
     expect(response.body.subscription).toEqual({
       message: null,
       status: null,
@@ -224,7 +229,15 @@ describe('CTI registration status route', () => {
     });
   });
 
-  test(`GET ${routes.ctiRegistrationStatus} clears stale store when registration completed but CM is not registered`, async () => {
+  test(`GET ${routes.ctiRegistrationStatus} clears stale store when CM confirms the instance is not registered`, async () => {
+    mockedGetCtiSubscriptionStatus.mockResolvedValueOnce({
+      message: {
+        plan: { name: '', is_public: true },
+        is_registered: false,
+      },
+      status: 200,
+    });
+
     const parsed = parseDeviceAuthorizationForStore({
       device_code: 'dc1',
       user_code: 'WZH-1',
@@ -243,9 +256,41 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
-      subscription: { message: null, status: null },
+      subscription: {
+        message: { plan: { name: '', is_public: true }, is_registered: false },
+        status: 200,
+      },
     });
     expect(store.getStatus('env-uuid-1')).toBeUndefined();
+  });
+
+  test(`GET ${routes.ctiRegistrationStatus} keeps a completed registration when the subscription status is unknown (502)`, async () => {
+    mockedGetCtiSubscriptionStatus.mockResolvedValueOnce({
+      message: null,
+      status: 502,
+    });
+
+    const parsed = parseDeviceAuthorizationForStore({
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      expires_in: 600,
+      interval: 5,
+    });
+    const store = CtiRegistrationStore.getInstance();
+    store.setInProgress('env-uuid-1', parsed);
+    store.setRegistrationComplete('env-uuid-1');
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiRegistrationStatus)
+      .expect(200);
+
+    expect(response.body).toEqual({
+      registrationComplete: true,
+      inProgress: false,
+      subscription: { message: null, status: 502 },
+    });
+    expect(store.getStatus('env-uuid-1')).toBeDefined();
   });
 
   describe('content-update trigger integration', () => {

@@ -29,6 +29,44 @@ import {
   DESCRIPTION_PREFIX,
 } from './constants';
 
+// Timeouts, refused connections (503) and circuit-breaker rejections (429) usually pass.
+const TRANSIENT_STATUS_CODES = new Set([429, 503]);
+const RETRY_DELAYS_MS = [1000, 2000, 4000];
+function getStatusCode(error: unknown): number | undefined {
+  return (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
+}
+
+function isTransientError(error: unknown) {
+  const statusCode = getStatusCode(error);
+  return statusCode !== undefined && TRANSIENT_STATUS_CODES.has(statusCode);
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+async function withRetries<T>(
+  operation: () => Promise<T>,
+  logger: InitializationTaskRunContext['logger'],
+  attempt = 0,
+): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    const delay = RETRY_DELAYS_MS[attempt];
+
+    if (delay === undefined || !isTransientError(error)) {
+      throw error;
+    }
+
+    logger.warn(
+      `Transient error [${getErrorMessage(error)}], retrying in ${delay}ms`,
+    );
+    await new Promise(resolve => setTimeout(resolve, delay));
+    return withRetries(operation, logger, attempt + 1);
+  }
+}
+
 function toSentenceCase(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 }
@@ -74,9 +112,7 @@ async function isSavedObjectPresent(
       return existing;
     }
   } catch (error) {
-    const status =
-      (error as any)?.output?.statusCode ?? (error as any)?.statusCode;
-    if (status !== 404) {
+    if (getStatusCode(error) !== 404) {
       throw error;
     }
   }
@@ -179,37 +215,82 @@ export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations
           extension: DEFAULT_EXTENSION,
         });
 
-        for (const dashboardDefinition of dashboardsWithVisualizations) {
+        const failures: { file: string; error: string }[] = [];
+
+        // A non-transient failure must not skip the files after it.
+        for (const [
+          index,
+          dashboardDefinition,
+        ] of dashboardsWithVisualizations.entries()) {
           ctx.logger.debug(
             `Processing dashboard definition file [${dashboardDefinition.relativeFilePath}]`,
           );
 
-          await Promise.all(
-            dashboardDefinition.visualizations.map(visualization =>
-              ensureVisualizationSavedObject(
-                client,
-                visualization,
-                ctx.logger,
-                shouldOverwrite,
+          try {
+            await Promise.all(
+              dashboardDefinition.visualizations.map(visualization =>
+                withRetries(
+                  () =>
+                    ensureVisualizationSavedObject(
+                      client,
+                      visualization,
+                      ctx.logger,
+                      shouldOverwrite,
+                    ),
+                  ctx.logger,
+                ),
               ),
-            ),
-          );
+            );
 
-          await ensureDashboardSavedObject(
-            client,
-            dashboardDefinition.dashboard,
-            ctx.logger,
-            shouldOverwrite,
-          );
+            await withRetries(
+              () =>
+                ensureDashboardSavedObject(
+                  client,
+                  dashboardDefinition.dashboard,
+                  ctx.logger,
+                  shouldOverwrite,
+                ),
+              ctx.logger,
+            );
+          } catch (error) {
+            const message = getErrorMessage(error);
+            ctx.logger.error(
+              `Error provisioning dashboard definition file [${dashboardDefinition.relativeFilePath}]: ${message}`,
+            );
+            failures.push({
+              file: dashboardDefinition.relativeFilePath,
+              error: message,
+            });
+
+            // Stop so the dashboard start is not held; the scheduled run creates the rest.
+            if (isTransientError(error)) {
+              dashboardsWithVisualizations
+                .slice(index + 1)
+                .forEach(({ relativeFilePath }) =>
+                  failures.push({
+                    file: relativeFilePath,
+                    error: 'Not attempted: the indexer kept failing',
+                  }),
+                );
+              break;
+            }
+          }
         }
 
         ctx.logger.debug('Saved objects provisioning finished');
 
+        if (failures.length > 0) {
+          return ctx.taskResult.warning(
+            `Could not provision ${failures.length} of ${dashboardsWithVisualizations.length} dashboard definition files. First error [${failures[0].file}]: ${failures[0].error}`,
+            { failures },
+          );
+        }
+
         return ctx.taskResult.ok();
       } catch (error) {
-        const message = `Error provisioning saved objects: ${
-          error instanceof Error ? error.message : String(error)
-        }`;
+        const message = `Error provisioning saved objects: ${getErrorMessage(
+          error,
+        )}`;
         ctx.logger.error(message);
         throw new Error(message);
       }

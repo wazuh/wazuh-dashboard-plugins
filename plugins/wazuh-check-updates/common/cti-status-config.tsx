@@ -8,7 +8,10 @@ export const statusData = {
     color: 'warning',
     onClickAriaLabel: i18n.translate(
       'wazuhCheckUpdates.ctiRegistration.statusAriaLabel.pending',
-      { defaultMessage: 'View pending to start CTI registration' },
+      {
+        defaultMessage:
+          'Wazuh Cloud activation pending. View activation details.',
+      },
     ),
     message: () => (
       <FormattedMessage

@@ -38,6 +38,7 @@ const HomeOverviewBody: React.FC = () => {
   return (
     <>
       <SectionHeader
+        headingLevel='h1'
         title={i18n.translate('wazuh.common.homeOverview.title', {
           defaultMessage: 'Overview',
         })}

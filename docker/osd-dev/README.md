@@ -108,10 +108,11 @@ Always use the provided script to bring up or down the development environment. 
   - Agents in this mode enroll with an **enrollment token**, not a static
     password: at startup each agent container mints its own token from the
     manager's Server API (`POST /agents/enrollment-tokens`), authenticating
-    with `API_USERNAME`/`API_PASSWORD` (defaulting to `wazuh-wui:wazuh-wui`,
-    which the manager container seeds into its RBAC database), then installs
-    the package with `WAZUH_ENROLLMENT_TOKEN`. `API_PASSWORD=... ./dev.sh up ...`
-    changes the `wazuh-wui` password on both sides; see
+    with `API_USERNAME`/`API_PASSWORD` (defaulting to
+    `wazuh-internal-client:wazuh-internal-client`, which the manager container
+    seeds into its RBAC database), then installs the package with
+    `WAZUH_ENROLLMENT_TOKEN`. `API_PASSWORD=... ./dev.sh up ...` changes the
+    `wazuh-internal-client` password on both sides; see
     [`manager/README.md`](manager/README.md#credentials).
   - If neither `--server` nor `--server-local` is specified, a standard development environment is deployed (profile standard).
 - --indexer-local [tag]: (Optional) Deploys an environment with a local Wazuh indexer package using the given image tag (e.g., my-custom-image) for IMAGE_INDEXER_PACKAGE_TAG.

@@ -585,6 +585,8 @@ export const WAZUH_CONFIGURATION_CACHE_TIME = 10000; // time in ms;
 // Reserved ids for Users/Role mapping
 export const WAZUH_API_RESERVED_ID_LOWER_THAN = 100;
 export const WAZUH_API_RESERVED_WUI_SECURITY_RULES = [1, 2];
+// Server API user the dashboard authenticates with (reserved ID 2)
+export const WAZUH_API_INTERNAL_CLIENT_USERNAME = 'wazuh-internal-client';
 
 // Queue
 export const WAZUH_QUEUE_CRON_FREQ = '*/15 * * * * *'; // Every 15 seconds

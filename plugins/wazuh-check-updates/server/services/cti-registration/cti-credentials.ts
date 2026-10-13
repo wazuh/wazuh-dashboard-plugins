@@ -38,7 +38,14 @@ function normalizeSubscriptionMessage(
 /**
  * Reads CTI subscription payload from the indexer Content Manager plugin
  * `GET /_plugins/_content_manager/subscription` (no query params; cluster-scoped).
- * On request failure returns nulls (same as “not registered” for UX).
+ *
+ * `transport.request` throws on any HTTP status >= 400. A `401` (token
+ * rejected) never reaches here: the Content Manager already answers that
+ * case with a `200` and a public plan. What does reach here is a `502`
+ * (CTI Console unreachable; registration unchanged) or a lower-level
+ * network/timeout failure, so the thrown status is preserved instead of
+ * being discarded, letting callers tell "unknown" apart from "not
+ * registered".
  */
 export async function getCtiSubscriptionStatus(
   wazuhClient: IScopedClusterClient,
@@ -63,7 +70,12 @@ export async function getCtiSubscriptionStatus(
           ? statusFromResponse
           : null,
     };
-  } catch {
-    return { message: null, status: null };
+  } catch (error) {
+    const statusCode = (error as { meta?: { statusCode?: number } })?.meta
+      ?.statusCode;
+    return {
+      message: null,
+      status: typeof statusCode === 'number' ? statusCode : null,
+    };
   }
 }

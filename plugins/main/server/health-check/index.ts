@@ -4,3 +4,4 @@ export * from './types';
 export * from './saved-objects';
 export * from './certificate-validity';
 export * from './certificate-validity-evaluator';
+export * from './rate-limit-rerun';

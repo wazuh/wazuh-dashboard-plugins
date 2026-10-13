@@ -15,7 +15,7 @@ Use this task to:
 - **Source of truth**: definitions live under `plugins/main/common/dashboards/dashboard-definitions` (recursively) with the `.ndjson` extension.
 - **Supported objects**: `visualization` and `dashboard` types. Each definition file must contain exactly one dashboard plus its referenced visualizations (one JSON document per line).
 - **Creation and overwrite**: on the **initial** health check run (`scope === 'internal-initial'`, which happens on every dashboard restart, not only the first install), the task creates every object with `overwrite: true` — any manual edit a user made to one of these provided dashboards/visualizations is reverted back to the repository definition. On later, non-initial runs it checks whether each object already exists and, if present, skips it (`overwrite: false`); only missing objects get created. Every write uses `refresh: true`.
-- **Execution context**: runs under the Dashboard internal user in the `Global` tenant through the health check lifecycle. Any parsing or creation error will fail the task and surface in the health check status.
+- **Execution context**: runs under the Dashboard internal user in the `Global` tenant through the health check lifecycle. A parsing error fails the task. Transient indexer errors (timeouts, refused connections, `429` and circuit-breaker rejections) are retried up to three times with a backoff (1 s, 2 s, 4 s). Any other failed write skips only its definition file: the task provisions the other files. If a transient error persists after the retries, the task stops, so the dashboard start is not held, and the next scheduled run creates the files left. In both cases the check turns yellow with the number of files not provisioned and the first error.
 
 ## Related health check task
 
@@ -40,4 +40,6 @@ server    log   [10:04:59.701] [debug][healthcheck][saved-objects:dashboards] Vi
 server    log   [10:04:59.702] [debug][healthcheck][saved-objects:dashboards] Dashboard ensured [mitre-overview-dashboard] title [MITRE ATT&CK Overview]
 ```
 
-If the task fails, review the logs for parsing errors (invalid JSON, unsupported types) or save conflicts. Fix the NDJSON file or adjust the saved object IDs, then rerun the Health Check.
+If the task fails, review the logs for parsing errors (invalid JSON, unsupported types) or save conflicts. Each failed file is logged as `Error provisioning dashboard definition file [<file>]: <reason>`, and listed in the check's `data.failures`.
+
+Fix the NDJSON file or adjust the saved object IDs, then restart the Wazuh dashboard, or wait for the next scheduled check (`healthcheck.interval`), which creates the missing objects.

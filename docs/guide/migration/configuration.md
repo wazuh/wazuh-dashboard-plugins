@@ -51,7 +51,7 @@ wazuh_core.hosts:
   default:
     url: https://wazuh-manager
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
 ```
 
@@ -60,6 +60,9 @@ The key differences are:
 - The top-level key changes from `hosts` to `wazuh_core.hosts`.
 - The host entries are now a flat map keyed by the host name, instead of a list of single-key objects.
 - The host name (previously the single key of each list entry) becomes the map key directly.
+- The Server API user `wazuh-wui` is renamed to `wazuh-internal-client`. The manager renames it on
+  upgrade and keeps its password, so update `username` in every host entry that still uses the old
+  name.
 
 ### Available host properties in 5.x
 

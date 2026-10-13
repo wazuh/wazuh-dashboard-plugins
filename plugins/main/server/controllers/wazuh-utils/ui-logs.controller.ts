@@ -18,6 +18,34 @@ import {
   RequestHandlerContext,
 } from 'src/core/server';
 
+type UiLogLevel = 'error' | 'warn' | 'info' | 'debug';
+
+/**
+ * Log levels the UI is allowed to write with. Any other value falls back to
+ * `error` so the logger is never indexed with an arbitrary key.
+ */
+const ALLOWED_LOG_LEVELS: ReadonlySet<string> = new Set<UiLogLevel>([
+  'error',
+  'warn',
+  'info',
+  'debug',
+]);
+
+/**
+ * Replace every C0 control character (0x00-0x1F) and DEL (0x7F) with a single
+ * space so user-supplied text cannot forge or break log lines (CWE-117).
+ * @param text text to sanitize
+ * @returns sanitized text
+ */
+export const sanitizeLogText = (text: string): string =>
+  // eslint-disable-next-line no-control-regex
+  text.replace(/[\x00-\x1F\x7F]/g, ' ');
+
+const resolveLogLevel = (level: unknown): UiLogLevel =>
+  typeof level === 'string' && ALLOWED_LOG_LEVELS.has(level)
+    ? (level as UiLogLevel)
+    : 'error';
+
 export class UiLogsCtrl {
   /**
    * Constructor
@@ -32,7 +60,7 @@ export class UiLogsCtrl {
    * @param response
    * @returns success message or ErrorResponse
    */
-  async createUiLogs(
+  createUiLogs(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
     response: OpenSearchDashboardsResponseFactory,
@@ -40,8 +68,11 @@ export class UiLogsCtrl {
     try {
       const { location, message, level } = request.body;
       const loggerUI = context.wazuh.logger.get('ui');
-      const loggerLevel = loggerUI?.[level] ? level : 'error';
-      loggerUI[loggerLevel](`${location}: ${message}`);
+      // The route schema already allow-lists `level`; this is defense in depth.
+      const loggerLevel = resolveLogLevel(level);
+      loggerUI[loggerLevel](
+        `${sanitizeLogText(location)}: ${sanitizeLogText(message)}`,
+      );
       return response.ok({
         body: {
           statusCode: 200,
