@@ -81,7 +81,7 @@ const App: React.FC<{
   // tracks the *dynamic* viewport, which is the unit Safari gets right, and the offset is measured
   // rather than assumed, so a taller or shorter global header needs no change here. The offset is
   // taken document-relative (`+ scrollY`) so a scrolled page cannot feed a negative rect back in.
-  const frameRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLElement | null>(null);
   const [frameHeight, setFrameHeight] = useState('100dvh');
   const measure = useCallback(() => {
     const node = frameRef.current;
@@ -214,7 +214,7 @@ const App: React.FC<{
               // bar + spacer live INSIDE this frame and take their own natural height via flex. The
               // content row is `flex:1` with `overflow:auto` so the Chat tab fills exactly (its own
               // panes scroll internally) while Settings, which is taller than the viewport, scrolls.
-              <div
+              <main
                 ref={frameRef}
                 style={{
                   height: frameHeight,
@@ -308,7 +308,7 @@ const App: React.FC<{
                     </div>
                   )}
                 </div>
-              </div>
+              </main>
             );
           }}
         </Route>

@@ -67,7 +67,7 @@ wazuh_core.hosts:
   default:
     url: https://<WAZUH_MANAGER_IP_OR_HOSTNAME>
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
 ```
 
@@ -96,7 +96,7 @@ wazuh_core.hosts:
   production:
     url: https://wazuh-manager-prod
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
 ```
 
@@ -114,7 +114,7 @@ wazuh_core.hosts:
   staging:
     url: https://wazuh-manager-staging
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
 ```
 
@@ -177,12 +177,12 @@ When CCS is active, the dashboard:
      production:
        url: https://wazuh-manager-prod
        port: 55000
-       username: wazuh-wui
+       username: wazuh-internal-client
        run_as: false
      staging:
        url: https://wazuh-manager-staging
        port: 55000
-       username: wazuh-wui
+       username: wazuh-internal-client
        run_as: false
    ```
 

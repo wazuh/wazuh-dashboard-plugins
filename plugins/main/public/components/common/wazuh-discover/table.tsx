@@ -266,7 +266,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
             data-test-subj='wz-table-data-grid-with-search-bar-title'
             size='s'
           >
-            <h1>{title}</h1>
+            <h2>{title}</h2>
           </EuiTitle>
         </Padding>
       )}
@@ -786,7 +786,8 @@ export const TableDataGridDiscover: React.FunctionComponent<WzTableDiscoverProps
             fullHeight={true}
             grow
             paddingSize='none'
-            pageContentProps={{ color: 'transparent' }}
+            // The app root renders the main landmark
+            pageContentProps={{ color: 'transparent', role: null }}
           >
             {children}
           </EuiPageTemplate>

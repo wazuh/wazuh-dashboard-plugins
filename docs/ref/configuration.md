@@ -20,6 +20,7 @@ The following settings can be defined in the configuration file `opensearch_dash
 | `wazuh.disabledSettings`                                   | Define which indexer settings are hidden from the UI                                                                                                                         | `[]`                              | list of: `index-raw-events`                                         |
 | `opensearch_security_analytics.disabledSettings`           | Define which Ruleset Management settings are hidden from the UI                                                                                                              | `[]`                              | list of: `index-discarded-events`, `index-unclassified-events`      |
 | `wazuh_check_updates.ctiRegistrationUiEnabled`             | Show the CTI Console registration UI and status                                                                                                                              | `false`                           | true, false                                                         |
+| `wazuh_check_updates.ctiUpsellEnabled`                     | Show the bottom bar that invites users to register for CTI. The CTI header button stays                                                                                      | `true`                            | true, false                                                         |
 | `wazuh_check_updates.ctiRegistrationStatusPollIntervalSec` | How often the UI polls the CTI Console registration status, in seconds                                                                                                       | `30`                              | integer                                                             |
 | `wazuh_check_updates.ctiApiUrl`                            | Base URL of the CTI API. Not set in the shipped configuration file; override only to target another CTI environment                                                          | `https://api.pre.cloud.wazuh.com` | a valid `http`/`https` URL                                          |
 
@@ -53,7 +54,7 @@ wazuh_core.hosts:
   default:
     url: https://localhost
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
 ```
 
@@ -64,12 +65,12 @@ wazuh_core.hosts:
   default:
     url: https://localhost
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
   another_host:
     url: https://another_host_dns
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: true
     key: '/etc/wazuh-dashboard/certs/dashboard-another-host.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-another-host.crt'
@@ -161,7 +162,7 @@ wazuh_core.hosts:
   production:
     url: 'https://wazuh.example.com'
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
     key: '/etc/wazuh-dashboard/certs/dashboard-client.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-client.crt'
@@ -175,7 +176,7 @@ wazuh_core.hosts:
   default:
     url: 'https://localhost'
     port: 55000
-    username: wazuh-wui
+    username: wazuh-internal-client
     run_as: false
 ```
 

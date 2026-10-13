@@ -141,4 +141,32 @@ export const getCtiTokenRoute = (router: IRouter) => {
       }
     },
   );
+
+  // Cancels a pending device-flow activation so a new one can be started.
+  // A completed registration is never cleared here.
+  router.delete(
+    {
+      path: routes.token,
+      validate: {},
+    },
+    async (_context, _request, response) => {
+      try {
+        const clientId = await resolveCtiOAuthClientId(undefined);
+        const store = CtiRegistrationStore.getInstance();
+        const rec = store.getStatus(clientId);
+        if (rec && !rec.registrationComplete) {
+          store.clear(clientId);
+        }
+        return response.ok({ body: { success: true } });
+      } catch (error) {
+        return response.customError({
+          statusCode: error instanceof CtiConfigurationError ? 500 : 503,
+          body:
+            error instanceof Error
+              ? error
+              : new Error('Error cancelling CTI registration'),
+        });
+      }
+    },
+  );
 };

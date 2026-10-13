@@ -12,7 +12,9 @@ export const useUserPreferences = () => {
     (async () => {
       try {
         setIsLoading(true);
-        const response = (await getCore().http.get(routes.userPreferences)) as UserPreferences;
+        const response = (await getCore().http.get(
+          routes.userPreferences,
+        )) as UserPreferences;
         setUserPreferences(response);
         setError(undefined);
       } catch (error: any) {
@@ -33,7 +35,7 @@ export const useUserPreferences = () => {
       await getCore().http.patch(routes.userPreferences, {
         body: JSON.stringify(userPreferences),
       });
-      setUserPreferences(userPreferences);
+      setUserPreferences(previous => ({ ...previous, ...userPreferences }));
     } catch (error: any) {
       setError(error);
     } finally {

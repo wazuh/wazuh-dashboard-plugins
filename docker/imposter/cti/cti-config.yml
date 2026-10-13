@@ -16,3 +16,10 @@ resources:
     path: /api/v1/platform/environments/token
     response:
       scriptFile: token.js
+
+  # Mock-only control endpoint: stores the polling scenario for requests that
+  # do not send the `X-Mock-Scenario` header (see scenario.js).
+  - method: POST
+    path: /mock/cti/scenario
+    response:
+      scriptFile: scenario.js

@@ -16,6 +16,7 @@ import {
   setSavedObjects,
   setOverlays,
   setScopedHistory,
+  getCore,
   setCore,
   setPlugins,
   setCookies,
@@ -43,7 +44,7 @@ import {
   initializeInterceptor,
   unregisterInterceptor,
 } from './services/request-handler';
-import { Applications, Categories } from './utils/applications';
+import { Applications, Categories, getAppTabTitle } from './utils/applications';
 import { setSecurityAnalyticsConfig } from './utils/security-analytics-config';
 import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
@@ -149,6 +150,10 @@ export class WazuhPlugin
         mount: async (params: AppMountParameters) => {
           try {
             setWzCurrentAppID(id);
+            // Overrides the core default tab title only for apps with a `tabTitle`
+            if (getAppTabTitle(app) !== title) {
+              getCore().chrome.docTitle.change(getAppTabTitle(app));
+            }
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
             initializeInterceptor(core);

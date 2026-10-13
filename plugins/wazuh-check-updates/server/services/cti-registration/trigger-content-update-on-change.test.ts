@@ -67,6 +67,35 @@ describe('triggerContentUpdateOnChange', () => {
     });
   });
 
+  test('skips the diff and leaves the snapshot untouched when the subscription status is unknown (502)', async () => {
+    const contentUpdate = jest.fn().mockResolvedValue({});
+    const wazuhClient = buildWazuhClient(contentUpdate);
+    const store = CtiRegistrationStore.getInstance();
+    store.setSubscriptionSnapshot('env-uuid-1', {
+      isRegistered: true,
+      planName: 'basic',
+    });
+
+    const outcome = await triggerContentUpdateOnChange(
+      wazuhClient,
+      'env-uuid-1',
+      { message: null, status: 502 },
+    );
+
+    expect(outcome).toEqual({
+      triggered: false,
+      failed: false,
+      reason: ctiContentUpdateReasons.NONE,
+    });
+    expect(contentUpdate).not.toHaveBeenCalled();
+    expect(
+      CtiRegistrationStore.getInstance().getSubscriptionSnapshot('env-uuid-1'),
+    ).toEqual({
+      isRegistered: true,
+      planName: 'basic',
+    });
+  });
+
   test('fires when unregistered transitions to registered', async () => {
     const contentUpdate = jest.fn().mockResolvedValue({});
     const wazuhClient = buildWazuhClient(contentUpdate);

@@ -70,20 +70,6 @@ describe.skip('Wazuh Elastic', () => {
   //   });
   // });
 
-  describe('Wazuh API - /elastic/template/{pattern}', () => {
-    test('[200] Check if there is some template with the pattern', () => {
-      const options = buildAxiosOptions(
-        'get',
-        '/elastic/template/wazuh-alerts-*',
-      );
-      return axios(options).then(response => {
-        expect(response.status).toBe(200);
-        expect(typeof response.data.status).toBe('boolean');
-        expect(typeof response.data.data).toBe('string');
-      });
-    });
-  });
-
   // TODO: This test need to be defined
   // describe('Wazuh API - /elastic/top/{mode}/{cluster}/{field}/{pattern}', () => {
   //   test('[200] Check if there an index pattern with the pattern', () => {

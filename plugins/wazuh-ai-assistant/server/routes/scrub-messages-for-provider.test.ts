@@ -371,3 +371,18 @@ test('documented residual: a bare, never-before-seen username in the same mid-co
 
   assert.match(scrubbed.content, /jdoe/);
 });
+
+test('builds the known-value matchers once per request, not once per minting message', () => {
+  // Interleaving mint and scrub per message rebuilt the matcher over the whole map after every
+  // mint: 1,000 messages with one new IP each stalled the event loop for ~24 s.
+  const p = new Pseudonymizer();
+  const knownEntities = jest.spyOn(p, 'knownEntities');
+  const messages = Array.from({ length: 50 }, (_, i) =>
+    userMessage(`check 10.0.${Math.floor(i / 250)}.${i % 250} please`),
+  );
+
+  const scrubbed = scrubMessagesForProvider(messages, p);
+
+  assert.ok(knownEntities.mock.calls.length <= 2);
+  scrubbed.forEach(message => assert.doesNotMatch(message.content, /10\.0\./));
+});

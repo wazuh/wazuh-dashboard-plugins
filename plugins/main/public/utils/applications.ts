@@ -495,6 +495,9 @@ export const endpointSummary = {
   title: i18n.translate('wazuh.endpointsSummary.app.title', {
     defaultMessage: 'Summary',
   }),
+  tabTitle: i18n.translate('wazuh.endpointsSummary.app.tabTitle', {
+    defaultMessage: 'Agents summary',
+  }),
   breadcrumbLabel: i18n.translate(
     'wazuh.endpointsSummary.app.breadcrumbLabel',
     {
@@ -516,6 +519,9 @@ export const endpointGroups = {
   id: 'endpoint-groups',
   title: i18n.translate('wazuh.endpointGroups.app.title', {
     defaultMessage: 'Groups',
+  }),
+  tabTitle: i18n.translate('wazuh.endpointGroups.app.tabTitle', {
+    defaultMessage: 'Agent groups',
   }),
   breadcrumbLabel: i18n.translate('wazuh.endpointGroups.app.breadcrumbLabel', {
     defaultMessage: 'Groups',
@@ -558,6 +564,9 @@ export const serverStatus = {
   title: i18n.translate('wazuh.serverStatus.app.title', {
     defaultMessage: 'Status',
   }),
+  tabTitle: i18n.translate('wazuh.serverStatus.app.tabTitle', {
+    defaultMessage: 'Server status',
+  }),
   breadcrumbLabel: i18n.translate('wazuh.serverStatus.app.breadcrumbLabel', {
     defaultMessage: 'Status',
   }),
@@ -596,6 +605,9 @@ export const statistics = {
   title: i18n.translate('wazuh.statistics.app.title', {
     defaultMessage: 'Statistics',
   }),
+  tabTitle: i18n.translate('wazuh.statistics.app.tabTitle', {
+    defaultMessage: 'Server statistics',
+  }),
   breadcrumbLabel: i18n.translate('wazuh.statistics.app.breadcrumbLabel', {
     defaultMessage: 'Statistics',
   }),
@@ -615,6 +627,9 @@ export const logs = {
   title: i18n.translate('wazuh.logs.app.title', {
     defaultMessage: 'Logs',
   }),
+  tabTitle: i18n.translate('wazuh.logs.app.tabTitle', {
+    defaultMessage: 'Server logs',
+  }),
   breadcrumbLabel: i18n.translate('wazuh.logs.app.breadcrumbLabel', {
     defaultMessage: 'Logs',
   }),
@@ -633,6 +648,9 @@ export const settings = {
   id: 'dashboards-settings',
   title: i18n.translate('wazuh.dashboardsSettings.app.title', {
     defaultMessage: 'Settings',
+  }),
+  tabTitle: i18n.translate('wazuh.dashboardsSettings.app.tabTitle', {
+    defaultMessage: 'Server settings',
   }),
   breadcrumbLabel: i18n.translate(
     'wazuh.dashboardsSettings.app.breadcrumbLabel',
@@ -656,6 +674,9 @@ export const devTools = {
   title: i18n.translate('wazuh.devTools.app.title', {
     defaultMessage: 'Dev Tools',
   }),
+  tabTitle: i18n.translate('wazuh.devTools.app.tabTitle', {
+    defaultMessage: 'Server API console',
+  }),
   breadcrumbLabel: i18n.translate('wazuh.devTools.app.breadcrumbLabel', {
     defaultMessage: 'Dev Tools',
   }),
@@ -674,6 +695,9 @@ export const security = {
   id: 'security',
   title: i18n.translate('wazuh.security.app.title', {
     defaultMessage: 'Security',
+  }),
+  tabTitle: i18n.translate('wazuh.security.app.tabTitle', {
+    defaultMessage: 'Server security',
   }),
   breadcrumbLabel: i18n.translate('wazuh.security.app.breadcrumbLabel', {
     defaultMessage: 'Security',
@@ -714,6 +738,9 @@ export const indexerSettings = {
   title: i18n.translate('wazuh.indexerSettings.app.title', {
     defaultMessage: 'Settings',
   }),
+  tabTitle: i18n.translate('wazuh.indexerSettings.app.tabTitle', {
+    defaultMessage: 'Indexer settings',
+  }),
   breadcrumbLabel: i18n.translate('wazuh.indexerSettings.app.breadcrumbLabel', {
     defaultMessage: 'Settings',
   }),
@@ -745,6 +772,10 @@ export const serverApis = {
   showInAgentMenu: false,
   redirectTo: () => '/settings?tab=api',
 };
+
+/** Name for the tab and page heading: `tabTitle` when the menu title is too vague alone. */
+export const getAppTabTitle = (app: { title: string; tabTitle?: string }) =>
+  app.tabTitle ?? app.title;
 
 export const Applications = [
   fileIntegrityMonitoring,

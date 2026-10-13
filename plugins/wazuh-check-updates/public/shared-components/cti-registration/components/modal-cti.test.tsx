@@ -21,6 +21,7 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
+  CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC,
   statusCodes,
 } from '../../../../common/constants';
 import { fetchCtiRegistrationPermission } from '../../../services/cti-registration-permission';
@@ -83,10 +84,26 @@ describe('ModalCti component', () => {
       writable: true,
       value: jest.fn(),
     });
+    document.execCommand = jest.fn().mockReturnValue(true);
   });
 
   afterEach(() => {
     cleanup();
+  });
+
+  it('marks a registration modal as open while mounted', async () => {
+    const { unmount } = render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    await screen.findByText('Wazuh XDR registration');
+    expect(ctiFlowState.isModalOpen()).toBe(true);
+
+    unmount();
+    expect(ctiFlowState.isModalOpen()).toBe(false);
   });
 
   it('should render correctly', async () => {
@@ -117,6 +134,62 @@ describe('ModalCti component', () => {
     expect(
       await screen.findByRole('button', { name: 'Consumers' }),
     ).toBeInTheDocument();
+  });
+
+  it('closes on Escape on the success screen, even without focus inside the modal', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    await screen.findByText('Your Wazuh XDR registration is complete');
+
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(handleModalToggleMock).toHaveBeenCalled();
+  });
+
+  it('shows the CTI unreachable call-out when registered but the subscription status is unknown (502)', async () => {
+    ctiFlowState.setSubscription({ message: null, status: 502 });
+
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    expect(
+      await screen.findByText('CTI temporarily unreachable'),
+    ).toBeInTheDocument();
+  });
+
+  it('does not show the CTI unreachable call-out when the subscription confirms the plan', async () => {
+    ctiFlowState.setSubscription({
+      message: {
+        plan: { name: 'basic', is_public: true },
+        is_registered: true,
+      },
+      status: 200,
+    });
+
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+
+    await screen.findByRole('button', { name: 'Consumers' });
+    expect(
+      screen.queryByText('CTI temporarily unreachable'),
+    ).not.toBeInTheDocument();
   });
 
   it('reopens to in-progress links when refetch restores server snapshot', async () => {
@@ -153,6 +226,11 @@ describe('ModalCti component', () => {
     expect(
       queryByText('Complete activation in Wazuh Cloud'),
     ).toBeInTheDocument();
+    // Closing cancels the pending activation, so the footer says so.
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Close' }),
+    ).not.toBeInTheDocument();
   });
 
   it('should handle button click, show activation URL, and open verification URI', async () => {
@@ -184,6 +262,22 @@ describe('ModalCti component', () => {
       );
     });
     expect(screen.getByText('WZH-999')).toBeInTheDocument();
+    const copyUserCodeButton = document.querySelector(
+      '[data-test-subj="ctiCopyUserCode"]',
+    ) as HTMLElement;
+    expect(copyUserCodeButton).toBeInTheDocument();
+
+    let copiedText = '';
+    (document.execCommand as jest.Mock).mockImplementation(() => {
+      copiedText = window.getSelection()?.toString() ?? '';
+      return true;
+    });
+    act(() => {
+      fireEvent.click(copyUserCodeButton);
+    });
+    expect(document.execCommand).toHaveBeenCalledWith('copy');
+    expect(copiedText).toBe('WZH-999');
+
     expect(window.open).toHaveBeenCalledWith(
       'https://example.test/platform/environments/register?user_code=WZH-999',
       'wazuh_cti',
@@ -191,6 +285,67 @@ describe('ModalCti component', () => {
     expect(ctiFlowState.getDeviceAuthLinks()?.verification_uri_complete).toBe(
       'https://example.test/platform/environments/register?user_code=WZH-999',
     );
+  });
+
+  it('closes on Escape after Register is clicked, even without focus inside the modal', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    const button = await screen.findByRole('button', { name: 'Register' });
+    act(() => {
+      fireEvent.click(button);
+    });
+
+    await screen.findByText('Complete activation in Wazuh Cloud');
+
+    // A pending activation asks for confirmation before cancelling.
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(handleModalToggleMock).not.toHaveBeenCalled();
+    expect(
+      document.querySelector('[data-test-subj="ctiCancelConfirmMessage"]'),
+    ).toBeInTheDocument();
+
+    // Escape again backs out of the confirmation.
+    act(() => {
+      fireEvent.keyDown(document, { key: 'Escape' });
+    });
+    expect(
+      document.querySelector('[data-test-subj="ctiCancelConfirmMessage"]'),
+    ).not.toBeInTheDocument();
+    expect(handleModalToggleMock).not.toHaveBeenCalled();
+  });
+
+  it('asks for confirmation before cancelling a pending activation', async () => {
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    const registerButton = await screen.findByRole('button', {
+      name: 'Register',
+    });
+    act(() => {
+      fireEvent.click(registerButton);
+    });
+    await screen.findByText('Complete activation in Wazuh Cloud');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Keep waiting' }));
+    expect(handleModalToggleMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Cancel registration' }),
+    );
+    expect(handleModalToggleMock).toHaveBeenCalledTimes(1);
   });
 
   it('starts device flow polling schedule and shows in-progress copy', async () => {
@@ -215,6 +370,184 @@ describe('ModalCti component', () => {
       expect(ctiFlowState.getDeviceAuthLinks()?.user_code).toBe('WZH-999');
       expect(
         document.querySelector('[data-test-subj="ctiRegistrationInProgress"]'),
+      ).toBeInTheDocument();
+    });
+    expect(
+      document.querySelector(
+        '[data-test-subj="ctiRegistrationEnvironmentExistsHelp"]',
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  describe('environment already exists in Wazuh Cloud', () => {
+    const restorePendingFlow = (pendingForSec: number) => {
+      mockRefetchStatus.mockImplementation(() => {
+        ctiFlowState.setDeviceCode('dc-pending');
+        ctiFlowState.setDeviceAuthPendingFor(pendingForSec);
+        /* eslint-disable camelcase -- OAuth device authorization fields use snake_case */
+        ctiFlowState.setDeviceAuthLinks({
+          user_code: 'WZH-OLD',
+          verification_uri: 'https://example.test/act',
+          verification_uri_complete:
+            'https://example.test/act?user_code=WZH-OLD',
+        });
+        /* eslint-enable camelcase */
+        return Promise.resolve();
+      });
+    };
+
+    const queryHelp = () =>
+      document.querySelector(
+        '[data-test-subj="ctiRegistrationEnvironmentExistsHelp"]',
+      );
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('explains the rejection once the code has been pending past the delay', async () => {
+      jest.useFakeTimers();
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+      const registerBtn = await screen.findByRole('button', {
+        name: 'Register',
+      });
+      fireEvent.click(registerBtn);
+      await waitFor(() => {
+        expect(
+          document.querySelector(
+            '[data-test-subj="ctiRegistrationInProgress"]',
+          ),
+        ).toBeInTheDocument();
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(
+          (CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC - 1) * 1000,
+        );
+      });
+      expect(queryHelp()).not.toBeInTheDocument();
+
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+      expect(queryHelp()).toHaveTextContent(
+        'Did Wazuh Cloud show "Environment already exists"?',
+      );
+      expect(queryHelp()).toHaveTextContent('CTI > Deployments');
+    });
+
+    it('shows the help right away when a restored code is already past the delay', async () => {
+      restorePendingFlow(CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC + 30);
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(queryHelp()).toBeInTheDocument();
+      });
+    });
+
+    it('names the deployment to delete and asks for the same code again', async () => {
+      restorePendingFlow(CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC + 30);
+      ctiFlowState.setEnvironmentUid('env-uuid-1');
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(queryHelp()).toBeInTheDocument();
+      });
+      expect(
+        document.querySelector(
+          '[data-test-subj="ctiRegistrationDeploymentId"]',
+        ),
+      ).toHaveTextContent('env-uuid-1');
+      expect(
+        screen.getByRole('button', { name: 'Copy deployment ID' }),
+      ).toBeInTheDocument();
+      expect(queryHelp()).toHaveTextContent('Enter the same user code again.');
+      expect(
+        screen.queryByRole('button', { name: /new code/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('asks to delete this deployment when its ID is unknown', async () => {
+      restorePendingFlow(CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC + 30);
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(queryHelp()).toHaveTextContent(
+          'In Wazuh Cloud, go to CTI > Deployments and delete this deployment.',
+        );
+      });
+      expect(
+        screen.queryByRole('button', { name: 'Copy deployment ID' }),
+      ).not.toBeInTheDocument();
+    });
+
+    it('explains an expired code in the failed state', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={{
+            status: statusCodes.REGISTRATION_FAILED,
+            message: 'expired_token: The device code has expired',
+          }}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByText('Registration could not be completed'),
+      ).toBeInTheDocument();
+      expect(
+        document.querySelector(
+          '[data-test-subj="ctiRegistrationFailedMessage"]',
+        ),
+      ).toHaveTextContent(
+        'The user code expired before the activation was completed in Wazuh Cloud.',
+      );
+    });
+
+    it('keeps other failure messages as reported', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={{
+            status: statusCodes.REGISTRATION_FAILED,
+            message: 'access_denied: The user denied the authorization request',
+          }}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByText(
+          'access_denied: The user denied the authorization request',
+        ),
       ).toBeInTheDocument();
     });
   });
