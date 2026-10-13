@@ -6,6 +6,7 @@ import { webDocumentationLink } from '../../common/services/web_documentation';
 import { version as appVersion } from '../../package.json';
 import type { InitializationTaskRunContext } from './types';
 import { checkCCS } from '../lib/ccs-detector';
+import { nextRunMessage, type RateLimitRerun } from './rate-limit-rerun';
 
 const MESSAGES = {
   NO_SERVER_AVAILABLE_CCS:
@@ -16,7 +17,24 @@ const MESSAGES = {
     `The configured server API hosts have not enabled run_as, or the API user cannot use it: ${summary}. Ensure all configured API hosts allow run_as for the API user.`,
   RUN_AS_NOT_ENABLED: (summary: string) =>
     `The configured server API host has not enabled run_as, or the API user cannot use it: ${summary}. Ensure the configured API host allows run_as for the API user.`,
+  RATE_LIMITED_CCS: (nextRun: string) =>
+    `The server API hosts are rate limiting the requests of the dashboard (status code 429), so their connection and compatibility could not be checked. ${nextRun}`,
+  RATE_LIMITED: (nextRun: string) =>
+    `The server API is rate limiting the requests of the dashboard (status code 429), so its connection and compatibility could not be checked. ${nextRun}`,
+  RUN_AS_RATE_LIMITED_CCS: (nextRun: string) =>
+    `The server API hosts are rate limiting the requests of the dashboard (status code 429), so the run_as permission of the API user could not be checked. ${nextRun}`,
+  RUN_AS_RATE_LIMITED: (nextRun: string) =>
+    `The server API is rate limiting the requests of the dashboard (status code 429), so the run_as permission of the API user could not be checked. ${nextRun}`,
 };
+
+const RATE_LIMIT_STATUS_CODE = 429;
+
+export function isRateLimitError(error: unknown): boolean {
+  return (
+    (error as { response?: { status?: number } } | null | undefined)?.response
+      ?.status === RATE_LIMIT_STATUS_CODE
+  );
+}
 
 export function checkAppServerCompatibility(
   appVersion: string,
@@ -41,7 +59,8 @@ export async function serverAPIConnectionCompatibility(
 ) {
   let connection = null,
     compatibility = null,
-    apiVersion = null;
+    apiVersion = null,
+    rateLimited = false;
 
   try {
     ctx.logger.debug(
@@ -78,6 +97,7 @@ export async function serverAPIConnectionCompatibility(
       );
     }
   } catch (error) {
+    rateLimited = isRateLimitError(error);
     ctx.logger.warn(
       `Error checking the connection and compatibility with server API [${apiHostID}]: ${error.message}`,
     );
@@ -88,6 +108,7 @@ export async function serverAPIConnectionCompatibility(
     compatibility,
     api_version: apiVersion,
     id: apiHostID,
+    ...(rateLimited && { rateLimited: true }),
   };
 }
 
@@ -137,9 +158,11 @@ async function serversAPIConnectionCompatibility(
 export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
   taskName,
   services,
+  rateLimitRerun,
 }: {
   taskName: string;
   services: any;
+  rateLimitRerun?: RateLimitRerun;
 }) => ({
   name: taskName,
   async run(ctx: InitializationTaskRunContext) {
@@ -159,14 +182,32 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
       );
 
       if (hasAvailable) {
+        rateLimitRerun?.clear(taskName);
+
         return ctx.taskResult.ok(results);
       }
 
       const isCCS = results?.length > 1;
+
+      if (results?.length > 0 && results.every(result => result.rateLimited)) {
+        const nextRun = nextRunMessage(
+          rateLimitRerun?.schedule(taskName, ctx) === true,
+        );
+        const message = isCCS
+          ? MESSAGES.RATE_LIMITED_CCS(nextRun)
+          : MESSAGES.RATE_LIMITED(nextRun);
+
+        ctx.logger.warn(message);
+
+        return ctx.taskResult.warning(message, results);
+      }
+
       throw new Error(
         isCCS ? MESSAGES.NO_SERVER_AVAILABLE_CCS : MESSAGES.NO_SERVER_AVAILABLE,
       );
     } catch (error) {
+      rateLimitRerun?.clear(taskName);
+
       const message = `Error checking server API connection and compatibility: ${error.message}`;
 
       ctx.logger.error(message);
@@ -178,9 +219,11 @@ export const initializationTaskCreatorServerAPIConnectionCompatibility = ({
 export const initializationTaskCreatorServerAPIRunAs = ({
   taskName,
   services,
+  rateLimitRerun,
 }: {
   taskName: string;
   services: any;
+  rateLimitRerun?: RateLimitRerun;
 }) => ({
   name: taskName,
   async run(ctx: InitializationTaskRunContext) {
@@ -237,6 +280,26 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           result.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
       );
 
+      if (
+        notEnabledHosts.length > 0 &&
+        notEnabledHosts.every(
+          (result: { id: string; allow_run_as: number }) =>
+            result.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK &&
+            services.manageHosts.isRateLimited?.(result.id) === true,
+        )
+      ) {
+        const nextRun = nextRunMessage(
+          rateLimitRerun?.schedule(taskName, ctx) === true,
+        );
+        const message = isCCS
+          ? MESSAGES.RUN_AS_RATE_LIMITED_CCS(nextRun)
+          : MESSAGES.RUN_AS_RATE_LIMITED(nextRun);
+
+        ctx.logger.warn(message);
+
+        return ctx.taskResult.warning(message, results);
+      }
+
       if (notEnabledHosts.length > 0) {
         const notEnabledSummary = notEnabledHosts
           .map(
@@ -270,8 +333,12 @@ export const initializationTaskCreatorServerAPIRunAs = ({
           .map((result: { id: string }) => result.id)
           .join(', ')}`,
       );
+      rateLimitRerun?.clear(taskName);
+
       return ctx.taskResult.ok(enabledHosts);
     } catch (error) {
+      rateLimitRerun?.clear(taskName);
+
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       const message = `Error checking server API allow_run_as: ${errorMessage}`;

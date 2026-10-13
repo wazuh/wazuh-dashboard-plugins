@@ -100,11 +100,15 @@ describe('[endpoint] GET /hosts/apis', () => {
 
     const expected = currentAPIs.slice(0, 1);
     expect(response.body).toHaveLength(expected.length);
-    expected.forEach((currentAPI, index) => {
-      Object.keys(currentAPI).forEach(key => {
-        expect(response.body[index][key]).toBe(currentAPI[key]);
+    expected.forEach(({ id, url, port, username }, index) => {
+      expect(response.body[index]).toEqual({
+        id,
+        url,
+        port,
+        username,
+        // eslint-disable-next-line camelcase -- response field name
+        cluster_info: {},
       });
-      expect(response.body[index].cluster_info).toBeDefined();
     });
   });
 });

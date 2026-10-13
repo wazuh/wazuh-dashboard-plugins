@@ -24,6 +24,7 @@ const mockReadDashboardDefinitionFiles =
 const createLogger = () => ({
   debug: jest.fn(),
   info: jest.fn(),
+  warn: jest.fn(),
   error: jest.fn(),
 });
 
@@ -249,6 +250,173 @@ describe('initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations', 
       expect(getCreatedAttributes('dashboard').description).toBe(
         'Provided by Wazuh. Already compliant',
       );
+    });
+  });
+  describe('write failures', () => {
+    const secondDefinition: DashboardDefinitionFromFile = {
+      filePath: '/fake/second.ndjson',
+      relativeFilePath: 'fake/second.ndjson',
+      dashboard: { ...mockDashboard, id: 'dash-2' },
+      visualizations: [],
+    };
+    const unavailableError = Object.assign(new Error('Request timed out'), {
+      output: { statusCode: 503 },
+    });
+    const badRequestError = Object.assign(
+      new Error('mapper_parsing_exception'),
+      {
+        output: { statusCode: 400 },
+      },
+    );
+
+    beforeEach(() => {
+      ctx.context.scope = 'internal-initial';
+      jest
+        .spyOn(global, 'setTimeout')
+        .mockImplementation((callback: () => void) => {
+          callback();
+          return 0 as unknown as NodeJS.Timeout;
+        });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('provisions the remaining files and reports the failed one', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([
+        mockDefinition,
+        secondDefinition,
+      ]);
+      mockClient.create.mockImplementation((type, attributes, options) =>
+        options?.id === mockVisualization.id
+          ? Promise.reject(badRequestError)
+          : Promise.resolve({ ...mockDashboard, id: options?.id as string }),
+      );
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      const result = await task.run(ctx);
+
+      expect(mockClient.create).toHaveBeenCalledTimes(2);
+      expect(mockClient.create).toHaveBeenCalledWith(
+        'dashboard',
+        expect.anything(),
+        expect.objectContaining({ id: 'dash-2' }),
+      );
+      expect(mockClient.create).not.toHaveBeenCalledWith(
+        'dashboard',
+        expect.anything(),
+        expect.objectContaining({ id: mockDashboard.id }),
+      );
+      expect(result).toEqual({
+        [TASK_RESULT]: true,
+        status: 'warning',
+        message:
+          'Could not provision 1 of 2 dashboard definition files. First error [fake/dashboard.ndjson]: mapper_parsing_exception',
+        data: {
+          failures: [
+            {
+              file: 'fake/dashboard.ndjson',
+              error: 'mapper_parsing_exception',
+            },
+          ],
+        },
+      });
+    });
+
+    it('retries a transient error and succeeds', async () => {
+      mockClient.create
+        .mockRejectedValueOnce(unavailableError)
+        .mockResolvedValueOnce(mockVisualization)
+        .mockResolvedValueOnce(mockDashboard);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      const result = await task.run(ctx);
+
+      expect(mockClient.create).toHaveBeenCalledTimes(3);
+      expect(ctx.logger.warn).toHaveBeenCalledWith(
+        'Transient error [Request timed out], retrying in 1000ms',
+      );
+      expect(result).toEqual({
+        [TASK_RESULT]: true,
+        status: 'ok',
+        data: undefined,
+      });
+    });
+
+    it('gives up on a transient error after three retries', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([
+        { ...mockDefinition, visualizations: [] },
+      ]);
+      mockClient.create.mockRejectedValue(unavailableError);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      const result = await task.run(ctx);
+
+      expect(mockClient.create).toHaveBeenCalledTimes(4);
+      expect(result).toEqual(
+        expect.objectContaining({
+          status: 'warning',
+          data: {
+            failures: [
+              { file: 'fake/dashboard.ndjson', error: 'Request timed out' },
+            ],
+          },
+        }),
+      );
+    });
+
+    it('stops after a file keeps failing transiently and reports the rest as not attempted', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([
+        { ...mockDefinition, visualizations: [] },
+        { ...secondDefinition },
+      ]);
+      mockClient.create.mockRejectedValue(unavailableError);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      const result = await task.run(ctx);
+
+      expect(mockClient.create).toHaveBeenCalledTimes(4);
+      expect(mockClient.create).not.toHaveBeenCalledWith(
+        'dashboard',
+        expect.anything(),
+        expect.objectContaining({ id: 'dash-2' }),
+      );
+      expect(result).toEqual(
+        expect.objectContaining({
+          status: 'warning',
+          message: expect.stringMatching(
+            /^Could not provision 2 of 2 dashboard definition files/,
+          ),
+          data: {
+            failures: [
+              { file: 'fake/dashboard.ndjson', error: 'Request timed out' },
+              {
+                file: 'fake/second.ndjson',
+                error: 'Not attempted: the indexer kept failing',
+              },
+            ],
+          },
+        }),
+      );
+    });
+
+    it('does not retry a non-transient error', async () => {
+      mockReadDashboardDefinitionFiles.mockReturnValue([
+        { ...mockDefinition, visualizations: [] },
+      ]);
+      mockClient.create.mockRejectedValue(badRequestError);
+
+      const task =
+        initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations();
+      await task.run(ctx);
+
+      expect(mockClient.create).toHaveBeenCalledTimes(1);
+      expect(ctx.logger.warn).not.toHaveBeenCalled();
     });
   });
 });

@@ -78,7 +78,10 @@ export const Policies = withUserAuthorizationPrompt([
   }
 
   return (
-    <EuiPageContent>
+    <EuiPageContent
+      // The app root renders the main landmark
+      role={null}
+    >
       <EuiPageContentHeader>
         <EuiPageContentHeaderSection>
           <EuiTitle>

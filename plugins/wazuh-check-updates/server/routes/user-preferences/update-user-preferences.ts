@@ -17,6 +17,7 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
             }),
           ),
           hide_update_notifications: schema.maybe(schema.boolean()),
+          hide_cti_upsell: schema.maybe(schema.boolean()),
         }),
       },
       options: {

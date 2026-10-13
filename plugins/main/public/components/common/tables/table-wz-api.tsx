@@ -286,14 +286,14 @@ function TableWzAPIInner(
             <EuiFlexItem className='wz-flex-basis-auto' grow={false}>
               {title && (
                 <EuiTitle data-test-subj='table-wz-api-title' size='s'>
-                  <h1>
+                  <h2>
                     {title}{' '}
                     {isLoading ? (
                       <EuiLoadingSpinner size='s' />
                     ) : (
                       <span>({formatUINumber(totalItems)})</span>
                     )}
-                  </h1>
+                  </h2>
                 </EuiTitle>
               )}
             </EuiFlexItem>

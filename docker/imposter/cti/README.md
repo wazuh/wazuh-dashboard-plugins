@@ -39,16 +39,35 @@ the header `X-Mock-Scenario` with one of:
 - `slow_down`
 - `access_denied`
 - `expired_token`
+- `environment_exists`: what the real CTI Console does after rejecting a user
+  code with "Environment already exists". The rejection is never reported:
+  the code stays pending and every poll answers `authorization_pending`.
+
+The dashboard server does not forward that header. To drive a scenario through
+the dashboard, store it in the mock instead (the header still wins when sent):
+
+```bash
+curl -X POST http://imposter:8080/mock/cti/scenario -d 'scenario=environment_exists'
+# Back to the default behaviour (pending x2, then success):
+curl -X POST http://imposter:8080/mock/cti/scenario -d 'scenario=default'
+```
+
+To reproduce the "Environment already exists" flow, store `environment_exists`,
+start a registration from the dashboard, and wait until the modal explains the
+rejection (one minute after the code was issued). Then store `default` (the
+equivalent of deleting the deployment in Wazuh Cloud) and the registration
+completes on the next polls.
 
 ## Files
 
 - `openapi.yml` — OpenAPI 3.0 specification consumed by Imposter.
 - `cti-config.yml` — Imposter resource configuration.
 - `token.js` — Dispatch logic (body parsing, scenario selection, poll counter).
+- `scenario.js` — Stores the scenario used when no `X-Mock-Scenario` header is sent.
 
 > **Note:** Imposter scripts run on **Nashorn (ES5 only)**. Avoid trailing
 > commas in function calls, `const`/`let`, arrow functions, template literals,
-> destructuring and any other ES2015+ syntax in `token.js`.
+> destructuring and any other ES2015+ syntax in `token.js` and `scenario.js`.
 
 ## Topology
 

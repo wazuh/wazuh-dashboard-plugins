@@ -19,7 +19,7 @@ Before installing:
 - A supported Linux distribution and architecture (see [Compatibility](../compatibility.md))
 - Enough CPU and RAM (see [Hardware requirements](requirements.md#hardware-requirements))
 - Network access to Wazuh indexer and Wazuh manager API
-- The `kibanaserver` and `wazuh-wui` passwords, when the indexer or the manager runs on another host (see [Credentials](credentials.md))
+- The `kibanaserver` and `wazuh-internal-client` passwords, when the indexer or the manager runs on another host (see [Credentials](credentials.md))
 - Root or sudo privileges
 
 See [Requirements](requirements.md) for detailed specifications.

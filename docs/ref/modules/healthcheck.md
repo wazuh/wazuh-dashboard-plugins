@@ -14,7 +14,7 @@ This defines a service that is integrated with the core lifecycle of the applica
 
 1. Setup the health check using the provided or default configuration.
 2. The plugins register the tasks to run
-3. If the health check is enabled and there are some enabled checks (configurable with the `healthcheck.checks_enabled` setting), this runs an initial check. If some check fails, the enabled checks are retried if this is configured.
+3. If the health check is enabled and there are some enabled checks (configurable with the `healthcheck.checks_enabled` setting), this runs an initial check. If a **critical** check fails, the enabled checks are retried (configurable with the `healthcheck.max_retries` and `healthcheck.retries_delay` settings). A failed non-critical check is not retried; it runs again on the next scheduled check.
 4. Once the health check pass, if this is enabled, this sets a scheduled task using the specified interval (configurable with the `healthcheck.interval` setting) to run and update the status of the enabled checks. This can be seen in the dashboard logs as:
 
 ```log
@@ -46,6 +46,10 @@ For details about the default notification channels the Wazuh indexer provisions
 ### Saved objects for dashboards and visualizations
 
 For details about the task that provisions dashboard and visualization saved objects from the repository definitions, see [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md).
+
+### Server API rate limiting
+
+When the server API answers `429 Too Many Requests`, the dashboard does not retry the request: the server API limits the requests of each client in a fixed window of one minute and does not send a `Retry-After` header. `server-api:connection-compatibility`, `server-api:run-as` and `server-api:certificate-validity` do not report an error. They log a `warning` that says that the server API is rate limiting the requests of the dashboard (status code 429) and turn yellow. The affected check runs again about a minute later, at most twice in a row, and then on the next scheduled run. The registry data of a rate limited API host, such as the `run_as` permission, is fetched again at most once per minute when the API hosts are read, so a rate limited start does not keep it unchecked until the dashboard restarts, and a known `run_as` state is kept while the requests are rate limited. Any other failure, such as an unreachable host or a `run_as` setting that is not enabled, keeps its own message.
 
 ### Server certificate validity
 
@@ -117,6 +121,7 @@ wazuh_core.healthCheckCertificateExpiryCriticalDays: 14
 - **The check still reports a certificate after you replace it**: the manager serves the listener certificate it loaded when `remoted` started, so replacing `remoted.pem` on disk has no effect until `remoted` restarts. The action line of the message states the date the manager loaded the current certificate.
 - **No CA chains to the listener certificate**: the CA bundle does not contain the CA that issued the certificate the listener serves, so the manager refuses to serve the bundle to agents. Add the issuing CA to the bundle with `wazuh-manager-certs add`, or replace the listener certificate with one issued by a CA already in the bundle.
 - **The manager cannot read the bundle**: if the manager read the file before, the reported certificates describe that last copy. If it never read it, the response carries no certificates. Verify that the file exists and that the manager can read it.
+- **The server API is rate limiting the requests**: the check reports that the state could not be determined because of the rate limiting (status code 429) and runs again about a minute later. If only some nodes are rate limited, the message names them. See [Server API rate limiting](#server-api-rate-limiting).
 - **The manager cannot list its nodes**: the check reports an undetermined state and logs the cause:
 
 ```

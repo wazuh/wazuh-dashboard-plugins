@@ -144,7 +144,7 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                   <div
                     class="euiFlexItem euiFlexItem--flexGrowZero wz-flex-basis-auto"
                   >
-                    <h1
+                    <h2
                       class="euiTitle euiTitle--small"
                       data-test-subj="table-wz-api-title"
                     >
@@ -152,7 +152,7 @@ exports[`Module Mitre Att&ck intelligence container should render the component 
                       <span>
                         (0)
                       </span>
-                    </h1>
+                    </h2>
                   </div>
                 </div>
               </div>

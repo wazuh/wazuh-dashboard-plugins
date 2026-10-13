@@ -3567,3 +3567,59 @@ test('dropNeverFields: a fieldless date_histogram breakdown passes through untou
     { key: '2026-07-31T00:00:00.000Z', count: 42 },
   ]);
 });
+
+// --- Large client-supplied maps (event-loop DoS) ------------------------------------------------
+// The pseudonym map is client-held and reseeds every request; scrubbing used to build one RegExp
+// per entry over the whole text, so tens of thousands of entries stalled the event loop for tens
+// of seconds. The scrub is now one linear pass whatever the map size.
+
+test('Pseudonymizer: scrubbing with a huge seeded map stays fast and replaces every value', () => {
+  const seed = Array.from({ length: 70_000 }, (_, index) => ({
+    value: `u${index.toString(36)}x`,
+    pseudonym: `USER_${index + 1}`,
+  }));
+  const p = new Pseudonymizer(seed);
+  const text = seed.map(entry => entry.value).join(' ');
+  const expected = seed.map(entry => entry.pseudonym).join(' ');
+  const started = Date.now();
+  assert.equal(p.applyToText(text), expected);
+  assert.equal(scrubKnownEntities(text.toUpperCase(), p), expected);
+  assert.ok(
+    Date.now() - started < 3000,
+    'the scrub must not scale with the map size',
+  );
+});
+
+test('scrubKnownEntities: a long value walked repeatedly does not go quadratic', () => {
+  const value = `${'a-'.repeat(1000)}b`;
+  const p = new Pseudonymizer([{ value, pseudonym: 'HOST_1' }]);
+  const text = 'a-'.repeat(200_000);
+  const started = Date.now();
+  assert.equal(scrubKnownEntities(text, p), text);
+  assert.equal(scrubKnownEntities(`x ${value} y`, p), 'x HOST_1 y');
+  assert.ok(Date.now() - started < 3000);
+});
+
+test('Pseudonymizer: the cached matcher picks up values minted after a previous scrub', () => {
+  const p = new Pseudonymizer();
+  const first = p.pseudonymize('dbprod07', 'HOST');
+  assert.equal(p.applyToText('dbprod07 and dbprod08'), `${first} and dbprod08`);
+  const second = p.pseudonymize('dbprod08', 'HOST');
+  assert.equal(
+    p.applyToText('dbprod07 and dbprod08'),
+    `${first} and ${second}`,
+  );
+});
+
+test('scrubKnownEntities: a value that starts or ends with a boundary character still matches as a whole token', () => {
+  const p = new Pseudonymizer([
+    { value: '-weird-', pseudonym: 'HOST_1' },
+    { value: 'DB03', pseudonym: 'HOST_2' },
+    { value: 'DB03-PRIMARY', pseudonym: 'HOST_3' },
+  ]);
+  assert.equal(
+    scrubKnownEntities('a -weird- b, db03-primary and db03.', p),
+    'a HOST_1 b, HOST_3 and HOST_2.',
+  );
+  assert.equal(scrubKnownEntities('x-weird-y', p), 'x-weird-y');
+});

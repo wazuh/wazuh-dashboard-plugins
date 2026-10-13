@@ -46,6 +46,11 @@ function buildDeviceAuthLinksFromStatusBody(
   };
 }
 
+/** Cancels the pending device-flow activation on the server. */
+export async function cancelCtiRegistration(): Promise<void> {
+  await getCore().http.delete(routes.token);
+}
+
 export async function hydrateCtiFlowFromServer(): Promise<void> {
   const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
     routes.ctiRegistrationStatus,
@@ -53,10 +58,11 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
 
   ctiFlowState.setSubscription(body.subscription ?? null);
 
-  if (
-    body.registrationComplete &&
-    Boolean(body.subscription?.message?.is_registered)
-  ) {
+  if (body.registrationComplete) {
+    // The server already decided this registration is still valid (it only
+    // clears a completed registration when the CTI Console confirms it's
+    // unregistered, not on an unknown/502 subscription read), so trust it
+    // without re-requiring `is_registered` here too.
     ctiFlowState.setRegistrationComplete(true);
     return;
   }
@@ -79,6 +85,10 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     ) {
       ctiFlowState.setDeviceAuthExpiry(body.expires_in_remaining_sec);
     }
+    if (typeof body.pending_for_sec === 'number') {
+      ctiFlowState.setDeviceAuthPendingFor(body.pending_for_sec);
+    }
+    ctiFlowState.setEnvironmentUid(body.environment_uid);
     const links = buildDeviceAuthLinksFromStatusBody(body);
     ctiFlowState.setDeviceAuthLinks(links);
     return;
