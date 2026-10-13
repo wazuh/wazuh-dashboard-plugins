@@ -15,8 +15,40 @@ jest.mock('../plugin-services', () => ({
 describe('hydrateCtiFlowFromServer', () => {
   afterEach(() => {
     ctiFlowState.reset();
+    ctiFlowState.setRegistrationLost(null);
     mockHttpGet.mockReset();
   });
+
+  /* eslint-disable camelcase -- status API body uses snake_case */
+  it('stores the registration loss the server reports, and clears it when gone', async () => {
+    const lost = {
+      detected_at: '2026-10-12T17:57:35.000Z',
+      last_plan: 'Professional',
+    };
+    const unregistered = {
+      registrationComplete: false,
+      inProgress: false,
+      subscription: {
+        message: {
+          plan: { name: 'Open', is_public: true },
+          is_registered: false,
+        },
+        status: 200,
+      },
+    };
+    mockHttpGet.mockResolvedValueOnce({
+      ...unregistered,
+      registration_lost: lost,
+    });
+
+    await hydrateCtiFlowFromServer();
+    expect(ctiFlowState.getRegistrationLost()).toEqual(lost);
+
+    mockHttpGet.mockResolvedValueOnce(unregistered);
+    await hydrateCtiFlowFromServer();
+    expect(ctiFlowState.getRegistrationLost()).toBeNull();
+  });
+  /* eslint-enable camelcase */
 
   it('keeps the registration complete when the subscription status is unknown (502)', async () => {
     mockHttpGet.mockResolvedValue({

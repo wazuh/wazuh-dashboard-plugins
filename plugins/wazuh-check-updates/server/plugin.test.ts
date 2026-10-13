@@ -3,6 +3,7 @@ import {
   savedObjectsRepositoryMock,
 } from '../../../src/core/server/mocks';
 import {
+  SAVED_OBJECT_CTI_REGISTRATION_HISTORY,
   SAVED_OBJECT_UPDATES,
   SAVED_OBJECT_USER_PREFERENCES,
 } from '../common/constants';
@@ -31,6 +32,7 @@ describe('WazuhCheckUpdatesPlugin start', () => {
     ).toHaveBeenCalledWith([
       SAVED_OBJECT_UPDATES,
       SAVED_OBJECT_USER_PREFERENCES,
+      SAVED_OBJECT_CTI_REGISTRATION_HISTORY,
     ]);
     expect(setInternalSavedObjectsClient).toHaveBeenCalledWith(
       internalRepository,

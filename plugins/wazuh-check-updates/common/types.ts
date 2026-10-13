@@ -35,6 +35,8 @@ export interface UserPreferences {
   last_dismissed_updates?: UserPreferencesDimissedUpdate;
   hide_update_notifications?: boolean;
   hide_cti_upsell?: boolean;
+  /** `detected_at` of the CTI registration loss this user dismissed. */
+  dismissed_cti_registration_lost_at?: string;
 }
 
 export interface AvailableUpdates extends ResponseIndexerAvailableUpdates {
@@ -46,4 +48,15 @@ export interface AvailableUpdates extends ResponseIndexerAvailableUpdates {
   };
 }
 
-export type savedObjectType = AvailableUpdates | UserPreferences;
+/** Last CTI registration this dashboard saw, per environment. */
+export interface CtiRegistrationHistory {
+  last_plan?: string;
+  last_registered_at?: string;
+  lost_at?: string | null;
+  lost_plan?: string | null;
+}
+
+export type savedObjectType =
+  | AvailableUpdates
+  | UserPreferences
+  | CtiRegistrationHistory;

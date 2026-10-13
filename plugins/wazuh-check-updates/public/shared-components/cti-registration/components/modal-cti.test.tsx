@@ -38,6 +38,7 @@ jest.mock('@osd/i18n/react', () => ({
   FormattedMessage: ({ defaultMessage }: { defaultMessage?: string }) => (
     <span>{defaultMessage}</span>
   ),
+  FormattedDate: ({ value }: { value: string }) => <span>{value}</span>,
   __esModule: true,
 }));
 
@@ -61,6 +62,7 @@ describe('ModalCti component', () => {
     mockRefetchStatus.mockResolvedValue(undefined);
     ctiFlowState.reset();
     ctiFlowState.setSubscription(null);
+    ctiFlowState.setRegistrationLost(null);
     mockHttpGet.mockResolvedValue({ data: [] });
     mockedFetchCtiRegistrationPermission.mockResolvedValue({
       accessAllowed: true,
@@ -719,6 +721,89 @@ describe('ModalCti component', () => {
           '[data-test-subj="ctiRegistrationPermissionDenied"]',
         ),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  describe('lost registration', () => {
+    const lostCallOut = () =>
+      document.querySelector('[data-test-subj="ctiRegistrationLostCallOut"]');
+
+    beforeEach(() => {
+      /* eslint-disable camelcase -- status API body uses snake_case */
+      ctiFlowState.setRegistrationLost({
+        detected_at: '2026-10-12T17:57:35.000Z',
+        last_plan: 'Professional',
+      });
+      /* eslint-enable camelcase */
+    });
+
+    it('explains the loss above the intro and offers to register again', async () => {
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByRole('button', { name: 'Register again' }),
+      ).toBeInTheDocument();
+      expect(lostCallOut()).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'This instance is no longer registered with Wazuh Cloud',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it('explains the loss to users who cannot register', async () => {
+      mockedFetchCtiRegistrationPermission.mockResolvedValue({
+        accessAllowed: false,
+        missingPrivileges: [],
+      });
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={defaultStatusCti}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          document.querySelector(
+            '[data-test-subj="ctiRegistrationPermissionDenied"]',
+          ),
+        ).toBeInTheDocument();
+      });
+      expect(lostCallOut()).toBeInTheDocument();
+    });
+
+    it('does not show the loss once registered again', async () => {
+      /* eslint-disable camelcase -- status API body uses snake_case */
+      ctiFlowState.setSubscription({
+        message: {
+          plan: { name: 'Professional', is_public: false },
+          is_registered: true,
+        },
+        status: 200,
+      });
+      /* eslint-enable camelcase */
+
+      render(
+        <ModalCti
+          handleModalToggle={handleModalToggleMock}
+          statusCTI={{ status: statusCodes.SUCCESS, message: '' }}
+          refetchStatus={mockRefetchStatus}
+        />,
+      );
+
+      expect(
+        await screen.findByText('Your Wazuh XDR registration is complete'),
+      ).toBeInTheDocument();
+      expect(lostCallOut()).not.toBeInTheDocument();
     });
   });
 });

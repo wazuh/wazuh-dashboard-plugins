@@ -2,6 +2,7 @@ import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { StartCtiRegistration } from './start-cti-registration';
+import { ctiFlowState } from '../../../services/cti-flow-state';
 
 // Mock @osd/i18n to handle FormattedMessage components
 jest.mock('@osd/i18n', () => ({
@@ -84,5 +85,43 @@ describe('StartCtiRegistration component', () => {
 
     fireEvent.click(getByRole('button'));
     expect(handleModalToggleMock).toHaveBeenCalledTimes(1);
+  });
+
+  describe('when the registration was lost', () => {
+    beforeEach(() => {
+      /* eslint-disable camelcase -- status API body uses snake_case */
+      ctiFlowState.setRegistrationLost({
+        detected_at: '2026-10-12T17:57:35.000Z',
+        last_plan: 'Professional',
+      });
+      /* eslint-enable camelcase */
+    });
+
+    afterEach(() => {
+      ctiFlowState.setRegistrationLost(null);
+    });
+
+    it('labels the header button and uses the warning color', async () => {
+      mockUiSettings.get.mockReturnValue(false);
+      const { getByText, getByRole, findByText } = render(
+        <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
+      );
+
+      expect(getByText('CTI · Registration lost')).toBeInTheDocument();
+      expect(getByRole('button')).toHaveClass('euiButtonEmpty--warning');
+      fireEvent.mouseEnter(getByRole('button'));
+      expect(
+        await findByText('Wazuh Cloud registration lost. Open for details.'),
+      ).toBeInTheDocument();
+    });
+
+    it('uses the warning color on the new home page icon', () => {
+      mockUiSettings.get.mockReturnValue(true);
+      const { getByRole } = render(
+        <StartCtiRegistration handleModalToggle={handleModalToggleMock} />,
+      );
+
+      expect(getByRole('button')).toHaveClass('euiButtonIcon--warning');
+    });
   });
 });

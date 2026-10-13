@@ -54,3 +54,36 @@ describe('ctiFlowState.subscribe', () => {
     expect(listener).not.toHaveBeenCalled();
   });
 });
+
+describe('ctiFlowState registration loss', () => {
+  /* eslint-disable camelcase -- status API body uses snake_case */
+  const lost = {
+    detected_at: '2026-10-12T17:57:35.000Z',
+    last_plan: 'Professional',
+  };
+  /* eslint-enable camelcase */
+
+  afterEach(() => {
+    ctiFlowState.setRegistrationLost(null);
+  });
+
+  it('notifies when the loss changes', () => {
+    const listener = jest.fn();
+    const unsubscribe = ctiFlowState.subscribe(listener);
+
+    ctiFlowState.setRegistrationLost(lost);
+    ctiFlowState.setRegistrationLost({ ...lost });
+    ctiFlowState.setRegistrationLost(null);
+
+    expect(listener).toHaveBeenCalledTimes(2);
+    unsubscribe();
+  });
+
+  it('keeps the server-reported loss across a flow reset', () => {
+    ctiFlowState.setRegistrationLost(lost);
+
+    ctiFlowState.reset();
+
+    expect(ctiFlowState.getRegistrationLost()).toEqual(lost);
+  });
+});

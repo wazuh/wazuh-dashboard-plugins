@@ -57,6 +57,7 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
   );
 
   ctiFlowState.setSubscription(body.subscription ?? null);
+  ctiFlowState.setRegistrationLost(body.registration_lost ?? null);
 
   if (body.registrationComplete) {
     // The server already decided this registration is still valid (it only

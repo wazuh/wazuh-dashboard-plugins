@@ -19,6 +19,14 @@ export interface CtiSubscriptionSnapshot {
   status: number | null;
 }
 
+/** A registration this dashboard saw, which the Content Manager no longer reports. */
+export interface CtiRegistrationLost {
+  /** ISO date of the first unregistered read after a registered one. */
+  detected_at: string;
+  /** Plan name of the last registered read. */
+  last_plan: string;
+}
+
 export interface CtiRegistrationStatusApiBody {
   registrationComplete: boolean;
   inProgress: boolean;
@@ -37,4 +45,5 @@ export interface CtiRegistrationStatusApiBody {
    * identifies the deployment to delete after an "Environment already exists" rejection.
    */
   environment_uid?: string;
+  registration_lost?: CtiRegistrationLost;
 }

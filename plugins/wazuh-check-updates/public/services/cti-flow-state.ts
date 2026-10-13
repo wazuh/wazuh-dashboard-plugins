@@ -4,7 +4,10 @@ import {
   CTI_MIN_DEVICE_POLL_INTERVAL_SEC,
   CTI_SLOW_DOWN_EXTRA_INTERVAL_SEC,
 } from '../../common/constants';
-import type { CtiSubscriptionSnapshot } from '../../common/cti-registration-status-api';
+import type {
+  CtiRegistrationLost,
+  CtiSubscriptionSnapshot,
+} from '../../common/cti-registration-status-api';
 import type { CtiDeviceAuthorization } from '../shared-components/cti-registration/types';
 
 let deviceCode: string | null = null;
@@ -15,6 +18,7 @@ let deviceAuthStartedAt: number | null = null;
 let environmentUid: string | null = null;
 let deviceAuthLinks: CtiDeviceAuthorization | null = null;
 let subscription: CtiSubscriptionSnapshot | null = null;
+let registrationLost: CtiRegistrationLost | null = null;
 let lastStatusFetchAtMs: number | null = null;
 let openModals = 0;
 let version = 0;
@@ -23,7 +27,7 @@ const listeners = new Set<() => void>();
 const flowKey = () =>
   `${deviceCode}|${registrationComplete}|${Boolean(
     subscription?.message?.is_registered,
-  )}|${openModals}`;
+  )}|${openModals}|${registrationLost?.detected_at ?? ''}`;
 
 /** Runs `change` and notifies subscribers if the flow or registration state moved. */
 const track = (change: () => void): void => {
@@ -76,6 +80,20 @@ export const ctiFlowState = {
 
   getSubscription(): CtiSubscriptionSnapshot | null {
     return subscription;
+  },
+
+  /**
+   * A registration the dashboard saw, which the Content Manager no longer reports.
+   * Server-owned and refreshed on every status read, so `reset()` keeps it.
+   */
+  getRegistrationLost(): CtiRegistrationLost | null {
+    return registrationLost;
+  },
+
+  setRegistrationLost(value: CtiRegistrationLost | null): void {
+    track(() => {
+      registrationLost = value;
+    });
   },
 
   getDeviceCode(): string | null {

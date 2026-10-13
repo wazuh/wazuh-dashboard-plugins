@@ -8,6 +8,7 @@ import {
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
+import { observeCtiRegistration } from '../../services/cti-registration/registration-history';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 
 type StatusWithoutSubscriptionFields = Omit<
@@ -37,9 +38,24 @@ async function withSubscriptionFields(
     }
   });
 
+  // The history is extra context: failing to read or write it never fails the status.
+  const registrationLost = await observeCtiRegistration(
+    environmentUuid,
+    subscription,
+  ).catch(error => {
+    getWazuhCheckUpdatesServices().logger.error(
+      `Could not update the CTI registration history for ${environmentUuid}: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    return undefined;
+  });
+
   return {
     ...base,
     subscription,
+    // eslint-disable-next-line camelcase -- status API body uses snake_case
+    ...(registrationLost ? { registration_lost: registrationLost } : {}),
   };
 }
 
