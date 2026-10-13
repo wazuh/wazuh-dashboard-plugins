@@ -22,7 +22,6 @@ function isBackgroundRegistrationActive(): boolean {
 
 export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
   statusCTI,
-  refetchStatus,
   onOpenModal,
 }) => {
   const isNewHomePageEnable = getCore().uiSettings.get('home:useNewHomePage');
@@ -51,7 +50,12 @@ export const StatusCtiRegistration: React.FC<StatusCtiRegistrationProps> = ({
       onClick={openRegistrationModal}
     >
       <span style={inlineRow} data-test-subj='ctiRegistrationNavStatus'>
-        {showPlanName ? (
+        {backgroundActive ? (
+          <FormattedMessage
+            id='wazuhCheckUpdates.ctiRegistration.statusNavTopPending'
+            defaultMessage='Wazuh Cloud - Activation pending'
+          />
+        ) : showPlanName ? (
           <FormattedMessage
             id='wazuhCheckUpdates.ctiRegistration.statusNavTopWithPlan'
             defaultMessage='Wazuh Cloud - {planName}'

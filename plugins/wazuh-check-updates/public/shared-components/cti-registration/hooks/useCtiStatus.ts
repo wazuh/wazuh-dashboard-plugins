@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { fetchCtiRegistrationStatus } from '../../../services/cti-registration-status';
 import { ctiFlowState } from '../../../services/cti-flow-state';
 import { ISubscriptionResponse } from '../../../services/types';
@@ -62,6 +62,29 @@ export const useCtiStatus = (
     useState<ISubscriptionResponse>(computeInitialStatus);
   const [loading, setLoading] = useState(() => !isSteadyRegistered());
   const [pollingSeed, setPollingSeed] = useState(0);
+  const flowVersion = useSyncExternalStore(
+    ctiFlowState.subscribe,
+    ctiFlowState.getVersion,
+  );
+
+  // Another CTI control (header or bottom bar) may have finished the flow.
+  useEffect(() => {
+    if (isSteadyRegistered()) {
+      setStatusCTI(current =>
+        current.status === statusCodes.SUCCESS
+          ? current
+          : {
+              status: statusCodes.SUCCESS,
+              message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,
+            },
+      );
+    }
+  }, [flowVersion]);
+
+  const deviceFlowActive =
+    Boolean(ctiFlowState.getDeviceCode()) &&
+    !ctiFlowState.isRegistrationComplete();
+  const modalOpen = ctiFlowState.isModalOpen();
 
   const fetchStatus = useCallback(async (options?: { silent?: boolean }) => {
     ctiFlowState.markStatusFetched();
@@ -245,5 +268,11 @@ export const useCtiStatus = (
       document.removeEventListener('visibilitychange', onVisibilityChange);
   }, [fetchStatus, pollIntervalSec]);
 
-  return { statusCTI, loading, refetchStatus: fetchStatus };
+  return {
+    statusCTI,
+    loading,
+    deviceFlowActive,
+    modalOpen,
+    refetchStatus: fetchStatus,
+  };
 };

@@ -2,12 +2,14 @@ import React from 'react';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiButtonEmpty,
-  EuiCallOut,
   EuiCode,
   EuiCopy,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiLink,
   EuiSpacer,
   EuiText,
+  EuiTitle,
 } from '@elastic/eui';
 import { CtiDeviceAuthorization } from '../types';
 
@@ -16,16 +18,16 @@ type Props = {
 };
 
 export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
-  <EuiCallOut
-    title={
-      <FormattedMessage
-        id='wazuhCheckUpdates.ctiRegistration.deviceAuthTitle'
-        defaultMessage='Your user code and activation link'
-      />
-    }
-    color='primary'
-    iconType='globe'
-  >
+  <>
+    <EuiTitle size='xs'>
+      <h3>
+        <FormattedMessage
+          id='wazuhCheckUpdates.ctiRegistration.deviceAuthTitle'
+          defaultMessage='Your user code and activation link'
+        />
+      </h3>
+    </EuiTitle>
+    <EuiSpacer size='s' />
     <EuiText size='s'>
       <FormattedMessage
         id='wazuhCheckUpdates.ctiRegistration.userCodeLabel'
@@ -33,7 +35,33 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
       />
     </EuiText>
     <EuiSpacer size='xs' />
-    <EuiCode data-test-subj='ctiDeviceUserCode'>{deviceAuth.user_code}</EuiCode>
+    <EuiFlexGroup alignItems='center' gutterSize='s' responsive={false} wrap>
+      <EuiFlexItem grow={false}>
+        <EuiCode
+          className='ctiDeviceUserCode'
+          data-test-subj='ctiDeviceUserCode'
+        >
+          {deviceAuth.user_code}
+        </EuiCode>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false}>
+        <EuiCopy textToCopy={deviceAuth.user_code}>
+          {(copy: () => void) => (
+            <EuiButtonEmpty
+              size='xs'
+              iconType='copyClipboard'
+              onClick={copy}
+              data-test-subj='ctiCopyUserCode'
+            >
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.copyUserCode'
+                defaultMessage='Copy user code'
+              />
+            </EuiButtonEmpty>
+          )}
+        </EuiCopy>
+      </EuiFlexItem>
+    </EuiFlexGroup>
     <EuiSpacer size='m' />
     <EuiText size='s'>
       <FormattedMessage
@@ -41,6 +69,7 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
         defaultMessage='Activation link:'
       />{' '}
       <EuiLink
+        className='eui-textBreakWord'
         href={deviceAuth.verification_uri_complete}
         target='_blank'
         rel='noopener noreferrer'
@@ -65,5 +94,5 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
         </EuiButtonEmpty>
       )}
     </EuiCopy>
-  </EuiCallOut>
+  </>
 );

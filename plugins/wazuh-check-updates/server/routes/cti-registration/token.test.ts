@@ -245,4 +245,53 @@ describe('CTI token route', () => {
     expect(mockedPollCtiToken).not.toHaveBeenCalled();
     expect(mockedGetCtiToken).not.toHaveBeenCalled();
   });
+
+  describe(`DELETE ${routes.token}`, () => {
+    const inProgress = () =>
+      CtiRegistrationStore.getInstance().setInProgress(
+        'resolved-client-id',
+        parseDeviceAuthorizationForStore({
+          device_code: 'dc1',
+          user_code: 'WZH-1',
+          verification_uri: 'https://example.test/register',
+          expires_in: 600,
+          interval: 5,
+        }),
+      );
+
+    test('clears a pending activation', async () => {
+      inProgress();
+
+      const response = await supertest(innerServer.listener)
+        .delete(routes.token)
+        .expect(200);
+
+      expect(response.body).toEqual({ success: true });
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id'),
+      ).toBeUndefined();
+    });
+
+    test('keeps a completed registration', async () => {
+      inProgress();
+      CtiRegistrationStore.getInstance().setRegistrationComplete(
+        'resolved-client-id',
+      );
+
+      await supertest(innerServer.listener).delete(routes.token).expect(200);
+
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
+          ?.registrationComplete,
+      ).toBe(true);
+    });
+
+    test('is a no-op when nothing is pending', async () => {
+      await supertest(innerServer.listener).delete(routes.token).expect(200);
+
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id'),
+      ).toBeUndefined();
+    });
+  });
 });

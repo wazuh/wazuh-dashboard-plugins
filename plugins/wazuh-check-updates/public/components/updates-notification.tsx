@@ -8,12 +8,14 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useUserPreferences } from '../hooks';
 import { areThereNewUpdates } from '../utils';
 import { getCore, getWazuhCore } from '../plugin-services';
 import { AvailableUpdates } from '../../../wazuh-check-updates/common/types';
 import { getAvailableUpdates } from '../services';
+import { ctiUpsellBarVisible$ } from '../services/cti-upsell-bar-state';
 import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
 import './updates-notification.scss';
 
@@ -21,6 +23,16 @@ export const UpdatesNotification = () => {
   const [availableUpdates, setAvailableUpdates] = useState<AvailableUpdates>();
   const [isDismissed, setIsDismissed] = useState(false);
   const [dismissFutureUpdates, setDismissFutureUpdates] = useState(false);
+  const [isCtiUpsellBarVisible, setIsCtiUpsellBarVisible] = useState(
+    ctiUpsellBarVisible$.getValue(),
+  );
+
+  useEffect(() => {
+    const subscription = ctiUpsellBarVisible$.subscribe(
+      setIsCtiUpsellBarVisible,
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
   const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
 
@@ -53,7 +65,7 @@ export const UpdatesNotification = () => {
     return null;
   }
 
-  if (isDismissed) {
+  if (isDismissed || isCtiUpsellBarVisible) {
     return null;
   }
 
@@ -81,7 +93,14 @@ export const UpdatesNotification = () => {
   return mustNotifyUser ? (
     <I18nProvider>
       <EuiBottomBar
-        className={sideNavDocked ? 'wz-check-updates-bottom-bar' : ''}
+        className={`wz-check-updates-bar${
+          sideNavDocked ? ' wz-check-updates-bottom-bar' : ''
+        }`}
+        bodyClassName='wz-check-updates-has-bottom-bar'
+        landmarkHeading={i18n.translate(
+          'wazuhCheckUpdates.updatesNotification.landmarkHeading',
+          { defaultMessage: 'New release notification' },
+        )}
       >
         <EuiFlexGroup
           justifyContent='spaceBetween'
