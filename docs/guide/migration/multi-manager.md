@@ -60,7 +60,7 @@ managers are members of a Wazuh cluster — to the cluster's virtual IP address 
 in front of the cluster nodes.
 
 In `opensearch_dashboards.yml`. Do not set `password` here for the `default` host — the package
-resolves it into the keystore from `/etc/wazuh/credentials.env` instead:
+resolves it into the keystore instead (see [Credentials](../../ref/getting-started/credentials.md)):
 
 ```yaml
 wazuh_core.hosts:
@@ -69,6 +69,7 @@ wazuh_core.hosts:
     port: 55000
     username: wazuh-internal-client
     run_as: false
+    ca: '/etc/wazuh-dashboard/certs/manager-ca.pem'
 ```
 
 ### Option B: Separate dashboard instances per manager
@@ -76,8 +77,7 @@ wazuh_core.hosts:
 If the multiple entries served genuinely independent Wazuh deployments (for example, different customer environments or separate security domains), deploy a **separate Wazuh dashboard instance for each manager**.
 
 Each instance is configured with a single `wazuh_core.hosts` entry pointing to its respective Wazuh
-manager. Only the literal `default` host name gets its password resolved automatically from
-`/etc/wazuh/credentials.env`; a differently-named host like `production` or `staging` does not, so
+manager. Only the literal `default` host name gets its password resolved automatically; a differently-named host like `production` or `staging` does not, so
 avoid writing its password in plain text in `opensearch_dashboards.yml` — add it to the keystore
 of each instance instead, under the matching dotted path (see
 [Passwords in the keystore](../../ref/configuration.md#passwords-in-the-keystore)).

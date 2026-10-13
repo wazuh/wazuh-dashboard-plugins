@@ -4,6 +4,9 @@ This section guides you through the upgrade process of the Wazuh dashboard.
 
 ## Pre-upgrade requirements
 
+Upgrades are supported between Wazuh 5.0.0 builds from RC2 on. Upgrading from RC1 or earlier testing
+versions is not supported: install those hosts again.
+
 Before upgrading, ensure you:
 
 1. Review release notes for breaking changes and new features
@@ -70,7 +73,7 @@ If the configuration file was replaced when the package was installed, follow th
 
 4.1. Manually reapply any configuration changes to the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file. Ensure that the values of `server.ssl.key` and `server.ssl.certificate` match the files located in `/etc/wazuh-dashboard/certs/`.
 
-4.2. The packaged `opensearch_dashboards.yml` no longer sets `wazuh_core.hosts.default.password`: the package stores that password in the keystore. If you replaced the file and the keystore has no `wazuh_core.hosts.default.password` entry, add `WAZUH_MANAGER_WUI_PASSWORD` to `/etc/wazuh/credentials.env` before starting the service, or keep the setting in your file. Otherwise the service refuses to start and names the missing key. See [Credentials](getting-started/credentials.md#upgrades-and-removal).
+4.2. The packaged `opensearch_dashboards.yml` no longer sets `wazuh_core.hosts.default.password`: the package stores that password in the keystore. If you replaced the file and the keystore has no `wazuh_core.hosts.default.password` entry, add `WAZUH_MANAGER_WUI_PASSWORD` to `/etc/wazuh-dashboard/local.env` before starting the service, or keep the setting in your file. Otherwise the service refuses to start and names the missing key. See [Credentials](getting-started/credentials.md#upgrades-and-removal).
 
 4.3. Ensure the value of `uiSettings.overrides.defaultRoute` in the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file is set to `/app/wz-home` as shown below:
 
@@ -78,8 +81,13 @@ If the configuration file was replaced when the package was installed, follow th
 uiSettings.overrides.defaultRoute: /app/wz-home
 ```
 
-The upgrade keeps the keystore entries, the AI Assistant encryption key and the TLS certificates as
-they are. It does not issue certificates or generate new secrets.
+If you kept your own file, check that `opensearch.ssl.certificateAuthorities` names
+`/etc/wazuh-dashboard/certs/indexer-ca.pem` and that `wazuh_core.hosts.default.ca` names
+`/etc/wazuh-dashboard/certs/manager-ca.pem`.
+
+The upgrade keeps the passwords, the keystore entries, the AI Assistant encryption key, the TLS
+certificates, the dashboard CA and the imported or staged peer CAs as they are. It does not issue
+certificates or generate new secrets.
 
 5. Restart the Wazuh dashboard:
 

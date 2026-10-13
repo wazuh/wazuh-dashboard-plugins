@@ -44,7 +44,7 @@ hosts:
 ### 5.x format (`opensearch_dashboards.yml`)
 
 Do not set the `default` host's password here — the package resolves it into the keystore from
-`/etc/wazuh/credentials.env` instead:
+the manager's `export/credentials.env` or `/etc/wazuh-dashboard/local.env` instead:
 
 ```yaml
 wazuh_core.hosts:
@@ -53,6 +53,7 @@ wazuh_core.hosts:
     port: 55000
     username: wazuh-internal-client
     run_as: true
+    ca: '/etc/wazuh-dashboard/certs/manager-ca.pem'
 ```
 
 The key differences are:
@@ -188,7 +189,7 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
 ### 3. Add the Wazuh server host block
 
 Append the following block to `opensearch_dashboards.yml`, replacing the placeholder values with those from your 4.x `wazuh.yml`. Do not set `password` here for the `default` host — the package
-resolves it into the keystore from `/etc/wazuh/credentials.env` instead:
+resolves it into the keystore instead (see [Credentials](../../ref/getting-started/credentials.md)):
 
 ```yaml
 wazuh_core.hosts:
@@ -197,6 +198,7 @@ wazuh_core.hosts:
     port: <PORT>
     username: <USERNAME>
     run_as: <RUN_AS>
+    ca: '/etc/wazuh-dashboard/certs/manager-ca.pem'
 ```
 
 Replace `<WAZUH_MANAGER_IP_OR_HOSTNAME>`, `<PORT>`, `<USERNAME>`, and `<RUN_AS>` with the values from your 4.x configuration.
