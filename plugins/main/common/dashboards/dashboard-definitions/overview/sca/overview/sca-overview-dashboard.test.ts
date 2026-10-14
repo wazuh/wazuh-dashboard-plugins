@@ -46,6 +46,17 @@ describe('SCA overview dashboard definition', () => {
       ]);
     });
 
+    it('is named after what it shows and keeps its saved-object id', () => {
+      const visState = JSON.parse(visualization.attributes.visState);
+      const termsAgg = visState.aggs.find(
+        (agg: { type: string }) => agg.type === 'terms',
+      );
+
+      expect(visualization.id).toBe('sca-top-checks-check.name');
+      expect(visState.title).toBe('Top 5 failed checks');
+      expect(termsAgg.params.customLabel).toBe('Top 5 failed checks');
+    });
+
     it('references the index pattern of every filter', () => {
       const referenceNames = visualization.references.map(
         (reference: { name: string }) => reference.name,
