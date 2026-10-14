@@ -407,9 +407,9 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
             <EuiTitle size='s'>
               <h3>
                 {i18n.translate(
-                  'wazuh.mitreAttack.techniqueFlyout.recentEvents.title',
+                  'wazuh.mitreAttack.techniqueFlyout.recentFindings.title',
                   {
-                    defaultMessage: 'Recent events',
+                    defaultMessage: 'Recent findings',
                   },
                 )}
                 <span style={{ marginLeft: 16 }}>
@@ -417,7 +417,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     <EuiToolTip
                       position='top'
                       content={i18n.translate(
-                        'wazuh.mitreAttack.techniqueFlyout.recentEvents.showInDashboardTooltip',
+                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.showInDashboardTooltip',
                         {
                           defaultMessage: 'Show {id} in {tabName}',
                           values: {
@@ -440,7 +440,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     <EuiToolTip
                       position='top'
                       content={i18n.translate(
-                        'wazuh.mitreAttack.techniqueFlyout.recentEvents.inspectInEventsTooltip',
+                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.inspectInEventsTooltip',
                         {
                           defaultMessage: 'Inspect {id} in {tabName}',
                           values: {
