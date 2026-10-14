@@ -26,8 +26,9 @@ import { I18nProvider } from '@osd/i18n/react';
 import { tUseSearchBarProps } from '../search-bar/use-search-bar';
 import { WzSearchBar } from '../search-bar/search-bar';
 import { MultiSelectInput } from './components/multi-select-input';
+import { ValueSuggestionMatchOptions } from '../hooks/use-value-suggestion';
 
-interface FilterInput {
+interface FilterInput extends ValueSuggestionMatchOptions {
   type: string;
   key: string;
   placeholder: string;

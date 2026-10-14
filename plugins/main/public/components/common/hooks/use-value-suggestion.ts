@@ -34,6 +34,18 @@ export interface BoolFilter {
   value: string;
 }
 
+export interface ValueSuggestionMatchOptions {
+  /* 'contains' matches the query anywhere in the value, ignoring case. Default: prefix match. */
+  matchMode?: 'prefix' | 'contains';
+  /* Keyword fields searched in 'contains' mode. Default: the filter field. */
+  matchFields?: string[];
+}
+
+const CONTAINS_DEBOUNCE_MS = 300;
+const CONTAINS_SUGGESTIONS_SIZE = 10;
+
+const escapeWildcard = (value: string) => value.replace(/[\\*?]/g, '\\$&');
+
 /**
  * Use the provided mechanism to retrieve the suggetions. It only supports the boolean and string
  * types.
@@ -115,6 +127,48 @@ async function getValueSuggestionResolverAggregation({
   return map(buckets || [], 'key');
 }
 
+/**
+ * Match the query anywhere in the matchFields values, ignoring case, and suggest the values of the
+ * field. Only for keyword fields.
+ */
+async function getValueSuggestionResolverContains({
+  query,
+  indexPattern,
+  field,
+  boolFilter,
+  matchFields,
+}) {
+  const value = `*${escapeWildcard(query)}*`;
+  const searchSource = await getDataPlugin().search.searchSource.create();
+  const searchParams = searchSource
+    .setParent(undefined)
+    .setField('size', 0)
+    .setField('index', indexPattern)
+    .setField('aggs', {
+      suggestions: {
+        terms: { field: field.name, size: CONTAINS_SUGGESTIONS_SIZE },
+      },
+    })
+    .setField('query', {
+      language: 'lucene',
+      query: {
+        bool: {
+          filter: boolFilter,
+          ...(query && {
+            should: matchFields.map(name => ({
+              wildcard: { [name]: { value, case_insensitive: true } },
+            })),
+            minimum_should_match: 1,
+          }),
+        },
+      },
+    });
+
+  const response = await searchParams.fetch();
+  const buckets = get(response, 'aggregations.suggestions.buckets');
+  return map(buckets || [], 'key');
+}
+
 const getValueSuggestionResolversByFieldType = {
   string: getValueSuggestionResolverAutocomplete,
   boolean: getValueSuggestionResolverAutocomplete,
@@ -141,6 +195,7 @@ export const useValueSuggestion = (
   },
   options?: string[],
   indexPattern?: IIndexPattern,
+  { matchMode = 'prefix', matchFields }: ValueSuggestionMatchOptions = {},
 ): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>(
     [],
@@ -168,6 +223,15 @@ export const useValueSuggestion = (
           ]
         : []; /* FIX: This should create a query depending on the field type. This is using term
         and this could not be supported for other types */
+    if (!options && matchMode === 'contains') {
+      return getValueSuggestionResolverContains({
+        query,
+        indexPattern,
+        field,
+        boolFilter,
+        matchFields: matchFields ?? [field.name],
+      });
+    }
     return options
       ? getOptions()
       : getValueSuggestionResolver({
@@ -179,15 +243,19 @@ export const useValueSuggestion = (
   };
 
   useEffect(() => {
+    let isStale = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (indexPattern) {
       setIsLoading(true);
-      (async () => {
+      const fetchSuggestions = async () => {
         try {
           const field = indexPattern.fields.find(
             ({ spec: { name } }) => name === filterField,
           );
           const suggestions = await getValueSuggestions(field.spec);
-          setSuggestedValues(suggestions);
+          if (!isStale) {
+            setSuggestedValues(suggestions);
+          }
         } catch (error) {
           const options: UIErrorLog = {
             context: `${useValueSuggestion.name}.getValueSuggestions`,
@@ -201,14 +269,25 @@ export const useValueSuggestion = (
           };
           getErrorOrchestrator().handleError(options);
         } finally {
-          setIsLoading(false);
+          if (!isStale) {
+            setIsLoading(false);
+          }
         }
-      })();
+      };
+      if (matchMode === 'contains' && query) {
+        timer = setTimeout(fetchSuggestions, CONTAINS_DEBOUNCE_MS);
+      } else {
+        fetchSuggestions();
+      }
     } else {
       setSuggestedValues([]);
       setIsLoading(false);
     }
-  }, [indexPattern, query, filterField, boolFilterValue]);
+    return () => {
+      isStale = true;
+      clearTimeout(timer);
+    };
+  }, [indexPattern, query, filterField, boolFilterValue, matchMode]);
 
   return { suggestedValues, isLoading, setQuery };
 };

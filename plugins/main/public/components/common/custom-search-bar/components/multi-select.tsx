@@ -27,7 +27,10 @@ import {
 import { IndexPattern } from 'src/plugins/data/public';
 import { IValueSuggestion, useValueSuggestion } from '../../hooks';
 import _ from 'lodash';
-import { BoolFilter } from '../../hooks/use-value-suggestion';
+import {
+  BoolFilter,
+  ValueSuggestionMatchOptions,
+} from '../../hooks/use-value-suggestion';
 
 const Switch = {
   ON: 'on',
@@ -49,7 +52,7 @@ interface MultiSelectProps {
     placeholder: string;
     filterByKey?: boolean;
     options?: string[];
-  };
+  } & ValueSuggestionMatchOptions;
   onChange: (selectedOptions: Item[], id: string) => void;
   selectedOptions: Item[];
   onRemove: (id: string) => void;
@@ -77,6 +80,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
       filterDrillDownValue,
       item?.options,
       indexPattern,
+      { matchMode: item.matchMode, matchFields: item.matchFields },
     );
   const [items, setItems] = useState<Item[]>([]);
   const [activeFilters, setActiveFilters] = useState<number>(0);

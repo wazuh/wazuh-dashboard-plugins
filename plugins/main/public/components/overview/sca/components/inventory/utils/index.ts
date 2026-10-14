@@ -23,6 +23,8 @@ export const managedFilters = [
   {
     type: 'multiSelect',
     key: 'check.name',
+    matchMode: 'contains' as const,
+    matchFields: ['check.name', 'check.id'],
     placeholder: i18n.translate(
       'wazuh.configurationAssessment.inventoryFilters.check',
       {
