@@ -28,6 +28,10 @@ export const userPreferencesObject: SavedObjectsType = {
       hide_cti_upsell: {
         type: 'boolean',
       },
+      // eslint-disable-next-line camelcase -- user preferences use snake_case
+      dismissed_cti_registration_lost_at: {
+        type: 'date',
+      },
     },
   },
   migrations: {},

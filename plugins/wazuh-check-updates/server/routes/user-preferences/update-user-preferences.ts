@@ -18,6 +18,8 @@ export const updateUserPreferencesRoutes = (router: IRouter) => {
           ),
           hide_update_notifications: schema.maybe(schema.boolean()),
           hide_cti_upsell: schema.maybe(schema.boolean()),
+          // eslint-disable-next-line camelcase -- user preferences use snake_case
+          dismissed_cti_registration_lost_at: schema.maybe(schema.string()),
         }),
       },
       options: {

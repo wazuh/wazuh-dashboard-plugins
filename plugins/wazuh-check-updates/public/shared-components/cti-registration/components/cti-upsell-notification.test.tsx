@@ -64,6 +64,7 @@ describe('CtiUpsellNotification', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     ctiFlowState.reset();
+    ctiFlowState.setRegistrationLost(null);
     mockHttpPatch.mockResolvedValue({});
 
     (getCore as jest.Mock).mockReturnValue({
@@ -230,4 +231,82 @@ describe('CtiUpsellNotification', () => {
       expect(screen.queryByText('Register now')).not.toBeInTheDocument();
     });
   });
+
+  /* eslint-disable camelcase -- status API body and user preferences use snake_case */
+  describe('when the registration was lost', () => {
+    const DETECTED_AT = '2026-10-12T17:57:35.000Z';
+    const LOST_STATUS = {
+      ...NOT_REGISTERED_STATUS,
+      registration_lost: {
+        detected_at: DETECTED_AT,
+        last_plan: 'Professional',
+      },
+    };
+
+    test('replaces the upsell with the lost message', async () => {
+      mockResponses(LOST_STATUS);
+
+      render(<CtiUpsellNotification />);
+
+      expect(await screen.findByText('Register again')).toBeInTheDocument();
+      expect(
+        screen.getByText(/no longer registered with Wazuh Cloud/),
+      ).toBeInTheDocument();
+      expect(screen.getByText('Dismiss')).toBeInTheDocument();
+    });
+
+    test('shows even when the user hid the upsell', async () => {
+      mockResponses(LOST_STATUS, { hide_cti_upsell: true });
+
+      render(<CtiUpsellNotification />);
+
+      expect(await screen.findByText('Register again')).toBeInTheDocument();
+    });
+
+    test('stores the dismissed loss in the user preferences', async () => {
+      mockResponses(LOST_STATUS);
+
+      render(<CtiUpsellNotification />);
+
+      fireEvent.click(await screen.findByText('Dismiss'));
+
+      expect(screen.queryByText('Register again')).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(mockHttpPatch).toHaveBeenCalledWith(routes.userPreferences, {
+          body: JSON.stringify({
+            dismissed_cti_registration_lost_at: DETECTED_AT,
+          }),
+        });
+      });
+      await act(() => mockHttpPatch.mock.results[0].value);
+    });
+
+    test('stays hidden for the loss the user dismissed', async () => {
+      mockResponses(LOST_STATUS, {
+        dismissed_cti_registration_lost_at: DETECTED_AT,
+      });
+
+      render(<CtiUpsellNotification />);
+
+      await waitFor(() => {
+        expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus);
+      });
+      await waitFor(() => {
+        expect(ctiFlowState.getRegistrationLost()).not.toBeNull();
+      });
+      expect(screen.queryByText('Register again')).not.toBeInTheDocument();
+      expect(screen.queryByText('Register now')).not.toBeInTheDocument();
+    });
+
+    test('shows again for a later loss', async () => {
+      mockResponses(LOST_STATUS, {
+        dismissed_cti_registration_lost_at: '2026-09-01T00:00:00.000Z',
+      });
+
+      render(<CtiUpsellNotification />);
+
+      expect(await screen.findByText('Register again')).toBeInTheDocument();
+    });
+  });
+  /* eslint-enable camelcase */
 });

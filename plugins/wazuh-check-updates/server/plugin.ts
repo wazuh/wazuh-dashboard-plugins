@@ -16,6 +16,7 @@ import {
 import { defineRoutes } from './routes';
 import {
   availableUpdatesObject,
+  ctiRegistrationHistoryObject,
   userPreferencesObject,
 } from './services/saved-object/types';
 import {
@@ -85,6 +86,7 @@ export class WazuhCheckUpdatesPlugin
     // Register saved objects types
     core.savedObjects.registerType(availableUpdatesObject);
     core.savedObjects.registerType(userPreferencesObject);
+    core.savedObjects.registerType(ctiRegistrationHistoryObject);
 
     // Register server side APIs
     defineRoutes(router);
@@ -103,6 +105,7 @@ export class WazuhCheckUpdatesPlugin
       core.savedObjects.createInternalRepository([
         availableUpdatesObject.name,
         userPreferencesObject.name,
+        ctiRegistrationHistoryObject.name,
       ]);
     setCore(core);
 

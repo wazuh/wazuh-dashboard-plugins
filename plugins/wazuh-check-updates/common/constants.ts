@@ -6,6 +6,8 @@ export const PLUGIN_NAME = 'wazuh_check_updates';
 export const SAVED_OBJECT_UPDATES = 'wazuh-check-updates-available-updates';
 export const SAVED_OBJECT_USER_PREFERENCES =
   'wazuh-check-updates-user-preferences';
+export const SAVED_OBJECT_CTI_REGISTRATION_HISTORY =
+  'wazuh-check-updates-cti-registration-history';
 
 const ctiBasePath = '/api/wazuh-check-updates/cti-registration';
 export enum routes {

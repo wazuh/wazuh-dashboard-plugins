@@ -13,6 +13,7 @@ import {
   parseDeviceAuthorizationForStore,
 } from '../../services/cti-registration/cti-registration-store';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
+import { observeCtiRegistration } from '../../services/cti-registration/registration-history';
 import supertest from 'supertest';
 
 const serverAddress = '127.0.0.1';
@@ -22,6 +23,7 @@ const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
 const mockedGetCtiSubscriptionStatus = getCtiSubscriptionStatus as jest.Mock;
 const mockedTriggerContentUpdateOnChange =
   triggerContentUpdateOnChange as jest.Mock;
+const mockedObserveCtiRegistration = observeCtiRegistration as jest.Mock;
 
 jest.mock('../../services/cti-registration', () => ({
   resolveCtiOAuthClientId: jest.fn(),
@@ -39,6 +41,10 @@ jest.mock(
       .mockResolvedValue({ triggered: false, failed: false }),
   }),
 );
+
+jest.mock('../../services/cti-registration/registration-history', () => ({
+  observeCtiRegistration: jest.fn().mockResolvedValue(undefined),
+}));
 
 jest.mock('../../plugin-services', () => {
   const loggerError = jest.fn();
@@ -117,6 +123,7 @@ describe('CTI registration status route', () => {
       triggered: false,
       failed: false,
     });
+    mockedObserveCtiRegistration.mockResolvedValue(undefined);
     mockedLoggerError.mockClear();
   });
 
@@ -327,6 +334,46 @@ describe('CTI registration status route', () => {
       await new Promise(resolve => setImmediate(resolve));
       expect(mockedLoggerError).toHaveBeenCalledTimes(1);
       expect(mockedLoggerError.mock.calls[0][0]).toContain('env-uuid-1');
+    });
+  });
+
+  describe('registration history', () => {
+    /* eslint-disable camelcase -- status API body uses snake_case */
+    const lost = {
+      detected_at: '2026-10-12T17:57:35.000Z',
+      last_plan: 'Professional',
+    };
+    /* eslint-enable camelcase */
+
+    test('returns registration_lost when the history reports a loss', async () => {
+      mockedObserveCtiRegistration.mockResolvedValue(lost);
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(response.body.registration_lost).toEqual(lost);
+      expect(mockedObserveCtiRegistration).toHaveBeenCalledWith('env-uuid-1', {
+        message: null,
+        status: null,
+      });
+    });
+
+    test('still answers, without registration_lost, when the history fails', async () => {
+      mockedObserveCtiRegistration.mockRejectedValue(new Error('index down'));
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(response.body.registration_lost).toBeUndefined();
+      expect(response.body.subscription).toEqual({
+        message: null,
+        status: null,
+      });
+      expect(mockedLoggerError).toHaveBeenCalledWith(
+        expect.stringContaining('CTI registration history'),
+      );
     });
   });
 });

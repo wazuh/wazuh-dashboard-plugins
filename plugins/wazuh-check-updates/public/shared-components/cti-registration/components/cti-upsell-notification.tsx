@@ -14,6 +14,7 @@ import { ModalCti } from './modal-cti';
 import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
+import { ctiFlowState } from '../../../services/cti-flow-state';
 import { getWazuhCore } from '../../../plugin-services';
 import { useUserPreferences } from '../../../hooks';
 
@@ -32,11 +33,17 @@ export const CtiUpsellNotification = () => {
   } = useUserPreferences();
 
   const isRegistered = statusCTI.status === statusCodes.SUCCESS;
+  const registrationLost = ctiFlowState.getRegistrationLost();
+  // A lost registration is news, not an upsell: it shows until dismissed, once per loss.
+  const barHidden = registrationLost
+    ? userPreferences.dismissed_cti_registration_lost_at ===
+      registrationLost.detected_at
+    : Boolean(userPreferences.hide_cti_upsell);
   const shouldShowBar =
     !loading &&
     !isLoadingPreferences &&
     !dismissed &&
-    !userPreferences.hide_cti_upsell &&
+    !barHidden &&
     !isRegistered &&
     !modalOpen &&
     !deviceFlowActive &&
@@ -45,7 +52,7 @@ export const CtiUpsellNotification = () => {
 
   const holdsBottomBar =
     !dismissed &&
-    !userPreferences.hide_cti_upsell &&
+    !barHidden &&
     !isRegistered &&
     (loading || isLoadingPreferences || modalOpen || shouldShowBar);
 
@@ -57,7 +64,13 @@ export const CtiUpsellNotification = () => {
 
   const handleDismiss = () => {
     setDismissed(true);
-    void updateUserPreferences({ hide_cti_upsell: true });
+    /* eslint-disable camelcase -- user preferences use snake_case */
+    void updateUserPreferences(
+      registrationLost
+        ? { dismissed_cti_registration_lost_at: registrationLost.detected_at }
+        : { hide_cti_upsell: true },
+    );
+    /* eslint-enable camelcase */
   };
 
   const handleOpenRegister = () => {
@@ -96,14 +109,27 @@ export const CtiUpsellNotification = () => {
                   responsive={false}
                 >
                   <EuiFlexItem grow={false}>
-                    <EuiIcon type='globe' color='ghost' size='m' aria-hidden />
+                    <EuiIcon
+                      type={registrationLost ? 'alert' : 'globe'}
+                      color={registrationLost ? 'warning' : 'ghost'}
+                      size='m'
+                      aria-hidden
+                    />
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiText color='ghost'>
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiUpsell.barMessage'
-                        defaultMessage='Connect your Wazuh environment to the Wazuh Console and unlock Cyber Threat Intelligence.'
-                      />
+                      {registrationLost ? (
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.lostBarMessage'
+                          defaultMessage='This instance is no longer registered with Wazuh Cloud. It was on the {planName} plan and now gets the Open feed.'
+                          values={{ planName: registrationLost.last_plan }}
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.barMessage'
+                          defaultMessage='Connect your Wazuh environment to the Wazuh Console and unlock Cyber Threat Intelligence.'
+                        />
+                      )}
                     </EuiText>
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -121,10 +147,17 @@ export const CtiUpsellNotification = () => {
                       onClick={handleDismiss}
                       data-test-subj='ctiUpsellDismissButton'
                     >
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiUpsell.dismissButton'
-                        defaultMessage="Don't show again"
-                      />
+                      {registrationLost ? (
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.lostDismissButton'
+                          defaultMessage='Dismiss'
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.dismissButton'
+                          defaultMessage="Don't show again"
+                        />
+                      )}
                     </EuiButtonEmpty>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
@@ -135,10 +168,17 @@ export const CtiUpsellNotification = () => {
                       onClick={handleOpenRegister}
                       data-test-subj='ctiUpsellRegisterButton'
                     >
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiUpsell.registerButton'
-                        defaultMessage='Register now'
-                      />
+                      {registrationLost ? (
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.registerAgainButton'
+                          defaultMessage='Register again'
+                        />
+                      ) : (
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.registerButton'
+                          defaultMessage='Register now'
+                        />
+                      )}
                     </EuiButton>
                   </EuiFlexItem>
                 </EuiFlexGroup>

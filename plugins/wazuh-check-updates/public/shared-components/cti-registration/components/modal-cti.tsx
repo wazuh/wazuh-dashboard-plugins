@@ -33,6 +33,7 @@ import {
 } from '../../../../common/constants';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
 import { CtiConsumersAccordion } from './cti-consumers-accordion';
+import { RegistrationLostCallOut } from './registration-lost-callout';
 import { useCtiRegistrationPermission } from '../hooks/use-cti-registration-permission';
 
 type CtiHrefLinkProps = {
@@ -331,6 +332,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const subscriptionPlanName =
     ctiFlowState.getSubscription()?.message?.plan?.name;
 
+  const registrationLost = ctiFlowState.getRegistrationLost();
+
   const ctiTemporarilyUnreachable =
     showSuccess && ctiFlowState.getSubscription()?.message === null;
 
@@ -411,6 +414,12 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           >
             <EuiLoadingSpinner size='xl' data-test-subj='ctiModalSyncSpinner' />
           </div>
+        ) : null}
+        {registrationLost && (showRegistrationIntro || showPermissionDenied) ? (
+          <>
+            <RegistrationLostCallOut registrationLost={registrationLost} />
+            <EuiSpacer size='m' />
+          </>
         ) : null}
         {showRegistrationIntro ? (
           <EuiText>
@@ -747,10 +756,17 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               onClick={handleStartRegistration}
               fill
             >
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalButtonRegister'
-                defaultMessage='Register'
-              />
+              {registrationLost ? (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalButtonRegisterAgain'
+                  defaultMessage='Register again'
+                />
+              ) : (
+                <FormattedMessage
+                  id='wazuhCheckUpdates.ctiRegistration.modalButtonRegister'
+                  defaultMessage='Register'
+                />
+              )}
             </EuiButton>
           </>
         )}
