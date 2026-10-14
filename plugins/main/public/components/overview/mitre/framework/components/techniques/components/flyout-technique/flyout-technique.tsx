@@ -440,7 +440,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                     <EuiToolTip
                       position='top'
                       content={i18n.translate(
-                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.inspectInEventsTooltip',
+                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.inspectInFindingsTooltip',
                         {
                           defaultMessage: 'Inspect {id} in {tabName}',
                           values: {
