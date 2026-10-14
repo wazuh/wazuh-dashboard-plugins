@@ -49,7 +49,7 @@ chmod 640 /etc/wazuh-dashboard/certs/*.pem
 
 ### The server API is refused although the manager is running
 
-The dashboard verifies the Server API certificate and host name. The connection is refused, and no
+The dashboard verifies the manager API certificate and host name. The connection is refused, and no
 credentials are sent, when:
 
 - `/etc/wazuh-dashboard/certs/manager-ca.pem` is missing. The journal shows
@@ -67,7 +67,7 @@ openssl s_client -connect <MANAGER_ADDRESS>:55000 -CAfile /etc/wazuh-dashboard/c
   -verify_hostname <MANAGER_ADDRESS> < /dev/null 2>/dev/null | grep 'Verify return code'
 ```
 
-`Verify return code: 0 (ok)` means the dashboard can verify the Server API.
+`Verify return code: 0 (ok)` means the dashboard can verify the manager API.
 
 ### The dashboard is unreachable from other hosts
 

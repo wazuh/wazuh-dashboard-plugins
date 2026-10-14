@@ -24,7 +24,7 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 - Each peer is verified with its own CA (`certs/indexer-ca.pem`, `certs/manager-ca.pem`), never
   with a merged bundle. In multi-host deployments, copy each peer's `export/ca.pem`, never its
   private key. See [Dashboard on a separate host](getting-started/installation.md#dashboard-on-a-separate-host).
-- Keep `wazuh_core.hosts.<name>.ca` set on every Server API host: without it, the server
+- Keep `wazuh_core.hosts.<name>.ca` set on every manager API host: without it, the server
   certificate is not verified.
 - Before publishing a container image built by installing the package, run
   `/usr/share/wazuh-dashboard/bin/resolve-credentials --clear` so the image ships no credentials,

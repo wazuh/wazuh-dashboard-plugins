@@ -134,7 +134,7 @@ key on disk cannot answer that question: an operator who stages their own CA lea
 3. Either way it must be a CA certificate, otherwise `--prestart` reports `INVALID <path>`.
 
 A missing `indexer-ca.pem` stops the start. A missing `manager-ca.pem` is only a warning: the
-dashboard starts and serves indexer data, and the Server API connection is refused until the CA is
+dashboard starts and serves indexer data, and the manager API connection is refused until the CA is
 present.
 
 ## Resolver modes

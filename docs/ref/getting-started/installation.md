@@ -99,11 +99,11 @@ checks them again immediately before the service starts. No default password and
 certificate authority (CA) is shipped.
 
 - **Passwords**: the dashboard stores the `kibanaserver` (indexer) and `wazuh-internal-client`
-  (Server API) passwords in its keystore. It never generates them: it reads them from the indexer's
+  (manager API) passwords in its keystore. It never generates them: it reads them from the indexer's
   `/etc/wazuh-indexer/export/credentials.env` and the manager's
   `/etc/wazuh-manager/export/credentials.env` on the same host, or from
   `/etc/wazuh-dashboard/local.env` when you supply them.
-- **Peer CAs**: the dashboard verifies the indexer with `certs/indexer-ca.pem` and the Server API
+- **Peer CAs**: the dashboard verifies the indexer with `certs/indexer-ca.pem` and the manager API
   with `certs/manager-ca.pem`, imported from the peers' `export/ca.pem` on the same host, or staged
   by you.
 - **Own certificate**: a fresh install mints the dashboard CA in `/etc/wazuh-dashboard/ca/`, issues
@@ -138,7 +138,7 @@ others' `export/` directories, and no operator input is needed.
 
 A dashboard installed before the indexer does not start until the indexer is installed: its start
 reports the missing password and CA. Start it again once the indexer is installed. A dashboard
-started before the manager is installed serves indexer data but refuses the Server API until its
+started before the manager is installed serves indexer data but refuses the manager API until its
 next start after the manager is installed.
 
 #### Dashboard on a separate host
@@ -191,7 +191,7 @@ manager values on the dashboard host **before** installing the package.
    - Set `opensearch.hosts` to the Wazuh indexer nodes.
    - Set `wazuh_core.hosts.default.url` to the Wazuh manager, or the master node in a cluster. Use a
      name or an address present in the subject alternative names of the manager's API certificate
-     (`apid.pem`): the dashboard refuses a Server API whose certificate does not match.
+     (`apid.pem`): the dashboard refuses a manager API whose certificate does not match.
 
    See [Configuring the Wazuh dashboard](#configuring-the-wazuh-dashboard).
 
@@ -201,10 +201,10 @@ manager values on the dashboard host **before** installing the package.
 If a peer CA is still missing when the dashboard starts:
 
 - **Indexer CA missing**: the dashboard does not start.
-- **Manager CA missing**: the dashboard starts and serves indexer data, but refuses the Server API
+- **Manager CA missing**: the dashboard starts and serves indexer data, but refuses the manager API
   until the CA is in place and the dashboard is restarted.
 
-To verify the deployment, check that the dashboard answers as `admin` and reaches the Server API with
+To verify the deployment, check that the dashboard answers as `admin` and reaches the manager API with
 verification on. Replace `<ADMIN_PASSWORD>` with the `admin` password and `<DASHBOARD_ADDRESS>` with
 the address of the dashboard:
 
@@ -245,7 +245,7 @@ installing the package so the install issues nothing, or afterwards to overwrite
    > `chown` command fails. Skip it in that case: the package gives `/etc/wazuh-dashboard/certs/` to
    > `root:wazuh-dashboard` when it is installed.
 
-2. The indexer and the Server API are still verified with `certs/indexer-ca.pem` and
+2. The indexer and the manager API are still verified with `certs/indexer-ca.pem` and
    `certs/manager-ca.pem`. If your PKI also issued their certificates, stage its CA certificate as
    those files, as described in [Dashboard on a separate host](#dashboard-on-a-separate-host).
 

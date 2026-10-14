@@ -4,9 +4,6 @@ This section guides you through the upgrade process of the Wazuh dashboard.
 
 ## Pre-upgrade requirements
 
-Upgrades are supported between Wazuh 5.0.0 builds from RC2 on. Upgrading from RC1 or earlier testing
-versions is not supported: install those hosts again.
-
 Before upgrading, ensure you:
 
 1. Review release notes for breaking changes and new features

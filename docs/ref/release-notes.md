@@ -74,7 +74,7 @@
   the `kibanaserver` and `wazuh-internal-client` passwords into the dashboard keystore at install
   time and again before every start, from the indexer and manager `export/` directories on the same
   host or from `/etc/wazuh-dashboard/local.env`. Each component owns its configuration directory and
-  CA, and the dashboard verifies the indexer and the Server API each with its own CA file. See
+  CA, and the dashboard verifies the indexer and the manager API each with its own CA file. See
   [Credentials](getting-started/credentials.md).
 
 ## Additional highlights

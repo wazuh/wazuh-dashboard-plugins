@@ -47,7 +47,7 @@ The dashboard never creates or reads `/etc/wazuh`.
   certs/                             root:wazuh-dashboard 0750
     dashboard.pem, dashboard-key.pem                             the certificate served to browsers
     indexer-ca.pem                                               verifies the Wazuh indexer
-    manager-ca.pem                                               verifies the Server API
+    manager-ca.pem                                               verifies the manager API
     .indexer-ca.imported, .manager-ca.imported                   the package imported the file
 ```
 
@@ -60,13 +60,13 @@ writable by nobody else, in a directory with the same properties. Anything else 
 The dashboard owns neither account it connects with. Each password belongs to the component that
 holds the account:
 
-| Key                                   | Environment-only alias | Account                              | Published by                                | Written to the keystore as                                    |
-| ------------------------------------- | ---------------------- | ------------------------------------ | ------------------------------------------- | ------------------------------------------------------------- |
-| `WAZUH_INDEXER_KIBANASERVER_PASSWORD` | `INDEXER_PASSWORD`     | `kibanaserver` (Wazuh indexer)       | `/etc/wazuh-indexer/export/credentials.env` | `opensearch.username` (`kibanaserver`), `opensearch.password` |
-| `WAZUH_MANAGER_WUI_PASSWORD`          | `API_PASSWORD`         | `wazuh-internal-client` (Server API) | `/etc/wazuh-manager/export/credentials.env` | `wazuh_core.hosts.default.password`                           |
+| Key                                   | Environment-only alias | Account                               | Published by                                | Written to the keystore as                                    |
+| ------------------------------------- | ---------------------- | ------------------------------------- | ------------------------------------------- | ------------------------------------------------------------- |
+| `WAZUH_INDEXER_KIBANASERVER_PASSWORD` | `INDEXER_PASSWORD`     | `kibanaserver` (Wazuh indexer)        | `/etc/wazuh-indexer/export/credentials.env` | `opensearch.username` (`kibanaserver`), `opensearch.password` |
+| `WAZUH_MANAGER_WUI_PASSWORD`          | `API_PASSWORD`         | `wazuh-internal-client` (manager API) | `/etc/wazuh-manager/export/credentials.env` | `wazuh_core.hosts.default.password`                           |
 
 The dashboard **consumes** both. It never generates them: a password the dashboard made up would not
-be accepted by the indexer or the Server API.
+be accepted by the indexer or the manager API.
 
 It also verifies each peer with that peer's own CA, never with a merged bundle:
 
@@ -149,7 +149,7 @@ Supported keys:
 | Key                                   | Used for                                                                                                                                                                                                              |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `WAZUH_INDEXER_KIBANASERVER_PASSWORD` | The password of the `kibanaserver` account on the Wazuh indexer.                                                                                                                                                      |
-| `WAZUH_MANAGER_WUI_PASSWORD`          | The password of the `wazuh-internal-client` account on the Server API.                                                                                                                                                |
+| `WAZUH_MANAGER_WUI_PASSWORD`          | The password of the `wazuh-internal-client` account on the manager API.                                                                                                                                               |
 | `WAZUH_DASHBOARD_CERT_SANS`           | A comma-separated list of names and addresses for the dashboard certificate. See [The issued certificate](#the-issued-certificate). `localhost`, `127.0.0.1` and `::1` are always appended; an empty list is refused. |
 
 Create it before installing the package, as described in
@@ -212,27 +212,27 @@ The dashboard keeps one CA file per peer in `/etc/wazuh-dashboard/certs/`: `inde
 3. **Validated either way.** The file must be a valid, current CA certificate. Otherwise the start
    reports `INVALID <path>` and the dashboard does not start.
 
-The two files are never merged: the indexer is verified only with `indexer-ca.pem`, and the Server
-API only with `manager-ca.pem`. A certificate issued by the indexer CA is refused on the Server API
+The two files are never merged: the indexer is verified only with `indexer-ca.pem`, and the manager
+API only with `manager-ca.pem`. A certificate issued by the indexer CA is refused on the manager API
 connection, and the other way round.
 
 ### When a peer CA is missing
 
 - **Indexer CA missing.** The dashboard does not start. The journal shows
   `MISSING /etc/wazuh-dashboard/certs/indexer-ca.pem: no CA to verify the indexer with`.
-- **Manager CA missing.** The dashboard starts and serves indexer data, but refuses every Server API
+- **Manager CA missing.** The dashboard starts and serves indexer data, but refuses every manager API
   connection until the CA is in place. The journal shows
   `warning: MISSING /etc/wazuh-dashboard/certs/manager-ca.pem: the Server API connection is refused until it is present`,
-  and the dashboard reports that it cannot reach the Server API.
+  and the dashboard reports that it cannot reach the manager API.
 
 On a single host, install the missing peer and restart the dashboard: the next start imports its CA.
 On a separate host, copy the peer's `export/ca.pem` as described in
 [Dashboard on a separate host](installation.md#dashboard-on-a-separate-host), then restart the
 dashboard.
 
-### Server API verification
+### Manager API verification
 
-Since Wazuh 5.0.0 the dashboard refuses any Server API it cannot verify. Besides the CA, the host
+Since Wazuh 5.0.0 the dashboard refuses any manager API it cannot verify. Besides the CA, the host
 name is checked: `wazuh_core.hosts.default.url` must be a name or an address present in the subject
 alternative names of the manager's API certificate (`apid.pem`). A connection to a name outside that
 list is refused, and no credentials are sent. To add a name, re-issue the manager's API certificate
@@ -447,9 +447,6 @@ staged is kept.
 
 ## Upgrades and removal
 
-Upgrades are supported between Wazuh 5.0.0 builds from RC2 on. Upgrading from RC1 or earlier testing
-versions is not supported: install those hosts again.
-
 An upgrade resolves only what the keystore does not already hold. It keeps the passwords, the
 keystore, the AI Assistant key, the dashboard certificate and CA, and the imported or staged peer
 CAs. It does not issue certificates or generate new secrets.
@@ -472,7 +469,7 @@ Removing the dashboard never touches another component's directory.
 Use `wazuh-passwords-tool.sh` to change a password on a running deployment. The dashboard does not
 follow a change on its own, because a password already in the keystore always wins.
 
-After the password of `kibanaserver` or `wazuh-internal-client` changes on the indexer or the Server
+After the password of `kibanaserver` or `wazuh-internal-client` changes on the indexer or the manager
 API, remove the matching keystore entry, supply the new value, and restart the dashboard. The next
 start stores the new value. For example, for `wazuh-internal-client`:
 
