@@ -494,7 +494,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                           <EuiToolTip
                             position='top'
                             content={i18n.translate(
-                              'wazuh.complianceTable.requirementFlyout.inspectInEventsTooltip',
+                              'wazuh.complianceTable.requirementFlyout.inspectInFindingsTooltip',
                               {
                                 defaultMessage:
                                   'Inspect {requirement} in {view}',
