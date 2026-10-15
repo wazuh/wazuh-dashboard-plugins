@@ -53,10 +53,16 @@ describe('states-sca sample data', () => {
 
     Object.entries(REMEDIATION_VARIANTS).forEach(([variant, remediation]) => {
       const variantDocument = documents.find(
-        document => document.check.id === `CUST-REM-${variant}`,
+        document =>
+          document.check.id ===
+          (variant.startsWith('REAL_')
+            ? `CUST-REAL-${variant.slice(5)}`
+            : `CUST-REM-${variant}`),
       );
 
       expect(variantDocument).toBeDefined();
+      // check.remediation is a keyword with ignore_above 4096
+      expect(remediation.length).toBeLessThan(4096);
       expect(variantDocument.check.remediation).toBe(remediation);
     });
   });

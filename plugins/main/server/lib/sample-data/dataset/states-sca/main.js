@@ -43,6 +43,10 @@ function generateDocument(params) {
   // for example: check.id: "CUST-REM-ALL"
   const remediationVariant = random.choice(Object.keys(REMEDIATION_VARIANTS));
 
+  const checkId = remediationVariant.startsWith('REAL_')
+    ? `CUST-REAL-${remediationVariant.slice(5)}`
+    : `CUST-REM-${remediationVariant}`;
+
   return {
     checksum: {
       hash: {
@@ -53,7 +57,7 @@ function generateDocument(params) {
       compliance: generateCompliance(),
       condition: random.choice(['all', 'any']),
       description: sentence(6),
-      id: `CUST-REM-${remediationVariant}`,
+      id: checkId,
       name: `[${remediationVariant}] Ensure ${word()} is ${random.choice([
         'enabled',
         'disabled',
