@@ -22,9 +22,13 @@ describe('scaPanelInfos', () => {
     );
   });
 
-  it('reuses the result definitions as tooltip content', () => {
-    expect(scaPanelInfos.map(({ getContent }) => getContent())).toEqual(
-      getScaResultDefinitions().map(({ description }) => description),
+  it('shares the Score definition with the About flyout', () => {
+    const scorePanel = scaPanelInfos.find(
+      ({ savedObjectId }) => savedObjectId === 'check_score',
+    );
+
+    expect(scorePanel?.getContent()).toBe(
+      getScaResultDefinitions()[3].description,
     );
   });
 });
