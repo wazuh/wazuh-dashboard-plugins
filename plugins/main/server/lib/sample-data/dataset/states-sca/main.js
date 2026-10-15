@@ -2,6 +2,7 @@ const {
   CheckResult,
 } = require('../../../../../public/components/overview/sca/utils/constants');
 const random = require('../../lib/random');
+const { REMEDIATION_VARIANTS } = require('./remediations');
 const {
   generateRandomAgent,
   generateRandomWazuh,
@@ -23,29 +24,44 @@ function sentence(wordsCount = 5) {
   return Array.from({ length: wordsCount }, () => word()).join(' ') + '.';
 }
 
+// Same shape as the real documents: one array of requirement ids per mapped framework.
+// The keys are the field names of the index, so they can't be camelCase.
+/* eslint-disable camelcase */
+function generateCompliance() {
+  return {
+    pci_dss: [`${random.int(1, 12)}.${random.int(1, 6)}.${random.int(1, 9)}`],
+    iso_27001: [`A.${random.int(5, 8)}.${random.int(1, 40)}`],
+    nist_800_53: [`CM-${random.int(1, 9)}`],
+    hipaa: [`164.308.a.${random.int(1, 8)}`],
+    tsc: [`CC${random.int(1, 9)}.${random.int(1, 6)}`],
+  };
+}
+/* eslint-enable camelcase */
+
 function generateDocument(params) {
+  // The variant is part of the check id and name so each remediation style is searchable,
+  // for example: check.id: "CUST-REM-ALL"
+  const remediationVariant = random.choice(Object.keys(REMEDIATION_VARIANTS));
+
   return {
     checksum: {
       hash: {
         sha1: random.hash(),
       },
     },
-    agent: generateRandomAgent(),
     check: {
-      compliance: [
-        `int:${random.int(1, 5)}.${random.int(1, 5)}.${random.int(1, 5)}`,
-      ],
+      compliance: generateCompliance(),
       condition: random.choice(['all', 'any']),
       description: sentence(6),
-      id: `CUST${random.int(100, 999)}`,
-      name: `Ensure ${word()} is ${random.choice(['enabled', 'disabled'])}.`,
+      id: `CUST-REM-${remediationVariant}`,
+      name: `[${remediationVariant}] Ensure ${word()} is ${random.choice([
+        'enabled',
+        'disabled',
+      ])}.`,
       rationale: `${sentence(6)}`,
       reason: null,
       references: [`https://internal.docs/policies/${word()}`],
-      remediation: `Set registry key ${word()} to ${random.choice([
-        '0',
-        '1',
-      ])}.`,
+      remediation: REMEDIATION_VARIANTS[remediationVariant],
       result: random.choice(scaResults),
       rules: [
         `r:HKLM\\SYSTEM\\${word()}\\Parameters -> n:${word()} compare == ${random.choice(
@@ -61,7 +77,10 @@ function generateDocument(params) {
       references: [`https://internal.docs/policies/${word()}`],
     },
     state: generateRandomState(),
-    wazuh: generateRandomWazuh(params),
+    wazuh: {
+      ...generateRandomWazuh(params),
+      agent: generateRandomAgent(),
+    },
   };
 }
 
