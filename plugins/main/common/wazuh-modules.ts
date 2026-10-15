@@ -268,7 +268,7 @@ export const WAZUH_MODULES = {
   },
   sca: {
     title: i18n.translate('wazuh.common.modules.sca.title', {
-      defaultMessage: 'Configuration assessment',
+      defaultMessage: 'Configuration Assessment',
     }),
     appId: 'configuration-assessment',
     description: i18n.translate('wazuh.common.modules.sca.description', {
