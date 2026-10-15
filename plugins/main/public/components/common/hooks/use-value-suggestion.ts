@@ -11,8 +11,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { getDataPlugin } from '../../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { IIndexPattern } from 'src/plugins/data/public';
+import { UI_SETTINGS } from '../../../../../../src/plugins/data/common';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -34,15 +35,11 @@ export interface BoolFilter {
   value: string;
 }
 
-export interface ValueSuggestionMatchOptions {
-  /* 'contains' matches the query anywhere in the value, ignoring case. Default: prefix match. */
-  matchMode?: 'prefix' | 'contains';
-  /* Keyword fields searched in 'contains' mode. Default: the filter field. */
-  matchFields?: string[];
-}
-
-const CONTAINS_DEBOUNCE_MS = 300;
+const SEARCH_DEBOUNCE_MS = 300;
 const CONTAINS_SUGGESTIONS_SIZE = 10;
+/* Same bounds as the platform autocomplete defaults */
+const CONTAINS_TIMEOUT = '1000ms';
+const CONTAINS_TERMINATE_AFTER = 100000;
 
 const escapeWildcard = (value: string) => value.replace(/[\\*?]/g, '\\$&');
 
@@ -128,21 +125,27 @@ async function getValueSuggestionResolverAggregation({
 }
 
 /**
- * Match the query anywhere in the matchFields values, ignoring case, and suggest the values of the
- * field. Only for keyword fields.
+ * Suggest the values of a string field that contain the query anywhere, ignoring case.
  */
 async function getValueSuggestionResolverContains({
   query,
   indexPattern,
   field,
   boolFilter,
-  matchFields,
 }) {
+  if (
+    !field.aggregatable ||
+    !getUiSettings().get(UI_SETTINGS.FILTERS_EDITOR_SUGGEST_VALUES)
+  ) {
+    return [];
+  }
   const value = `*${escapeWildcard(query)}*`;
   const searchSource = await getDataPlugin().search.searchSource.create();
   const searchParams = searchSource
     .setParent(undefined)
     .setField('size', 0)
+    .setField('timeout', CONTAINS_TIMEOUT)
+    .setField('terminate_after', CONTAINS_TERMINATE_AFTER)
     .setField('index', indexPattern)
     .setField('aggs', {
       suggestions: {
@@ -153,13 +156,15 @@ async function getValueSuggestionResolverContains({
       language: 'lucene',
       query: {
         bool: {
-          filter: boolFilter,
-          ...(query && {
-            should: matchFields.map(name => ({
-              wildcard: { [name]: { value, case_insensitive: true } },
-            })),
-            minimum_should_match: 1,
-          }),
+          filter: query
+            ? [
+                ...boolFilter,
+                {
+                  // eslint-disable-next-line camelcase
+                  wildcard: { [field.name]: { value, case_insensitive: true } },
+                },
+              ]
+            : boolFilter,
         },
       },
     });
@@ -170,7 +175,7 @@ async function getValueSuggestionResolverContains({
 }
 
 const getValueSuggestionResolversByFieldType = {
-  string: getValueSuggestionResolverAutocomplete,
+  string: getValueSuggestionResolverContains,
   boolean: getValueSuggestionResolverAutocomplete,
   _default: getValueSuggestionResolverAggregation,
 };
@@ -195,7 +200,6 @@ export const useValueSuggestion = (
   },
   options?: string[],
   indexPattern?: IIndexPattern,
-  { matchMode = 'prefix', matchFields }: ValueSuggestionMatchOptions = {},
 ): IValueSuggestion => {
   const [suggestedValues, setSuggestedValues] = useState<string[] | boolean[]>(
     [],
@@ -223,15 +227,6 @@ export const useValueSuggestion = (
           ]
         : []; /* FIX: This should create a query depending on the field type. This is using term
         and this could not be supported for other types */
-    if (!options && matchMode === 'contains') {
-      return getValueSuggestionResolverContains({
-        query,
-        indexPattern,
-        field,
-        boolFilter,
-        matchFields: matchFields ?? [field.name],
-      });
-    }
     return options
       ? getOptions()
       : getValueSuggestionResolver({
@@ -257,6 +252,9 @@ export const useValueSuggestion = (
             setSuggestedValues(suggestions);
           }
         } catch (error) {
+          if (isStale) {
+            return;
+          }
           const options: UIErrorLog = {
             context: `${useValueSuggestion.name}.getValueSuggestions`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -274,8 +272,8 @@ export const useValueSuggestion = (
           }
         }
       };
-      if (matchMode === 'contains' && query) {
-        timer = setTimeout(fetchSuggestions, CONTAINS_DEBOUNCE_MS);
+      if (query && !options) {
+        timer = setTimeout(fetchSuggestions, SEARCH_DEBOUNCE_MS);
       } else {
         fetchSuggestions();
       }
@@ -287,7 +285,7 @@ export const useValueSuggestion = (
       isStale = true;
       clearTimeout(timer);
     };
-  }, [indexPattern, query, filterField, boolFilterValue, matchMode]);
+  }, [indexPattern, query, filterField, boolFilterValue]);
 
   return { suggestedValues, isLoading, setQuery };
 };
