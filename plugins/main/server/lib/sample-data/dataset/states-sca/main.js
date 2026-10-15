@@ -1,6 +1,3 @@
-const {
-  CheckResult,
-} = require('../../../../../public/components/overview/sca/utils/constants');
 const random = require('../../lib/random');
 const { REMEDIATION_VARIANTS } = require('./remediations');
 const {
@@ -9,11 +6,10 @@ const {
   generateRandomState,
 } = require('../../shared-utils');
 
-const scaResults = [
-  CheckResult.Passed,
-  CheckResult.Failed,
-  CheckResult.NotApplicable,
-];
+// Values of the CheckResult enum of the SCA module. They are not imported from public/ because
+// this file also runs from scripts/sample-data/cli.js with plain Node, which can't load that
+// TypeScript file, and server code must not import from public/.
+const scaResults = ['Passed', 'Failed', 'Not applicable'];
 
 function word() {
   const words = ['network', 'smb', 'auth', 'firewall', 'admin', 'crypto'];
