@@ -126,6 +126,38 @@ describe('searchableSettingsRegistry', () => {
     expect(get(content, field.agentPath!)).toBe('/');
   });
 
+  it('places every SCA entry under configuration-assessment, none under policy-monitoring', () => {
+    const idsByGoto = (goto: string) =>
+      searchableSettingsRegistry
+        .filter(entry => entry.goto === goto)
+        .map(entry => entry.id);
+
+    expect(idsByGoto('configuration-assessment')).toEqual([
+      'configuration-assessment.enabled',
+      'configuration-assessment.interval',
+      'configuration-assessment.scan_on_start',
+      'configuration-assessment.skip_nfs',
+      'configuration-assessment.policies',
+    ]);
+    expect(
+      searchableSettingsRegistry.filter(
+        entry =>
+          entry.goto === 'policy-monitoring' &&
+          entry.agentPath?.startsWith('sca.'),
+      ),
+    ).toEqual([]);
+
+    const policies = findField('configuration-assessment.policies');
+    const content = { sca: { policies: ['cis_ubuntu.yml'] } };
+    expect(policies.kind).toBe('list');
+    expect(policies.kind === 'list' && policies.agentExtract!(content)).toEqual(
+      [{ policy: 'cis_ubuntu.yml' }],
+    );
+    expect(findField('configuration-assessment.enabled').agentPath).toBe(
+      'sca.enabled',
+    );
+  });
+
   it('resolves client fields from agent.agent, including a batch sub-field', () => {
     const remoteConf = findField('client.remote_conf');
     const batchSize = findField('client.batch.size');

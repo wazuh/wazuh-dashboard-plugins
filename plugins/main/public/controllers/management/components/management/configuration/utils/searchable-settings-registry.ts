@@ -288,6 +288,18 @@ const POLICY_MONITORING_HELP: HelpLink[] = [
   },
   {
     text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.rootcheckReference',
+      {
+        defaultMessage: 'Rootcheck reference',
+      },
+    ),
+    href: 'user-manual/reference/ossec-conf/rootcheck.html',
+  },
+];
+
+const CONFIGURATION_ASSESSMENT_HELP: HelpLink[] = [
+  {
+    text: i18n.translate(
       'wazuh.configuration.settingsHelpLinks.securityConfigurationAssessment',
       {
         defaultMessage: 'Security Configuration Assessment',
@@ -297,12 +309,12 @@ const POLICY_MONITORING_HELP: HelpLink[] = [
   },
   {
     text: i18n.translate(
-      'wazuh.configuration.settingsHelpLinks.rootcheckReference',
+      'wazuh.configuration.settingsHelpLinks.configurationAssessmentReference',
       {
-        defaultMessage: 'Rootcheck reference',
+        defaultMessage: 'SCA reference',
       },
     ),
-    href: 'user-manual/reference/ossec-conf/rootcheck.html',
+    href: 'user-manual/reference/ossec-conf/sca.html',
   },
 ];
 
@@ -644,14 +656,21 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     ),
     help: POLICY_MONITORING_HELP,
   },
-  [configurationHeaderKey('policy-monitoring', 'SCA')]: {
+  [configurationHeaderKey('configuration-assessment', 'Main settings')]: {
     title: i18n.translate(
-      'wazuh.configuration.settingsHeaders.policyMonitoringScaTitle',
+      'wazuh.configuration.settingsHeaders.configurationAssessmentMainSettingsTitle',
       {
-        defaultMessage: 'Security configuration assessment status',
+        defaultMessage: 'Main settings',
       },
     ),
-    help: POLICY_MONITORING_HELP,
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.configurationAssessmentMainSettingsDescription',
+      {
+        defaultMessage:
+          'General settings for the configuration assessment scan',
+      },
+    ),
+    help: CONFIGURATION_ASSESSMENT_HELP,
   },
   [configurationHeaderKey('client', 'Main settings')]: {
     title: i18n.translate(
@@ -1768,15 +1787,15 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     ],
   },
 
-  // --- Policy monitoring > SCA tab (agent-only, wodle) ---
+  // --- Configuration Assessment (agent-only, wodle) ---
   ...(
     [
       [
         'enabled',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaEnabledLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentEnabledLabel',
           {
-            defaultMessage: 'Security configuration assessment status',
+            defaultMessage: 'Configuration Assessment status',
           },
         ),
         renderValueYesThenEnabled,
@@ -1784,7 +1803,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       [
         'interval',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaIntervalLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentIntervalLabel',
           {
             defaultMessage: 'Interval',
           },
@@ -1793,7 +1812,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       [
         'scan_on_start',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaScanOnStartLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentScanOnStartLabel',
           {
             defaultMessage: 'Scan on start',
           },
@@ -1802,36 +1821,37 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       [
         'skip_nfs',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaSkipNfsLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentSkipNfsLabel',
           {
-            defaultMessage: 'Skip nfs',
+            defaultMessage: 'Skip NFS',
           },
         ),
       ],
     ] as const
   ).map(([field, label, render]) => ({
-    id: `policy-monitoring.sca.${field}`,
+    id: `configuration-assessment.${field}`,
     label,
-    category: 'Policy monitoring',
-    tab: 'SCA',
-    goto: 'policy-monitoring',
+    category: 'Configuration Assessment',
+    tab: 'Main settings',
+    goto: 'configuration-assessment',
     appliesTo: 'agent' as const,
     agentPath: `sca.${field}`,
     ...(render ? { render } : {}),
   })),
   {
     kind: 'list',
-    id: 'policy-monitoring.sca.policies',
-    category: 'Policy monitoring',
-    tab: 'SCA',
-    goto: 'policy-monitoring',
+    id: 'configuration-assessment.policies',
+    category: 'Configuration Assessment',
+    tab: 'Main settings',
+    goto: 'configuration-assessment',
     appliesTo: 'agent',
     title: i18n.translate(
-      'wazuh.configuration.settingsRegistry.policyMonitoringScaPoliciesTitle',
+      'wazuh.configuration.settingsRegistry.configurationAssessmentPoliciesTitle',
       {
         defaultMessage: 'Policies',
       },
     ),
+    help: CONFIGURATION_ASSESSMENT_HELP,
     // A policy is reported as `{ policy: <path> }`, a bare path string, or
     // (if none are enabled) absent entirely -- see policy-monitoring-sca.js's
     // buildPolicyItems.
@@ -1851,7 +1871,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       {
         field: 'policy',
         label: i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaPoliciesItemPolicyLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentPoliciesItemPolicyLabel',
           {
             defaultMessage: 'Name',
           },
