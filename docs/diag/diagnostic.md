@@ -7,7 +7,8 @@
 Before the dashboard starts, the service runs `resolve-credentials --prestart`, which resolves the
 `kibanaserver` and `wazuh-internal-client` passwords into the keystore, imports the peer CAs and
 checks the files it relies on. If a password, the indexer CA or the dashboard certificate is missing
-or invalid, or a file is unsafe, the service refuses to start and the journal names each problem:
+or invalid, a peer CA (`indexer-ca.pem` or `manager-ca.pem`) is invalid, or a file is unsafe, the
+service refuses to start and the journal names each problem:
 
 ```
 resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-internal-client account)
@@ -21,12 +22,14 @@ journalctl -u wazuh-dashboard -n 50
 ```
 
 2. Set the missing key in `/etc/wazuh-dashboard/local.env` (`WAZUH_INDEXER_KIBANASERVER_PASSWORD`
-   or `WAZUH_MANAGER_WUI_PASSWORD`), or correct the value reported as `INVALID`.
+   or `WAZUH_MANAGER_WUI_PASSWORD`), or correct the value reported as `INVALID`. For an `INVALID`
+   peer CA, replace it with that peer's `export/ca.pem`.
 3. If the journal reports `MISSING /etc/wazuh-dashboard/certs/indexer-ca.pem`, install the indexer on
    this host first, or stage its CA as described in
    [Dashboard on a separate host](../ref/getting-started/installation.md#dashboard-on-a-separate-host).
 4. If the journal reports `UNSAFE <path>`, fix the ownership and mode of that file or directory: it
-   must be owned by root, not writable by another user, and not a symbolic link.
+   must be owned by root, not writable by another user, and not a symbolic link. `local.env` must
+   also not be readable by another user (mode `0600`).
 5. Start the service again. If systemd reports that the start limit was hit, run
    `systemctl reset-failed wazuh-dashboard` first.
 
@@ -46,6 +49,8 @@ chown -R root:wazuh-dashboard /etc/wazuh-dashboard/certs
 chmod 750 /etc/wazuh-dashboard/certs
 chmod 640 /etc/wazuh-dashboard/certs/*.pem
 ```
+
+See [Credentials](../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
 
 ### The server API is refused although the manager is running
 
@@ -67,6 +72,9 @@ openssl s_client -connect <MANAGER_ADDRESS>:55000 -CAfile /etc/wazuh-dashboard/c
   -verify_hostname <MANAGER_ADDRESS> < /dev/null 2>/dev/null | grep 'Verify return code'
 ```
 
+When `<MANAGER_ADDRESS>` is an IP address, use `-verify_ip <MANAGER_ADDRESS>` instead of
+`-verify_hostname`.
+
 `Verify return code: 0 (ok)` means the dashboard can verify the manager API.
 
 ### The dashboard is unreachable from other hosts
@@ -77,8 +85,6 @@ port `443`:
 ```bash
 firewall-cmd --permanent --add-port=443/tcp && firewall-cmd --reload
 ```
-
-See [Credentials](../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
 
 ### Authentication errors (401) with the indexer or the server API
 

@@ -85,8 +85,8 @@ of each instance instead, under the matching dotted path (see
 **Instance 1**: add the password to the keystore, and type it when prompted:
 
 ```bash
-sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
-  add wazuh_core.hosts.production.password
+sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.production.password --allow-root
 ```
 
 Then configure the host in `opensearch_dashboards.yml`:
@@ -103,8 +103,8 @@ wazuh_core.hosts:
 **Instance 2**: add the password to the keystore, and type it when prompted:
 
 ```bash
-sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
-  add wazuh_core.hosts.staging.password
+sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.staging.password --allow-root
 ```
 
 Then configure the host in `opensearch_dashboards.yml`:
@@ -164,10 +164,10 @@ When CCS is active, the dashboard:
    when prompted:
 
    ```bash
-   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
-     add wazuh_core.hosts.production.password
-   sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
-     add wazuh_core.hosts.staging.password
+   sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+     add wazuh_core.hosts.production.password --allow-root
+   sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+     add wazuh_core.hosts.staging.password --allow-root
    ```
 
    Then define one host entry per manager in `opensearch_dashboards.yml`:

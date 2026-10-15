@@ -10,25 +10,8 @@ Follow these steps to install the Wazuh dashboard.
 
 ### Installing package dependencies
 
-1. Install the following packages if missing.
-
-#### APT
-
-```bash
-apt-get install tar curl libcap2-bin openssl
-```
-
-#### Yum
-
-```bash
-yum install libcap openssl diffutils util-linux
-```
-
-#### DNF
-
-```bash
-dnf install libcap openssl diffutils util-linux
-```
+The package declares its own dependencies, so the package manager installs anything missing. Only
+`curl` is needed to download the package and to run the verification commands in this guide.
 
 ### Downloading the package
 
@@ -136,10 +119,19 @@ others' `export/` directories, and no operator input is needed.
    [Starting the Wazuh dashboard service](#starting-the-wazuh-dashboard-service).
 3. Log in as `admin`, as described in [Accessing the Wazuh dashboard](#accessing-the-wazuh-dashboard).
 
-A dashboard installed before the indexer does not start until the indexer is installed: its start
-reports the missing password and CA. Start it again once the indexer is installed. A dashboard
-started before the manager is installed serves indexer data but refuses the manager API until its
-next start after the manager is installed.
+A dashboard started before the indexer or the manager is installed does not start: its start
+reports the missing password (and, for the indexer, the missing CA), because the shipped
+`opensearch_dashboards.yml` configures the `wazuh_core.hosts.default` host. systemd stops retrying
+after three attempts, so once the missing peer is installed, start it again with:
+
+```bash
+systemctl reset-failed wazuh-dashboard
+systemctl start wazuh-dashboard
+```
+
+Only when `WAZUH_MANAGER_WUI_PASSWORD` is set in `local.env` does a dashboard started before the
+manager start: it serves indexer data but refuses the manager API until its next start after the
+manager is installed.
 
 #### Dashboard on a separate host
 

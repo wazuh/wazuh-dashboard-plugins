@@ -188,7 +188,7 @@ sudo nano /etc/wazuh-dashboard/opensearch_dashboards.yml
 
 ### 3. Add the Wazuh server host block
 
-Append the following block to `opensearch_dashboards.yml`, replacing the placeholder values with those from your 4.x `wazuh.yml`. Do not set `password` here for the `default` host — the package
+Edit the existing `wazuh_core.hosts` block in `opensearch_dashboards.yml` (the package already ships one; a second `wazuh_core.hosts` key is rejected as a duplicated mapping key), replacing the placeholder values with those from your 4.x `wazuh.yml`. Do not set `password` here for the `default` host — the package
 resolves it into the keystore instead (see [Credentials](../../ref/getting-started/credentials.md)):
 
 ```yaml

@@ -63,7 +63,7 @@ removes group and other access from it. The freed user ID can later be given to 
 but that account cannot read the files left behind. The removal prints:
 
 ```
-Kept /etc/wazuh-dashboard, now owned by root. Reinstalling wazuh-dashboard takes it back.
+Kept /etc/wazuh-dashboard, owned by root. Reinstalling wazuh-dashboard takes it back.
 ```
 
 If a file cannot be given to `root`, for example because the directory is on a read-only file
@@ -81,7 +81,11 @@ chmod -R go-rwx /etc/wazuh-dashboard/
 ```
 
 Installing the package again takes `/etc/wazuh-dashboard/` back, and the dashboard starts with the
-certificate pair, peer CAs and keystore it kept.
+certificate pair, peer CAs and keystore it kept. The dashboard CA and `export/ca.pem` are not
+restored: commands that use `--cacert /etc/wazuh-dashboard/export/ca.pem` fail, and browsers keep
+trusting the old CA only if they imported it before. To keep the CA, back up
+`/etc/wazuh-dashboard/ca/` and `export/` before removing the package and put them back before
+reinstalling.
 
 To delete everything the removal kept:
 

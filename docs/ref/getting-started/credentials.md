@@ -141,8 +141,8 @@ dashboard certificate.
 - It holds one `KEY=VALUE` per line. Values can be bare, single-quoted or double-quoted. Lines
   starting with `#` are comments. The file is **parsed, never sourced**, so nothing in it is ever
   executed.
-- A file that is a symbolic link, or that is not owned by root, or that is writable by another user,
-  is reported as `UNSAFE` and ignored.
+- A file that is a symbolic link, or that is not owned by root, or that is readable or writable by
+  another user (group or world), is reported as `UNSAFE` and ignored.
 
 Supported keys:
 
@@ -220,10 +220,14 @@ connection, and the other way round.
 
 - **Indexer CA missing.** The dashboard does not start. The journal shows
   `MISSING /etc/wazuh-dashboard/certs/indexer-ca.pem: no CA to verify the indexer with`.
-- **Manager CA missing.** The dashboard starts and serves indexer data, but refuses every manager API
-  connection until the CA is in place. The journal shows
-  `warning: MISSING /etc/wazuh-dashboard/certs/manager-ca.pem: the Server API connection is refused until it is present`,
-  and the dashboard reports that it cannot reach the manager API.
+- **Manager CA missing.** When the manager password is resolved (for example from `local.env`), the
+  dashboard starts and serves indexer data, but refuses every manager API connection until the CA
+  is in place. The journal shows
+  `warning: MISSING /etc/wazuh-dashboard/certs/manager-ca.pem: the Server API connection is refused until it is present; once wazuh-manager is installed, the next start imports it`,
+  and the dashboard reports that it cannot reach the manager API. Without the manager password, the
+  dashboard does not start at all: the start also reports `MISSING WAZUH_MANAGER_WUI_PASSWORD`.
+- **Peer CA invalid.** An `indexer-ca.pem` or `manager-ca.pem` that is not a valid, current CA
+  certificate stops the start with `INVALID <path>`, for either peer.
 
 On a single host, install the missing peer and restart the dashboard: the next start imports its CA.
 On a separate host, copy the peer's `export/ca.pem` as described in
@@ -232,11 +236,12 @@ dashboard.
 
 ### Manager API verification
 
-Since Wazuh 5.0.0 the dashboard refuses any manager API it cannot verify. Besides the CA, the host
-name is checked: `wazuh_core.hosts.default.url` must be a name or an address present in the subject
-alternative names of the manager's API certificate (`apid.pem`). A connection to a name outside that
-list is refused, and no credentials are sent. To add a name, re-issue the manager's API certificate
-as described in the manager documentation.
+Since Wazuh 5.0.0 the dashboard refuses any manager API it cannot verify, for every host that sets
+`ca` in `wazuh_core.hosts` (the shipped `default` host does). A host without `ca` is not verified.
+Besides the CA, the host name is checked: `wazuh_core.hosts.default.url` must be a name or an address
+present in the subject alternative names of the manager's API certificate (`apid.pem`). A connection
+to a name outside that list is refused, and no credentials are sent. To add a name, re-issue the
+manager's API certificate as described in the manager documentation.
 
 ## Installing and starting
 
@@ -259,11 +264,11 @@ order again, picks up what the peers published since, and stores it.
 | Package upgrade       | `--upgrade`   | resolved; never fails                     | not generated       | not touched                                       | not touched           |
 | Every service start   | `--prestart`  | resolved; **refuses to start** if missing | generated if absent | imported; **refuses** if the indexer's is missing | not touched           |
 
-The start step runs from `ExecStartPre=+` in `wazuh-dashboard.service`, and from the `start` action of
-the SysV init script. The unit also sets `StartLimitBurst=3` and `StartLimitIntervalSec=60`, so a
-dashboard that cannot resolve its credentials stops retrying after three attempts in one minute
-instead of flooding the journal. Set `WAZUH_DASHBOARD_VERBOSE=1` in the environment to print detail
-lines.
+The start step runs from `ExecStartPre=+` in `wazuh-dashboard.service`. The unit also sets
+`StartLimitBurst=3` and `StartLimitIntervalSec=60`, so a dashboard that cannot resolve its
+credentials stops retrying after three attempts in one minute instead of flooding the journal. Run
+`systemctl reset-failed wazuh-dashboard` before starting it again. Set `WAZUH_DASHBOARD_VERBOSE=1`
+in the environment to print detail lines.
 
 ## When the dashboard does not start
 
@@ -285,16 +290,16 @@ $ journalctl -u wazuh-dashboard -n 50
 3. Start the service again: `sudo systemctl start wazuh-dashboard`. If systemd reports that the start
    limit was hit, run `sudo systemctl reset-failed wazuh-dashboard` first.
 
-| Message                                             | Meaning                                                                                                                                |
-| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `MISSING WAZUH_INDEXER_KIBANASERVER_PASSWORD`       | No source gives the `kibanaserver` password. Set it in `local.env`, or install `wazuh-indexer` on this host first.                     |
-| `MISSING WAZUH_MANAGER_WUI_PASSWORD`                | No source gives the `wazuh-internal-client` password. Set it in `local.env`, or install `wazuh-manager` on this host first.            |
-| `INVALID <KEY>`                                     | The value is JSON or has surrounding whitespace. Correct it and start the service again.                                               |
-| `MISSING /etc/wazuh-dashboard/certs/indexer-ca.pem` | No CA to verify the indexer with. Install `wazuh-indexer` on this host first, or stage the indexer CA.                                 |
-| `INVALID /etc/wazuh-dashboard/certs/<peer>-ca.pem`  | The file is not a valid, current CA certificate. Replace it with the peer's `export/ca.pem`.                                           |
-| `MISSING /etc/wazuh-dashboard/certs/dashboard.pem`  | The dashboard has no TLS certificate. [Re-issue it](#re-issuing-the-dashboard-certificate) or provision your own pair.                 |
-| `UNSAFE <path>: <reason>`                           | The file or a directory above it is a symbolic link, is not owned by root, or is writable by another user. Fix its ownership and mode. |
-| `MISSING keystore`                                  | `/etc/wazuh-dashboard/opensearch_dashboards.keystore` could not be created or read.                                                    |
+| Message                                             | Meaning                                                                                                                                                    |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MISSING WAZUH_INDEXER_KIBANASERVER_PASSWORD`       | No source gives the `kibanaserver` password. Set it in `local.env`, or install `wazuh-indexer` on this host first.                                         |
+| `MISSING WAZUH_MANAGER_WUI_PASSWORD`                | No source gives the `wazuh-internal-client` password. Set it in `local.env`, or install `wazuh-manager` on this host first.                                |
+| `INVALID <KEY>`                                     | The value is JSON or has surrounding whitespace. Correct it and start the service again.                                                                   |
+| `MISSING /etc/wazuh-dashboard/certs/indexer-ca.pem` | No CA to verify the indexer with. Install `wazuh-indexer` on this host first, or stage the indexer CA.                                                     |
+| `INVALID /etc/wazuh-dashboard/certs/<peer>-ca.pem`  | The file is not a valid, current CA certificate. Replace it with the peer's `export/ca.pem`.                                                               |
+| `MISSING /etc/wazuh-dashboard/certs/dashboard.pem`  | The dashboard has no TLS certificate. [Re-issue it](#re-issuing-the-dashboard-certificate) or provision your own pair.                                     |
+| `UNSAFE <path>: <reason>`                           | The file or its directory is a symbolic link, is not owned by root, or is writable by another user (`local.env`: or readable). Fix its ownership and mode. |
+| `MISSING keystore`                                  | `/etc/wazuh-dashboard/opensearch_dashboards.keystore` could not be created or read.                                                                        |
 
 The start step checks **presence and format only**. It never opens a network connection, because
 making the start depend on reaching a peer would break boot ordering and cluster restarts. A
@@ -331,7 +336,8 @@ is logged and the dashboard starts anyway, because the AI Assistant is optional.
 ### Issued at installation, and at no other moment
 
 A fresh install issues the pair when both files are missing. A service start or a package upgrade
-never issues or re-examines it, so a pair you replaced survives every upgrade.
+never issues it, so a pair you replaced survives every upgrade. Every start still checks that both
+files are present, owned by root, not writable by another user, and not symbolic links.
 
 | Pair in `certs/` | CA in `ca/`                     | Result                                                                                           |
 | ---------------- | ------------------------------- | ------------------------------------------------------------------------------------------------ |
@@ -342,7 +348,9 @@ never issues or re-examines it, so a pair you replaced survives every upgrade.
 
 In every case where the pair is issued, the CA certificate is published as
 `/etc/wazuh-dashboard/export/ca.pem`. A CA you staged in `ca/` yourself has no marker: it is
-validated, used as is, and never removed.
+validated, used as is, and never removed by the resolver. Removing the RPM package (`rpm -e`,
+`yum remove`, `dnf remove`) deletes `ca/` with its private key, staged or not: back it up first.
+Removing the DEB package keeps it.
 
 When the install issues nothing, it says so and still exits `0`. The dashboard then has no
 certificate and does not start until you provision one:
@@ -404,15 +412,16 @@ after adding a name or an address:
    ```
 
 The new pair is issued from the same dashboard CA, so a browser that already trusts
-`export/ca.pem` keeps trusting it.
+`export/ca.pem` keeps trusting it. After an RPM removal and reinstall, `ca/` and `export/` are gone,
+so the re-issue mints a new dashboard CA: import the new `export/ca.pem` in the browsers again.
 
 ### Using certificates issued elsewhere
 
 A corporate PKI or the Wazuh installation assistant's `wazuh-certs-tool` can issue the dashboard
 certificate outside the host. Place `dashboard.pem` and `dashboard-key.pem` in
 `/etc/wazuh-dashboard/certs/`, either **before** installing the package, so the install issues
-nothing, or afterwards, overwriting the pair it issued. Nothing checks them again after that. See
-[Deploying certificates](installation.md#deploying-certificates).
+nothing, or afterwards, overwriting the pair it issued. After that, every start checks only their
+presence, owner and mode. See [Deploying certificates](installation.md#deploying-certificates).
 
 The files must be owned by `root:wazuh-dashboard` with mode `0640`, in a `certs/` directory owned by
 `root:wazuh-dashboard` with mode `0750`. Files placed before installing get that group and mode from

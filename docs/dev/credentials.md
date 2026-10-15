@@ -112,7 +112,8 @@ Issued by `--install` only. `--upgrade` and `--prestart` never touch them.
 - Both absent: the CA in `ca/` is used, or minted when `ca/` has none
   (`CN=wazuh-dashboard-<host>, OU=Wazuh, O=Wazuh, L=California, C=US`, 10 years), and the
   `.wazuh-dashboard-bootstrap-ca` marker is dropped. A pair staged in `ca/` by the operator (no
-  marker) is validated, used, and never removed.
+  marker) is validated, used, and never removed by the resolver. RPM `%postun` still deletes `ca/`
+  (and `export/`) on erase, marker or not; DEB `postrm` keeps it.
 - The leaf is RSA 2048, SHA-256, 10 years backdated one day, `serverAuth,clientAuth`, `CN=<host>`.
   `dashboard.pem` holds the leaf followed by the CA. Its SANs are `DNS:<host>`, the FQDN when it
   differs, and every global address of the default-route interfaces, or
@@ -142,12 +143,12 @@ present.
 `bin/resolve-credentials --install|--upgrade|--prestart|--clear [-H <config-dir>]`, as root.
 `WAZUH_DASHBOARD_VERBOSE=1` prints detail lines.
 
-| Mode         | Called from                                          | Does                                                                                                              | Exit status                                                                                                  |
-| ------------ | ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `--install`  | DEB `postinst` / RPM `%post` on a fresh install      | Everything; ends with the dashboard URL and where the `admin` password is                                         | always `0`                                                                                                   |
-| `--upgrade`  | DEB `postinst` / RPM `%post` on an upgrade           | Keystore and passwords only                                                                                       | always `0`                                                                                                   |
-| `--prestart` | `ExecStartPre=+` in the unit, `start()` in SysV init | File checks, passwords, AI Assistant key, peer CAs                                                                | `1` with one `MISSING`, `INVALID` or `UNSAFE` line per problem: a password, `indexer-ca.pem` or the TLS pair |
-| `--clear`    | image builds only; nothing in the product calls it   | Removes the keystore entries, the pair, the imported peer CAs, the minted CA (a staged one is kept) and `export/` | `1` when the dashboard is running or something could not be removed                                          |
+| Mode         | Called from                                        | Does                                                                                                              | Exit status                                                                                                                      |
+| ------------ | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `--install`  | DEB `postinst` / RPM `%post` on a fresh install    | Everything; ends with the dashboard URL and where the `admin` password is                                         | always `0`                                                                                                                       |
+| `--upgrade`  | DEB `postinst` / RPM `%post` on an upgrade         | Keystore and passwords only                                                                                       | always `0`                                                                                                                       |
+| `--prestart` | `ExecStartPre=+` in the unit                       | File checks, passwords, AI Assistant key, peer CAs                                                                | `1` with one `MISSING`, `INVALID` or `UNSAFE` line per problem: a password, `indexer-ca.pem`, an invalid peer CA or the TLS pair |
+| `--clear`    | image builds only; nothing in the product calls it | Removes the keystore entries, the pair, the imported peer CAs, the minted CA (a staged one is kept) and `export/` | `1` when the dashboard is running or something could not be removed                                                              |
 
 The maintainer scripts call `--install` or `--upgrade` with `|| true`. A maintainer script that
 aborts leaves the package half-configured, breaks `apt install -f` and fails image builds, so the
