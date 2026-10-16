@@ -93,6 +93,12 @@ fi
 # 0640. The daemons and the API read their pairs through the group; anything
 # owned by the service account is refused by the credential resolver.
 install -o root -g wazuh-manager -m 640 "$CERTS_CA" "$CONF/certs/root-ca.pem"
+# The credential resolver also requires the manager's CA in ca/ (root:root
+# 0700, key 0600), and refuses to start with "the manager's CA is missing"
+# otherwise. Stage the shared root CA there so it does not mint its own.
+install -d -o root -g root -m 700 "$CONF/ca"
+install -o root -g root -m 644 "$CERTS_CA" "$CONF/ca/root-ca.pem"
+install -o root -g root -m 600 "$CERTS_CA_KEY" "$CONF/ca/root-ca.key"
 for pair in remoted apid; do
   install -o root -g wazuh-manager -m 640 \
     "$certs_out/$CERTS_NODE_NAME-remoted.pem" "$CONF/certs/$pair.pem"
