@@ -53,6 +53,8 @@ import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 import { registerHeaderNavControl } from './components/wz-header-nav-control/header-nav-control';
 import { registerWazuhNavLinks } from './utils/nav-groups';
 import _ from 'lodash';
+import { registerPanelInfoActions } from './components/common/dashboards/panel-info/panel-info-actions';
+import { scaPanelInfos } from './components/overview/sca/utils/result-definitions';
 
 export class WazuhPlugin
   implements
@@ -125,6 +127,8 @@ export class WazuhPlugin
 
       _.merge(this._mapping, _.zipObject(keysToMap, colorPalette));
     };
+
+    registerPanelInfoActions(plugins.uiActions, scaPanelInfos);
 
     // Register the supported languages for the query bar, including Wazuh
     // applications IDs to enable the use of Saved queries in our search bar
