@@ -5,12 +5,14 @@
 ### The Wazuh dashboard service does not start
 
 Before the dashboard starts, the service runs `resolve-credentials --prestart`, which resolves the
-`kibanaserver` and `wazuh-internal-client` passwords into the keystore. If a password is missing or invalid, the
-service refuses to start and the journal names the key:
+`kibanaserver` and `wazuh-internal-client` passwords into the keystore, imports the peer CAs and
+checks the files it relies on. If a password, the indexer CA or the dashboard certificate is missing
+or invalid, a peer CA (`indexer-ca.pem` or `manager-ca.pem`) is invalid, or a file is unsafe, the
+service refuses to start and the journal names each problem:
 
 ```
 resolve-credentials: MISSING WAZUH_MANAGER_WUI_PASSWORD (the manager's wazuh-internal-client account)
-resolve-credentials:         set it in /etc/wazuh/credentials.env, or install wazuh-manager on this host first
+resolve-credentials:         set it in /etc/wazuh-dashboard/local.env, or install wazuh-manager on this host first
 ```
 
 1. Read the journal:
@@ -19,36 +21,77 @@ resolve-credentials:         set it in /etc/wazuh/credentials.env, or install wa
 journalctl -u wazuh-dashboard -n 50
 ```
 
-2. Set the missing key in `/etc/wazuh/credentials.env` (`WAZUH_INDEXER_KIBANASERVER_PASSWORD` or
-   `WAZUH_MANAGER_WUI_PASSWORD`), or correct the value reported as `INVALID`.
-3. If the journal reports `REFUSED /etc/wazuh/credentials.env`, fix its ownership and mode: the file
-   must be `root:root 0600`, and `/etc/wazuh` must not be group- or world-writable.
-4. Start the service again. If systemd reports that the start limit was hit, run
+2. Set the missing key in `/etc/wazuh-dashboard/local.env` (`WAZUH_INDEXER_KIBANASERVER_PASSWORD`
+   or `WAZUH_MANAGER_WUI_PASSWORD`), or correct the value reported as `INVALID`. For an `INVALID`
+   peer CA, replace it with that peer's `export/ca.pem`.
+3. If the journal reports `MISSING /etc/wazuh-dashboard/certs/indexer-ca.pem`, install the indexer on
+   this host first, or stage its CA as described in
+   [Dashboard on a separate host](../ref/getting-started/installation.md#dashboard-on-a-separate-host).
+4. If the journal reports `UNSAFE <path>`, fix the ownership and mode of that file or directory: it
+   must be owned by root, not writable by another user, and not a symbolic link. `local.env` must
+   also not be readable by another user (mode `0600`).
+5. Start the service again. If systemd reports that the start limit was hit, run
    `systemctl reset-failed wazuh-dashboard` first.
 
 If the service does not start because a certificate file is missing, check that
-`/etc/wazuh-dashboard/certs/` holds `dashboard.pem`, `dashboard-key.pem` and `root-ca.pem`.
+`/etc/wazuh-dashboard/certs/` holds `dashboard.pem`, `dashboard-key.pem` and `indexer-ca.pem`.
 Certificates are issued only on a fresh install; the installation output says why they could not be
-issued.
+issued. To issue them again, see
+[Re-issuing the dashboard certificate](../ref/getting-started/credentials.md#re-issuing-the-dashboard-certificate).
 
 If the journal shows
-`EACCES: permission denied, open '/etc/wazuh-dashboard/certs/dashboard-key.pem'`, the certificate
-files are not owned by the service user. This happens with a pair copied into `certs/` as `root`
-after the package was installed, or with an older package that did not give `certs/` to the service
-user. Give them to the service user and start the service again:
+`EACCES: permission denied, open '/etc/wazuh-dashboard/certs/dashboard-key.pem'`, the service cannot
+read the certificate files through its group. This happens with a pair copied into `certs/` after
+the package was installed. Give them the expected group and mode and start the service again:
 
 ```bash
-chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
+chown -R root:wazuh-dashboard /etc/wazuh-dashboard/certs
+chmod 750 /etc/wazuh-dashboard/certs
+chmod 640 /etc/wazuh-dashboard/certs/*.pem
 ```
 
 See [Credentials](../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
+
+### The server API is refused although the manager is running
+
+The dashboard verifies the manager API certificate and host name. The connection is refused, and no
+credentials are sent, when:
+
+- `/etc/wazuh-dashboard/certs/manager-ca.pem` is missing. The journal shows
+  `warning: MISSING /etc/wazuh-dashboard/certs/manager-ca.pem` at every start. Install the manager on
+  this host and restart the dashboard, or stage the manager's `export/ca.pem` as `manager-ca.pem`.
+- `manager-ca.pem` is not the CA that issued the manager's API certificate (`apid.pem`).
+- `wazuh_core.hosts.default.url` is a name or an address that is not in the subject alternative
+  names of `apid.pem`. Use a name it contains, or re-issue `apid.pem` on the manager.
+
+To check the certificate from the dashboard host, replace `<MANAGER_ADDRESS>` with the host part of
+`wazuh_core.hosts.default.url`:
+
+```bash
+openssl s_client -connect <MANAGER_ADDRESS>:55000 -CAfile /etc/wazuh-dashboard/certs/manager-ca.pem \
+  -verify_hostname <MANAGER_ADDRESS> < /dev/null 2>/dev/null | grep 'Verify return code'
+```
+
+When `<MANAGER_ADDRESS>` is an IP address, use `-verify_ip <MANAGER_ADDRESS>` instead of
+`-verify_hostname`.
+
+`Verify return code: 0 (ok)` means the dashboard can verify the manager API.
+
+### The dashboard is unreachable from other hosts
+
+The package opens no port. On RHEL and other distributions where `firewalld` runs by default, open
+port `443`:
+
+```bash
+firewall-cmd --permanent --add-port=443/tcp && firewall-cmd --reload
+```
 
 ### Authentication errors (401) with the indexer or the server API
 
 The start check validates that the passwords are present and well formed, not that they are
 correct. A password that is present but wrong fails at runtime with a `401`. This happens when the
 password of `kibanaserver` or `wazuh-internal-client` changed after the dashboard stored it in its keystore:
-editing `/etc/wazuh/credentials.env` afterwards has no effect, because the keystore entry takes
+editing `local.env` afterwards has no effect, because the keystore entry takes
 precedence.
 
 Update the keystore entry (`opensearch.password` or `wazuh_core.hosts.default.password`) and restart
