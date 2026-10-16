@@ -25,8 +25,6 @@ Ensure that these dependencies are installed on the system.
   - `brotli`
   - `curl`
   - `jq`
-- **Network access** to `raw.githubusercontent.com`, to download the shared credentials library (see
-  [Credentials resolver](#credentials-resolver)).
 
 ### Generating zip packages
 
@@ -216,35 +214,9 @@ The script generates the package in the `output` folder of the same directory wh
 ### Credentials resolver
 
 The package includes the credential resolver described in [Credentials](../ref/getting-started/credentials.md)
-and, for the two-halves design, [Credential and TLS resolution](credentials.md). This section only
-covers the build-time download mechanism for the shared half (`wazuh-credentials.sh`), which is not
-committed to `wazuh-dashboard`.
-
-`build-packages.sh` downloads the library from
-`https://raw.githubusercontent.com/wazuh/wazuh-installation-assistant/<ref>/credentials_lib/wazuh-credentials.sh`,
-trying these refs in order and using the first one that exists:
-
-1. `WAZUH_CREDENTIALS_LIB_REF`, when set.
-2. The tag being built (`GITHUB_REF_NAME` when `GITHUB_REF_TYPE=tag`, else
-   `git describe --tags --exact-match`). A tag build tries **only** this ref after the override, so
-   a release never falls back to a branch that keeps moving.
-3. The branch being built. A feature branch that does not exist in wazuh-installation-assistant is
-   skipped.
-4. The version branch (for example `5.0.0`), then the version tag (for example `v5.0.0`).
-
-| Variable                       | Description                                                           |
-| ------------------------------ | --------------------------------------------------------------------- |
-| `WAZUH_CREDENTIALS_LIB_REF`    | Git ref of wazuh-installation-assistant to download the library from. |
-| `WAZUH_CREDENTIALS_LIB_SHA256` | Expected SHA-256 of the downloaded library. Checked when set.         |
-
-A failed download or a checksum mismatch fails the build. There is no bundled fallback.
-
-For example, to build against a specific library ref and pin its checksum, replace `<REF>` and
-`<SHA256>`:
-
-```bash
-WAZUH_CREDENTIALS_LIB_REF=<REF> WAZUH_CREDENTIALS_LIB_SHA256=<SHA256> ./build-packages.sh ...
-```
+and [Credential and TLS resolution](credentials.md). It is committed to `wazuh-dashboard` under
+`dev-tools/build-packages/credentials/` and runs on the Node.js runtime the package bundles, so the
+build downloads nothing for it.
 
 ### Generating commit SHA
 

@@ -7,8 +7,12 @@ This guide focuses on the assets managed by the Wazuh dashboard itself.
 - Dashboard configuration: `/etc/wazuh-dashboard/opensearch_dashboards.yml`
 - Dashboard NodeJS options: `/etc/wazuh-dashboard/node.options`
 - Dashboard keystore: `/etc/wazuh-dashboard/opensearch_dashboards.keystore`
-- TLS certificates: `/etc/wazuh-dashboard/certs/`
-- Shared Wazuh root CA, when this host created it: `/etc/wazuh/ca/` (see [Credentials](getting-started/credentials.md#certificates)). It is shared with the other Wazuh components on the host, and its private key can issue certificates they trust. Back up the directory as a whole: it includes the `.wazuh-dashboard-bootstrap-ca` marker, which records that this dashboard created the CA.
+- TLS certificates and peer CAs: `/etc/wazuh-dashboard/certs/`, including the
+  `.indexer-ca.imported` and `.manager-ca.imported` markers
+- Dashboard CA: `/etc/wazuh-dashboard/ca/` and `/etc/wazuh-dashboard/export/` (see
+  [Credentials](getting-started/credentials.md#certificates)). Back up `ca/` as a whole: it includes
+  the `.wazuh-dashboard-bootstrap-ca` marker, which records that this dashboard created the CA.
+- Operator values, if any: `/etc/wazuh-dashboard/local.env`
 - Saved objects exported from the UI (dashboards, visualizations, index patterns)
 - Custom assets
 
@@ -31,22 +35,17 @@ rsync -aREz \
 /etc/wazuh-dashboard/node.options \
 /etc/wazuh-dashboard/opensearch_dashboards.keystore \
 /etc/wazuh-dashboard/certs/ \
+/etc/wazuh-dashboard/ca/ \
+/etc/wazuh-dashboard/export/ \
 $backup_folder
+[ -f /etc/wazuh-dashboard/local.env ] && rsync -aREz /etc/wazuh-dashboard/local.env $backup_folder
 ```
-
-> **Note:** If this host created the shared Wazuh root CA (see [What to back up](#what-to-back-up)
-> above), also back up `/etc/wazuh/ca/` as a whole — including the `.wazuh-dashboard-bootstrap-ca`
-> marker:
->
-> ```
-> rsync -aREz /etc/wazuh/ca/ $backup_folder
-> ```
 
 > **Note:** The keystore holds the `kibanaserver` and `wazuh-internal-client` passwords and the AI Assistant
 > encryption key (`wazuh_ai_assistant.encryptionKey`). Without that key, the provider API keys
 > stored by the AI Assistant cannot be decrypted, so keep the keystore backup as protected as the
-> passwords themselves. `/etc/wazuh/credentials.env` does not need to be backed up for the
-> dashboard: once the passwords are in the keystore, the dashboard does not read it again.
+> passwords themselves. `ca/root-ca.key` can issue certificates that browsers trusting the
+> dashboard CA accept: protect the backup accordingly.
 
 3. Export the saved objects
 
@@ -116,25 +115,24 @@ cd $backup_destination_folder
 cp etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/opensearch_dashboards.yml
 cp etc/wazuh-dashboard/node.options /etc/wazuh-dashboard/node.options
 cp etc/wazuh-dashboard/opensearch_dashboards.keystore /etc/wazuh-dashboard/opensearch_dashboards.keystore
-cp -r etc/wazuh-dashboard/certs/. /etc/wazuh-dashboard/certs/
-chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.yml
-chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/node.options
-chown wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.keystore
-chown -R wazuh-dashboard:wazuh-dashboard /etc/wazuh-dashboard/certs
-chmod 500 /etc/wazuh-dashboard/certs
-chmod 400 /etc/wazuh-dashboard/certs/*
+cp -a etc/wazuh-dashboard/certs/. /etc/wazuh-dashboard/certs/
+cp -a etc/wazuh-dashboard/ca/. /etc/wazuh-dashboard/ca/
+cp -a etc/wazuh-dashboard/export/. /etc/wazuh-dashboard/export/
+[ -f etc/wazuh-dashboard/local.env ] && cp -a etc/wazuh-dashboard/local.env /etc/wazuh-dashboard/local.env
+chown root:wazuh-dashboard /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/node.options /etc/wazuh-dashboard/opensearch_dashboards.keystore
+chmod 640 /etc/wazuh-dashboard/opensearch_dashboards.yml /etc/wazuh-dashboard/node.options /etc/wazuh-dashboard/opensearch_dashboards.keystore
+chown -R root:wazuh-dashboard /etc/wazuh-dashboard/certs
+chmod 750 /etc/wazuh-dashboard/certs
+find /etc/wazuh-dashboard/certs -type f -exec chmod 640 {} +
+chown -R root:root /etc/wazuh-dashboard/ca /etc/wazuh-dashboard/export
+chmod 700 /etc/wazuh-dashboard/ca /etc/wazuh-dashboard/export
 ```
 
-If the backup includes the shared Wazuh root CA (`etc/wazuh/ca/`), restore it as a whole,
-including the `.wazuh-dashboard-bootstrap-ca` marker, before starting the dashboard. `cp -a` keeps
-the ownership and permissions the backup preserved:
+`cp -a` keeps the ownership and permissions the backup preserved, including the
+`.wazuh-dashboard-bootstrap-ca` and import markers. The dashboard refuses to start with any of
+these files owned by another user or writable by one (`UNSAFE`).
 
-```
-mkdir -p /etc/wazuh/ca
-cp -a etc/wazuh/ca/. /etc/wazuh/ca/
-```
-
-The restored keystore entries take precedence over `/etc/wazuh/credentials.env`, so the dashboard
+The restored keystore entries take precedence over `local.env` and the peers' `export/`, so the dashboard
 uses the restored passwords. If the passwords changed since the backup, update them as described in
 [Rotation](getting-started/credentials.md#rotation).
 
