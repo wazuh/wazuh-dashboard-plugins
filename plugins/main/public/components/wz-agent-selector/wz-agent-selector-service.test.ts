@@ -38,7 +38,7 @@ const createStore = (currentAgentData: object) => {
     setPinnedAgent: (agentData: object) => {
       state = { appStateReducers: { currentAgentData: agentData } };
     },
-    dispatch: jest.fn(action => {
+    dispatch: jest.fn((action: { currentAgentData: object }) => {
       state = {
         appStateReducers: { currentAgentData: action.currentAgentData },
       };
