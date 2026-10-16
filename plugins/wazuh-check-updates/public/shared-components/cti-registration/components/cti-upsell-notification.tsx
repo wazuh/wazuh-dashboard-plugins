@@ -102,7 +102,7 @@ export const CtiUpsellNotification = () => {
                     <EuiText color='ghost'>
                       <FormattedMessage
                         id='wazuhCheckUpdates.ctiUpsell.barMessage'
-                        defaultMessage='The open Cyber Threat Intelligence feed is already included. Register with Wazuh Cloud to upgrade to the Professional feed, with no delay.'
+                        defaultMessage='The open source Cyber Threat Intelligence feed is already included. Connect to the Wazuh Console to add the Pro feed.'
                       />
                     </EuiText>
                   </EuiFlexItem>

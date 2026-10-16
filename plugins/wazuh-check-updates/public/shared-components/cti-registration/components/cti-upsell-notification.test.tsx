@@ -100,7 +100,7 @@ describe('CtiUpsellNotification', () => {
     expect(await screen.findByText('Register now')).toBeInTheDocument();
     expect(
       screen.getByText(
-        /The open Cyber Threat Intelligence feed is already included/,
+        /The open source Cyber Threat Intelligence feed is already included. Connect to the Wazuh Console to add the Pro feed./,
       ),
     ).toBeInTheDocument();
   });
