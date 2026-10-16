@@ -47,7 +47,9 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 - The session cookie's name, encryption key, `secure` flag, and `SameSite` policy come from the
   security plugin's `opensearch_security.cookie.{name,password,secure,isSameSite}` settings —
   keep `password` a long random value and `secure` enabled whenever the dashboard is served over
-  HTTPS (the default).
+  HTTPS (the default). The packages generate a random `password` into the keystore on each
+  installation; nodes behind a load balancer must share one value, see
+  [Session cookie password](getting-started/credentials.md#session-cookie-password).
 - `server.customResponseHeaders` in `opensearch_dashboards.yml` adds arbitrary response headers
   (for example a stricter `Content-Security-Policy` or `Strict-Transport-Security`) without
   changing dashboard code.
