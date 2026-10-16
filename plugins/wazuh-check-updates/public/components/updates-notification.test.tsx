@@ -28,11 +28,6 @@ jest.mock('../plugin-services', () => ({
       },
     },
   }),
-  getWazuhCore: jest.fn().mockReturnValue({
-    hooks: {
-      useDockedSideNav: () => false,
-    },
-  }),
 }));
 
 jest.mock('react-use/lib/useObservable', () => () => {});
@@ -73,6 +68,9 @@ describe('UpdatesNotification component', () => {
       },
     }));
     mockedAreThereNewUpdates.mockImplementation(() => true);
+    const appWrapper = document.createElement('div');
+    appWrapper.id = 'app-wrapper';
+    document.body.appendChild(appWrapper);
 
     const { container, getByText, getByRole } = render(<UpdatesNotification />);
 
@@ -92,10 +90,11 @@ describe('UpdatesNotification component', () => {
     const checkUpdatesButton = getByRole('button', { name: 'Dismiss' });
     expect(checkUpdatesButton).toBeInTheDocument();
 
-    expect(
-      getByRole('region', { name: 'New release notification' }),
-    ).toBeInTheDocument();
-    expect(document.body).toHaveClass('wz-check-updates-has-bottom-bar');
+    const bar = getByRole('region', { name: 'New release notification' });
+    expect(bar).toHaveClass('euiBottomBar--sticky');
+    expect(appWrapper).toContainElement(bar);
+    expect(document.body.style.paddingBottom).toBe('');
+    appWrapper.remove();
   });
 
   test('should return null when user close notification', async () => {
