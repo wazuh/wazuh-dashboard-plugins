@@ -99,7 +99,9 @@ describe('CtiUpsellNotification', () => {
 
     expect(await screen.findByText('Register now')).toBeInTheDocument();
     expect(
-      screen.getByText(/Your instance already gets the Open feed/),
+      screen.getByText(
+        /The open Cyber Threat Intelligence feed is already included/,
+      ),
     ).toBeInTheDocument();
   });
 
