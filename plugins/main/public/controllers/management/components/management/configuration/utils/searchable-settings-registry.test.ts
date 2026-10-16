@@ -6,6 +6,7 @@ import {
   configurationHeaders,
   configurationHeaderKey,
 } from './searchable-settings-registry';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 describe('searchableSettingsRegistry', () => {
   it('has a unique id for every field', () => {
@@ -331,6 +332,19 @@ describe('searchableSettingsRegistry', () => {
     expect(logs.help).toBeDefined();
     expect(sockets.help).not.toEqual(logs.help);
     expect(logs.help).toEqual(windowsEvents.help);
+  });
+
+  it('points every help link to the web documentation', () => {
+    const links = [
+      ...Object.values(configurationHeaders).flatMap(h => h.help ?? []),
+      ...searchableSettingsRegistry.flatMap(entry =>
+        entry.kind === 'list' ? entry.help ?? [] : [],
+      ),
+    ];
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      expect(link.href.startsWith(webDocumentationLink(''))).toBe(true);
+    }
   });
 
   it('carries the 5 restored per-field info tooltips', () => {

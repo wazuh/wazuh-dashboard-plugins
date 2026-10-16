@@ -12,6 +12,7 @@
 
 import { get } from 'lodash';
 import { i18n } from '@osd/i18n';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 import {
   renderValueBooleanYesNo,
@@ -263,7 +264,7 @@ const REMOTE_HELP: HelpLink[] = [
         defaultMessage: 'Remote daemon reference',
       },
     ),
-    href: 'user-manual/manager/reference.html#daemons',
+    href: webDocumentationLink('user-manual/manager/reference.html#daemons'),
   },
   {
     text: i18n.translate(
@@ -272,7 +273,9 @@ const REMOTE_HELP: HelpLink[] = [
         defaultMessage: 'Remote configuration reference',
       },
     ),
-    href: 'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
+    ),
   },
 ];
 
@@ -284,7 +287,9 @@ const POLICY_MONITORING_HELP: HelpLink[] = [
         defaultMessage: 'Malware detection',
       },
     ),
-    href: 'user-manual/capabilities/malware-detection/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/malware-detection/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -293,7 +298,9 @@ const POLICY_MONITORING_HELP: HelpLink[] = [
         defaultMessage: 'Rootcheck reference',
       },
     ),
-    href: 'user-manual/reference/ossec-conf/rootcheck.html',
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/rootcheck.html',
+    ),
   },
 ];
 
@@ -305,7 +312,9 @@ const CONFIGURATION_ASSESSMENT_HELP: HelpLink[] = [
         defaultMessage: 'Security Configuration Assessment',
       },
     ),
-    href: 'user-manual/capabilities/sec-config-assessment/how-to-configure.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/sec-config-assessment/how-to-configure.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -314,7 +323,7 @@ const CONFIGURATION_ASSESSMENT_HELP: HelpLink[] = [
         defaultMessage: 'SCA reference',
       },
     ),
-    href: 'user-manual/reference/ossec-conf/sca.html',
+    href: webDocumentationLink('user-manual/reference/ossec-conf/sca.html'),
   },
 ];
 
@@ -326,7 +335,9 @@ const FIM_HELP: HelpLink[] = [
         defaultMessage: 'Integrity monitoring documentation',
       },
     ),
-    href: 'user-manual/capabilities/file-integrity/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/file-integrity/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -335,7 +346,9 @@ const FIM_HELP: HelpLink[] = [
         defaultMessage: 'Syscheck reference',
       },
     ),
-    href: 'user-manual/capabilities/file-integrity/how-to-configure-fim.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/file-integrity/how-to-configure-fim.html',
+    ),
   },
 ];
 
@@ -347,7 +360,9 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
         defaultMessage: 'Log data collection documentation',
       },
     ),
-    href: 'user-manual/capabilities/log-data-collection/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/log-data-collection/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -356,7 +371,9 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
         defaultMessage: 'Command monitoring',
       },
     ),
-    href: 'user-manual/capabilities/command-monitoring/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/command-monitoring/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -365,7 +382,9 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
         defaultMessage: 'Localfile reference',
       },
     ),
-    href: 'user-manual/reference/ossec-conf/localfile.html',
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/localfile.html',
+    ),
   },
 ];
 
@@ -404,7 +423,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Agent enrollment',
           },
         ),
-        href: 'user-manual/agent/agent-enrollment/index.html',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-enrollment/index.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -413,7 +434,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Registration service reference',
           },
         ),
-        href: 'user-manual/manager/wazuh-manager-services.html#agent-enrollment-service',
+        href: webDocumentationLink(
+          'user-manual/manager/wazuh-manager-services.html#agent-enrollment-service',
+        ),
       },
     ],
   },
@@ -447,7 +470,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Configuring a cluster',
           },
         ),
-        href: 'installation-guide/wazuh-server/step-by-step.html#cluster-configuration-for-multi-node-deployment',
+        href: webDocumentationLink(
+          'installation-guide/wazuh-server/step-by-step.html#cluster-configuration-for-multi-node-deployment',
+        ),
       },
       {
         text: i18n.translate(
@@ -456,7 +481,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Cluster reference',
           },
         ),
-        href: 'user-manual/manager/wazuh-manager-services.html#cluster-service',
+        href: webDocumentationLink(
+          'user-manual/manager/wazuh-manager-services.html#cluster-service',
+        ),
       },
     ],
   },
@@ -475,7 +502,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Indexer configuration',
           },
         ),
-        href: 'user-manual/manager/wazuh-indexer-connector.html',
+        href: webDocumentationLink(
+          'user-manual/manager/wazuh-indexer-connector.html',
+        ),
       },
     ],
   },
@@ -508,7 +537,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Logging reference',
           },
         ),
-        href: 'user-manual/manager/logging.html#configuration',
+        href: webDocumentationLink(
+          'user-manual/manager/logging.html#configuration',
+        ),
       },
     ],
   },
@@ -533,7 +564,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Agents times reference',
           },
         ),
-        href: 'user-manual/agent/agent-enrollment/agent-life-cycle.html#agent-connection-states',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-enrollment/agent-life-cycle.html#agent-connection-states',
+        ),
       },
     ],
   },
@@ -602,7 +635,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Logging reference',
           },
         ),
-        href: 'user-manual/manager/logging.html#configuration',
+        href: webDocumentationLink(
+          'user-manual/manager/logging.html#configuration',
+        ),
       },
     ],
   },
@@ -628,7 +663,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Vulnerability detection',
           },
         ),
-        href: 'user-manual/capabilities/vulnerability-detection/index.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/vulnerability-detection/index.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -637,7 +674,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Vulnerability detector reference',
           },
         ),
-        href: 'user-manual/capabilities/vulnerability-detection/configuring-scans.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/vulnerability-detection/configuring-scans.html',
+        ),
       },
     ],
   },
@@ -693,7 +732,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Checking connection with manager',
           },
         ),
-        href: 'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
+        ),
       },
       {
         text: i18n.translate(
@@ -702,7 +743,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Client reference',
           },
         ),
-        href: 'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+        ),
       },
     ],
   },
@@ -758,7 +801,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
               defaultMessage: 'Active response documentation',
             },
           ),
-          href: 'user-manual/capabilities/active-response/index.html',
+          href: webDocumentationLink(
+            'user-manual/capabilities/active-response/index.html',
+          ),
         },
         {
           text: i18n.translate(
@@ -767,7 +812,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
               defaultMessage: 'Active response reference',
             },
           ),
-          href: 'user-manual/reference/ossec-conf/active-response.html',
+          href: webDocumentationLink(
+            'user-manual/reference/ossec-conf/active-response.html',
+          ),
         },
       ],
     },
@@ -792,7 +839,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'System inventory',
           },
         ),
-        href: 'user-manual/capabilities/system-inventory/index.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/system-inventory/index.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -801,7 +850,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Syscollector module reference',
           },
         ),
-        href: 'user-manual/capabilities/system-inventory/configuration.html#wazuh-agent-configuration',
+        href: webDocumentationLink(
+          'user-manual/capabilities/system-inventory/configuration.html#wazuh-agent-configuration',
+        ),
       },
     ],
   },
@@ -3077,7 +3128,9 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Command module reference',
           },
         ),
-        href: 'user-manual/capabilities/command-monitoring/configuration.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/command-monitoring/configuration.html',
+        ),
       },
     ],
     agentExtract: content => {
@@ -3700,7 +3753,9 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Using multiple outputs',
           },
         ),
-        href: 'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -3709,7 +3764,9 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Socket reference',
           },
         ),
-        href: 'user-manual/reference/ossec-conf/socket.html',
+        href: webDocumentationLink(
+          'user-manual/reference/ossec-conf/socket.html',
+        ),
       },
     ],
     agentExtract: content => {
