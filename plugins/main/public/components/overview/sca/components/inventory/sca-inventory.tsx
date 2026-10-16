@@ -59,14 +59,13 @@ export const SCAInventory: React.FC<{}> = compose(
           title: i18n.translate(
             'wazuh.configurationAssessment.checkDetailsTab.title',
             {
-              defaultMessage: 'Security Configuration Assessment dashboard',
+              defaultMessage: 'Configuration Assessment dashboard',
             },
           ),
           description: i18n.translate(
             'wazuh.configurationAssessment.checkDetailsTab.description',
             {
-              defaultMessage:
-                'Dashboard of the Security Configuration Assessment',
+              defaultMessage: 'Dashboard of the Configuration Assessment',
             },
           ),
           name: i18n.translate(

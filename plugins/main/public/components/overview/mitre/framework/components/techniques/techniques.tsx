@@ -493,7 +493,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
                       <EuiToolTip
                         position='top'
                         content={i18n.translate(
-                          'wazuh.mitreAttack.techniques.facet.inspectInEventsTooltip',
+                          'wazuh.mitreAttack.techniques.facet.inspectInFindingsTooltip',
                           {
                             defaultMessage: 'Inspect {id} in {tabName}',
                             values: {
