@@ -129,7 +129,7 @@ describe('WazuhApiCtrl.csv', () => {
     );
   });
 
-  it.each(['/agents', '/agents/groups/default/agents'])(
+  it.each(['/agents', '/groups/default/agents'])(
     'exports only the agent columns the API can fill for %s',
     async path => {
       const { response } = await exportAgentsCsv(undefined, path);
@@ -154,6 +154,17 @@ describe('WazuhApiCtrl.csv', () => {
       ]);
     },
   );
+
+  it('does not apply the agent columns to the files of a group', async () => {
+    const { response } = await exportAgentsCsv(
+      undefined,
+      '/groups/default/files',
+    );
+
+    const [header] = response.ok.mock.calls[0][0].body.split('\n');
+
+    expect(header.split(',')).toContain('Manager');
+  });
 
   it.each`
     group                | expected
