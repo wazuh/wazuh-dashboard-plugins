@@ -74,8 +74,14 @@ wazuh_core.hosts:
     run_as: true
     key: '/etc/wazuh-dashboard/certs/dashboard-another-host.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-another-host.crt'
-    ca: '/etc/wazuh-dashboard/certs/root-ca.pem'
+    ca: '/etc/wazuh-dashboard/certs/another-host-ca.pem'
 ```
+
+The `default` host is verified with `/etc/wazuh-dashboard/certs/manager-ca.pem`, which the package
+imports or you stage (see [Peer certificate authorities](getting-started/credentials.md#peer-certificate-authorities)).
+Every other manager has its own CA: copy its `/etc/wazuh-manager/export/ca.pem` to the dashboard
+host as a separate file, owned by `root:wazuh-dashboard` with mode `0640`, and name it in that
+host's `ca`.
 
 ### Passwords in the keystore
 
@@ -90,18 +96,22 @@ The packages manage the entries of the `default` host and of the indexer connect
 | `wazuh_core.hosts.default.password`          | `WAZUH_MANAGER_WUI_PASSWORD`          |
 | `opensearch.username`, `opensearch.password` | `WAZUH_INDEXER_KIBANASERVER_PASSWORD` |
 
-They are read from `/etc/wazuh/credentials.env` or the environment, at installation and before
-every start, and the dashboard refuses to start while one of them is missing. A value set in
+They are read from the environment, `/etc/wazuh-dashboard/local.env` or the peers'
+`export/credentials.env`, at installation and before every start, and the dashboard refuses to start while one of them is missing. A value set in
 `opensearch_dashboards.yml` counts as resolved and is never overridden. See
 [Credentials](getting-started/credentials.md).
 
-For any other host, add the entry yourself as the service user. Replace `<HOST_ID>` with the host
-identifier, and type the password when prompted:
+For any other host, add the entry yourself as root, then restart the dashboard. Replace `<HOST_ID>`
+with the host identifier, and type the password when prompted:
 
 ```bash
-sudo -u wazuh-dashboard /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
-  add wazuh_core.hosts.<HOST_ID>.password
+sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore \
+  add wazuh_core.hosts.<HOST_ID>.password --allow-root
+sudo systemctl restart wazuh-dashboard
 ```
+
+The keystore is owned by root and read by the service through its group. The restart sets it back
+to `root:wazuh-dashboard 0640` before the dashboard starts.
 
 ## Session cookies
 
@@ -166,7 +176,7 @@ wazuh_core.hosts:
     run_as: false
     key: '/etc/wazuh-dashboard/certs/dashboard-client.key'
     cert: '/etc/wazuh-dashboard/certs/dashboard-client.crt'
-    ca: '/etc/wazuh-dashboard/certs/root-ca.pem'
+    ca: '/etc/wazuh-dashboard/certs/manager-ca.pem'
 ```
 
 For a host that connects without client certificates (server certificate validation is skipped):
