@@ -121,7 +121,7 @@ describe('ModalCti component', () => {
       screen.getByRole('button', { name: 'Register' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Your instance already gets the Open feed/),
+      screen.getByText(/Register it in the Wazuh Console to manage it there/),
     ).toBeInTheDocument();
   });
 
