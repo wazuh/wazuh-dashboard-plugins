@@ -8,14 +8,16 @@ export const SAVED_OBJECT_USER_PREFERENCES =
   'wazuh-check-updates-user-preferences';
 
 const ctiBasePath = '/api/wazuh-check-updates/cti-registration';
+const ctiFeedBasePath = '/api/wazuh-check-updates/cti-feed';
 export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
   token = `${ctiBasePath}/token`,
   ctiRegistrationStatus = `${ctiBasePath}/status`,
-  contentUpdate = `${ctiBasePath}/update`,
   ctiConsumers = `${ctiBasePath}/consumers`,
   ctiRegistrationPermission = `${ctiBasePath}/permission`,
+  ctiFeedContentUpdate = `${ctiFeedBasePath}/update`,
+  ctiFeedIndicators = `${ctiFeedBasePath}/indicators`,
 }
 
 /** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
@@ -41,7 +43,7 @@ export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
 
 /**
  * Seconds a device code stays pending before the registration modal explains the
- * "Environment already exists" rejection. Wazuh Cloud never reports that rejection to
+ * "Environment already exists" rejection. The CTI console never reports that rejection to
  * the token endpoint, so the help is shown once a normal activation should be done.
  */
 export const CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC = 60;
@@ -61,11 +63,11 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
   },
 );
 
-/** Wazuh Cloud portal / product URL. Uses `#` in the UI until set. */
-export const WAZUH_CLOUD_PORTAL_HREF = '';
+/** Wazuh Cyber Threat Intelligence console URL. Uses `#` in the UI until set. */
+export const WAZUH_CTI_CONSOLE_HREF = '';
 
 /**
- * Default base URL of the Wazuh Cloud CTI Console API (server-side OAuth device
+ * Default base URL of the Wazuh Cyber Threat Intelligence Console API (server-side OAuth device
  * flow). Overridable with the `wazuh_check_updates.ctiApiUrl` setting.
  */
 export const WAZUH_CTI_CONSOLE_BASE_URL = 'https://api.pre.cloud.wazuh.com';

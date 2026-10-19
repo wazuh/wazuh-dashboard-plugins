@@ -37,6 +37,7 @@ jest.mock('@osd/i18n/react', () => ({
 
 const mockHttpGet = jest.fn();
 const mockHttpPatch = jest.fn();
+const mockNavigateToApp = jest.fn();
 
 const NOT_REGISTERED_STATUS = {
   registrationComplete: false,
@@ -63,6 +64,7 @@ describe('CtiUpsellNotification', () => {
 
     (getCore as jest.Mock).mockReturnValue({
       http: { get: mockHttpGet, patch: mockHttpPatch },
+      application: { navigateToApp: mockNavigateToApp },
     });
   });
 
@@ -100,6 +102,17 @@ describe('CtiUpsellNotification', () => {
     ).toBeInTheDocument();
   });
 
+  test('opens the CTI feed app on its registration modal from Register now', async () => {
+    mockResponses(NOT_REGISTERED_STATUS);
+
+    render(<CtiUpsellNotification />);
+    fireEvent.click(await screen.findByText('Register now'));
+
+    expect(mockNavigateToApp).toHaveBeenCalledWith('cti-feed', {
+      state: { openRegistration: true },
+    });
+  });
+
   test('names the bar landmark and keeps it sticky in the app wrapper', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
     const appWrapper = document.createElement('div');
@@ -109,7 +122,7 @@ describe('CtiUpsellNotification', () => {
     render(<CtiUpsellNotification />);
 
     const bar = await screen.findByRole('region', {
-      name: 'Wazuh Cloud registration',
+      name: 'Wazuh Cyber Threat Intelligence registration',
     });
     expect(bar).toHaveClass('euiBottomBar--sticky');
     expect(appWrapper).toContainElement(bar);
