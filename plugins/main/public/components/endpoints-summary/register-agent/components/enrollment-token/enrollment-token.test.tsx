@@ -10,11 +10,21 @@ import {
 import { EnrollmentToken } from '../../interfaces/types';
 
 /* register-agent-data reads the theme from the UI settings when it is imported,
-which the wizard's data module is pulled in by the component under test. */
-jest.mock('../../../../../kibana-services', () => ({
-  ...(jest.requireActual('../../../../../kibana-services') as object),
-  getUiSettings: jest.fn().mockReturnValue({ get: () => false }),
-}));
+which the wizard's data module is pulled in by the component under test. The
+token expiry is formatted with the dashboard's date format and time zone, set
+here to a zone other than UTC so that the conversion shows. */
+jest.mock('../../../../../kibana-services', () => {
+  const uiSettings: Record<string, unknown> = {
+    dateFormat: 'MMM D, YYYY @ HH:mm:ss.SSS',
+    'dateFormat:tz': 'America/New_York',
+  };
+  return {
+    ...(jest.requireActual('../../../../../kibana-services') as object),
+    getUiSettings: jest.fn().mockReturnValue({
+      get: (key: string) => uiSettings[key] ?? false,
+    }),
+  };
+});
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
   createEnrollmentToken: jest.fn(),
@@ -269,6 +279,20 @@ describe('EnrollmentTokenInput token source tabs', () => {
 
     fireEvent.click(existingTab());
     expect(onEnrollmentTokenChange).toHaveBeenCalledWith(null);
+  });
+
+  /* The Enrollment tokens page shows the same expiry, so both follow the
+  dashboard's date format and time zone rather than the browser's. */
+  it('shows the expiry in the dashboard date format and time zone', async () => {
+    createToken.mockResolvedValue(MINTED);
+    renderInput();
+
+    fireEvent.click(generateButton());
+    expect(
+      await screen.findByText(
+        'Token successfully generated, valid until Oct 9, 2026 @ 01:12:40.000.',
+      ),
+    ).toBeVisible();
   });
 
   /* The server returns the token text once, so coming back to the tab must not
