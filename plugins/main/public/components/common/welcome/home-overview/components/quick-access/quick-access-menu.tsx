@@ -27,6 +27,8 @@ import {
   getFiltersUrl,
   getAiAssistantUrl,
   isAiAssistantRegistered,
+  getCtiFeedUrl,
+  isCtiFeedRegistered,
 } from '../../utils/navigation';
 
 interface QuickAccessItem {
@@ -134,6 +136,28 @@ const SECURITY_ANALYTICS_GROUP: QuickAccessGroup = {
   ],
 };
 
+const THREAT_INTELLIGENCE_CATEGORY_ID = 'wz-category-threat-intelligence';
+
+/**
+ * The CTI feed app lives in the `wazuh-check-updates` plugin, so `Applications`
+ * does not describe it. It joins the Threat intelligence group, after the
+ * category's own apps, as the CTI feed app does in the navigation.
+ */
+const CTI_FEED_ITEM: QuickAccessItem = {
+  id: 'cti-feed',
+  title: i18n.translate('wazuh.common.homeOverviewQuickAccess.ctiFeed', {
+    defaultMessage: 'CTI Feed',
+  }),
+  getHref: getCtiFeedUrl,
+};
+
+const withCtiFeed = (groups: QuickAccessGroup[]): QuickAccessGroup[] =>
+  groups.map(group =>
+    group.id === THREAT_INTELLIGENCE_CATEGORY_ID
+      ? { ...group, items: [...group.items, CTI_FEED_ITEM] }
+      : group,
+  );
+
 const NO_APPLICATIONS: ReadonlyMap<string, unknown> = new Map();
 
 /**
@@ -167,15 +191,55 @@ const AiAssistantLink: React.FC = () => {
   );
 };
 
+/**
+ * The groups of the opened menu. Reads the app registry only once the menu is
+ * open, as `AiAssistantLink` does.
+ */
+const QuickAccessGroups: React.FC = () => {
+  const applications = useObservable(
+    getCore().application.applications$,
+    NO_APPLICATIONS,
+  );
+  // Only when registered: the setting that gates the app can turn it off.
+  const ctiFeedRegistered = isCtiFeedRegistered(applications);
+  const groups = useMemo(() => {
+    const dataDriven = getDataDrivenGroups();
+    return [
+      ...(ctiFeedRegistered ? withCtiFeed(dataDriven) : dataDriven),
+      SECURITY_ANALYTICS_GROUP,
+    ].sort((a, b) => a.order - b.order);
+  }, [ctiFeedRegistered]);
+
+  return (
+    <EuiFlexGrid columns={2} style={{ width: 420 }}>
+      {groups.map(group => (
+        <EuiFlexItem
+          key={group.id}
+          data-test-subj={`quick-access-group-${group.id}`}
+        >
+          <EuiText size='xs'>
+            <strong>
+              <EuiIcon type={group.icon} size='s' /> {group.label}
+            </strong>
+          </EuiText>
+          <EuiListGroup flush gutterSize='none' maxWidth={false}>
+            {group.items.map(item => (
+              <EuiListGroupItem
+                key={item.id}
+                label={item.title}
+                href={item.getHref()}
+                size='s'
+              />
+            ))}
+          </EuiListGroup>
+        </EuiFlexItem>
+      ))}
+    </EuiFlexGrid>
+  );
+};
+
 export const QuickAccessMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const groups = useMemo(
-    () =>
-      [...getDataDrivenGroups(), SECURITY_ANALYTICS_GROUP].sort(
-        (a, b) => a.order - b.order,
-      ),
-    [],
-  );
 
   return (
     <EuiPopover
@@ -216,30 +280,7 @@ export const QuickAccessMenu: React.FC = () => {
               <AiAssistantLink />
             </EuiFlexGroup>
           </EuiPopoverTitle>
-          <EuiFlexGrid columns={2} style={{ width: 420 }}>
-            {groups.map(group => (
-              <EuiFlexItem
-                key={group.id}
-                data-test-subj={`quick-access-group-${group.id}`}
-              >
-                <EuiText size='xs'>
-                  <strong>
-                    <EuiIcon type={group.icon} size='s' /> {group.label}
-                  </strong>
-                </EuiText>
-                <EuiListGroup flush gutterSize='none' maxWidth={false}>
-                  {group.items.map(item => (
-                    <EuiListGroupItem
-                      key={item.id}
-                      label={item.title}
-                      href={item.getHref()}
-                      size='s'
-                    />
-                  ))}
-                </EuiListGroup>
-              </EuiFlexItem>
-            ))}
-          </EuiFlexGrid>
+          <QuickAccessGroups />
         </RedirectAppLinks>
       )}
     </EuiPopover>

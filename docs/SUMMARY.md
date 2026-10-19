@@ -40,6 +40,7 @@
   - [Notifications and Alerting](ref/modules/notifications-alerting.md)
   - [Indexer management settings](ref/modules/indexer-settings.md)
   - [Available updates](ref/modules/available-updates.md)
+  - [CTI feed](ref/modules/cti-feed.md)
   - [Enrollment tokens](ref/modules/enrollment-tokens/README.md)
   - [Saved objects for dashboards and visualizations](ref/modules/saved-objects-dashboards.md)
   - [Active Response](ref/modules/active-response/README.md)
