@@ -1,5 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CaseManagementTab } from './case-management-tab';
 import {
@@ -67,9 +74,8 @@ describe('CaseManagementTab required fields', () => {
     expect(screen.getByLabelText('Case title')).toHaveValue('Case_doc-1');
     expect(createButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText('Case status'), {
-      target: { value: 'active' },
-    });
+    fireEvent.click(screen.getByLabelText('Case status'));
+    fireEvent.click(await screen.findByRole('option', { name: /^Active/ }));
     expect(createButton).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText('Case severity'), {
@@ -110,6 +116,65 @@ describe('CaseManagementTab required fields', () => {
       target: { value: '' },
     });
     expect(updateButton).toBeDisabled();
+  });
+});
+
+describe('CaseManagementTab status descriptions', () => {
+  it('describes every status in the dropdown and under the field', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    await screen.findByRole('button', { name: 'Create case' });
+    expect(
+      screen.getByText('Current lifecycle status of this finding.'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText('Case status'));
+    const options = within(await screen.findByRole('listbox')).getAllByRole(
+      'option',
+    );
+    expect(options.map(option => option.textContent)).toEqual([
+      'ActiveOpen and waiting for an analyst.',
+      'AcknowledgedAn analyst is investigating the case.',
+      'CompletedThe investigation is done and the case is closed.',
+      'AuditKept for review or as a compliance record.',
+      'ErrorThe case was opened by mistake.',
+      'DeletedMarked as removed. The record stays for history.',
+    ]);
+
+    fireEvent.click(screen.getByRole('option', { name: /^Acknowledged/ }));
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+    expect(
+      screen.getByText('An analyst is investigating the case.'),
+    ).toBeInTheDocument();
+  });
+
+  it('describes a status set outside the form in the badge and the field', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: { ...fullCase, status: 'audit' },
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    const badge = await screen.findByText('Audit');
+    fireEvent.mouseOver(badge);
+    const tooltip = await screen.findByText(
+      'Kept for review or as a compliance record.',
+    );
+    fireEvent.mouseOut(badge);
+    await waitForElementToBeRemoved(tooltip);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+
+    expect(screen.getByLabelText('Case status')).toHaveTextContent('Audit');
+    expect(
+      screen.getByText('Kept for review or as a compliance record.'),
+    ).toBeInTheDocument();
   });
 });
 

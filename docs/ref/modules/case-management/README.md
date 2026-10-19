@@ -84,17 +84,20 @@ The module also shows read-only metadata that the server sets: the **User** who 
 
 The **Status** field records the stage of the case. A case has one of these values:
 
-| Status           | Meaning                                                             |
-| ---------------- | ------------------------------------------------------------------- |
-| **Active**       | The case is open and under review.                                  |
-| **Acknowledged** | An analyst has confirmed the case and works on it.                  |
-| **Completed**    | The work on the case is done.                                       |
-| **Audit**        | The case is kept for review or for a compliance record.             |
-| **Error**        | The case is marked as a mistake, for example a false positive.      |
-| **Deleted**      | The case is marked as removed but the record stays for the history. |
+| Status           | Meaning                                           |
+| ---------------- | ------------------------------------------------- |
+| **Active**       | Open and waiting for an analyst.                  |
+| **Acknowledged** | An analyst is investigating the case.             |
+| **Completed**    | The investigation is done and the case is closed. |
+| **Audit**        | Kept for review or as a compliance record.        |
+| **Error**        | The case was opened by mistake.                   |
+| **Deleted**      | Marked as removed. The record stays for history.  |
 
 A typical case moves from **Active** to **Acknowledged**, and then to **Completed**. The module
 does not force a fixed order, so you can set any status that fits your process.
+
+The **Status** list shows the meaning under each value. In read mode, point to the status badge
+to see it.
 
 ### TLP (Traffic Light Protocol)
 

@@ -32,6 +32,7 @@ import {
   EuiOutsideClickDetector,
   EuiSelect,
   EuiSpacer,
+  EuiSuperSelect,
   EuiText,
   EuiTextArea,
   EuiTitle,
@@ -56,44 +57,87 @@ import {
 } from './use-case-management-form';
 import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
 
-const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
+const CASE_STATUS_OPTIONS: Array<{
+  value: CaseStatus;
+  text: string;
+  description: string;
+}> = [
   {
     value: 'active',
     text: i18n.translate('wazuh.common.caseManagementStatus.active', {
       defaultMessage: 'Active',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.activeDescription',
+      { defaultMessage: 'Open and waiting for an analyst.' },
+    ),
   },
   {
     value: 'acknowledged',
     text: i18n.translate('wazuh.common.caseManagementStatus.acknowledged', {
       defaultMessage: 'Acknowledged',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.acknowledgedDescription',
+      { defaultMessage: 'An analyst is investigating the case.' },
+    ),
   },
   {
     value: 'completed',
     text: i18n.translate('wazuh.common.caseManagementStatus.completed', {
       defaultMessage: 'Completed',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.completedDescription',
+      { defaultMessage: 'The investigation is done and the case is closed.' },
+    ),
   },
   {
     value: 'audit',
     text: i18n.translate('wazuh.common.caseManagementStatus.audit', {
       defaultMessage: 'Audit',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.auditDescription',
+      { defaultMessage: 'Kept for review or as a compliance record.' },
+    ),
   },
   {
     value: 'error',
     text: i18n.translate('wazuh.common.caseManagementStatus.error', {
       defaultMessage: 'Error',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.errorDescription',
+      { defaultMessage: 'The case was opened by mistake.' },
+    ),
   },
   {
     value: 'deleted',
     text: i18n.translate('wazuh.common.caseManagementStatus.deleted', {
       defaultMessage: 'Deleted',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.deletedDescription',
+      { defaultMessage: 'Marked as removed. The record stays for history.' },
+    ),
   },
 ];
+
+const CASE_STATUS_SELECT_OPTIONS = CASE_STATUS_OPTIONS.map(
+  ({ value, text, description }) => ({
+    value,
+    inputDisplay: text,
+    dropdownDisplay: (
+      <>
+        <strong>{text}</strong>
+        <EuiText size='s' color='subdued'>
+          <p>{description}</p>
+        </EuiText>
+      </>
+    ),
+  }),
+);
 
 const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
   {
@@ -200,6 +244,9 @@ const optionText = (
   options: Array<{ value: string; text: string }>,
   value: string | undefined,
 ): string | undefined => options.find(option => option.value === value)?.text;
+
+const statusDescription = (status: string | undefined): string | undefined =>
+  CASE_STATUS_OPTIONS.find(option => option.value === status)?.description;
 
 const renderTwoColumnRows = (
   items: Array<{
@@ -792,9 +839,11 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               </EuiFlexItem>
               {status && (
                 <EuiFlexItem grow={false}>
-                  <EuiBadge color={STATUS_BADGE_COLOR[status] ?? 'default'}>
-                    {optionText(CASE_STATUS_OPTIONS, status) ?? status}
-                  </EuiBadge>
+                  <EuiToolTip content={statusDescription(status) ?? status}>
+                    <EuiBadge color={STATUS_BADGE_COLOR[status] ?? 'default'}>
+                      {optionText(CASE_STATUS_OPTIONS, status) ?? status}
+                    </EuiBadge>
+                  </EuiToolTip>
                 </EuiFlexItem>
               )}
               {isNewCase && (
@@ -950,23 +999,25 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       'wazuh.common.caseManagementForm.statusLabel',
                       { defaultMessage: 'Status *' },
                     )}
-                    helpText={i18n.translate(
-                      'wazuh.common.caseManagementForm.statusHelpText',
-                      {
-                        defaultMessage:
-                          'Current lifecycle status of this finding.',
-                      },
-                    )}
+                    helpText={
+                      statusDescription(status) ??
+                      i18n.translate(
+                        'wazuh.common.caseManagementForm.statusHelpText',
+                        {
+                          defaultMessage:
+                            'Current lifecycle status of this finding.',
+                        },
+                      )
+                    }
                   >
-                    <EuiSelect
+                    {/* '' keeps the hidden input controlled before a status is set */}
+                    <EuiSuperSelect<CaseStatus | ''>
                       fullWidth
-                      options={CASE_STATUS_OPTIONS}
-                      value={status}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setStatus(e.target.value as CaseStatus)
-                      }
+                      hasDividers
+                      options={CASE_STATUS_SELECT_OPTIONS}
+                      valueOfSelected={status ?? ''}
+                      onChange={value => value && setStatus(value)}
                       disabled={isSaving || isCleaning}
-                      hasNoInitialSelection={isNewCase && !status}
                       aria-label={i18n.translate(
                         'wazuh.common.caseManagementForm.statusAriaLabel',
                         { defaultMessage: 'Case status' },
