@@ -900,7 +900,7 @@ export class WazuhApiCtrl {
         const { path, filters } = request.body;
         const isArrayOfLists = path.includes('/lists') && !isList;
         const isAgents = path.includes('/agents') && !path.includes('groups');
-        const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        const isAgentsOfGroup = /^\/groups\/[^/]+\/agents$/.test(path);
         const isFiles = path.endsWith('/files');
         let fields = Object.keys(output.data.data.affected_items[0]);
 
@@ -914,20 +914,22 @@ export class WazuhApiCtrl {
               'name',
               'ip',
               'group',
-              'manager',
               'dateAdd',
               'version',
               'lastKeepAlive',
               'os.arch',
-              'os.build',
-              'os.codename',
               'os.major',
               'os.minor',
               'os.name',
               'os.platform',
-              'os.uname',
               'os.version',
             ];
+            // The API returns the groups as an array; write plain names.
+            itemsArray = itemsArray.map(item =>
+              Array.isArray(item.group)
+                ? { ...item, group: item.group.join(', ') }
+                : item,
+            );
           }
         }
 
