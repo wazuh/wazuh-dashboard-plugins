@@ -25,6 +25,7 @@ import { createEnrollmentToken } from '../../../../../services/enrollment-tokens
 import { EnrollmentToken } from '../../interfaces/types';
 import { enrollmentTokens } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { formatUIDate } from '../../../../../react-services/time-service';
 import '../group-input/group-input.scss';
 
 interface EnrollmentTokenInputProps {
@@ -67,11 +68,6 @@ const TOKEN_SOURCE_TABS: { id: TokenSource; name: string }[] = [
     ),
   },
 ];
-
-const formatExpiration = (expires: string) => {
-  const date = new Date(expires);
-  return Number.isNaN(date.getTime()) ? expires : date.toLocaleString();
-};
 
 const EnrollmentTokenInput = ({
   formFields,
@@ -620,7 +616,7 @@ const EnrollmentTokenInput = ({
                       defaultMessage:
                         'Token successfully generated, valid until {expiration}.',
                       values: {
-                        expiration: formatExpiration(enrollmentToken.expires),
+                        expiration: formatUIDate(enrollmentToken.expires),
                       },
                     },
                   )}
