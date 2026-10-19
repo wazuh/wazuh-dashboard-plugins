@@ -234,6 +234,83 @@ describe('[endpoint][security] POST /reports/modules/{moduleID} - Parameters val
       }
     },
   );
+
+  // 1x1 transparent PNG
+  const PNG_IMAGE =
+    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0' +
+    'lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+  const sendReportRequest = (array: unknown) =>
+    supertest(innerServer.listener)
+      .post('/reports/modules/general')
+      .set('x-test-username', 'admin')
+      .send({
+        array,
+        agents: false,
+        browserTimezone: '',
+        searchBar: '',
+        filters: [],
+        time: {
+          from: '',
+          to: '',
+        },
+        tables: [],
+        tab: 'general',
+        section: 'overview',
+        indexPatternTitle: 'wazuh-alerts-*',
+        apiId: 'default',
+      });
+
+  it.each`
+    testTitle               | element
+    ${'File name'}          | ${'chart.png'}
+    ${'Plain text'}         | ${'not-an-image'}
+    ${'Remote URL'}         | ${'https://example.com/a.png'}
+    ${'Malformed data URI'} | ${'data:image/png;base64,@@@'}
+    ${'SVG data URI'}       | ${'data:image/svg+xml;base64,PHN2Zz4='}
+  `(
+    '$testTitle element: POST /reports/modules/general - responseStatusCode: 400',
+    async ({ element }) => {
+      const response = await sendReportRequest([
+        { element, width: 300, height: 100, title: 'Alerts' },
+      ]).expect(400);
+      expect(response.body.message).toBe(
+        '[request body.array.0.element]: must be a base64-encoded PNG data URI',
+      );
+    },
+  );
+
+  it.each`
+    testTitle                 | array                                                 | field
+    ${'Missing element'}      | ${[{ width: 300, height: 100 }]}                      | ${'array.0.element'}
+    ${'Non-string element'}   | ${[{ element: { src: 'chart.png' } }]}                | ${'array.0.element'}
+    ${'String visualization'} | ${['chart.png']}                                      | ${'array.0'}
+    ${'Non-array array'}      | ${'chart.png'}                                        | ${'array'}
+    ${'Invalid second image'} | ${[{ element: PNG_IMAGE }, { element: 'chart.png' }]} | ${'array.1.element'}
+    ${'Non-number width'}     | ${[{ element: PNG_IMAGE, width: 'wide' }]}            | ${'array.0.width'}
+    ${'Non-string title'}     | ${[{ element: PNG_IMAGE, title: {} }]}                | ${'array.0.title'}
+  `(
+    '$testTitle: POST /reports/modules/general - responseStatusCode: 400',
+    async ({ array, field }) => {
+      const response = await sendReportRequest(array).expect(400);
+      expect(response.body.message).toContain(`[request body.${field}]: `);
+    },
+  );
+
+  it.each`
+    testTitle                  | array
+    ${'No visualizations'}     | ${[]}
+    ${'PNG image'}             | ${[{ element: PNG_IMAGE, width: 300, height: 100, title: 'A' }]}
+    ${'PNG image, no title'}   | ${[{ element: PNG_IMAGE, width: 800, height: 100 }]}
+    ${'PNG image, extra keys'} | ${[{ element: PNG_IMAGE, id: 'vis' }]}
+  `(
+    '$testTitle: POST /reports/modules/general - passes the parameters validation',
+    async ({ array }) => {
+      const response = await sendReportRequest(array);
+      expect(response.status).not.toBe(400);
+      expect(response.body.message).not.toMatch(/\[request body/);
+    },
+  );
 });
 
 describe('[endpoint][security] POST /reports/groups/{groupID} - Parameters validation', () => {
