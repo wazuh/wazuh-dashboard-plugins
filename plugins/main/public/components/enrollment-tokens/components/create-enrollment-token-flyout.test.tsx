@@ -30,6 +30,7 @@ jest.mock('../../../react-services/time-service', () => ({
 }));
 
 jest.mock('../../../services/enrollment-tokens', () => ({
+  ...jest.requireActual('../../../services/enrollment-tokens/constants'),
   createEnrollmentToken: jest.fn(),
   validateEnrollmentTokenDescription: () => undefined,
   validateEnrollmentTokenTtl: () => undefined,

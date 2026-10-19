@@ -11,3 +11,11 @@
  */
 
 export const ENROLLMENT_TOKENS_ENDPOINT = '/agents/enrollment-tokens';
+
+/* Limits the manager enforces on the token request, shared by the validators
+and the texts that state them. */
+export const ENROLLMENT_TOKEN_TTL_MAX_DAYS = 3650;
+export const ENROLLMENT_TOKEN_TTL_MAX_YEARS = 10;
+export const ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH = 256;
+export const ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS =
+  ',*<>!-.+:/()[]\'"|=~#'.split('').join(' ');

@@ -44,6 +44,9 @@ import { getWazuhCorePlugin } from '../../../kibana-services';
 import { formatUIDate } from '../../../react-services/time-service';
 import {
   createEnrollmentToken,
+  ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
+  ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH,
+  ENROLLMENT_TOKEN_TTL_MAX_DAYS,
   MintedEnrollmentToken,
   validateEnrollmentTokenDescription,
   validateEnrollmentTokenMaxUses,
@@ -360,12 +363,13 @@ const CreateEnrollmentTokenFlyoutContent = ({
                 <EuiText size='xs' color='subdued'>
                   <FormattedMessage
                     id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.ttlHelp'
-                    defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}, up to 3650 days. Left empty, the server applies its default of 30 days.'
+                    defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}, up to {maxDays} days. Left empty, the server applies its default of 30 days.'
                     values={{
                       days: <EuiCode>d</EuiCode>,
                       hours: <EuiCode>h</EuiCode>,
                       minutes: <EuiCode>m</EuiCode>,
                       seconds: <EuiCode>s</EuiCode>,
+                      maxDays: ENROLLMENT_TOKEN_TTL_MAX_DAYS,
                     }}
                   />
                 </EuiText>
@@ -413,7 +417,11 @@ const CreateEnrollmentTokenFlyoutContent = ({
                     'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.descriptionHelp',
                     {
                       defaultMessage:
-                        'Text shown in the listing so the token can be told apart from the others. Up to 256 characters; letters, digits, spaces and the symbols , * < > ! - . + : / ( ) [ ] \' " | = ~ # are allowed.',
+                        'Text shown in the listing so the token can be told apart from the others. Up to {maxLength} characters; letters, digits, spaces and the symbols {symbols} are allowed.',
+                      values: {
+                        maxLength: ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH,
+                        symbols: ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
+                      },
                     },
                   )}
                 </EuiText>
