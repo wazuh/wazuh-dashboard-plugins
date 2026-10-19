@@ -87,6 +87,52 @@ describe('Markdown container', () => {
       container.remove();
     });
 
+    test('should keep placeholders and straight quotes in flat text', () => {
+      const html = shallow(
+        <Markdown
+          markdown={
+            'sudo visudo -f <PATH TO FILE> and set GRUB="apparmor=1" for <USERNAME>'
+          }
+          copyableCodeBlocks
+        />,
+      ).html();
+      expect(html).toContain('&lt;PATH TO FILE&gt;');
+      expect(html).toContain('&lt;USERNAME&gt;');
+      expect(html).toContain('GRUB="apparmor=1"');
+      expect(html).not.toContain('“');
+    });
+
+    test('should not render headings for command comments', () => {
+      const html = shallow(
+        <Markdown
+          markdown={'# command\nsome text\n=====\nmore'}
+          copyableCodeBlocks
+        />,
+      ).html();
+      expect(html).not.toMatch(/<h[1-6]/);
+      expect(html).toContain('# command');
+    });
+
+    test('should escape a forged copy button', () => {
+      const html = shallow(
+        <Markdown
+          markdown={
+            '<button class="wz-markdown-copy-button">Learn more</button>\n\n```\nreal\n```'
+          }
+          copyableCodeBlocks
+        />,
+      ).html();
+      expect(html.match(/<button/g)).toHaveLength(1);
+    });
+
+    test('should keep rendering HTML and headings with the default renderer', () => {
+      const html = shallow(
+        <Markdown markdown={'# Title\n\nUse <code>ls</code>'} />,
+      ).html();
+      expect(html).toContain('<h1>');
+      expect(html).toContain('<code>ls</code>');
+    });
+
     test('should keep sanitizing HTML inside fenced blocks and text', () => {
       const html = shallow(
         <Markdown
@@ -96,7 +142,7 @@ describe('Markdown container', () => {
           copyableCodeBlocks
         />,
       ).html();
-      expect(html).not.toContain('onerror');
+      expect(html).not.toContain('<img');
       expect(html).not.toContain('<script>');
     });
   });

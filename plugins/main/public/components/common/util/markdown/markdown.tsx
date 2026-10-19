@@ -20,12 +20,13 @@ import { i18n } from '@osd/i18n';
 const COPY_BUTTON_CLASS = 'wz-markdown-copy-button';
 const CODE_BLOCK_CLASS = 'wz-markdown-code';
 
-const createMarkdownIt = () =>
+const createMarkdownIt = (options: MarkdownIt.Options = {}) =>
   new MarkdownIt({
     html: true,
     linkify: true,
     breaks: true,
     typographer: true,
+    ...options,
   }).use(MarkdownItLinkAttributes, {
     attrs: {
       target: '_blank',
@@ -35,9 +36,16 @@ const createMarkdownIt = () =>
 
 const md = createMarkdownIt();
 
-// Same renderer, but every fenced code block gets a copy button. The click is handled by
-// the component through event delegation, because the button lives in injected HTML.
-const mdWithCopyableCodeBlocks = createMarkdownIt();
+// Remediations are command text, not prose: placeholders like <PATH TO FILE> must not be parsed
+// as HTML, quotes must stay straight to be copyable, and a leading "# " is a shell comment, not a
+// heading. Emphasis stays enabled so markdown remediations can use bold.
+const mdWithCopyableCodeBlocks = createMarkdownIt({
+  html: false,
+  typographer: false,
+}).disable(['heading', 'lheading']);
+
+// Every fenced code block gets a copy button. The click is handled by the component through
+// event delegation, because the button lives in injected HTML.
 mdWithCopyableCodeBlocks.renderer.rules.fence = (tokens, index) => {
   const label = i18n.translate('wazuh.common.markdown.copyCodeButton', {
     defaultMessage: 'Copy code',
