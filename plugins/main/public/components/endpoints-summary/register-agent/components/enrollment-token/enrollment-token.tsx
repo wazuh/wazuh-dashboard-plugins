@@ -21,7 +21,12 @@ import { UseFormReturn } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
 import AdvancedOptions from '../advanced-options/advanced-options';
 import { ENROLLMENT_TOKEN_TEXTS } from '../../utils/register-agent-data';
-import { createEnrollmentToken } from '../../../../../services/enrollment-tokens';
+import {
+  createEnrollmentToken,
+  ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
+  ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH,
+  ENROLLMENT_TOKEN_TTL_MAX_DAYS,
+} from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
 import { enrollmentTokens } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
@@ -174,9 +179,8 @@ const EnrollmentTokenInput = ({
   const endpointIsInvalid =
     !serverAddress?.value ||
     ENDPOINT_FIELDS.some(field => Boolean(formFields[field]?.error));
-  const tokenRequestIsInvalid = Boolean(
-    formFields.enrollmentTokenTtl?.error ||
-      formFields.enrollmentTokenMaxUses?.error,
+  const tokenRequestIsInvalid = TOKEN_REQUEST_FIELDS.some(field =>
+    Boolean(formFields[field]?.error),
   );
 
   const generateEnrollmentToken = async () => {
@@ -366,12 +370,13 @@ const EnrollmentTokenInput = ({
                     <EuiText size='xs' color='subdued'>
                       <FormattedMessage
                         id='wazuh.endpointsSummary.enrollmentTokenInput.lifetimeHelp'
-                        defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}. If left empty, the server default of 30 days is used.'
+                        defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}, up to {maxDays} days. If left empty, the server default of 30 days is used.'
                         values={{
                           days: <EuiCode>d</EuiCode>,
                           hours: <EuiCode>h</EuiCode>,
                           minutes: <EuiCode>m</EuiCode>,
                           seconds: <EuiCode>s</EuiCode>,
+                          maxDays: ENROLLMENT_TOKEN_TTL_MAX_DAYS,
                         }}
                       />
                     </EuiText>
@@ -455,7 +460,12 @@ const EnrollmentTokenInput = ({
                         'wazuh.endpointsSummary.enrollmentTokenInput.descriptionHelp',
                         {
                           defaultMessage:
-                            'Kept with the token on the server so it can be told apart from the others when they are listed later. It is not sent to the agent.',
+                            'Kept with the token on the server so it can be told apart from the others when they are listed later. It is not sent to the agent. Up to {maxLength} characters; letters, digits, spaces and the symbols {symbols} are allowed.',
+                          values: {
+                            maxLength: ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH,
+                            symbols:
+                              ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
+                          },
                         },
                       )}
                     </EuiText>
