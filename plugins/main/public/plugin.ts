@@ -50,7 +50,6 @@ import { euiPaletteColorBlind } from '@elastic/eui';
 import NavigationService from './react-services/navigation-service';
 import { createHashHistory } from 'history';
 import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
-import { registerHeaderNavControl } from './components/wz-header-nav-control/header-nav-control';
 import { registerWazuhNavLinks } from './utils/nav-groups';
 import _ from 'lodash';
 import { registerPanelInfoActions } from './components/common/dashboards/panel-info/panel-info-actions';
@@ -230,10 +229,6 @@ export class WazuhPlugin
       // assign to a method to hide the telemetry banner used when the app is mounted
       this.hideTelemetryBanner = () =>
         plugins.telemetry.telemetryNotifications.setOptedInNoticeSeen();
-    }
-
-    if (plugins.wazuhCheckUpdates.ctiRegistrationUiEnabled) {
-      registerHeaderNavControl(core, plugins.wazuhCheckUpdates.CtiRegistration);
     }
 
     setCore(core);

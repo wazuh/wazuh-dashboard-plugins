@@ -596,7 +596,9 @@ describe('WzConfigurationOverview', () => {
       const { container } = renderManagerOverview();
 
       fireEvent.click(
-        await screen.findByRole('button', { name: /Registration Service/ }),
+        await screen.findByRole('button', {
+          name: /Agents Registration Service/,
+        }),
       );
 
       const category = container.querySelector(
@@ -630,7 +632,9 @@ describe('WzConfigurationOverview', () => {
       renderManagerOverview();
 
       fireEvent.click(
-        await screen.findByRole('button', { name: /Registration Service/ }),
+        await screen.findByRole('button', {
+          name: /Agents Registration Service/,
+        }),
       );
 
       const label = await screen.findByText('Re-register only on key mismatch');
@@ -657,7 +661,7 @@ describe('WzConfigurationOverview', () => {
       // Same rail + detail layout, just narrowed -- not a different view.
       expect(screen.getByText('Main configurations')).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Registration Service/ }),
+        screen.getByRole('button', { name: /Agents Registration Service/ }),
       ).toBeInTheDocument();
       expect(screen.queryByText('Cluster')).not.toBeInTheDocument();
     });

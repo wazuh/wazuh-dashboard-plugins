@@ -33,7 +33,7 @@ export interface CtiRegistrationStatusApiBody {
   /** Seconds since the device code was issued. */
   pending_for_sec?: number;
   /**
-   * Environment UID sent as `client_id`. Wazuh Cloud shows it as the deployment ID, which
+   * Environment UID sent as `client_id`. The CTI console shows it as the deployment ID, which
    * identifies the deployment to delete after an "Environment already exists" rejection.
    */
   environment_uid?: string;
