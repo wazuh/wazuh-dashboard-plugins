@@ -31,7 +31,7 @@ import {
 
 const getCtiFeedAppTitle = () =>
   i18n.translate('wazuhCheckUpdates.ctiFeed.app.title', {
-    defaultMessage: 'CTI feed',
+    defaultMessage: 'CTI Feed',
   });
 
 export class WazuhCheckUpdatesPlugin

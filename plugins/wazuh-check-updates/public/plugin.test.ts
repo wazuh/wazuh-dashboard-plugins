@@ -57,7 +57,7 @@ describe('WazuhCheckUpdatesPlugin public setup', () => {
     expect(core.application.register).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'cti-feed',
-        title: 'CTI feed',
+        title: 'CTI Feed',
         category: expect.objectContaining({
           id: 'wz-category-threat-intelligence',
         }),
