@@ -31,6 +31,7 @@ jest.mock('../../../react-services/time-service', () => ({
 
 jest.mock('../../../services/enrollment-tokens', () => ({
   createEnrollmentToken: jest.fn(),
+  validateEnrollmentTokenDescription: () => undefined,
   validateEnrollmentTokenTtl: () => undefined,
   validateEnrollmentTokenMaxUses: () => undefined,
 }));

@@ -45,6 +45,7 @@ import { formatUIDate } from '../../../react-services/time-service';
 import {
   createEnrollmentToken,
   MintedEnrollmentToken,
+  validateEnrollmentTokenDescription,
   validateEnrollmentTokenMaxUses,
   validateEnrollmentTokenTtl,
 } from '../../../services/enrollment-tokens';
@@ -112,6 +113,7 @@ const CreateEnrollmentTokenFlyoutContent = ({
     description: {
       type: 'text',
       initialValue: '',
+      validate: validateEnrollmentTokenDescription,
     },
   };
 
@@ -358,7 +360,7 @@ const CreateEnrollmentTokenFlyoutContent = ({
                 <EuiText size='xs' color='subdued'>
                   <FormattedMessage
                     id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.ttlHelp'
-                    defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}. Left empty, the server applies its default of 30 days.'
+                    defaultMessage='Seconds, or a number followed by {days}, {hours}, {minutes} or {seconds}, up to 3650 days. Left empty, the server applies its default of 30 days.'
                     values={{
                       days: <EuiCode>d</EuiCode>,
                       hours: <EuiCode>h</EuiCode>,
@@ -411,7 +413,7 @@ const CreateEnrollmentTokenFlyoutContent = ({
                     'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.descriptionHelp',
                     {
                       defaultMessage:
-                        'Free text shown in the listing so the token can be told apart from the others.',
+                        'Text shown in the listing so the token can be told apart from the others. Up to 256 characters; letters, digits, spaces and the symbols , * < > ! - . + : / ( ) [ ] \' " | = ~ # are allowed.',
                     },
                   )}
                 </EuiText>
