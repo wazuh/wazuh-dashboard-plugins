@@ -416,7 +416,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           <EuiText>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
-              defaultMessage='Register your Wazuh XDR to receive the latest Cyber Threat Intelligence content. For more information, visit our {documentationCTIWazuh}.'
+              defaultMessage='Your instance already gets the Open feed. Register it in the Wazuh Console to manage it there and to upgrade it to the Professional feed, which delivers vulnerabilities, IOCs and rules with no delay. You will need a free Wazuh Console account. For more information, visit our {documentationCTIWazuh}.'
               values={{
                 documentationCTIWazuh: (
                   <EuiLink

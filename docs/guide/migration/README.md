@@ -185,7 +185,7 @@ Verify that the agent appears in the dashboard under **Agents**.
 
 ### The dashboard fails to start
 
-If the service does not start at all and the journal shows `resolve-credentials: MISSING ...`, supply the named password in `/etc/wazuh/credentials.env`. See [When the dashboard does not start](../../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
+If the service does not start at all and the journal shows `resolve-credentials: MISSING ...`, supply the named password in `/etc/wazuh-dashboard/local.env`. See [When the dashboard does not start](../../ref/getting-started/credentials.md#when-the-dashboard-does-not-start).
 
 If the logs show `[error][savedobjects-service] Unable to connect to OpenSearch`:
 
@@ -205,7 +205,7 @@ If the logs show `[error][savedobjects-service] Unable to connect to OpenSearch`
 3. Test the indexer connectivity:
 
    ```bash
-   openssl s_client -connect localhost:9200 -CAfile /etc/wazuh-dashboard/certs/root-ca.pem
+   openssl s_client -connect localhost:9200 -CAfile /etc/wazuh-dashboard/certs/indexer-ca.pem
    ```
 
 4. Review the logs:

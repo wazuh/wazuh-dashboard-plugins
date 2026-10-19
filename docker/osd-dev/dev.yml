@@ -215,6 +215,11 @@ services:
     tty: true
     environment:
       - 'LOGS=/proc/1/fd/1'
+      # Host-mounted sources (e.g. --base) are owned by a different uid; let git
+      # (used by @osd/optimizer cache keys) trust them.
+      - 'GIT_CONFIG_COUNT=1'
+      - 'GIT_CONFIG_KEY_0=safe.directory'
+      - 'GIT_CONFIG_VALUE_0=*'
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
@@ -232,6 +237,11 @@ services:
     container_name: dashboard-src-installer-${NODE_VERSION}
     user: '1000:1000'
     working_dir: /home/node/kbn
+    environment:
+      # The mounted --base sources are owned by a host uid; osd bootstrap runs git on them.
+      - 'GIT_CONFIG_COUNT=1'
+      - 'GIT_CONFIG_KEY_0=safe.directory'
+      - 'GIT_CONFIG_VALUE_0=*'
     entrypoint: /bin/bash
     command: >
       -c '
@@ -243,7 +253,7 @@ services:
         fi
         echo "Initializating setup"
         cd $$root_app_dir
-        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap
+        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap || exit 1
         echo "Setup was finished"
       '
 

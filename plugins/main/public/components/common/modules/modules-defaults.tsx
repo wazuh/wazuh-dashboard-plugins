@@ -118,6 +118,7 @@ import {
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
+import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
@@ -334,21 +335,24 @@ export const ModulesDefaults = {
       {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent],
+        buttons: [ButtonAboutConfigurationAssessment, ButtonExploreAgent],
         component: SCADashboard,
       },
       {
         id: 'inventory',
         name: TAB_NAMES.inventory,
-        buttons: [ButtonExploreAgent],
+        buttons: [ButtonAboutConfigurationAssessment, ButtonExploreAgent],
         component: SCAInventory,
       },
-      renderFindingsDiscoverTab({
-        moduleId: 'sca',
-        tableColumns: configurationAssessmentColumns,
-        DataSource: ConfigurationAssessmentDataSource,
-        categoriesSampleData: [],
-      }),
+      {
+        ...renderFindingsDiscoverTab({
+          moduleId: 'sca',
+          tableColumns: configurationAssessmentColumns,
+          DataSource: ConfigurationAssessmentDataSource,
+          categoriesSampleData: [],
+        }),
+        buttons: [ButtonAboutConfigurationAssessment, ButtonExploreAgent],
+      },
     ],
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],

@@ -71,8 +71,10 @@
   - List, create, revoke and purge tokens from the **Enrollment tokens** app; the **Deploy new
     agent** wizard mints a token for a single deployment.
 - Install-time credential resolution: the package no longer ships default passwords. It resolves
-  the `kibanaserver` and `wazuh-internal-client` passwords from `/etc/wazuh/credentials.env` into the dashboard
-  keystore at install time and again before every start (`wazuh-indexer` issue #1928). See
+  the `kibanaserver` and `wazuh-internal-client` passwords into the dashboard keystore at install
+  time and again before every start, from the indexer and manager `export/` directories on the same
+  host or from `/etc/wazuh-dashboard/local.env`. Each component owns its configuration directory and
+  CA, and the dashboard verifies the indexer and the manager API each with its own CA file. See
   [Credentials](getting-started/credentials.md).
 
 ## Additional highlights

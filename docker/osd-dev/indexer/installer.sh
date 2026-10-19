@@ -1,4 +1,5 @@
-# Install dependencies (iproute2, openssl and diffutils are required by the wazuh-indexer package)
+# Install dependencies. iproute2 and openssl are required by the wazuh-indexer package; procps and
+# diffutils only by packages before 5.0.0 RC 2, kept so those still install.
 apt update
 apt install -y debconf adduser procps curl iproute2 openssl diffutils
 

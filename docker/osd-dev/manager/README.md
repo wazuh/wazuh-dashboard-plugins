@@ -12,15 +12,23 @@ This directory contains the files required to run a Wazuh manager container in t
 
 ## Certificates
 
-The manager package does not generate certificates, so the entrypoint issues
-them at startup with `wazuh-certs-tool.sh` and installs them under the names the
-shipped `wazuh-manager.conf` already expects, leaving that file untouched:
+The manager configuration lives in `/etc/wazuh-manager` (5.0.0 RC 2 on;
+`/var/wazuh-manager/etc` no longer exists, and no shared `/etc/wazuh` is used).
+The entrypoint installs every certificate in `/etc/wazuh-manager/certs`, which
+is `root:wazuh-manager 0750`, each file `root:wazuh-manager 0640`, as the
+package lays it out. The credential resolver refuses to start the manager if
+anything there belongs to the service account. The root CA pair is also
+installed in `/etc/wazuh-manager/ca`: the package build clears the CA it minted,
+and outside `--install` the resolver refuses to start with an empty `ca/`.
 
-| File                                                 | Read by                                                                        |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `etc/certs/remoted.pem`, `etc/certs/remoted-key.pem` | `<remote><https>` (the listener agents enroll and report through) and `<auth>` |
-| `etc/certs/apid.pem`, `etc/certs/apid-key.pem`       | The Server API (`55000`), through `https.cert` / `https.key` in `api.yaml`     |
-| `etc/certs/root-ca.pem`                              | `<remote><https><ca_certificate>`                                              |
+| File                                         | Read by                                                                        |
+| -------------------------------------------- | ------------------------------------------------------------------------------ |
+| `certs/remoted.pem`, `certs/remoted-key.pem` | `<remote><https>` (the listener agents enroll and report through) and `<auth>` |
+| `certs/apid.pem`, `certs/apid-key.pem`       | The Server API (`55000`), through `https.cert` / `https.key` in `api.yaml`     |
+| `certs/root-ca.pem`                          | `<remote><https><ca_certificate>`                                              |
+| `certs/indexer-ca.pem`                       | `<indexer><ssl>`: verifies the indexer (from `INDEXER_SSL_CA`)                 |
+| `certs/indexer-connector.pem`, `-key.pem`    | `<indexer><ssl>`: client pair (from `INDEXER_SSL_CERTIFICATE[_KEY]`)           |
+| `ca/root-ca.pem`, `ca/root-ca.key`           | The credential resolver: the manager's CA (`root:root`, key `0600`)            |
 
 Both pairs are the same leaf. The Server API no longer generates a self-signed
 certificate and refuses to start (error `2003`) without `apid.pem`; the manager
@@ -39,8 +47,9 @@ To change the certificate's SAN or its filename prefix, edit `wazuh-certs.yml`.
 ## Credentials
 
 The package's `postinst` runs `wazuh-manager-resolve-credentials --install`,
-which seeds `rbac.db` with random Server API passwords, mints a bootstrap CA
-(private key included) and issues certificates for the build container.
+which seeds `rbac.db` with random Server API passwords, mints the manager's own
+CA (`/etc/wazuh-manager/ca`), publishes them in `/etc/wazuh-manager/export` and
+issues certificates for the build container.
 `installer.sh` removes all of it with `--clear`, as the manager documents for
 container images.
 
