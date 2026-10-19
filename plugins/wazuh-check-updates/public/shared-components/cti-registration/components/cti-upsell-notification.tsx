@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import {
@@ -10,21 +11,20 @@ import {
   EuiIcon,
   EuiText,
 } from '@elastic/eui';
-import { ModalCti } from './modal-cti';
 import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
+import {
+  CTI_FEED_APP_ID,
+  CtiFeedLocationState,
+} from '../../../../common/cti-feed';
+import { getCore } from '../../../plugin-services';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
-import { getWazuhCore } from '../../../plugin-services';
 import { useUserPreferences } from '../../../hooks';
 
 export const CtiUpsellNotification = () => {
   const [dismissed, setDismissed] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
 
-  const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
-  const { statusCTI, loading, deviceFlowActive, modalOpen, refetchStatus } =
-    useCtiStatus(deviceFlowNonce);
+  const { statusCTI, loading, deviceFlowActive, modalOpen } = useCtiStatus();
   const {
     userPreferences,
     isLoading: isLoadingPreferences,
@@ -60,101 +60,99 @@ export const CtiUpsellNotification = () => {
     void updateUserPreferences({ hide_cti_upsell: true });
   };
 
+  // Registration lives in the CTI feed app, which opens its modal on arrival.
   const handleOpenRegister = () => {
-    setIsRegisterModalOpen(true);
-  };
-
-  const handleCloseRegister = () => {
-    setIsRegisterModalOpen(false);
-    void refetchStatus();
+    const state: CtiFeedLocationState = { openRegistration: true };
+    void getCore().application.navigateToApp(CTI_FEED_APP_ID, { state });
   };
 
   return (
     <I18nProvider>
       <>
-        {shouldShowBar && (
-          <EuiBottomBar
-            className={`wz-check-updates-bar${
-              sideNavDocked ? ' wz-check-updates-bottom-bar' : ''
-            }`}
-            bodyClassName='wz-check-updates-has-bottom-bar'
-            landmarkHeading={i18n.translate(
-              'wazuhCheckUpdates.ctiUpsell.landmarkHeading',
-              { defaultMessage: 'Wazuh Cloud registration' },
-            )}
-            data-test-subj='ctiUpsellBar'
-          >
-            <EuiFlexGroup
-              justifyContent='spaceBetween'
-              alignItems='center'
-              gutterSize='m'
+        {/* Sticky in the app wrapper, as OSD does: the bar takes its own space
+            instead of padding the body, so views that fit do not scroll. */}
+        {shouldShowBar &&
+          createPortal(
+            <EuiBottomBar
+              position='sticky'
+              className='wz-check-updates-bar'
+              landmarkHeading={i18n.translate(
+                'wazuhCheckUpdates.ctiUpsell.landmarkHeading',
+                {
+                  defaultMessage:
+                    'Wazuh Cyber Threat Intelligence registration',
+                },
+              )}
+              data-test-subj='ctiUpsellBar'
             >
-              <EuiFlexItem grow={false}>
-                <EuiFlexGroup
-                  gutterSize='s'
-                  alignItems='center'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiIcon type='globe' color='ghost' size='m' aria-hidden />
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiText color='ghost'>
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiUpsell.barMessage'
-                        defaultMessage='The open source Cyber Threat Intelligence feed is already included. Connect to the Wazuh Console to add the Pro feed.'
+              <EuiFlexGroup
+                justifyContent='spaceBetween'
+                alignItems='center'
+                gutterSize='m'
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiFlexGroup
+                    gutterSize='s'
+                    alignItems='center'
+                    responsive={false}
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiIcon
+                        type='globe'
+                        color='ghost'
+                        size='m'
+                        aria-hidden
                       />
-                    </EuiText>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiFlexGroup
-                  gutterSize='m'
-                  alignItems='center'
-                  responsive={false}
-                >
-                  <EuiFlexItem grow={false}>
-                    <EuiButtonEmpty
-                      color='ghost'
-                      size='s'
-                      onClick={handleDismiss}
-                      data-test-subj='ctiUpsellDismissButton'
-                    >
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiUpsell.dismissButton'
-                        defaultMessage="Don't show again"
-                      />
-                    </EuiButtonEmpty>
-                  </EuiFlexItem>
-                  <EuiFlexItem grow={false}>
-                    <EuiButton
-                      fill
-                      size='s'
-                      iconType='globe'
-                      onClick={handleOpenRegister}
-                      data-test-subj='ctiUpsellRegisterButton'
-                    >
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiUpsell.registerButton'
-                        defaultMessage='Register now'
-                      />
-                    </EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiBottomBar>
-        )}
-
-        {isRegisterModalOpen && (
-          <ModalCti
-            handleModalToggle={handleCloseRegister}
-            statusCTI={statusCTI}
-            refetchStatus={refetchStatus}
-            onDeviceFlowStarted={() => setDeviceFlowNonce(n => n + 1)}
-          />
-        )}
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiText color='ghost'>
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.barMessage'
+                          defaultMessage='The open source Cyber Threat Intelligence feed is already included. Connect to the Wazuh Console to add the Pro feed.'
+                        />
+                      </EuiText>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiFlexGroup
+                    gutterSize='m'
+                    alignItems='center'
+                    responsive={false}
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiButtonEmpty
+                        color='ghost'
+                        size='s'
+                        onClick={handleDismiss}
+                        data-test-subj='ctiUpsellDismissButton'
+                      >
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.dismissButton'
+                          defaultMessage="Don't show again"
+                        />
+                      </EuiButtonEmpty>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiButton
+                        fill
+                        size='s'
+                        iconType='globe'
+                        onClick={handleOpenRegister}
+                        data-test-subj='ctiUpsellRegisterButton'
+                      >
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiUpsell.registerButton'
+                          defaultMessage='Register now'
+                        />
+                      </EuiButton>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiBottomBar>,
+            document.getElementById('app-wrapper') ?? document.body,
+          )}
       </>
     </I18nProvider>
   );

@@ -1,10 +1,5 @@
 jest.mock('../../../plugin-services', () => ({
   getCore: jest.fn(),
-  getWazuhCore: jest.fn().mockReturnValue({
-    hooks: {
-      useDockedSideNav: () => false,
-    },
-  }),
 }));
 
 import React from 'react';
@@ -42,6 +37,7 @@ jest.mock('@osd/i18n/react', () => ({
 
 const mockHttpGet = jest.fn();
 const mockHttpPatch = jest.fn();
+const mockNavigateToApp = jest.fn();
 
 const NOT_REGISTERED_STATUS = {
   registrationComplete: false,
@@ -68,6 +64,7 @@ describe('CtiUpsellNotification', () => {
 
     (getCore as jest.Mock).mockReturnValue({
       http: { get: mockHttpGet, patch: mockHttpPatch },
+      application: { navigateToApp: mockNavigateToApp },
     });
   });
 
@@ -105,15 +102,32 @@ describe('CtiUpsellNotification', () => {
     ).toBeInTheDocument();
   });
 
-  test('names the bar landmark and pads the page while it shows', async () => {
+  test('opens the CTI feed app on its registration modal from Register now', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
 
     render(<CtiUpsellNotification />);
+    fireEvent.click(await screen.findByText('Register now'));
 
-    expect(
-      await screen.findByRole('region', { name: 'Wazuh Cloud registration' }),
-    ).toBeInTheDocument();
-    expect(document.body).toHaveClass('wz-check-updates-has-bottom-bar');
+    expect(mockNavigateToApp).toHaveBeenCalledWith('cti-feed', {
+      state: { openRegistration: true },
+    });
+  });
+
+  test('names the bar landmark and keeps it sticky in the app wrapper', async () => {
+    mockResponses(NOT_REGISTERED_STATUS);
+    const appWrapper = document.createElement('div');
+    appWrapper.id = 'app-wrapper';
+    document.body.appendChild(appWrapper);
+
+    render(<CtiUpsellNotification />);
+
+    const bar = await screen.findByRole('region', {
+      name: 'Wazuh Cyber Threat Intelligence registration',
+    });
+    expect(bar).toHaveClass('euiBottomBar--sticky');
+    expect(appWrapper).toContainElement(bar);
+    expect(document.body.style.paddingBottom).toBe('');
+    appWrapper.remove();
   });
 
   test('does not show the upsell bar when the user dismissed it before', async () => {
