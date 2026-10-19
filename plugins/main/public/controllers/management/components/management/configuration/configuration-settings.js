@@ -74,7 +74,7 @@ export default [
         name: i18n.translate(
           'wazuh.configuration.settingsCategories.registrationServiceName',
           {
-            defaultMessage: 'Registration Service',
+            defaultMessage: 'Agents Registration Service',
           },
         ),
         description: i18n.translate(

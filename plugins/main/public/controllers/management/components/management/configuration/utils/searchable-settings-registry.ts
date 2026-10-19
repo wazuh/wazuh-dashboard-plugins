@@ -1002,7 +1002,7 @@ const REGISTRATION_SERVICE_INFO: Partial<Record<string, string>> = {
 };
 
 export const searchableSettingsRegistry: SearchableSettingEntry[] = [
-  // --- Registration Service (manager-only, regular request) ---
+  // --- Agents Registration Service (manager-only, regular request) ---
   ...(
     [
       [
@@ -1115,7 +1115,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   ).map(([field, label, render]) => ({
     id: `registration-service.${field}`,
     label,
-    category: 'Registration Service',
+    category: 'Agents Registration Service',
     tab: 'Main settings',
     goto: 'registration-service',
     appliesTo: 'manager' as const,
@@ -1203,7 +1203,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   ).map(([field, label, render]) => ({
     id: `registration-service.ssl.${field}`,
     label,
-    category: 'Registration Service',
+    category: 'Agents Registration Service',
     tab: 'SSL settings',
     goto: 'registration-service',
     appliesTo: 'manager' as const,
