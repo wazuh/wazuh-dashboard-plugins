@@ -22,6 +22,7 @@ import type {
   CtiConsumer,
   CtiConsumersResponse,
 } from '../../../../common/cti-consumers';
+import { getConsumerSyncState } from '../../../services/cti-consumer-sync-state';
 
 const CTI_CONSUMER_FIELDS: Array<{
   key: keyof CtiConsumer;
@@ -84,37 +85,6 @@ const CTI_CONSUMER_FIELDS: Array<{
   },
 ];
 
-// `status` has no validated enum — the server route passes it through
-// verbatim. 'ready', 'running' and 'failed' are the only literal values this
-// component gives meaning to (see
-// plugins/wazuh-ai-assistant/server/tools/catalog/get-cti-status.ts for
-// 'ready'); anything else falls back to showing the raw value.
-const CTI_CONSUMER_STATUS_READY = 'ready';
-const CTI_CONSUMER_STATUS_RUNNING = 'running';
-const CTI_CONSUMER_STATUS_FAILED = 'failed';
-
-type ConsumerSyncState =
-  | { kind: 'upToDate' }
-  | { kind: 'syncing' }
-  | { kind: 'failed' }
-  | { kind: 'unknown'; rawStatus: string };
-
-function getConsumerSyncState(consumer: CtiConsumer): ConsumerSyncState {
-  if (
-    consumer.status === CTI_CONSUMER_STATUS_READY &&
-    consumer.local_offset === consumer.remote_offset
-  ) {
-    return { kind: 'upToDate' };
-  }
-  if (consumer.status === CTI_CONSUMER_STATUS_RUNNING) {
-    return { kind: 'syncing' };
-  }
-  if (consumer.status === CTI_CONSUMER_STATUS_FAILED) {
-    return { kind: 'failed' };
-  }
-  return { kind: 'unknown', rawStatus: consumer.status };
-}
-
 const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
   const syncState = getConsumerSyncState(consumer);
 
@@ -128,6 +98,14 @@ const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
               defaultMessage: 'Up to date',
             },
           )}
+        </EuiBadge>
+      );
+    case 'pending':
+      return (
+        <EuiBadge color='primary' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.pending', {
+            defaultMessage: 'Update pending',
+          })}
         </EuiBadge>
       );
     case 'syncing':

@@ -18,8 +18,8 @@ the Wazuh Indexer. The plugin provides the following capabilities:
     - GitHub: Security events related to your GitHub organizations, collected via GitHub audit logs API.
     - Google Cloud Platform: Security events related to your Google Cloud Platform services, collected directly via GCP API.
   - Auditing and Policy Monitoring
-    - Policy monitoring: Verify that your systems are configured according to your security policies baseline.
-    - Security configuration assessment: Scan your assets as part of a configuration assessment audit.
+    - Malware detection: Check indicators of compromise triggered by malware infections or cyberattacks.
+    - Configuration Assessment: Scan your assets as part of a configuration assessment audit.
     - System auditing: Audit users behavior, monitoring command execution and alerting on access to critical files.
   - Threat Detection and Response
     - Vulnerabilities: Discover what applications in your environment are affected by well-known vulnerabilities.

@@ -1,0 +1,51 @@
+.ctiFeed__panel {
+  height: 100%;
+}
+
+// Tinted disc behind the subscription state icon, colored by the state.
+.ctiFeed__badgeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $euiSizeXXL;
+  height: $euiSizeXXL;
+  border-radius: 50%;
+
+  &--success {
+    color: $euiColorSuccessText;
+    background-color: tintOrShade($euiColorSuccess, 85%, 70%);
+  }
+
+  &--warning {
+    color: $euiColorWarningText;
+    background-color: tintOrShade($euiColorWarning, 85%, 70%);
+  }
+
+  &--danger {
+    color: $euiColorDangerText;
+    background-color: tintOrShade($euiColorDanger, 85%, 70%);
+  }
+
+  &--primary {
+    color: $euiColorPrimaryText;
+    background-color: tintOrShade($euiColorPrimary, 85%, 70%);
+  }
+}
+
+// Neutral square behind feed and content icons, on top of a subdued panel.
+.ctiFeed__feedIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: $euiSizeXL;
+  height: $euiSizeXL;
+  border-radius: $euiBorderRadius;
+  color: $euiColorPrimaryText;
+  background-color: $euiColorEmptyShade;
+  border: $euiBorderThin;
+
+  &--large {
+    width: $euiSizeXXL;
+    height: $euiSizeXXL;
+  }
+}

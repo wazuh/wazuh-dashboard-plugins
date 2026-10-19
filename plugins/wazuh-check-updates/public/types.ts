@@ -14,7 +14,6 @@ export interface WazuhCheckUpdatesPluginStart {
   ctiRegistrationUiEnabled: boolean;
   ctiUpsellEnabled: boolean;
   ctiRegistrationStatusPollIntervalSec: number;
-  CtiRegistration: () => JSX.Element | null;
   CtiUpsellNotification: () => JSX.Element | null;
 }
 

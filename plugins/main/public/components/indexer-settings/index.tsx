@@ -29,12 +29,7 @@ import { isSecurityAnalyticsSettingDisabled } from '../../utils/security-analyti
 import { GenericRequest } from '../../react-services';
 import { EngineSwitch } from './engine-switch';
 import type { Engine, IndexerSettings } from './types';
-import { getErrorOrchestrator } from '../../react-services/common-services';
-import { UI_ERROR_SEVERITIES } from '../../react-services/error-orchestrator/types';
-import {
-  UI_LOGGER_LEVELS,
-  WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
-} from '../../../common/constants';
+import { WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS } from '../../../common/constants';
 
 export const WzIndexerSettings: React.FC = () => {
   const [savedSettings, setSavedSettings] = useState<IndexerSettings | null>(
@@ -47,7 +42,6 @@ export const WzIndexerSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [bottomBarHost, setBottomBarHost] = useState<HTMLElement | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const isIndexRawEventsDisabled = isSecurityAnalyticsSettingDisabled(
     WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS,
@@ -151,46 +145,6 @@ export const WzIndexerSettings: React.FC = () => {
     }
   };
 
-  const handleUpdateClick = async () => {
-    setIsLoading(true);
-
-    try {
-      await GenericRequest.request('POST', '/api/cti-feeds/update');
-      getToasts().add({
-        color: 'success',
-        title: i18n.translate(
-          'wazuh.indexerSettings.ctiUpdate.successToastTitle',
-          {
-            defaultMessage: 'CTI update requested',
-          },
-        ),
-        text: i18n.translate(
-          'wazuh.indexerSettings.ctiUpdate.successToastText',
-          {
-            defaultMessage: 'The update has been requested successfully',
-          },
-        ),
-        toastLifeTimeMs: 5000,
-      });
-    } catch (error) {
-      const options = {
-        context: `${WzIndexerSettings.name}.handleUpdateClick`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: i18n.translate('wazuh.indexerSettings.ctiUpdate.errorTitle', {
-            defaultMessage: 'Error updating CTI feeds',
-          }),
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const bottomBar = hasUnsavedChanges ? (
     <EuiBottomBar data-test-subj='indexerSettings-bottomBar' position='sticky'>
       <EuiFlexGroup
@@ -289,120 +243,56 @@ export const WzIndexerSettings: React.FC = () => {
                 })}
               </EuiButton>
             </EuiCallOut>
+          ) : draftSettings && isIndexRawEventsDisabled ? (
+            // Raw events is the only setting, so hiding it leaves nothing to configure.
+            <EuiText color='subdued' data-test-subj='indexerSettings-empty'>
+              <p>
+                {i18n.translate('wazuh.indexerSettings.page.empty', {
+                  defaultMessage:
+                    'There are no indexer settings available to configure.',
+                })}
+              </p>
+            </EuiText>
           ) : draftSettings ? (
-            <EuiFlexGroup direction='column'>
-              {!isIndexRawEventsDisabled && (
-                <EuiFlexItem>
-                  <EuiPanel
-                    paddingSize='none'
-                    hasBorder={false}
-                    hasShadow={false}
-                  >
-                    <EuiDescribedFormGroup
-                      fullWidth
-                      id='indexer-settings-enable-raw-events-group'
-                      title={
-                        <span>
-                          {i18n.translate(
-                            'wazuh.indexerSettings.rawEvents.title',
-                            {
-                              defaultMessage: 'Enable raw events',
-                            },
-                          )}
-                        </span>
-                      }
-                      description={
-                        <div>
-                          <FormattedMessage
-                            id='wazuh.indexerSettings.rawEvents.description'
-                            defaultMessage='Enables indexing of raw events into the {indexName} indices.'
-                            values={{
-                              indexName: <strong>wazuh-events-raw-v5</strong>,
-                            }}
-                          />
-                        </div>
-                      }
-                      descriptionFlexItemProps={{
-                        style: { alignSelf: 'center' },
+            <EuiPanel paddingSize='none' hasBorder={false} hasShadow={false}>
+              <EuiDescribedFormGroup
+                fullWidth
+                id='indexer-settings-enable-raw-events-group'
+                title={
+                  <span>
+                    {i18n.translate('wazuh.indexerSettings.rawEvents.title', {
+                      defaultMessage: 'Enable raw events',
+                    })}
+                  </span>
+                }
+                description={
+                  <div>
+                    <FormattedMessage
+                      id='wazuh.indexerSettings.rawEvents.description'
+                      defaultMessage='Enables indexing of raw events into the {indexName} indices.'
+                      values={{
+                        indexName: <strong>wazuh-events-raw-v5</strong>,
                       }}
-                      fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
-                    >
-                      <EngineSwitch
-                        field='index_raw_events'
-                        ariaLabel={i18n.translate(
-                          'wazuh.indexerSettings.rawEvents.switchAriaLabel',
-                          { defaultMessage: 'Enable raw events' },
-                        )}
-                        engine={draftSettings.engine}
-                        updateEngine={updateEngine}
-                        saving={saving}
-                      />
-                    </EuiDescribedFormGroup>
-                  </EuiPanel>
-                </EuiFlexItem>
-              )}
-              <EuiFlexItem>
-                <EuiPanel
-                  paddingSize='none'
-                  hasBorder={false}
-                  hasShadow={false}
-                >
-                  <EuiDescribedFormGroup
-                    fullWidth
-                    id='indexer-settings-enable-raw-events-group'
-                    title={
-                      <span>
-                        {i18n.translate(
-                          'wazuh.indexerSettings.ctiUpdate.title',
-                          {
-                            defaultMessage: 'Update CTI content feeds',
-                          },
-                        )}
-                      </span>
-                    }
-                    description={
-                      <div>
-                        <FormattedMessage
-                          id='wazuh.indexerSettings.ctiUpdate.description'
-                          defaultMessage='Triggers an update of threat intelligence content from {subscribedCti} feeds.'
-                          values={{
-                            subscribedCti: (
-                              <strong>
-                                {i18n.translate(
-                                  'wazuh.indexerSettings.ctiUpdate.subscribedCti',
-                                  {
-                                    defaultMessage: 'subscribed CTI',
-                                  },
-                                )}
-                              </strong>
-                            ),
-                          }}
-                        />
-                      </div>
-                    }
-                    descriptionFlexItemProps={{
-                      style: { alignSelf: 'center' },
-                    }}
-                    fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
-                  >
-                    <EuiButton
-                      size='s'
-                      isLoading={isLoading}
-                      onClick={handleUpdateClick}
-                      iconType='refresh'
-                      style={{ width: 'fit-content' }}
-                    >
-                      {i18n.translate(
-                        'wazuh.indexerSettings.ctiUpdate.button',
-                        {
-                          defaultMessage: 'Update CTI content',
-                        },
-                      )}
-                    </EuiButton>
-                  </EuiDescribedFormGroup>
-                </EuiPanel>
-              </EuiFlexItem>
-            </EuiFlexGroup>
+                    />
+                  </div>
+                }
+                descriptionFlexItemProps={{
+                  style: { alignSelf: 'center' },
+                }}
+                fieldFlexItemProps={{ style: { alignSelf: 'center' } }}
+              >
+                <EngineSwitch
+                  field='index_raw_events'
+                  ariaLabel={i18n.translate(
+                    'wazuh.indexerSettings.rawEvents.switchAriaLabel',
+                    { defaultMessage: 'Enable raw events' },
+                  )}
+                  engine={draftSettings.engine}
+                  updateEngine={updateEngine}
+                  saving={saving}
+                />
+              </EuiDescribedFormGroup>
+            </EuiPanel>
           ) : null}
         </EuiPanel>
         {bottomBar && bottomBarHost
