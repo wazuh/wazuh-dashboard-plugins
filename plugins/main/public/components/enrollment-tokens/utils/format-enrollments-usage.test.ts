@@ -2,13 +2,13 @@
 import { formatEnrollmentsUsage } from './format-enrollments-usage';
 
 describe('formatEnrollmentsUsage', () => {
-  it('spells out an unlimited allowance', () => {
+  it('shows the count against an unlimited allowance', () => {
     expect(formatEnrollmentsUsage({ uses: 900, max_uses: 0 })).toBe(
-      'Unlimited',
+      '900 / Unlimited',
     );
     expect(
       formatEnrollmentsUsage({ uses: undefined, max_uses: undefined }),
-    ).toBe('Unlimited');
+    ).toBe('0 / Unlimited');
   });
 
   it('shows the count against the allowance when it is limited', () => {
