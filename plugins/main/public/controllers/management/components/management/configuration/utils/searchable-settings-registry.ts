@@ -282,17 +282,6 @@ const REMOTE_HELP: HelpLink[] = [
 const POLICY_MONITORING_HELP: HelpLink[] = [
   {
     text: i18n.translate(
-      'wazuh.configuration.settingsHelpLinks.malwareDetection',
-      {
-        defaultMessage: 'Malware detection',
-      },
-    ),
-    href: webDocumentationLink(
-      'user-manual/capabilities/malware-detection/index.html',
-    ),
-  },
-  {
-    text: i18n.translate(
       'wazuh.configuration.settingsHelpLinks.rootcheckReference',
       {
         defaultMessage: 'Rootcheck reference',
@@ -471,7 +460,7 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
           },
         ),
         href: webDocumentationLink(
-          'installation-guide/wazuh-server/step-by-step.html#cluster-configuration-for-multi-node-deployment',
+          'installation-guide/wazuh-manager/step-by-step.html#cluster-configuration-for-multi-node-deployment',
         ),
       },
       {
@@ -1002,7 +991,7 @@ const REGISTRATION_SERVICE_INFO: Partial<Record<string, string>> = {
 };
 
 export const searchableSettingsRegistry: SearchableSettingEntry[] = [
-  // --- Registration Service (manager-only, regular request) ---
+  // --- Agents Registration Service (manager-only, regular request) ---
   ...(
     [
       [
@@ -1115,7 +1104,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   ).map(([field, label, render]) => ({
     id: `registration-service.${field}`,
     label,
-    category: 'Registration Service',
+    category: 'Agents Registration Service',
     tab: 'Main settings',
     goto: 'registration-service',
     appliesTo: 'manager' as const,
@@ -1203,7 +1192,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   ).map(([field, label, render]) => ({
     id: `registration-service.ssl.${field}`,
     label,
-    category: 'Registration Service',
+    category: 'Agents Registration Service',
     tab: 'SSL settings',
     goto: 'registration-service',
     appliesTo: 'manager' as const,
@@ -3754,7 +3743,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
           },
         ),
         href: webDocumentationLink(
-          'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
+          'user-manual/capabilities/log-data-collection/configuring-log-collection/monitoring-log-files.html#configuring-sockets',
         ),
       },
       {

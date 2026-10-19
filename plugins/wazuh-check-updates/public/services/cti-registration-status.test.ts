@@ -1,15 +1,19 @@
-import { hydrateCtiFlowFromServer } from './cti-registration-status';
+import {
+  fetchCtiRegistrationStatus,
+  hydrateCtiFlowFromServer,
+} from './cti-registration-status';
 import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
 const mockHttpGet = jest.fn();
+const mockHttpPost = jest.fn();
 
 jest.mock('../plugin-services', () => ({
   getCore: jest.fn(),
 }));
 
 (getCore as jest.Mock).mockReturnValue({
-  http: { get: mockHttpGet },
+  http: { get: mockHttpGet, post: mockHttpPost },
 });
 
 describe('hydrateCtiFlowFromServer', () => {
@@ -92,5 +96,66 @@ describe('hydrateCtiFlowFromServer', () => {
       90 * 1000,
     );
     expect(ctiFlowState.getEnvironmentUid()).toBe('env-uuid-1');
+  });
+});
+
+describe('fetchCtiRegistrationStatus', () => {
+  afterEach(() => {
+    ctiFlowState.reset();
+    mockHttpGet.mockReset();
+    mockHttpPost.mockReset();
+  });
+
+  it('shares one device-code poll between concurrent callers', async () => {
+    /* eslint-disable camelcase -- status API body uses snake_case */
+    const pending = {
+      registrationComplete: false,
+      inProgress: true,
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      subscription: {
+        message: { plan: { name: '', is_public: true }, is_registered: false },
+        status: 200,
+      },
+    };
+    const registered = {
+      registrationComplete: true,
+      inProgress: false,
+      subscription: {
+        message: {
+          plan: { name: 'Open', is_public: true },
+          is_registered: true,
+        },
+        status: 200,
+      },
+    };
+    /* eslint-enable camelcase */
+    mockHttpGet.mockResolvedValueOnce(pending).mockResolvedValue(registered);
+    // A second exchange of the redeemed code would answer not_found.
+    mockHttpPost
+      .mockResolvedValueOnce({ success: true })
+      .mockResolvedValue({ error: 'not_found' });
+
+    const results = await Promise.all([
+      fetchCtiRegistrationStatus(),
+      fetchCtiRegistrationStatus(),
+    ]);
+
+    expect(mockHttpPost).toHaveBeenCalledTimes(1);
+    results.forEach(result => expect(result.statusCode).toBe(200));
+  });
+
+  it('starts a new request once the previous one settled', async () => {
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: false,
+      subscription: { message: null, status: 404 },
+    });
+
+    await fetchCtiRegistrationStatus();
+    await fetchCtiRegistrationStatus();
+
+    expect(mockHttpGet).toHaveBeenCalledTimes(2);
   });
 });
