@@ -17,6 +17,7 @@ jest.mock('../../../../../kibana-services', () => ({
 }));
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
+  ...jest.requireActual('../../../../../services/enrollment-tokens/constants'),
   createEnrollmentToken: jest.fn(),
 }));
 
@@ -334,6 +335,17 @@ describe('EnrollmentTokenInput advanced options', () => {
     });
     expect(lifetimeInput()).toBeInTheDocument();
   });
+
+  /* The manager refuses the request anyway, so it is not sent. */
+  it.each(['enrollmentTokenTtl', 'enrollmentTokenDescription'])(
+    'blocks generating while %s is in error',
+    fieldName => {
+      renderInput({
+        formFields: { [fieldName]: field('x', 'Invalid value.') },
+      });
+      expect(generateButton()).toBeDisabled();
+    },
+  );
 });
 
 describe('EnrollmentTokenInput token flags', () => {
