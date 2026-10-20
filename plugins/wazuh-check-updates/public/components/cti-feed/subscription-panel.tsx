@@ -215,8 +215,7 @@ const FeedTiers: React.FC = () => (
         description={i18n.translate(
           'wazuhCheckUpdates.ctiFeed.subscription.tiers.proDescription',
           {
-            defaultMessage:
-              'Vulnerabilities, IOCs and rules delivered with no delay.',
+            defaultMessage: 'Vulnerabilities, IOCs and rules delivered faster.',
           },
         )}
       />

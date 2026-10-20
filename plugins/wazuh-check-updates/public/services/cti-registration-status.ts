@@ -51,6 +51,21 @@ export async function cancelCtiRegistration(): Promise<void> {
   await getCore().http.delete(routes.token);
 }
 
+/**
+ * Cancels the pending activation while the page unloads (reload or tab close).
+ * `keepalive` lets the request outlive the page, which `core.http` can't do.
+ */
+export function cancelCtiRegistrationOnUnload(): void {
+  void fetch(getCore().http.basePath.prepend(routes.token), {
+    method: 'DELETE',
+    keepalive: true,
+    credentials: 'same-origin',
+    headers: { 'osd-xsrf': 'true' },
+  }).catch(() => {
+    // Nothing to recover: the page is going away.
+  });
+}
+
 export async function hydrateCtiFlowFromServer(): Promise<void> {
   const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
     routes.ctiRegistrationStatus,
