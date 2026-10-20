@@ -420,7 +420,12 @@ export const Steps = ({
           defaultMessage: 'Optional settings:',
         },
       ),
-      children: <OptionalsInputs formFields={form.fields} />,
+      children: (
+        <OptionalsInputs
+          formFields={form.fields}
+          usesEnrollmentToken={canCreateEnrollmentToken}
+        />
+      ),
       status: getOptionalParameterStepStatus(
         form.fields,
         installCommandWasCopied,
