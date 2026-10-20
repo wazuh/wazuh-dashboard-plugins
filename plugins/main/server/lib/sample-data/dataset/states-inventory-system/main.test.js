@@ -28,7 +28,7 @@ describe('states-inventory-system sample data', () => {
     });
   });
 
-  it('fills display_version only for Windows documents', () => {
+  it('fills display_version and the version as kernel for Windows documents', () => {
     const windows = documents.filter(
       ({ host }) => host.os.platform === 'windows',
     );
@@ -40,6 +40,7 @@ describe('states-inventory-system sample data', () => {
     expect(others.length).toBeGreaterThan(0);
     windows.forEach(({ host }) => {
       expect(host.os.display_version).toEqual(expect.any(String));
+      expect(host.os.kernel).toBe(host.os.version);
     });
     others.forEach(({ host }) => {
       expect(host.os).not.toHaveProperty('display_version');

@@ -9,7 +9,8 @@ const {
 /**
  * Operating systems reported by the agents, following the `host.os` shape of the
  * system inventory. Only Windows fills `display_version` (`DisplayVersion` or
- * `ReleaseId` registry value). `full` is built by `getFullName`.
+ * `ReleaseId` registry value), and its `kernel` is the OS version. `full` is
+ * built by `getFullName`.
  */
 /* eslint-disable camelcase -- the keys reproduce the index fields */
 const OPERATING_SYSTEMS = [
@@ -72,10 +73,9 @@ const OPERATING_SYSTEMS = [
     platform: 'windows',
     name: 'Microsoft Windows 11 Pro',
     version: '10.0.22631.4169',
-    kernel: '10.0.22631',
+    kernel: '10.0.22631.4169',
     major: '10',
     minor: '0',
-    patch: '4169',
     build: '22631',
     display_version: '23H2',
   },
@@ -84,10 +84,9 @@ const OPERATING_SYSTEMS = [
     platform: 'windows',
     name: 'Microsoft Windows 10 Enterprise',
     version: '10.0.19045.4894',
-    kernel: '10.0.19045',
+    kernel: '10.0.19045.4894',
     major: '10',
     minor: '0',
-    patch: '4894',
     build: '19045',
     display_version: '22H2',
   },
@@ -96,10 +95,9 @@ const OPERATING_SYSTEMS = [
     platform: 'windows',
     name: 'Microsoft Windows Server 2019 Datacenter',
     version: '10.0.17763.6293',
-    kernel: '10.0.17763',
+    kernel: '10.0.17763.6293',
     major: '10',
     minor: '0',
-    patch: '6293',
     build: '17763',
     display_version: '1809',
   },
