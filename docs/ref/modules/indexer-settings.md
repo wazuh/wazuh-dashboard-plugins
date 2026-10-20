@@ -2,7 +2,9 @@
 
 ## Overview
 
-The **Settings** app, available under **Indexer management**, provides a single place to configure indexer related behavior of the Wazuh platform. From this page you can enable or disable the indexing of raw events and request an on demand update of the threat intelligence content provided by the subscribed CTI feeds.
+The **Settings** app, available under **Indexer management**, provides a single place to configure indexer related behavior of the Wazuh platform. From this page you can enable or disable the indexing of raw events.
+
+To request an on demand update of the threat intelligence content, use the [CTI feed](cti-feed.md) app.
 
 These functions are part of the dashboard and may be available depending on the platform installation and configuration.
 
@@ -24,7 +26,7 @@ Controls whether raw events are indexed.
 - Use the **On/Off** toggle to change the value.
 - This change is applied as a draft and must be saved. See [Saving and discarding changes](#saving-and-discarding-changes).
 
-> **Note:** This setting can be hidden from the UI through the platform configuration. If your deployment hides it, the **Enable raw events** control will not appear on the Settings page. For details on hiding settings, see [Configuration](../configuration.md).
+> **Note:** This setting can be hidden from the UI through the platform configuration. If your deployment hides it, the **Enable raw events** control will not appear on the Settings page, and the page reports that there are no settings to configure. For details on hiding settings, see [Configuration](../configuration.md).
 
 Hiding it is configured with `wazuh.disabledSettings` in `opensearch_dashboards.yml`, an array of
 disabled-setting ids. The only id it currently accepts is `index-raw-events`, which hides the
@@ -33,15 +35,6 @@ disabled-setting ids. The only id it currently accepts is `index-raw-events`, wh
 ```yaml
 wazuh.disabledSettings: ['index-raw-events']
 ```
-
-### Update CTI content feeds
-
-Triggers an update of the threat intelligence content from the subscribed CTI (Cyber Threat Intelligence) feeds.
-
-- Click **Update CTI content** to request the update.
-- The request is sent immediately and runs asynchronously; you do **not** need to save changes for this action.
-- The button calls `POST /api/cti-feeds/update` on the dashboard server, which forwards the
-  request to `POST /_plugins/_content_manager/update` on the Wazuh indexer as the current user.
 
 ## Saving and discarding changes
 

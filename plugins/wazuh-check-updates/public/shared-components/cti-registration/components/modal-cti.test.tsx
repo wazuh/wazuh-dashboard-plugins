@@ -217,7 +217,7 @@ describe('ModalCti component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Complete activation in Wazuh Cloud'),
+        screen.getByText('Complete activation in Wazuh CTI'),
       ).toBeInTheDocument();
       expect(
         document.querySelector('[data-test-subj="ctiModalDeviceFlowSubtitle"]'),
@@ -226,9 +226,7 @@ describe('ModalCti component', () => {
         document.querySelector('[data-test-subj="ctiDeviceUserCode"]'),
       ).toHaveTextContent('WZH-REST');
     });
-    expect(
-      queryByText('Complete activation in Wazuh Cloud'),
-    ).toBeInTheDocument();
+    expect(queryByText('Complete activation in Wazuh CTI')).toBeInTheDocument();
     // Closing cancels the pending activation, so the footer says so.
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(
@@ -303,7 +301,7 @@ describe('ModalCti component', () => {
       fireEvent.click(button);
     });
 
-    await screen.findByText('Complete activation in Wazuh Cloud');
+    await screen.findByText('Complete activation in Wazuh CTI');
 
     // A pending activation asks for confirmation before cancelling.
     act(() => {
@@ -338,7 +336,7 @@ describe('ModalCti component', () => {
     act(() => {
       fireEvent.click(registerButton);
     });
-    await screen.findByText('Complete activation in Wazuh Cloud');
+    await screen.findByText('Complete activation in Wazuh CTI');
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     fireEvent.click(screen.getByRole('button', { name: 'Keep waiting' }));
@@ -382,7 +380,7 @@ describe('ModalCti component', () => {
     ).not.toBeInTheDocument();
   });
 
-  describe('environment already exists in Wazuh Cloud', () => {
+  describe('environment already exists in Wazuh CTI', () => {
     const restorePendingFlow = (pendingForSec: number) => {
       mockRefetchStatus.mockImplementation(() => {
         ctiFlowState.setDeviceCode('dc-pending');
@@ -440,7 +438,7 @@ describe('ModalCti component', () => {
         jest.advanceTimersByTime(1000);
       });
       expect(queryHelp()).toHaveTextContent(
-        'Did Wazuh Cloud show "Environment already exists"?',
+        'Did Wazuh CTI show "Environment already exists"?',
       );
       expect(queryHelp()).toHaveTextContent('CTI > Deployments');
     });
@@ -503,7 +501,7 @@ describe('ModalCti component', () => {
 
       await waitFor(() => {
         expect(queryHelp()).toHaveTextContent(
-          'In Wazuh Cloud, go to CTI > Deployments and delete this deployment.',
+          'In Wazuh CTI, go to CTI > Deployments and delete this deployment.',
         );
       });
       expect(
@@ -531,7 +529,7 @@ describe('ModalCti component', () => {
           '[data-test-subj="ctiRegistrationFailedMessage"]',
         ),
       ).toHaveTextContent(
-        'The user code expired before the activation was completed in Wazuh Cloud.',
+        'The user code expired before the activation was completed in Wazuh Cyber Threat Intelligence.',
       );
     });
 

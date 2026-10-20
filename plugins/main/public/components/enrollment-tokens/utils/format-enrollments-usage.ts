@@ -13,21 +13,25 @@
 import { i18n } from '@osd/i18n';
 import { EnrollmentTokenSummary } from '../../../services/enrollment-tokens';
 
-/* A `max_uses` of 0 is the manager's way of saying unlimited, so it is spelled
-out rather than shown as a limit of zero -- and with no allowance to count
-against, the use count on its own says nothing about whether the token is
-running out, which is what this column is read for. */
+/* A `max_uses` of 0 is the manager's way of saying unlimited, so the allowance
+is spelled out rather than shown as a limit of zero. The use count is kept
+either way: besides telling whether a limited token is running out, it is how an
+administrator learns whether a token -- a leaked one, say -- was ever used. */
 export const formatEnrollmentsUsage = (
   token: Pick<EnrollmentTokenSummary, 'uses' | 'max_uses'>,
-): string =>
-  token.max_uses
+): string => {
+  const uses = token.uses ?? 0;
+
+  return token.max_uses
     ? i18n.translate('wazuh.enrollmentTokens.formatEnrollmentsUsage.limited', {
         defaultMessage: '{uses} / {maxUses}',
-        values: { uses: token.uses ?? 0, maxUses: token.max_uses },
+        values: { uses, maxUses: token.max_uses },
       })
     : i18n.translate(
-        'wazuh.enrollmentTokens.formatEnrollmentsUsage.unlimited',
+        'wazuh.enrollmentTokens.formatEnrollmentsUsage.unlimitedUses',
         {
-          defaultMessage: 'Unlimited',
+          defaultMessage: '{uses} / Unlimited',
+          values: { uses },
         },
       );
+};

@@ -55,7 +55,7 @@ curl -X POST http://imposter:8080/mock/cti/scenario -d 'scenario=default'
 To reproduce the "Environment already exists" flow, store `environment_exists`,
 start a registration from the dashboard, and wait until the modal explains the
 rejection (one minute after the code was issued). Then store `default` (the
-equivalent of deleting the deployment in Wazuh Cloud) and the registration
+equivalent of deleting the deployment in Wazuh CTI) and the registration
 completes on the next polls.
 
 ## Files

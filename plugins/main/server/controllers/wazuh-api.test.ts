@@ -69,9 +69,10 @@ const makeResponse = () => ({
 const exportAgentsCsv = async (
   uiSettings: Record<string, unknown> = { 'reports.csv.maxRows': 10_000 },
   path = '/agents',
+  agent: Record<string, unknown> = AGENT_WITH_FORMULA_OS_NAME,
 ) => {
   const ctrl = new WazuhApiCtrl();
-  const { context } = makeContext([AGENT_WITH_FORMULA_OS_NAME], uiSettings);
+  const { context } = makeContext([agent], uiSettings);
   const response = makeResponse();
 
   const result = await ctrl.csv(
@@ -125,6 +126,60 @@ describe('WazuhApiCtrl.csv', () => {
     expect(headers['Content-Type']).toBe('text/csv');
     expect(headers['Content-Disposition']).toBe(
       'attachment; filename="agents.csv"',
+    );
+  });
+
+  it.each(['/agents', '/groups/default/agents'])(
+    'exports only the agent columns the API can fill for %s',
+    async path => {
+      const { response } = await exportAgentsCsv(undefined, path);
+
+      const [header] = response.ok.mock.calls[0][0].body.split('\n');
+
+      expect(header.split(',')).toEqual([
+        'ID',
+        'Status',
+        'Name',
+        'IP address',
+        'Group',
+        'Registration date',
+        'Version',
+        'Last keep alive',
+        'OS version architecture',
+        'OS version major',
+        'OS version minor',
+        'OS name',
+        'OS platform',
+        'OS version',
+      ]);
+    },
+  );
+
+  it('does not apply the agent columns to the files of a group', async () => {
+    const { response } = await exportAgentsCsv(
+      undefined,
+      '/groups/default/files',
+    );
+
+    const [header] = response.ok.mock.calls[0][0].body.split('\n');
+
+    expect(header.split(',')).toContain('Manager');
+  });
+
+  it.each`
+    group                | expected
+    ${['linux-servers']} | ${'linux-servers'}
+    ${['a', 'b']}        | ${'"a, b"'}
+  `('writes the groups $group as plain names', async ({ group, expected }) => {
+    const { response } = await exportAgentsCsv(undefined, '/agents', {
+      ...AGENT_WITH_FORMULA_OS_NAME,
+      group,
+    });
+
+    const [, row] = response.ok.mock.calls[0][0].body.split('\n');
+
+    expect(row.startsWith(`001,active,agent-1,172.16.0.2,${expected},`)).toBe(
+      true,
     );
   });
 
