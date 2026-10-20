@@ -279,7 +279,8 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
     },
   },
   /* The agent verifies the manager certificate on its own -- an unset
-  `<verification_mode>` resolves to the endpoint's system CA store, or to
+  `<verification_mode>` resolves to `full` against the CA bootstrapped from the
+  enrollment token, to the endpoint's system CA store without a token, or to
   `certificate` when a CA is configured -- so the enabled state contributes
   nothing and only the opt-out is spelled out. Emitting `system` here instead
   would be harmful: the agent rejects `system` combined with a CA and drops the
@@ -292,8 +293,9 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
     },
   },
   /* Path to a CA already present on the endpoint, which the installer writes
-  into `<agent><ssl><certificate_authorities>`. Left empty the agent falls back
-  to the endpoint's system CA store. */
+  into `<agent><ssl><certificate_authorities>`. Left empty the agent trusts the
+  CA bootstrapped from the enrollment token, or the endpoint's system CA store
+  without a token. */
   managerCa: {
     property: 'WAZUH_REGISTRATION_CA',
     getParamCommand: props => {
