@@ -17,9 +17,14 @@ describe('ButtonAboutConfigurationAssessment', () => {
     );
 
     const flyout = screen.getByRole('dialog');
-    ['Passed', 'Failed', 'Not applicable', 'Score'].forEach(term =>
-      expect(flyout).toHaveTextContent(term),
-    );
+    [
+      'Inventory',
+      'Findings',
+      'Passed',
+      'Failed',
+      'Not applicable',
+      'Score',
+    ].forEach(term => expect(flyout).toHaveTextContent(term));
     expect(
       screen.getByRole('link', { name: /Security Configuration Assessment/ }),
     ).toHaveAttribute(

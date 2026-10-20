@@ -71,6 +71,47 @@ export const ButtonAboutConfigurationAssessment = () => {
             <EuiTitle size='xs'>
               <h3>
                 {i18n.translate(
+                  'wazuh.configurationAssessment.aboutFlyout.dataSourcesTitle',
+                  { defaultMessage: 'Data sources' },
+                )}
+              </h3>
+            </EuiTitle>
+            <EuiSpacer size='s' />
+            <EuiDescriptionList
+              compressed
+              listItems={[
+                {
+                  title: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.inventoryTerm',
+                    { defaultMessage: 'Inventory' },
+                  ),
+                  description: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.inventoryDescription',
+                    {
+                      defaultMessage:
+                        'The current result of every check on each endpoint, reported by the agent scans. It is populated as soon as an agent completes a scan.',
+                    },
+                  ),
+                },
+                {
+                  title: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.findingsTerm',
+                    { defaultMessage: 'Findings' },
+                  ),
+                  description: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.findingsDescription',
+                    {
+                      defaultMessage:
+                        'Security findings generated from Configuration Assessment events. It can be empty even when Inventory has data, because findings only appear once they are generated.',
+                    },
+                  ),
+                },
+              ]}
+            />
+            <EuiSpacer />
+            <EuiTitle size='xs'>
+              <h3>
+                {i18n.translate(
                   'wazuh.configurationAssessment.aboutFlyout.resultsTitle',
                   { defaultMessage: 'Results' },
                 )}
