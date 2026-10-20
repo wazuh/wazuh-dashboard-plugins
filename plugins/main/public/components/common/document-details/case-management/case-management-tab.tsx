@@ -39,6 +39,7 @@ import {
   EuiToolTip,
   EuiAccordion,
   EuiAvatar,
+  htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { formatUIDate } from '../../../../react-services';
@@ -109,7 +110,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.errorDescription',
-      { defaultMessage: 'Opened by mistake.' },
+      { defaultMessage: 'Marked as a mistake, for example a false positive.' },
     ),
   },
   {
@@ -119,25 +120,10 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.deletedDescription',
-      { defaultMessage: 'Removed. Kept only for history.' },
+      { defaultMessage: 'Marked as removed. Kept for history.' },
     ),
   },
 ];
-
-const CASE_STATUS_SELECT_OPTIONS = CASE_STATUS_OPTIONS.map(
-  ({ value, text, description }) => ({
-    value,
-    inputDisplay: text,
-    dropdownDisplay: (
-      <>
-        <strong>{text}</strong>
-        <EuiText size='s' color='subdued'>
-          <p>{description}</p>
-        </EuiText>
-      </>
-    ),
-  }),
-);
 
 const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
   {
@@ -201,12 +187,49 @@ const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
     },
   ];
 
-const CASE_TLP_OPTIONS: Array<{ value: CaseTLP | ''; text: string }> = [
+const CASE_TLP_OPTIONS: Array<{
+  value: CaseTLP | '';
+  text: string;
+  description?: string;
+}> = [
   { value: '', text: '—' },
-  { value: 'TLP:RED', text: 'TLP:RED' },
-  { value: 'TLP:AMBER', text: 'TLP:AMBER' },
-  { value: 'TLP:GREEN', text: 'TLP:GREEN' },
-  { value: 'TLP:CLEAR', text: 'TLP:CLEAR' },
+  {
+    value: 'TLP:RED',
+    text: 'TLP:RED',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.redDescription',
+      {
+        defaultMessage: 'Named recipients only. No further sharing.',
+      },
+    ),
+  },
+  {
+    value: 'TLP:AMBER',
+    text: 'TLP:AMBER',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.amberDescription',
+      {
+        defaultMessage:
+          'Your organization and its clients, on a need-to-know basis.',
+      },
+    ),
+  },
+  {
+    value: 'TLP:GREEN',
+    text: 'TLP:GREEN',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.greenDescription',
+      { defaultMessage: 'Your community. Not on public channels.' },
+    ),
+  },
+  {
+    value: 'TLP:CLEAR',
+    text: 'TLP:CLEAR',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.clearDescription',
+      { defaultMessage: 'No limit. Can be shared publicly.' },
+    ),
+  },
 ];
 
 const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
@@ -240,13 +263,51 @@ const TLP_BADGE_COLOR: Record<CaseTLP, string> = {
   'TLP:CLEAR': 'hollow',
 };
 
+const findOption = <T extends { value: string }>(
+  options: T[],
+  value: string | undefined,
+): T | undefined => options.find(option => option.value === value);
+
 const optionText = (
   options: Array<{ value: string; text: string }>,
   value: string | undefined,
-): string | undefined => options.find(option => option.value === value)?.text;
+): string | undefined => findOption(options, value)?.text;
 
-const statusDescription = (status: string | undefined): string | undefined =>
-  CASE_STATUS_OPTIONS.find(option => option.value === status)?.description;
+// selectedId names the selected value so the button's aria-labelledby can include it
+const toSuperSelectOptions = <T extends string>(
+  options: Array<{ value: T; text: string; description?: string }>,
+  selectedId: string,
+) =>
+  options.map(({ value, text, description }) => ({
+    value,
+    inputDisplay: <span id={selectedId}>{text}</span>,
+    dropdownDisplay: (
+      <>
+        <strong>{text}</strong>
+        {description && (
+          <EuiText size='s' color='subdued'>
+            <p>{description}</p>
+          </EuiText>
+        )}
+      </>
+    ),
+  }));
+
+// tabIndex lets keyboard users open the tooltip
+const DescribedBadge: React.FC<{ color: string; description?: string }> = ({
+  color,
+  description,
+  children,
+}) => {
+  const badge = <EuiBadge color={color}>{children}</EuiBadge>;
+  return description ? (
+    <EuiToolTip content={description}>
+      <span tabIndex={0}>{badge}</span>
+    </EuiToolTip>
+  ) : (
+    badge
+  );
+};
 
 const renderTwoColumnRows = (
   items: Array<{
@@ -304,6 +365,15 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   onSaveSuccess,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [fieldIds] = useState(() => {
+    const id = htmlIdGenerator('caseManagement')();
+    return {
+      statusLabel: `${id}-statusLabel`,
+      statusValue: `${id}-statusValue`,
+      tlpLabel: `${id}-tlpLabel`,
+      tlpValue: `${id}-tlpValue`,
+    };
+  });
   const [isCleanModalVisible, setIsCleanModalVisible] = useState(false);
   const [editingCommentKey, setEditingCommentKey] = useState<
     string | undefined
@@ -367,6 +437,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     // Comment saves patch the host grid through the tab's own onSaveSuccess
     // but must not leave edit mode nor close the inline comment editor.
   } = useCaseManagementForm(document, handleOperationSuccess, onSaveSuccess);
+  const statusOption = findOption(CASE_STATUS_OPTIONS, status);
 
   const openCleanModal = useCallback(() => setIsCleanModalVisible(true), []);
   const closeCleanModal = useCallback(() => setIsCleanModalVisible(false), []);
@@ -705,7 +776,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         defaultMessage: 'TLP',
       }),
       description: tlp ? (
-        <EuiBadge color={TLP_BADGE_COLOR[tlp]}>{tlp}</EuiBadge>
+        <DescribedBadge
+          color={TLP_BADGE_COLOR[tlp]}
+          description={findOption(CASE_TLP_OPTIONS, tlp)?.description}
+        >
+          {tlp}
+        </DescribedBadge>
       ) : (
         '—'
       ),
@@ -839,11 +915,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               </EuiFlexItem>
               {status && (
                 <EuiFlexItem grow={false}>
-                  <EuiToolTip content={statusDescription(status) ?? status}>
-                    <EuiBadge color={STATUS_BADGE_COLOR[status] ?? 'default'}>
-                      {optionText(CASE_STATUS_OPTIONS, status) ?? status}
-                    </EuiBadge>
-                  </EuiToolTip>
+                  <DescribedBadge
+                    color={STATUS_BADGE_COLOR[status] ?? 'default'}
+                    description={statusOption?.description}
+                  >
+                    {statusOption?.text ?? status}
+                  </DescribedBadge>
                 </EuiFlexItem>
               )}
               {isNewCase && (
@@ -995,12 +1072,16 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.statusLabel',
-                      { defaultMessage: 'Status *' },
-                    )}
+                    label={
+                      <span id={fieldIds.statusLabel}>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.statusLabel',
+                          { defaultMessage: 'Status *' },
+                        )}
+                      </span>
+                    }
                     helpText={
-                      statusDescription(status) ??
+                      statusOption?.description ??
                       i18n.translate(
                         'wazuh.common.caseManagementForm.statusHelpText',
                         {
@@ -1014,14 +1095,14 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     <EuiSuperSelect<CaseStatus | ''>
                       fullWidth
                       hasDividers
-                      options={CASE_STATUS_SELECT_OPTIONS}
+                      options={toSuperSelectOptions(
+                        CASE_STATUS_OPTIONS,
+                        fieldIds.statusValue,
+                      )}
                       valueOfSelected={status ?? ''}
                       onChange={value => value && setStatus(value)}
                       disabled={isSaving || isCleaning}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.statusAriaLabel',
-                        { defaultMessage: 'Case status' },
-                      )}
+                      aria-labelledby={`${fieldIds.statusLabel} ${fieldIds.statusValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -1088,29 +1169,36 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.tlpLabel',
-                      { defaultMessage: 'TLP' },
-                    )}
-                    helpText={i18n.translate(
-                      'wazuh.common.caseManagementForm.tlpHelpText',
-                      {
-                        defaultMessage: 'Traffic Light Protocol sharing level.',
-                      },
-                    )}
+                    label={
+                      <span id={fieldIds.tlpLabel}>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.tlpLabel',
+                          { defaultMessage: 'TLP' },
+                        )}
+                      </span>
+                    }
+                    helpText={
+                      findOption(CASE_TLP_OPTIONS, tlp)?.description ??
+                      i18n.translate(
+                        'wazuh.common.caseManagementForm.tlpHelpText',
+                        {
+                          defaultMessage:
+                            'Traffic Light Protocol sharing level.',
+                        },
+                      )
+                    }
                   >
-                    <EuiSelect
+                    <EuiSuperSelect<CaseTLP | ''>
                       fullWidth
-                      options={CASE_TLP_OPTIONS}
-                      value={tlp}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setTlp(e.target.value as CaseTLP | '')
-                      }
-                      disabled={isSaving || isCleaning}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.tlpAriaLabel',
-                        { defaultMessage: 'Case TLP' },
+                      hasDividers
+                      options={toSuperSelectOptions(
+                        CASE_TLP_OPTIONS,
+                        fieldIds.tlpValue,
                       )}
+                      valueOfSelected={tlp}
+                      onChange={setTlp}
+                      disabled={isSaving || isCleaning}
+                      aria-labelledby={`${fieldIds.tlpLabel} ${fieldIds.tlpValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>

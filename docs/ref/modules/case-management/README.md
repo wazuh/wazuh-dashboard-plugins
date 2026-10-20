@@ -84,32 +84,35 @@ The module also shows read-only metadata that the server sets: the **User** who 
 
 The **Status** field records the stage of the case. A case has one of these values:
 
-| Status           | Meaning                            |
-| ---------------- | ---------------------------------- |
-| **Active**       | Open. No one is working on it yet. |
-| **Acknowledged** | Open. Someone is working on it.    |
-| **Completed**    | Closed. No more work needed.       |
-| **Audit**        | Kept for review or compliance.     |
-| **Error**        | Opened by mistake.                 |
-| **Deleted**      | Removed. Kept only for history.    |
+| Status           | Meaning                                            |
+| ---------------- | -------------------------------------------------- |
+| **Active**       | Open. No one is working on it yet.                 |
+| **Acknowledged** | Open. Someone is working on it.                    |
+| **Completed**    | Closed. No more work needed.                       |
+| **Audit**        | Kept for review or compliance.                     |
+| **Error**        | Marked as a mistake, for example a false positive. |
+| **Deleted**      | Marked as removed. Kept for history.               |
 
 A typical case moves from **Active** to **Acknowledged**, and then to **Completed**. The module
 does not force a fixed order, so you can set any status that fits your process.
 
-The **Status** list shows the meaning under each value. In read mode, point to the status badge
-to see it.
+The **Status** list shows the meaning under each value. In read mode, point to or focus the status
+badge to see it.
 
 ### TLP (Traffic Light Protocol)
 
 The **TLP** field records how widely you can share the case. It uses the standard Traffic Light
 Protocol values.
 
-| Value         | Sharing rule                                                       |
-| ------------- | ------------------------------------------------------------------ |
-| **TLP:RED**   | Do not share outside the people named in the exchange.             |
-| **TLP:AMBER** | Share only with the members of your organization who need to know. |
-| **TLP:GREEN** | Share within your community, but not on public channels.           |
-| **TLP:CLEAR** | Share without a restriction.                                       |
+| Value         | Sharing rule                                                |
+| ------------- | ----------------------------------------------------------- |
+| **TLP:RED**   | Named recipients only. No further sharing.                  |
+| **TLP:AMBER** | Your organization and its clients, on a need-to-know basis. |
+| **TLP:GREEN** | Your community. Not on public channels.                     |
+| **TLP:CLEAR** | No limit. Can be shared publicly.                           |
+
+The **TLP** list shows the rule under each value. In read mode, point to or focus the TLP badge to
+see it. The rules follow [FIRST TLP 2.0](https://www.first.org/tlp/).
 
 ### Comments
 
