@@ -104,16 +104,17 @@ badge to see it.
 The **TLP** field records how widely you can share the case. It uses the standard Traffic Light
 Protocol values.
 
-| Value         | Sharing rule                                                       |
-| ------------- | ------------------------------------------------------------------ |
-| **TLP:RED**   | Named recipients only. No further sharing.                         |
-| **TLP:AMBER** | Recipients' organization and its clients, on a need-to-know basis. |
-| **TLP:GREEN** | Recipients' community. Not on public channels.                     |
-| **TLP:CLEAR** | No limit. Can be shared publicly.                                  |
+| Value         | Sharing rule                                                                  |
+| ------------- | ----------------------------------------------------------------------------- |
+| **TLP:RED**   | Not for disclosure, restricted to participants only.                          |
+| **TLP:AMBER** | Limited disclosure, restricted to participants' organization and its clients. |
+| **TLP:GREEN** | Limited disclosure, restricted to the community.                              |
+| **TLP:CLEAR** | Disclosure is not limited.                                                    |
 
 The **TLP** list shows the rule under each value. In read mode, point to or focus the TLP badge to
-see it. The rules follow [FIRST TLP 2.0](https://www.first.org/tlp/). The module does not support
-**TLP:AMBER+STRICT**: the server rejects it.
+see it. The rules follow the
+[CISA TLP definitions](https://www.cisa.gov/news-events/news/traffic-light-protocol-tlp-definitions-and-usage).
+The module does not support **TLP:AMBER+STRICT**: the server rejects it.
 
 ### Comments
 

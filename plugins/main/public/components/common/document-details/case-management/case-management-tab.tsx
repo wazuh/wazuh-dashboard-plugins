@@ -201,7 +201,7 @@ const CASE_TLP_OPTIONS: Array<{
     description: i18n.translate(
       'wazuh.common.caseManagementTlp.redDescription',
       {
-        defaultMessage: 'Named recipients only. No further sharing.',
+        defaultMessage: 'Not for disclosure, restricted to participants only.',
       },
     ),
   },
@@ -212,7 +212,7 @@ const CASE_TLP_OPTIONS: Array<{
       'wazuh.common.caseManagementTlp.amberDescription',
       {
         defaultMessage:
-          "Recipients' organization and its clients, on a need-to-know basis.",
+          "Limited disclosure, restricted to participants' organization and its clients.",
       },
     ),
   },
@@ -221,7 +221,7 @@ const CASE_TLP_OPTIONS: Array<{
     text: 'TLP:GREEN',
     description: i18n.translate(
       'wazuh.common.caseManagementTlp.greenDescription',
-      { defaultMessage: "Recipients' community. Not on public channels." },
+      { defaultMessage: 'Limited disclosure, restricted to the community.' },
     ),
   },
   {
@@ -229,7 +229,7 @@ const CASE_TLP_OPTIONS: Array<{
     text: 'TLP:CLEAR',
     description: i18n.translate(
       'wazuh.common.caseManagementTlp.clearDescription',
-      { defaultMessage: 'No limit. Can be shared publicly.' },
+      { defaultMessage: 'Disclosure is not limited.' },
     ),
   },
 ];

@@ -256,7 +256,7 @@ describe('CaseManagementTab TLP descriptions', () => {
     );
     fireEvent.focus(badge as Element);
     const tooltip = await screen.findByText(
-      "Recipients' organization and its clients, on a need-to-know basis.",
+      "Limited disclosure, restricted to participants' organization and its clients.",
     );
     fireEvent.blur(badge as Element);
     await waitForElementToBeRemoved(tooltip);
@@ -264,7 +264,7 @@ describe('CaseManagementTab TLP descriptions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     expect(
       screen.getByText(
-        "Recipients' organization and its clients, on a need-to-know basis.",
+        "Limited disclosure, restricted to participants' organization and its clients.",
       ),
     ).toBeInTheDocument();
 
@@ -274,16 +274,16 @@ describe('CaseManagementTab TLP descriptions', () => {
     );
     expect(options.map(option => option.textContent)).toEqual([
       '—',
-      'TLP:REDNamed recipients only. No further sharing.',
-      "TLP:AMBERRecipients' organization and its clients, on a need-to-know basis.",
-      "TLP:GREENRecipients' community. Not on public channels.",
-      'TLP:CLEARNo limit. Can be shared publicly.',
+      'TLP:REDNot for disclosure, restricted to participants only.',
+      "TLP:AMBERLimited disclosure, restricted to participants' organization and its clients.",
+      'TLP:GREENLimited disclosure, restricted to the community.',
+      'TLP:CLEARDisclosure is not limited.',
     ]);
 
     fireEvent.click(screen.getByRole('option', { name: /^TLP:GREEN/ }));
     await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
     expect(
-      screen.getByText("Recipients' community. Not on public channels."),
+      screen.getByText('Limited disclosure, restricted to the community.'),
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'TLP TLP:GREEN' }));
