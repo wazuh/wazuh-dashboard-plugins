@@ -108,7 +108,11 @@ export class DynamicHeight {
       if (devToolsElement && devToolsElement.length) {
         clearInterval(interval);
         setTimeout(() => {
-          const windows = $(window).height() - CONSOLE_CONTAINER.padding;
+          // The bottom bars (CTI registration, new release) take their own space
+          const bottomBarHeight =
+            $('#app-wrapper .euiBottomBar').outerHeight() || 0;
+          const windows =
+            $(window).height() - CONSOLE_CONTAINER.padding - bottomBarHeight;
           // Left column
           $(leftColumnSelector).height(
             windows - DynamicHeight.getPosition($(leftColumnSelector)[0]).y,
