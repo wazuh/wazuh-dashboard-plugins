@@ -56,6 +56,7 @@ import {
   useCaseManagementForm,
 } from './use-case-management-form';
 import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
+import './case-management-tab.scss';
 
 const CASE_STATUS_OPTIONS: Array<{
   value: CaseStatus;
@@ -1163,6 +1164,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   >
                     <EuiSuperSelect<CaseSeverity | ''>
                       fullWidth
+                      itemClassName='wzCaseSelect__item--compact'
                       options={toSuperSelectOptions(
                         severity
                           ? CASE_SEVERITY_OPTIONS
@@ -1207,6 +1209,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   >
                     <EuiSuperSelect<CasePriority | ''>
                       fullWidth
+                      itemClassName='wzCaseSelect__item--compact'
                       options={toSuperSelectOptions(CASE_PRIORITY_OPTIONS)}
                       valueOfSelected={priority}
                       onChange={setPriority}
