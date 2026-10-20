@@ -18,7 +18,7 @@ describe('ButtonAboutConfigurationAssessment', () => {
 
     const flyout = screen.getByRole('dialog');
     [
-      'Inventory',
+      'States',
       'Findings',
       'Passed',
       'Failed',

@@ -82,14 +82,14 @@ export const ButtonAboutConfigurationAssessment = () => {
               listItems={[
                 {
                   title: i18n.translate(
-                    'wazuh.configurationAssessment.aboutFlyout.inventoryTerm',
-                    { defaultMessage: 'Inventory' },
+                    'wazuh.configurationAssessment.aboutFlyout.statesTerm',
+                    { defaultMessage: 'States' },
                   ),
                   description: i18n.translate(
-                    'wazuh.configurationAssessment.aboutFlyout.inventoryDescription',
+                    'wazuh.configurationAssessment.aboutFlyout.statesDescription',
                     {
                       defaultMessage:
-                        'The current result of every check on each endpoint, reported by the agent scans. It is populated as soon as an agent completes a scan.',
+                        'The current result of every check on each endpoint, reported by the agent scans. Used in the Dashboard and Inventory tabs.',
                     },
                   ),
                 },
@@ -102,7 +102,7 @@ export const ButtonAboutConfigurationAssessment = () => {
                     'wazuh.configurationAssessment.aboutFlyout.findingsDescription',
                     {
                       defaultMessage:
-                        'Security findings generated from Configuration Assessment events. A finding appears only when the result of a check differs between consecutive scans, so this tab can be empty even when Inventory has data.',
+                        'Security findings generated from Configuration Assessment events. A finding appears only when the result of a check differs between consecutive scans, so it can be empty even when States has data. Used in the Findings tab.',
                     },
                   ),
                 },
