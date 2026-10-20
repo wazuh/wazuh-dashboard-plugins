@@ -88,6 +88,25 @@ describe('CaseManagementTab required fields', () => {
     expect(createButton).toBeEnabled();
   });
 
+  it('create: prefills the title with the rule title when provided', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    render(
+      <CaseManagementTab
+        document={{
+          ...documentRef,
+          _source: { wazuh: { rule: { title: 'Brute force' } } },
+        }}
+      />,
+    );
+
+    await screen.findByRole('button', { name: 'Create case' });
+    expect(screen.getByLabelText('Case title')).toHaveValue('Brute force');
+  });
+
   it('edit: keeps the save button disabled until dirty and while a required field is blank', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
       case: fullCase,
