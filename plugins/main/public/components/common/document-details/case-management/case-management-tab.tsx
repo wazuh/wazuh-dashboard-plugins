@@ -249,14 +249,11 @@ const renderTwoColumnRows = (
 
 interface CaseManagementTabProps {
   document: CaseManagementFormDocument;
-  /** Rule title of the finding, used to suggest the title of a new case. */
-  ruleTitle?: string;
   onSaveSuccess?: (caseData: CaseData | null) => void;
 }
 
 export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   document,
-  ruleTitle,
   onSaveSuccess,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -322,12 +319,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     handleReset,
     // Comment saves patch the host grid through the tab's own onSaveSuccess
     // but must not leave edit mode nor close the inline comment editor.
-  } = useCaseManagementForm(
-    document,
-    handleOperationSuccess,
-    onSaveSuccess,
-    ruleTitle,
-  );
+  } = useCaseManagementForm(document, handleOperationSuccess, onSaveSuccess);
 
   const openCleanModal = useCallback(() => setIsCleanModalVisible(true), []);
   const closeCleanModal = useCallback(() => setIsCleanModalVisible(false), []);

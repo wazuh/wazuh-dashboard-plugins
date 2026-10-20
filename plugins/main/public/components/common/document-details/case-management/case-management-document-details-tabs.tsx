@@ -34,8 +34,13 @@ export const caseManagementDocumentDetailsTabs: DocumentViewTableAndJsonPropsAdd
       guardUnsavedChanges: true,
       content: (
         <CaseManagementTab
-          document={{ _index: document._index, _id: document._id }}
-          ruleTitle={document._source?.wazuh?.rule?.title}
+          document={{
+            _index: document._index,
+            _id: document._id,
+            _source: {
+              wazuh: { rule: { title: document._source?.wazuh?.rule?.title } },
+            },
+          }}
           onSaveSuccess={caseData =>
             onDocumentMutated?.({ wazuh: { case: caseData } })
           }

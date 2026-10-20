@@ -38,6 +38,7 @@ import {
 export interface CaseManagementFormDocument {
   _index: string;
   _id: string;
+  _source?: { wazuh?: { rule?: { title?: string } } };
 }
 
 export const CASE_TITLE_MAX_LENGTH = 1024;
@@ -372,9 +373,11 @@ export function useCaseManagementForm(
   document: CaseManagementFormDocument,
   onSaveSuccess?: (caseData: CaseData | null) => void,
   onCommentSaveSuccess?: (caseData: CaseData | null) => void,
-  ruleTitle?: string,
 ): UseCaseManagementFormReturn {
-  const suggestedTitle = getSuggestedCaseTitle(document._id, ruleTitle);
+  const suggestedTitle = getSuggestedCaseTitle(
+    document._id,
+    document._source?.wazuh?.rule?.title,
+  );
   const [state, dispatch] = useReducer(
     caseFormReducer,
     undefined,

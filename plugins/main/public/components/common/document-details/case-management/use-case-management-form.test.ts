@@ -270,6 +270,10 @@ describe('getSuggestedCaseTitle', () => {
 
 describe('useCaseManagementForm', () => {
   const documentRef = { _index: 'wazuh-findings-v5-security', _id: 'doc-1' };
+  const documentWithRuleTitle = (title: string) => ({
+    ...documentRef,
+    _source: { wazuh: { rule: { title } } },
+  });
 
   it('loads the case on mount and exposes its fields', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
@@ -798,7 +802,7 @@ describe('useCaseManagementForm', () => {
     });
 
     const { result } = renderHook(() =>
-      useCaseManagementForm(documentRef, undefined, undefined, 'Brute force'),
+      useCaseManagementForm(documentWithRuleTitle('Brute force')),
     );
     await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
 
@@ -823,7 +827,7 @@ describe('useCaseManagementForm', () => {
     });
 
     const { result } = renderHook(() =>
-      useCaseManagementForm(documentRef, undefined, undefined, '  '),
+      useCaseManagementForm(documentWithRuleTitle('  ')),
     );
     await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
 
@@ -838,7 +842,7 @@ describe('useCaseManagementForm', () => {
     (cleanDocumentCase as jest.Mock).mockResolvedValue(null);
 
     const { result } = renderHook(() =>
-      useCaseManagementForm(documentRef, undefined, undefined, 'Brute force'),
+      useCaseManagementForm(documentWithRuleTitle('Brute force')),
     );
     await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
 

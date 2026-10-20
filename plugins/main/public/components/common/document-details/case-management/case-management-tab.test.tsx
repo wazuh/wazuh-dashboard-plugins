@@ -95,7 +95,12 @@ describe('CaseManagementTab required fields', () => {
     });
 
     render(
-      <CaseManagementTab document={documentRef} ruleTitle='Brute force' />,
+      <CaseManagementTab
+        document={{
+          ...documentRef,
+          _source: { wazuh: { rule: { title: 'Brute force' } } },
+        }}
+      />,
     );
 
     await screen.findByRole('button', { name: 'Create case' });
