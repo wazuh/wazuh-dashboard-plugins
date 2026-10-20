@@ -102,6 +102,33 @@ describe('Markdown container', () => {
       expect(html).not.toContain('“');
     });
 
+    test('should keep backslashes in flat text', () => {
+      const html = shallow(
+        <Markdown
+          markdown={
+            'grep -P \'pam_pwhistory\\.so\' and echo "Mode: \\"$l_mode\\" \\:$l_max" in \\/etc'
+          }
+          copyableCodeBlocks
+        />,
+      ).html();
+      expect(html).toContain('pam_pwhistory\\.so');
+      expect(html).toContain('\\"$l_mode\\"');
+      expect(html).toContain('\\:$l_max');
+      expect(html).toContain('\\/etc');
+    });
+
+    test('should keep bold in remediations', () => {
+      const html = shallow(
+        <Markdown markdown={'**WARNING:** review first'} copyableCodeBlocks />,
+      ).html();
+      expect(html).toContain('<strong>WARNING:</strong>');
+    });
+
+    test('should keep consuming backslash escapes with the default renderer', () => {
+      const html = shallow(<Markdown markdown={'a \\. b'} />).html();
+      expect(html).toContain('a . b');
+    });
+
     test('should not render headings for command comments', () => {
       const html = shallow(
         <Markdown

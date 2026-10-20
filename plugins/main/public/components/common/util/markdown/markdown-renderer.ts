@@ -36,11 +36,12 @@ const md = createMarkdownIt();
 
 // Remediations are command text, not prose: placeholders like <PATH TO FILE> must not be parsed
 // as HTML, quotes must stay straight to be copyable, and a leading "# " is a shell comment, not a
-// heading. Emphasis stays enabled so markdown remediations can use bold.
+// heading. Backslash escapes stay literal (`\.`, `\"`, `\:` are part of regexes and scripts).
+// Emphasis stays enabled so markdown remediations can use bold.
 const mdWithCopyableCodeBlocks = createMarkdownIt({
   html: false,
   typographer: false,
-}).disable(['heading', 'lheading']);
+}).disable(['heading', 'lheading', 'escape']);
 
 // Every fenced code block gets a copy button. The click is handled by the component through
 // event delegation, because the button lives in injected HTML.
