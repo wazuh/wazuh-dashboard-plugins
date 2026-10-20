@@ -69,7 +69,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.activeDescription',
-      { defaultMessage: 'Open and waiting for an analyst.' },
+      { defaultMessage: 'Open. No one is working on it yet.' },
     ),
   },
   {
@@ -79,7 +79,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.acknowledgedDescription',
-      { defaultMessage: 'An analyst is investigating the case.' },
+      { defaultMessage: 'Open. Someone is working on it.' },
     ),
   },
   {
@@ -89,7 +89,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.completedDescription',
-      { defaultMessage: 'The investigation is done and the case is closed.' },
+      { defaultMessage: 'Closed. No more work needed.' },
     ),
   },
   {
@@ -99,7 +99,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.auditDescription',
-      { defaultMessage: 'Kept for review or as a compliance record.' },
+      { defaultMessage: 'Kept for review or compliance.' },
     ),
   },
   {
@@ -109,7 +109,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.errorDescription',
-      { defaultMessage: 'The case was opened by mistake.' },
+      { defaultMessage: 'Opened by mistake.' },
     ),
   },
   {
@@ -119,7 +119,7 @@ const CASE_STATUS_OPTIONS: Array<{
     }),
     description: i18n.translate(
       'wazuh.common.caseManagementStatus.deletedDescription',
-      { defaultMessage: 'Marked as removed. The record stays for history.' },
+      { defaultMessage: 'Removed. Kept only for history.' },
     ),
   },
 ];

@@ -84,14 +84,14 @@ The module also shows read-only metadata that the server sets: the **User** who 
 
 The **Status** field records the stage of the case. A case has one of these values:
 
-| Status           | Meaning                                           |
-| ---------------- | ------------------------------------------------- |
-| **Active**       | Open and waiting for an analyst.                  |
-| **Acknowledged** | An analyst is investigating the case.             |
-| **Completed**    | The investigation is done and the case is closed. |
-| **Audit**        | Kept for review or as a compliance record.        |
-| **Error**        | The case was opened by mistake.                   |
-| **Deleted**      | Marked as removed. The record stays for history.  |
+| Status           | Meaning                            |
+| ---------------- | ---------------------------------- |
+| **Active**       | Open. No one is working on it yet. |
+| **Acknowledged** | Open. Someone is working on it.    |
+| **Completed**    | Closed. No more work needed.       |
+| **Audit**        | Kept for review or compliance.     |
+| **Error**        | Opened by mistake.                 |
+| **Deleted**      | Removed. Kept only for history.    |
 
 A typical case moves from **Active** to **Acknowledged**, and then to **Completed**. The module
 does not force a fixed order, so you can set any status that fits your process.

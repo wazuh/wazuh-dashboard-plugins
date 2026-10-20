@@ -138,18 +138,18 @@ describe('CaseManagementTab status descriptions', () => {
       'option',
     );
     expect(options.map(option => option.textContent)).toEqual([
-      'ActiveOpen and waiting for an analyst.',
-      'AcknowledgedAn analyst is investigating the case.',
-      'CompletedThe investigation is done and the case is closed.',
-      'AuditKept for review or as a compliance record.',
-      'ErrorThe case was opened by mistake.',
-      'DeletedMarked as removed. The record stays for history.',
+      'ActiveOpen. No one is working on it yet.',
+      'AcknowledgedOpen. Someone is working on it.',
+      'CompletedClosed. No more work needed.',
+      'AuditKept for review or compliance.',
+      'ErrorOpened by mistake.',
+      'DeletedRemoved. Kept only for history.',
     ]);
 
     fireEvent.click(screen.getByRole('option', { name: /^Acknowledged/ }));
     await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
     expect(
-      screen.getByText('An analyst is investigating the case.'),
+      screen.getByText('Open. Someone is working on it.'),
     ).toBeInTheDocument();
   });
 
@@ -163,9 +163,7 @@ describe('CaseManagementTab status descriptions', () => {
 
     const badge = await screen.findByText('Audit');
     fireEvent.mouseOver(badge);
-    const tooltip = await screen.findByText(
-      'Kept for review or as a compliance record.',
-    );
+    const tooltip = await screen.findByText('Kept for review or compliance.');
     fireEvent.mouseOut(badge);
     await waitForElementToBeRemoved(tooltip);
 
@@ -173,7 +171,7 @@ describe('CaseManagementTab status descriptions', () => {
 
     expect(screen.getByLabelText('Case status')).toHaveTextContent('Audit');
     expect(
-      screen.getByText('Kept for review or as a compliance record.'),
+      screen.getByText('Kept for review or compliance.'),
     ).toBeInTheDocument();
   });
 });
