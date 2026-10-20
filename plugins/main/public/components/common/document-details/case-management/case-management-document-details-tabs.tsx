@@ -35,6 +35,7 @@ export const caseManagementDocumentDetailsTabs: DocumentViewTableAndJsonPropsAdd
       content: (
         <CaseManagementTab
           document={{ _index: document._index, _id: document._id }}
+          ruleTitle={document._source?.wazuh?.rule?.title}
           onSaveSuccess={caseData =>
             onDocumentMutated?.({ wazuh: { case: caseData } })
           }

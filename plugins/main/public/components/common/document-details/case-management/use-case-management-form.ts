@@ -40,6 +40,21 @@ export interface CaseManagementFormDocument {
   _id: string;
 }
 
+export const CASE_TITLE_MAX_LENGTH = 1024;
+
+/**
+ * Title suggested for a new case: the rule title of the finding (trimmed and
+ * capped to the case title limit), or `Case_<document id>` when it has none.
+ */
+export const getSuggestedCaseTitle = (
+  documentId: string,
+  ruleTitle?: string,
+): string =>
+  (typeof ruleTitle === 'string' ? ruleTitle.trim() : '').slice(
+    0,
+    CASE_TITLE_MAX_LENGTH,
+  ) || `Case_${documentId}`;
+
 export interface UseCaseManagementFormReturn {
   status: CaseStatus | undefined;
   title: string;
@@ -357,7 +372,9 @@ export function useCaseManagementForm(
   document: CaseManagementFormDocument,
   onSaveSuccess?: (caseData: CaseData | null) => void,
   onCommentSaveSuccess?: (caseData: CaseData | null) => void,
+  ruleTitle?: string,
 ): UseCaseManagementFormReturn {
+  const suggestedTitle = getSuggestedCaseTitle(document._id, ruleTitle);
   const [state, dispatch] = useReducer(
     caseFormReducer,
     undefined,
@@ -367,9 +384,7 @@ export function useCaseManagementForm(
   const isNewCase = state.baseline.status === undefined;
   const isDirty = isFormDirty(state);
   const titleIsAutoSuggestion =
-    isNewCase &&
-    !state.baseline.title &&
-    state.title === `Case_${document._id}`;
+    isNewCase && !state.baseline.title && state.title === suggestedTitle;
   const hasUnsavedChanges =
     (titleIsAutoSuggestion
       ? isFormDirty({ ...state, title: state.baseline.title })
@@ -397,7 +412,7 @@ export function useCaseManagementForm(
             payload: { caseData: caseData ?? {}, username },
           });
           if (!caseData?.status && !caseData?.title) {
-            dispatch({ type: 'SET_TITLE', payload: `Case_${document._id}` });
+            dispatch({ type: 'SET_TITLE', payload: suggestedTitle });
           }
         }
       } catch {
@@ -410,7 +425,7 @@ export function useCaseManagementForm(
     return () => {
       cancelled = true;
     };
-  }, [document._index, document._id]);
+  }, [document._index, document._id, suggestedTitle]);
 
   const setStatus = useCallback(
     (status: CaseStatus) => dispatch({ type: 'SET_STATUS', payload: status }),
@@ -455,9 +470,9 @@ export function useCaseManagementForm(
   const handleReset = useCallback(() => {
     dispatch({ type: 'RESET' });
     if (!state.baseline.status && !state.baseline.title) {
-      dispatch({ type: 'SET_TITLE', payload: `Case_${document._id}` });
+      dispatch({ type: 'SET_TITLE', payload: suggestedTitle });
     }
-  }, [state.baseline.status, state.baseline.title, document._id]);
+  }, [state.baseline.status, state.baseline.title, suggestedTitle]);
 
   const handleSave = useCallback(async () => {
     if (isSaving || isCleaning || isSavingComment) {
@@ -596,7 +611,7 @@ export function useCaseManagementForm(
       );
       dispatch({ type: 'CLEAN_SUCCESS', payload: cleanedCase });
       if (!cleanedCase?.status && !cleanedCase?.title) {
-        dispatch({ type: 'SET_TITLE', payload: `Case_${document._id}` });
+        dispatch({ type: 'SET_TITLE', payload: suggestedTitle });
       }
       onSaveSuccess?.(cleanedCase);
       getToasts().add({
@@ -636,6 +651,7 @@ export function useCaseManagementForm(
     isSavingComment,
     isNewCase,
     onSaveSuccess,
+    suggestedTitle,
   ]);
 
   // Comments persist on their own submit: the server appends/edits them from

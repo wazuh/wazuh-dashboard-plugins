@@ -1,8 +1,10 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
 import {
+  CASE_TITLE_MAX_LENGTH,
   CaseFormState,
   caseFormReducer,
   createInitialState,
+  getSuggestedCaseTitle,
   isFormDirty,
   useCaseManagementForm,
 } from './use-case-management-form';
@@ -240,6 +242,29 @@ describe('caseFormReducer', () => {
     });
     expect(state.baseline.status).toBeUndefined();
     expect(state.currentUsername).toBe('admin');
+  });
+});
+
+describe('getSuggestedCaseTitle', () => {
+  it('uses the trimmed rule title', () => {
+    expect(getSuggestedCaseTitle('doc-1', '  Brute force  ')).toBe(
+      'Brute force',
+    );
+  });
+
+  it.each([undefined, '', '   '])(
+    'falls back to Case_<id> when the rule title is %p',
+    ruleTitle => {
+      expect(getSuggestedCaseTitle('doc-1', ruleTitle)).toBe('Case_doc-1');
+    },
+  );
+
+  it('truncates the rule title to the case title limit', () => {
+    const title = getSuggestedCaseTitle(
+      'doc-1',
+      'a'.repeat(CASE_TITLE_MAX_LENGTH + 10),
+    );
+    expect(title).toHaveLength(CASE_TITLE_MAX_LENGTH);
   });
 });
 
@@ -764,5 +789,64 @@ describe('useCaseManagementForm', () => {
     );
     expect(onSaveSuccess).toHaveBeenCalledWith(null);
     expect(result.current.isNewCase).toBe(true);
+  });
+
+  it('prefills a new case with the rule title without an unsaved-changes warning', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() =>
+      useCaseManagementForm(documentRef, undefined, undefined, 'Brute force'),
+    );
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    expect(result.current.title).toBe('Brute force');
+    expect(result.current.hasUnsavedChanges).toBe(false);
+
+    act(() => {
+      result.current.setTitle('custom');
+    });
+    expect(result.current.hasUnsavedChanges).toBe(true);
+    act(() => {
+      result.current.handleReset();
+    });
+    expect(result.current.title).toBe('Brute force');
+    expect(result.current.hasUnsavedChanges).toBe(false);
+  });
+
+  it('falls back to Case_<id> when the rule title is blank', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    const { result } = renderHook(() =>
+      useCaseManagementForm(documentRef, undefined, undefined, '  '),
+    );
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    expect(result.current.title).toBe('Case_doc-1');
+  });
+
+  it('suggests the rule title again after cleaning the case', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+    (cleanDocumentCase as jest.Mock).mockResolvedValue(null);
+
+    const { result } = renderHook(() =>
+      useCaseManagementForm(documentRef, undefined, undefined, 'Brute force'),
+    );
+    await waitFor(() => expect(result.current.isLoadingCase).toBe(false));
+
+    await act(async () => {
+      await result.current.handleClean();
+    });
+
+    expect(result.current.title).toBe('Brute force');
+    expect(result.current.hasUnsavedChanges).toBe(false);
   });
 });
