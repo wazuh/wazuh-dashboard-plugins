@@ -45,6 +45,32 @@ export const ButtonAboutConfigurationAssessment = () => {
             <EuiTitle size='m'>
               <h2 id={FLYOUT_TITLE_ID}>{title}</h2>
             </EuiTitle>
+            <EuiSpacer size='s' />
+            <EuiText size='s'>
+              <p>
+                <FormattedMessage
+                  id='wazuh.configurationAssessment.aboutFlyout.learnMore'
+                  defaultMessage='Learn more in the {link}.'
+                  values={{
+                    link: (
+                      <EuiLink
+                        href={webDocumentationLink(
+                          'user-manual/capabilities/sec-config-assessment/index.html',
+                        )}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        external
+                      >
+                        {i18n.translate(
+                          'wazuh.configurationAssessment.aboutFlyout.learnMoreLink',
+                          { defaultMessage: 'documentation' },
+                        )}
+                      </EuiLink>
+                    ),
+                  }}
+                />
+              </p>
+            </EuiText>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
             <EuiText size='s'>
@@ -124,34 +150,6 @@ export const ButtonAboutConfigurationAssessment = () => {
                 ({ term, description }) => ({ title: term, description }),
               )}
             />
-            <EuiSpacer />
-            <EuiText size='s'>
-              <p>
-                <FormattedMessage
-                  id='wazuh.configurationAssessment.aboutFlyout.learnMore'
-                  defaultMessage='Learn more in the {link} documentation.'
-                  values={{
-                    link: (
-                      <EuiLink
-                        href={webDocumentationLink(
-                          'user-manual/capabilities/sec-config-assessment/index.html',
-                        )}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        external
-                      >
-                        {i18n.translate(
-                          'wazuh.configurationAssessment.aboutFlyout.learnMoreLink',
-                          {
-                            defaultMessage: 'Security Configuration Assessment',
-                          },
-                        )}
-                      </EuiLink>
-                    ),
-                  }}
-                />
-              </p>
-            </EuiText>
           </EuiFlyoutBody>
         </EuiFlyout>
       )}
