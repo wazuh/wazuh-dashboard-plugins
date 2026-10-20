@@ -11,19 +11,20 @@ import {
   EuiIcon,
   EuiText,
 } from '@elastic/eui';
-import { ModalCti } from './modal-cti';
 import { useCtiStatus } from '../hooks/useCtiStatus';
 import { statusCodes } from '../../../../common/constants';
+import {
+  CTI_FEED_APP_ID,
+  CtiFeedLocationState,
+} from '../../../../common/cti-feed';
+import { getCore } from '../../../plugin-services';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { useUserPreferences } from '../../../hooks';
 
 export const CtiUpsellNotification = () => {
   const [dismissed, setDismissed] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-  const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
 
-  const { statusCTI, loading, deviceFlowActive, modalOpen, refetchStatus } =
-    useCtiStatus(deviceFlowNonce);
+  const { statusCTI, loading, deviceFlowActive, modalOpen } = useCtiStatus();
   const {
     userPreferences,
     isLoading: isLoadingPreferences,
@@ -59,13 +60,10 @@ export const CtiUpsellNotification = () => {
     void updateUserPreferences({ hide_cti_upsell: true });
   };
 
+  // Registration lives in the CTI feed app, which opens its modal on arrival.
   const handleOpenRegister = () => {
-    setIsRegisterModalOpen(true);
-  };
-
-  const handleCloseRegister = () => {
-    setIsRegisterModalOpen(false);
-    void refetchStatus();
+    const state: CtiFeedLocationState = { openRegistration: true };
+    void getCore().application.navigateToApp(CTI_FEED_APP_ID, { state });
   };
 
   return (
@@ -80,7 +78,10 @@ export const CtiUpsellNotification = () => {
               className='wz-check-updates-bar'
               landmarkHeading={i18n.translate(
                 'wazuhCheckUpdates.ctiUpsell.landmarkHeading',
-                { defaultMessage: 'Wazuh Cloud registration' },
+                {
+                  defaultMessage:
+                    'Wazuh Cyber Threat Intelligence registration',
+                },
               )}
               data-test-subj='ctiUpsellBar'
             >
@@ -152,15 +153,6 @@ export const CtiUpsellNotification = () => {
             </EuiBottomBar>,
             document.getElementById('app-wrapper') ?? document.body,
           )}
-
-        {isRegisterModalOpen && (
-          <ModalCti
-            handleModalToggle={handleCloseRegister}
-            statusCTI={statusCTI}
-            refetchStatus={refetchStatus}
-            onDeviceFlowStarted={() => setDeviceFlowNonce(n => n + 1)}
-          />
-        )}
       </>
     </I18nProvider>
   );

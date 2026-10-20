@@ -41,6 +41,7 @@ import {
   validateManagerCaPath,
 } from '../../utils/validations';
 import {
+  validateEnrollmentTokenDescription,
   validateEnrollmentTokenMaxUses,
   validateEnrollmentTokenTtl,
 } from '../../../../../services/enrollment-tokens';
@@ -179,6 +180,7 @@ export const RegisterAgent = compose(
     enrollmentTokenDescription: {
       type: 'text',
       initialValue: '',
+      validate: validateEnrollmentTokenDescription,
     },
     agentName: {
       type: 'text',
