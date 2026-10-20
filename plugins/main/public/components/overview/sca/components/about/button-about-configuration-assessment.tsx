@@ -102,7 +102,7 @@ export const ButtonAboutConfigurationAssessment = () => {
                     'wazuh.configurationAssessment.aboutFlyout.findingsDescription',
                     {
                       defaultMessage:
-                        'Security findings generated from Configuration Assessment events. It can be empty even when Inventory has data, because findings only appear once they are generated.',
+                        'Security findings generated from Configuration Assessment events. A finding appears only when the result of a check differs between consecutive scans, so this tab can be empty even when Inventory has data.',
                     },
                   ),
                 },
