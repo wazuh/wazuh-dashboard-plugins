@@ -91,4 +91,17 @@ describe(`[endpoint] PATCH ${routes.userPreferences}`, () => {
 
     expect(response.body).toEqual(mockResponse);
   });
+
+  test('accepts the CTI upsell preference', async () => {
+    mockedUpdateUserPreferences.mockImplementation((_username, body) => body);
+    const response = await supertest(innerServer.listener)
+      .patch(routes.userPreferences)
+      .send({ hide_cti_upsell: true })
+      .expect(200);
+
+    expect(mockedUpdateUserPreferences).toHaveBeenCalledWith('admin', {
+      hide_cti_upsell: true,
+    });
+    expect(response.body).toEqual({ hide_cti_upsell: true });
+  });
 });

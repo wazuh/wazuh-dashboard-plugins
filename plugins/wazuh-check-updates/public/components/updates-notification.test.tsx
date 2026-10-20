@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useUserPreferences } from '../hooks';
 import { getAvailableUpdates } from '../services';
@@ -7,6 +7,7 @@ import { areThereNewUpdates } from '../utils';
 import { UpdatesNotification } from './updates-notification';
 import userEvent from '@testing-library/user-event';
 import { API_UPDATES_STATUS } from '../../common/types';
+import { ctiUpsellBarVisible$ } from '../services/cti-upsell-bar-state';
 
 jest.mock(
   '../../../../node_modules/@elastic/eui/lib/services/accessibility/html_id_generator',
@@ -27,11 +28,6 @@ jest.mock('../plugin-services', () => ({
       },
     },
   }),
-  getWazuhCore: jest.fn().mockReturnValue({
-    hooks: {
-      useDockedSideNav: () => false,
-    },
-  }),
 }));
 
 jest.mock('react-use/lib/useObservable', () => () => {});
@@ -46,6 +42,10 @@ const mockedAreThereNewUpdates = areThereNewUpdates as jest.Mock;
 jest.mock('../utils/are-there-new-updates');
 
 describe('UpdatesNotification component', () => {
+  afterEach(() => {
+    ctiUpsellBarVisible$.next(false);
+  });
+
   test('should return the nofication component', async () => {
     mockedGetAvailableUpdates.mockImplementation(() => ({
       current_version: 'v4.3.1',
@@ -68,6 +68,9 @@ describe('UpdatesNotification component', () => {
       },
     }));
     mockedAreThereNewUpdates.mockImplementation(() => true);
+    const appWrapper = document.createElement('div');
+    appWrapper.id = 'app-wrapper';
+    document.body.appendChild(appWrapper);
 
     const { container, getByText, getByRole } = render(<UpdatesNotification />);
 
@@ -86,6 +89,12 @@ describe('UpdatesNotification component', () => {
 
     const checkUpdatesButton = getByRole('button', { name: 'Dismiss' });
     expect(checkUpdatesButton).toBeInTheDocument();
+
+    const bar = getByRole('region', { name: 'New release notification' });
+    expect(bar).toHaveClass('euiBottomBar--sticky');
+    expect(appWrapper).toContainElement(bar);
+    expect(document.body.style.paddingBottom).toBe('');
+    appWrapper.remove();
   });
 
   test('should return null when user close notification', async () => {
@@ -205,5 +214,40 @@ describe('UpdatesNotification component', () => {
 
     const firstChild = await waitFor(() => container.firstChild);
     expect(firstChild).toBeNull();
+  });
+
+  test('should wait until the CTI upsell bar is no longer visible', async () => {
+    mockedGetAvailableUpdates.mockImplementation(() => ({
+      current_version: 'v4.3.1',
+      status: 'availableUpdates' as API_UPDATES_STATUS,
+      last_check_date_dashboard: new Date('2023-09-30T14:00:00.000Z'),
+      last_available_patch: {
+        description: 'Release notes',
+        published_date: '2022-05-18T10:12:43Z',
+        semver: { major: 4, minor: 3, patch: 8 },
+        tag: 'v4.3.8',
+        title: 'Wazuh v4.3.8',
+      },
+    }));
+    mockedUseUserPreferences.mockImplementation(() => ({
+      isLoading: false,
+      userPreferences: {
+        last_dismissed_updates: { last_patch: 'v4.3.1' },
+        hide_update_notifications: false,
+      },
+    }));
+    mockedAreThereNewUpdates.mockImplementation(() => true);
+    ctiUpsellBarVisible$.next(true);
+
+    const { queryByText, findByText } = render(<UpdatesNotification />);
+
+    await waitFor(() => expect(mockedGetAvailableUpdates).toHaveBeenCalled());
+    expect(queryByText('New release is available!')).not.toBeInTheDocument();
+
+    act(() => {
+      ctiUpsellBarVisible$.next(false);
+    });
+
+    expect(await findByText('New release is available!')).toBeInTheDocument();
   });
 });

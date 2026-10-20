@@ -10,11 +10,28 @@
  * Find more information about this on the LICENSE file.
  */
 import { i18n } from '@osd/i18n';
+import {
+  ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
+  ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH,
+  ENROLLMENT_TOKEN_TTL_MAX_DAYS,
+  ENROLLMENT_TOKEN_TTL_MAX_YEARS,
+} from './constants';
 
 /* The manager takes the token lifetime as a plain number of seconds, or as a
 number followed by `d`, `h`, `m` or `s`. It is validated here because an
 unparseable timeframe resolves to 0 on the manager side rather than being
-refused. Left empty, the manager applies its own default of 30 days. */
+refused. Left empty, the manager applies its own default of 30 days. It refuses
+a lifetime over 3650 days, which is mirrored here so the limit is reported under
+the field instead of as a raw API error. */
+const TTL_SECONDS_PER_UNIT: Record<string, number> = {
+  '': 1,
+  s: 1,
+  m: 60,
+  h: 3600,
+  d: 86400,
+};
+const TTL_MAX_SECONDS = ENROLLMENT_TOKEN_TTL_MAX_DAYS * TTL_SECONDS_PER_UNIT.d;
+
 export const validateEnrollmentTokenTtl = (value: string) => {
   if (!value || value.trim().length === 0) {
     return undefined;
@@ -30,6 +47,59 @@ export const validateEnrollmentTokenTtl = (value: string) => {
     return i18n.translate('wazuh.enrollmentTokens.validation.ttlPositive', {
       defaultMessage: 'The lifetime must be greater than 0.',
     });
+  }
+  const [, amount, unit] = ttl.match(/^(\d+)([dhms]?)$/) as RegExpMatchArray;
+  if (Number(amount) * TTL_SECONDS_PER_UNIT[unit] > TTL_MAX_SECONDS) {
+    return i18n.translate('wazuh.enrollmentTokens.validation.ttlMax', {
+      defaultMessage:
+        'The lifetime can be at most {maxDays} days ({maxYears} years). For example: {maxDays}d.',
+      values: {
+        maxDays: ENROLLMENT_TOKEN_TTL_MAX_DAYS,
+        maxYears: ENROLLMENT_TOKEN_TTL_MAX_YEARS,
+      },
+    });
+  }
+  return undefined;
+};
+
+/* The manager only accepts letters, digits, whitespace and a fixed set of
+symbols in the description, up to 256 characters, and refuses the rest (for
+example `&`) with a schema message that names no character. The rule is
+mirrored here so the offending characters are reported under the field. */
+const DESCRIPTION_ALLOWED_CHARACTER = /[\p{L}\p{N}_\s,*<>!\-.+:/()[\]'"|=~#]/u;
+
+export const validateEnrollmentTokenDescription = (value: string) => {
+  if (!value || value.trim().length === 0) {
+    return undefined;
+  }
+  const invalid = Array.from(
+    new Set(
+      Array.from(value).filter(
+        character => !DESCRIPTION_ALLOWED_CHARACTER.test(character),
+      ),
+    ),
+  );
+  if (invalid.length > 0) {
+    return i18n.translate(
+      'wazuh.enrollmentTokens.validation.descriptionChars',
+      {
+        defaultMessage:
+          'The description cannot contain: {invalid}. Allowed: letters, digits, spaces and {symbols}.',
+        values: {
+          invalid: invalid.join(' '),
+          symbols: ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
+        },
+      },
+    );
+  }
+  if (Array.from(value).length > ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH) {
+    return i18n.translate(
+      'wazuh.enrollmentTokens.validation.descriptionLength',
+      {
+        defaultMessage: 'The description can have at most {max} characters.',
+        values: { max: ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH },
+      },
+    );
   }
   return undefined;
 };

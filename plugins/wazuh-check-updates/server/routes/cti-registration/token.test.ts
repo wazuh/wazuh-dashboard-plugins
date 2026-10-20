@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- OAuth and CTI fields keep their API names */
 import { Router } from '../../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
@@ -236,6 +237,86 @@ describe('CTI token route', () => {
     ).toBeUndefined();
   });
 
+  describe('when polls for the same device code race', () => {
+    const pendingRegistration = () =>
+      CtiRegistrationStore.getInstance().setInProgress(
+        'resolved-client-id',
+        parseDeviceAuthorizationForStore({
+          device_code: 'dc1',
+          user_code: 'WZH-1',
+          verification_uri: 'https://example.test/register',
+          expires_in: 600,
+          interval: 5,
+        }),
+      );
+
+    const poll = () =>
+      supertest(innerServer.listener).post(routes.token).send({
+        grant_type: CTI_OAUTH_DEVICE_GRANT_TYPE,
+        device_code: 'dc1',
+      });
+
+    test('concurrent polls share one exchange and all report success', async () => {
+      pendingRegistration();
+      let redeem: (body: unknown) => void = () => undefined;
+      // The CTI console redeems a code once; a second exchange would get not_found.
+      mockedPollCtiToken.mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            redeem = resolve;
+          }),
+      );
+      mockedPollCtiToken.mockResolvedValue({ error: 'not_found' });
+
+      const first = poll().then(response => response);
+      const second = poll().then(response => response);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      redeem({ access_token: 'tok' });
+      const responses = await Promise.all([first, second]);
+
+      expect(mockedPollCtiToken).toHaveBeenCalledTimes(1);
+      responses.forEach(response => {
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
+      });
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
+          ?.registrationComplete,
+      ).toBe(true);
+    });
+
+    test('a poll after the registration completed does not reach the CTI console', async () => {
+      pendingRegistration();
+      CtiRegistrationStore.getInstance().setRegistrationComplete(
+        'resolved-client-id',
+      );
+
+      const response = await poll().expect(200);
+
+      expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
+      expect(mockedPollCtiToken).not.toHaveBeenCalled();
+    });
+
+    test('a terminal error never drops a registration completed meanwhile', async () => {
+      pendingRegistration();
+      mockedPollCtiToken.mockImplementation(() => {
+        // Another request completed the registration while this one waited.
+        CtiRegistrationStore.getInstance().setRegistrationComplete(
+          'resolved-client-id',
+        );
+        return Promise.resolve({ error: 'not_found' });
+      });
+
+      const response = await poll().expect(200);
+
+      expect(response.body).toEqual(CTI_REGISTRATION_COMPLETED_BODY);
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
+          ?.registrationComplete,
+      ).toBe(true);
+    });
+  });
+
   test('POST rejects partial polling body', async () => {
     await supertest(innerServer.listener)
       .post(routes.token)
@@ -244,5 +325,54 @@ describe('CTI token route', () => {
 
     expect(mockedPollCtiToken).not.toHaveBeenCalled();
     expect(mockedGetCtiToken).not.toHaveBeenCalled();
+  });
+
+  describe(`DELETE ${routes.token}`, () => {
+    const inProgress = () =>
+      CtiRegistrationStore.getInstance().setInProgress(
+        'resolved-client-id',
+        parseDeviceAuthorizationForStore({
+          device_code: 'dc1',
+          user_code: 'WZH-1',
+          verification_uri: 'https://example.test/register',
+          expires_in: 600,
+          interval: 5,
+        }),
+      );
+
+    test('clears a pending activation', async () => {
+      inProgress();
+
+      const response = await supertest(innerServer.listener)
+        .delete(routes.token)
+        .expect(200);
+
+      expect(response.body).toEqual({ success: true });
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id'),
+      ).toBeUndefined();
+    });
+
+    test('keeps a completed registration', async () => {
+      inProgress();
+      CtiRegistrationStore.getInstance().setRegistrationComplete(
+        'resolved-client-id',
+      );
+
+      await supertest(innerServer.listener).delete(routes.token).expect(200);
+
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
+          ?.registrationComplete,
+      ).toBe(true);
+    });
+
+    test('is a no-op when nothing is pending', async () => {
+      await supertest(innerServer.listener).delete(routes.token).expect(200);
+
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('resolved-client-id'),
+      ).toBeUndefined();
+    });
   });
 });

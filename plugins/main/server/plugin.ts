@@ -40,6 +40,8 @@ import {
   initializationTaskCreatorServerAPIConnectionCompatibility,
   initializationTaskCreatorServerAPIRunAs,
   initializationTaskCreatorCertificateValidity,
+  createRateLimitRerun,
+  type RateLimitRerun,
   CertificateValidityServices,
   mapFieldsFormat,
 } from './health-check';
@@ -669,6 +671,7 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
   private readonly logger: Logger;
+  private rateLimitRerun?: RateLimitRerun;
 
   constructor(private readonly initializerContext: PluginInitializerContext) {
     this.logger = initializerContext.logger.get();
@@ -759,11 +762,17 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       );
     }
 
+    this.rateLimitRerun = createRateLimitRerun({
+      getTask: name => core.healthCheck.get(name),
+      logger: this.logger,
+    });
+
     // server API connection-compatibility
     core.healthCheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
         taskName: 'server-api:connection-compatibility',
         services: plugins.wazuhCore,
+        rateLimitRerun: this.rateLimitRerun,
       }),
     );
 
@@ -772,6 +781,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorServerAPIRunAs({
         taskName: 'server-api:run-as',
         services: plugins.wazuhCore,
+        rateLimitRerun: this.rateLimitRerun,
       }),
     );
 
@@ -780,6 +790,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       initializationTaskCreatorCertificateValidity({
         taskName: HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
         services: plugins.wazuhCore as CertificateValidityServices,
+        rateLimitRerun: this.rateLimitRerun,
       }),
     );
 
@@ -834,5 +845,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     return {};
   }
 
-  public stop() {}
+  public stop() {
+    this.rateLimitRerun?.stop();
+  }
 }

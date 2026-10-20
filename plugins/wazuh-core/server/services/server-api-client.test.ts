@@ -194,3 +194,43 @@ describe('ServerAPIClient.asInternalUser.request', () => {
     expect(internals._authenticate).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('ServerAPIClient rate limit (429)', () => {
+  interface RateLimitClientInternals {
+    _axios: jest.Mock;
+    _request: (...args: unknown[]) => Promise<unknown>;
+    _authenticate: (...args: unknown[]) => Promise<unknown>;
+  }
+
+  it.each([
+    [
+      'request',
+      (internals: RateLimitClientInternals) =>
+        internals._request('GET', '/agents', {}, { apiHostID: 'default' }),
+    ],
+    [
+      'login',
+      (internals: RateLimitClientInternals) =>
+        internals._authenticate('default', { useRunAs: false }),
+    ],
+  ])(
+    'reports a 429 answer to the %s as rate limiting without retrying it',
+    async (_name, send) => {
+      const internals = createClient()
+        .client as unknown as RateLimitClientInternals;
+      internals._axios = jest.fn().mockRejectedValue({
+        message: 'Request failed with status code 429',
+        code: 'ERR_BAD_REQUEST',
+        response: { status: 429 },
+      });
+
+      await expect(send(internals)).rejects.toMatchObject({
+        message:
+          'The server API [default] is rate limiting the requests of the dashboard (status code 429)',
+        code: 'ERR_BAD_REQUEST',
+        response: { status: 429 },
+      });
+      expect(internals._axios).toHaveBeenCalledTimes(1);
+    },
+  );
+});

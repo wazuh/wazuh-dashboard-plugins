@@ -538,6 +538,7 @@ describe('evaluateCertificateValidity — undetermined states', () => {
     ${'unavailable'}    | ${{ kind: 'unavailable', node: 'node01', reason: 'remoted is down' }}
     ${'malformed'}      | ${{ kind: 'malformed', node: 'node01', detail: 'bad shape' }}
     ${'transportError'} | ${{ kind: 'transportError', node: 'node01', message: 'ECONNREFUSED' }}
+    ${'rateLimited'}    | ${{ kind: 'rateLimited', node: 'node01' }}
   `('reports $kind as unknown, never as healthy', ({ outcome }) => {
     const result = evaluateCertificateValidity([outcome], OPTIONS);
 
@@ -552,6 +553,17 @@ describe('evaluateCertificateValidity — undetermined states', () => {
     );
 
     expect(result.findings[0].detail).toMatch(/permission/i);
+  });
+
+  it('states the rate limiting when the node request was rate limited', () => {
+    const result = evaluateCertificateValidity(
+      [{ kind: 'rateLimited', node: 'node01' }],
+      OPTIONS,
+    );
+
+    expect(result.findings[0].detail).toBe(
+      'Node node01 could not report its certificate state: the server API is rate limiting the requests of the dashboard (status code 429).',
+    );
   });
 
   it("includes the manager's reason when unavailable (S6.3)", () => {

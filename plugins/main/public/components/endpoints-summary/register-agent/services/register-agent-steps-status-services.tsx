@@ -221,6 +221,7 @@ export enum tFormFieldsLabel {
   existingEnrollmentToken = 'existing enrollment token',
   enrollmentTokenTtl = 'enrollment token lifetime',
   enrollmentTokenMaxUses = 'enrollment token enrollments',
+  enrollmentTokenDescription = 'enrollment token description',
   agentName = 'agent name',
   agentGroups = 'agent groups',
   serverAddress = 'server address',

@@ -122,7 +122,10 @@ const EndpointSecuritySectionComponent: React.FC<
                   }))}
                   emptyMessage={i18n.translate(
                     'wazuh.common.homeOverviewEndpointSecurity.scaNoBenchmarks',
-                    { defaultMessage: 'No SCA benchmarks found' },
+                    {
+                      defaultMessage:
+                        'No Configuration Assessment benchmarks found',
+                    },
                   )}
                   data-test-subj='sca-benchmarks'
                 />

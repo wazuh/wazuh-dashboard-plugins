@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
@@ -7,6 +7,7 @@ import {
   EuiButtonEmpty,
   EuiCallOut,
   EuiCode,
+  EuiCopy,
   EuiIcon,
   EuiLink,
   EuiLoadingSpinner,
@@ -20,12 +21,14 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { LinkCtiProps, CtiDeviceAuthorization } from '../types';
+import '../registration.scss';
 import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
 import {
   CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC,
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
-  WAZUH_CLOUD_PORTAL_HREF,
+  CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC,
+  WAZUH_CTI_CONSOLE_HREF,
   routes,
   statusCodes,
 } from '../../../../common/constants';
@@ -37,6 +40,11 @@ type CtiHrefLinkProps = {
   href: string;
   children: React.ReactNode;
 };
+
+/** Whether a failed-status message carries the given OAuth `error` (alone or as `error: description`). */
+function isOAuthError(message: string, error: string): boolean {
+  return message === error || message.startsWith(`${error}:`);
+}
 
 const CtiHrefLink: React.FC<CtiHrefLinkProps> = ({ href, children }) => {
   const placeholder = href.length === 0;
@@ -74,6 +82,8 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
   const permission = useCtiRegistrationPermission(!alreadyRegistered);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [showEnvironmentExistsHelp, setShowEnvironmentExistsHelp] =
+    React.useState(false);
   const [deviceAuth, setDeviceAuth] =
     React.useState<CtiDeviceAuthorization | null>(() =>
       ctiFlowState.getDeviceAuthLinks(),
@@ -138,8 +148,21 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     }
   }, [statusCTI, deviceAuth]);
 
-  const handleModalToggleRef = useRef(handleModalToggle);
-  handleModalToggleRef.current = handleModalToggle;
+  useEffect(() => ctiFlowState.openModal(), []);
+
+  // Closing during a pending activation cancels it, so ask first. Requesting
+  // a close again while the confirmation is shown backs out of it.
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+  const requestClose = () => {
+    if (!deviceAuth) {
+      handleModalToggle();
+      return;
+    }
+    setConfirmingCancel(confirming => !confirming);
+  };
+
+  const requestCloseRef = useRef(requestClose);
+  requestCloseRef.current = requestClose;
 
   useEffect(() => {
     // EUI's own Escape handler lives on the modal's wrapper div, so it only
@@ -148,7 +171,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     // dropping focus to document.body and silently breaking Escape.
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        handleModalToggleRef.current();
+        requestCloseRef.current();
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -191,6 +214,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           ? rawExpires
           : CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC;
       ctiFlowState.setDeviceAuthExpiry(expiresInSec);
+      ctiFlowState.setDeviceAuthPendingFor(0);
 
       const verificationUri =
         ctiResponse.verification_uri ??
@@ -241,10 +265,53 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     statusCTI.status === statusCodes.NOT_FOUND &&
     !ctiFlowState.isRegistrationComplete();
 
+  /*
+   * The CTI console rejects the user code with "Environment already exists" when a
+   * deployment with this environment UID is still registered there. The rejection rolls
+   * back, so the code stays pending and polling only ever sees `authorization_pending`
+   * until it expires. The dashboard cannot detect the rejection, so once the code has
+   * been pending longer than a normal activation takes, explain it and the way out:
+   * delete that deployment, then enter the same code again (the CTI console hands out the
+   * same pending code until it expires, so a new one cannot be requested).
+   */
+  useEffect(() => {
+    if (!showInProgress) {
+      setShowEnvironmentExistsHelp(false);
+      return undefined;
+    }
+    const pendingMs = ctiFlowState.getDeviceAuthPendingMs();
+    const remainingMs =
+      pendingMs === null
+        ? 0
+        : CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC * 1000 - pendingMs;
+    if (remainingMs <= 0) {
+      setShowEnvironmentExistsHelp(true);
+      return undefined;
+    }
+    setShowEnvironmentExistsHelp(false);
+    const timeoutId = setTimeout(
+      () => setShowEnvironmentExistsHelp(true),
+      remainingMs,
+    );
+    return () => clearTimeout(timeoutId);
+  }, [showInProgress]);
+
+  const environmentUid = ctiFlowState.getEnvironmentUid();
+
   const showSuccess = statusCTI.status === statusCodes.SUCCESS;
 
   const showRegistrationFailed =
     statusCTI.status === statusCodes.REGISTRATION_FAILED;
+
+  const registrationFailedMessage = isOAuthError(
+    statusCTI.message,
+    'expired_token',
+  )
+    ? i18n.translate('wazuhCheckUpdates.ctiRegistration.failedExpiredBody', {
+        defaultMessage:
+          'The user code expired before the activation was completed in Wazuh Cyber Threat Intelligence. If it showed "Environment already exists", delete this deployment in CTI > Deployments, then register again.',
+      })
+    : statusCTI.message;
 
   const showPermissionDenied =
     serverSnapshotReady &&
@@ -269,7 +336,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     showSuccess && ctiFlowState.getSubscription()?.message === null;
 
   return (
-    <EuiModal onClose={handleModalToggle}>
+    <EuiModal onClose={requestClose}>
       <EuiModalHeader>
         <div>
           <EuiModalHeaderTitle>
@@ -306,7 +373,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               ) : deviceAuth ? (
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalTitleInProgress'
-                  defaultMessage='Complete activation in Wazuh Cloud'
+                  defaultMessage='Complete activation in Wazuh CTI'
                 />
               ) : (
                 <FormattedMessage
@@ -326,7 +393,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               >
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalSubtitleDeviceFlow'
-                  defaultMessage='Complete your registration in Wazuh Cloud using the user code on the activation page. Alternatively, you can click on the link below.'
+                  defaultMessage='Complete your registration in Wazuh Cyber Threat Intelligence using the user code on the activation page. Alternatively, you can click on the link below.'
                 />
               </EuiText>
             </>
@@ -350,7 +417,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
           <EuiText>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
-              defaultMessage='Register your Wazuh XDR to receive the latest Cyber Threat Intelligence content. For more information, visit our {documentationCTIWazuh}.'
+              defaultMessage='Your instance already gets the Open feed. Register it in the Wazuh Console to manage it there and to upgrade it to the Professional feed, which delivers vulnerabilities, IOCs and rules with no delay. You will need a free Wazuh Console account. For more information, visit our {documentationCTIWazuh}.'
               values={{
                 documentationCTIWazuh: (
                   <EuiLink
@@ -428,6 +495,75 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               </EuiText>
               <EuiLoadingSpinner size='m' />
             </div>
+            {showEnvironmentExistsHelp ? (
+              <>
+                <EuiSpacer size='m' />
+                <EuiCallOut
+                  size='s'
+                  color='primary'
+                  iconType='questionInCircle'
+                  data-test-subj='ctiRegistrationEnvironmentExistsHelp'
+                  title={
+                    <FormattedMessage
+                      id='wazuhCheckUpdates.ctiRegistration.environmentExistsTitle'
+                      defaultMessage='Did Wazuh CTI show "Environment already exists"?'
+                    />
+                  }
+                >
+                  <EuiText size='s'>
+                    <p>
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.ctiRegistration.environmentExistsBody'
+                        defaultMessage='This deployment is still registered in Wazuh Cyber Threat Intelligence, which does not report it to the dashboard, so the activation stays pending until the user code expires. To register again:'
+                      />
+                    </p>
+                    <ol>
+                      <li>
+                        {environmentUid ? (
+                          <>
+                            <FormattedMessage
+                              id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepDeleteId'
+                              defaultMessage='In Wazuh CTI, go to CTI > Deployments and delete the deployment with this ID:'
+                            />
+                            <br />
+                            <EuiCode data-test-subj='ctiRegistrationDeploymentId'>
+                              {environmentUid}
+                            </EuiCode>
+                            <EuiCopy textToCopy={environmentUid}>
+                              {(copy: () => void) => (
+                                <EuiButtonEmpty
+                                  size='xs'
+                                  color='text'
+                                  iconType='copyClipboard'
+                                  onClick={copy}
+                                  data-test-subj='ctiRegistrationCopyDeploymentId'
+                                >
+                                  <FormattedMessage
+                                    id='wazuhCheckUpdates.ctiRegistration.copyDeploymentId'
+                                    defaultMessage='Copy deployment ID'
+                                  />
+                                </EuiButtonEmpty>
+                              )}
+                            </EuiCopy>
+                          </>
+                        ) : (
+                          <FormattedMessage
+                            id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepDelete'
+                            defaultMessage='In Wazuh CTI, go to CTI > Deployments and delete this deployment.'
+                          />
+                        )}
+                      </li>
+                      <li>
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepRetry'
+                          defaultMessage='Enter the same user code again. The registration then completes here.'
+                        />
+                      </li>
+                    </ol>
+                  </EuiText>
+                </EuiCallOut>
+              </>
+            ) : null}
           </>
         )}
         {showSuccess && (
@@ -436,13 +572,13 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               <EuiText size='s'>
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.successManageBody'
-                  defaultMessage='To manage your Wazuh XDR registration, unlock additional capabilities, or explore other services, please visit your {cloudLink}.'
+                  defaultMessage='To manage your Wazuh XDR registration, unlock additional capabilities, or explore other services, visit {ctiLink}.'
                   values={{
-                    cloudLink: (
-                      <CtiHrefLink href={WAZUH_CLOUD_PORTAL_HREF}>
+                    ctiLink: (
+                      <CtiHrefLink href={WAZUH_CTI_CONSOLE_HREF}>
                         <FormattedMessage
-                          id='wazuhCheckUpdates.ctiRegistration.successCloudLink'
-                          defaultMessage='Wazuh Cloud'
+                          id='wazuhCheckUpdates.ctiRegistration.successCtiLink'
+                          defaultMessage='Wazuh Cyber Threat Intelligence'
                         />
                       </CtiHrefLink>
                     ),
@@ -515,8 +651,10 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               color='danger'
               iconType='alert'
             >
-              {statusCTI.message ? (
-                <EuiText size='s'>{statusCTI.message}</EuiText>
+              {registrationFailedMessage ? (
+                <EuiText size='s' data-test-subj='ctiRegistrationFailedMessage'>
+                  {registrationFailedMessage}
+                </EuiText>
               ) : null}
             </EuiCallOut>
           </>
@@ -536,6 +674,21 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
             {error}
           </EuiCallOut>
         )}
+        {deviceAuth && confirmingCancel && (
+          <EuiCallOut
+            size='s'
+            color='warning'
+            iconType='alert'
+            data-test-subj='ctiCancelConfirmMessage'
+            title={
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalCancelConfirmMessage'
+                defaultMessage='Are you sure you want to cancel the registration?'
+              />
+            }
+            style={{ marginTop: 16 }}
+          />
+        )}
       </EuiModalBody>
 
       <EuiModalFooter>
@@ -553,7 +706,29 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               defaultMessage='Close'
             />
           </EuiButtonEmpty>
-        ) : deviceAuth || showPermissionDenied ? (
+        ) : deviceAuth && confirmingCancel ? (
+          <>
+            <EuiButtonEmpty onClick={() => setConfirmingCancel(false)}>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalButtonKeepWaiting'
+                defaultMessage='Keep waiting'
+              />
+            </EuiButtonEmpty>
+            <EuiButton color='danger' onClick={handleModalToggle} fill>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalButtonConfirmCancel'
+                defaultMessage='Cancel registration'
+              />
+            </EuiButton>
+          </>
+        ) : deviceAuth ? (
+          <EuiButtonEmpty onClick={requestClose}>
+            <FormattedMessage
+              id='wazuhCheckUpdates.ctiRegistration.modalButtonCancel'
+              defaultMessage='Cancel'
+            />
+          </EuiButtonEmpty>
+        ) : showPermissionDenied ? (
           <EuiButtonEmpty onClick={handleModalToggle}>
             <FormattedMessage
               id='wazuhCheckUpdates.ctiRegistration.modalButtonClose'

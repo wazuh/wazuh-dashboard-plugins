@@ -46,6 +46,11 @@ function buildDeviceAuthLinksFromStatusBody(
   };
 }
 
+/** Cancels the pending device-flow activation on the server. */
+export async function cancelCtiRegistration(): Promise<void> {
+  await getCore().http.delete(routes.token);
+}
+
 export async function hydrateCtiFlowFromServer(): Promise<void> {
   const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
     routes.ctiRegistrationStatus,
@@ -80,6 +85,10 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     ) {
       ctiFlowState.setDeviceAuthExpiry(body.expires_in_remaining_sec);
     }
+    if (typeof body.pending_for_sec === 'number') {
+      ctiFlowState.setDeviceAuthPendingFor(body.pending_for_sec);
+    }
+    ctiFlowState.setEnvironmentUid(body.environment_uid);
     const links = buildDeviceAuthLinksFromStatusBody(body);
     ctiFlowState.setDeviceAuthLinks(links);
     return;
@@ -90,10 +99,9 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
   }
 }
 
-export async function fetchCtiRegistrationStatus(): Promise<{
-  statusCode: number;
-  message: string;
-}> {
+type CtiRegistrationStatusResult = { statusCode: number; message: string };
+
+async function requestCtiRegistrationStatus(): Promise<CtiRegistrationStatusResult> {
   await hydrateCtiFlowFromServer();
 
   try {
@@ -196,4 +204,21 @@ export async function fetchCtiRegistrationStatus(): Promise<{
       });
     throw { statusCode, message };
   }
+}
+
+let statusRequestInFlight: Promise<CtiRegistrationStatusResult> | null = null;
+
+/**
+ * Reads the registration status, polling the device code while an activation
+ * is pending. Concurrent callers (the polling timer and the tab-visibility
+ * refresh) share one request: the CTI console redeems a device code once, and
+ * a duplicate poll would get `not_found` and report a false failure.
+ */
+export function fetchCtiRegistrationStatus(): Promise<CtiRegistrationStatusResult> {
+  if (!statusRequestInFlight) {
+    statusRequestInFlight = requestCtiRegistrationStatus().finally(() => {
+      statusRequestInFlight = null;
+    });
+  }
+  return statusRequestInFlight;
 }

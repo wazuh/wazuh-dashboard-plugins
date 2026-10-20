@@ -21,7 +21,6 @@ import {
   ManageHosts,
   createDashboardSecurity,
   ServerAPIClient,
-  CTIFeedsClient,
   CertificateValidityClient,
 } from './services';
 import { InitializerConfigProvider } from './services/configuration';
@@ -86,10 +85,6 @@ export class WazuhCorePlugin
     );
 
     this.services.manageHosts.setServerAPIClient(this.services.serverAPIClient);
-
-    this.services.ctiFeedsClient = new CTIFeedsClient(
-      this.logger.get('cti-feeds-client'),
-    );
 
     this.services.certificateValidityClient = new CertificateValidityClient(
       this.services.serverAPIClient,

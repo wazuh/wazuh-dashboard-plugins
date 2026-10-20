@@ -11,9 +11,6 @@
  */
 
 import { i18n } from '@osd/i18n';
-import { hasAgentSupportModule } from '../../../../../react-services/wz-agents';
-import { WAZUH_MODULES_ID } from '../../../../../../common/constants';
-import { docker as dockerApp } from '../../../../../utils/applications';
 
 export default [
   {
@@ -77,7 +74,7 @@ export default [
         name: i18n.translate(
           'wazuh.configuration.settingsCategories.registrationServiceName',
           {
-            defaultMessage: 'Registration Service',
+            defaultMessage: 'Agents Registration Service',
           },
         ),
         description: i18n.translate(
@@ -153,10 +150,27 @@ export default [
           'wazuh.configuration.settingsCategories.policyMonitoringDescription',
           {
             defaultMessage:
-              'Configuration to ensure compliance with security policies, standards, and hardening guides',
+              'Rootcheck settings to detect rootkits, malware, and system anomalies',
           },
         ),
         goto: 'policy-monitoring',
+        when: 'agent',
+      },
+      {
+        name: i18n.translate(
+          'wazuh.configuration.settingsCategories.configurationAssessmentName',
+          {
+            defaultMessage: 'Configuration Assessment',
+          },
+        ),
+        description: i18n.translate(
+          'wazuh.configuration.settingsCategories.configurationAssessmentDescription',
+          {
+            defaultMessage:
+              'Scan settings and policies to ensure compliance with security policies, standards, and hardening guides',
+          },
+        ),
+        goto: 'configuration-assessment',
         when: 'agent',
       },
     ],

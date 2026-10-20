@@ -2,9 +2,12 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import {
   EuiAccordion,
+  EuiBadge,
   EuiButton,
+  EuiButtonEmpty,
   EuiCallOut,
   EuiFlexGrid,
+  EuiFlexGroup,
   EuiFlexItem,
   EuiLink,
   EuiLoadingSpinner,
@@ -19,6 +22,7 @@ import type {
   CtiConsumer,
   CtiConsumersResponse,
 } from '../../../../common/cti-consumers';
+import { getConsumerSyncState } from '../../../services/cti-consumer-sync-state';
 
 const CTI_CONSUMER_FIELDS: Array<{
   key: keyof CtiConsumer;
@@ -81,6 +85,56 @@ const CTI_CONSUMER_FIELDS: Array<{
   },
 ];
 
+const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
+  const syncState = getConsumerSyncState(consumer);
+
+  switch (syncState.kind) {
+    case 'upToDate':
+      return (
+        <EuiBadge color='success' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate(
+            'wazuhCheckUpdates.ctiConsumers.syncStatus.upToDate',
+            {
+              defaultMessage: 'Up to date',
+            },
+          )}
+        </EuiBadge>
+      );
+    case 'pending':
+      return (
+        <EuiBadge color='primary' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.pending', {
+            defaultMessage: 'Update pending',
+          })}
+        </EuiBadge>
+      );
+    case 'syncing':
+      return (
+        <EuiBadge color='warning' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.syncing', {
+            defaultMessage: 'Syncing',
+          })}
+        </EuiBadge>
+      );
+    case 'failed':
+      return (
+        <EuiBadge color='danger' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.failed', {
+            defaultMessage: 'Failed',
+          })}
+        </EuiBadge>
+      );
+    case 'unknown':
+      return (
+        <EuiBadge color='hollow' data-test-subj='ctiConsumerSyncStatus'>
+          {syncState.rawStatus}
+        </EuiBadge>
+      );
+    default:
+      return null;
+  }
+};
+
 function formatFieldValue(value: unknown): string {
   if (typeof value === 'boolean') {
     return value
@@ -132,6 +186,21 @@ export const CtiConsumersAccordion: React.FC = () => {
   const [consumers, setConsumers] = useState<CtiConsumer[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [expandedConsumers, setExpandedConsumers] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const toggleExpanded = useCallback((name: string) => {
+    setExpandedConsumers(previous => {
+      const next = new Set(previous);
+      if (next.has(name)) {
+        next.delete(name);
+      } else {
+        next.add(name);
+      }
+      return next;
+    });
+  }, []);
 
   const fetchConsumers = useCallback(async () => {
     setLoading(true);
@@ -141,10 +210,10 @@ export const CtiConsumersAccordion: React.FC = () => {
         routes.ctiConsumers,
       );
       setConsumers(response.data ?? []);
-    } catch (fetchError: any) {
+    } catch (fetchError: unknown) {
       setConsumers(null);
       setError(
-        fetchError?.message ||
+        (fetchError instanceof Error && fetchError.message) ||
           i18n.translate('wazuhCheckUpdates.ctiConsumers.error.fallback', {
             defaultMessage: 'Could not load consumers',
           }),
@@ -202,26 +271,86 @@ export const CtiConsumersAccordion: React.FC = () => {
           })}
         </EuiText>
       ) : (
-        consumers.map(consumer => (
-          <EuiPanel
-            key={consumer.name}
-            paddingSize='m'
-            hasBorder
-            style={{ marginBottom: 8 }}
-          >
-            <EuiFlexGrid columns={2} gutterSize='m'>
-              {CTI_CONSUMER_FIELDS.map(field => (
-                <ConsumerField
-                  key={String(field.key)}
-                  title={field.label}
-                  value={formatFieldValue(consumer[field.key])}
-                  href={field.isLink ? consumer.resource : undefined}
-                  dataTestSubj={field.dataTestSubj}
-                />
-              ))}
-            </EuiFlexGrid>
-          </EuiPanel>
-        ))
+        consumers.map(consumer => {
+          const isExpanded = expandedConsumers.has(consumer.name);
+          return (
+            <EuiPanel
+              key={consumer.name}
+              paddingSize='m'
+              hasBorder
+              style={{ marginBottom: 8 }}
+            >
+              <EuiFlexGroup
+                justifyContent='spaceBetween'
+                alignItems='center'
+                responsive={false}
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiFlexGroup
+                    alignItems='center'
+                    gutterSize='s'
+                    responsive={false}
+                  >
+                    <EuiFlexItem grow={false}>
+                      <EuiTitle size='xs'>
+                        <h6>{consumer.name}</h6>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <SyncStatusBadge consumer={consumer} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty
+                    size='xs'
+                    iconType={isExpanded ? 'arrowUp' : 'arrowDown'}
+                    iconSide='right'
+                    aria-expanded={isExpanded}
+                    onClick={() => toggleExpanded(consumer.name)}
+                    data-test-subj='ctiConsumerDetailsToggle'
+                  >
+                    {isExpanded
+                      ? i18n.translate(
+                          'wazuhCheckUpdates.ctiConsumers.details.hide',
+                          {
+                            defaultMessage: 'Hide details',
+                          },
+                        )
+                      : i18n.translate(
+                          'wazuhCheckUpdates.ctiConsumers.details.show',
+                          {
+                            defaultMessage: 'Show details',
+                          },
+                        )}
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              {isExpanded && (
+                <>
+                  <EuiSpacer size='s' />
+                  <EuiFlexGrid
+                    columns={2}
+                    gutterSize='m'
+                    data-test-subj='ctiConsumerDetails'
+                  >
+                    {CTI_CONSUMER_FIELDS.filter(
+                      field => field.key !== 'name',
+                    ).map(field => (
+                      <ConsumerField
+                        key={String(field.key)}
+                        title={field.label}
+                        value={formatFieldValue(consumer[field.key])}
+                        href={field.isLink ? consumer.resource : undefined}
+                        dataTestSubj={field.dataTestSubj}
+                      />
+                    ))}
+                  </EuiFlexGrid>
+                </>
+              )}
+            </EuiPanel>
+          );
+        })
       )}
     </EuiAccordion>
   );

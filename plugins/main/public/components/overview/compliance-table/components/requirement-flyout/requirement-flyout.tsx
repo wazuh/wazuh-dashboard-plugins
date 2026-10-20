@@ -459,9 +459,9 @@ export const RequirementFlyout = connect(mapStateToProps)(
               <EuiTitle size='s'>
                 <h3>
                   {i18n.translate(
-                    'wazuh.complianceTable.requirementFlyout.recentEventsTitle',
+                    'wazuh.complianceTable.requirementFlyout.recentFindingsTitle',
                     {
-                      defaultMessage: 'Recent events',
+                      defaultMessage: 'Recent findings',
                     },
                   )}
                   {!this.props.isOthers &&
@@ -494,7 +494,7 @@ export const RequirementFlyout = connect(mapStateToProps)(
                           <EuiToolTip
                             position='top'
                             content={i18n.translate(
-                              'wazuh.complianceTable.requirementFlyout.inspectInEventsTooltip',
+                              'wazuh.complianceTable.requirementFlyout.inspectInFindingsTooltip',
                               {
                                 defaultMessage:
                                   'Inspect {requirement} in {view}',

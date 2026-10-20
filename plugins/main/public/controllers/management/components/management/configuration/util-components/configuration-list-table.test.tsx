@@ -30,7 +30,7 @@ describe('WzConfigurationListTable', () => {
 
   it('applies the field render function when provided', () => {
     const renderingList = {
-      id: 'policy-monitoring.sca.policies',
+      id: 'configuration-assessment.policies',
       itemLabel: (item: { policy: string }) => item.policy,
       itemFields: [
         {

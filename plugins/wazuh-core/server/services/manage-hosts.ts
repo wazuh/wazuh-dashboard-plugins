@@ -15,6 +15,7 @@ import { IConfiguration } from '../../common/services/configuration';
 import { ServerAPIClient } from './server-api-client';
 import { API_USER_STATUS_RUN_AS } from '../../common/api-user-status-run-as';
 import { HTTP_STATUS_CODES } from '../../common/constants';
+import { isRateLimitError } from '../../common/rate-limit';
 
 export interface IAPIHost {
   id: string;
@@ -33,7 +34,11 @@ interface IAPIHostRegistry {
   cluster: string;
   allow_run_as: API_USER_STATUS_RUN_AS;
   verify_ca: boolean | null;
+  rateLimited?: boolean;
+  attemptedAt?: number;
 }
+
+const RATE_LIMITED_REGISTRY_COOLDOWN_MS = 60000;
 
 interface GetRegistryDataByHostOptions {
   /* this option lets to throw the error when trying to fetch the required data
@@ -55,6 +60,10 @@ interface GetRegistryDataByHostOptions {
 export class ManageHosts {
   public serverAPIClient: ServerAPIClient | null = null;
   private readonly cacheRegistry = new Map<string, IAPIHostRegistry>();
+  private readonly pendingRegistryRequests = new Map<
+    string,
+    Promise<IAPIHostRegistry>
+  >();
 
   constructor(
     private readonly logger: Logger,
@@ -183,10 +192,22 @@ export class ManageHosts {
       this.logger.debug('Getting registry');
       const registry = Object.fromEntries([...this.cacheRegistry.entries()]);
 
-      const hostsNeedingRegistry = hosts.filter(host => !registry[host.id]);
+      const hostsNeedingRegistry = hosts.filter(
+        host =>
+          !registry[host.id] ||
+          this.pendingRegistryRequests.has(host.id) ||
+          (registry[host.id].rateLimited === true &&
+            Date.now() - (registry[host.id].attemptedAt ?? 0) >=
+              RATE_LIMITED_REGISTRY_COOLDOWN_MS),
+      );
       const enhanceHostWithRegistry = (host: IAPIHost, registryData: any) => {
+        const entry = Object.fromEntries(
+          Object.entries(registryData || {}).filter(
+            ([field]) => !['rateLimited', 'attemptedAt'].includes(field),
+          ),
+        );
         const { allow_run_as, verify_ca, ca, cert, key, ...cluster_info } =
-          registryData || {};
+          entry;
         return {
           ...host,
           allow_run_as,
@@ -196,13 +217,13 @@ export class ManageHosts {
       };
       if (hostsNeedingRegistry.length > 0) {
         this.logger.debug(
-          `Found ${hostsNeedingRegistry.length} hosts without registry data, updating cache`,
+          `Found ${hostsNeedingRegistry.length} hosts without registry data or rate limited, updating cache`,
         );
 
         await Promise.allSettled(
           hostsNeedingRegistry.map(async (host: IAPIHost) => {
             try {
-              await this.getRegistryDataByHost(host, { throwError: false });
+              await this.refreshRegistryByHost(host);
               this.logger.debug(`Registry data updated for host [${host.id}]`);
             } catch (error) {
               const errorMessage =
@@ -233,6 +254,19 @@ export class ManageHosts {
     }
   }
 
+  private refreshRegistryByHost(host: IAPIHost) {
+    let pending = this.pendingRegistryRequests.get(host.id);
+
+    if (!pending) {
+      pending = this.getRegistryDataByHost(host, { throwError: false }).finally(
+        () => this.pendingRegistryRequests.delete(host.id),
+      );
+      this.pendingRegistryRequests.set(host.id, pending);
+    }
+
+    return pending;
+  }
+
   private isServerAPIClientResponseOk(response: { status: number }) {
     return response.status === HTTP_STATUS_CODES.OK;
   }
@@ -253,7 +287,8 @@ export class ManageHosts {
 
     let node = null,
       cluster = null,
-      allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK;
+      allow_run_as = API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK,
+      rateLimited = false;
 
     try {
       // Sent in parallel, read in order so a cluster info failure keeps allow_run_as
@@ -300,21 +335,37 @@ export class ManageHosts {
       if (options?.throwError) {
         throw error;
       }
+
+      rateLimited = isRateLimitError(error);
+      this.logger[rateLimited ? 'warn' : 'debug'](
+        `Could not get the registry data of the host [${apiHostID}]: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
 
     // Calculate verify_ca based on certificate paths
     const verify_ca = this.calculateVerifyCa(host);
 
+    const previous = rateLimited
+      ? this.cacheRegistry.get(apiHostID)
+      : undefined;
     const data = {
-      node,
-      cluster,
+      node: node ?? previous?.node ?? null,
+      cluster: cluster ?? previous?.cluster ?? null,
       allow_run_as,
       verify_ca,
+      rateLimited,
+      attemptedAt: Date.now(),
     };
+    const registryData =
+      previous && data.allow_run_as === API_USER_STATUS_RUN_AS.UNABLE_TO_CHECK
+        ? { ...previous, rateLimited, attemptedAt: data.attemptedAt }
+        : data;
 
-    this.updateRegistryByHost(apiHostID, data);
+    this.updateRegistryByHost(apiHostID, registryData);
 
-    return data;
+    return registryData;
   }
 
   /**
@@ -347,6 +398,16 @@ export class ManageHosts {
       this.logger.error(error.message);
       throw error;
     }
+  }
+
+  /**
+   * Check if the registry data of the API host could not be fetched because the
+   * Server API rate limited the requests
+   * @param hostID
+   * @returns false when there is no registry data of the host
+   */
+  isRateLimited(hostID: string): boolean {
+    return this.cacheRegistry.get(hostID)?.rateLimited === true;
   }
 
   private getRegistryByHost(hostID: string) {

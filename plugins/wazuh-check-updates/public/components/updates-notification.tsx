@@ -8,12 +8,15 @@ import {
   EuiText,
 } from '@elastic/eui';
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { i18n } from '@osd/i18n';
 import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
 import { useUserPreferences } from '../hooks';
 import { areThereNewUpdates } from '../utils';
-import { getCore, getWazuhCore } from '../plugin-services';
+import { getCore } from '../plugin-services';
 import { AvailableUpdates } from '../../../wazuh-check-updates/common/types';
 import { getAvailableUpdates } from '../services';
+import { ctiUpsellBarVisible$ } from '../services/cti-upsell-bar-state';
 import { RedirectAppLinks } from '../../../../src/plugins/opensearch_dashboards_react/public';
 import './updates-notification.scss';
 
@@ -21,8 +24,16 @@ export const UpdatesNotification = () => {
   const [availableUpdates, setAvailableUpdates] = useState<AvailableUpdates>();
   const [isDismissed, setIsDismissed] = useState(false);
   const [dismissFutureUpdates, setDismissFutureUpdates] = useState(false);
+  const [isCtiUpsellBarVisible, setIsCtiUpsellBarVisible] = useState(
+    ctiUpsellBarVisible$.getValue(),
+  );
 
-  const sideNavDocked = getWazuhCore().hooks.useDockedSideNav();
+  useEffect(() => {
+    const subscription = ctiUpsellBarVisible$.subscribe(
+      setIsCtiUpsellBarVisible,
+    );
+    return () => subscription.unsubscribe();
+  }, []);
 
   const {
     userPreferences,
@@ -53,7 +64,7 @@ export const UpdatesNotification = () => {
     return null;
   }
 
-  if (isDismissed) {
+  if (isDismissed || isCtiUpsellBarVisible) {
     return null;
   }
 
@@ -78,75 +89,88 @@ export const UpdatesNotification = () => {
     setIsDismissed(true);
   };
 
-  return mustNotifyUser ? (
-    <I18nProvider>
-      <EuiBottomBar
-        className={sideNavDocked ? 'wz-check-updates-bottom-bar' : ''}
-      >
-        <EuiFlexGroup
-          justifyContent='spaceBetween'
-          alignItems='center'
-          gutterSize='m'
-        >
-          <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize='m' alignItems='center'>
-              <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiText>
-                  <FormattedMessage
-                    id='wazuhCheckUpdates.updatesNotification.message'
-                    defaultMessage='New release is available!'
-                  />
-                </EuiText>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiButtonEmpty
-                    color='ghost'
-                    href={getCore().application.getUrlForApp('server-apis', {
-                      path: '#/settings?tab=api',
-                    })}
-                  >
-                    <FormattedMessage
-                      id='wazuhCheckUpdates.updatesNotification.linkText'
-                      defaultMessage='Go to the API configuration page for details'
-                    />
-                  </EuiButtonEmpty>
-                </RedirectAppLinks>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiFlexGroup gutterSize='m' alignItems='center'>
+  // Sticky in the app wrapper, as OSD does: the bar takes its own space instead
+  // of padding the body, so views that fit in the viewport do not scroll.
+  return mustNotifyUser
+    ? createPortal(
+        <I18nProvider>
+          <EuiBottomBar
+            position='sticky'
+            className='wz-check-updates-bar'
+            landmarkHeading={i18n.translate(
+              'wazuhCheckUpdates.updatesNotification.landmarkHeading',
+              { defaultMessage: 'New release notification' },
+            )}
+          >
+            <EuiFlexGroup
+              justifyContent='spaceBetween'
+              alignItems='center'
+              gutterSize='m'
+            >
               <EuiFlexItem grow={false}>
-                <EuiCheckbox
-                  id='check-dismiss-in-notification'
-                  label={
-                    <FormattedMessage
-                      id='wazuhCheckUpdates.updatesNotification.dismissCheckText'
-                      defaultMessage='Disable updates notifications'
-                    />
-                  }
-                  checked={dismissFutureUpdates}
-                  onChange={e => handleOnChangeDismiss(e.target.checked)}
-                />
+                <EuiFlexGroup gutterSize='m' alignItems='center'>
+                  <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+                    <EuiText>
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.updatesNotification.message'
+                        defaultMessage='New release is available!'
+                      />
+                    </EuiText>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiButtonEmpty
+                        color='ghost'
+                        href={getCore().application.getUrlForApp(
+                          'server-apis',
+                          {
+                            path: '#/settings?tab=api',
+                          },
+                        )}
+                      >
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.updatesNotification.linkText'
+                          defaultMessage='Go to the API configuration page for details'
+                        />
+                      </EuiButtonEmpty>
+                    </RedirectAppLinks>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
-              <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
-                <EuiButton
-                  fill
-                  size='s'
-                  iconType='cross'
-                  onClick={() => handleOnClose()}
-                >
-                  <FormattedMessage
-                    id='wazuhCheckUpdates.updatesNotification.closeButtonText'
-                    defaultMessage='Dismiss'
-                  />
-                </EuiButton>
+              <EuiFlexItem grow={false}>
+                <EuiFlexGroup gutterSize='m' alignItems='center'>
+                  <EuiFlexItem grow={false}>
+                    <EuiCheckbox
+                      id='check-dismiss-in-notification'
+                      label={
+                        <FormattedMessage
+                          id='wazuhCheckUpdates.updatesNotification.dismissCheckText'
+                          defaultMessage='Disable updates notifications'
+                        />
+                      }
+                      checked={dismissFutureUpdates}
+                      onChange={e => handleOnChangeDismiss(e.target.checked)}
+                    />
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false} style={{ maxWidth: 'max-content' }}>
+                    <EuiButton
+                      fill
+                      size='s'
+                      iconType='cross'
+                      onClick={() => handleOnClose()}
+                    >
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.updatesNotification.closeButtonText'
+                        defaultMessage='Dismiss'
+                      />
+                    </EuiButton>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiBottomBar>
-    </I18nProvider>
-  ) : null;
+          </EuiBottomBar>
+        </I18nProvider>,
+        document.getElementById('app-wrapper') ?? document.body,
+      )
+    : null;
 };

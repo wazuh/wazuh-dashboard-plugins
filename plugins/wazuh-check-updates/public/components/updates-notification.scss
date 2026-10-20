@@ -1,3 +1,4 @@
-.wz-check-updates-bottom-bar {
-  margin-left: 320px;
+// A global `:focus { outline: none !important }` hides the default ring.
+.wz-check-updates-bar .euiButtonEmpty:focus-visible {
+  box-shadow: 0 0 0 2px currentColor;
 }
