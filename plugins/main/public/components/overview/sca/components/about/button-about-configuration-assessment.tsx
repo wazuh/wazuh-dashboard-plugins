@@ -36,15 +36,41 @@ export const ButtonAboutConfigurationAssessment = () => {
       {isOpen && (
         <EuiFlyout
           onClose={() => setIsOpen(false)}
-          size='s'
+          size='m'
           ownFocus
           aria-labelledby={FLYOUT_TITLE_ID}
           data-test-subj='wzAboutConfigurationAssessmentFlyout'
         >
           <EuiFlyoutHeader hasBorder>
-            <EuiTitle size='m'>
+            <EuiTitle size='s'>
               <h2 id={FLYOUT_TITLE_ID}>{title}</h2>
             </EuiTitle>
+            <EuiSpacer size='xs' />
+            <EuiText size='s'>
+              <p>
+                <FormattedMessage
+                  id='wazuh.configurationAssessment.aboutFlyout.learnMore'
+                  defaultMessage='Learn more in the {link}.'
+                  values={{
+                    link: (
+                      <EuiLink
+                        href={webDocumentationLink(
+                          'user-manual/capabilities/sec-config-assessment/index.html',
+                        )}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        external
+                      >
+                        {i18n.translate(
+                          'wazuh.configurationAssessment.aboutFlyout.learnMoreLink',
+                          { defaultMessage: 'documentation' },
+                        )}
+                      </EuiLink>
+                    ),
+                  }}
+                />
+              </p>
+            </EuiText>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
             <EuiText size='s'>
@@ -67,7 +93,48 @@ export const ButtonAboutConfigurationAssessment = () => {
                 )}
               </p>
             </EuiText>
-            <EuiSpacer />
+            <EuiSpacer size='m' />
+            <EuiTitle size='xs'>
+              <h3>
+                {i18n.translate(
+                  'wazuh.configurationAssessment.aboutFlyout.dataSourcesTitle',
+                  { defaultMessage: 'Data sources' },
+                )}
+              </h3>
+            </EuiTitle>
+            <EuiSpacer size='s' />
+            <EuiDescriptionList
+              compressed
+              listItems={[
+                {
+                  title: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.statesTerm',
+                    { defaultMessage: 'States' },
+                  ),
+                  description: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.statesDescription',
+                    {
+                      defaultMessage:
+                        'The current result of every check on each endpoint, reported by the agent scans. Used in the Dashboard and Inventory tabs.',
+                    },
+                  ),
+                },
+                {
+                  title: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.findingsTerm',
+                    { defaultMessage: 'Findings' },
+                  ),
+                  description: i18n.translate(
+                    'wazuh.configurationAssessment.aboutFlyout.findingsDescription',
+                    {
+                      defaultMessage:
+                        'Security findings generated from Configuration Assessment events. A finding appears only when the result of a check differs between consecutive scans, so it can be empty even when States has data. Used in the Findings tab.',
+                    },
+                  ),
+                },
+              ]}
+            />
+            <EuiSpacer size='m' />
             <EuiTitle size='xs'>
               <h3>
                 {i18n.translate(
@@ -83,34 +150,6 @@ export const ButtonAboutConfigurationAssessment = () => {
                 ({ term, description }) => ({ title: term, description }),
               )}
             />
-            <EuiSpacer />
-            <EuiText size='s'>
-              <p>
-                <FormattedMessage
-                  id='wazuh.configurationAssessment.aboutFlyout.learnMore'
-                  defaultMessage='Learn more in the {link} documentation.'
-                  values={{
-                    link: (
-                      <EuiLink
-                        href={webDocumentationLink(
-                          'user-manual/capabilities/sec-config-assessment/index.html',
-                        )}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        external
-                      >
-                        {i18n.translate(
-                          'wazuh.configurationAssessment.aboutFlyout.learnMoreLink',
-                          {
-                            defaultMessage: 'Security Configuration Assessment',
-                          },
-                        )}
-                      </EuiLink>
-                    ),
-                  }}
-                />
-              </p>
-            </EuiText>
           </EuiFlyoutBody>
         </EuiFlyout>
       )}

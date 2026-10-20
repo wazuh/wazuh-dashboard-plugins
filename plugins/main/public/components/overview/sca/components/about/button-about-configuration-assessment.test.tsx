@@ -17,14 +17,22 @@ describe('ButtonAboutConfigurationAssessment', () => {
     );
 
     const flyout = screen.getByRole('dialog');
-    ['Passed', 'Failed', 'Not applicable', 'Score'].forEach(term =>
-      expect(flyout).toHaveTextContent(term),
-    );
-    expect(
-      screen.getByRole('link', { name: /Security Configuration Assessment/ }),
-    ).toHaveAttribute(
+    [
+      'States',
+      'Findings',
+      'Passed',
+      'Failed',
+      'Not applicable',
+      'Score',
+    ].forEach(term => expect(flyout).toHaveTextContent(term));
+    const link = screen.getByRole('link', { name: /documentation/ });
+    expect(link).toHaveAttribute(
       'href',
       'https://docs.example/user-manual/capabilities/sec-config-assessment/index.html',
+    );
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link.getAttribute('rel')).toEqual(
+      expect.stringMatching(/noopener.*noreferrer|noreferrer.*noopener/),
     );
   });
 
