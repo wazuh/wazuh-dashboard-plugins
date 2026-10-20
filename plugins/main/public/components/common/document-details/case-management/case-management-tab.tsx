@@ -30,7 +30,6 @@ import {
   EuiLoadingSpinner,
   EuiOverlayMask,
   EuiOutsideClickDetector,
-  EuiSelect,
   EuiSpacer,
   EuiSuperSelect,
   EuiText,
@@ -158,9 +157,11 @@ const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
   },
 ];
 
+const EMPTY_OPTION = { value: '' as const, text: '—' };
+
 const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
   [
-    { value: '', text: '—' },
+    EMPTY_OPTION,
     {
       value: 'urgent',
       text: i18n.translate('wazuh.common.caseManagementPriority.urgent', {
@@ -186,8 +187,6 @@ const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
       }),
     },
   ];
-
-const EMPTY_OPTION = { value: '' as const, text: '—' };
 
 const CASE_TLP_OPTIONS: Array<{
   value: CaseTLP | '';
@@ -281,17 +280,34 @@ const toSuperSelectOptions = <T extends string>(
   options.map(({ value, text, description }) => ({
     value,
     inputDisplay: text,
-    dropdownDisplay: (
+    dropdownDisplay: description ? (
       <>
         <strong>{text}</strong>
-        {description && (
-          <EuiText size='s' color='subdued'>
-            <p>{description}</p>
-          </EuiText>
-        )}
+        <EuiText size='s' color='subdued'>
+          <p>{description}</p>
+        </EuiText>
       </>
+    ) : (
+      text
     ),
   }));
+
+// names a select button by field and value; OUI renders inputDisplay twice, so no ids there
+const SelectName: React.FC<{
+  nameId: string;
+  name: string;
+  valueId: string;
+  value?: string;
+}> = ({ nameId, name, valueId, value }) => (
+  <>
+    <span id={nameId} hidden>
+      {name}
+    </span>
+    <span id={valueId} hidden>
+      {value}
+    </span>
+  </>
+);
 
 // tabIndex lets keyboard users open the tooltip
 const DescribedBadge: React.FC<{ color: string; description?: string }> = ({
@@ -369,6 +385,10 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     const id = htmlIdGenerator('caseManagement')();
     return {
       statusName: `${id}-statusName`,
+      severityName: `${id}-severityName`,
+      severityValue: `${id}-severityValue`,
+      priorityName: `${id}-priorityName`,
+      priorityValue: `${id}-priorityValue`,
       statusValue: `${id}-statusValue`,
       tlpLabel: `${id}-tlpLabel`,
       tlpValue: `${id}-tlpValue`,
@@ -1078,16 +1098,15 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                           'wazuh.common.caseManagementForm.statusLabel',
                           { defaultMessage: 'Status *' },
                         )}
-                        {/* name the button without the asterisk; OUI renders inputDisplay twice */}
-                        <span id={fieldIds.statusName} hidden>
-                          {i18n.translate(
+                        <SelectName
+                          nameId={fieldIds.statusName}
+                          name={i18n.translate(
                             'wazuh.common.caseManagementForm.statusAriaLabel',
                             { defaultMessage: 'Case status' },
                           )}
-                        </span>
-                        <span id={fieldIds.statusValue} hidden>
-                          {statusOption?.text}
-                        </span>
+                          valueId={fieldIds.statusValue}
+                          value={statusOption?.text}
+                        />
                       </>
                     }
                     helpText={
@@ -1101,7 +1120,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       )
                     }
                   >
-                    {/* the '' option gives keyboard focus a target before a status is set */}
+                    {/* the '' option gives keyboard focus a target before a value is set */}
                     <EuiSuperSelect<CaseStatus | ''>
                       fullWidth
                       hasDividers
@@ -1120,28 +1139,39 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.severityLabel',
-                      { defaultMessage: 'Severity *' },
-                    )}
+                    label={
+                      <>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.severityLabel',
+                          { defaultMessage: 'Severity *' },
+                        )}
+                        <SelectName
+                          nameId={fieldIds.severityName}
+                          name={i18n.translate(
+                            'wazuh.common.caseManagementForm.severityAriaLabel',
+                            { defaultMessage: 'Case severity' },
+                          )}
+                          valueId={fieldIds.severityValue}
+                          value={optionText(CASE_SEVERITY_OPTIONS, severity)}
+                        />
+                      </>
+                    }
                     helpText={i18n.translate(
                       'wazuh.common.caseManagementForm.severityHelpText',
                       { defaultMessage: 'Impact severity of this case.' },
                     )}
                   >
-                    <EuiSelect
+                    <EuiSuperSelect<CaseSeverity | ''>
                       fullWidth
-                      options={CASE_SEVERITY_OPTIONS}
-                      value={severity}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setSeverity(e.target.value as CaseSeverity)
-                      }
-                      disabled={isSaving || isCleaning}
-                      hasNoInitialSelection={!severity}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.severityAriaLabel',
-                        { defaultMessage: 'Case severity' },
+                      options={toSuperSelectOptions(
+                        severity
+                          ? CASE_SEVERITY_OPTIONS
+                          : [EMPTY_OPTION, ...CASE_SEVERITY_OPTIONS],
                       )}
+                      valueOfSelected={severity}
+                      onChange={value => value && setSeverity(value)}
+                      disabled={isSaving || isCleaning}
+                      aria-labelledby={`${fieldIds.severityName} ${fieldIds.severityValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -1153,27 +1183,35 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.priorityLabel',
-                      { defaultMessage: 'Priority' },
-                    )}
+                    label={
+                      <>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.priorityLabel',
+                          { defaultMessage: 'Priority' },
+                        )}
+                        <SelectName
+                          nameId={fieldIds.priorityName}
+                          name={i18n.translate(
+                            'wazuh.common.caseManagementForm.priorityAriaLabel',
+                            { defaultMessage: 'Case priority' },
+                          )}
+                          valueId={fieldIds.priorityValue}
+                          value={optionText(CASE_PRIORITY_OPTIONS, priority)}
+                        />
+                      </>
+                    }
                     helpText={i18n.translate(
                       'wazuh.common.caseManagementForm.priorityHelpText',
                       { defaultMessage: 'Triage priority of this case.' },
                     )}
                   >
-                    <EuiSelect
+                    <EuiSuperSelect<CasePriority | ''>
                       fullWidth
-                      options={CASE_PRIORITY_OPTIONS}
-                      value={priority}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setPriority(e.target.value as CasePriority | '')
-                      }
+                      options={toSuperSelectOptions(CASE_PRIORITY_OPTIONS)}
+                      valueOfSelected={priority}
+                      onChange={setPriority}
                       disabled={isSaving || isCleaning}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.priorityAriaLabel',
-                        { defaultMessage: 'Case priority' },
-                      )}
+                      aria-labelledby={`${fieldIds.priorityName} ${fieldIds.priorityValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>

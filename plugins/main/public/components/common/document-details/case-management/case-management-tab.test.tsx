@@ -59,6 +59,13 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+const pickOption = async (button: RegExp, option: RegExp) => {
+  fireEvent.click(screen.getByRole('button', { name: button }));
+  const listbox = await screen.findByRole('listbox');
+  fireEvent.click(within(listbox).getByRole('option', { name: option }));
+  await waitForElementToBeRemoved(listbox);
+};
+
 describe('CaseManagementTab required fields', () => {
   it('create: enables the save button only when status, title and severity are set', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
@@ -74,13 +81,10 @@ describe('CaseManagementTab required fields', () => {
     expect(screen.getByLabelText('Case title')).toHaveValue('Case_doc-1');
     expect(createButton).toBeDisabled();
 
-    fireEvent.click(screen.getByRole('button', { name: /^Case status/ }));
-    fireEvent.click(await screen.findByRole('option', { name: /^Active/ }));
+    await pickOption(/^Case status/, /^Active/);
     expect(createButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText('Case severity'), {
-      target: { value: 'high' },
-    });
+    await pickOption(/^Case severity/, /^High/);
     expect(createButton).toBeEnabled();
 
     fireEvent.change(screen.getByLabelText('Case title'), {
@@ -107,9 +111,7 @@ describe('CaseManagementTab required fields', () => {
     const updateButton = screen.getByRole('button', { name: 'Update case' });
     expect(updateButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText('Case severity'), {
-      target: { value: 'critical' },
-    });
+    await pickOption(/^Case severity/, /^Critical/);
     expect(updateButton).toBeEnabled();
 
     fireEvent.change(screen.getByLabelText('Case title'), {
@@ -177,6 +179,10 @@ describe('CaseManagementTab status descriptions', () => {
     for (const suffix of [
       'statusName',
       'statusValue',
+      'severityName',
+      'severityValue',
+      'priorityName',
+      'priorityValue',
       'tlpLabel',
       'tlpValue',
     ]) {
@@ -247,6 +253,28 @@ describe('CaseManagementTab status descriptions', () => {
     expect(
       screen.getByRole('button', { name: 'Case status Active' }),
     ).toBeInTheDocument();
+  });
+});
+
+describe('CaseManagementTab selects', () => {
+  it('names each select by its field and value', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+
+    for (const name of [
+      'Case status Active',
+      'Case severity High',
+      'Case priority Urgent',
+      'TLP TLP:AMBER',
+    ]) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
   });
 });
 
