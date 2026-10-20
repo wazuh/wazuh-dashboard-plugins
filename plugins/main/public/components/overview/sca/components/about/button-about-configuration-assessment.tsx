@@ -36,16 +36,16 @@ export const ButtonAboutConfigurationAssessment = () => {
       {isOpen && (
         <EuiFlyout
           onClose={() => setIsOpen(false)}
-          size='s'
+          size='m'
           ownFocus
           aria-labelledby={FLYOUT_TITLE_ID}
           data-test-subj='wzAboutConfigurationAssessmentFlyout'
         >
           <EuiFlyoutHeader hasBorder>
-            <EuiTitle size='m'>
+            <EuiTitle size='s'>
               <h2 id={FLYOUT_TITLE_ID}>{title}</h2>
             </EuiTitle>
-            <EuiSpacer size='s' />
+            <EuiSpacer size='xs' />
             <EuiText size='s'>
               <p>
                 <FormattedMessage
@@ -93,7 +93,7 @@ export const ButtonAboutConfigurationAssessment = () => {
                 )}
               </p>
             </EuiText>
-            <EuiSpacer />
+            <EuiSpacer size='m' />
             <EuiTitle size='xs'>
               <h3>
                 {i18n.translate(
@@ -134,7 +134,7 @@ export const ButtonAboutConfigurationAssessment = () => {
                 },
               ]}
             />
-            <EuiSpacer />
+            <EuiSpacer size='m' />
             <EuiTitle size='xs'>
               <h3>
                 {i18n.translate(
