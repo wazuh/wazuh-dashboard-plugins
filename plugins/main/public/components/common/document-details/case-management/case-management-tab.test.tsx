@@ -74,7 +74,7 @@ describe('CaseManagementTab required fields', () => {
     expect(screen.getByLabelText('Case title')).toHaveValue('Case_doc-1');
     expect(createButton).toBeDisabled();
 
-    fireEvent.click(screen.getByRole('button', { name: /^Status/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Case status/ }));
     fireEvent.click(await screen.findByRole('option', { name: /^Active/ }));
     expect(createButton).toBeDisabled();
 
@@ -133,11 +133,12 @@ describe('CaseManagementTab status descriptions', () => {
       screen.getByText('Current lifecycle status of this finding.'),
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /^Status/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Case status/ }));
     const options = within(await screen.findByRole('listbox')).getAllByRole(
       'option',
     );
     expect(options.map(option => option.textContent)).toEqual([
+      '—',
       'ActiveOpen. No one is working on it yet.',
       'AcknowledgedOpen. Someone is working on it.',
       'CompletedClosed. No more work needed.',
@@ -171,7 +172,7 @@ describe('CaseManagementTab status descriptions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
 
     expect(
-      screen.getByRole('button', { name: 'Status * Audit' }),
+      screen.getByRole('button', { name: 'Case status Audit' }),
     ).toBeInTheDocument();
     expect(
       screen.getByText('Kept for review or compliance.'),
@@ -192,7 +193,7 @@ describe('CaseManagementTab status descriptions', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
     const statusButton = screen.getByRole('button', {
-      name: 'Status * Active',
+      name: 'Case status Active',
     });
     fireEvent.keyDown(statusButton, { key: 'ArrowDown' });
     const active = await screen.findByRole('option', { name: /^Active/ });
@@ -214,6 +215,31 @@ describe('CaseManagementTab status descriptions', () => {
       ),
     );
   });
+  it('lets a keyboard user pick the status of a new case', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    await screen.findByRole('button', { name: 'Create case' });
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Case status' }), {
+      key: 'ArrowDown',
+    });
+    const listbox = await screen.findByRole('listbox');
+    const empty = within(listbox).getByRole('option', { name: '—' });
+    await waitFor(() => expect(empty).toHaveFocus());
+    fireEvent.keyDown(empty, { key: 'ArrowDown' });
+    const active = within(listbox).getByRole('option', { name: /^Active/ });
+    expect(active).toHaveFocus();
+    fireEvent.click(active);
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+
+    expect(
+      screen.getByRole('button', { name: 'Case status Active' }),
+    ).toBeInTheDocument();
+  });
 });
 
 describe('CaseManagementTab TLP descriptions', () => {
@@ -230,7 +256,7 @@ describe('CaseManagementTab TLP descriptions', () => {
     );
     fireEvent.focus(badge as Element);
     const tooltip = await screen.findByText(
-      'Your organization and its clients, on a need-to-know basis.',
+      "Recipients' organization and its clients, on a need-to-know basis.",
     );
     fireEvent.blur(badge as Element);
     await waitForElementToBeRemoved(tooltip);
@@ -238,7 +264,7 @@ describe('CaseManagementTab TLP descriptions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
     expect(
       screen.getByText(
-        'Your organization and its clients, on a need-to-know basis.',
+        "Recipients' organization and its clients, on a need-to-know basis.",
       ),
     ).toBeInTheDocument();
 
@@ -249,15 +275,15 @@ describe('CaseManagementTab TLP descriptions', () => {
     expect(options.map(option => option.textContent)).toEqual([
       '—',
       'TLP:REDNamed recipients only. No further sharing.',
-      'TLP:AMBERYour organization and its clients, on a need-to-know basis.',
-      'TLP:GREENYour community. Not on public channels.',
+      "TLP:AMBERRecipients' organization and its clients, on a need-to-know basis.",
+      "TLP:GREENRecipients' community. Not on public channels.",
       'TLP:CLEARNo limit. Can be shared publicly.',
     ]);
 
     fireEvent.click(screen.getByRole('option', { name: /^TLP:GREEN/ }));
     await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
     expect(
-      screen.getByText('Your community. Not on public channels.'),
+      screen.getByText("Recipients' community. Not on public channels."),
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'TLP TLP:GREEN' }));

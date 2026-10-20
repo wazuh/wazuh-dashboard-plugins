@@ -187,12 +187,14 @@ const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
     },
   ];
 
+const EMPTY_OPTION = { value: '' as const, text: '—' };
+
 const CASE_TLP_OPTIONS: Array<{
   value: CaseTLP | '';
   text: string;
   description?: string;
 }> = [
-  { value: '', text: '—' },
+  EMPTY_OPTION,
   {
     value: 'TLP:RED',
     text: 'TLP:RED',
@@ -210,7 +212,7 @@ const CASE_TLP_OPTIONS: Array<{
       'wazuh.common.caseManagementTlp.amberDescription',
       {
         defaultMessage:
-          'Your organization and its clients, on a need-to-know basis.',
+          "Recipients' organization and its clients, on a need-to-know basis.",
       },
     ),
   },
@@ -219,7 +221,7 @@ const CASE_TLP_OPTIONS: Array<{
     text: 'TLP:GREEN',
     description: i18n.translate(
       'wazuh.common.caseManagementTlp.greenDescription',
-      { defaultMessage: 'Your community. Not on public channels.' },
+      { defaultMessage: "Recipients' community. Not on public channels." },
     ),
   },
   {
@@ -368,7 +370,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   const [fieldIds] = useState(() => {
     const id = htmlIdGenerator('caseManagement')();
     return {
-      statusLabel: `${id}-statusLabel`,
+      statusName: `${id}-statusName`,
       statusValue: `${id}-statusValue`,
       tlpLabel: `${id}-tlpLabel`,
       tlpValue: `${id}-tlpValue`,
@@ -1073,12 +1075,19 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   <EuiFormRow
                     fullWidth
                     label={
-                      <span id={fieldIds.statusLabel}>
+                      <>
                         {i18n.translate(
                           'wazuh.common.caseManagementForm.statusLabel',
                           { defaultMessage: 'Status *' },
                         )}
-                      </span>
+                        {/* names the button without the required-field asterisk */}
+                        <span id={fieldIds.statusName} hidden>
+                          {i18n.translate(
+                            'wazuh.common.caseManagementForm.statusAriaLabel',
+                            { defaultMessage: 'Case status' },
+                          )}
+                        </span>
+                      </>
                     }
                     helpText={
                       statusOption?.description ??
@@ -1091,18 +1100,20 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                       )
                     }
                   >
-                    {/* '' keeps the hidden input controlled before a status is set */}
+                    {/* the '' option gives keyboard focus a target before a status is set */}
                     <EuiSuperSelect<CaseStatus | ''>
                       fullWidth
                       hasDividers
                       options={toSuperSelectOptions(
-                        CASE_STATUS_OPTIONS,
+                        status
+                          ? CASE_STATUS_OPTIONS
+                          : [EMPTY_OPTION, ...CASE_STATUS_OPTIONS],
                         fieldIds.statusValue,
                       )}
                       valueOfSelected={status ?? ''}
                       onChange={value => value && setStatus(value)}
                       disabled={isSaving || isCleaning}
-                      aria-labelledby={`${fieldIds.statusLabel} ${fieldIds.statusValue}`}
+                      aria-labelledby={`${fieldIds.statusName} ${fieldIds.statusValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
