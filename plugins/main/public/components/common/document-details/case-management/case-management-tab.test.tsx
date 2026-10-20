@@ -174,6 +174,14 @@ describe('CaseManagementTab status descriptions', () => {
     expect(
       screen.getByRole('button', { name: 'Case status Audit' }),
     ).toBeInTheDocument();
+    for (const suffix of [
+      'statusName',
+      'statusValue',
+      'tlpLabel',
+      'tlpValue',
+    ]) {
+      expect(document.querySelectorAll(`[id$="-${suffix}"]`)).toHaveLength(1);
+    }
     expect(
       screen.getByText('Kept for review or compliance.'),
     ).toBeInTheDocument();

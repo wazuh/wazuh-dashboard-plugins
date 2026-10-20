@@ -275,14 +275,12 @@ const optionText = (
   value: string | undefined,
 ): string | undefined => findOption(options, value)?.text;
 
-// selectedId names the selected value so the button's aria-labelledby can include it
 const toSuperSelectOptions = <T extends string>(
   options: Array<{ value: T; text: string; description?: string }>,
-  selectedId: string,
 ) =>
   options.map(({ value, text, description }) => ({
     value,
-    inputDisplay: <span id={selectedId}>{text}</span>,
+    inputDisplay: text,
     dropdownDisplay: (
       <>
         <strong>{text}</strong>
@@ -1080,12 +1078,15 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                           'wazuh.common.caseManagementForm.statusLabel',
                           { defaultMessage: 'Status *' },
                         )}
-                        {/* names the button without the required-field asterisk */}
+                        {/* name the button without the asterisk; OUI renders inputDisplay twice */}
                         <span id={fieldIds.statusName} hidden>
                           {i18n.translate(
                             'wazuh.common.caseManagementForm.statusAriaLabel',
                             { defaultMessage: 'Case status' },
                           )}
+                        </span>
+                        <span id={fieldIds.statusValue} hidden>
+                          {statusOption?.text}
                         </span>
                       </>
                     }
@@ -1108,7 +1109,6 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                         status
                           ? CASE_STATUS_OPTIONS
                           : [EMPTY_OPTION, ...CASE_STATUS_OPTIONS],
-                        fieldIds.statusValue,
                       )}
                       valueOfSelected={status ?? ''}
                       onChange={value => value && setStatus(value)}
@@ -1181,12 +1181,17 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                   <EuiFormRow
                     fullWidth
                     label={
-                      <span id={fieldIds.tlpLabel}>
-                        {i18n.translate(
-                          'wazuh.common.caseManagementForm.tlpLabel',
-                          { defaultMessage: 'TLP' },
-                        )}
-                      </span>
+                      <>
+                        <span id={fieldIds.tlpLabel}>
+                          {i18n.translate(
+                            'wazuh.common.caseManagementForm.tlpLabel',
+                            { defaultMessage: 'TLP' },
+                          )}
+                        </span>
+                        <span id={fieldIds.tlpValue} hidden>
+                          {tlp}
+                        </span>
+                      </>
                     }
                     helpText={
                       findOption(CASE_TLP_OPTIONS, tlp)?.description ??
@@ -1202,10 +1207,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                     <EuiSuperSelect<CaseTLP | ''>
                       fullWidth
                       hasDividers
-                      options={toSuperSelectOptions(
-                        CASE_TLP_OPTIONS,
-                        fieldIds.tlpValue,
-                      )}
+                      options={toSuperSelectOptions(CASE_TLP_OPTIONS)}
                       valueOfSelected={tlp}
                       onChange={setTlp}
                       disabled={isSaving || isCleaning}
