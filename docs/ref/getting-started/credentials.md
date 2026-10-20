@@ -338,23 +338,24 @@ value of its own (32 random bytes, base64) straight into the keystore:
   users log in again once.
 - Never as a replacement for an existing value, and a restart never rotates it.
 
-The value is never written to the credentials file and never printed. If it cannot be generated, a
-warning is logged and the dashboard starts anyway, but it then keeps the built-in default until you
-set one.
+The value is stored only in the keystore and is never printed. If it cannot be generated, a warning
+is logged and the dashboard starts anyway, but it then keeps the built-in default until you set one.
 
 **Several nodes behind a load balancer must share one value.** A request that lands on a node with a
 different value cannot open the session cookie, and the user is logged out. The value must be 32
 characters or more and must not look like JSON (a number, `true`, a quoted string...); a value that
 breaks these rules makes the dashboard fail its configuration validation at start. Keep it in a file
-that only root can read and feed it to the keystore as the service user, so it never appears in a
+that only root can read and feed it to the keystore on stdin, as root, so it never appears in a
 command line or in the shell history:
 
 ```bash
-runuser -u wazuh-dashboard -- \
-  /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore add \
-  opensearch_security.cookie.password --force --stdin < /root/cookie-password
+sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore add \
+  opensearch_security.cookie.password --force --stdin --allow-root < /root/cookie-password
 sudo systemctl restart wazuh-dashboard
 ```
+
+The keystore is owned by root and read by the service through its group. The restart sets it back
+to `root:wazuh-dashboard 0640` before the dashboard starts.
 
 - On a **new installation** the package has already generated a value, so `--force` is required to
   replace it. Without it, `add --stdin` leaves an existing entry untouched.
@@ -362,9 +363,14 @@ sudo systemctl restart wazuh-dashboard
   `--force`, because the entry does not exist yet. A value in the keystore or in
   `opensearch_dashboards.yml` counts as already set, so nothing is generated.
 - A value in `opensearch_dashboards.yml` does not take effect while the keystore holds an entry,
-  because the keystore is merged over the file. To keep it in the file, remove the entry first with
-  `runuser -u wazuh-dashboard -- /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore remove opensearch_security.cookie.password`
-  and restart.
+  because the keystore is merged over the file. To keep it in the file, remove the entry first, and
+  restart:
+
+  ```bash
+  sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore remove \
+    opensearch_security.cookie.password --allow-root
+  sudo systemctl restart wazuh-dashboard
+  ```
 
 For the setting itself, see [Cookies, headers, and cross-origin requests](../security.md#cookies-headers-and-cross-origin-requests).
 
