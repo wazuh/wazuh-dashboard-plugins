@@ -32,17 +32,16 @@ describe('ButtonAboutSecurity', () => {
     ].forEach(text => expect(flyout).toHaveTextContent(text));
   });
 
-  it('links to the indexer security documentation', () => {
+  it('links the header to the API RBAC docs and the warning to the indexer security docs', () => {
     render(<ButtonAboutSecurity />);
     fireEvent.click(screen.getByRole('button', { name: 'About Security' }));
 
     const links = screen.getAllByRole('link', { name: /documentation/ });
-    expect(links).toHaveLength(2);
+    expect(links.map(link => link.getAttribute('href'))).toEqual([
+      'https://docs.example/user-manual/api/rbac/index.html',
+      'https://docs.example/user-manual/wazuh-indexer/security.html#roles',
+    ]);
     links.forEach(link => {
-      expect(link).toHaveAttribute(
-        'href',
-        'https://docs.example/user-manual/wazuh-indexer/security.html',
-      );
       expect(link).toHaveAttribute('target', '_blank');
       expect(link.getAttribute('rel')).toEqual(
         expect.stringMatching(/noopener.*noreferrer|noreferrer.*noopener/),

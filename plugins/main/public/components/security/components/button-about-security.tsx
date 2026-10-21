@@ -17,7 +17,9 @@ import { FormattedMessage } from '@osd/i18n/react';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
 
 const FLYOUT_TITLE_ID = 'wzAboutSecurityTitle';
-const INDEXER_SECURITY_DOCS_PATH = 'user-manual/wazuh-indexer/security.html';
+const API_RBAC_DOCS_PATH = 'user-manual/api/rbac/index.html';
+const INDEXER_SECURITY_DOCS_PATH =
+  'user-manual/wazuh-indexer/security.html#roles';
 const AGENT_DATA_INDICES = [
   'wazuh-events-*',
   'wazuh-findings-*',
@@ -27,9 +29,15 @@ const AGENT_DATA_INDICES = [
 ];
 const DLS_QUERY_EXAMPLE = '{"terms":{"wazuh.agent.groups":["<group>"]}}';
 
-const DocumentationLink = ({ children }: { children: React.ReactNode }) => (
+const DocumentationLink = ({
+  path,
+  children,
+}: {
+  path: string;
+  children: React.ReactNode;
+}) => (
   <EuiLink
-    href={webDocumentationLink(INDEXER_SECURITY_DOCS_PATH)}
+    href={webDocumentationLink(path)}
     target='_blank'
     rel='noopener noreferrer'
     external
@@ -73,7 +81,7 @@ export const ButtonAboutSecurity = () => {
                   defaultMessage='Learn more in the {link}.'
                   values={{
                     link: (
-                      <DocumentationLink>
+                      <DocumentationLink path={API_RBAC_DOCS_PATH}>
                         {i18n.translate(
                           'wazuh.security.aboutFlyout.learnMoreLink',
                           { defaultMessage: 'documentation' },
@@ -90,7 +98,7 @@ export const ButtonAboutSecurity = () => {
               <p>
                 {i18n.translate('wazuh.security.aboutFlyout.overview', {
                   defaultMessage:
-                    'This section manages the access control of the Wazuh server API. Users get roles, and roles group the policies and rules that allow or deny actions on resources.',
+                    'This section manages the access control of the manager API. Users get roles, and roles group the policies and rules that allow or deny actions on resources.',
                 })}
               </p>
             </EuiText>
@@ -107,7 +115,7 @@ export const ButtonAboutSecurity = () => {
                     'wazuh.security.aboutFlyout.usersDescription',
                     {
                       defaultMessage:
-                        'Wazuh server API users. A dashboard user acts as one of them when run as is enabled.',
+                        'Manager API users. A dashboard user acts as one of them when run as is enabled.',
                     },
                   ),
                 },
@@ -170,7 +178,7 @@ export const ButtonAboutSecurity = () => {
                   'wazuh.security.aboutFlyout.indexerWarning.apiScope',
                   {
                     defaultMessage:
-                      'Policies on agent:group or agent:id only limit what the Wazuh server API returns, such as the endpoints list. They do not filter the data stored in the indexer.',
+                      'Policies on agent:group or agent:id only limit what the manager API returns, such as the endpoints list. They do not filter the data stored in the indexer.',
                   },
                 )}
               </p>
@@ -209,7 +217,7 @@ export const ButtonAboutSecurity = () => {
                   defaultMessage='Roles and role mappings of the indexer are described in the {link}.'
                   values={{
                     link: (
-                      <DocumentationLink>
+                      <DocumentationLink path={INDEXER_SECURITY_DOCS_PATH}>
                         {i18n.translate(
                           'wazuh.security.aboutFlyout.indexerWarning.docsLink',
                           { defaultMessage: 'documentation' },
