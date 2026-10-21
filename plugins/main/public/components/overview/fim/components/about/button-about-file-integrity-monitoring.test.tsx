@@ -36,7 +36,7 @@ describe('ButtonAboutFileIntegrityMonitoring', () => {
       'Current state',
       'Inventory',
       'Findings',
-      'mtime',
+      'Last modified (mtime)',
       'Getting started',
     ].forEach(term => expect(flyout).toHaveTextContent(term));
     expect(flyout).toHaveTextContent(

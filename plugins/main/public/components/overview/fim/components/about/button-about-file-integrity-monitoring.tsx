@@ -13,6 +13,10 @@ import {
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import {
+  FIM_CONFIGURE_DOCS_PATH,
+  FIM_DOCS_PATH,
+} from '../../fim-documentation';
 
 const FLYOUT_TITLE_ID = 'wzAboutFileIntegrityMonitoringTitle';
 
@@ -89,13 +93,13 @@ const getTermDefinitions = () => [
   {
     title: i18n.translate(
       'wazuh.fileIntegrityMonitoring.aboutFlyout.mtimeTerm',
-      { defaultMessage: 'mtime' },
+      { defaultMessage: 'Last modified (mtime)' },
     ),
     description: i18n.translate(
       'wazuh.fileIntegrityMonitoring.aboutFlyout.mtimeDescription',
       {
         defaultMessage:
-          'The time a file was last modified, as reported by its file system. The Last modified files table sorts files by it.',
+          'The time a file was last modified, as reported by its file system. The Last modified files table shows it in its Last modified column, newest first.',
       },
     ),
   },
@@ -137,7 +141,7 @@ export const ButtonAboutFileIntegrityMonitoring = () => {
                   defaultMessage='Learn more in the {link}.'
                   values={{
                     link: (
-                      <ExternalDocLink path='user-manual/capabilities/file-integrity/index.html'>
+                      <ExternalDocLink path={FIM_DOCS_PATH}>
                         {i18n.translate(
                           'wazuh.fileIntegrityMonitoring.aboutFlyout.learnMoreLink',
                           { defaultMessage: 'documentation' },
@@ -207,7 +211,7 @@ export const ButtonAboutFileIntegrityMonitoring = () => {
                   defaultMessage='To monitor your own files, add their directories to the syscheck configuration of the agent or of its group. See {link}.'
                   values={{
                     link: (
-                      <ExternalDocLink path='user-manual/capabilities/file-integrity/how-to-configure-fim.html'>
+                      <ExternalDocLink path={FIM_CONFIGURE_DOCS_PATH}>
                         {i18n.translate(
                           'wazuh.fileIntegrityMonitoring.aboutFlyout.addDirectoriesLink',
                           {

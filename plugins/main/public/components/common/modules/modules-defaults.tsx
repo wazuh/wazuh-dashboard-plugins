@@ -118,6 +118,7 @@ import {
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { ButtonAboutFileIntegrityMonitoring } from '../../overview/fim/components/about/button-about-file-integrity-monitoring';
+import { getFimModuleDescription } from '../../overview/fim/fim-documentation';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ReportingService } from '../../../react-services';
@@ -233,6 +234,7 @@ export const ModulesDefaults = {
   },
   fim: {
     init: TAB_VIEW_ID_DASHBOARD,
+    description: getFimModuleDescription(),
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
