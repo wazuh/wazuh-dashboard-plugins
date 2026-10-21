@@ -25,10 +25,15 @@ export class DevToolsActions {
     status?: number;
     statusText?: string;
     fallbackMessage?: string;
-  }): { error: string; message: string } {
+  }): string {
     const { body, status, statusText, fallbackMessage } = input || {};
 
-    // Build message strictly from HTTP status code and text when available
+    // Show the API error body as is, as the Indexer Dev Tools does
+    if (body && typeof body === 'object') {
+      return JSON.stringify(body, null, 2);
+    }
+
+    // Without a body, build message strictly from HTTP status code and text
     let message: string | undefined;
     if (
       typeof status === 'number' &&
@@ -44,28 +49,21 @@ export class DevToolsActions {
       message = fallbackMessage;
     }
 
-    // Build error field using API error code when available
-    // - If body is an object with `error`, use it as code
-    // - Otherwise, fall back to HTTP status code or to fallback message
     let errorPayload: string | undefined;
-    if (
-      body &&
-      typeof body === 'object' &&
-      (body as any).error !== undefined &&
-      (body as any).error !== null
-    ) {
-      const maybeCode = (body as any).error;
-      errorPayload = String(maybeCode);
-    } else if (typeof status === 'number') {
+    if (typeof status === 'number') {
       errorPayload = String(status);
     } else if (fallbackMessage) {
       errorPayload = fallbackMessage;
     }
 
-    return {
-      error: errorPayload || 'Unknown',
-      message: message || 'Unknown error',
-    };
+    return JSON.stringify(
+      {
+        error: errorPayload || 'Unknown',
+        message: message || 'Unknown error',
+      },
+      null,
+      2,
+    );
   }
 
   async send(
@@ -74,6 +72,7 @@ export class DevToolsActions {
     firstTime = false,
     hooks?: SendHooks,
   ) {
+    let start: number | undefined;
     try {
       const groups = this.grouping.parseGroups(editorInput);
       const desiredGroup = this.grouping.selectActiveGroup(
@@ -94,7 +93,7 @@ export class DevToolsActions {
         const built = this.requests.build(desiredGroup);
 
         if (!firstTime) {
-          const start = Date.now();
+          start = Date.now();
           hooks?.onStart?.();
           const response = await this.http.request(
             built.method,
@@ -119,8 +118,9 @@ export class DevToolsActions {
           if (ok) {
             editorOutput.setValue(JSON.stringify(body, null, 2));
           } else {
-            const out = this.buildErrorOutput({ body, status, statusText });
-            editorOutput.setValue(JSON.stringify(out, null, 2));
+            editorOutput.setValue(
+              this.buildErrorOutput({ body, status, statusText }),
+            );
           }
           hooks?.onEnd?.({
             status,
@@ -138,14 +138,20 @@ export class DevToolsActions {
       const status = resp?.status;
       const statusText = resp?.statusText || (error as any)?.message;
       const body = resp?.data;
-      const out = this.buildErrorOutput({
-        body,
+      editorOutput.setValue(
+        this.buildErrorOutput({
+          body,
+          status,
+          statusText,
+          fallbackMessage: parseErrorForOutput(error as any),
+        }),
+      );
+      hooks?.onEnd?.({
         status,
         statusText,
-        fallbackMessage: parseErrorForOutput(error as any),
+        durationMs: start === undefined ? 0 : Date.now() - start,
+        ok: false,
       });
-      editorOutput.setValue(JSON.stringify(out, null, 2));
-      hooks?.onEnd?.({ status, statusText, durationMs: 0, ok: false });
     }
   }
 }
