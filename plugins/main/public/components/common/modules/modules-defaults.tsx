@@ -119,6 +119,7 @@ import {
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
+import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
@@ -315,17 +316,24 @@ export const ModulesDefaults = {
       {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        buttons: [
+          ButtonAboutMalwareDetection,
+          ButtonExploreAgent,
+          ButtonModuleGenerateReport,
+        ],
         component: DashboardMalwareDetection,
       },
-      renderFindingsDiscoverTab({
-        moduleId: 'pm',
-        tableColumns: malwareDetectionColumns,
-        DataSource: MalwareDetectionDataSource,
-        categoriesSampleData: [
-          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
-        ],
-      }),
+      {
+        ...renderFindingsDiscoverTab({
+          moduleId: 'pm',
+          tableColumns: malwareDetectionColumns,
+          DataSource: MalwareDetectionDataSource,
+          categoriesSampleData: [
+            WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+          ],
+        }),
+        buttons: [ButtonAboutMalwareDetection, ButtonExploreAgent],
+      },
     ],
     availableFor: ['manager', 'agent'],
   },
