@@ -1442,6 +1442,28 @@ describe('SettingsPage — in-card layout and hierarchy', () => {
     ]);
   });
 
+  it('scopes the typed-text scan and Anonymize to privacy mode being on', async () => {
+    render(
+      <SettingsPageWithRouter
+        core={coreMock}
+        onProvidersChanged={jest.fn()}
+        initialEntries={['/settings?tab=privacy']}
+      />,
+    );
+    await screen.findByText(/enable privacy mode by default/i);
+
+    // With privacy mode off, only Never send fields are dropped; nothing is masked.
+    expect(
+      screen.getByText(
+        /when privacy mode is on, text typed into chat is scanned/i,
+      ),
+    ).toBeTruthy();
+    expect(
+      screen.getByText(/anonymize — only while privacy mode is on/i),
+    ).toBeTruthy();
+    expect(screen.getByText(/never send — in both modes/i)).toBeTruthy();
+  });
+
   it('puts the retention field and its explanation side by side', async () => {
     render(
       <SettingsPageWithRouter
