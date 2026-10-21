@@ -34,6 +34,7 @@ import { nestedResolve } from '../../services/resolves';
 import { Redirect, Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
+import { ButtonAboutSecurity } from './components/button-about-security';
 
 const tabs = [
   {
@@ -186,7 +187,14 @@ export const WzSecurity = compose(
     <EuiPage>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiTabs>{renderTabs()}</EuiTabs>
+          <EuiFlexGroup alignItems='center' responsive={false} gutterSize='s'>
+            <EuiFlexItem>
+              <EuiTabs>{renderTabs()}</EuiTabs>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <ButtonAboutSecurity />
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <EuiSpacer size='m'></EuiSpacer>
           <Switch>
             <Route path='?tab=users'>
