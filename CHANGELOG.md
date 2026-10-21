@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.11
 
+### Changed
+
+- Server management > Dev Tools shows the Server API error body and the request duration when a request fails [#9382](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9382)
+
 ## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 00
 
 ### Added
