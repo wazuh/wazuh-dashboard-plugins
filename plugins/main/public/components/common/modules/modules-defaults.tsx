@@ -118,6 +118,7 @@ import {
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
 import { ButtonAboutFileIntegrityMonitoring } from '../../overview/fim/components/about/button-about-file-integrity-monitoring';
+import { FimEmptyState } from '../../overview/fim/components/empty-state/fim-empty-state';
 import { getFimModuleDescription } from '../../overview/fim/fim-documentation';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
@@ -258,6 +259,7 @@ export const ModulesDefaults = {
           tableColumns: fileIntegrityMonitoringColumns,
           DataSource: FIMFindingsDataSource,
           categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+          emptyState: <FimEmptyState kind='findings' />,
         }),
         buttons: [ButtonAboutFileIntegrityMonitoring, ButtonExploreAgent],
       },
