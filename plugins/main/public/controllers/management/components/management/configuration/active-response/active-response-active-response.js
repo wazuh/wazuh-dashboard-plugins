@@ -25,9 +25,24 @@ import { compose } from 'redux';
 import withWzConfig from '../util-hocs/wz-config';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
+// The manager reports the runtime flag of the location instead of the configured value
+const configuredLocationByRuntimeLocation = {
+  AS_ONLY: 'server',
+  REMOTE_AGENT: 'local',
+  SPECIFIC_AGENT: 'defined-agent',
+  ALL_AGENTS: 'all',
+};
+
+const renderLocation = value =>
+  configuredLocationByRuntimeLocation[value] ?? value;
+
 const mainSettings = [
   { field: 'command', label: 'Command to execute' },
-  { field: 'location', label: 'Execute the command on this location' },
+  {
+    field: 'location',
+    label: 'Execute the command on this location',
+    render: renderLocation,
+  },
   { field: 'agent_id', label: 'Agent ID on which execute the command' },
   { field: 'level', label: 'Match to this severity level or above' },
   { field: 'rules_group', label: 'Match to one of these groups' },
