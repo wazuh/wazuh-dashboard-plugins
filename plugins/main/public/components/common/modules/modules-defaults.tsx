@@ -117,6 +117,7 @@ import {
   RegulatoryComplianceTSC,
 } from '../../overview/regulatory-compliance';
 import { InventoryFIM } from '../../overview/fim';
+import { ButtonAboutFileIntegrityMonitoring } from '../../overview/fim/components/about/button-about-file-integrity-monitoring';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ReportingService } from '../../../react-services';
@@ -236,21 +237,28 @@ export const ModulesDefaults = {
       {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        buttons: [
+          ButtonAboutFileIntegrityMonitoring,
+          ButtonExploreAgent,
+          ButtonModuleGenerateReport,
+        ],
         component: DashboardFIM,
       },
       {
         id: 'inventory',
         name: TAB_NAMES.inventory,
-        buttons: [ButtonExploreAgent],
+        buttons: [ButtonAboutFileIntegrityMonitoring, ButtonExploreAgent],
         component: InventoryFIM,
       },
-      renderFindingsDiscoverTab({
-        moduleId: 'fim',
-        tableColumns: fileIntegrityMonitoringColumns,
-        DataSource: FIMFindingsDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
+      {
+        ...renderFindingsDiscoverTab({
+          moduleId: 'fim',
+          tableColumns: fileIntegrityMonitoringColumns,
+          DataSource: FIMFindingsDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+        buttons: [ButtonAboutFileIntegrityMonitoring, ButtonExploreAgent],
+      },
     ],
     availableFor: ['manager', 'agent'],
   },

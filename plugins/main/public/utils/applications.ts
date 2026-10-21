@@ -127,7 +127,7 @@ export const fileIntegrityMonitoring = {
   ),
   description: i18n.translate('wazuh.fileIntegrityMonitoring.app.description', {
     defaultMessage:
-      'Alerts related to file changes, including permissions, content, ownership, and attributes.',
+      'Detects when monitored files and registry entries are created, modified or deleted, and who changed them when who-data is enabled.',
   }),
   euiIconType: 'sqlApp',
   showInOverviewApp: true,
