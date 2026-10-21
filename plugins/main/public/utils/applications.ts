@@ -16,6 +16,11 @@ that is included.
 Example:
 Category order of the application: 100
 Application order: one of 100-199 range: 100, 101, 102, etc...
+
+Optional fields:
+- tabTitle: name for the tab and page heading when the title is too vague alone.
+- docsUrl: full URL of the application documentation, linked from the Help menu of the
+  header. Build it with webDocumentationLink('<path>'). See AppHelpDocs in help-extension.ts.
 */
 
 /* Categories ID
