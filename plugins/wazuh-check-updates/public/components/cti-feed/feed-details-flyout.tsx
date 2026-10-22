@@ -14,7 +14,6 @@ import {
   EuiFlyoutHeader,
   EuiIcon,
   EuiLink,
-  EuiPanel,
   EuiProgress,
   EuiSpacer,
   EuiText,
@@ -26,11 +25,8 @@ import {
   getConsumerSyncState,
   getSyncProgress,
 } from '../../services/cti-consumer-sync-state';
-import {
-  MISSING_CTI_VALUE,
-  formatCtiTimestamp,
-} from '../../services/cti-timestamp';
-import { getFeedMetadata, getSyncPhaseMetadata } from './feed-metadata';
+import { formatCtiTimestamp } from '../../services/cti-timestamp';
+import { getFeedMetadata } from './feed-metadata';
 import { FeedSyncBadge } from './feed-sync-badge';
 import { CtiTimestamp } from './cti-timestamp';
 import { CheckForUpdatesButton } from './check-for-updates-button';
@@ -53,24 +49,6 @@ function getStateExplanation(
 ): StateExplanation {
   switch (state.kind) {
     case 'upToDate':
-      // All content is downloaded, but not all of it is applied yet.
-      if (consumer.pending_sync_phases?.length) {
-        return {
-          color: 'warning',
-          iconType: 'alert',
-          title: i18n.translate(
-            'wazuhCheckUpdates.ctiFeed.details.state.upToDateWithPendingTitle',
-            { defaultMessage: 'Synced, with steps to retry' },
-          ),
-          body: i18n.translate(
-            'wazuhCheckUpdates.ctiFeed.details.state.upToDateWithPendingBody',
-            {
-              defaultMessage:
-                'Every change published to the feed is downloaded, but some steps to apply it did not finish. The indexer retries them on its next sync.',
-            },
-          ),
-        };
-      }
       return {
         color: 'success',
         iconType: 'checkInCircleFilled',
@@ -236,80 +214,6 @@ const ColonSeparatedId: React.FC<{ value: string }> = ({ value }) => (
   </>
 );
 
-const PendingSyncPhases: React.FC<{ phases: string[] }> = ({ phases }) => (
-  <>
-    <EuiTitle size='xs'>
-      <h3>
-        {i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.details.pendingPhases.title',
-          {
-            defaultMessage: 'Steps to retry',
-          },
-        )}
-      </h3>
-    </EuiTitle>
-    <EuiText size='xs' color='subdued'>
-      {i18n.translate(
-        'wazuhCheckUpdates.ctiFeed.details.pendingPhases.description',
-        {
-          defaultMessage:
-            'These steps of the last sync did not finish. The indexer retries them on its next sync, even without new content. Use Check for updates to retry them now.',
-        },
-      )}
-    </EuiText>
-    <EuiSpacer size='s' />
-    <EuiFlexGroup
-      direction='column'
-      gutterSize='s'
-      role='list'
-      data-test-subj='ctiFeedDetailsPendingPhases'
-    >
-      {phases.map(phase => {
-        const { label, description } = getSyncPhaseMetadata(phase);
-        return (
-          <EuiFlexItem key={phase} role='listitem'>
-            <EuiPanel color='subdued' hasShadow={false} paddingSize='s'>
-              <EuiFlexGroup
-                gutterSize='s'
-                alignItems='center'
-                responsive={false}
-              >
-                <EuiFlexItem grow={false}>
-                  <EuiIcon type='refresh' color='warning' aria-hidden />
-                </EuiFlexItem>
-                <EuiFlexItem style={{ minWidth: 0 }}>
-                  <EuiText size='s'>
-                    <strong>{label}</strong>
-                  </EuiText>
-                  {description ? (
-                    <EuiText size='xs' color='subdued'>
-                      {description}
-                    </EuiText>
-                  ) : null}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPanel>
-          </EuiFlexItem>
-        );
-      })}
-    </EuiFlexGroup>
-    <EuiSpacer size='l' />
-  </>
-);
-
-/** Raw step names, as the indexer logs them; `None` when all are in sync. */
-function formatPendingSyncPhases(phases: string[] | undefined): string {
-  if (!phases) {
-    return MISSING_CTI_VALUE;
-  }
-  return phases.length > 0
-    ? phases.join(', ')
-    : i18n.translate(
-        'wazuhCheckUpdates.ctiFeed.details.fields.pendingPhasesNone',
-        { defaultMessage: 'None' },
-      );
-}
-
 const COPY_RESOURCE_LABEL = i18n.translate(
   'wazuhCheckUpdates.ctiFeed.details.fields.resourceCopy',
   { defaultMessage: 'Copy resource URL' },
@@ -391,13 +295,6 @@ function getDetailItems(consumer: CtiConsumer) {
         { defaultMessage: 'Last updated' },
       ),
       description: formatCtiTimestamp(consumer.updated_at),
-    },
-    {
-      title: i18n.translate(
-        'wazuhCheckUpdates.ctiFeed.details.fields.pendingPhases',
-        { defaultMessage: 'Pending phases' },
-      ),
-      description: formatPendingSyncPhases(consumer.pending_sync_phases),
     },
     {
       title: i18n.translate(
@@ -500,9 +397,6 @@ export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
           <p>{explanation.body}</p>
         </EuiCallOut>
         <EuiSpacer size='l' />
-        {consumer.pending_sync_phases?.length ? (
-          <PendingSyncPhases phases={consumer.pending_sync_phases} />
-        ) : null}
         <EuiTitle size='xs'>
           <h3>
             {i18n.translate(

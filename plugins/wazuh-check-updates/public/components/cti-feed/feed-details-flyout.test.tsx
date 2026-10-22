@@ -178,48 +178,16 @@ describe('FeedDetailsFlyout', () => {
     );
   });
 
-  test('lists the sync steps that will be retried', () => {
-    renderFlyout({ pending_sync_phases: ['rules', 'detectors', 'policies'] });
+  test('does not show the pending sync phases', () => {
+    renderFlyout({ pending_sync_phases: ['rules', 'detectors'] });
 
-    const phases = screen.getByTestId('ctiFeedDetailsPendingPhases');
-    expect(phases).toHaveTextContent('Rules');
-    expect(phases).toHaveTextContent('Apply the rules to Ruleset Management');
-    expect(phases).toHaveTextContent('Detectors');
-    // A step this page does not know yet keeps its stored name.
-    expect(phases).toHaveTextContent('policies');
-    expect(screen.getByTestId('ctiFeedDetailsFields')).toHaveTextContent(
-      'Pending phasesrules, detectors, policies',
-    );
-  });
-
-  test('warns that an up to date feed still has steps to retry', () => {
-    renderFlyout({ pending_sync_phases: ['detectors'] });
-
+    const flyout = screen.getByTestId('ctiFeedDetailsFlyout');
     expect(screen.getByTestId('ctiFeedDetailsState')).toHaveTextContent(
-      'Synced, with steps to retry',
+      'This feed is up to date',
     );
-    expect(screen.getByTestId('ctiFeedDetailsBadge')).toHaveTextContent(
-      'Up to date',
-    );
+    expect(flyout).not.toHaveTextContent('detectors');
+    expect(flyout).not.toHaveTextContent('Pending');
   });
-
-  test.each([
-    [[], 'None'],
-    [undefined, '-'],
-  ])(
-    'shows no steps to retry for %p, with %p in the details',
-    (phases, expected) => {
-      renderFlyout({ pending_sync_phases: phases });
-
-      expect(screen.queryByTestId('ctiFeedDetailsPendingPhases')).toBeNull();
-      expect(screen.getByTestId('ctiFeedDetailsState')).toHaveTextContent(
-        'This feed is up to date',
-      );
-      expect(screen.getByTestId('ctiFeedDetailsFields')).toHaveTextContent(
-        `Pending phases${expected}`,
-      );
-    },
-  );
 
   test('closes from the footer', () => {
     const { onClose } = renderFlyout();

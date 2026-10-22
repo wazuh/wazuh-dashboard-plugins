@@ -1,10 +1,6 @@
 /* eslint-disable camelcase -- CTI consumer and query fields keep their API names */
 import type { CtiConsumer } from '../../../common/cti-consumers';
-import {
-  getFeedMetadata,
-  getSyncPhaseMetadata,
-  sortFeeds,
-} from './feed-metadata';
+import { getFeedMetadata, sortFeeds } from './feed-metadata';
 
 const consumer = (type: string, name = type): CtiConsumer => ({
   name,
@@ -48,19 +44,5 @@ describe('feed metadata', () => {
       'a-unknown',
       'z-unknown',
     ]);
-  });
-});
-
-describe('sync phase metadata', () => {
-  test('names and explains the known sync steps', () => {
-    expect(getSyncPhaseMetadata('detectors')).toEqual({
-      label: 'Detectors',
-      description: 'Create the threat detectors for the integrations',
-    });
-    expect(getSyncPhaseMetadata('ioc_load').label).toBe('Indicator load');
-  });
-
-  test('keeps the stored name of a step it does not know', () => {
-    expect(getSyncPhaseMetadata('policies')).toEqual({ label: 'policies' });
   });
 });
