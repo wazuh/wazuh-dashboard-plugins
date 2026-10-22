@@ -120,7 +120,6 @@ import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
-import { MalwareDetectionDescription } from '../../overview/malware-detection/components/description/malware-detection-description';
 import { MalwareDetectionEmptyState } from '../../overview/malware-detection/components/empty-state/malware-detection-empty-state';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
@@ -314,7 +313,6 @@ export const ModulesDefaults = {
   // This module is Malware Detection. Ref: https://github.com/wazuh/wazuh-dashboard-plugins/issues/5893
   pm: {
     init: TAB_VIEW_ID_DASHBOARD,
-    description: <MalwareDetectionDescription />,
     tabs: [
       {
         id: TAB_VIEW_ID_DASHBOARD,
