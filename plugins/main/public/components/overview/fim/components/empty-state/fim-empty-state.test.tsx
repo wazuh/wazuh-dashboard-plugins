@@ -1,6 +1,8 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 import { I18nProvider } from '@osd/i18n/react';
 import { queryDataTestAttr } from '../../../../../../test/public/query-attr';
 import {
@@ -16,6 +18,11 @@ jest.mock(
     clearAgentReportedConfigurationCache: jest.fn(),
   }),
 );
+jest.mock('../../../../wz-agent-selector/wz-agent-selector-service', () => ({
+  PinnedAgentManager: jest.fn().mockImplementation(() => ({
+    isPinnedAgent: () => false,
+  })),
+}));
 jest.mock('../../../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
 }));
@@ -31,39 +38,38 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 
 const getReport = getAgentReportedConfiguration as jest.Mock;
 
-const fimReport = (syscheck?: Record<string, unknown>) => ({
-  content: syscheck ? { fim: { syscheck } } : {},
-});
-
-const renderView = (kind: 'findings' | 'dashboard', agentId?: string) => {
-  const { container, unmount } = render(
-    <I18nProvider>
-      <FimEmptyStateView kind={kind} agent={{ id: agentId }} />
-    </I18nProvider>,
+const renderView = (kind: 'findings' | 'dashboard', agentId?: string) =>
+  render(
+    <Provider store={createStore(() => ({ appStateReducers: {} }))}>
+      <I18nProvider>
+        <FimEmptyStateView kind={kind} agent={{ id: agentId }} />
+      </I18nProvider>
+    </Provider>,
   );
-  const directories = container.querySelector(
-    queryDataTestAttr('wzFimEmptyStateDirectories'),
-  ) as HTMLElement;
-  return { directories, unmount };
-};
 
 describe('FimEmptyStateView', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it.each([
-    ['findings', 'No file changes found'],
-    ['dashboard', 'No monitored files found'],
-  ] as const)('titles the %s empty state', (kind, title) => {
+    ['findings', 'No file changes found', /search or time range/],
+    ['dashboard', 'No monitored files found', /^Try changing the search\./],
+  ] as const)('titles the %s empty state', (kind, title, hint) => {
     renderView(kind);
 
     expect(screen.getByText(title)).toBeInTheDocument();
+    expect(screen.getByText(hint)).toBeInTheDocument();
   });
 
-  it('states the default directories and links the setup guide without a pinned agent', () => {
-    const { directories } = renderView('findings');
+  it('asks to select an agent and links the setup guide without a pinned agent', () => {
+    const { container } = renderView('findings');
 
     expect(getReport).not.toHaveBeenCalled();
-    expect(directories).toHaveTextContent('By default, agents monitor /etc');
+    expect(
+      screen.getByText('Select an agent to see the directories it monitors.'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector(queryDataTestAttr('explore-agent-button')),
+    ).toHaveTextContent('Explore agent');
     const link = screen.getByRole('link', {
       name: /How to configure File Integrity Monitoring/,
     });
@@ -74,16 +80,20 @@ describe('FimEmptyStateView', () => {
     expect(link).toHaveAttribute('target', '_blank');
   });
 
-  it('lists the directories the pinned agent reported until it unmounts', async () => {
-    getReport.mockResolvedValue(
-      fimReport({ directories: [{ dir: '/etc' }, { dir: '/home' }, '/etc'] }),
-    );
-    const { directories, unmount } = renderView('findings', '001');
+  it('shows the directories the pinned agent reported as code until it unmounts', async () => {
+    getReport.mockResolvedValue({
+      content: {
+        fim: { syscheck: { directories: [{ dir: '/etc' }, '/home', '/etc'] } },
+      },
+    });
+    const { container, unmount } = renderView('findings', '001');
 
-    expect(screen.getByText(/^Loading the directories/)).toBeInTheDocument();
+    expect(screen.getByText(/^Loading the monitored/)).toBeInTheDocument();
     expect(await screen.findByText('/home')).toBeInTheDocument();
     expect(getReport).toHaveBeenCalledWith('001');
-    expect(directories.querySelectorAll('li')).toHaveLength(2);
+    expect(
+      [...container.querySelectorAll('code')].map(code => code.textContent),
+    ).toEqual(['/etc', '/home']);
     expect(
       screen.getByRole('link', { name: 'View the endpoint configuration' }),
     ).toHaveAttribute(
@@ -96,26 +106,19 @@ describe('FimEmptyStateView', () => {
     expect(clearAgentReportedConfigurationCache).toHaveBeenCalled();
   });
 
-  it.each([
-    [
-      'one directory',
-      fimReport({ directories: { dir: '/srv' } }),
-      '/srv',
-      false,
-    ],
-    ['FIM disabled', fimReport({ disabled: 'yes' }), /is disabled/, false],
-    ['no directories', fimReport(), /has no monitored directories/, false],
-    ['no report', null, /hasn't reported its configuration/, true],
-    ['a read error', new Error(), /couldn't be loaded/, true],
-  ])('explains %s of the pinned agent', async (_, report, text, defaults) => {
-    if (report instanceof Error) {
-      getReport.mockRejectedValue(report);
-    } else {
-      getReport.mockResolvedValue(report);
-    }
-    const { directories } = renderView('findings', '001');
+  it('says when FIM is disabled on the pinned agent', async () => {
+    getReport.mockResolvedValue({
+      content: { fim: { syscheck: { disabled: 'yes' } } },
+    });
+    renderView('dashboard', '001');
 
-    expect(await screen.findByText(text)).toBeInTheDocument();
-    expect(directories.textContent?.includes('By default')).toBe(defaults);
+    expect(
+      await screen.findByText(
+        'File Integrity Monitoring is disabled on this endpoint.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /How to configure/ }),
+    ).toBeInTheDocument();
   });
 });

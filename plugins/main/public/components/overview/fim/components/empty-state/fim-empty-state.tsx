@@ -7,14 +7,15 @@ import {
   EuiLink,
   EuiLoadingSpinner,
   EuiPanel,
+  EuiSpacer,
   EuiText,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
-import { FormattedMessage } from '@osd/i18n/react';
 import { useSelector } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { endpointSummary } from '../../../../../utils/applications';
+import { ButtonExploreAgent } from '../../../../wz-agent-selector/button-explore-agent';
 import { FIM_CONFIGURE_DOCS_PATH } from '../../fim-documentation';
 import {
   MonitoredDirectories,
@@ -46,43 +47,16 @@ const getDescription = (kind: EmptyStateKind) =>
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescription',
         {
           defaultMessage:
-            'A finding is generated when a monitored file or registry entry is added, modified or deleted after its baseline was recorded. If you expected changes, check the time range and the filters, and that the files are in a monitored directory.',
+            'Try changing the search or time range. Findings appear when a file in a monitored directory is added, modified or deleted.',
         },
       )
     : i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.dashboardDescription',
         {
           defaultMessage:
-            'Monitored files appear here after the agents scan their monitored directories and record a baseline. If you expected files, check the filters, and that the files are in a monitored directory.',
+            'Try changing the search. Monitored files appear after the agents scan their monitored directories and record a baseline.',
         },
       );
-
-const DefaultDirectories = () => (
-  <p>
-    {i18n.translate(
-      'wazuh.fileIntegrityMonitoring.emptyState.defaultDirectories',
-      {
-        defaultMessage:
-          'By default, agents monitor /etc, /usr/bin, /usr/sbin, /bin, /sbin and /boot on Linux, /private/etc, /usr/bin, /usr/sbin, /bin and /sbin on macOS, and selected system files, the Startup folder and registry keys on Windows.',
-      },
-    )}
-  </p>
-);
-
-const EndpointConfigurationLink = ({ agentId }: { agentId: string }) => (
-  <p>
-    <EuiLink
-      href={NavigationService.getInstance().getUrlForApp(endpointSummary.id, {
-        path: `#/agents?tab=configuration&agent=${agentId}`,
-      })}
-    >
-      {i18n.translate(
-        'wazuh.fileIntegrityMonitoring.emptyState.viewConfiguration',
-        { defaultMessage: 'View the endpoint configuration' },
-      )}
-    </EuiLink>
-  </p>
-);
 
 const getEndpointStatusMessage = (
   status: Exclude<MonitoredDirectories['status'], 'loading' | 'monitored'>,
@@ -91,17 +65,14 @@ const getEndpointStatusMessage = (
     case 'none':
       return i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.noDirectories',
-        {
-          defaultMessage:
-            'The configuration this endpoint reported has no monitored directories.',
-        },
+        { defaultMessage: 'This endpoint reports no monitored directories.' },
       );
     case 'disabled':
       return i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.moduleDisabled',
         {
           defaultMessage:
-            'File Integrity Monitoring is disabled in the configuration this endpoint reported.',
+            'File Integrity Monitoring is disabled on this endpoint.',
         },
       );
     case 'not-reported':
@@ -109,7 +80,7 @@ const getEndpointStatusMessage = (
         'wazuh.fileIntegrityMonitoring.emptyState.notReported',
         {
           defaultMessage:
-            "This endpoint hasn't reported its configuration yet, so its monitored directories can't be shown. Check that configuration reporting is enabled in the agent settings.",
+            "This endpoint hasn't reported its configuration yet.",
         },
       );
     default:
@@ -117,139 +88,131 @@ const getEndpointStatusMessage = (
         'wazuh.fileIntegrityMonitoring.emptyState.loadError',
         {
           defaultMessage:
-            "The directories this endpoint monitors couldn't be loaded.",
+            "The monitored directories of this endpoint couldn't be loaded.",
         },
       );
   }
 };
 
+const Actions = ({ children }: { children: React.ReactNode }) => (
+  <>
+    <EuiSpacer size='s' />
+    <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false} wrap>
+      {React.Children.map(children, child => (
+        <EuiFlexItem grow={false}>{child}</EuiFlexItem>
+      ))}
+    </EuiFlexGroup>
+  </>
+);
+
+const ConfigureLink = () => (
+  <EuiLink
+    href={webDocumentationLink(FIM_CONFIGURE_DOCS_PATH)}
+    target='_blank'
+    rel='noopener noreferrer'
+    external
+  >
+    {i18n.translate(
+      'wazuh.fileIntegrityMonitoring.emptyState.addDirectoriesLink',
+      { defaultMessage: 'How to configure File Integrity Monitoring' },
+    )}
+  </EuiLink>
+);
+
 const EndpointDirectories = ({
-  agentId,
   directories,
 }: {
-  agentId: string;
   directories: MonitoredDirectories;
 }) => {
-  if (directories.status === 'loading') {
-    return (
-      <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
-        <EuiFlexItem grow={false}>
-          <EuiLoadingSpinner size='s' />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          {i18n.translate(
-            'wazuh.fileIntegrityMonitoring.emptyState.loadingDirectories',
-            {
-              defaultMessage: 'Loading the directories this endpoint monitors',
-            },
-          )}
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    );
-  }
-  if (directories.status === 'monitored') {
-    return (
-      <>
+  switch (directories.status) {
+    case 'loading':
+      return (
+        <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
+          <EuiFlexItem grow={false}>
+            <EuiLoadingSpinner size='s' />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            {i18n.translate(
+              'wazuh.fileIntegrityMonitoring.emptyState.loadingDirectories',
+              { defaultMessage: 'Loading the monitored directories' },
+            )}
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      );
+    case 'monitored':
+      return (
         <p>
           {i18n.translate(
             'wazuh.fileIntegrityMonitoring.emptyState.monitoredDirectories',
-            {
-              defaultMessage:
-                'This endpoint monitors these directories, as it last reported:',
-            },
+            { defaultMessage: 'Monitored directories:' },
           )}
-        </p>
-        <ul>
           {directories.directories.map(directory => (
-            <li key={directory}>
+            <React.Fragment key={directory}>
+              {' '}
               <EuiCode>{directory}</EuiCode>
-            </li>
+            </React.Fragment>
           ))}
-        </ul>
-        <EndpointConfigurationLink agentId={agentId} />
-      </>
-    );
+        </p>
+      );
+    default:
+      return <p>{getEndpointStatusMessage(directories.status)}</p>;
   }
-  const hasReport =
-    directories.status === 'none' || directories.status === 'disabled';
-
-  return (
-    <>
-      <p>{getEndpointStatusMessage(directories.status)}</p>
-      {/* Without a readable report, the defaults are the best available answer */}
-      {hasReport ? (
-        <EndpointConfigurationLink agentId={agentId} />
-      ) : (
-        <DefaultDirectories />
-      )}
-    </>
-  );
 };
 
 /**
- * Shown instead of the default no results callout of the File Integrity Monitoring tabs. Says
- * when data appears, which directories are monitored now and how to monitor more.
+ * Shown instead of the default no results callout of the File Integrity Monitoring tabs, with the
+ * same layout. Says what to try, which directories the pinned agent monitors and how to add more.
  */
 export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
   const agentId = agent?.id;
   const directories = useMonitoredDirectories(agentId);
+  const pinned = agentId ? directories : undefined;
 
   return (
     <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
       <EuiCallOut
         title={getTitle(kind)}
-        color='primary'
+        color='warning'
         iconType='help'
         data-test-subj='wzFimEmptyState'
       >
         <EuiText size='s'>
           <p>{getDescription(kind)}</p>
-          <div data-test-subj='wzFimEmptyStateDirectories'>
-            {agentId && directories ? (
-              <EndpointDirectories
-                agentId={agentId}
-                directories={directories}
-              />
-            ) : (
-              <>
-                <DefaultDirectories />
-                <p>
-                  {i18n.translate(
-                    'wazuh.fileIntegrityMonitoring.emptyState.whereToSeeDirectories',
-                    {
-                      defaultMessage:
-                        'Each endpoint that reports its configuration shows the directories it monitors in its Configuration, under Integrity monitoring.',
-                    },
-                  )}
-                </p>
-              </>
-            )}
-          </div>
-          <p>
-            <FormattedMessage
-              id='wazuh.fileIntegrityMonitoring.emptyState.addDirectories'
-              defaultMessage='To monitor more directories, add them to the syscheck configuration of the agent or of its group. See {link}.'
-              values={{
-                link: (
-                  <EuiLink
-                    href={webDocumentationLink(FIM_CONFIGURE_DOCS_PATH)}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    external
-                  >
-                    {i18n.translate(
-                      'wazuh.fileIntegrityMonitoring.emptyState.addDirectoriesLink',
-                      {
-                        defaultMessage:
-                          'How to configure File Integrity Monitoring',
-                      },
-                    )}
-                  </EuiLink>
-                ),
-              }}
-            />
-          </p>
+          {pinned ? (
+            <EndpointDirectories directories={pinned} />
+          ) : (
+            <p>
+              {i18n.translate(
+                'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
+                {
+                  defaultMessage:
+                    'Select an agent to see the directories it monitors.',
+                },
+              )}
+            </p>
+          )}
         </EuiText>
+        {!pinned ? (
+          <Actions>
+            <ButtonExploreAgent />
+            <ConfigureLink />
+          </Actions>
+        ) : pinned.status !== 'loading' ? (
+          <Actions>
+            <EuiLink
+              href={NavigationService.getInstance().getUrlForApp(
+                endpointSummary.id,
+                { path: `#/agents?tab=configuration&agent=${agentId}` },
+              )}
+            >
+              {i18n.translate(
+                'wazuh.fileIntegrityMonitoring.emptyState.viewConfiguration',
+                { defaultMessage: 'View the endpoint configuration' },
+              )}
+            </EuiLink>
+            <ConfigureLink />
+          </Actions>
+        ) : null}
       </EuiCallOut>
     </EuiPanel>
   );
