@@ -3209,6 +3209,10 @@ describe('ChatPage — privacy control legibility', () => {
       document.querySelector('[data-test-subj="wzPrivacyHelpPanel"]')
         ?.textContent,
     ).toContain('is sent as-is');
+    expect(
+      document.querySelector('[data-test-subj="wzPrivacyHelpPanel"]')
+        ?.textContent,
+    ).toContain('Never send in the field policy are still dropped');
   });
 });
 
