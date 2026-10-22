@@ -49,24 +49,21 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
         iconType='lock'
         body={
           <p>
-            {i18n.translate(
-              'wazuh.common.homeOverviewAgentsByStatus.noWazuhRole',
-              {
-                defaultMessage:
-                  'Your account has no Wazuh role that grants access to agents.',
-              },
-            )}
+            {i18n.translate('wazuh.common.homeOverviewAgentsByStatus.noRole', {
+              defaultMessage:
+                'Your account has no role that grants access to agents.',
+            })}
             <br />
             {i18n.translate(
-              'wazuh.common.homeOverviewAgentsByStatus.noWazuhRoleHint',
+              'wazuh.common.homeOverviewAgentsByStatus.noRoleHint',
               {
                 defaultMessage:
-                  'Ask an administrator to map it to a Wazuh role in Server management > Security > Roles mapping.',
+                  'Ask an administrator to map it to a role in Server management > Security > Roles mapping.',
               },
             )}
           </p>
         }
-        data-test-subj='agents-by-status-no-wazuh-role'
+        data-test-subj='agents-by-status-no-role'
       />
     );
   }

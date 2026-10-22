@@ -76,7 +76,7 @@ describe('AgentsByStatus', () => {
     expect(onStatusSelect).toHaveBeenCalledWith('disconnected');
   });
 
-  it('says the account has no Wazuh role when an empty fleet comes from missing agent:read', () => {
+  it('says the account has no role when an empty fleet comes from missing agent:read', () => {
     const { container } = render(
       <AgentsByStatus
         data={{
@@ -91,7 +91,7 @@ describe('AgentsByStatus', () => {
       />,
     );
     expect(container.textContent).toContain(
-      'Your account has no Wazuh role that grants access to agents.',
+      'Your account has no role that grants access to agents.',
     );
     expect(container.textContent).toContain(
       'Server management > Security > Roles mapping',

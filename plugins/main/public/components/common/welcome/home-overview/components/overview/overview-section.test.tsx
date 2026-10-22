@@ -134,7 +134,7 @@ describe('OverviewSection', () => {
     expect(screen.queryByText('agents active')).not.toBeInTheDocument();
   });
 
-  it('says the account has no Wazuh role instead of "no agents" when agent:read is missing', () => {
+  it('says the account has no role instead of "no agents" when agent:read is missing', () => {
     asMock(useUserPermissionsRequirements).mockReturnValue([
       [[{ action: 'agent:read', resource: 'agent:id:*' }]],
       {},
@@ -153,7 +153,7 @@ describe('OverviewSection', () => {
       <OverviewSection findings={findingsAvailable} />,
     );
     expect(container.textContent).toContain(
-      'Your account has no Wazuh role that grants access to agents.',
+      'Your account has no role that grants access to agents.',
     );
     expect(container.textContent).not.toContain(
       'This instance has no agents registered.',
