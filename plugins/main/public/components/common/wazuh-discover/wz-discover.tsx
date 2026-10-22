@@ -71,6 +71,8 @@ export type WazuhDiscoverProps = {
   categoriesSampleData: string[];
   additionalDocumentDetailsTabs?: import('./components/document-view-table-and-json').DocumentViewTableAndJsonPropsAdditionalTabs;
   flyoutTitle?: string;
+  /** Rendered instead of the default no results callout when the search has no hits. */
+  emptyState?: React.ReactNode;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -82,6 +84,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     categoriesSampleData,
     additionalDocumentDetailsTabs,
     flyoutTitle,
+    emptyState,
   } = props;
 
   if (!DataSource) {
@@ -282,9 +285,14 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               />
               <SampleDataWarning categoriesSampleData={categoriesSampleData} />
             </HideOnErrorInitializatingDataSource>
-            {!isDataSourceLoading && results?.hits?.total === 0 ? (
-              <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
-            ) : null}
+            {!isDataSourceLoading && results?.hits?.total === 0
+              ? emptyState ?? (
+                  <DiscoverNoResults
+                    timeFieldName={timeField}
+                    queryLanguage={''}
+                  />
+                )
+              : null}
             <div
               className={
                 !isDataSourceLoading && dataSource && results?.hits?.total > 0

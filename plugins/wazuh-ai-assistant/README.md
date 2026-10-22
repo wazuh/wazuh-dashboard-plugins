@@ -111,7 +111,9 @@ Answering a question sends the user's prompt plus a capped tool-result digest to
 third-party provider**. That digest can include hostnames, source/destination IPs, usernames,
 process command lines and rule/finding text — and, via the escape hatch, any field the model selects.
 Pseudonymisation mitigates this and is **off by default** (the primary deployment target is a
-self-hosted gateway). The Settings page names the field categories involved and the chat header
+self-hosted gateway). With privacy mode off, fields marked Anonymize in the field policy are sent
+as-is and text typed into chat is not scanned; fields marked Never send are dropped in both modes.
+The Settings page names the field categories involved and the chat header
 carries a privacy on/off badge.
 
 ## Limits enforced server-side
