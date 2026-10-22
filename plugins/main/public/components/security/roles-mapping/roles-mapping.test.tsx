@@ -61,9 +61,13 @@ jest.mock('../../common/permissions/button', () => ({
 }));
 
 describe('RolesMapping', () => {
-  it('shows a description clarifying these mappings belong to the Wazuh manager API', () => {
+  it('shows a description saying role mappings give Wazuh roles to the users who sign in', () => {
     render(<RolesMapping />);
 
-    expect(screen.getByText(/Map roles of the manager API/)).toBeTruthy();
+    expect(
+      screen.getByText(
+        /Give Wazuh roles to the users who sign in to the dashboard/,
+      ),
+    ).toBeTruthy();
   });
 });
