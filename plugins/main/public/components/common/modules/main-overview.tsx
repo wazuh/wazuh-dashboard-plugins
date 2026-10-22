@@ -11,7 +11,7 @@
  */
 
 import React, { Component } from 'react';
-import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import '../../common/modules/module.scss';
 import { ReportingService } from '../../../react-services/reporting';
 import { connect } from 'react-redux';
@@ -48,8 +48,6 @@ export const MainModuleOverview = connect(mapStateToProps)(
       const ModuleTabView = (this.props.tabs || []).find(
         tab => tab.id === selectView,
       );
-      // Optional `description` of the module defaults entry: a short explanation of the module
-      const moduleDescription = this.props.module?.description;
       return (
         <div
           className={
@@ -65,18 +63,6 @@ export const MainModuleOverview = connect(mapStateToProps)(
               'wz-module-header-nav hide-for-sharing'
             }
           >
-            {this.props.tabs && this.props.tabs.length && moduleDescription && (
-              // Outside the tabs container, so the tabs keep its height and bottom border
-              <div className='wz-module-description'>
-                <EuiText
-                  size='s'
-                  color='subdued'
-                  data-test-subj='wzModuleDescription'
-                >
-                  {moduleDescription}
-                </EuiText>
-              </div>
-            )}
             {this.props.tabs && this.props.tabs.length && (
               <div className='wz-welcome-page-agent-tabs'>
                 <EuiFlexGroup>
