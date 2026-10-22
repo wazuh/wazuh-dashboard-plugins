@@ -229,7 +229,8 @@ export default [
         description: i18n.translate(
           'wazuh.configuration.settingsCategories.commandsDescription',
           {
-            defaultMessage: 'Configuration options of the Command wodle',
+            defaultMessage:
+              'Run a command on the endpoint on a schedule and raise findings from its output.',
           },
         ),
         goto: 'commands',

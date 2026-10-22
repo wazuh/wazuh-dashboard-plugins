@@ -24,12 +24,29 @@ import NavigationService from '../../../../../react-services/navigation-service'
 
 jest.mock('../../../../../kibana-services', () => ({
   getUiSettings: () => ({ get: () => false }),
-  getCore: () => ({ application: {} }),
+  getCore: () => ({
+    application: {
+      getUrlForApp: (appId: string, { path }: { path: string }) =>
+        `/app/${appId}${path}`,
+    },
+  }),
   // The permissions button reaches AppState, which wants a cookie jar on import.
   getCookies: () => ({ get: () => undefined, set: () => {}, remove: () => {} }),
   setCookies: () => {},
   getWzCurrentAppID: () => 'wazuh',
 }));
+
+jest.mock(
+  '../../../../../../../../src/plugins/opensearch_dashboards_react/public',
+  () => ({
+    ...jest.requireActual(
+      '../../../../../../../../src/plugins/opensearch_dashboards_react/public',
+    ),
+    RedirectAppLinks: ({ children }: { children: React.ReactNode }) => (
+      <>{children}</>
+    ),
+  }),
+);
 
 /* The eager fetch that powers search is not this file's concern -- covered by
 settings-search-service.test.ts -- so it's mocked here to keep these tests
@@ -267,14 +284,32 @@ describe('WzConfigurationOverview', () => {
     expect(screen.queryByText('Command definitions')).not.toBeInTheDocument();
   });
 
-  it('shows an empty-state message for a category with nothing configured', async () => {
-    (getSearchableSettingsData as jest.Mock).mockResolvedValue({
-      values: {},
-      sources: {},
-    });
-
+  it('shows an empty-state message for a list with nothing configured', async () => {
     const { container } = renderOverview({
       agent,
+      report: { content: {}, modules: [] },
+    });
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: /Log collection/ }),
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector('#configuration-category-log-collection'),
+      ).not.toBeNull(),
+    );
+    const category = container.querySelector(
+      '#configuration-category-log-collection',
+    );
+    expect(
+      within(category).getAllByText('Nothing configured yet.').length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("says how to add a command, leading to the endpoint's group", async () => {
+    const { container } = renderOverview({
+      agent: { ...agent, group: ['default'] },
       report: { content: {}, modules: [] },
     });
 
@@ -285,8 +320,18 @@ describe('WzConfigurationOverview', () => {
       '#configuration-category-commands',
     );
     expect(
-      within(category).getByText('Nothing configured yet.'),
+      within(category).getByText(/raise findings from its output/),
     ).toBeInTheDocument();
+    expect(within(category).getByText('No commands yet.')).toBeInTheDocument();
+    expect(
+      within(category).queryByText('Nothing configured yet.'),
+    ).not.toBeInTheDocument();
+    expect(
+      within(category).getByRole('link', { name: 'Go to group default' }),
+    ).toHaveAttribute(
+      'href',
+      '/app/endpoint-groups#/manager/?tab=groups&group=default',
+    );
   });
 
   it("counts only settings with a visible value in a category's badge", async () => {
