@@ -56,7 +56,7 @@ describe('FimEmptyStateView', () => {
     expect(getReport).not.toHaveBeenCalled();
     expect(
       screen.getByText(
-        /Use Explore agent, at the top, to see the directories an agent monitors\./,
+        /Use Explore agent to see the directories an agent monitors\./,
       ),
     ).toBeInTheDocument();
     const link = screen.getByRole('link', {
@@ -99,13 +99,12 @@ describe('FimEmptyStateView', () => {
     getReport.mockResolvedValue({
       content: { fim: { syscheck: { disabled: 'yes' } } },
     });
-    renderView('dashboard', '001');
+    renderView('findings', '001');
 
-    expect(
-      await screen.findByText(
-        /File Integrity Monitoring is disabled on this endpoint\./,
-      ),
-    ).toBeInTheDocument();
+    const text = await screen.findByText(
+      /File Integrity Monitoring is disabled on this endpoint\./,
+    );
+    expect(text).not.toHaveTextContent('Dashboard and Inventory');
     expect(
       screen.getByRole('link', { name: /How to configure/ }),
     ).toBeInTheDocument();

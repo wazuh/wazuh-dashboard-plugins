@@ -40,8 +40,20 @@ const getTitle = (kind: EmptyStateKind) =>
         { defaultMessage: 'No monitored files found' },
       );
 
-const getDescription = (kind: EmptyStateKind) =>
-  kind === 'findings'
+/**
+ * `withCurrentState` says that the Dashboard and Inventory can have data while Findings is empty;
+ * it is left out when the pinned agent monitors nothing, so the text does not contradict it.
+ */
+const getDescription = (kind: EmptyStateKind, withCurrentState: boolean) =>
+  kind === 'findings' && !withCurrentState
+    ? i18n.translate(
+        'wazuh.fileIntegrityMonitoring.emptyState.findingsDescriptionShort',
+        {
+          defaultMessage:
+            "Findings list the changes detected after each file's baseline was recorded. Try changing the search or time range.",
+        },
+      )
+    : kind === 'findings'
     ? i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescription',
         {
@@ -173,7 +185,10 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
       >
         <EuiText size='s'>
           <p>
-            {getDescription(kind)}{' '}
+            {getDescription(
+              kind,
+              !pinned || ['loading', 'monitored'].includes(pinned.status),
+            )}{' '}
             {pinned ? (
               <EndpointDirectories directories={pinned} />
             ) : (
@@ -181,7 +196,7 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
                 'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
                 {
                   defaultMessage:
-                    'Use Explore agent, at the top, to see the directories an agent monitors.',
+                    'Use Explore agent to see the directories an agent monitors.',
                 },
               )
             )}
