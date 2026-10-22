@@ -552,6 +552,7 @@ export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <CheckForUpdatesButton
+              fill
               onRequested={onUpdateRequested}
               dataTestSubj='ctiFeedDetailsCheckForUpdatesButton'
             />

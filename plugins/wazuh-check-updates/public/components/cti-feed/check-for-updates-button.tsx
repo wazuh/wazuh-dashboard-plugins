@@ -7,11 +7,14 @@ import { requestCtiContentUpdate } from '../../services/cti-feed';
 export interface CheckForUpdatesButtonProps {
   /** Runs after a successful request; the button waits for it to settle. */
   onRequested: () => void | Promise<void>;
+  /** Filled only where checking is the main action, not a secondary one. */
+  fill?: boolean;
   dataTestSubj?: string;
 }
 
 export const CheckForUpdatesButton: React.FC<CheckForUpdatesButtonProps> = ({
   onRequested,
+  fill = false,
   dataTestSubj = 'ctiFeedCheckForUpdatesButton',
 }) => {
   const [requesting, setRequesting] = useState(false);
@@ -50,7 +53,7 @@ export const CheckForUpdatesButton: React.FC<CheckForUpdatesButtonProps> = ({
 
   return (
     <EuiButton
-      fill
+      fill={fill}
       iconType='refresh'
       isLoading={requesting}
       onClick={handleClick}

@@ -15,6 +15,7 @@ import { FeedSyncPanel } from './feed-sync-panel';
 import { FeedContentPanel } from './feed-content-panel';
 import { useCtiConsumers } from './hooks/use-cti-consumers';
 import { useFeedContentCounts } from './hooks/use-feed-content-counts';
+import { CheckForUpdatesAbout } from './check-for-updates-about';
 import { CheckForUpdatesButton } from './check-for-updates-button';
 import { CtiTimestamp } from './cti-timestamp';
 
@@ -66,8 +67,21 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
               responsive={false}
             >
               <EuiFlexItem grow={false}>
-                {/* The check writes `last_checked_at`, so read it back. */}
-                <CheckForUpdatesButton onRequested={sync.refetchAfterCheck} />
+                <EuiFlexGroup
+                  gutterSize='s'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <CheckForUpdatesAbout />
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    {/* The check writes `last_checked_at`, so read it back. */}
+                    <CheckForUpdatesButton
+                      onRequested={sync.refetchAfterCheck}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
                 <CtiTimestamp
