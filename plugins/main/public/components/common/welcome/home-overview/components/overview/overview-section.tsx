@@ -74,7 +74,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                 data={agents.data}
                 deployAgentUrl={getDeployAgentUrl()}
                 onStatusSelect={goToAgentsByStatus}
-                canReadAgents={!missingAgentRead}
+                missingPermissions={missingAgentRead}
               />
             )}
           </WidgetGroup>

@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { AgentsByStatus } from './agents-by-status';
 
@@ -76,7 +76,7 @@ describe('AgentsByStatus', () => {
     expect(onStatusSelect).toHaveBeenCalledWith('disconnected');
   });
 
-  it('says the account has no role when an empty fleet comes from missing agent:read', () => {
+  it('says the account has no role when an empty fleet comes from missing agent:read', async () => {
     const { container } = render(
       <AgentsByStatus
         data={{
@@ -87,7 +87,12 @@ describe('AgentsByStatus', () => {
           total: 0,
         }}
         deployAgentUrl='https://example.test/deploy'
-        canReadAgents={false}
+        missingPermissions={[
+          [
+            { action: 'agent:read', resource: 'agent:id:*' },
+            { action: 'agent:read', resource: 'agent:group:*' },
+          ],
+        ]}
       />,
     );
     expect(container.textContent).toContain(
@@ -100,5 +105,18 @@ describe('AgentsByStatus', () => {
       'This instance has no agents registered.',
     );
     expect(screen.queryByText('Deploy new agent')).not.toBeInTheDocument();
+
+    fireEvent.mouseOver(
+      container.querySelector(
+        '[data-test-subj="agents-by-status-missing-permissions"]',
+      )!,
+    );
+    await waitFor(() =>
+      expect(document.body.textContent).toContain(
+        'The role must grant the permission:',
+      ),
+    );
+    expect(document.body.textContent).toContain('agent:id:*');
+    expect(document.body.textContent).toContain('agent:group:*');
   });
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiEmptyPrompt, EuiText } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiIconTip, EuiText } from '@elastic/eui';
 import { FormattedMessage } from '@osd/i18n/react';
 import { AgentStatus } from '../../interfaces/types';
 import {
@@ -14,6 +14,8 @@ import {
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';
+import { TUserPermissions } from '../../../../permissions/element';
+import { WzPermissionsFormatted } from '../../../../permissions/format';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../lib/theme-colors';
 
 type AgentStatusName =
@@ -31,8 +33,8 @@ export interface AgentsByStatusProps {
   /** Deploy-agent CTA href; passed in so this stays a pure presentational widget. */
   deployAgentUrl: string;
   onStatusSelect?: (status: string) => void;
-  /** False when the user lacks agent:read, so the API filters every agent out. */
-  canReadAgents?: boolean;
+  /** agent:read requirements the user lacks; the API then filters every agent out. */
+  missingPermissions?: TUserPermissions | false;
 }
 
 /** Shows a deploy prompt when the fleet is empty. */
@@ -40,10 +42,10 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   data,
   deployAgentUrl,
   onStatusSelect,
-  canReadAgents = true,
+  missingPermissions,
 }) => {
   // A total of 0 without agent:read means "filtered out", not "no agents".
-  if (data.total === 0 && !canReadAgents) {
+  if (data.total === 0 && missingPermissions) {
     return (
       <EuiEmptyPrompt
         iconType='lock'
@@ -60,7 +62,30 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
                 defaultMessage:
                   'Ask an administrator to map it to a role in Server management > Security > Roles mapping.',
               },
-            )}
+            )}{' '}
+            <EuiIconTip
+              type='questionInCircle'
+              aria-label={i18n.translate(
+                'wazuh.common.homeOverviewAgentsByStatus.missingPermissionsLabel',
+                { defaultMessage: 'Missing permissions' },
+              )}
+              content={
+                <div>
+                  {i18n.translate(
+                    'wazuh.common.homeOverviewAgentsByStatus.missingPermissions',
+                    {
+                      defaultMessage:
+                        'The role must grant the {count, plural, one {permission} other {permissions}}:',
+                      values: { count: missingPermissions.length },
+                    },
+                  )}
+                  {WzPermissionsFormatted(missingPermissions)}
+                </div>
+              }
+              iconProps={{
+                'data-test-subj': 'agents-by-status-missing-permissions',
+              }}
+            />
           </p>
         }
         data-test-subj='agents-by-status-no-role'
