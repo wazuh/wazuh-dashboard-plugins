@@ -6,42 +6,33 @@ import { createStore } from 'redux';
 import { queryDataTestAttr } from '../../../test/public/query-attr';
 import { ButtonExploreAgent } from './button-explore-agent';
 
-const mockPinnedAgent = { current: null as null | Record<string, string> };
+let mockPinnedAgent: null | Record<string, string> = null;
 
 jest.mock('./wz-agent-selector-service', () => ({
   PinnedAgentManager: jest.fn().mockImplementation(() => ({
-    isPinnedAgent: () => Boolean(mockPinnedAgent.current),
-    getPinnedAgent: () => mockPinnedAgent.current,
+    isPinnedAgent: () => Boolean(mockPinnedAgent),
+    getPinnedAgent: () => mockPinnedAgent,
     unPinAgent: jest.fn(),
   })),
 }));
 
-const renderButton = () =>
-  render(
-    <Provider store={createStore(() => ({ appStateReducers: {} }))}>
-      <ButtonExploreAgent />
-    </Provider>,
-  );
-
-const warningSlot = (container: HTMLElement) =>
-  container.querySelector(queryDataTestAttr('wzOutdatedAgentWarning'));
-
 describe('ButtonExploreAgent', () => {
-  afterEach(() => {
-    mockPinnedAgent.current = null;
-  });
+  it.each([
+    [null, false],
+    [{ id: '001', name: 'web-01', version: 'v4.9.0' }, true],
+  ])('with pinned agent %o shows the outdated warning: %s', (agent, shown) => {
+    mockPinnedAgent = agent;
 
-  it('leaves no space for the outdated agent warning without an outdated pinned agent', () => {
-    const { container } = renderButton();
+    const { container } = render(
+      <Provider store={createStore(() => ({ appStateReducers: {} }))}>
+        <ButtonExploreAgent />
+      </Provider>,
+    );
 
-    expect(warningSlot(container)).toBeNull();
-  });
-
-  it('shows the outdated agent warning when the pinned agent is below 5.0.0', () => {
-    mockPinnedAgent.current = { id: '001', name: 'web-01', version: 'v4.9.0' };
-
-    const { container } = renderButton();
-
-    expect(warningSlot(container)).toBeInTheDocument();
+    expect(
+      Boolean(
+        container.querySelector(queryDataTestAttr('wzOutdatedAgentWarning')),
+      ),
+    ).toBe(shown);
   });
 });
