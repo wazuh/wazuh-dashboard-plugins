@@ -15,7 +15,7 @@ jest.mock('../components/empty-state/fim-empty-state', () => ({
 
 describe('DashboardFIM', () => {
   it('explains what to do when the current state has no monitored files', () => {
-    const { emptyState } = (DashboardFIM as unknown) as {
+    const { emptyState } = DashboardFIM as unknown as {
       emptyState: JSX.Element;
     };
 
