@@ -1,6 +1,23 @@
 /* eslint-disable camelcase -- CTI consumer and query fields keep their API names */
+jest.mock('../../plugin-services', () => ({
+  getCore: jest.fn(),
+  getWazuhCore: () => ({
+    utils: { formatUIDate: (date: string) => `formatted ${date}` },
+  }),
+}));
+
+jest.mock('../../services/cti-feed', () => ({
+  requestCtiContentUpdate: jest.fn(),
+}));
+
 import React from 'react';
-import { configure, fireEvent, render, screen } from '@testing-library/react';
+import {
+  configure,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { CtiConsumer } from '../../../common/cti-consumers';
 import { getFeedSyncSummary } from '../../services/cti-consumer-sync-state';
@@ -24,18 +41,26 @@ const renderPanel = (
   consumers: CtiConsumer[],
   props: Partial<React.ComponentProps<typeof FeedSyncPanel>> = {},
 ) => {
-  const onRetry = jest.fn();
-  render(
+  const onRefresh = jest.fn();
+  const onUpdateRequested = jest.fn();
+  const ui = (nextConsumers: CtiConsumer[]) => (
     <FeedSyncPanel
-      consumers={consumers}
-      summary={getFeedSyncSummary(consumers)}
+      consumers={nextConsumers}
+      summary={getFeedSyncSummary(nextConsumers)}
       loading={false}
+      refreshing={false}
       error={null}
-      onRetry={onRetry}
+      onRefresh={onRefresh}
+      onUpdateRequested={onUpdateRequested}
       {...props}
-    />,
+    />
   );
-  return { onRetry };
+  const { rerender } = render(ui(consumers));
+  return {
+    onRefresh,
+    onUpdateRequested,
+    rerender: (nextConsumers: CtiConsumer[]) => rerender(ui(nextConsumers)),
+  };
 };
 
 describe('FeedSyncPanel', () => {
@@ -115,12 +140,90 @@ describe('FeedSyncPanel', () => {
   });
 
   test('offers a retry when the sync state cannot be read', () => {
-    const { onRetry } = renderPanel([], { error: 'Forbidden' });
+    const { onRefresh } = renderPanel([], { error: 'Forbidden' });
 
     expect(screen.getByTestId('ctiFeedSyncError')).toHaveTextContent(
       'Forbidden',
     );
     fireEvent.click(screen.getByText('Retry'));
-    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  test('opens the details of a feed from its row', async () => {
+    renderPanel([
+      consumer(),
+      consumer({
+        name: 'public-iocs-5',
+        type: 'cti:catalog:consumer:iocs',
+        status: 'failed',
+      }),
+    ]);
+
+    expect(screen.queryByTestId('ctiFeedDetailsFlyout')).toBeNull();
+    const [, iocsRow] = screen.getAllByTestId('ctiFeedSyncRow');
+    expect(iocsRow.tagName).toBe('BUTTON');
+    fireEvent.click(iocsRow);
+
+    const flyout = screen.getByTestId('ctiFeedDetailsFlyout');
+    expect(flyout).toHaveTextContent('Indicators of compromise');
+    expect(screen.getByTestId('ctiFeedDetailsState')).toHaveTextContent(
+      'The last sync failed',
+    );
+
+    fireEvent.click(screen.getByTestId('ctiFeedDetailsClose'));
+    await waitFor(() =>
+      expect(screen.queryByTestId('ctiFeedDetailsFlyout')).toBeNull(),
+    );
+  });
+
+  test('keeps the open details in step with the latest read', () => {
+    const { rerender } = renderPanel([
+      consumer({ status: 'running', local_offset: 40, remote_offset: 80 }),
+    ]);
+    fireEvent.click(screen.getByTestId('ctiFeedSyncRow'));
+    expect(screen.getByTestId('ctiFeedDetailsBadge')).toHaveTextContent(
+      'Syncing',
+    );
+
+    rerender([consumer({ local_offset: 80, remote_offset: 80 })]);
+
+    expect(screen.getByTestId('ctiFeedDetailsBadge')).toHaveTextContent(
+      'Up to date',
+    );
+  });
+
+  test('closes the details when the feed is no longer reported', () => {
+    const { rerender } = renderPanel([consumer()]);
+    fireEvent.click(screen.getByTestId('ctiFeedSyncRow'));
+    expect(screen.getByTestId('ctiFeedDetailsFlyout')).toBeInTheDocument();
+
+    rerender([]);
+
+    expect(screen.queryByTestId('ctiFeedDetailsFlyout')).toBeNull();
+  });
+
+  test('shows when each feed was last updated, or a dash if not reported', () => {
+    renderPanel([
+      consumer({ updated_at: new Date(Date.now() - 5 * 60000).toISOString() }),
+      consumer({ name: 'public-iocs-5', type: 'cti:catalog:consumer:iocs' }),
+    ]);
+
+    const [rulesetRow, iocsRow] = screen.getAllByTestId('ctiFeedSyncRow');
+    expect(rulesetRow).toHaveTextContent('Last updated: 5 minutes ago');
+    expect(iocsRow).toHaveTextContent('Last updated: -');
+  });
+
+  test('refreshes the sync state on demand', () => {
+    const { onRefresh } = renderPanel([consumer()]);
+
+    fireEvent.click(screen.getByTestId('ctiFeedSyncRefresh'));
+
+    expect(onRefresh).toHaveBeenCalledTimes(1);
+  });
+
+  test('waits for a read in flight before refreshing again', () => {
+    renderPanel([consumer()], { refreshing: true });
+
+    expect(screen.getByTestId('ctiFeedSyncRefresh')).toBeDisabled();
   });
 });

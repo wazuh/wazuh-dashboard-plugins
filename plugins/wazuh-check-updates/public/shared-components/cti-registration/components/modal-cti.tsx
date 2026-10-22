@@ -572,7 +572,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               <EuiText size='s'>
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.successManageBody'
-                  defaultMessage='To manage your Wazuh XDR registration, unlock additional capabilities, or explore other services, visit {ctiLink}.'
+                  defaultMessage='To manage your Wazuh XDR registration and threat intelligence feed, or explore other services, visit {ctiLink}.'
                   values={{
                     ctiLink: (
                       <CtiHrefLink href={WAZUH_CTI_CONSOLE_HREF}>
