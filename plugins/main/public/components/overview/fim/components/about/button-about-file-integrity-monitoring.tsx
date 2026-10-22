@@ -1,41 +1,15 @@
-import React, { useState } from 'react';
-import {
-  EuiButtonEmpty,
-  EuiDescriptionList,
-  EuiFlyout,
-  EuiFlyoutBody,
-  EuiFlyoutHeader,
-  EuiLink,
-  EuiSpacer,
-  EuiText,
-  EuiTitle,
-} from '@elastic/eui';
+import React from 'react';
+import { EuiDescriptionList, EuiSpacer, EuiText, EuiTitle } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import {
+  AboutFlyoutButton,
+  AboutFlyoutDocsLink,
+} from '../../../../common/flyouts/about-flyout-button';
 import {
   FIM_CONFIGURE_DOCS_PATH,
   FIM_DOCS_PATH,
 } from '../../fim-documentation';
-
-const FLYOUT_TITLE_ID = 'wzAboutFileIntegrityMonitoringTitle';
-
-const ExternalDocLink = ({
-  path,
-  children,
-}: {
-  path: string;
-  children: React.ReactNode;
-}) => (
-  <EuiLink
-    href={webDocumentationLink(path)}
-    target='_blank'
-    rel='noopener noreferrer'
-    external
-  >
-    {children}
-  </EuiLink>
-);
 
 const getTermDefinitions = () => [
   {
@@ -105,129 +79,84 @@ const getTermDefinitions = () => [
   },
 ];
 
-export const ButtonAboutFileIntegrityMonitoring = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const title = i18n.translate(
-    'wazuh.fileIntegrityMonitoring.aboutFlyout.title',
-    { defaultMessage: 'About File Integrity Monitoring' },
-  );
-
-  return (
-    <>
-      <EuiButtonEmpty
-        iconType='iInCircle'
-        onClick={() => setIsOpen(true)}
-        data-test-subj='wzAboutFileIntegrityMonitoringButton'
-      >
-        {title}
-      </EuiButtonEmpty>
-      {isOpen && (
-        <EuiFlyout
-          onClose={() => setIsOpen(false)}
-          size='m'
-          ownFocus
-          aria-labelledby={FLYOUT_TITLE_ID}
-          data-test-subj='wzAboutFileIntegrityMonitoringFlyout'
-        >
-          <EuiFlyoutHeader hasBorder>
-            <EuiTitle size='s'>
-              <h2 id={FLYOUT_TITLE_ID}>{title}</h2>
-            </EuiTitle>
-            <EuiSpacer size='xs' />
-            <EuiText size='s'>
-              <p>
-                <FormattedMessage
-                  id='wazuh.fileIntegrityMonitoring.aboutFlyout.learnMore'
-                  defaultMessage='Learn more in the {link}.'
-                  values={{
-                    link: (
-                      <ExternalDocLink path={FIM_DOCS_PATH}>
-                        {i18n.translate(
-                          'wazuh.fileIntegrityMonitoring.aboutFlyout.learnMoreLink',
-                          { defaultMessage: 'documentation' },
-                        )}
-                      </ExternalDocLink>
-                    ),
-                  }}
-                />
-              </p>
-            </EuiText>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiText size='s'>
-              <p>
+export const ButtonAboutFileIntegrityMonitoring = () => (
+  <AboutFlyoutButton
+    title={i18n.translate('wazuh.fileIntegrityMonitoring.aboutFlyout.title', {
+      defaultMessage: 'About File Integrity Monitoring',
+    })}
+    testSubj='FileIntegrityMonitoring'
+    docsPath={FIM_DOCS_PATH}
+  >
+    <EuiText size='s'>
+      <p>
+        {i18n.translate(
+          'wazuh.fileIntegrityMonitoring.aboutFlyout.whatItDoes',
+          {
+            defaultMessage:
+              'File Integrity Monitoring detects when files and registry entries are created, modified or deleted in the paths that the agents monitor. With who-data monitoring enabled, it also records the user and process that made each change.',
+          },
+        )}
+      </p>
+      <p>
+        {i18n.translate(
+          'wazuh.fileIntegrityMonitoring.aboutFlyout.howItWorks',
+          {
+            defaultMessage:
+              'Each agent first scans the monitored paths to record a baseline. Later scans, and real-time or who-data monitoring when enabled, compare every file against its baseline and report each difference as a finding.',
+          },
+        )}
+      </p>
+    </EuiText>
+    <EuiSpacer size='m' />
+    <EuiTitle size='xs'>
+      <h3>
+        {i18n.translate(
+          'wazuh.fileIntegrityMonitoring.aboutFlyout.termsTitle',
+          { defaultMessage: 'Terms' },
+        )}
+      </h3>
+    </EuiTitle>
+    <EuiSpacer size='s' />
+    <EuiDescriptionList compressed listItems={getTermDefinitions()} />
+    <EuiSpacer size='m' />
+    <EuiTitle size='xs'>
+      <h3>
+        {i18n.translate(
+          'wazuh.fileIntegrityMonitoring.aboutFlyout.gettingStartedTitle',
+          { defaultMessage: 'Getting started' },
+        )}
+      </h3>
+    </EuiTitle>
+    <EuiSpacer size='s' />
+    <EuiText size='s'>
+      <p>
+        {i18n.translate(
+          'wazuh.fileIntegrityMonitoring.aboutFlyout.defaultDirectories',
+          {
+            defaultMessage:
+              'Agents monitor only a few system directories by default. To see which ones an endpoint monitors, open the endpoint, select Configuration and find Monitored directories under Integrity monitoring.',
+          },
+        )}
+      </p>
+      <p>
+        <FormattedMessage
+          id='wazuh.fileIntegrityMonitoring.aboutFlyout.addDirectories'
+          defaultMessage='To monitor your own files, add their directories to the syscheck configuration of the agent or of its group. See {link}.'
+          values={{
+            link: (
+              <AboutFlyoutDocsLink path={FIM_CONFIGURE_DOCS_PATH}>
                 {i18n.translate(
-                  'wazuh.fileIntegrityMonitoring.aboutFlyout.whatItDoes',
+                  'wazuh.fileIntegrityMonitoring.aboutFlyout.addDirectoriesLink',
                   {
                     defaultMessage:
-                      'File Integrity Monitoring detects when files and registry entries are created, modified or deleted in the paths that the agents monitor. With who-data monitoring enabled, it also records the user and process that made each change.',
+                      'How to configure File Integrity Monitoring',
                   },
                 )}
-              </p>
-              <p>
-                {i18n.translate(
-                  'wazuh.fileIntegrityMonitoring.aboutFlyout.howItWorks',
-                  {
-                    defaultMessage:
-                      'Each agent first scans the monitored paths to record a baseline. Later scans, and real-time or who-data monitoring when enabled, compare every file against its baseline and report each difference as a finding.',
-                  },
-                )}
-              </p>
-            </EuiText>
-            <EuiSpacer size='m' />
-            <EuiTitle size='xs'>
-              <h3>
-                {i18n.translate(
-                  'wazuh.fileIntegrityMonitoring.aboutFlyout.termsTitle',
-                  { defaultMessage: 'Terms' },
-                )}
-              </h3>
-            </EuiTitle>
-            <EuiSpacer size='s' />
-            <EuiDescriptionList compressed listItems={getTermDefinitions()} />
-            <EuiSpacer size='m' />
-            <EuiTitle size='xs'>
-              <h3>
-                {i18n.translate(
-                  'wazuh.fileIntegrityMonitoring.aboutFlyout.gettingStartedTitle',
-                  { defaultMessage: 'Getting started' },
-                )}
-              </h3>
-            </EuiTitle>
-            <EuiSpacer size='s' />
-            <EuiText size='s'>
-              <p>
-                {i18n.translate(
-                  'wazuh.fileIntegrityMonitoring.aboutFlyout.defaultDirectories',
-                  {
-                    defaultMessage:
-                      'Agents monitor only a few system directories by default. To see which ones an endpoint monitors, open the endpoint, select Configuration and find Monitored directories under Integrity monitoring.',
-                  },
-                )}
-              </p>
-              <p>
-                <FormattedMessage
-                  id='wazuh.fileIntegrityMonitoring.aboutFlyout.addDirectories'
-                  defaultMessage='To monitor your own files, add their directories to the syscheck configuration of the agent or of its group. See {link}.'
-                  values={{
-                    link: (
-                      <ExternalDocLink path={FIM_CONFIGURE_DOCS_PATH}>
-                        {i18n.translate(
-                          'wazuh.fileIntegrityMonitoring.aboutFlyout.addDirectoriesLink',
-                          {
-                            defaultMessage:
-                              'How to configure File Integrity Monitoring',
-                          },
-                        )}
-                      </ExternalDocLink>
-                    ),
-                  }}
-                />
-              </p>
-            </EuiText>
-          </EuiFlyoutBody>
-        </EuiFlyout>
-      )}
-    </>
-  );
-};
+              </AboutFlyoutDocsLink>
+            ),
+          }}
+        />
+      </p>
+    </EuiText>
+  </AboutFlyoutButton>
+);
