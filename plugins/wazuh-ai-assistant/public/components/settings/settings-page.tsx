@@ -1903,7 +1903,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 // domain name/FQDN is; the bare case is covered separately by "identifiers already
                 // seen in the session".
                 defaultMessage:
-                  'Control whether Wazuh finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is. Text typed into chat is scanned for IP addresses, domain names, and identifiers already seen in the session; other identifiers typed into chat may still reach the provider unmasked.',
+                  'Control whether Wazuh finding data is anonymized before reaching the configured AI provider. When privacy mode is off, hostnames, IP addresses, usernames, process command lines, and finding/rule text leave the cluster as-is; only fields set to Never send are dropped. When privacy mode is on, text typed into chat is scanned for IP addresses, domain names, and identifiers already seen in the session; other identifiers typed into chat may still reach the provider unmasked.',
               },
             )}
           >
@@ -2015,7 +2015,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     // server-side scrub, so the copy avoids promising byte-verbatim delivery this
                     // product does not give.
                     defaultMessage:
-                      'What the AI provider gets per field: the value (Allow — in privacy mode, known identifiers in it are still pseudonymized), a pseudonym (Anonymize), or nothing (Never send).',
+                      'What the AI provider gets per field: the value (Allow — in privacy mode, known identifiers in it are still pseudonymized), a pseudonym (Anonymize — only while privacy mode is on; with it off, the real value is sent), or nothing (Never send — in both modes).',
                   },
                 )}
               >
