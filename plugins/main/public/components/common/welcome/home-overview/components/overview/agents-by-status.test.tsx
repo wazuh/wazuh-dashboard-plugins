@@ -75,4 +75,30 @@ describe('AgentsByStatus', () => {
     fireEvent.click(screen.getByText('Disconnected').closest('button')!);
     expect(onStatusSelect).toHaveBeenCalledWith('disconnected');
   });
+
+  it('says the account has no Wazuh role when an empty fleet comes from missing agent:read', () => {
+    const { container } = render(
+      <AgentsByStatus
+        data={{
+          active: 0,
+          disconnected: 0,
+          pending: 0,
+          neverConnected: 0,
+          total: 0,
+        }}
+        deployAgentUrl='https://example.test/deploy'
+        canReadAgents={false}
+      />,
+    );
+    expect(container.textContent).toContain(
+      'Your account has no Wazuh role that grants access to agents.',
+    );
+    expect(container.textContent).toContain(
+      'Server management > Security > Roles mapping',
+    );
+    expect(container.textContent).not.toContain(
+      'This instance has no agents registered.',
+    );
+    expect(screen.queryByText('Deploy new agent')).not.toBeInTheDocument();
+  });
 });

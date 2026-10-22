@@ -31,6 +31,8 @@ export interface AgentsByStatusProps {
   /** Deploy-agent CTA href; passed in so this stays a pure presentational widget. */
   deployAgentUrl: string;
   onStatusSelect?: (status: string) => void;
+  /** False when the user lacks agent:read, so the API filters every agent out. */
+  canReadAgents?: boolean;
 }
 
 /** Shows a deploy prompt when the fleet is empty. */
@@ -38,7 +40,37 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   data,
   deployAgentUrl,
   onStatusSelect,
+  canReadAgents = true,
 }) => {
+  // A total of 0 without agent:read means "filtered out", not "no agents".
+  if (data.total === 0 && !canReadAgents) {
+    return (
+      <EuiEmptyPrompt
+        iconType='lock'
+        body={
+          <p>
+            {i18n.translate(
+              'wazuh.common.homeOverviewAgentsByStatus.noWazuhRole',
+              {
+                defaultMessage:
+                  'Your account has no Wazuh role that grants access to agents.',
+              },
+            )}
+            <br />
+            {i18n.translate(
+              'wazuh.common.homeOverviewAgentsByStatus.noWazuhRoleHint',
+              {
+                defaultMessage:
+                  'Ask an administrator to map it to a Wazuh role in Server management > Security > Roles mapping.',
+              },
+            )}
+          </p>
+        }
+        data-test-subj='agents-by-status-no-wazuh-role'
+      />
+    );
+  }
+
   if (data.total === 0) {
     return (
       <EuiEmptyPrompt

@@ -5,6 +5,7 @@ import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
 import { useAgentStatus } from '../../hooks/use-overview-data';
 import * as navigation from '../../utils/navigation';
+import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Explicit factories so the real modules (and their heavy data-source imports)
 // are never loaded — this section is tested purely against the seam boundary.
@@ -32,6 +33,10 @@ jest.mock('../../../../permissions/button', () => ({
   ),
 }));
 
+jest.mock('../../../../hooks/useUserPermissions', () => ({
+  useUserPermissionsRequirements: jest.fn(),
+}));
+
 const asMock = (fn: unknown) => fn as jest.Mock;
 
 const findingsAvailable = {
@@ -49,6 +54,7 @@ const findingsAvailable = {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  asMock(useUserPermissionsRequirements).mockReturnValue([false, {}]);
   asMock(useAgentStatus).mockReturnValue({
     status: 'available',
     data: {
@@ -126,5 +132,32 @@ describe('OverviewSection', () => {
       'This instance has no agents registered.',
     );
     expect(screen.queryByText('agents active')).not.toBeInTheDocument();
+  });
+
+  it('says the account has no Wazuh role instead of "no agents" when agent:read is missing', () => {
+    asMock(useUserPermissionsRequirements).mockReturnValue([
+      [[{ action: 'agent:read', resource: 'agent:id:*' }]],
+      {},
+    ]);
+    asMock(useAgentStatus).mockReturnValue({
+      status: 'available',
+      data: {
+        active: 0,
+        disconnected: 0,
+        pending: 0,
+        neverConnected: 0,
+        total: 0,
+      },
+    });
+    const { container } = render(
+      <OverviewSection findings={findingsAvailable} />,
+    );
+    expect(container.textContent).toContain(
+      'Your account has no Wazuh role that grants access to agents.',
+    );
+    expect(container.textContent).not.toContain(
+      'This instance has no agents registered.',
+    );
+    expect(screen.queryByText('Deploy new agent')).not.toBeInTheDocument();
   });
 });
