@@ -24,11 +24,6 @@ jest.mock('../components/users-and-data-access-link', () => ({
     <a href='/app/security-dashboards-plugin'>Users and data access</a>
   ),
 }));
-jest.mock('../components/users-and-data-access-link', () => ({
-  UsersAndDataAccessLink: () => (
-    <a href='/app/security-dashboards-plugin'>Users and data access</a>
-  ),
-}));
 jest.mock('./components/edit-user', () => ({ EditUser: () => <div /> }));
 jest.mock('./services', () => ({ __esModule: true, default: {} }));
 jest.mock('../roles/services', () => ({ __esModule: true, default: {} }));

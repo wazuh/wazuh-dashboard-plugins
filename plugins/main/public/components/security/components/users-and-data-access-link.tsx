@@ -16,7 +16,8 @@ const NO_APPLICATIONS: ReadonlyMap<string, unknown> = new Map();
 /**
  * Links to Indexer management > Users and data access, where the dashboard sign-in accounts
  * live. The app is not registered for users who can't manage indexer security, so it then
- * renders the name without a link.
+ * renders the name without a link. With multiple data sources enabled (off by default in Wazuh),
+ * the app is registered for every user, and the link may open a page they can't use.
  */
 export const UsersAndDataAccessLink = () => {
   const application = getCore().application;

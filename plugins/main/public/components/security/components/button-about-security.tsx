@@ -58,7 +58,7 @@ const DocumentationLink = ({
 export const ButtonAboutSecurity = () => {
   const [isOpen, setIsOpen] = useState(false);
   const title = i18n.translate('wazuh.security.aboutFlyout.title', {
-    defaultMessage: 'About Security',
+    defaultMessage: 'About Wazuh API access',
   });
 
   return (
@@ -107,7 +107,7 @@ export const ButtonAboutSecurity = () => {
               <p>
                 {i18n.translate('wazuh.security.aboutFlyout.overview', {
                   defaultMessage:
-                    'This section manages the access control of the manager API. Users get roles, and roles group the policies and rules that allow or deny actions on resources.',
+                    'This section manages the access control of the Wazuh API. Users get roles, and roles group the policies and rules that allow or deny actions on resources.',
                 })}
               </p>
             </EuiText>
@@ -124,7 +124,7 @@ export const ButtonAboutSecurity = () => {
                     'wazuh.security.aboutFlyout.usersDescription',
                     {
                       defaultMessage:
-                        'Manager API users. The dashboard connects as the API user set in the host configuration. With run as, the roles come from Roles mapping instead.',
+                        'Wazuh API users. The dashboard connects as the API user set in the host configuration. With run as, the roles come from Roles mapping instead.',
                     },
                   ),
                 },
@@ -188,7 +188,7 @@ export const ButtonAboutSecurity = () => {
               <p>
                 <FormattedMessage
                   id='wazuh.security.aboutFlyout.indexerWarning.apiScope'
-                  defaultMessage='Policies on {group} or {id} only limit what the manager API returns, such as the endpoints list. They do not filter the data stored in the indexer.'
+                  defaultMessage='Policies on {group} or {id} only limit what the Wazuh API returns, such as the endpoints list. They do not filter the data stored in the indexer.'
                   values={{
                     group: <code>agent:group</code>,
                     id: <code>agent:id</code>,
