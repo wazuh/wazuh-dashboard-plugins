@@ -1,10 +1,7 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
 import { I18nProvider } from '@osd/i18n/react';
-import { queryDataTestAttr } from '../../../../../../test/public/query-attr';
 import {
   clearAgentReportedConfigurationCache,
   getAgentReportedConfiguration,
@@ -18,11 +15,6 @@ jest.mock(
     clearAgentReportedConfigurationCache: jest.fn(),
   }),
 );
-jest.mock('../../../../wz-agent-selector/wz-agent-selector-service', () => ({
-  PinnedAgentManager: jest.fn().mockImplementation(() => ({
-    isPinnedAgent: () => false,
-  })),
-}));
 jest.mock('../../../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
 }));
@@ -40,11 +32,9 @@ const getReport = getAgentReportedConfiguration as jest.Mock;
 
 const renderView = (kind: 'findings' | 'dashboard', agentId?: string) =>
   render(
-    <Provider store={createStore(() => ({ appStateReducers: {} }))}>
-      <I18nProvider>
-        <FimEmptyStateView kind={kind} agent={{ id: agentId }} />
-      </I18nProvider>
-    </Provider>,
+    <I18nProvider>
+      <FimEmptyStateView kind={kind} agent={{ id: agentId }} />
+    </I18nProvider>,
   );
 
 describe('FimEmptyStateView', () => {
@@ -61,15 +51,14 @@ describe('FimEmptyStateView', () => {
   });
 
   it('asks to select an agent and links the setup guide without a pinned agent', () => {
-    const { container } = renderView('findings');
+    renderView('findings');
 
     expect(getReport).not.toHaveBeenCalled();
     expect(
-      screen.getByText('Select an agent to see the directories it monitors.'),
+      screen.getByText(
+        'Use Explore agent to see the directories an agent monitors.',
+      ),
     ).toBeInTheDocument();
-    expect(
-      container.querySelector(queryDataTestAttr('explore-agent-button')),
-    ).toHaveTextContent('Explore agent');
     const link = screen.getByRole('link', {
       name: /How to configure File Integrity Monitoring/,
     });

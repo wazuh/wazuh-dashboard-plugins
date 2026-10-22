@@ -15,7 +15,6 @@ import { useSelector } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { endpointSummary } from '../../../../../utils/applications';
-import { ButtonExploreAgent } from '../../../../wz-agent-selector/button-explore-agent';
 import { FIM_CONFIGURE_DOCS_PATH } from '../../fim-documentation';
 import {
   MonitoredDirectories,
@@ -47,7 +46,7 @@ const getDescription = (kind: EmptyStateKind) =>
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescription',
         {
           defaultMessage:
-            'Try changing the search or time range. Findings appear when a file in a monitored directory is added, modified or deleted.',
+            "Findings list the changes detected after each file's baseline was recorded, so this tab can be empty while the Dashboard and Inventory show the monitored files. Try changing the search or time range.",
         },
       )
     : i18n.translate(
@@ -186,7 +185,7 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
                 'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
                 {
                   defaultMessage:
-                    'Select an agent to see the directories it monitors.',
+                    'Use Explore agent to see the directories an agent monitors.',
                 },
               )}
             </p>
@@ -194,7 +193,6 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
         </EuiText>
         {!pinned ? (
           <Actions>
-            <ButtonExploreAgent />
             <ConfigureLink />
           </Actions>
         ) : pinned.status !== 'loading' ? (
