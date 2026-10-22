@@ -42,7 +42,7 @@ describe('FimEmptyStateView', () => {
 
   it.each([
     ['findings', 'No file changes found', /search or time range/],
-    ['dashboard', 'No monitored files found', /^Try changing the search\./],
+    ['dashboard', 'No monitored files found', /Try changing the search\./],
   ] as const)('titles the %s empty state', (kind, title, hint) => {
     renderView(kind);
 
@@ -56,7 +56,7 @@ describe('FimEmptyStateView', () => {
     expect(getReport).not.toHaveBeenCalled();
     expect(
       screen.getByText(
-        'Use Explore agent to see the directories an agent monitors.',
+        /Use Explore agent, at the top, to see the directories an agent monitors\./,
       ),
     ).toBeInTheDocument();
     const link = screen.getByRole('link', {
@@ -77,7 +77,7 @@ describe('FimEmptyStateView', () => {
     });
     const { container, unmount } = renderView('findings', '001');
 
-    expect(screen.getByText(/^Loading the monitored/)).toBeInTheDocument();
+    expect(screen.getByText(/Loading the monitored/)).toBeInTheDocument();
     expect(await screen.findByText('/home')).toBeInTheDocument();
     expect(getReport).toHaveBeenCalledWith('001');
     expect(
@@ -103,7 +103,7 @@ describe('FimEmptyStateView', () => {
 
     expect(
       await screen.findByText(
-        'File Integrity Monitoring is disabled on this endpoint.',
+        /File Integrity Monitoring is disabled on this endpoint\./,
       ),
     ).toBeInTheDocument();
     expect(

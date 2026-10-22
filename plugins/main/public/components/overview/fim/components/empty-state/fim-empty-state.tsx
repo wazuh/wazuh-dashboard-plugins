@@ -126,21 +126,17 @@ const EndpointDirectories = ({
   switch (directories.status) {
     case 'loading':
       return (
-        <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
-          <EuiFlexItem grow={false}>
-            <EuiLoadingSpinner size='s' />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            {i18n.translate(
-              'wazuh.fileIntegrityMonitoring.emptyState.loadingDirectories',
-              { defaultMessage: 'Loading the monitored directories' },
-            )}
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <>
+          <EuiLoadingSpinner size='s' />{' '}
+          {i18n.translate(
+            'wazuh.fileIntegrityMonitoring.emptyState.loadingDirectories',
+            { defaultMessage: 'Loading the monitored directories' },
+          )}
+        </>
       );
     case 'monitored':
       return (
-        <p>
+        <>
           {i18n.translate(
             'wazuh.fileIntegrityMonitoring.emptyState.monitoredDirectories',
             { defaultMessage: 'Monitored directories:' },
@@ -151,10 +147,10 @@ const EndpointDirectories = ({
               <EuiCode>{directory}</EuiCode>
             </React.Fragment>
           ))}
-        </p>
+        </>
       );
     default:
-      return <p>{getEndpointStatusMessage(directories.status)}</p>;
+      return <>{getEndpointStatusMessage(directories.status)}</>;
   }
 };
 
@@ -176,20 +172,20 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
         data-test-subj='wzFimEmptyState'
       >
         <EuiText size='s'>
-          <p>{getDescription(kind)}</p>
-          {pinned ? (
-            <EndpointDirectories directories={pinned} />
-          ) : (
-            <p>
-              {i18n.translate(
+          <p>
+            {getDescription(kind)}{' '}
+            {pinned ? (
+              <EndpointDirectories directories={pinned} />
+            ) : (
+              i18n.translate(
                 'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
                 {
                   defaultMessage:
-                    'Use Explore agent to see the directories an agent monitors.',
+                    'Use Explore agent, at the top, to see the directories an agent monitors.',
                 },
-              )}
-            </p>
-          )}
+              )
+            )}
+          </p>
         </EuiText>
         {!pinned ? (
           <Actions>
