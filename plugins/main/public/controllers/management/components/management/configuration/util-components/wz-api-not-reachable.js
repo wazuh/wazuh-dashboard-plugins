@@ -26,7 +26,6 @@ import {
 
 import { updateRefreshTime } from '../../../../../../redux/actions/configurationActions';
 import { getToasts } from '../../../../../../kibana-services';
-import { WzEmptyPromptNoPermissions } from '../../../../../../components/common/permissions/prompt';
 import { connect } from 'react-redux';
 
 class WzWazuhAPINotReachable extends Component {
@@ -39,11 +38,8 @@ class WzWazuhAPINotReachable extends Component {
   addToast(toast) {
     getToasts().add(toast);
   }
-  isPermissionDenied() {
-    return this.props.error?.response?.status === 403;
-  }
   componentDidMount() {
-    if (this.props.error && !this.isPermissionDenied()) {
+    if (this.props.error) {
       this.addToast({
         title: (
           <Fragment>
@@ -57,19 +53,6 @@ class WzWazuhAPINotReachable extends Component {
     }
   }
   render() {
-    if (this.isPermissionDenied()) {
-      // The API answered, so the problem is the user's role, not the connection.
-      return (
-        <WzEmptyPromptNoPermissions
-          permissions={[
-            {
-              action: 'cluster:read',
-              resource: `node:id:${this.props.clusterNodeSelected}`,
-            },
-          ]}
-        />
-      );
-    }
     return (
       <EuiPanel>
         <EuiFlexGroup>
@@ -97,21 +80,8 @@ class WzWazuhAPINotReachable extends Component {
   }
 }
 
-WzWazuhAPINotReachable.propTypes = {
-  error: PropTypes.any,
-  clusterNodeSelected: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-  updateRefreshTime: PropTypes.func,
-};
-
-const mapStateToProps = state => ({
-  clusterNodeSelected: state.configurationReducers.clusterNodeSelected,
-});
-
 const mapDispatchToProps = dispatch => ({
   updateRefreshTime: () => dispatch(updateRefreshTime()),
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(WzWazuhAPINotReachable);
+export default connect(null, mapDispatchToProps)(WzWazuhAPINotReachable);

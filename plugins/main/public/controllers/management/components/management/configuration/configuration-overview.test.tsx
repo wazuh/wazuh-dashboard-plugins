@@ -339,6 +339,67 @@ describe('WzConfigurationOverview', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('does not offer Edit configuration when the cluster node is unknown and the user lacks permission', async () => {
+    render(
+      <Provider
+        store={configureMockStore()({
+          configurationReducers: {
+            clusterNodes: false,
+            clusterNodeSelected: false,
+            refreshTime: false,
+          },
+          appStateReducers: {
+            // White mode denies any action the user has no policy for.
+            userPermissions: { rbac_mode: 'white' },
+            userAccount: { administrator_requirements: null },
+            withUserLogged: true,
+          },
+        })}
+      >
+        <WzConfigurationOverview
+          updateConfigurationSection={jest.fn()}
+          onRefreshAgentReport={jest.fn()}
+        />
+      </Provider>,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /Edit configuration/ }),
+    ).toBeDisabled();
+  });
+
+  it('offers Edit configuration when the user may read and update the configuration of any node', async () => {
+    render(
+      <Provider
+        store={configureMockStore()({
+          configurationReducers: {
+            clusterNodes: false,
+            clusterNodeSelected: false,
+            refreshTime: false,
+          },
+          appStateReducers: {
+            userPermissions: {
+              rbac_mode: 'white',
+              'cluster:read': { 'node:id:*': 'allow' },
+              'cluster:update_config': { 'node:id:*': 'allow' },
+            },
+            userAccount: { administrator_requirements: null },
+            withUserLogged: true,
+          },
+        })}
+      >
+        <WzConfigurationOverview
+          updateConfigurationSection={jest.fn()}
+          onRefreshAgentReport={jest.fn()}
+        />
+      </Provider>,
+    );
+
+    expect(
+      await screen.findByRole('button', { name: /Edit configuration/ }),
+    ).toBeEnabled();
+  });
+
   it('says nothing about reporting for the manager', async () => {
     renderOverview({});
 
