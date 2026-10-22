@@ -15,6 +15,13 @@ import {
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import {
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
+  WAZUH_AGENT_CONFIG_PATTERN,
+  WAZUH_AGENT_STATS_PATTERN,
+  WAZUH_METRICS_AGENTS_PATTERN,
+  WAZUH_METRICS_COMMS_PATTERN,
+} from '../../../../common/constants';
 
 const FLYOUT_TITLE_ID = 'wzAboutSecurityTitle';
 const API_RBAC_DOCS_PATH = 'user-manual/api/rbac/index.html';
@@ -24,10 +31,12 @@ const AGENT_DATA_INDICES = [
   'wazuh-events-*',
   'wazuh-findings-*',
   'wazuh-states-*',
-  'wazuh-active-responses-*',
-  'wazuh-metrics-agents-*',
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
+  WAZUH_METRICS_AGENTS_PATTERN,
+  WAZUH_METRICS_COMMS_PATTERN,
 ];
 const DLS_QUERY_EXAMPLE = '{"terms":{"wazuh.agent.groups":["<group>"]}}';
+const DLS_AGENT_ID_QUERY_EXAMPLE = '{"term":{"wazuh.agent.id":"<agent id>"}}';
 
 const DocumentationLink = ({
   path,
@@ -115,7 +124,7 @@ export const ButtonAboutSecurity = () => {
                     'wazuh.security.aboutFlyout.usersDescription',
                     {
                       defaultMessage:
-                        'Manager API users. A dashboard user acts as one of them when run as is enabled.',
+                        'Manager API users. The dashboard connects as the API user set in the host configuration. With run as, the roles come from Roles mapping instead.',
                     },
                   ),
                 },
@@ -137,12 +146,15 @@ export const ButtonAboutSecurity = () => {
                     'wazuh.security.aboutFlyout.policiesTerm',
                     { defaultMessage: 'Policies' },
                   ),
-                  description: i18n.translate(
-                    'wazuh.security.aboutFlyout.policiesDescription',
-                    {
-                      defaultMessage:
-                        'Allow or deny actions on resources, for example agent:read on agent:group:<group>.',
-                    },
+                  description: (
+                    <FormattedMessage
+                      id='wazuh.security.aboutFlyout.policiesDescription'
+                      defaultMessage='Allow or deny actions on resources, for example {action} on {resource}.'
+                      values={{
+                        action: <code>agent:read</code>,
+                        resource: <code>agent:group:&lt;group&gt;</code>,
+                      }}
+                    />
                   ),
                 },
                 {
@@ -174,22 +186,21 @@ export const ButtonAboutSecurity = () => {
               )}
             >
               <p>
-                {i18n.translate(
-                  'wazuh.security.aboutFlyout.indexerWarning.apiScope',
-                  {
-                    defaultMessage:
-                      'Policies on agent:group or agent:id only limit what the manager API returns, such as the endpoints list. They do not filter the data stored in the indexer.',
-                  },
-                )}
+                <FormattedMessage
+                  id='wazuh.security.aboutFlyout.indexerWarning.apiScope'
+                  defaultMessage='Policies on {group} or {id} only limit what the manager API returns, such as the endpoints list. They do not filter the data stored in the indexer.'
+                  values={{
+                    group: <code>agent:group</code>,
+                    id: <code>agent:id</code>,
+                  }}
+                />
               </p>
               <p>
-                {i18n.translate(
-                  'wazuh.security.aboutFlyout.indexerWarning.dlsRequired',
-                  {
-                    defaultMessage:
-                      'To limit a user to an agent or a group of agents, also create an indexer role with document-level security on wazuh.agent.groups in the indices with agent data, and map it to the user:',
-                  },
-                )}
+                <FormattedMessage
+                  id='wazuh.security.aboutFlyout.indexerWarning.dlsRequired'
+                  defaultMessage='To limit a user to an agent or a group of agents, also create an indexer role with document-level security on {field} in the indices with agent data, and map it to the user:'
+                  values={{ field: <code>wazuh.agent.groups</code> }}
+                />
               </p>
               <ul>
                 {AGENT_DATA_INDICES.map(index => (
@@ -202,6 +213,31 @@ export const ButtonAboutSecurity = () => {
                 {DLS_QUERY_EXAMPLE}
               </EuiCodeBlock>
               <EuiSpacer size='s' />
+              <p>
+                {i18n.translate(
+                  'wazuh.security.aboutFlyout.indexerWarning.agentIdExample',
+                  {
+                    defaultMessage:
+                      'To limit a user to a single agent, use its ID instead:',
+                  },
+                )}
+              </p>
+              <EuiCodeBlock language='json' paddingSize='s' isCopyable>
+                {DLS_AGENT_ID_QUERY_EXAMPLE}
+              </EuiCodeBlock>
+              <EuiSpacer size='s' />
+              <p>
+                <FormattedMessage
+                  id='wazuh.security.aboutFlyout.indexerWarning.agentIdOnlyIndices'
+                  defaultMessage='The documents in {stats} and {config} do not have {groups}, so a group query hides the Stats tab and the agent configuration. Use document-level security on {id} in those indices.'
+                  values={{
+                    stats: <code>{WAZUH_AGENT_STATS_PATTERN}</code>,
+                    config: <code>{WAZUH_AGENT_CONFIG_PATTERN}</code>,
+                    groups: <code>wazuh.agent.groups</code>,
+                    id: <code>wazuh.agent.id</code>,
+                  }}
+                />
+              </p>
               <p>
                 {i18n.translate(
                   'wazuh.security.aboutFlyout.indexerWarning.indexTime',

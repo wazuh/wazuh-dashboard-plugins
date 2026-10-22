@@ -187,14 +187,12 @@ export const WzSecurity = compose(
     <EuiPage>
       <EuiFlexGroup>
         <EuiFlexItem>
-          <EuiFlexGroup alignItems='center' responsive={false} gutterSize='s'>
-            <EuiFlexItem>
-              <EuiTabs>{renderTabs()}</EuiTabs>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
+          <EuiTabs>
+            {renderTabs()}
+            <div style={{ marginLeft: 'auto' }}>
               <ButtonAboutSecurity />
-            </EuiFlexItem>
-          </EuiFlexGroup>
+            </div>
+          </EuiTabs>
           <EuiSpacer size='m'></EuiSpacer>
           <Switch>
             <Route path='?tab=users'>

@@ -2,6 +2,13 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { ButtonAboutSecurity } from './button-about-security';
+import {
+  WAZUH_ACTIVE_RESPONSES_PATTERN,
+  WAZUH_AGENT_CONFIG_PATTERN,
+  WAZUH_AGENT_STATS_PATTERN,
+  WAZUH_METRICS_AGENTS_PATTERN,
+  WAZUH_METRICS_COMMS_PATTERN,
+} from '../../../../common/constants';
 
 jest.mock('../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
@@ -26,9 +33,14 @@ describe('ButtonAboutSecurity', () => {
       'wazuh-events-*',
       'wazuh-findings-*',
       'wazuh-states-*',
-      'wazuh-active-responses-*',
-      'wazuh-metrics-agents-*',
+      WAZUH_ACTIVE_RESPONSES_PATTERN,
+      WAZUH_METRICS_AGENTS_PATTERN,
+      WAZUH_METRICS_COMMS_PATTERN,
+      WAZUH_AGENT_CONFIG_PATTERN,
+      WAZUH_AGENT_STATS_PATTERN,
       '{"terms":{"wazuh.agent.groups":["<group>"]}}',
+      '{"term":{"wazuh.agent.id":"<agent id>"}}',
+      'With run as, the roles come from Roles mapping instead.',
     ].forEach(text => expect(flyout).toHaveTextContent(text));
   });
 
