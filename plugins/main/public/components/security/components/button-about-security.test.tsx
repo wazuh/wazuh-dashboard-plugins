@@ -19,7 +19,9 @@ describe('ButtonAboutSecurity', () => {
     render(<ButtonAboutSecurity />);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'About Security' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'About Wazuh API access' }),
+    );
 
     const flyout = screen.getByRole('dialog');
     ['Users', 'Roles', 'Policies', 'Roles mapping'].forEach(term =>
@@ -42,11 +44,14 @@ describe('ButtonAboutSecurity', () => {
       '{"term":{"wazuh.agent.id":"<agent id>"}}',
       'With run as, the roles come from Roles mapping instead.',
     ].forEach(text => expect(flyout).toHaveTextContent(text));
+    expect(flyout).not.toHaveTextContent('hides the Stats tab');
   });
 
   it('links the header to the API RBAC docs and the warning to the indexer security docs', () => {
     render(<ButtonAboutSecurity />);
-    fireEvent.click(screen.getByRole('button', { name: 'About Security' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'About Wazuh API access' }),
+    );
 
     const links = screen.getAllByRole('link', { name: /documentation/ });
     expect(links.map(link => link.getAttribute('href'))).toEqual([
@@ -63,7 +68,9 @@ describe('ButtonAboutSecurity', () => {
 
   it('closes the flyout', () => {
     render(<ButtonAboutSecurity />);
-    fireEvent.click(screen.getByRole('button', { name: 'About Security' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'About Wazuh API access' }),
+    );
 
     fireEvent.click(
       document.querySelector('[data-test-subj="euiFlyoutCloseButton"]')!,

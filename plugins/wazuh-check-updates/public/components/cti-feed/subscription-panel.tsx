@@ -26,7 +26,8 @@ interface SubscriptionView {
   title: string;
   status: string;
   description: string;
-  action: string;
+  /** Opens the registration flow; a registered environment has none. */
+  action?: string;
   fillAction: boolean;
 }
 
@@ -73,10 +74,6 @@ function getSubscriptionView(
             defaultMessage:
               'This environment is registered with Wazuh Cyber Threat Intelligence. Manage the subscription and upgrade the plan from the Wazuh Console.',
           },
-        ),
-        action: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.registeredAction',
-          { defaultMessage: 'View registration' },
         ),
         fillAction: false,
       };
@@ -294,15 +291,19 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
               <FeedTiers />
             </>
           ) : null}
-          <EuiSpacer size='l' />
-          <EuiButton
-            fill={view.fillAction}
-            onClick={onOpenRegistration}
-            iconType={state === 'notRegistered' ? 'globe' : undefined}
-            data-test-subj='ctiFeedSubscriptionAction'
-          >
-            {view.action}
-          </EuiButton>
+          {view.action ? (
+            <>
+              <EuiSpacer size='l' />
+              <EuiButton
+                fill={view.fillAction}
+                onClick={onOpenRegistration}
+                iconType={state === 'notRegistered' ? 'globe' : undefined}
+                data-test-subj='ctiFeedSubscriptionAction'
+              >
+                {view.action}
+              </EuiButton>
+            </>
+          ) : null}
         </>
       )}
     </EuiPanel>

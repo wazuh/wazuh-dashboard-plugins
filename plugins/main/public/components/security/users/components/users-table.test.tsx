@@ -1,9 +1,11 @@
+import '@testing-library/jest-dom';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { UsersTable } from './users-table';
 
 interface TableColumn {
   field?: string;
+  name?: React.ReactNode;
   sortable?: boolean;
 }
 
@@ -31,6 +33,10 @@ jest.mock('@elastic/eui', () => ({
   EuiFlexGroup: ({ children }: MockNode) => <div>{children}</div>,
   EuiFlexItem: ({ children }: MockNode) => <div>{children}</div>,
   EuiLoadingSpinner: () => <div />,
+  EuiIcon: () => <span />,
+  EuiToolTip: ({ children, content }: MockNode & { content: string }) => (
+    <span title={content}>{children}</span>
+  ),
 }));
 jest.mock('../../../common/buttons', () => ({
   WzButtonPermissionsModalConfirm: () => <button />,
@@ -86,5 +92,19 @@ describe('UsersTable', () => {
     // The Server API only allows sorting /security/users by `username` and
     // `id`; any other field is rejected with a bad request.
     expect(sortableFields).toEqual(['username']);
+  });
+
+  it('explains Allow run as in a tooltip on its column header', () => {
+    renderTable({ sort: { field: 'username', direction: 'asc' } });
+
+    const column = mockBasicTableProps.columns.find(
+      ({ field }) => field === 'allow_run_as',
+    );
+    render(<>{column?.name}</>);
+
+    expect(screen.getByText('Allow run as').closest('[title]')).toHaveAttribute(
+      'title',
+      expect.stringMatching(/^Lets the dashboard call the API on behalf/),
+    );
   });
 });

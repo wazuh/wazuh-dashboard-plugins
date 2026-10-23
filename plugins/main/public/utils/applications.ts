@@ -702,13 +702,13 @@ export const security = {
   category: 'wz-category-server-management',
   id: 'security',
   title: i18n.translate('wazuh.security.app.title', {
-    defaultMessage: 'Security',
+    defaultMessage: 'Wazuh API access',
   }),
   tabTitle: i18n.translate('wazuh.security.app.tabTitle', {
-    defaultMessage: 'Server security',
+    defaultMessage: 'Wazuh API access',
   }),
   breadcrumbLabel: i18n.translate('wazuh.security.app.breadcrumbLabel', {
-    defaultMessage: 'Security',
+    defaultMessage: 'Wazuh API access',
   }),
   description: i18n.translate('wazuh.security.app.description', {
     defaultMessage:

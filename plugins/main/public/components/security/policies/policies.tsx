@@ -93,7 +93,7 @@ export const Policies = withUserAuthorizationPrompt([
           </EuiTitle>
           <EuiText size='s' color='subdued'>
             {i18n.translate('wazuh.security.policies.description', {
-              defaultMessage: 'Manage the policies of the manager API.',
+              defaultMessage: 'Manage the policies of the Wazuh API.',
             })}
           </EuiText>
         </EuiPageContentHeaderSection>
