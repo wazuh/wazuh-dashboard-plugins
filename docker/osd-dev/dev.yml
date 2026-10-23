@@ -215,6 +215,11 @@ services:
     tty: true
     environment:
       - 'LOGS=/proc/1/fd/1'
+      # Host-mounted sources (e.g. --base) are owned by a different uid; let git
+      # (used by @osd/optimizer cache keys) trust them.
+      - 'GIT_CONFIG_COUNT=1'
+      - 'GIT_CONFIG_KEY_0=safe.directory'
+      - 'GIT_CONFIG_VALUE_0=*'
     entrypoint: ['tail', '-f', '/dev/null']
     volumes:
       - osd_cache:/home/node/.cache
@@ -232,6 +237,11 @@ services:
     container_name: dashboard-src-installer-${NODE_VERSION}
     user: '1000:1000'
     working_dir: /home/node/kbn
+    environment:
+      # The mounted --base sources are owned by a host uid; osd bootstrap runs git on them.
+      - 'GIT_CONFIG_COUNT=1'
+      - 'GIT_CONFIG_KEY_0=safe.directory'
+      - 'GIT_CONFIG_VALUE_0=*'
     entrypoint: /bin/bash
     command: >
       -c '
@@ -243,7 +253,7 @@ services:
         fi
         echo "Initializating setup"
         cd $$root_app_dir
-        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap
+        yarn osd clean && yarn osd bootstrap && touch $$marker_osd_bootstrap || exit 1
         echo "Setup was finished"
       '
 
@@ -424,73 +434,72 @@ services:
       - /bin/bash
       - -c
       - |
-        # Update and install dependencies. ca-certificates is required: the
-        # agent verifies the manager certificate by default, and without an OS
-        # trust store it refuses to start with "no OS CA bundle was found".
-        # curl/jq are required to mint the enrollment token from the manager's
-        # Server API below.
-        apt update -y
-        apt install -y lsb-release adduser ca-certificates curl jq
+        # Enrollment happens once. A restarted container re-runs this whole
+        # script on its persisted filesystem, so only do the first-time setup
+        # when the agent is not installed and enrolled yet: re-minting a token
+        # would needlessly depend on the manager Server API being ready again.
+        if ! { dpkg -s wazuh-agent >/dev/null 2>&1 && [ -s /var/ossec/etc/client.keys ]; }; then
+          # Update and install dependencies. ca-certificates is required: the
+          # agent verifies the manager certificate by default, and without an OS
+          # trust store it refuses to start with "no OS CA bundle was found".
+          # curl/jq are required to mint the enrollment token from the manager's
+          # Server API below.
+          apt update -y
+          apt install -y lsb-release adduser ca-certificates curl jq
 
-        # The manager generates its certificates on startup, so wait for the
-        # root CA to appear in the shared volume before installing. Give up
-        # rather than wait forever: without the CA the agent cannot verify the
-        # manager, and a container stuck in this loop looks like a hang.
-        ca_wait=0
-        while [ ! -f /etc/server_certs/root-ca.pem ]; do
-          if [ "$$ca_wait" -ge 120 ]; then
-            echo "ERROR: the manager root CA did not appear at /etc/server_certs/root-ca.pem after $${ca_wait}s."
-            echo "The certificate generator may not have run. Check the 'generator' service."
-            exit 1
-          fi
-          echo "Waiting for the manager root CA..."
-          sleep 2
-          ca_wait=$$((ca_wait + 2))
-        done
+          # The manager generates its certificates on startup, so wait for the
+          # root CA to appear in the shared volume before installing. Give up
+          # rather than wait forever: without the CA the agent cannot verify the
+          # manager, and a container stuck in this loop looks like a hang.
+          ca_wait=0
+          while [ ! -f /etc/server_certs/root-ca.pem ]; do
+            if [ "$$ca_wait" -ge 120 ]; then
+              echo "ERROR: the manager root CA did not appear at /etc/server_certs/root-ca.pem after $${ca_wait}s."
+              echo "The certificate generator may not have run. Check the 'generator' service."
+              exit 1
+            fi
+            echo "Waiting for the manager root CA..."
+            sleep 2
+            ca_wait=$$((ca_wait + 2))
+          done
 
-        # Copy the CA out of the shared volume. The manager keeps it readable
-        # only by its own user, and wazuh-agentd drops privileges, so it needs
-        # its own world-readable copy or it exits with "verify_mode requires a
-        # readable CA file".
-        cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
-        chmod 644 /etc/wazuh-manager-root-ca.pem
+          # Copy the CA out of the shared volume. The manager keeps it readable
+          # only by its own user, and wazuh-agentd drops privileges, so it needs
+          # its own world-readable copy or it exits with "verify_mode requires a
+          # readable CA file".
+          cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
+          chmod 644 /etc/wazuh-manager-root-ca.pem
 
-        # The manager's Server API only starts once entrypoint.sh reaches
-        # "wazuh-manager-control start", which happens after the CA above is
-        # already written, so it needs its own wait. -k skips TLS
-        # verification for this call only, matching the indexer healthcheck
-        # convention already used in this file.
-        api_wait=0
-        until curl -sk -o /dev/null "https://wazuh.manager.local:55000/security/user/authenticate"; do
-          if [ "$$api_wait" -ge 120 ]; then
-            echo "ERROR: the manager Server API did not become reachable after $${api_wait}s."
-            exit 1
-          fi
-          echo "Waiting for the manager Server API..."
-          sleep 2
-          api_wait=$$((api_wait + 2))
-        done
+          # Mint a short-lived enrollment token from the manager's Server API,
+          # the same flow the "Deploy new agent" wizard uses, instead of a
+          # static registration password. The API starts listening before the
+          # manager daemons are up and answers 500 until they are, so retry the
+          # real authentication instead of only waiting for the port to answer.
+          # -k skips TLS verification for these calls only, matching the indexer
+          # healthcheck convention already used in this file.
+          ENROLLMENT_TOKEN=
+          api_wait=0
+          until [ -n "$$ENROLLMENT_TOKEN" ]; do
+            AUTH_TOKEN=$$(curl -sk -u "$$API_USERNAME:$$API_PASSWORD" -X POST "https://wazuh.manager.local:55000/security/user/authenticate" | jq -r '.data.token // empty' 2>/dev/null)
+            if [ -n "$$AUTH_TOKEN" ]; then
+              ENROLLMENT_TOKEN=$$(curl -sk -X POST "https://wazuh.manager.local:55000/agents/enrollment-tokens" -H "Authorization: Bearer $$AUTH_TOKEN" -H 'content-type: application/json' -d '{"address":"wazuh.manager.local","description":"Generated by docker/osd-dev agent host: wazuh.agent.deb.local"}' | jq -r '.data.token // empty' 2>/dev/null)
+            fi
+            [ -n "$$ENROLLMENT_TOKEN" ] && break
+            if [ "$$api_wait" -ge 120 ]; then
+              echo "ERROR: could not mint an enrollment token from the manager Server API after $${api_wait}s."
+              exit 1
+            fi
+            echo "Waiting for the manager Server API..."
+            sleep 2
+            api_wait=$$((api_wait + 2))
+          done
 
-        # Mint a short-lived enrollment token from the manager's Server API,
-        # the same flow the "Deploy new agent" wizard uses, instead of a
-        # static registration password.
-        AUTH_TOKEN=$$(curl -sk -u "$$API_USERNAME:$$API_PASSWORD" -X POST "https://wazuh.manager.local:55000/security/user/authenticate" | jq -r '.data.token')
-        if [ -z "$$AUTH_TOKEN" ] || [ "$$AUTH_TOKEN" = "null" ]; then
-          echo "ERROR: could not authenticate against the manager Server API to mint an enrollment token."
-          exit 1
+          # Install Wazuh agent. WAZUH_REGISTRATION_CA pins the manager's root
+          # CA: the agent then verifies the certificate chain instead of
+          # trusting any certificate. The token names the manager itself, so
+          # WAZUH_MANAGER is not set alongside it.
+          WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_ENROLLMENT_TOKEN="$$ENROLLMENT_TOKEN" dpkg -i /packages-agents/wazuh-agent*.deb
         fi
-
-        ENROLLMENT_TOKEN=$$(curl -sk -X POST "https://wazuh.manager.local:55000/agents/enrollment-tokens" -H "Authorization: Bearer $$AUTH_TOKEN" -H 'content-type: application/json' -d '{"address":"wazuh.manager.local","description":"Generated by docker/osd-dev agent host: wazuh.agent.deb.local"}' | jq -r '.data.token')
-        if [ -z "$$ENROLLMENT_TOKEN" ] || [ "$$ENROLLMENT_TOKEN" = "null" ]; then
-          echo "ERROR: the manager did not return an enrollment token."
-          exit 1
-        fi
-
-        # Install Wazuh agent. WAZUH_REGISTRATION_CA pins the manager's root
-        # CA: the agent then verifies the certificate chain instead of
-        # trusting any certificate. The token names the manager itself, so
-        # WAZUH_MANAGER is not set alongside it.
-        WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_ENROLLMENT_TOKEN="$$ENROLLMENT_TOKEN" dpkg -i /packages-agents/wazuh-agent*.deb
 
         # Start Wazuh agent
         /etc/init.d/wazuh-agent start
@@ -516,76 +525,75 @@ services:
       - /bin/bash
       - -c
       - |
-        # Update CentOS 8
-        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-        yum clean all
-        yum makecache
-        yum upgrade -y
+        # Enrollment happens once. A restarted container re-runs this whole
+        # script on its persisted filesystem, so only do the first-time setup
+        # when the agent is not installed and enrolled yet: re-minting a token
+        # would needlessly depend on the manager Server API being ready again.
+        if ! { rpm -q wazuh-agent >/dev/null 2>&1 && [ -s /var/ossec/etc/client.keys ]; }; then
+          # Update CentOS 8
+          sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+          sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+          yum clean all
+          yum makecache
+          yum upgrade -y
 
-        # curl/jq are required to mint the enrollment token from the
-        # manager's Server API below.
-        yum install -y curl jq
+          # curl/jq are required to mint the enrollment token from the
+          # manager's Server API below.
+          yum install -y curl jq
 
-        # The manager generates its certificates on startup, so wait for the
-        # root CA to appear in the shared volume before installing. Give up
-        # rather than wait forever: without the CA the agent cannot verify the
-        # manager, and a container stuck in this loop looks like a hang.
-        ca_wait=0
-        while [ ! -f /etc/server_certs/root-ca.pem ]; do
-          if [ "$$ca_wait" -ge 120 ]; then
-            echo "ERROR: the manager root CA did not appear at /etc/server_certs/root-ca.pem after $${ca_wait}s."
-            echo "The certificate generator may not have run. Check the 'generator' service."
-            exit 1
-          fi
-          echo "Waiting for the manager root CA..."
-          sleep 2
-          ca_wait=$$((ca_wait + 2))
-        done
+          # The manager generates its certificates on startup, so wait for the
+          # root CA to appear in the shared volume before installing. Give up
+          # rather than wait forever: without the CA the agent cannot verify the
+          # manager, and a container stuck in this loop looks like a hang.
+          ca_wait=0
+          while [ ! -f /etc/server_certs/root-ca.pem ]; do
+            if [ "$$ca_wait" -ge 120 ]; then
+              echo "ERROR: the manager root CA did not appear at /etc/server_certs/root-ca.pem after $${ca_wait}s."
+              echo "The certificate generator may not have run. Check the 'generator' service."
+              exit 1
+            fi
+            echo "Waiting for the manager root CA..."
+            sleep 2
+            ca_wait=$$((ca_wait + 2))
+          done
 
-        # Copy the CA out of the shared volume. The manager keeps it readable
-        # only by its own user, and wazuh-agentd drops privileges, so it needs
-        # its own world-readable copy or it exits with "verify_mode requires a
-        # readable CA file".
-        cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
-        chmod 644 /etc/wazuh-manager-root-ca.pem
+          # Copy the CA out of the shared volume. The manager keeps it readable
+          # only by its own user, and wazuh-agentd drops privileges, so it needs
+          # its own world-readable copy or it exits with "verify_mode requires a
+          # readable CA file".
+          cp /etc/server_certs/root-ca.pem /etc/wazuh-manager-root-ca.pem
+          chmod 644 /etc/wazuh-manager-root-ca.pem
 
-        # The manager's Server API only starts once entrypoint.sh reaches
-        # "wazuh-manager-control start", which happens after the CA above is
-        # already written, so it needs its own wait. -k skips TLS
-        # verification for this call only, matching the indexer healthcheck
-        # convention already used in this file.
-        api_wait=0
-        until curl -sk -o /dev/null "https://wazuh.manager.local:55000/security/user/authenticate"; do
-          if [ "$$api_wait" -ge 120 ]; then
-            echo "ERROR: the manager Server API did not become reachable after $${api_wait}s."
-            exit 1
-          fi
-          echo "Waiting for the manager Server API..."
-          sleep 2
-          api_wait=$$((api_wait + 2))
-        done
+          # Mint a short-lived enrollment token from the manager's Server API,
+          # the same flow the "Deploy new agent" wizard uses, instead of a
+          # static registration password. The API starts listening before the
+          # manager daemons are up and answers 500 until they are, so retry the
+          # real authentication instead of only waiting for the port to answer.
+          # -k skips TLS verification for these calls only, matching the indexer
+          # healthcheck convention already used in this file.
+          ENROLLMENT_TOKEN=
+          api_wait=0
+          until [ -n "$$ENROLLMENT_TOKEN" ]; do
+            AUTH_TOKEN=$$(curl -sk -u "$$API_USERNAME:$$API_PASSWORD" -X POST "https://wazuh.manager.local:55000/security/user/authenticate" | jq -r '.data.token // empty' 2>/dev/null)
+            if [ -n "$$AUTH_TOKEN" ]; then
+              ENROLLMENT_TOKEN=$$(curl -sk -X POST "https://wazuh.manager.local:55000/agents/enrollment-tokens" -H "Authorization: Bearer $$AUTH_TOKEN" -H 'content-type: application/json' -d '{"address":"wazuh.manager.local","description":"Generated by docker/osd-dev agent host: wazuh.agent.rpm.local"}' | jq -r '.data.token // empty' 2>/dev/null)
+            fi
+            [ -n "$$ENROLLMENT_TOKEN" ] && break
+            if [ "$$api_wait" -ge 120 ]; then
+              echo "ERROR: could not mint an enrollment token from the manager Server API after $${api_wait}s."
+              exit 1
+            fi
+            echo "Waiting for the manager Server API..."
+            sleep 2
+            api_wait=$$((api_wait + 2))
+          done
 
-        # Mint a short-lived enrollment token from the manager's Server API,
-        # the same flow the "Deploy new agent" wizard uses, instead of a
-        # static registration password.
-        AUTH_TOKEN=$$(curl -sk -u "$$API_USERNAME:$$API_PASSWORD" -X POST "https://wazuh.manager.local:55000/security/user/authenticate" | jq -r '.data.token')
-        if [ -z "$$AUTH_TOKEN" ] || [ "$$AUTH_TOKEN" = "null" ]; then
-          echo "ERROR: could not authenticate against the manager Server API to mint an enrollment token."
-          exit 1
+          # Install wazuh-agent. WAZUH_REGISTRATION_CA pins the manager's root
+          # CA: the agent then verifies the certificate chain instead of
+          # trusting any certificate. The token names the manager itself, so
+          # WAZUH_MANAGER is not set alongside it.
+          WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_ENROLLMENT_TOKEN="$$ENROLLMENT_TOKEN" yum localinstall -y /packages-agents/wazuh-agent*.rpm
         fi
-
-        ENROLLMENT_TOKEN=$$(curl -sk -X POST "https://wazuh.manager.local:55000/agents/enrollment-tokens" -H "Authorization: Bearer $$AUTH_TOKEN" -H 'content-type: application/json' -d '{"address":"wazuh.manager.local","description":"Generated by docker/osd-dev agent host: wazuh.agent.rpm.local"}' | jq -r '.data.token')
-        if [ -z "$$ENROLLMENT_TOKEN" ] || [ "$$ENROLLMENT_TOKEN" = "null" ]; then
-          echo "ERROR: the manager did not return an enrollment token."
-          exit 1
-        fi
-
-        # Install wazuh-agent. WAZUH_REGISTRATION_CA pins the manager's root
-        # CA: the agent then verifies the certificate chain instead of
-        # trusting any certificate. The token names the manager itself, so
-        # WAZUH_MANAGER is not set alongside it.
-        WAZUH_AGENT_GROUP='default' WAZUH_REGISTRATION_CA='/etc/wazuh-manager-root-ca.pem' WAZUH_ENROLLMENT_TOKEN="$$ENROLLMENT_TOKEN" yum localinstall -y /packages-agents/wazuh-agent*.rpm
 
         # Start wazuh-agent
         /var/ossec/bin/wazuh-control start

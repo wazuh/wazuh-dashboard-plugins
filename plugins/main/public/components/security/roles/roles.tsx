@@ -131,7 +131,7 @@ export const Roles = withUserAuthorizationPrompt([
           </EuiTitle>
           <EuiText size='s' color='subdued'>
             {i18n.translate('wazuh.security.roles.description', {
-              defaultMessage: 'Manage the roles of the manager API.',
+              defaultMessage: 'Manage the roles of the Wazuh API.',
             })}
           </EuiText>
         </EuiPageContentHeaderSection>

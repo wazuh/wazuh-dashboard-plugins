@@ -163,7 +163,7 @@ export const ctiFlowState = {
       : Date.now() - deviceAuthStartedAt;
   },
 
-  /** Environment UID sent as `client_id`: the deployment ID in Wazuh Cloud. */
+  /** Environment UID sent as `client_id`: the deployment ID in the CTI console. */
   getEnvironmentUid(): string | null {
     return environmentUid;
   },

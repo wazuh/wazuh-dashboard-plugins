@@ -9,6 +9,8 @@ import {
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
+import { UsersAndDataAccessLink } from '../components/users-and-data-access-link';
 import { UsersTable } from './components/users-table';
 import { CreateUser } from './components/create-user';
 import { EditUser } from './components/edit-user';
@@ -157,9 +159,11 @@ export const Users = withUserAuthorizationPrompt([
             </h2>
           </EuiTitle>
           <EuiText size='s' color='subdued'>
-            {i18n.translate('wazuh.security.users.description', {
-              defaultMessage: 'Manage the users of the manager API.',
-            })}
+            <FormattedMessage
+              id='wazuh.security.users.description'
+              defaultMessage='Manage the users of the Wazuh API. To manage who signs in to the dashboard, go to Indexer management > {usersAndDataAccess}.'
+              values={{ usersAndDataAccess: <UsersAndDataAccessLink /> }}
+            />
           </EuiText>
         </EuiPageContentHeaderSection>
         <EuiPageContentHeaderSection>

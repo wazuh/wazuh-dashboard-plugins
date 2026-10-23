@@ -51,7 +51,7 @@ export const sampleFileIntegrityMonitoring = i18n.translate(
 
 export const sampleSecurityConfigurationAssessment = i18n.translate(
   'wazuh.sampleData.categories.configurationAssessment.sources',
-  { defaultMessage: 'states of SCA, checks, policies' },
+  { defaultMessage: 'states, checks, policies' },
 );
 
 export const sampleInventory = i18n.translate(

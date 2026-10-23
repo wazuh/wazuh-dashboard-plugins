@@ -19,6 +19,11 @@ jest.mock('./components/users-table', () => ({
   UsersTable: () => <div data-test-subj='users-table' />,
 }));
 jest.mock('./components/create-user', () => ({ CreateUser: () => <div /> }));
+jest.mock('../components/users-and-data-access-link', () => ({
+  UsersAndDataAccessLink: () => (
+    <a href='/app/security-dashboards-plugin'>Users and data access</a>
+  ),
+}));
 jest.mock('./components/edit-user', () => ({ EditUser: () => <div /> }));
 jest.mock('./services', () => ({ __esModule: true, default: {} }));
 jest.mock('../roles/services', () => ({ __esModule: true, default: {} }));
@@ -46,11 +51,14 @@ jest.mock('../../common/permissions/button', () => ({
 }));
 
 describe('Users', () => {
-  it('shows a description clarifying these users belong to the Wazuh manager API', () => {
+  it('shows a description that points to where dashboard sign-in is managed', () => {
     render(<Users />);
 
     expect(
-      screen.getByText(/Manage the users of the manager API/),
+      screen.getByText(
+        /Manage the users of the Wazuh API\. To manage who signs in/,
+      ),
     ).toBeTruthy();
+    expect(screen.getByText('Users and data access')).toBeTruthy();
   });
 });

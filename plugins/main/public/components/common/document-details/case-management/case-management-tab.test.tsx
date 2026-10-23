@@ -1,5 +1,12 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  waitForElementToBeRemoved,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { CaseManagementTab } from './case-management-tab';
 import {
@@ -52,6 +59,13 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+const pickOption = async (button: RegExp, option: RegExp) => {
+  fireEvent.click(screen.getByRole('button', { name: button }));
+  const listbox = await screen.findByRole('listbox');
+  fireEvent.click(within(listbox).getByRole('option', { name: option }));
+  await waitForElementToBeRemoved(listbox);
+};
+
 describe('CaseManagementTab required fields', () => {
   it('create: enables the save button only when status, title and severity are set', async () => {
     (getFindingsCase as jest.Mock).mockResolvedValue({
@@ -67,14 +81,10 @@ describe('CaseManagementTab required fields', () => {
     expect(screen.getByLabelText('Case title')).toHaveValue('Case_doc-1');
     expect(createButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText('Case status'), {
-      target: { value: 'active' },
-    });
+    await pickOption(/^Case status/, /^Active/);
     expect(createButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText('Case severity'), {
-      target: { value: 'high' },
-    });
+    await pickOption(/^Case severity/, /^High/);
     expect(createButton).toBeEnabled();
 
     fireEvent.change(screen.getByLabelText('Case title'), {
@@ -86,6 +96,25 @@ describe('CaseManagementTab required fields', () => {
       target: { value: 'my case' },
     });
     expect(createButton).toBeEnabled();
+  });
+
+  it('create: prefills the title with the rule title when provided', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    render(
+      <CaseManagementTab
+        document={{
+          ...documentRef,
+          _source: { wazuh: { rule: { title: 'Brute force' } } },
+        }}
+      />,
+    );
+
+    await screen.findByRole('button', { name: 'Create case' });
+    expect(screen.getByLabelText('Case title')).toHaveValue('Brute force');
   });
 
   it('edit: keeps the save button disabled until dirty and while a required field is blank', async () => {
@@ -101,15 +130,227 @@ describe('CaseManagementTab required fields', () => {
     const updateButton = screen.getByRole('button', { name: 'Update case' });
     expect(updateButton).toBeDisabled();
 
-    fireEvent.change(screen.getByLabelText('Case severity'), {
-      target: { value: 'critical' },
-    });
+    await pickOption(/^Case severity/, /^Critical/);
     expect(updateButton).toBeEnabled();
 
     fireEvent.change(screen.getByLabelText('Case title'), {
       target: { value: '' },
     });
     expect(updateButton).toBeDisabled();
+  });
+});
+
+describe('CaseManagementTab status descriptions', () => {
+  it('describes every status in the dropdown and under the field', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    await screen.findByRole('button', { name: 'Create case' });
+    expect(
+      screen.getByText('Current lifecycle status of this finding.'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /^Case status/ }));
+    const options = within(await screen.findByRole('listbox')).getAllByRole(
+      'option',
+    );
+    expect(options.map(option => option.textContent)).toEqual([
+      '—',
+      'ActiveOpen. No one is working on it yet.',
+      'AcknowledgedOpen. Someone is working on it.',
+      'CompletedClosed. No more work needed.',
+      'AuditKept for review or compliance.',
+      'ErrorMarked as a mistake, for example a false positive.',
+      'DeletedMarked as removed. Kept for history.',
+    ]);
+
+    fireEvent.click(screen.getByRole('option', { name: /^Acknowledged/ }));
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+    expect(
+      screen.getByText('Open. Someone is working on it.'),
+    ).toBeInTheDocument();
+  });
+
+  it('describes a status set outside the form in the badge and the field', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: { ...fullCase, status: 'audit' },
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    const badge = (await screen.findByText('Audit')).closest('[tabindex="0"]');
+    expect(badge).not.toBeNull();
+    fireEvent.focus(badge as Element);
+    const tooltip = await screen.findByText('Kept for review or compliance.');
+    fireEvent.blur(badge as Element);
+    await waitForElementToBeRemoved(tooltip);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+
+    expect(
+      screen.getByRole('button', { name: 'Case status Audit' }),
+    ).toBeInTheDocument();
+    for (const suffix of [
+      'statusName',
+      'statusValue',
+      'severityName',
+      'severityValue',
+      'priorityName',
+      'priorityValue',
+      'tlpLabel',
+      'tlpValue',
+    ]) {
+      expect(document.querySelectorAll(`[id$="-${suffix}"]`)).toHaveLength(1);
+    }
+    expect(
+      screen.getByText('Kept for review or compliance.'),
+    ).toBeInTheDocument();
+  });
+
+  it('saves a status picked with the keyboard', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+    (updateDocumentCase as jest.Mock).mockResolvedValue({
+      case: { ...fullCase, status: 'acknowledged' },
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    const statusButton = screen.getByRole('button', {
+      name: 'Case status Active',
+    });
+    fireEvent.keyDown(statusButton, { key: 'ArrowDown' });
+    const active = await screen.findByRole('option', { name: /^Active/ });
+    await waitFor(() => expect(active).toHaveFocus());
+    fireEvent.keyDown(active, { key: 'ArrowDown' });
+    const acknowledged = screen.getByRole('option', { name: /^Acknowledged/ });
+    expect(acknowledged).toHaveFocus();
+    // jsdom does not turn Enter on a focused button into a click
+    fireEvent.click(acknowledged);
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Update case' }));
+
+    await waitFor(() =>
+      expect(updateDocumentCase).toHaveBeenCalledWith(
+        'wazuh-findings-v5-security',
+        'doc-1',
+        expect.objectContaining({ status: 'acknowledged' }),
+      ),
+    );
+  });
+  it('lets a keyboard user pick the status of a new case', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: null,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    await screen.findByRole('button', { name: 'Create case' });
+    fireEvent.keyDown(screen.getByRole('button', { name: 'Case status' }), {
+      key: 'ArrowDown',
+    });
+    const listbox = await screen.findByRole('listbox');
+    const empty = within(listbox).getByRole('option', { name: '—' });
+    await waitFor(() => expect(empty).toHaveFocus());
+    fireEvent.keyDown(empty, { key: 'ArrowDown' });
+    const active = within(listbox).getByRole('option', { name: /^Active/ });
+    expect(active).toHaveFocus();
+    fireEvent.click(active);
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+
+    expect(
+      screen.getByRole('button', { name: 'Case status Active' }),
+    ).toBeInTheDocument();
+  });
+});
+
+describe('CaseManagementTab selects', () => {
+  it('names each select by its field and value', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+
+    for (const name of [
+      'Case status Active',
+      'Case severity High',
+      'Case priority Urgent',
+      'TLP TLP:AMBER',
+    ]) {
+      expect(screen.getByRole('button', { name })).toBeInTheDocument();
+    }
+  });
+});
+
+describe('CaseManagementTab TLP descriptions', () => {
+  it('describes every TLP level in the dropdown, under the field and in the badge', async () => {
+    (getFindingsCase as jest.Mock).mockResolvedValue({
+      case: fullCase,
+      username: 'admin',
+    });
+
+    render(<CaseManagementTab document={documentRef} />);
+
+    const badge = (await screen.findByText('TLP:AMBER')).closest(
+      '[tabindex="0"]',
+    );
+    fireEvent.focus(badge as Element);
+    const tooltip = await screen.findByText(
+      "Limited disclosure, restricted to participants' organization and its clients.",
+    );
+    fireEvent.blur(badge as Element);
+    await waitForElementToBeRemoved(tooltip);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(
+      screen.getByText(
+        "Limited disclosure, restricted to participants' organization and its clients.",
+      ),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'TLP TLP:AMBER' }));
+    const options = within(await screen.findByRole('listbox')).getAllByRole(
+      'option',
+    );
+    expect(options.map(option => option.textContent)).toEqual([
+      '—',
+      'TLP:REDNot for disclosure, restricted to participants only.',
+      "TLP:AMBERLimited disclosure, restricted to participants' organization and its clients.",
+      'TLP:GREENLimited disclosure, restricted to the community.',
+      'TLP:CLEARDisclosure is not limited.',
+    ]);
+
+    fireEvent.click(screen.getByRole('option', { name: /^TLP:GREEN/ }));
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+    expect(
+      screen.getByText('Limited disclosure, restricted to the community.'),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'TLP TLP:GREEN' }));
+    fireEvent.click(
+      within(await screen.findByRole('listbox')).getByRole('option', {
+        name: '—',
+      }),
+    );
+    await waitForElementToBeRemoved(() => screen.queryByRole('listbox'));
+    expect(
+      screen.getByText('Traffic Light Protocol sharing level.'),
+    ).toBeInTheDocument();
   });
 });
 
