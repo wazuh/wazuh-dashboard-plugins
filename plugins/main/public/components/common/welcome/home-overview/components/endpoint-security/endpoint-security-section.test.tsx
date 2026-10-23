@@ -20,6 +20,16 @@ jest.mock('../../utils/navigation', () => ({
   getFileIntegrityMonitoringUrl: jest.fn(),
   getFileIntegrityMonitoringInventoryFilesUrl: jest.fn(() => '#fim-files'),
   getMalwareDetectionUrl: jest.fn(),
+  getDeployAgentUrl: jest.fn(() => '#deploy'),
+}));
+// WzButtonPermissions needs the redux store for RBAC; a plain link is enough.
+jest.mock('../../../../permissions/button', () => ({
+  WzButtonPermissions: ({
+    children,
+    ...rest
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    <a {...rest}>{children}</a>
+  ),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -100,6 +110,33 @@ describe('EndpointSecuritySection', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('IOC matches')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
+  });
+
+  it('shows a deploy prompt instead of zeros on SCA and FIM when there are no agents', () => {
+    const { container } = render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+        noAgents
+      />,
+    );
+    for (const card of ['sca-no-agents', 'fim-no-agents']) {
+      expect(
+        container.querySelector(`[data-test-subj="${card}"]`),
+      ).toBeInTheDocument();
+    }
+    expect(
+      screen.getAllByText('No data yet. Deploy an agent to see results here.'),
+    ).toHaveLength(2);
+    for (const cta of screen.getAllByText('Deploy new agent')) {
+      expect(cta.closest('a')).toHaveAttribute('href', '#deploy');
+    }
+    expect(screen.queryByText('Overall score')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('File integrity baselined fleet-wide'),
+    ).not.toBeInTheDocument();
+    // Malware Detection isn't agent-only data, so it keeps its render.
+    expect(screen.getByText('IOC matches')).toBeInTheDocument();
   });
 
   it('links the SCA tiles and the FIM hero to their filtered/inventory views', () => {

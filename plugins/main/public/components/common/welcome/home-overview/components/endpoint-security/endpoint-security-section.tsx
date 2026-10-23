@@ -7,6 +7,7 @@ import {
   StatTile,
   TabNumber,
   ScoreGauge,
+  NoAgentsState,
   DualBarList,
   SectionHeader,
   WIDGET_LOADING_MIN_HEIGHT,
@@ -22,6 +23,7 @@ import {
 } from '../../hooks/use-overview-data';
 import {
   getConfigurationAssessmentUrl,
+  getDeployAgentUrl,
   getFileIntegrityMonitoringInventoryFilesUrl,
   getFileIntegrityMonitoringUrl,
 } from '../../utils/navigation';
@@ -35,11 +37,13 @@ export interface EndpointSecuritySectionProps {
   findings: ReturnType<typeof useFindingsOverview>;
   /** Feed-by-type comes from the shared threat-intel enrichments catalog. */
   threatIntel: DataGroupResult<ThreatIntelEnrichments>;
+  /** No agents registered: SCA and FIM show a deploy prompt instead of zeros. */
+  noAgents?: boolean;
 }
 
 const EndpointSecuritySectionComponent: React.FC<
   EndpointSecuritySectionProps
-> = ({ findings, threatIntel }) => {
+> = ({ findings, threatIntel, noAgents = false }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
   const sca = useSCAOverview(visible);
   const fim = useFIMOverview(visible);
@@ -90,9 +94,16 @@ const EndpointSecuritySectionComponent: React.FC<
               { defaultMessage: 'Current state' },
             )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
+            centerBody={noAgents}
             data-test-subj='home-overview-sca'
           >
-            {sca.data && (
+            {sca.data && noAgents && (
+              <NoAgentsState
+                deployAgentUrl={getDeployAgentUrl()}
+                data-test-subj='sca-no-agents'
+              />
+            )}
+            {sca.data && !noAgents && (
               <>
                 <ScaTiles
                   tiles={sca.data.tiles}
@@ -151,9 +162,16 @@ const EndpointSecuritySectionComponent: React.FC<
               { defaultMessage: 'Current state' },
             )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
+            centerBody={noAgents}
             data-test-subj='home-overview-fim'
           >
-            {fim.data && (
+            {fim.data && noAgents && (
+              <NoAgentsState
+                deployAgentUrl={getDeployAgentUrl()}
+                data-test-subj='fim-no-agents'
+              />
+            )}
+            {fim.data && !noAgents && (
               <>
                 <StatTile
                   value={
