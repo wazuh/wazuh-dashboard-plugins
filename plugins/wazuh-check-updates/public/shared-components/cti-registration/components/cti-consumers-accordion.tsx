@@ -22,12 +22,19 @@ import type {
   CtiConsumer,
   CtiConsumersResponse,
 } from '../../../../common/cti-consumers';
+import { getConsumerSyncState } from '../../../services/cti-consumer-sync-state';
+import {
+  MISSING_CTI_VALUE,
+  formatCtiTimestamp,
+} from '../../../services/cti-timestamp';
 
 const CTI_CONSUMER_FIELDS: Array<{
   key: keyof CtiConsumer;
   label: string;
   isLink?: boolean;
   dataTestSubj?: string;
+  /** Formats the value when the generic formatting does not fit. */
+  format?: (consumer: CtiConsumer) => string;
 }> = [
   {
     key: 'name',
@@ -82,38 +89,34 @@ const CTI_CONSUMER_FIELDS: Array<{
       },
     ),
   },
+  {
+    key: 'updated_at',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.updatedAt', {
+      defaultMessage: 'Last updated',
+    }),
+    dataTestSubj: 'ctiConsumersUpdatedAtItem',
+    format: consumer => formatCtiTimestamp(consumer.updated_at),
+  },
+  {
+    key: 'pending_sync_phases',
+    label: i18n.translate(
+      'wazuhCheckUpdates.ctiConsumers.fields.pendingSyncPhases',
+      { defaultMessage: 'Pending phases' },
+    ),
+    dataTestSubj: 'ctiConsumersPendingSyncPhasesItem',
+    format: ({ pending_sync_phases: phases }) => {
+      if (!phases) {
+        return MISSING_CTI_VALUE;
+      }
+      return phases.length > 0
+        ? phases.join(', ')
+        : i18n.translate(
+            'wazuhCheckUpdates.ctiConsumers.fields.pendingSyncPhasesNone',
+            { defaultMessage: 'None' },
+          );
+    },
+  },
 ];
-
-// `status` has no validated enum — the server route passes it through
-// verbatim. 'ready', 'running' and 'failed' are the only literal values this
-// component gives meaning to (see
-// plugins/wazuh-ai-assistant/server/tools/catalog/get-cti-status.ts for
-// 'ready'); anything else falls back to showing the raw value.
-const CTI_CONSUMER_STATUS_READY = 'ready';
-const CTI_CONSUMER_STATUS_RUNNING = 'running';
-const CTI_CONSUMER_STATUS_FAILED = 'failed';
-
-type ConsumerSyncState =
-  | { kind: 'upToDate' }
-  | { kind: 'syncing' }
-  | { kind: 'failed' }
-  | { kind: 'unknown'; rawStatus: string };
-
-function getConsumerSyncState(consumer: CtiConsumer): ConsumerSyncState {
-  if (
-    consumer.status === CTI_CONSUMER_STATUS_READY &&
-    consumer.local_offset === consumer.remote_offset
-  ) {
-    return { kind: 'upToDate' };
-  }
-  if (consumer.status === CTI_CONSUMER_STATUS_RUNNING) {
-    return { kind: 'syncing' };
-  }
-  if (consumer.status === CTI_CONSUMER_STATUS_FAILED) {
-    return { kind: 'failed' };
-  }
-  return { kind: 'unknown', rawStatus: consumer.status };
-}
 
 const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
   const syncState = getConsumerSyncState(consumer);
@@ -128,6 +131,14 @@ const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
               defaultMessage: 'Up to date',
             },
           )}
+        </EuiBadge>
+      );
+    case 'pending':
+      return (
+        <EuiBadge color='primary' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate('wazuhCheckUpdates.ctiConsumers.syncStatus.pending', {
+            defaultMessage: 'Update pending',
+          })}
         </EuiBadge>
       );
     case 'syncing':
@@ -362,7 +373,11 @@ export const CtiConsumersAccordion: React.FC = () => {
                       <ConsumerField
                         key={String(field.key)}
                         title={field.label}
-                        value={formatFieldValue(consumer[field.key])}
+                        value={
+                          field.format
+                            ? field.format(consumer)
+                            : formatFieldValue(consumer[field.key])
+                        }
                         href={field.isLink ? consumer.resource : undefined}
                         dataTestSubj={field.dataTestSubj}
                       />

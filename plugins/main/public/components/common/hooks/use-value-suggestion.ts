@@ -11,8 +11,9 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { getDataPlugin } from '../../../kibana-services';
+import { getDataPlugin, getUiSettings } from '../../../kibana-services';
 import { IIndexPattern } from 'src/plugins/data/public';
+import { UI_SETTINGS } from '../../../../../../src/plugins/data/common';
 import {
   UI_ERROR_SEVERITIES,
   UIErrorLog,
@@ -33,6 +34,14 @@ export interface BoolFilter {
   field: string;
   value: string;
 }
+
+const SEARCH_DEBOUNCE_MS = 300;
+const CONTAINS_SUGGESTIONS_SIZE = 10;
+/* Same bounds as the platform autocomplete defaults */
+const CONTAINS_TIMEOUT = '1000ms';
+const CONTAINS_TERMINATE_AFTER = 100000;
+
+const escapeWildcard = (value: string) => value.replace(/[\\*?]/g, '\\$&');
 
 /**
  * Use the provided mechanism to retrieve the suggetions. It only supports the boolean and string
@@ -115,8 +124,58 @@ async function getValueSuggestionResolverAggregation({
   return map(buckets || [], 'key');
 }
 
+/**
+ * Suggest the values of a string field that contain the query anywhere, ignoring case.
+ */
+async function getValueSuggestionResolverContains({
+  query,
+  indexPattern,
+  field,
+  boolFilter,
+}) {
+  if (
+    !field.aggregatable ||
+    !getUiSettings().get(UI_SETTINGS.FILTERS_EDITOR_SUGGEST_VALUES)
+  ) {
+    return [];
+  }
+  const value = `*${escapeWildcard(query)}*`;
+  const searchSource = await getDataPlugin().search.searchSource.create();
+  const searchParams = searchSource
+    .setParent(undefined)
+    .setField('size', 0)
+    .setField('timeout', CONTAINS_TIMEOUT)
+    .setField('terminate_after', CONTAINS_TERMINATE_AFTER)
+    .setField('index', indexPattern)
+    .setField('aggs', {
+      suggestions: {
+        terms: { field: field.name, size: CONTAINS_SUGGESTIONS_SIZE },
+      },
+    })
+    .setField('query', {
+      language: 'lucene',
+      query: {
+        bool: {
+          filter: query
+            ? [
+                ...boolFilter,
+                {
+                  // eslint-disable-next-line camelcase
+                  wildcard: { [field.name]: { value, case_insensitive: true } },
+                },
+              ]
+            : boolFilter,
+        },
+      },
+    });
+
+  const response = await searchParams.fetch();
+  const buckets = get(response, 'aggregations.suggestions.buckets');
+  return map(buckets || [], 'key');
+}
+
 const getValueSuggestionResolversByFieldType = {
-  string: getValueSuggestionResolverAutocomplete,
+  string: getValueSuggestionResolverContains,
   boolean: getValueSuggestionResolverAutocomplete,
   _default: getValueSuggestionResolverAggregation,
 };
@@ -179,16 +238,23 @@ export const useValueSuggestion = (
   };
 
   useEffect(() => {
+    let isStale = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
     if (indexPattern) {
       setIsLoading(true);
-      (async () => {
+      const fetchSuggestions = async () => {
         try {
           const field = indexPattern.fields.find(
             ({ spec: { name } }) => name === filterField,
           );
           const suggestions = await getValueSuggestions(field.spec);
-          setSuggestedValues(suggestions);
+          if (!isStale) {
+            setSuggestedValues(suggestions);
+          }
         } catch (error) {
+          if (isStale) {
+            return;
+          }
           const options: UIErrorLog = {
             context: `${useValueSuggestion.name}.getValueSuggestions`,
             level: UI_LOGGER_LEVELS.ERROR as UILogLevel,
@@ -201,13 +267,24 @@ export const useValueSuggestion = (
           };
           getErrorOrchestrator().handleError(options);
         } finally {
-          setIsLoading(false);
+          if (!isStale) {
+            setIsLoading(false);
+          }
         }
-      })();
+      };
+      if (query && !options) {
+        timer = setTimeout(fetchSuggestions, SEARCH_DEBOUNCE_MS);
+      } else {
+        fetchSuggestions();
+      }
     } else {
       setSuggestedValues([]);
       setIsLoading(false);
     }
+    return () => {
+      isStale = true;
+      clearTimeout(timer);
+    };
   }, [indexPattern, query, filterField, boolFilterValue]);
 
   return { suggestedValues, isLoading, setQuery };

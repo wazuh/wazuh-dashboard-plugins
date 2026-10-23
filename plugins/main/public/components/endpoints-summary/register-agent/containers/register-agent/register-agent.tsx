@@ -41,6 +41,7 @@ import {
   validateManagerCaPath,
 } from '../../utils/validations';
 import {
+  validateEnrollmentTokenDescription,
   validateEnrollmentTokenMaxUses,
   validateEnrollmentTokenTtl,
 } from '../../../../../services/enrollment-tokens';
@@ -179,6 +180,7 @@ export const RegisterAgent = compose(
     enrollmentTokenDescription: {
       type: 'text',
       initialValue: '',
+      validate: validateEnrollmentTokenDescription,
     },
     agentName: {
       type: 'text',
@@ -187,7 +189,8 @@ export const RegisterAgent = compose(
     },
     /* Enrollment authenticates one way, agent to manager, so the manager is
     authenticated solely by TLS. The agent verifies by default -- against the
-    endpoint's system CA store, or against the CA below when one is given -- and
+    CA bootstrapped from the enrollment token, the endpoint's system CA store
+    without a token, or the CA below when one is given -- and
     turning this off generates an explicit WAZUH_SSL_VERIFICATION=none
     opt-out. */
     sslVerification: {

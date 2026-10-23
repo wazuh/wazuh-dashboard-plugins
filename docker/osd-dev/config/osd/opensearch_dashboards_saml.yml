@@ -51,5 +51,8 @@ wazuh_core.hosts:
     username: wazuh-internal-client
     password: wazuh-internal-client
     run_as: true
+    # Verify the Server API certificate, as the dashboard package does. The manager
+    # container issues it from the generator CA, with wazuh.manager.local in its SAN.
+    ca: '/home/node/kbn/certs/root-ca.pem'
 wazuh_core.healthCheckCertificateExpiryWarningDays: 30
 wazuh_core.healthCheckCertificateExpiryCriticalDays: 7

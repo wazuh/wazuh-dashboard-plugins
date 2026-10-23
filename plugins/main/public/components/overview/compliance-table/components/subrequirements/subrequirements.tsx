@@ -331,7 +331,7 @@ export class ComplianceSubrequirements extends Component {
                       <EuiToolTip
                         position='top'
                         content={i18n.translate(
-                          'wazuh.complianceTable.subrequirements.inspectInEventsTooltip',
+                          'wazuh.complianceTable.subrequirements.inspectInFindingsTooltip',
                           {
                             defaultMessage: 'Inspect {requirement} in {view}',
                             values: {

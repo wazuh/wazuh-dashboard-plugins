@@ -287,7 +287,7 @@ export function buildSystemPrompt(nowIso: string): string {
       '  3. RBAC / spaces admin troubleshooting (diagnosing a role or permission problem): "I ' +
       "can't diagnose role or space permission issues — that's not available in the AI " +
       'assistant at the moment. Check your access with an administrator, or review it under ' +
-      'Server management > Security > Roles." NOTE: the word space/spaces is ' +
+      'Server management > Wazuh API access > Roles." NOTE: the word space/spaces is ' +
       'overloaded -- this decline is ONLY for an access/permission problem (a role, who can see ' +
       'what). A question about a Ruleset Management space as a CONTENT grouping, e.g. what ' +
       'spaces exist and what each one contains, is a different, answerable question: call ' +

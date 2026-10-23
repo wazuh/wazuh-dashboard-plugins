@@ -27,9 +27,3 @@ export enum CtiDetails {
   ERROR = 'Error trying to contact the API',
   PENDING = 'Registration process was not started and never tried.',
 }
-
-export interface StatusCtiRegistrationProps {
-  statusCTI: ISubscriptionResponse;
-  refetchStatus: (options?: { silent?: boolean }) => Promise<void>;
-  onOpenModal: () => void;
-}

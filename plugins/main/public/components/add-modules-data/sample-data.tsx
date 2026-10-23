@@ -146,13 +146,13 @@ export default class WzSampleData extends Component {
       {
         title: i18n.translate(
           'wazuh.sampleData.categories.configurationAssessment.title',
-          { defaultMessage: 'Sample security configuration assessment' },
+          { defaultMessage: 'Sample Configuration Assessment' },
         ),
         description: i18n.translate(
           'wazuh.sampleData.categories.configurationAssessment.description',
           {
             defaultMessage:
-              'Sample data, visualizations and dashboards for security configuration assessment ({sources}).',
+              'Sample data, visualizations and dashboards for Configuration Assessment ({sources}).',
             values: { sources: sampleSecurityConfigurationAssessment },
           },
         ),

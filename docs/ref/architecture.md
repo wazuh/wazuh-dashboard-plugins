@@ -106,7 +106,7 @@ any plugin reaches the server API client as `context.wazuh_core.api.client.asCur
 
 ### wazuh-check-updates
 
-`wazuh-check-updates` provides two features:
+`wazuh-check-updates` provides three features:
 
 - **Available updates**: checks the latest published Wazuh version through the content manager
   of the Wazuh indexer (`GET /_plugins/_content_manager/version/check`), stores the result in a
@@ -114,8 +114,11 @@ any plugin reaches the server API client as `context.wazuh_core.api.client.asCur
   bottom of the interface. See [Available updates](modules/available-updates.md).
 - **CTI registration**: registers the environment with the Wazuh CTI Console through the OAuth
   2.0 device authorization grant, then hands the resulting subscription to the content manager of
-  the Wazuh indexer (`/_plugins/_content_manager/subscription`). The browser side exposes the
-  `CtiRegistration` header control, which `main` mounts when `ctiRegistrationUiEnabled` is set.
+  the Wazuh indexer (`/_plugins/_content_manager/subscription`).
+- **CTI feed app**: the **CTI feed** application, under **Threat intelligence**, shows the
+  registration status, the sync state of each feed and the content the feed delivered, and
+  requests an on-demand content update. It is registered only when `ctiRegistrationUiEnabled` is
+  set. See [CTI feed](modules/cti-feed.md).
 
 Its server routes live under `/api/wazuh-check-updates/`.
 
@@ -182,7 +185,8 @@ Plugins share code and state through two mechanisms, both provided by OpenSearch
 - **Lifecycle contracts**: the object a plugin returns from `setup()` or `start()` is handed to
   every plugin that lists it in `requiredPlugins` or `optionalPlugins`. For example, `main` reads
   `plugins.wazuhCore` for the configuration and the server API client, and
-  `plugins.wazuhCheckUpdates.CtiRegistration` for the CTI registration header control.
+  `plugins.wazuhCheckUpdates.CtiUpsellNotification` for the bar that invites users to register
+  for CTI.
 - **Route handler contexts**: a server plugin can attach values to the `context` argument of
   every route handler. `wazuh-core` registers `context.wazuh_core`, `main` registers
   `context.wazuh`, `wazuh-check-updates` registers `context.wazuh_check_updates`, and

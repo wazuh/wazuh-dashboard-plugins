@@ -25,6 +25,7 @@ import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
 import { removeAgentService } from '../../services/remove-agent';
 import { useAsyncAction } from '../../../common/hooks';
+import { PinnedAgentManager } from '../../../wz-agent-selector/wz-agent-selector-service';
 
 interface RemoveAgentModalProps {
   agent: Agent;
@@ -61,6 +62,7 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
         const response = await removeAgentService(agent.id);
         // Ensure the agent was actually removed
         if (response?.data?.data?.affected_items.includes(agent.id)) {
+          new PinnedAgentManager().unPinAgentIfPinned([agent.id]);
           getToasts().add({
             color: 'success',
             title: i18n.translate(

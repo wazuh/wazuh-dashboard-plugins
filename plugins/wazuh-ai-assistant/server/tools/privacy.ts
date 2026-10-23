@@ -391,7 +391,7 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   // that claim is FALSE as stated (live-verified: `.ds-wazuh-events-v5-security-000001`'s root leaves
   // include `message` (the raw log line), `related` (ECS `related.ip`/`related.user`), and `url` (an
   // observed URL) -- all bare, all customer data). The narrower claim that actually holds, and the
-  // one this file's safety depends on, is the COLLISION claim: none of the 19 bare names below is
+  // one this file's safety depends on, is the COLLISION claim: none of the 22 bare names below is
   // itself the SAME literal as a bare root leaf of any customer-data family (`wazuh-states-*`,
   // `wazuh-events-v5-*`, `wazuh-findings-v5-*`) -- live-verified for every one of them against
   // `wazuh-states-inventory-users` (whose personal field is `user.name`, never a bare `name`) and
@@ -494,6 +494,11 @@ export const FIELD_POLICY_DEFAULTS: FieldPolicyEntry[] = [
   { field: 'is_public', action: 'allow' },
   { field: 'local_offset', action: 'allow' },
   { field: 'remote_offset', action: 'allow' },
+  // Newer indexers (wazuh-indexer-plugins#1198): ISO timestamps and a list of fixed sub-step names
+  // (`integrations`, `rules`, `detectors`, ...), all written by the content-manager service.
+  { field: 'updated_at', action: 'allow' },
+  { field: 'pending_sync_phases', action: 'allow' },
+  { field: 'last_checked_at', action: 'allow' },
   { field: 'job_type', action: 'allow' },
   { field: 'enabled', action: 'allow' },
   // `type` is DELIBERATELY NOT LISTED here even though it appears on both CTI documents (a
