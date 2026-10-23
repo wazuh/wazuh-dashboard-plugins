@@ -69,4 +69,38 @@ describe('SCA overview dashboard definition', () => {
       );
     });
   });
+
+  describe('score visualization', () => {
+    const visState = JSON.parse(
+      getSavedObject('check_score').attributes.visState,
+    );
+    const spec = JSON.parse(visState.params.spec);
+    const [scoreMark, captionMark] = spec.marks;
+
+    it('sizes the score from the panel width on every resize', () => {
+      expect(scoreMark.encode.enter.fontSize).toBeUndefined();
+      expect(scoreMark.encode.update.fontSize.signal).toMatch(
+        /^min\(53\.333, width \//,
+      );
+      expect(scoreMark.encode.update.x.signal).toBe('width / 2');
+    });
+
+    it('keeps the caption below the score', () => {
+      expect(captionMark.encode.update.y.signal).toContain(
+        scoreMark.encode.update.fontSize.signal,
+      );
+    });
+  });
+
+  describe.each(['policies_by_result', 'results_by_agent'])(
+    '%s bar chart',
+    id => {
+      const { params } = JSON.parse(getSavedObject(id).attributes.visState);
+
+      it('leaves room for the bars in narrow panels', () => {
+        expect(params.legendPosition).toBe('bottom');
+        expect(params.categoryAxes[0].labels.truncate).toBe(30);
+      });
+    },
+  );
 });
