@@ -443,13 +443,16 @@ class WzConfigurationOverview extends Component {
                   <EuiFlexItem>
                     <WzButtonPermissions
                       buttonType='empty'
+                      // The node is unknown until the cluster nodes load, or when the user can't list them.
                       permissions={[
-                        this.props.clusterNodeSelected && {
-                          action: 'cluster:update_config',
-                          resource: `node:id:${this.props.clusterNodeSelected}`,
-                        },
-                      ].filter(Boolean)} // Filter falsy values. clusterNodeSelected is initially false on mount
-                      // before cluster data loads, causing [false] in permissions array and TypeError
+                        'cluster:read',
+                        'cluster:update_config',
+                      ].map(action => ({
+                        action,
+                        resource: `node:id:${
+                          this.props.clusterNodeSelected || '*'
+                        }`,
+                      }))}
                       iconSide='left'
                       iconType='pencil'
                       onClick={() =>

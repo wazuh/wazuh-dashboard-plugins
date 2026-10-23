@@ -41,6 +41,7 @@ export const WzIndexerSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [canEdit, setCanEdit] = useState(true);
   const [bottomBarHost, setBottomBarHost] = useState<HTMLElement | null>(null);
 
   const isIndexRawEventsDisabled = isSecurityAnalyticsSettingDisabled(
@@ -63,11 +64,11 @@ export const WzIndexerSettings: React.FC = () => {
       const settings = response.data;
       setSavedSettings(settings);
       setDraftSettings(settings);
-    } catch (error: any) {
+    } catch (error) {
       setSavedSettings(null);
       setDraftSettings(null);
       setLoadError(
-        error?.message ||
+        (error as Error)?.message ||
           i18n.translate('wazuh.indexerSettings.form.fetchError', {
             defaultMessage: 'Error fetching settings.',
           }),
@@ -84,7 +85,9 @@ export const WzIndexerSettings: React.FC = () => {
   const updateEngine = useCallback(
     <K extends keyof Engine>(key: K, value: Engine[K]) => {
       setDraftSettings(prev => {
-        if (!prev) return prev;
+        if (!prev) {
+          return prev;
+        }
         return {
           ...prev,
           engine: { ...prev.engine, [key]: value },
@@ -106,7 +109,9 @@ export const WzIndexerSettings: React.FC = () => {
   }, [savedSettings, draftSettings]);
 
   useEffect(() => {
-    if (!hasUnsavedChanges) return;
+    if (!hasUnsavedChanges) {
+      return;
+    }
 
     const handler = (e: BeforeUnloadEvent) => {
       e.preventDefault();
@@ -117,15 +122,29 @@ export const WzIndexerSettings: React.FC = () => {
   }, [hasUnsavedChanges]);
 
   const cancelChanges = () => {
-    if (savedSettings === null) return;
+    if (savedSettings === null) {
+      return;
+    }
     setDraftSettings(savedSettings);
   };
 
+  const noPermissionMessage = i18n.translate(
+    'wazuh.indexerSettings.form.noPermission',
+    { defaultMessage: "You don't have permission to change indexer settings." },
+  );
+
   const saveChanges = async () => {
-    if (draftSettings === null) return;
+    if (draftSettings === null) {
+      return;
+    }
     setSaving(true);
     try {
-      await GenericRequest.request('PUT', '/indexer/settings', draftSettings);
+      await GenericRequest.request(
+        'PUT',
+        '/indexer/settings',
+        draftSettings,
+        true,
+      );
 
       setSavedSettings(draftSettings);
       getToasts().addSuccess(
@@ -133,9 +152,21 @@ export const WzIndexerSettings: React.FC = () => {
           defaultMessage: 'Settings updated successfully.',
         }),
       );
-    } catch (error: any) {
+    } catch (error) {
+      const { response, message } = error as {
+        response?: { status?: number; data?: { message?: string } };
+        message?: string;
+      };
+      if (response?.status === 403) {
+        // The change was refused, so drop it and stop offering an edit that cannot be saved.
+        setDraftSettings(savedSettings);
+        setCanEdit(false);
+        getToasts().addDanger(noPermissionMessage);
+        return;
+      }
       getToasts().addDanger(
-        error?.message ||
+        response?.data?.message ||
+          message ||
           i18n.translate('wazuh.indexerSettings.form.saveErrorToast', {
             defaultMessage: 'Error updating settings.',
           }),
@@ -255,6 +286,18 @@ export const WzIndexerSettings: React.FC = () => {
             </EuiText>
           ) : draftSettings ? (
             <EuiPanel paddingSize='none' hasBorder={false} hasShadow={false}>
+              {!canEdit && (
+                <>
+                  <EuiCallOut
+                    title={noPermissionMessage}
+                    color='warning'
+                    iconType='lock'
+                    size='s'
+                    data-test-subj='indexerSettings-noPermission'
+                  />
+                  <EuiSpacer size='m' />
+                </>
+              )}
               <EuiDescribedFormGroup
                 fullWidth
                 id='indexer-settings-enable-raw-events-group'
@@ -289,7 +332,7 @@ export const WzIndexerSettings: React.FC = () => {
                   )}
                   engine={draftSettings.engine}
                   updateEngine={updateEngine}
-                  saving={saving}
+                  disabled={saving || !canEdit}
                 />
               </EuiDescribedFormGroup>
             </EuiPanel>
