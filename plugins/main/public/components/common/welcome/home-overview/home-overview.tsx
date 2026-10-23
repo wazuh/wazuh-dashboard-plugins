@@ -10,6 +10,7 @@ import { SecurityOperationsSection } from './components/security-operations';
 import { CloudSecuritySection } from './components/cloud-security';
 import { ThreatIntelligenceFeedSection } from './components/threat-intel-feed';
 import {
+  useAgentStatus,
   useFindingsBreakdowns,
   useFindingsOverview,
   useThreatIntelEnrichments,
@@ -20,12 +21,16 @@ import { withErrorBoundary, withGlobalBreadcrumb } from '../../hocs';
 import { overview } from '../../../../utils/applications';
 
 /**
- * Searches feeding more than one section run once here: findings on mount, the
- * rest once their sections scroll in. Enrichments feed Malware Detection
+ * Searches feeding more than one section run once here: agents and findings on
+ * mount, the rest once their sections scroll in. The agent count also switches
+ * agent-fed cards to their no-agents state. Enrichments feed Malware Detection
  * (feed-by-type) and the Threat Catalog (IOCs); the findings breakdowns feed the
  * Compliance chips and the Cloud Security badges.
  */
 const HomeOverviewBody: React.FC = () => {
+  const agents = useAgentStatus();
+  // Only a successful zero counts; on error the cards keep their own render.
+  const noAgents = agents.status === 'available' && agents.data?.total === 0;
   const findings = useFindingsOverview();
   const [vulnerabilitiesRef, vulnerabilitiesVisible] =
     useInViewport<HTMLDivElement>();
@@ -48,12 +53,13 @@ const HomeOverviewBody: React.FC = () => {
         })}
         actions={<QuickAccessMenu />}
       />
-      <OverviewSection findings={findings} />
+      <OverviewSection agents={agents} findings={findings} />
       <EuiSpacer size='l' />
       <div ref={enrichmentsRef}>
         <EndpointSecuritySection
           findings={findings}
           threatIntel={threatIntel}
+          noAgents={noAgents}
         />
       </div>
       <EuiSpacer size='l' />
