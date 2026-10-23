@@ -44,24 +44,6 @@ const validateCharacters = (value: any) => {
   return '';
 };
 
-/* The CA path is interpolated into the generated command wrapped in single
-quotes (PROP='value'), so a single quote in the value would break out of the
-quoting. Everything else a filesystem path may contain -- spaces, backslashes,
-drive letters, relative segments -- is left alone: the path is resolved on the
-endpoint, not here, and Windows, Linux and macOS all spell it differently. */
-export const validateManagerCaPath = (value: string) => {
-  if (!value || value.trim().length === 0) {
-    return undefined;
-  }
-  if (value.includes("'")) {
-    return i18n.translate(
-      'wazuh.endpointsSummary.registerAgentValidations.managerCaPathInvalidCharacter',
-      { defaultMessage: 'The character "\'" is not valid in a file path.' },
-    );
-  }
-  return undefined;
-};
-
 /* A stored token is typed or pasted in by hand, and it reaches the generated
 command wrapped in single quotes (WAZUH_ENROLLMENT_TOKEN='value'), so a quote or
 a space in it would break the command apart. Only that is checked: whether the
