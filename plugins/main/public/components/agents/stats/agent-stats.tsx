@@ -317,7 +317,7 @@ const AgentStatsBody = withDataSourceInitiated({})(
                 >
                   {i18n.translate(
                     'wazuh.endpointsSummary.agentStats.statsReportDocsLink',
-                    { defaultMessage: 'stats_report reference' },
+                    { defaultMessage: 'Statistics reporting reference' },
                   )}
                 </EuiLink>
               </>
@@ -420,6 +420,9 @@ export function AgentStats(props: AgentStatsProps) {
     if (dataSource.isLoading) {
       return;
     }
+    // Set when a newer fetch starts (another agent or a refresh), so a slower
+    // response can't overwrite its result or end its loading state.
+    let cancelled = false;
     (async function () {
       setLoading(true);
       const startedAt = Date.now();
@@ -433,6 +436,9 @@ export function AgentStats(props: AgentStatsProps) {
           // previous one, so there is only one document per agent
           pagination: { pageIndex: 0, pageSize: 1 },
         });
+        if (cancelled) {
+          return;
+        }
         setStatisticsForAgent({
           agentID: agent.id,
           statistics:
@@ -457,9 +463,14 @@ export function AgentStats(props: AgentStatsProps) {
             setTimeout(resolve, MIN_LOADING_DURATION_MS - elapsedMs),
           );
         }
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, [dataSource.isLoading, dataSource.fetchFilters, agent.id, refreshCount]);
   const hasCurrentAgentStatistics = statisticsForAgent?.agentID === agent.id;
   const isLoading =

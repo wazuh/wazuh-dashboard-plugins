@@ -293,6 +293,33 @@ describe('AgentStats', () => {
     ).toContain('connected');
   });
 
+  it('should ignore a stale fetch that resolves after the agent changed', async () => {
+    let resolveStale: (value: unknown) => void = () => undefined;
+    fetchDataMock.mockReturnValueOnce(
+      new Promise(resolve => {
+        resolveStale = resolve;
+      }),
+    );
+    const { container, rerender } = render(
+      <AgentStats agent={{ id: agent001 }} />,
+    );
+
+    fetchDataMock.mockResolvedValue(
+      statisticsResponse({ agent: { status: 'connected' } }),
+    );
+    await rerenderAndSettle(rerender, { id: agent002 });
+    await act(() => Promise.resolve(resolveStale(noDocumentResponse)));
+    await act(() =>
+      Promise.resolve(jest.advanceTimersByTime(MIN_LOADING_DURATION_MS)),
+    );
+
+    expect(container.querySelector('.euiProgress')).toBeFalsy();
+    expect(
+      container.querySelector(queryDataTestAttr('ribbon-item-status'))
+        ?.textContent,
+    ).toContain('connected');
+  });
+
   it('should render - in the stats without value', async () => {
     const { container } = await renderAndSettle({ id: agent002 });
 
