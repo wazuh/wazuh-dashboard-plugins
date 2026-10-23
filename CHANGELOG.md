@@ -8,7 +8,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.11
 
-## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 00
+### Fixed
+
+- Fixed the location shown for active responses in Server management > Settings [#9426](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9426)
+
+## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 01
 
 ### Added
 
