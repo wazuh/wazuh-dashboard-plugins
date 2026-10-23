@@ -29,14 +29,15 @@ describe('CommandsEmptyState', () => {
     NavigationService.getInstance(createMemoryHistory());
   });
 
-  it('says how to add a command, including the remote commands setting', () => {
+  it('says how to add a command and that the endpoint must allow remote commands', () => {
     render(<CommandsEmptyState agent={{ group: ['default'] }} />);
 
-    expect(screen.getByText('No commands yet.')).toBeInTheDocument();
-    expect(screen.getByText('<wodle name="command">')).toBeInTheDocument();
     expect(
-      screen.getByText('wazuh_command.remote_commands=1'),
+      screen.getByRole('heading', { name: 'No commands yet' }),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Add a command to a group this endpoint belongs to/),
+    ).toHaveTextContent('The endpoint must also allow remote commands.');
     expect(
       screen.getByRole('link', { name: /Command monitoring guide/ }),
     ).toHaveAttribute(

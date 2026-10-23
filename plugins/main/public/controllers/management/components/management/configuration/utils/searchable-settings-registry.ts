@@ -3112,7 +3112,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     description: i18n.translate(
       'wazuh.configuration.settingsRegistry.commandsCommandDescription',
       {
-        defaultMessage: 'Commands this endpoint runs.',
+        defaultMessage: 'Commands this endpoint runs',
       },
     ),
     help: [

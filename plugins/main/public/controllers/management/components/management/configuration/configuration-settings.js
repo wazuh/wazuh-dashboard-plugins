@@ -230,7 +230,7 @@ export default [
           'wazuh.configuration.settingsCategories.commandsDescription',
           {
             defaultMessage:
-              'Run a command on the endpoint on a schedule and raise findings from its output.',
+              'Run a command on the endpoint on a schedule and raise findings from its output',
           },
         ),
         goto: 'commands',

@@ -322,7 +322,7 @@ describe('WzConfigurationOverview', () => {
     expect(
       within(category).getByText(/raise findings from its output/),
     ).toBeInTheDocument();
-    expect(within(category).getByText('No commands yet.')).toBeInTheDocument();
+    expect(within(category).getByText('No commands yet')).toBeInTheDocument();
     expect(
       within(category).queryByText('Nothing configured yet.'),
     ).not.toBeInTheDocument();
