@@ -44,6 +44,7 @@ describe('ButtonAboutSecurity', () => {
       '{"term":{"wazuh.agent.id":"<agent id>"}}',
       'With run as, the roles come from Roles mapping instead.',
     ].forEach(text => expect(flyout).toHaveTextContent(text));
+    expect(flyout).not.toHaveTextContent('hides the Stats tab');
   });
 
   it('links the header to the API RBAC docs and the warning to the indexer security docs', () => {
