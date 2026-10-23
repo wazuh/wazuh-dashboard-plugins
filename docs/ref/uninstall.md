@@ -52,9 +52,10 @@ dnf remove wazuh-dashboard -y
 ```
 
 Removing the RPM package deletes the installation (`/usr/share/wazuh-dashboard/`) and the
-`wazuh-dashboard` user and group. There is no purge on RPM, so the configuration directory
-`/etc/wazuh-dashboard/` is kept: the certificates with their private keys, the keystore, and any
-`*.rpmsave` file. A modified `/etc/default/wazuh-dashboard` is kept as
+`wazuh-dashboard` user and group, and the dashboard CA in `/etc/wazuh-dashboard/ca/` and
+`/etc/wazuh-dashboard/export/`. There is no purge on RPM, so the rest of the configuration directory
+`/etc/wazuh-dashboard/` is kept: the certificates with their private keys, the peer CAs,
+`local.env`, the keystore, and any `*.rpmsave` file. A modified `/etc/default/wazuh-dashboard` is kept as
 `/etc/default/wazuh-dashboard.rpmsave`.
 
 Before it removes the user and group, the package makes `root` the owner of what it kept and
@@ -62,7 +63,7 @@ removes group and other access from it. The freed user ID can later be given to 
 but that account cannot read the files left behind. The removal prints:
 
 ```
-Kept /etc/wazuh-dashboard, now owned by root. Reinstalling wazuh-dashboard takes it back.
+Kept /etc/wazuh-dashboard, owned by root. Reinstalling wazuh-dashboard takes it back.
 ```
 
 If a file cannot be given to `root`, for example because the directory is on a read-only file
@@ -79,7 +80,12 @@ chown -R root:root /etc/wazuh-dashboard/
 chmod -R go-rwx /etc/wazuh-dashboard/
 ```
 
-Installing the package again gives `/etc/wazuh-dashboard/` back to the `wazuh-dashboard` user.
+Installing the package again takes `/etc/wazuh-dashboard/` back, and the dashboard starts with the
+certificate pair, peer CAs and keystore it kept. The dashboard CA and `export/ca.pem` are not
+restored: commands that use `--cacert /etc/wazuh-dashboard/export/ca.pem` fail, and browsers keep
+trusting the old CA only if they imported it before. To keep the CA, back up
+`/etc/wazuh-dashboard/ca/` and `export/` before removing the package and put them back before
+reinstalling.
 
 To delete everything the removal kept:
 
@@ -90,14 +96,12 @@ rm -f /etc/default/wazuh-dashboard.rpmsave
 
 This cannot be undone: it deletes the certificates' private keys and the keystore.
 
-## Shared credentials
+## Other Wazuh components
 
-The Wazuh indexer, manager and dashboard share `/etc/wazuh`, which holds the credentials file
-(`credentials.env`) and the default directory of the shared root CA (`ca/`). Purging the dashboard
-(`apt-get remove --purge`, or removing the RPM package) removes `/etc/wazuh` only when neither
-`wazuh-indexer` nor `wazuh-manager` is still installed on the host. On Debian-based systems, a
-package removed without purging its configuration files still counts as installed. A CA relocated
-with `WAZUH_CA_DIR` is not removed. See [Credentials](getting-started/credentials.md#upgrades-and-removal).
+The dashboard owns only `/etc/wazuh-dashboard/`. Removing or purging it never touches the
+configuration directory of another Wazuh component, such as `/etc/wazuh-indexer/` or
+`/etc/wazuh-manager/`. Removing the RPM package also deletes the dashboard CA (`ca/`) and its
+published copy (`export/`). See [Credentials](getting-started/credentials.md#upgrades-and-removal).
 
 ## Leftovers on the Wazuh indexer
 

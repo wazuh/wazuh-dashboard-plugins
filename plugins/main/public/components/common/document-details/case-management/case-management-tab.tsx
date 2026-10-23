@@ -30,14 +30,15 @@ import {
   EuiLoadingSpinner,
   EuiOverlayMask,
   EuiOutsideClickDetector,
-  EuiSelect,
   EuiSpacer,
+  EuiSuperSelect,
   EuiText,
   EuiTextArea,
   EuiTitle,
   EuiToolTip,
   EuiAccordion,
   EuiAvatar,
+  htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { formatUIDate } from '../../../../react-services';
@@ -55,43 +56,72 @@ import {
   useCaseManagementForm,
 } from './use-case-management-form';
 import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
+import './case-management-tab.scss';
 
-const CASE_STATUS_OPTIONS: Array<{ value: CaseStatus; text: string }> = [
+const CASE_STATUS_OPTIONS: Array<{
+  value: CaseStatus;
+  text: string;
+  description: string;
+}> = [
   {
     value: 'active',
     text: i18n.translate('wazuh.common.caseManagementStatus.active', {
       defaultMessage: 'Active',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.activeDescription',
+      { defaultMessage: 'Open. No one is working on it yet.' },
+    ),
   },
   {
     value: 'acknowledged',
     text: i18n.translate('wazuh.common.caseManagementStatus.acknowledged', {
       defaultMessage: 'Acknowledged',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.acknowledgedDescription',
+      { defaultMessage: 'Open. Someone is working on it.' },
+    ),
   },
   {
     value: 'completed',
     text: i18n.translate('wazuh.common.caseManagementStatus.completed', {
       defaultMessage: 'Completed',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.completedDescription',
+      { defaultMessage: 'Closed. No more work needed.' },
+    ),
   },
   {
     value: 'audit',
     text: i18n.translate('wazuh.common.caseManagementStatus.audit', {
       defaultMessage: 'Audit',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.auditDescription',
+      { defaultMessage: 'Kept for review or compliance.' },
+    ),
   },
   {
     value: 'error',
     text: i18n.translate('wazuh.common.caseManagementStatus.error', {
       defaultMessage: 'Error',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.errorDescription',
+      { defaultMessage: 'Marked as a mistake, for example a false positive.' },
+    ),
   },
   {
     value: 'deleted',
     text: i18n.translate('wazuh.common.caseManagementStatus.deleted', {
       defaultMessage: 'Deleted',
     }),
+    description: i18n.translate(
+      'wazuh.common.caseManagementStatus.deletedDescription',
+      { defaultMessage: 'Marked as removed. Kept for history.' },
+    ),
   },
 ];
 
@@ -128,9 +158,11 @@ const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
   },
 ];
 
+const EMPTY_OPTION = { value: '' as const, text: '—' };
+
 const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
   [
-    { value: '', text: '—' },
+    EMPTY_OPTION,
     {
       value: 'urgent',
       text: i18n.translate('wazuh.common.caseManagementPriority.urgent', {
@@ -157,12 +189,49 @@ const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
     },
   ];
 
-const CASE_TLP_OPTIONS: Array<{ value: CaseTLP | ''; text: string }> = [
-  { value: '', text: '—' },
-  { value: 'TLP:RED', text: 'TLP:RED' },
-  { value: 'TLP:AMBER', text: 'TLP:AMBER' },
-  { value: 'TLP:GREEN', text: 'TLP:GREEN' },
-  { value: 'TLP:CLEAR', text: 'TLP:CLEAR' },
+const CASE_TLP_OPTIONS: Array<{
+  value: CaseTLP | '';
+  text: string;
+  description?: string;
+}> = [
+  EMPTY_OPTION,
+  {
+    value: 'TLP:RED',
+    text: 'TLP:RED',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.redDescription',
+      {
+        defaultMessage: 'Not for disclosure, restricted to participants only.',
+      },
+    ),
+  },
+  {
+    value: 'TLP:AMBER',
+    text: 'TLP:AMBER',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.amberDescription',
+      {
+        defaultMessage:
+          "Limited disclosure, restricted to participants' organization and its clients.",
+      },
+    ),
+  },
+  {
+    value: 'TLP:GREEN',
+    text: 'TLP:GREEN',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.greenDescription',
+      { defaultMessage: 'Limited disclosure, restricted to the community.' },
+    ),
+  },
+  {
+    value: 'TLP:CLEAR',
+    text: 'TLP:CLEAR',
+    description: i18n.translate(
+      'wazuh.common.caseManagementTlp.clearDescription',
+      { defaultMessage: 'Disclosure is not limited.' },
+    ),
+  },
 ];
 
 const STATUS_BADGE_COLOR: Record<CaseStatus, string> = {
@@ -196,10 +265,66 @@ const TLP_BADGE_COLOR: Record<CaseTLP, string> = {
   'TLP:CLEAR': 'hollow',
 };
 
+const findOption = <T extends { value: string }>(
+  options: T[],
+  value: string | undefined,
+): T | undefined => options.find(option => option.value === value);
+
 const optionText = (
   options: Array<{ value: string; text: string }>,
   value: string | undefined,
-): string | undefined => options.find(option => option.value === value)?.text;
+): string | undefined => findOption(options, value)?.text;
+
+const toSuperSelectOptions = <T extends string>(
+  options: Array<{ value: T; text: string; description?: string }>,
+) =>
+  options.map(({ value, text, description }) => ({
+    value,
+    inputDisplay: text,
+    dropdownDisplay: description ? (
+      <>
+        <strong>{text}</strong>
+        <EuiText size='s' color='subdued'>
+          <p>{description}</p>
+        </EuiText>
+      </>
+    ) : (
+      text
+    ),
+  }));
+
+// names a select button by field and value; OUI renders inputDisplay twice, so no ids there
+const SelectName: React.FC<{
+  nameId: string;
+  name: string;
+  valueId: string;
+  value?: string;
+}> = ({ nameId, name, valueId, value }) => (
+  <>
+    <span id={nameId} hidden>
+      {name}
+    </span>
+    <span id={valueId} hidden>
+      {value}
+    </span>
+  </>
+);
+
+// tabIndex lets keyboard users open the tooltip
+const DescribedBadge: React.FC<{ color: string; description?: string }> = ({
+  color,
+  description,
+  children,
+}) => {
+  const badge = <EuiBadge color={color}>{children}</EuiBadge>;
+  return description ? (
+    <EuiToolTip content={description}>
+      <span tabIndex={0}>{badge}</span>
+    </EuiToolTip>
+  ) : (
+    badge
+  );
+};
 
 const renderTwoColumnRows = (
   items: Array<{
@@ -257,6 +382,19 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
   onSaveSuccess,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [fieldIds] = useState(() => {
+    const id = htmlIdGenerator('caseManagement')();
+    return {
+      statusName: `${id}-statusName`,
+      severityName: `${id}-severityName`,
+      severityValue: `${id}-severityValue`,
+      priorityName: `${id}-priorityName`,
+      priorityValue: `${id}-priorityValue`,
+      statusValue: `${id}-statusValue`,
+      tlpLabel: `${id}-tlpLabel`,
+      tlpValue: `${id}-tlpValue`,
+    };
+  });
   const [isCleanModalVisible, setIsCleanModalVisible] = useState(false);
   const [editingCommentKey, setEditingCommentKey] = useState<
     string | undefined
@@ -320,6 +458,7 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
     // Comment saves patch the host grid through the tab's own onSaveSuccess
     // but must not leave edit mode nor close the inline comment editor.
   } = useCaseManagementForm(document, handleOperationSuccess, onSaveSuccess);
+  const statusOption = findOption(CASE_STATUS_OPTIONS, status);
 
   const openCleanModal = useCallback(() => setIsCleanModalVisible(true), []);
   const closeCleanModal = useCallback(() => setIsCleanModalVisible(false), []);
@@ -658,7 +797,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
         defaultMessage: 'TLP',
       }),
       description: tlp ? (
-        <EuiBadge color={TLP_BADGE_COLOR[tlp]}>{tlp}</EuiBadge>
+        <DescribedBadge
+          color={TLP_BADGE_COLOR[tlp]}
+          description={findOption(CASE_TLP_OPTIONS, tlp)?.description}
+        >
+          {tlp}
+        </DescribedBadge>
       ) : (
         '—'
       ),
@@ -792,9 +936,12 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
               </EuiFlexItem>
               {status && (
                 <EuiFlexItem grow={false}>
-                  <EuiBadge color={STATUS_BADGE_COLOR[status] ?? 'default'}>
-                    {optionText(CASE_STATUS_OPTIONS, status) ?? status}
-                  </EuiBadge>
+                  <DescribedBadge
+                    color={STATUS_BADGE_COLOR[status] ?? 'default'}
+                    description={statusOption?.description}
+                  >
+                    {statusOption?.text ?? status}
+                  </DescribedBadge>
                 </EuiFlexItem>
               )}
               {isNewCase && (
@@ -946,59 +1093,87 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.statusLabel',
-                      { defaultMessage: 'Status *' },
-                    )}
-                    helpText={i18n.translate(
-                      'wazuh.common.caseManagementForm.statusHelpText',
-                      {
-                        defaultMessage:
-                          'Current lifecycle status of this finding.',
-                      },
-                    )}
+                    label={
+                      <>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.statusLabel',
+                          { defaultMessage: 'Status *' },
+                        )}
+                        <SelectName
+                          nameId={fieldIds.statusName}
+                          name={i18n.translate(
+                            'wazuh.common.caseManagementForm.statusAriaLabel',
+                            { defaultMessage: 'Case status' },
+                          )}
+                          valueId={fieldIds.statusValue}
+                          value={statusOption?.text}
+                        />
+                      </>
+                    }
+                    helpText={
+                      statusOption?.description ??
+                      i18n.translate(
+                        'wazuh.common.caseManagementForm.statusHelpText',
+                        {
+                          defaultMessage:
+                            'Current lifecycle status of this finding.',
+                        },
+                      )
+                    }
                   >
-                    <EuiSelect
+                    {/* the '' option gives keyboard focus a target before a value is set */}
+                    <EuiSuperSelect<CaseStatus | ''>
                       fullWidth
-                      options={CASE_STATUS_OPTIONS}
-                      value={status}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setStatus(e.target.value as CaseStatus)
-                      }
-                      disabled={isSaving || isCleaning}
-                      hasNoInitialSelection={isNewCase && !status}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.statusAriaLabel',
-                        { defaultMessage: 'Case status' },
+                      hasDividers
+                      options={toSuperSelectOptions(
+                        status
+                          ? CASE_STATUS_OPTIONS
+                          : [EMPTY_OPTION, ...CASE_STATUS_OPTIONS],
                       )}
+                      valueOfSelected={status ?? ''}
+                      onChange={value => value && setStatus(value)}
+                      disabled={isSaving || isCleaning}
+                      aria-labelledby={`${fieldIds.statusName} ${fieldIds.statusValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.severityLabel',
-                      { defaultMessage: 'Severity *' },
-                    )}
+                    label={
+                      <>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.severityLabel',
+                          { defaultMessage: 'Severity *' },
+                        )}
+                        <SelectName
+                          nameId={fieldIds.severityName}
+                          name={i18n.translate(
+                            'wazuh.common.caseManagementForm.severityAriaLabel',
+                            { defaultMessage: 'Case severity' },
+                          )}
+                          valueId={fieldIds.severityValue}
+                          value={optionText(CASE_SEVERITY_OPTIONS, severity)}
+                        />
+                      </>
+                    }
                     helpText={i18n.translate(
                       'wazuh.common.caseManagementForm.severityHelpText',
                       { defaultMessage: 'Impact severity of this case.' },
                     )}
                   >
-                    <EuiSelect
+                    <EuiSuperSelect<CaseSeverity | ''>
                       fullWidth
-                      options={CASE_SEVERITY_OPTIONS}
-                      value={severity}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setSeverity(e.target.value as CaseSeverity)
-                      }
-                      disabled={isSaving || isCleaning}
-                      hasNoInitialSelection={!severity}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.severityAriaLabel',
-                        { defaultMessage: 'Case severity' },
+                      itemClassName='wzCaseSelect__item--compact'
+                      options={toSuperSelectOptions(
+                        severity
+                          ? CASE_SEVERITY_OPTIONS
+                          : [EMPTY_OPTION, ...CASE_SEVERITY_OPTIONS],
                       )}
+                      valueOfSelected={severity}
+                      onChange={value => value && setSeverity(value)}
+                      disabled={isSaving || isCleaning}
+                      aria-labelledby={`${fieldIds.severityName} ${fieldIds.severityValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -1010,56 +1185,74 @@ export const CaseManagementTab: React.FC<CaseManagementTabProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.priorityLabel',
-                      { defaultMessage: 'Priority' },
-                    )}
+                    label={
+                      <>
+                        {i18n.translate(
+                          'wazuh.common.caseManagementForm.priorityLabel',
+                          { defaultMessage: 'Priority' },
+                        )}
+                        <SelectName
+                          nameId={fieldIds.priorityName}
+                          name={i18n.translate(
+                            'wazuh.common.caseManagementForm.priorityAriaLabel',
+                            { defaultMessage: 'Case priority' },
+                          )}
+                          valueId={fieldIds.priorityValue}
+                          value={optionText(CASE_PRIORITY_OPTIONS, priority)}
+                        />
+                      </>
+                    }
                     helpText={i18n.translate(
                       'wazuh.common.caseManagementForm.priorityHelpText',
                       { defaultMessage: 'Triage priority of this case.' },
                     )}
                   >
-                    <EuiSelect
+                    <EuiSuperSelect<CasePriority | ''>
                       fullWidth
-                      options={CASE_PRIORITY_OPTIONS}
-                      value={priority}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setPriority(e.target.value as CasePriority | '')
-                      }
+                      itemClassName='wzCaseSelect__item--compact'
+                      options={toSuperSelectOptions(CASE_PRIORITY_OPTIONS)}
+                      valueOfSelected={priority}
+                      onChange={setPriority}
                       disabled={isSaving || isCleaning}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.priorityAriaLabel',
-                        { defaultMessage: 'Case priority' },
-                      )}
+                      aria-labelledby={`${fieldIds.priorityName} ${fieldIds.priorityValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
                 <EuiFlexItem>
                   <EuiFormRow
                     fullWidth
-                    label={i18n.translate(
-                      'wazuh.common.caseManagementForm.tlpLabel',
-                      { defaultMessage: 'TLP' },
-                    )}
-                    helpText={i18n.translate(
-                      'wazuh.common.caseManagementForm.tlpHelpText',
-                      {
-                        defaultMessage: 'Traffic Light Protocol sharing level.',
-                      },
-                    )}
+                    label={
+                      <>
+                        <span id={fieldIds.tlpLabel}>
+                          {i18n.translate(
+                            'wazuh.common.caseManagementForm.tlpLabel',
+                            { defaultMessage: 'TLP' },
+                          )}
+                        </span>
+                        <span id={fieldIds.tlpValue} hidden>
+                          {tlp}
+                        </span>
+                      </>
+                    }
+                    helpText={
+                      findOption(CASE_TLP_OPTIONS, tlp)?.description ??
+                      i18n.translate(
+                        'wazuh.common.caseManagementForm.tlpHelpText',
+                        {
+                          defaultMessage:
+                            'Traffic Light Protocol sharing level.',
+                        },
+                      )
+                    }
                   >
-                    <EuiSelect
+                    <EuiSuperSelect<CaseTLP | ''>
                       fullWidth
-                      options={CASE_TLP_OPTIONS}
-                      value={tlp}
-                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                        setTlp(e.target.value as CaseTLP | '')
-                      }
+                      hasDividers
+                      options={toSuperSelectOptions(CASE_TLP_OPTIONS)}
+                      valueOfSelected={tlp}
+                      onChange={setTlp}
                       disabled={isSaving || isCleaning}
-                      aria-label={i18n.translate(
-                        'wazuh.common.caseManagementForm.tlpAriaLabel',
-                        { defaultMessage: 'Case TLP' },
-                      )}
+                      aria-labelledby={`${fieldIds.tlpLabel} ${fieldIds.tlpValue}`}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>

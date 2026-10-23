@@ -50,9 +50,9 @@ export const Dashboard = props => {
         showQueryInput={true}
         showQueryBar={true}
       />
-      {props.dataSourceAction?.data?.hits?.total === 0 ? (
-        <DiscoverNoResults />
-      ) : null}
+      {props.dataSourceAction?.data?.hits?.total === 0
+        ? props.emptyState ?? <DiscoverNoResults />
+        : null}
       <div>
         {props.sampleDataWarningCategories && (
           <div
@@ -111,7 +111,9 @@ export const Dashboard = props => {
  * Create a dashboard component using minimal dependencies: datasource, sample data warning
  * categories, dashboard panels creator and dashboard metadata.
  *
- * This renders a search bar with a dashboard. Communicate the state with Generate Report button
+ * This renders a search bar with a dashboard. Communicate the state with Generate Report button.
+ * An optional `emptyState` replaces the default no results callout, so a module can explain why
+ * it has no data yet.
  * @param param0
  * @returns
  */
@@ -121,6 +123,7 @@ export const createDashboard = ({
   sampleDataWarningCategories,
   getDashboardPanels,
   managedFilters,
+  emptyState,
 }: {
   DataSource: any;
   DataSourceRepositoryCreator: any;
@@ -133,6 +136,8 @@ export const createDashboard = ({
     agentDashboardId?: string;
     className?: string;
   }>;
+  /** Rendered instead of the default no results callout when the search has no hits. */
+  emptyState?: React.ReactNode;
 }) =>
   compose(
     withErrorBoundary,
@@ -140,6 +145,7 @@ export const createDashboard = ({
       sampleDataWarningCategories,
       getDashboardPanels,
       managedFilters,
+      emptyState,
     }),
     withDataSourceFetchSearchBar({
       DataSource,

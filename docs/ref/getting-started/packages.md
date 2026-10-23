@@ -50,11 +50,11 @@ The Wazuh dashboard package includes:
   only part of the installation directory the service user owns)
 - **Logs**: systemd journal (`journalctl -u wazuh-dashboard`); the package writes no log files
 - **Plugin directory**: `/usr/share/wazuh-dashboard/plugins/`
-- **Certificates**: `/etc/wazuh-dashboard/certs/` (issued on a fresh install, see [Credentials](credentials.md#certificates))
-- **Credential resolver**: `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`)
-- **Shared credentials library**: `/usr/share/wazuh-dashboard/lib/wazuh-credentials.sh` (`root:root 0644`)
+- **Certificates**: `/etc/wazuh-dashboard/certs/` (the dashboard pair, issued on a fresh install, and the peer CAs `indexer-ca.pem` and `manager-ca.pem`; see [Credentials](credentials.md#certificates))
+- **Dashboard CA**: `/etc/wazuh-dashboard/ca/` (`root:root 0700`), published as `/etc/wazuh-dashboard/export/ca.pem`
+- **Operator values**: `/etc/wazuh-dashboard/local.env` (`root:root 0600`, optional, not shipped; see [The local.env file](credentials.md#the-localenv-file))
+- **Credential resolver**: `/usr/share/wazuh-dashboard/bin/resolve-credentials` (`root:root 0750`) and `resolve-credentials.js` (`root:root 0644`)
 - **Service environment file**: `/etc/default/wazuh-dashboard` (`root:wazuh-dashboard 0640`)
-- **Shared credentials file**: `/etc/wazuh/credentials.env` (created by the first Wazuh package on the host, not shipped)
 
 ### System integration
 

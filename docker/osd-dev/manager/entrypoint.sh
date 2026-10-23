@@ -1,35 +1,42 @@
 #!/bin/bash
 
+# The manager configuration lives in /etc/wazuh-manager since 5.0.0 RC 2;
+# /var/wazuh-manager/etc no longer exists.
+CONF=/etc/wazuh-manager
+
 # Configure Wazuh server-Wazuh indexer connection
 [ -n "$INDEXER_USERNAME" ] && echo "$INDEXER_USERNAME" | /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k username
 [ -n "$INDEXER_PASSWORD" ] && echo "$INDEXER_PASSWORD" | /var/wazuh-manager/bin/wazuh-manager-keystore -f indexer -k password
-[ -n "$INDEXER_URL" ] && sed -i "/<indexer>/,/<\/indexer>/ s|<host>[^<]*</host>|<host>$INDEXER_URL</host>|g" /var/wazuh-manager/etc/wazuh-manager.conf
-WAZUH_USER_AND_GROUP="wazuh-manager:wazuh-manager"
-if [ -n "$INDEXER_SSL_CA" ]; then
-  sed -i "/<indexer>/,/<\/indexer>/ s|<ca>[^<]*</ca>|<ca>$INDEXER_SSL_CA</ca>|g" /var/wazuh-manager/etc/wazuh-manager.conf
-  chown "$WAZUH_USER_AND_GROUP" $INDEXER_SSL_CA
-  chmod 400 $INDEXER_SSL_CA
-fi
+[ -n "$INDEXER_URL" ] && sed -i "/<indexer>/,/<\/indexer>/ s|<host>[^<]*</host>|<host>$INDEXER_URL</host>|g" "$CONF/wazuh-manager.conf"
 
-if [ -n "$INDEXER_SSL_CERTIFICATE" ]; then
-  sed -i "/<indexer>/,/<\/indexer>/ s|<certificate>[^<]*</certificate>|<certificate>$INDEXER_SSL_CERTIFICATE</certificate>|g" /var/wazuh-manager/etc/wazuh-manager.conf
-  chown "$WAZUH_USER_AND_GROUP" $INDEXER_SSL_CERTIFICATE
-  chmod 400 $INDEXER_SSL_CERTIFICATE
-fi
+# Trust material is root-owned and only group-readable, and the credential
+# resolver refuses to start the manager otherwise. Create certs/ with that
+# ownership before anything is copied into it.
+install -d -o root -g wazuh-manager -m 750 "$CONF/certs"
 
-if [ -n "$INDEXER_SSL_CERTIFICATE_KEY" ]; then
-  sed -i "/<indexer>/,/<\/indexer>/ s|<key>[^<]*</key>|<key>$INDEXER_SSL_CERTIFICATE_KEY</key>|g" /var/wazuh-manager/etc/wazuh-manager.conf
-  chown "$WAZUH_USER_AND_GROUP" $INDEXER_SSL_CERTIFICATE_KEY
-  chmod 400 $INDEXER_SSL_CERTIFICATE_KEY
-fi
+# Indexer connection: the CA that verifies the indexer and the client pair the
+# manager presents to it, copied under the names the package uses
+# (certs/indexer-ca.pem, certs/indexer-connector*.pem). The files in the shared
+# volume are not readable by the manager group, and pointing the configuration
+# at them would leave trust material outside the configuration directory.
+stage_indexer_file() {
+  local source="$1" target="$2" tag="$3"
+  [ -n "$source" ] || return 0
+  install -o root -g wazuh-manager -m 640 "$source" "$CONF/certs/$target"
+  sed -i "/<indexer>/,/<\/indexer>/ s|<$tag>[^<]*</$tag>|<$tag>$CONF/certs/$target</$tag>|g" \
+    "$CONF/wazuh-manager.conf"
+}
+stage_indexer_file "$INDEXER_SSL_CA" indexer-ca.pem ca
+stage_indexer_file "$INDEXER_SSL_CERTIFICATE" indexer-connector.pem certificate
+stage_indexer_file "$INDEXER_SSL_CERTIFICATE_KEY" indexer-connector-key.pem key
 
-sed -i "/<https>/,/<\/https>/ s|<bind_addr>[^<]*</bind_addr>|<bind_addr>0.0.0.0</bind_addr>|g" /var/wazuh-manager/etc/wazuh-manager.conf
+sed -i "/<https>/,/<\/https>/ s|<bind_addr>[^<]*</bind_addr>|<bind_addr>0.0.0.0</bind_addr>|g" "$CONF/wazuh-manager.conf"
 
 # Agent-facing listener certificate. One pair, read by both <remote><https>
 # (the HTTPS listener agents enroll and report through, 1517) and <auth>.
 #
 # The manager package does not generate certificates: it refuses to start with
-# "file not found: /var/wazuh-manager/etc/certs/remoted.pem". Agents also verify
+# "file not found: /etc/wazuh-manager/certs/remoted.pem". Agents also verify
 # the certificate, so it needs a SAN covering the address they connect to.
 # Issue it here with the installation assistant certificate tool, the same one
 # the wazuh repository uses to provision its manager integration tests, so this
@@ -71,28 +78,32 @@ fi
 
 # Install under the names the shipped configuration already expects, so nothing
 # has to be rewritten: both <remote><https> and <auth> read
-# etc/certs/remoted.pem, and <remote><https> reads etc/certs/root-ca.pem. These
-# paths are relative to the manager home, so the files have to be copied in; an
-# absolute path into the shared certificate volume is reported as "missing or
-# unreadable" and the manager refuses to start.
+# certs/remoted.pem, and <remote><https> reads certs/root-ca.pem. The files have
+# to be copied in: a path into the shared certificate volume is reported as
+# "missing or unreadable" and the manager refuses to start.
 #
-# The Server API (55000) reads etc/certs/apid.pem / apid-key.pem and no longer
+# The Server API (55000) reads certs/apid.pem / apid-key.pem and no longer
 # generates a self-signed pair: without them it refuses to start with error
 # 2003. The manager installer issues that pair with the same profile as
 # remoted.pem (serverAuth, leaf followed by the CA), so the listener leaf is
 # installed under both names, as the wazuh devContainer does. Its SAN covers
 # wazuh.manager.local, the address the dashboard connects to.
 #
-# Ownership follows the deployment model: remoted, authd and the API open the
-# pairs after dropping privileges, while the CA only has to be group-readable.
-mkdir -p /var/wazuh-manager/etc/certs
-install -o root -g wazuh-manager -m 640 \
-  "$CERTS_CA" /var/wazuh-manager/etc/certs/root-ca.pem
+# Ownership follows the package: every file in certs/ is root:wazuh-manager
+# 0640. The daemons and the API read their pairs through the group; anything
+# owned by the service account is refused by the credential resolver.
+install -o root -g wazuh-manager -m 640 "$CERTS_CA" "$CONF/certs/root-ca.pem"
+# The credential resolver also requires the manager's CA in ca/ (root:root
+# 0700, key 0600), and refuses to start with "the manager's CA is missing"
+# otherwise. Stage the shared root CA there so it does not mint its own.
+install -d -o root -g root -m 700 "$CONF/ca"
+install -o root -g root -m 644 "$CERTS_CA" "$CONF/ca/root-ca.pem"
+install -o root -g root -m 600 "$CERTS_CA_KEY" "$CONF/ca/root-ca.key"
 for pair in remoted apid; do
-  install -o wazuh-manager -g wazuh-manager -m 640 \
-    "$certs_out/$CERTS_NODE_NAME-remoted.pem" "/var/wazuh-manager/etc/certs/$pair.pem"
-  install -o wazuh-manager -g wazuh-manager -m 640 \
-    "$certs_out/$CERTS_NODE_NAME-remoted-key.pem" "/var/wazuh-manager/etc/certs/$pair-key.pem"
+  install -o root -g wazuh-manager -m 640 \
+    "$certs_out/$CERTS_NODE_NAME-remoted.pem" "$CONF/certs/$pair.pem"
+  install -o root -g wazuh-manager -m 640 \
+    "$certs_out/$CERTS_NODE_NAME-remoted-key.pem" "$CONF/certs/$pair-key.pem"
 done
 rm -rf "$certs_out"
 

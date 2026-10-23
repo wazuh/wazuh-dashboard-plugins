@@ -357,6 +357,65 @@ describe('WzConfigurationOverview', () => {
       await screen.findByText('Command definitions');
     });
 
+    it('opens the Configuration Assessment section from its URL, without the rootcheck settings', async () => {
+      (getSearchableSettingsData as jest.Mock).mockResolvedValue({
+        values: {
+          'configuration-assessment.enabled': 'yes',
+          'configuration-assessment.policies': [{ policy: 'cis_ubuntu.yml' }],
+          'policy-monitoring.frequency': 43200,
+        },
+        sources: {},
+      });
+      NavigationService.getInstance()
+        .getHistory()
+        .replace('/?category=configuration-assessment');
+
+      const { container } = renderOverview({
+        agent,
+        report: { content: {}, modules: [] },
+      });
+
+      await screen.findByText('cis_ubuntu.yml');
+      const category = container.querySelector(
+        '#configuration-category-configuration-assessment',
+      ) as HTMLElement;
+      expect(
+        within(category).getByText('Configuration Assessment status'),
+      ).toBeInTheDocument();
+      expect(
+        within(category).queryByText('Frequency (in seconds) to run the scan'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('opens the Policy monitoring section from its URL, without the SCA settings', async () => {
+      (getSearchableSettingsData as jest.Mock).mockResolvedValue({
+        values: {
+          'configuration-assessment.enabled': 'yes',
+          'configuration-assessment.policies': [{ policy: 'cis_ubuntu.yml' }],
+          'policy-monitoring.frequency': 43200,
+        },
+        sources: {},
+      });
+      NavigationService.getInstance()
+        .getHistory()
+        .replace('/?category=policy-monitoring');
+
+      const { container } = renderOverview({
+        agent,
+        report: { content: {}, modules: [] },
+      });
+
+      await screen.findByText('Frequency (in seconds) to run the scan');
+      const category = container.querySelector(
+        '#configuration-category-policy-monitoring',
+      ) as HTMLElement;
+      expect(within(category).getByText('Ignored paths')).toBeInTheDocument();
+      expect(
+        within(category).queryByText('Configuration Assessment status'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('cis_ubuntu.yml')).not.toBeInTheDocument();
+    });
+
     it('pre-fills and narrows by the search term named in the URL on mount', async () => {
       NavigationService.getInstance().getHistory().replace('/?q=Commands');
 
@@ -537,7 +596,9 @@ describe('WzConfigurationOverview', () => {
       const { container } = renderManagerOverview();
 
       fireEvent.click(
-        await screen.findByRole('button', { name: /Registration Service/ }),
+        await screen.findByRole('button', {
+          name: /Agents Registration Service/,
+        }),
       );
 
       const category = container.querySelector(
@@ -571,7 +632,9 @@ describe('WzConfigurationOverview', () => {
       renderManagerOverview();
 
       fireEvent.click(
-        await screen.findByRole('button', { name: /Registration Service/ }),
+        await screen.findByRole('button', {
+          name: /Agents Registration Service/,
+        }),
       );
 
       const label = await screen.findByText('Re-register only on key mismatch');
@@ -598,7 +661,7 @@ describe('WzConfigurationOverview', () => {
       // Same rail + detail layout, just narrowed -- not a different view.
       expect(screen.getByText('Main configurations')).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Registration Service/ }),
+        screen.getByRole('button', { name: /Agents Registration Service/ }),
       ).toBeInTheDocument();
       expect(screen.queryByText('Cluster')).not.toBeInTheDocument();
     });
