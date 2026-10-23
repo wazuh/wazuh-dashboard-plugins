@@ -8,8 +8,6 @@ import {
   LogoOffice365,
 } from '../components/common/logos';
 import { getWzCurrentAppID } from '../kibana-services';
-import { webDocumentationLink } from '../../common/services/web_documentation';
-import { FIM_DOCS_PATH } from '../components/overview/fim/fim-documentation';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -21,8 +19,6 @@ Application order: one of 100-199 range: 100, 101, 102, etc...
 
 Optional fields:
 - tabTitle: name for the tab and page heading when the title is too vague alone.
-- docsUrl: full URL of the application documentation, linked from the Help menu of the
-  header. Build it with webDocumentationLink('<path>'). See AppHelpDocs in help-extension.ts.
 */
 
 /* Categories ID
@@ -137,7 +133,6 @@ export const fileIntegrityMonitoring = {
       'Detects when monitored files and registry entries are created, modified or deleted, and who changed them when who-data is enabled.',
   }),
   euiIconType: 'sqlApp',
-  docsUrl: webDocumentationLink(FIM_DOCS_PATH),
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
