@@ -11,13 +11,17 @@
  */
 import React, { useState, useEffect } from 'react';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import semver from 'semver';
 import { get } from 'lodash';
 import {
   EuiButton,
+  EuiButtonEmpty,
+  EuiCode,
   EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiLink,
   EuiPage,
   EuiPageBody,
   EuiProgress,
@@ -57,6 +61,7 @@ import WzRibbon from '../../common/ribbon/ribbon';
 import { Agent } from '../../endpoints-summary/types';
 import { SECTIONS } from '../../../sections';
 import { getAgentVersion } from '../../../../common/services/wz-agent';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
 import {
   AgentStatsDataSource,
   AgentStatsDataSourceRepository,
@@ -245,7 +250,11 @@ interface AgentStatsBodyProps {
   agentID: string;
   loading: boolean;
   statistics?: AgentStatistics;
+  onRefresh: () => void;
 }
+
+const STATS_REPORT_DOCS_PATH =
+  'user-manual/reference/ossec-conf/agent.html#stats-report';
 
 /** Statistics for a given agent, kept together so a stale fetch result or a
  * still-in-flight one can never be mistaken for the currently viewed agent's
@@ -256,7 +265,7 @@ interface AgentStatisticsForAgent {
 }
 
 const AgentStatsBody = withDataSourceInitiated({})(
-  ({ agentID, loading, statistics }: AgentStatsBodyProps) => {
+  ({ agentID, loading, statistics, onRefresh }: AgentStatsBodyProps) => {
     const dispatch = useDispatch();
     const openAgentSelector = () => dispatch(showExploreAgentModalGlobal(true));
 
@@ -289,24 +298,52 @@ const AgentStatsBody = withDataSourceInitiated({})(
               </h2>
             }
             body={
-              <p>
-                {i18n.translate(
-                  'wazuh.endpointsSummary.agentStats.noStatisticsBody',
-                  {
-                    defaultMessage:
-                      'Statistics are not available for this agent. Confirm that statistics collection is enabled in its configuration file.',
-                  },
-                )}
-              </p>
+              <>
+                <p>
+                  <FormattedMessage
+                    id='wazuh.endpointsSummary.agentStats.noStatisticsBody'
+                    defaultMessage='This agent does not send statistics. Reporting is off by default: enable {option} in the agent configuration. The first report arrives after one interval, 60 seconds by default.'
+                    values={{
+                      option: <EuiCode>{'<agent><stats_report>'}</EuiCode>,
+                    }}
+                  />
+                </p>
+                <EuiLink
+                  href={webDocumentationLink(STATS_REPORT_DOCS_PATH)}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  external
+                  data-test-subj='agent-stats-stats-report-docs'
+                >
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.agentStats.statsReportDocsLink',
+                    { defaultMessage: 'stats_report reference' },
+                  )}
+                </EuiLink>
+              </>
             }
-            actions={
-              <EuiButton color='primary' fill onClick={openAgentSelector}>
+            actions={[
+              <EuiButton
+                key='refresh'
+                color='primary'
+                fill
+                iconType='refresh'
+                isLoading={loading}
+                onClick={onRefresh}
+                data-test-subj='agent-stats-refresh'
+              >
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentStats.refreshButton',
+                  { defaultMessage: 'Refresh' },
+                )}
+              </EuiButton>,
+              <EuiButtonEmpty key='select-agent' onClick={openAgentSelector}>
                 {i18n.translate(
                   'wazuh.endpointsSummary.agentStats.selectAgentButton',
                   { defaultMessage: 'Select agent' },
                 )}
-              </EuiButton>
-            }
+              </EuiButtonEmpty>,
+            ]}
           />
         ) : (
           <>
@@ -372,6 +409,9 @@ export function AgentStats(props: AgentStatsProps) {
   const [loading, setLoading] = useState(true);
   const [statisticsForAgent, setStatisticsForAgent] =
     useState<AgentStatisticsForAgent>();
+  // Bumped by Refresh, so the statistics can be fetched again without
+  // reloading the page once the agent starts reporting.
+  const [refreshCount, setRefreshCount] = useState(0);
   const dataSource = useDataSource<tParsedIndexPattern, PatternDataSource>({
     DataSource: AgentStatsDataSource,
     repository: new AgentStatsDataSourceRepository(),
@@ -420,7 +460,7 @@ export function AgentStats(props: AgentStatsProps) {
         setLoading(false);
       }
     })();
-  }, [dataSource.isLoading, dataSource.fetchFilters, agent.id]);
+  }, [dataSource.isLoading, dataSource.fetchFilters, agent.id, refreshCount]);
   const hasCurrentAgentStatistics = statisticsForAgent?.agentID === agent.id;
   const isLoading =
     loading || dataSource.isLoading || !hasCurrentAgentStatistics;
@@ -437,6 +477,7 @@ export function AgentStats(props: AgentStatsProps) {
                 ? statisticsForAgent?.statistics
                 : undefined
             }
+            onRefresh={() => setRefreshCount(count => count + 1)}
             dataSource={dataSource}
           />
         </EuiPageBody>
