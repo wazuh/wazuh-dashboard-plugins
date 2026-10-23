@@ -124,6 +124,10 @@ Enforced by tooling — run the linter/formatter, don't hand-format:
   ([`eslint.config.mjs`](eslint.config.mjs), [`.prettierrc`](.prettierrc)).
 - Filenames follow `filenames-simple` (kebab-case, e.g. `wz-menu.tsx`).
 - `camelCase`, `eqeqeq`, `no-var`, `curly`, no duplicate imports, `require-await`.
+- Avoid brand references (the product name "Wazuh") in the user-facing text, comments and
+  docs you write: say "the indexer", "the agents", etc. Add them only when asked, and keep
+  them where they are part of an identifier (index names such as `wazuh-states-inventory-*`,
+  i18n ids, constants, URLs).
 - English everywhere (code, comments, commits, docs). Full guide:
   [`STYLEGUIDE.md`](STYLEGUIDE.md).
 - User-facing text goes through `i18n.translate` with ids
