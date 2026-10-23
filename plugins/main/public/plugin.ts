@@ -54,7 +54,6 @@ import { registerWazuhNavLinks } from './utils/nav-groups';
 import _ from 'lodash';
 import { registerPanelInfoActions } from './components/common/dashboards/panel-info/panel-info-actions';
 import { panelInfos } from './components/common/dashboards/panel-info/panel-infos';
-import { setAppHelpExtension } from './utils/help-extension';
 
 export class WazuhPlugin
   implements
@@ -158,8 +157,6 @@ export class WazuhPlugin
             if (getAppTabTitle(app) !== title) {
               getCore().chrome.docTitle.change(getAppTabTitle(app));
             }
-            // Link the app documentation from the Help menu for apps with a `docsUrl`
-            setAppHelpExtension(getCore().chrome, app);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
             initializeInterceptor(core);
