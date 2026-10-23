@@ -6,7 +6,7 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryUsersDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryTable } from '../../../components/inventory-table/it-hygiene-inventory-table';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import {
   WAZUH_SAMPLE_INVENTORY_AGENT,
   IT_HYGIENE_USERS_INVENTORY_ID,
@@ -20,7 +20,7 @@ export const ITHygieneUsersInventoryUsers = compose(
   withSystemInventoryUsersDataSource,
 )(() => {
   return (
-    <ITHygieneInventoryTable
+    <InventoryDashboardTable
       DataSource={SystemInventoryStatesDataSource}
       DataSourceRepositoryCreator={
         SystemInventoryUsersStatesDataSourceRepository

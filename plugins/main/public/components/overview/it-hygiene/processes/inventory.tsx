@@ -11,12 +11,12 @@ import {
   IT_HYGIENE_PROCESSES_INVENTORY_ID,
   IT_HYGIENE_PROCESSES_AGENT_INVENTORY_ID,
 } from '../../../../../common/constants';
-import { ITHygieneInventoryTable } from '../components/inventory-table/it-hygiene-inventory-table';
+import { InventoryDashboardTable } from '../../../common/dashboards';
 
 export const ITHygieneProcessesInventory =
   withSystemInventoryProcessesDataSource(() => {
     return (
-      <ITHygieneInventoryTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryProcessesStatesDataSourceRepository

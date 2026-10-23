@@ -6,7 +6,7 @@ import {
 import tableColumns from './table-columns';
 import managedFilters from './managed-filters';
 import { withSystemInventoryInterfacesDataSource } from '../../../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneInventoryTable } from '../../../components/inventory-table/it-hygiene-inventory-table';
+import { InventoryDashboardTable } from '../../../../../common/dashboards';
 import {
   WAZUH_SAMPLE_INVENTORY_AGENT,
   IT_HYGIENE_INTERFACES_INVENTORY_ID,
@@ -16,7 +16,7 @@ import {
 export const ITHygieneNetworksInventoryInterfaces =
   withSystemInventoryInterfacesDataSource(() => {
     return (
-      <ITHygieneInventoryTable
+      <InventoryDashboardTable
         DataSource={SystemInventoryStatesDataSource}
         DataSourceRepositoryCreator={
           SystemInventoryInterfacesStatesDataSourceRepository

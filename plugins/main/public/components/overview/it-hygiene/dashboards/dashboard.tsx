@@ -8,7 +8,6 @@ import {
 } from '../../../common/data-source';
 
 import { withSystemInventoryDataSource } from '../common/hocs/validate-system-inventory-index-pattern';
-import { ITHygieneEmptyState } from '../components/empty-state/it-hygiene-empty-state';
 import { createDashboard } from '../../../common/dashboards';
 import {
   IT_HYGIENE_DASHBOARD_ID,
@@ -29,7 +28,6 @@ export const DashboardITHygiene = withErrorBoundary(
         },
       ],
       sampleDataWarningCategories: [WAZUH_SAMPLE_INVENTORY_AGENT],
-      emptyState: <ITHygieneEmptyState />,
     }),
   ),
 );
