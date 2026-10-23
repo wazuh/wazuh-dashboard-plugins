@@ -7,6 +7,7 @@ import * as TimSort from 'timsort';
 import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
 import { IConfigurationEnhanced } from '../../../../wazuh-core/server';
+import { isVisualizationImageDataURI } from './visualization-image';
 
 interface IVisualization {
   title: string;
@@ -472,6 +473,13 @@ export class ReportPrinter {
   }
   addVisualizations(visualizations: IVisualization[]) {
     this.logger.debug(`Add visualizations [${visualizations.length}]`);
+    visualizations.forEach((visualization, index) => {
+      if (!isVisualizationImageDataURI(visualization?.element)) {
+        throw new Error(
+          `Visualization ${index} image must be a base64-encoded PNG data URI`,
+        );
+      }
+    });
     const sanitazedVisualizations: IVisualizationExtended[] =
       visualizations.map((visualization, index) => ({
         ...visualization,
