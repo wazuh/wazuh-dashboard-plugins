@@ -121,7 +121,7 @@ describe('parseRegisterAgentFormValues - enrollment token interaction', () => {
         agentGroups: '',
         sslVerification: true,
       },
-    }) as any;
+    } as any);
 
   /* The lifetime and the number of enrollments parameterize the request that
   mints the token, so they are not deployment variables and must not reach the

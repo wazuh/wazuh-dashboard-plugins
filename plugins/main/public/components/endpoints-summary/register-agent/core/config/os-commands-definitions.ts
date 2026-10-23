@@ -45,7 +45,10 @@ export interface ILinuxAARCHDEB {
 }
 
 type ILinuxOSTypes =
-  ILinuxAMDRPM | ILinuxAARCHRPM | ILinuxAMDDEB | ILinuxAARCHDEB;
+  | ILinuxAMDRPM
+  | ILinuxAARCHRPM
+  | ILinuxAMDDEB
+  | ILinuxAARCHDEB;
 
 /** Windows options **/
 export interface IWindowsOSTypes {
