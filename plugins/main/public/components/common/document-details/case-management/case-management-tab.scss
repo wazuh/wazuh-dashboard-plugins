@@ -1,0 +1,5 @@
+// super select pads items for two-line content; options with no description need less
+.euiSuperSelect__item.wzCaseSelect__item--compact {
+  padding-top: $euiSizeXS;
+  padding-bottom: $euiSizeXS;
+}

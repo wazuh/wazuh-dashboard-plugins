@@ -13,6 +13,8 @@ type TsyncPinnedAgentSourcesOptions = {
   forceUpdate?: boolean;
 };
 
+type TAgentItem = { id: string };
+
 export class PinnedAgentManager {
   public static NO_AGENT_DATA = {};
   public static AGENT_ID_VIEW_KEY = 'agent';
@@ -43,6 +45,10 @@ export class PinnedAgentManager {
   }
 
   pinAgent(agentData: any): void {
+    if (!agentData?.id) {
+      this.unPinAgent();
+      return;
+    }
     const isPinnedAgent = this.isPinnedAgent();
     if (isPinnedAgent && this.equalToPinnedAgent(agentData)) {
       return;
@@ -75,6 +81,17 @@ export class PinnedAgentManager {
     this.navigationService.renewURL(params);
   }
 
+  /**
+   * Unpin the pinned agent when its ID is in the list (e.g. the agents were removed)
+   * @param agentIds - IDs of the agents
+   */
+  unPinAgentIfPinned(agentIds: string[]): void {
+    const pinnedAgentId = this.getPinnedAgent()?.id;
+    if (pinnedAgentId && agentIds.includes(pinnedAgentId)) {
+      this.unPinAgent();
+    }
+  }
+
   isPinnedAgent(): boolean {
     return !!this.store.getState().appStateReducers?.currentAgentData?.id;
   }
@@ -103,18 +120,51 @@ export class PinnedAgentManager {
       if (mustBeSynchronized) {
         try {
           if (isValidAgentId) {
-            const data = await WzRequest.apiReq('GET', '/agents', {
-              params: { q: 'id=' + agentIdValueUrl },
+            const agents = await this.fetchAgents({
+              q: 'id=' + agentIdValueUrl,
             });
-            const formattedData = data?.data?.data?.affected_items?.[0];
-            this.pinAgent(formattedData);
+            const agent = agents?.[0];
+            if (agent) {
+              this.pinAgent(agent);
+            } else {
+              this.unPinAgent();
+            }
           } else {
             this.unPinAgent();
           }
         } catch (_error) {
           this.unPinAgent();
         }
+      } else if (pinnedAgentByStore) {
+        await this.unPinAgentIfRemoved(this.getPinnedAgent().id);
       }
+    }
+  }
+
+  private async fetchAgents(params: {
+    q: string;
+    select?: string;
+  }): Promise<TAgentItem[] | undefined> {
+    const response = await WzRequest.apiReq('GET', '/agents', { params });
+    return response?.data?.data?.affected_items;
+  }
+
+  /**
+   * Unpin the pinned agent when the Wazuh API confirms it no longer exists.
+   * The pin is kept when the request fails (e.g. transient or permission errors)
+   * and the result is ignored when the pinned agent changed during the request.
+   * @param agentId - ID of the pinned agent
+   */
+  private async unPinAgentIfRemoved(agentId: string) {
+    let agents: TAgentItem[] | undefined;
+    try {
+      agents = await this.fetchAgents({ q: 'id=' + agentId, select: 'id' });
+    } catch {
+      return;
+    }
+    const agentWasRemoved = Array.isArray(agents) && agents.length === 0;
+    if (agentWasRemoved && this.getPinnedAgent()?.id === agentId) {
+      this.unPinAgent();
     }
   }
 

@@ -58,6 +58,13 @@ export const OPTIONAL_PARAMETERS_TEXT = [
           'The agent verifies the manager certificate by default, against the endpoint system CA store or against a manager CA file given below. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
       },
     ),
+    subtitleEnrollmentToken: i18n.translate(
+      'wazuh.endpointsSummary.optionalSettingsStep.subtitleEnrollmentToken',
+      {
+        defaultMessage:
+          'The agent verifies the manager certificate by default, against the manager CA it fetches on first start and checks with the enrollment token, or against a manager CA file given below. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
+      },
+    ),
   },
 ];
 

@@ -12,6 +12,7 @@
 
 import { get } from 'lodash';
 import { i18n } from '@osd/i18n';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 import {
   renderValueBooleanYesNo,
@@ -263,7 +264,7 @@ const REMOTE_HELP: HelpLink[] = [
         defaultMessage: 'Remote daemon reference',
       },
     ),
-    href: 'user-manual/manager/reference.html#daemons',
+    href: webDocumentationLink('user-manual/manager/reference.html#daemons'),
   },
   {
     text: i18n.translate(
@@ -272,29 +273,13 @@ const REMOTE_HELP: HelpLink[] = [
         defaultMessage: 'Remote configuration reference',
       },
     ),
-    href: 'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
+    href: webDocumentationLink(
+      'user-manual/manager/wazuh-manager-services.html#agent-connection-service',
+    ),
   },
 ];
 
 const POLICY_MONITORING_HELP: HelpLink[] = [
-  {
-    text: i18n.translate(
-      'wazuh.configuration.settingsHelpLinks.malwareDetection',
-      {
-        defaultMessage: 'Malware detection',
-      },
-    ),
-    href: 'user-manual/capabilities/malware-detection/index.html',
-  },
-  {
-    text: i18n.translate(
-      'wazuh.configuration.settingsHelpLinks.securityConfigurationAssessment',
-      {
-        defaultMessage: 'Security Configuration Assessment',
-      },
-    ),
-    href: 'user-manual/capabilities/sec-config-assessment/how-to-configure.html',
-  },
   {
     text: i18n.translate(
       'wazuh.configuration.settingsHelpLinks.rootcheckReference',
@@ -302,7 +287,32 @@ const POLICY_MONITORING_HELP: HelpLink[] = [
         defaultMessage: 'Rootcheck reference',
       },
     ),
-    href: 'user-manual/reference/ossec-conf/rootcheck.html',
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/rootcheck.html',
+    ),
+  },
+];
+
+const CONFIGURATION_ASSESSMENT_HELP: HelpLink[] = [
+  {
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.securityConfigurationAssessment',
+      {
+        defaultMessage: 'Security Configuration Assessment',
+      },
+    ),
+    href: webDocumentationLink(
+      'user-manual/capabilities/sec-config-assessment/how-to-configure.html',
+    ),
+  },
+  {
+    text: i18n.translate(
+      'wazuh.configuration.settingsHelpLinks.configurationAssessmentReference',
+      {
+        defaultMessage: 'SCA reference',
+      },
+    ),
+    href: webDocumentationLink('user-manual/reference/ossec-conf/sca.html'),
   },
 ];
 
@@ -314,7 +324,9 @@ const FIM_HELP: HelpLink[] = [
         defaultMessage: 'Integrity monitoring documentation',
       },
     ),
-    href: 'user-manual/capabilities/file-integrity/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/file-integrity/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -323,7 +335,9 @@ const FIM_HELP: HelpLink[] = [
         defaultMessage: 'Syscheck reference',
       },
     ),
-    href: 'user-manual/capabilities/file-integrity/how-to-configure-fim.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/file-integrity/how-to-configure-fim.html',
+    ),
   },
 ];
 
@@ -335,7 +349,9 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
         defaultMessage: 'Log data collection documentation',
       },
     ),
-    href: 'user-manual/capabilities/log-data-collection/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/log-data-collection/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -344,7 +360,9 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
         defaultMessage: 'Command monitoring',
       },
     ),
-    href: 'user-manual/capabilities/command-monitoring/index.html',
+    href: webDocumentationLink(
+      'user-manual/capabilities/command-monitoring/index.html',
+    ),
   },
   {
     text: i18n.translate(
@@ -353,7 +371,9 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
         defaultMessage: 'Localfile reference',
       },
     ),
-    href: 'user-manual/reference/ossec-conf/localfile.html',
+    href: webDocumentationLink(
+      'user-manual/reference/ossec-conf/localfile.html',
+    ),
   },
 ];
 
@@ -392,7 +412,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Agent enrollment',
           },
         ),
-        href: 'user-manual/agent/agent-enrollment/index.html',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-enrollment/index.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -401,7 +423,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Registration service reference',
           },
         ),
-        href: 'user-manual/manager/wazuh-manager-services.html#agent-enrollment-service',
+        href: webDocumentationLink(
+          'user-manual/manager/wazuh-manager-services.html#agent-enrollment-service',
+        ),
       },
     ],
   },
@@ -435,7 +459,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Configuring a cluster',
           },
         ),
-        href: 'installation-guide/wazuh-server/step-by-step.html#cluster-configuration-for-multi-node-deployment',
+        href: webDocumentationLink(
+          'installation-guide/wazuh-manager/step-by-step.html#cluster-configuration-for-multi-node-deployment',
+        ),
       },
       {
         text: i18n.translate(
@@ -444,7 +470,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Cluster reference',
           },
         ),
-        href: 'user-manual/manager/wazuh-manager-services.html#cluster-service',
+        href: webDocumentationLink(
+          'user-manual/manager/wazuh-manager-services.html#cluster-service',
+        ),
       },
     ],
   },
@@ -463,7 +491,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Indexer configuration',
           },
         ),
-        href: 'user-manual/manager/wazuh-indexer-connector.html',
+        href: webDocumentationLink(
+          'user-manual/manager/wazuh-indexer-connector.html',
+        ),
       },
     ],
   },
@@ -496,7 +526,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Logging reference',
           },
         ),
-        href: 'user-manual/manager/logging.html#configuration',
+        href: webDocumentationLink(
+          'user-manual/manager/logging.html#configuration',
+        ),
       },
     ],
   },
@@ -521,7 +553,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Agents times reference',
           },
         ),
-        href: 'user-manual/agent/agent-enrollment/agent-life-cycle.html#agent-connection-states',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-enrollment/agent-life-cycle.html#agent-connection-states',
+        ),
       },
     ],
   },
@@ -590,7 +624,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Logging reference',
           },
         ),
-        href: 'user-manual/manager/logging.html#configuration',
+        href: webDocumentationLink(
+          'user-manual/manager/logging.html#configuration',
+        ),
       },
     ],
   },
@@ -616,7 +652,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Vulnerability detection',
           },
         ),
-        href: 'user-manual/capabilities/vulnerability-detection/index.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/vulnerability-detection/index.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -625,7 +663,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Vulnerability detector reference',
           },
         ),
-        href: 'user-manual/capabilities/vulnerability-detection/configuring-scans.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/vulnerability-detection/configuring-scans.html',
+        ),
       },
     ],
   },
@@ -644,14 +684,21 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     ),
     help: POLICY_MONITORING_HELP,
   },
-  [configurationHeaderKey('policy-monitoring', 'SCA')]: {
+  [configurationHeaderKey('configuration-assessment', 'Main settings')]: {
     title: i18n.translate(
-      'wazuh.configuration.settingsHeaders.policyMonitoringScaTitle',
+      'wazuh.configuration.settingsHeaders.configurationAssessmentMainSettingsTitle',
       {
-        defaultMessage: 'Security configuration assessment status',
+        defaultMessage: 'Main settings',
       },
     ),
-    help: POLICY_MONITORING_HELP,
+    description: i18n.translate(
+      'wazuh.configuration.settingsHeaders.configurationAssessmentMainSettingsDescription',
+      {
+        defaultMessage:
+          'General settings for the configuration assessment scan',
+      },
+    ),
+    help: CONFIGURATION_ASSESSMENT_HELP,
   },
   [configurationHeaderKey('client', 'Main settings')]: {
     title: i18n.translate(
@@ -674,7 +721,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Checking connection with manager',
           },
         ),
-        href: 'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-management/agent-connection.html#checking-connection-with-the-wazuh-manager',
+        ),
       },
       {
         text: i18n.translate(
@@ -683,7 +732,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Client reference',
           },
         ),
-        href: 'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+        href: webDocumentationLink(
+          'user-manual/agent/agent-enrollment/enrollment-methods/via-agent-configuration/index.html',
+        ),
       },
     ],
   },
@@ -739,7 +790,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
               defaultMessage: 'Active response documentation',
             },
           ),
-          href: 'user-manual/capabilities/active-response/index.html',
+          href: webDocumentationLink(
+            'user-manual/capabilities/active-response/index.html',
+          ),
         },
         {
           text: i18n.translate(
@@ -748,7 +801,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
               defaultMessage: 'Active response reference',
             },
           ),
-          href: 'user-manual/reference/ossec-conf/active-response.html',
+          href: webDocumentationLink(
+            'user-manual/reference/ossec-conf/active-response.html',
+          ),
         },
       ],
     },
@@ -773,7 +828,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'System inventory',
           },
         ),
-        href: 'user-manual/capabilities/system-inventory/index.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/system-inventory/index.html',
+        ),
       },
       {
         text: i18n.translate(
@@ -782,7 +839,9 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
             defaultMessage: 'Syscollector module reference',
           },
         ),
-        href: 'user-manual/capabilities/system-inventory/configuration.html#wazuh-agent-configuration',
+        href: webDocumentationLink(
+          'user-manual/capabilities/system-inventory/configuration.html#wazuh-agent-configuration',
+        ),
       },
     ],
   },
@@ -932,7 +991,7 @@ const REGISTRATION_SERVICE_INFO: Partial<Record<string, string>> = {
 };
 
 export const searchableSettingsRegistry: SearchableSettingEntry[] = [
-  // --- Registration Service (manager-only, regular request) ---
+  // --- Agents Registration Service (manager-only, regular request) ---
   ...(
     [
       [
@@ -1045,7 +1104,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   ).map(([field, label, render]) => ({
     id: `registration-service.${field}`,
     label,
-    category: 'Registration Service',
+    category: 'Agents Registration Service',
     tab: 'Main settings',
     goto: 'registration-service',
     appliesTo: 'manager' as const,
@@ -1133,7 +1192,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
   ).map(([field, label, render]) => ({
     id: `registration-service.ssl.${field}`,
     label,
-    category: 'Registration Service',
+    category: 'Agents Registration Service',
     tab: 'SSL settings',
     goto: 'registration-service',
     appliesTo: 'manager' as const,
@@ -1768,15 +1827,15 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     ],
   },
 
-  // --- Policy monitoring > SCA tab (agent-only, wodle) ---
+  // --- Configuration Assessment (agent-only, wodle) ---
   ...(
     [
       [
         'enabled',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaEnabledLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentEnabledLabel',
           {
-            defaultMessage: 'Security configuration assessment status',
+            defaultMessage: 'Configuration Assessment status',
           },
         ),
         renderValueYesThenEnabled,
@@ -1784,7 +1843,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       [
         'interval',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaIntervalLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentIntervalLabel',
           {
             defaultMessage: 'Interval',
           },
@@ -1793,7 +1852,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       [
         'scan_on_start',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaScanOnStartLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentScanOnStartLabel',
           {
             defaultMessage: 'Scan on start',
           },
@@ -1802,36 +1861,37 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       [
         'skip_nfs',
         i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaSkipNfsLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentSkipNfsLabel',
           {
-            defaultMessage: 'Skip nfs',
+            defaultMessage: 'Skip NFS',
           },
         ),
       ],
     ] as const
   ).map(([field, label, render]) => ({
-    id: `policy-monitoring.sca.${field}`,
+    id: `configuration-assessment.${field}`,
     label,
-    category: 'Policy monitoring',
-    tab: 'SCA',
-    goto: 'policy-monitoring',
+    category: 'Configuration Assessment',
+    tab: 'Main settings',
+    goto: 'configuration-assessment',
     appliesTo: 'agent' as const,
     agentPath: `sca.${field}`,
     ...(render ? { render } : {}),
   })),
   {
     kind: 'list',
-    id: 'policy-monitoring.sca.policies',
-    category: 'Policy monitoring',
-    tab: 'SCA',
-    goto: 'policy-monitoring',
+    id: 'configuration-assessment.policies',
+    category: 'Configuration Assessment',
+    tab: 'Main settings',
+    goto: 'configuration-assessment',
     appliesTo: 'agent',
     title: i18n.translate(
-      'wazuh.configuration.settingsRegistry.policyMonitoringScaPoliciesTitle',
+      'wazuh.configuration.settingsRegistry.configurationAssessmentPoliciesTitle',
       {
         defaultMessage: 'Policies',
       },
     ),
+    help: CONFIGURATION_ASSESSMENT_HELP,
     // A policy is reported as `{ policy: <path> }`, a bare path string, or
     // (if none are enabled) absent entirely -- see policy-monitoring-sca.js's
     // buildPolicyItems.
@@ -1851,7 +1911,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
       {
         field: 'policy',
         label: i18n.translate(
-          'wazuh.configuration.settingsRegistry.policyMonitoringScaPoliciesItemPolicyLabel',
+          'wazuh.configuration.settingsRegistry.configurationAssessmentPoliciesItemPolicyLabel',
           {
             defaultMessage: 'Name',
           },
@@ -3057,7 +3117,9 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Command module reference',
           },
         ),
-        href: 'user-manual/capabilities/command-monitoring/configuration.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/command-monitoring/configuration.html',
+        ),
       },
     ],
     agentExtract: content => {
@@ -3680,7 +3742,9 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Using multiple outputs',
           },
         ),
-        href: 'user-manual/capabilities/log-data-collection/monitoring-log-files.html',
+        href: webDocumentationLink(
+          'user-manual/capabilities/log-data-collection/configuring-log-collection/monitoring-log-files.html#configuring-sockets',
+        ),
       },
       {
         text: i18n.translate(
@@ -3689,7 +3753,9 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
             defaultMessage: 'Socket reference',
           },
         ),
-        href: 'user-manual/reference/ossec-conf/socket.html',
+        href: webDocumentationLink(
+          'user-manual/reference/ossec-conf/socket.html',
+        ),
       },
     ],
     agentExtract: content => {

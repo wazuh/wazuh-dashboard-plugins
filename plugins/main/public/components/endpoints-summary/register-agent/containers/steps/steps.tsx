@@ -79,6 +79,10 @@ const FIELD_LABELS: Record<tFormFieldsLabel, string> = {
     'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.enrollmentTokenMaxUses',
     { defaultMessage: 'enrollment token enrollments' },
   ),
+  [tFormFieldsLabel.enrollmentTokenDescription]: i18n.translate(
+    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.enrollmentTokenDescription',
+    { defaultMessage: 'enrollment token description' },
+  ),
   [tFormFieldsLabel.agentName]: i18n.translate(
     'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.agentName',
     { defaultMessage: 'agent name' },
@@ -416,7 +420,12 @@ export const Steps = ({
           defaultMessage: 'Optional settings:',
         },
       ),
-      children: <OptionalsInputs formFields={form.fields} />,
+      children: (
+        <OptionalsInputs
+          formFields={form.fields}
+          usesEnrollmentToken={canCreateEnrollmentToken}
+        />
+      ),
       status: getOptionalParameterStepStatus(
         form.fields,
         installCommandWasCopied,

@@ -6,6 +6,7 @@ import {
   configurationHeaders,
   configurationHeaderKey,
 } from './searchable-settings-registry';
+import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
 
 describe('searchableSettingsRegistry', () => {
   it('has a unique id for every field', () => {
@@ -124,6 +125,38 @@ describe('searchableSettingsRegistry', () => {
     const field = findField('policy-monitoring.base_directory');
     const content = { fim: { rootcheck: { base_directory: '/' } } };
     expect(get(content, field.agentPath!)).toBe('/');
+  });
+
+  it('places every SCA entry under configuration-assessment, none under policy-monitoring', () => {
+    const idsByGoto = (goto: string) =>
+      searchableSettingsRegistry
+        .filter(entry => entry.goto === goto)
+        .map(entry => entry.id);
+
+    expect(idsByGoto('configuration-assessment')).toEqual([
+      'configuration-assessment.enabled',
+      'configuration-assessment.interval',
+      'configuration-assessment.scan_on_start',
+      'configuration-assessment.skip_nfs',
+      'configuration-assessment.policies',
+    ]);
+    expect(
+      searchableSettingsRegistry.filter(
+        entry =>
+          entry.goto === 'policy-monitoring' &&
+          entry.agentPath?.startsWith('sca.'),
+      ),
+    ).toEqual([]);
+
+    const policies = findField('configuration-assessment.policies');
+    const content = { sca: { policies: ['cis_ubuntu.yml'] } };
+    expect(policies.kind).toBe('list');
+    expect(policies.kind === 'list' && policies.agentExtract!(content)).toEqual(
+      [{ policy: 'cis_ubuntu.yml' }],
+    );
+    expect(findField('configuration-assessment.enabled').agentPath).toBe(
+      'sca.enabled',
+    );
   });
 
   it('resolves client fields from agent.agent, including a batch sub-field', () => {
@@ -299,6 +332,19 @@ describe('searchableSettingsRegistry', () => {
     expect(logs.help).toBeDefined();
     expect(sockets.help).not.toEqual(logs.help);
     expect(logs.help).toEqual(windowsEvents.help);
+  });
+
+  it('points every help link to the web documentation', () => {
+    const links = [
+      ...Object.values(configurationHeaders).flatMap(h => h.help ?? []),
+      ...searchableSettingsRegistry.flatMap(entry =>
+        entry.kind === 'list' ? entry.help ?? [] : [],
+      ),
+    ];
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) {
+      expect(link.href.startsWith(webDocumentationLink(''))).toBe(true);
+    }
   });
 
   it('carries the 5 restored per-field info tooltips', () => {

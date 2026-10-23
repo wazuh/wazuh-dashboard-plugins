@@ -24,6 +24,7 @@ import { Agent } from '../../../types';
 import { RemoveAgentsModalResult } from './result';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
 import { removeAgentsService } from '../../../services/remove-agents';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 
 export type Result = {
   successAgents?: { id: string; name: string }[];
@@ -137,6 +138,7 @@ export const RemoveAgentsModal = compose(withErrorBoundary)(
 
         const { data, message } = response.data;
         const { affected_items, failed_items, total_failed_items } = data;
+        new PinnedAgentManager().unPinAgentIfPinned(affected_items);
         setResult({
           successAgents: affected_items.map((id: any) => ({
             id: id as string,

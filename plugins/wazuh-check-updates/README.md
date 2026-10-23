@@ -23,6 +23,47 @@ If the user had not chosen not to receive notifications of new updates and if th
 
 The plugin provides a function for fetching the available updates for each API. This function is utilized by the main plugin on the API Configuration page. This page presents a table listing the APIs, along with their respective versions and update statuses, both of which are obtained through the mentioned function.
 
+### 3. CTI registration
+
+The plugin registers the environment with Wazuh Cyber Threat Intelligence (CTI) through the OAuth
+2.0 device authorization grant, then hands the resulting subscription to the content manager of
+the Wazuh indexer (`/_plugins/_content_manager/subscription`). The registration UI is enabled by
+`wazuh_check_updates.ctiRegistrationUiEnabled` and has two entry points:
+
+- The registration modal (`ModalCti`), opened from the CTI feed app. `useCtiRegistrationModal`
+  holds its open state and cancels a pending activation when the modal closes.
+- The `CtiUpsellNotification` bottom bar, exposed in the start contract and rendered by the main
+  plugin while the environment is not registered. Its **Register now** button opens the CTI feed
+  app with the registration modal already open (location state `openRegistration`). The bar can be
+  turned off with `wazuh_check_updates.ctiUpsellEnabled`.
+
+The routes of the registration flow live under `/api/wazuh-check-updates/cti-registration/`.
+
+### 4. CTI feed app
+
+The plugin registers the **CTI feed** app (`cti-feed`) in the **Threat intelligence** category,
+in both the classic navigation (`wz-category-threat-intelligence`) and the new navigation
+(`wazuh-threat-intelligence`). The category ids are duplicated in `common/cti-feed.ts` and must
+match the main plugin's own, which is what places the app next to the main plugin's Threat
+intelligence apps. The app is registered only when `ctiRegistrationUiEnabled` is `true`.
+
+The app has three panels and one action:
+
+- **Subscription**: the registration state, the plan name, and the registration modal.
+- **Feed sync**: the sync state of each feed, read from the `.wazuh-cti-consumers` index
+  (`GET /api/wazuh-check-updates/cti-registration/consumers`). The state rules live in
+  `public/services/cti-consumer-sync-state.ts` and are shared with the consumers accordion of the
+  registration modal. The panel polls while a feed is syncing and for a minute after an update
+  request.
+- **Feed content**: counts of the content the feed delivered. Rules, decoders, integrations and
+  KVDBs come from the Security Analytics `_search` routes, limited to the `standard` space. IOCs
+  and CVEs come from `GET /api/wazuh-check-updates/cti-feed/indicators`, which counts
+  `wazuh-threatintel-enrichments*` and the `CVE` documents of `.wazuh-threatintel-vulnerabilities*`
+  as the current user.
+- **Update CTI content**: `POST /api/wazuh-check-updates/cti-feed/update` forwards the request to
+  `POST /_plugins/_content_manager/update` as the current user, so that user's indexer privileges
+  decide whether it is allowed.
+
 ## Use cases
 
 ### User logs in

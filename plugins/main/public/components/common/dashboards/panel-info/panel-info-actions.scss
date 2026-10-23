@@ -1,0 +1,4 @@
+// Keep the info button in the panel corner; the options menu shows to its left on hover.
+.embPanel__header > div:has([data-test-subj^='wzPanelInfo']) {
+  order: 1;
+}

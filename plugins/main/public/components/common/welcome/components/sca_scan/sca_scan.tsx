@@ -53,7 +53,7 @@ const ScaScanHeader = ({ agent }) => {
         <RedirectAppLinks application={getCore().application}>
           <Typography level='card'>
             {i18n.translate('wazuh.common.agentWelcomeScaScan.title', {
-              defaultMessage: 'Security Configuration Assessment',
+              defaultMessage: 'Configuration Assessment',
             })}
           </Typography>
         </RedirectAppLinks>
@@ -65,7 +65,7 @@ const ScaScanHeader = ({ agent }) => {
             content={i18n.translate(
               'wazuh.common.agentWelcomeScaScan.openApp',
               {
-                defaultMessage: 'Open SCA Scans',
+                defaultMessage: 'Open Configuration Assessment',
               },
             )}
           >
@@ -82,7 +82,7 @@ const ScaScanHeader = ({ agent }) => {
               aria-label={i18n.translate(
                 'wazuh.common.agentWelcomeScaScan.openApp',
                 {
-                  defaultMessage: 'Open SCA Scans',
+                  defaultMessage: 'Open Configuration Assessment',
                 },
               )}
             />
@@ -202,7 +202,8 @@ const ScaScanNoData = () => {
         title={
           <h4>
             {i18n.translate('wazuh.common.agentWelcomeScaScan.noDataTitle', {
-              defaultMessage: "You don't have SCA scans in this agent.",
+              defaultMessage:
+                "You don't have Configuration Assessment scans in this agent.",
             })}
           </h4>
         }

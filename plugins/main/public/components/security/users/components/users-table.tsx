@@ -6,8 +6,11 @@ import {
   EuiLoadingSpinner,
   EuiFlexItem,
   EuiBasicTableColumn,
+  EuiIcon,
+  EuiToolTip,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { getAllowRunAsHelpText } from './allow-run-as-help-text';
 import { WzButtonPermissionsModalConfirm } from '../../../common/buttons';
 import UsersServices from '../services';
 import { ErrorHandler } from '../../../../react-services/error-handler';
@@ -83,9 +86,16 @@ export const UsersTable = ({
     },
     {
       field: 'allow_run_as',
-      name: i18n.translate('wazuh.security.usersTable.columns.allowRunAs', {
-        defaultMessage: 'Allow run as ',
-      }),
+      name: (
+        <EuiToolTip content={getAllowRunAsHelpText()}>
+          <span>
+            {i18n.translate('wazuh.security.usersTable.columns.allowRunAs', {
+              defaultMessage: 'Allow run as',
+            })}{' '}
+            <EuiIcon type='questionInCircle' color='subdued' size='s' />
+          </span>
+        </EuiToolTip>
+      ),
       // Not sortable: the Server API only allows sorting /security/users by
       // `username` and `id`. Any other field is rejected with a bad request.
       truncateText: true,
