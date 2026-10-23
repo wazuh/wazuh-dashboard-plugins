@@ -45,10 +45,7 @@ export interface ILinuxAARCHDEB {
 }
 
 type ILinuxOSTypes =
-  | ILinuxAMDRPM
-  | ILinuxAARCHRPM
-  | ILinuxAMDDEB
-  | ILinuxAARCHDEB;
+  ILinuxAMDRPM | ILinuxAARCHRPM | ILinuxAMDDEB | ILinuxAARCHDEB;
 
 /** Windows options **/
 export interface IWindowsOSTypes {
@@ -77,8 +74,7 @@ export type tOptionalParameters =
   | 'agentName'
   | 'agentGroups'
   | 'wazuhPassword'
-  | 'sslVerification'
-  | 'managerCa';
+  | 'sslVerification';
 
 ///////////////////////////////////////////////////////////////////
 /// Package repository helpers (evaluated lazily at call time)
@@ -278,30 +274,15 @@ export const optionalParamsDefinitions: tOptionalParams<tOptionalParameters> = {
       return value !== '' ? `${property}=$'${value}'` : '';
     },
   },
-  /* The agent verifies the manager certificate on its own -- an unset
-  `<verification_mode>` resolves to `full` against the CA bootstrapped from the
-  enrollment token, to the endpoint's system CA store without a token, or to
-  `certificate` when a CA is configured -- so the enabled state contributes
-  nothing and only the opt-out is spelled out. Emitting `system` here instead
-  would be harmful: the agent rejects `system` combined with a CA and drops the
-  CA, silently undoing a `WAZUH_REGISTRATION_CA` added to the command by hand. */
+  /* An unset `<verification_mode>` resolves to `full` against the CA the
+  enrollment token delivers, so the enabled state emits nothing and only the
+  opt-out is spelled out. The 5.0 installer sets no CA, so there is no CA
+  variable here. */
   sslVerification: {
     property: 'WAZUH_SSL_VERIFICATION',
     getParamCommand: props => {
       const { property, value } = props;
       return value === false ? `${property}='none'` : '';
-    },
-  },
-  /* Path to a CA already present on the endpoint, which the installer writes
-  into `<agent><ssl><certificate_authorities>`. Left empty the agent trusts the
-  CA bootstrapped from the enrollment token, or the endpoint's system CA store
-  without a token. */
-  managerCa: {
-    property: 'WAZUH_REGISTRATION_CA',
-    getParamCommand: props => {
-      const { property, value } = props;
-      const parsedValue = typeof value === 'string' ? value.trim() : value;
-      return parsedValue ? `${property}='${parsedValue}'` : '';
     },
   },
 };
