@@ -34,6 +34,8 @@ const AGENT_DATA_INDICES = [
   WAZUH_ACTIVE_RESPONSES_PATTERN,
   WAZUH_METRICS_AGENTS_PATTERN,
   WAZUH_METRICS_COMMS_PATTERN,
+  WAZUH_AGENT_STATS_PATTERN,
+  WAZUH_AGENT_CONFIG_PATTERN,
 ];
 const DLS_QUERY_EXAMPLE = '{"terms":{"wazuh.agent.groups":["<group>"]}}';
 const DLS_AGENT_ID_QUERY_EXAMPLE = '{"term":{"wazuh.agent.id":"<agent id>"}}';
@@ -226,18 +228,6 @@ export const ButtonAboutSecurity = () => {
                 {DLS_AGENT_ID_QUERY_EXAMPLE}
               </EuiCodeBlock>
               <EuiSpacer size='s' />
-              <p>
-                <FormattedMessage
-                  id='wazuh.security.aboutFlyout.indexerWarning.agentIdOnlyIndices'
-                  defaultMessage='The documents in {stats} and {config} do not have {groups}, so a group query hides the Stats tab and the agent configuration. Use document-level security on {id} in those indices.'
-                  values={{
-                    stats: <code>{WAZUH_AGENT_STATS_PATTERN}</code>,
-                    config: <code>{WAZUH_AGENT_CONFIG_PATTERN}</code>,
-                    groups: <code>wazuh.agent.groups</code>,
-                    id: <code>wazuh.agent.id</code>,
-                  }}
-                />
-              </p>
               <p>
                 {i18n.translate(
                   'wazuh.security.aboutFlyout.indexerWarning.indexTime',
