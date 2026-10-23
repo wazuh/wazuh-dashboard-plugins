@@ -36,6 +36,16 @@ The board is the **Dashboard team project** of the `wazuh` GitHub organization
 (titled like "XDR+SIEM/Dashboard team"). Don't hard-code its number or ids: resolve
 them once at the start and reuse the values.
 
+**Local file first (optional).** If the file written by the `setup-local-secrets` skill
+exists (`${WZSS_FILE:-$HOME/.config/wzss/secrets.env}`, mode `600`), read the
+`WZSS_DASHBOARD_PROJECT_*` variables from it in the same shell command that uses them
+(`PROJECT_NUMBER` = `WZSS_DASHBOARD_PROJECT_NUMBER`, `PROJECT_ID` =
+`WZSS_DASHBOARD_PROJECT_ID`, `STATUS_FIELD_ID` = `WZSS_DASHBOARD_PROJECT_STATUS_FIELD_ID`,
+`STARTDATE_FIELD_ID` = `WZSS_DASHBOARD_PROJECT_STARTDATE_FIELD_ID`, and each Status option
+id = `WZSS_DASHBOARD_PROJECT_STATUS_<NAME>_ID`, e.g. `…_IN_PROGRESS_ID`). Never print the
+values. If the file or a variable is missing, offer to run `/setup-local-secrets`, or
+resolve them as below.
+
 ```bash
 # 1) The project whose title mentions "Dashboard team" (several or none → ask the user)
 gh project list --owner wazuh --limit 200 --format json \
