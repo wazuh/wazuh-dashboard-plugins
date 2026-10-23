@@ -48,6 +48,7 @@ const InventoryDashboard = compose(
     categoriesSampleData,
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
+    emptyState,
   }: InventoryDashboardTableProps) => {
     const {
       results,
@@ -85,7 +86,9 @@ const InventoryDashboard = compose(
           filterInputsProps={managedFiltersProps}
         />
 
-        {results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
+        {results?.hits?.total === 0
+          ? emptyState ?? <DiscoverNoResults />
+          : null}
 
         {categoriesSampleData && (
           <div
@@ -190,6 +193,8 @@ export interface InventoryDashboardTableProps {
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
+  /** Rendered instead of the default no results callout when the search has no hits. */
+  emptyState?: React.ReactNode;
 }
 
 export const InventoryDashboardTable = ({
@@ -203,6 +208,7 @@ export const InventoryDashboardTable = ({
   tableId,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
+  emptyState,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -250,6 +256,7 @@ export const InventoryDashboardTable = ({
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}
+      emptyState={emptyState}
     />
   );
 };
