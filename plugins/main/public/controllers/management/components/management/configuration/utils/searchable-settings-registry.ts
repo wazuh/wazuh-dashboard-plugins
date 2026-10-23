@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import type { ComponentType } from 'react';
 import { get } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -22,6 +23,7 @@ import {
   renderValueOrYes,
   renderValueOrDefault,
 } from './utils';
+import { CommandsEmptyState } from '../util-components/commands-empty-state';
 
 /** How to source a field's raw value in the manager branch. Mirrors the two
  * shapes `withWzConfig`/`getCurrentConfig` already support, so the fetch
@@ -110,6 +112,8 @@ export interface SearchableSettingList {
    * lookup -- just set directly, verbatim from the original section's
    * `helpLinks`. */
   help?: HelpLink[];
+  /** Replaces "Nothing configured yet." when the list is empty. */
+  emptyState?: ComponentType<{ agent?: unknown }>;
   agentPath?: string;
   /** For a raw shape a plain path can't express (bare-value-or-array, two
    * possible field names, app-side filtering of one shared field). */
@@ -341,6 +345,18 @@ const FIM_HELP: HelpLink[] = [
   },
 ];
 
+const COMMAND_MONITORING_HELP_LINK: HelpLink = {
+  text: i18n.translate(
+    'wazuh.configuration.settingsHelpLinks.commandMonitoring',
+    {
+      defaultMessage: 'Command monitoring',
+    },
+  ),
+  href: webDocumentationLink(
+    'user-manual/capabilities/command-monitoring/index.html',
+  ),
+};
+
 const LOG_COLLECTION_HELP: HelpLink[] = [
   {
     text: i18n.translate(
@@ -353,17 +369,7 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
       'user-manual/capabilities/log-data-collection/index.html',
     ),
   },
-  {
-    text: i18n.translate(
-      'wazuh.configuration.settingsHelpLinks.commandMonitoring',
-      {
-        defaultMessage: 'Command monitoring',
-      },
-    ),
-    href: webDocumentationLink(
-      'user-manual/capabilities/command-monitoring/index.html',
-    ),
-  },
+  COMMAND_MONITORING_HELP_LINK,
   {
     text: i18n.translate(
       'wazuh.configuration.settingsHelpLinks.localfileReference',
@@ -3106,10 +3112,11 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     description: i18n.translate(
       'wazuh.configuration.settingsRegistry.commandsCommandDescription',
       {
-        defaultMessage: 'Find here all the currently defined commands',
+        defaultMessage: 'Commands this endpoint runs',
       },
     ),
     help: [
+      COMMAND_MONITORING_HELP_LINK,
       {
         text: i18n.translate(
           'wazuh.configuration.settingsHelpLinks.commandModuleReference',
@@ -3122,6 +3129,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
         ),
       },
     ],
+    emptyState: CommandsEmptyState,
     agentExtract: content => {
       const reported = get(content, 'command');
       if (!reported || typeof reported === 'string') {
