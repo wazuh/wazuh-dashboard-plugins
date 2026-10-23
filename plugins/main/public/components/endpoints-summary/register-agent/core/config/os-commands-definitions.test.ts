@@ -43,58 +43,10 @@ describe('optionalParamsDefinitions - sslVerification', () => {
   );
 });
 
-describe('optionalParamsDefinitions - managerCa', () => {
-  it('renders the CA path when one is given', () => {
-    const result = optionalParamsDefinitions.managerCa.getParamCommand(
-      {
-        name: 'managerCa',
-        property: 'WAZUH_REGISTRATION_CA',
-        value: '/var/ossec/etc/manager-ca.pem',
-      },
-      linux,
-    );
-    expect(result).toBe(
-      "WAZUH_REGISTRATION_CA='/var/ossec/etc/manager-ca.pem'",
-    );
-  });
-
-  it('keeps a path containing spaces intact', () => {
-    const result = optionalParamsDefinitions.managerCa.getParamCommand(
-      {
-        name: 'managerCa',
-        property: 'WAZUH_REGISTRATION_CA',
-        value: 'C:\\Program Files\\ossec-agent\\manager-ca.pem',
-      },
-      windows,
-    );
-    expect(result).toBe(
-      "WAZUH_REGISTRATION_CA='C:\\Program Files\\ossec-agent\\manager-ca.pem'",
-    );
-  });
-
-  it('trims surrounding whitespace', () => {
-    const result = optionalParamsDefinitions.managerCa.getParamCommand(
-      {
-        name: 'managerCa',
-        property: 'WAZUH_REGISTRATION_CA',
-        value: '  /var/ossec/etc/manager-ca.pem  ',
-      },
-      linux,
-    );
-    expect(result).toBe(
-      "WAZUH_REGISTRATION_CA='/var/ossec/etc/manager-ca.pem'",
-    );
-  });
-
-  it.each(['', '   '])('renders nothing for %p', value => {
-    const result = optionalParamsDefinitions.managerCa.getParamCommand(
-      {
-        name: 'managerCa',
-        property: 'WAZUH_REGISTRATION_CA',
-        value,
-      },
-      linux,
-    );
-    expect(result).toBe('');
-  });
+/* The 5.0 installer refuses WAZUH_REGISTRATION_CA as a removed variable. */
+it('defines no CA variable for any operating system', () => {
+  const properties = Object.values(optionalParamsDefinitions).map(
+    ({ property }) => property,
+  );
+  expect(properties).not.toContain('WAZUH_REGISTRATION_CA');
 });

@@ -1,7 +1,6 @@
 import {
   validateAgentName,
   validateExistingEnrollmentToken,
-  validateManagerCaPath,
 } from './validations';
 
 describe('Validations', () => {
@@ -45,30 +44,6 @@ describe('Validations', () => {
     const validAgentName = 'agent_name';
     const result = validateAgentName(validAgentName);
     expect(result).toBe('');
-  });
-});
-
-describe('validateManagerCaPath', () => {
-  test.each(['', '   ', undefined])(
-    'should return undefined for the empty value %p',
-    value => {
-      expect(validateManagerCaPath(value)).toBeUndefined();
-    },
-  );
-
-  test.each([
-    '/var/ossec/etc/manager-ca.pem',
-    'C:\\Program Files\\ossec-agent\\manager-ca.pem',
-    './certs/manager ca.pem',
-  ])('should accept the path %p', value => {
-    expect(validateManagerCaPath(value)).toBeUndefined();
-  });
-
-  /* The path is interpolated into the command inside single quotes, so a single
-  quote in the value would break out of them. */
-  test('should return an error message for a path containing a single quote', () => {
-    const result = validateManagerCaPath("/etc/ca's.pem");
-    expect(result).toBe('The character "\'" is not valid in a file path.');
   });
 });
 
