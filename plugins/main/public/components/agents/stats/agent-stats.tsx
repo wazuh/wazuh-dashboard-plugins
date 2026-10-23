@@ -298,52 +298,62 @@ const AgentStatsBody = withDataSourceInitiated({})(
               </h2>
             }
             body={
-              <>
-                <p>
-                  <FormattedMessage
-                    id='wazuh.endpointsSummary.agentStats.noStatisticsBody'
-                    defaultMessage='This agent does not send statistics. Reporting is off by default: enable {option} in the agent configuration. The first report arrives after one interval, 60 seconds by default.'
-                    values={{
-                      option: <EuiCode>{'<agent><stats_report>'}</EuiCode>,
-                    }}
-                  />
-                </p>
-                <EuiLink
-                  href={webDocumentationLink(STATS_REPORT_DOCS_PATH)}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  external
-                  data-test-subj='agent-stats-stats-report-docs'
-                >
-                  {i18n.translate(
-                    'wazuh.endpointsSummary.agentStats.statsReportDocsLink',
-                    { defaultMessage: 'Statistics reporting reference' },
-                  )}
-                </EuiLink>
-              </>
+              <p>
+                <FormattedMessage
+                  id='wazuh.endpointsSummary.agentStats.noStatisticsBody'
+                  defaultMessage='This agent does not send statistics. Reporting is off by default: enable {option} in the agent configuration. The first report arrives after one interval, 60 seconds by default. {docsLink}'
+                  values={{
+                    option: <EuiCode>{'<agent><stats_report>'}</EuiCode>,
+                    docsLink: (
+                      <EuiLink
+                        href={webDocumentationLink(STATS_REPORT_DOCS_PATH)}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        external
+                        data-test-subj='agent-stats-stats-report-docs'
+                      >
+                        {i18n.translate(
+                          'wazuh.endpointsSummary.agentStats.statsReportDocsLink',
+                          { defaultMessage: 'Statistics reporting reference' },
+                        )}
+                      </EuiLink>
+                    ),
+                  }}
+                />
+              </p>
             }
-            actions={[
-              <EuiButton
-                key='refresh'
-                color='primary'
-                fill
-                iconType='refresh'
-                isLoading={loading}
-                onClick={onRefresh}
-                data-test-subj='agent-stats-refresh'
+            // A single node, because an array of actions is stacked in a column
+            actions={
+              <EuiFlexGroup
+                gutterSize='s'
+                justifyContent='center'
+                responsive={false}
               >
-                {i18n.translate(
-                  'wazuh.endpointsSummary.agentStats.refreshButton',
-                  { defaultMessage: 'Refresh' },
-                )}
-              </EuiButton>,
-              <EuiButtonEmpty key='select-agent' onClick={openAgentSelector}>
-                {i18n.translate(
-                  'wazuh.endpointsSummary.agentStats.selectAgentButton',
-                  { defaultMessage: 'Select agent' },
-                )}
-              </EuiButtonEmpty>,
-            ]}
+                <EuiFlexItem grow={false}>
+                  <EuiButton
+                    color='primary'
+                    fill
+                    iconType='refresh'
+                    isLoading={loading}
+                    onClick={onRefresh}
+                    data-test-subj='agent-stats-refresh'
+                  >
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.agentStats.refreshButton',
+                      { defaultMessage: 'Refresh' },
+                    )}
+                  </EuiButton>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiButtonEmpty onClick={openAgentSelector}>
+                    {i18n.translate(
+                      'wazuh.endpointsSummary.agentStats.selectAgentButton',
+                      { defaultMessage: 'Select agent' },
+                    )}
+                  </EuiButtonEmpty>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            }
           />
         ) : (
           <>
