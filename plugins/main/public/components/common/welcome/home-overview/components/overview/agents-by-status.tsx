@@ -1,6 +1,6 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiEmptyPrompt, EuiIconTip, EuiText } from '@elastic/eui';
+import { EuiEmptyPrompt, EuiText } from '@elastic/eui';
 import { FormattedMessage } from '@osd/i18n/react';
 import { AgentStatus } from '../../interfaces/types';
 import {
@@ -15,7 +15,7 @@ import {
 } from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';
 import { TUserPermissions } from '../../../../permissions/element';
-import { WzPermissionsFormatted } from '../../../../permissions/format';
+import { WzEmptyPromptNoPermissions } from '../../../../permissions/prompt';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../lib/theme-colors';
 
 type AgentStatusName =
@@ -46,51 +46,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
 }) => {
   // A total of 0 without agent:read means "filtered out", not "no agents".
   if (data.total === 0 && missingPermissions) {
-    return (
-      <EuiEmptyPrompt
-        iconType='lock'
-        body={
-          <p>
-            {i18n.translate('wazuh.common.homeOverviewAgentsByStatus.noRole', {
-              defaultMessage:
-                'Your account has no role that grants access to agents.',
-            })}
-            <br />
-            {i18n.translate(
-              'wazuh.common.homeOverviewAgentsByStatus.noRoleHint',
-              {
-                defaultMessage:
-                  'Ask an administrator to map it to a role in Server management > Security > Roles mapping.',
-              },
-            )}{' '}
-            <EuiIconTip
-              type='questionInCircle'
-              aria-label={i18n.translate(
-                'wazuh.common.homeOverviewAgentsByStatus.missingPermissionsLabel',
-                { defaultMessage: 'Missing permissions' },
-              )}
-              content={
-                <div>
-                  {i18n.translate(
-                    'wazuh.common.homeOverviewAgentsByStatus.missingPermissions',
-                    {
-                      defaultMessage:
-                        'The role must grant the {count, plural, one {permission} other {permissions}}:',
-                      values: { count: missingPermissions.length },
-                    },
-                  )}
-                  {WzPermissionsFormatted(missingPermissions)}
-                </div>
-              }
-              iconProps={{
-                'data-test-subj': 'agents-by-status-missing-permissions',
-              }}
-            />
-          </p>
-        }
-        data-test-subj='agents-by-status-no-role'
-      />
-    );
+    return <WzEmptyPromptNoPermissions permissions={missingPermissions} />;
   }
 
   if (data.total === 0) {

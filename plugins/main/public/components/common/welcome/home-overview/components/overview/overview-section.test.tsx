@@ -134,7 +134,7 @@ describe('OverviewSection', () => {
     expect(screen.queryByText('agents active')).not.toBeInTheDocument();
   });
 
-  it('says the account has no role instead of "no agents" when agent:read is missing', () => {
+  it('shows the missing permissions instead of "no agents" when agent:read is missing', () => {
     asMock(useUserPermissionsRequirements).mockReturnValue([
       [[{ action: 'agent:read', resource: 'agent:id:*' }]],
       {},
@@ -152,9 +152,7 @@ describe('OverviewSection', () => {
     const { container } = render(
       <OverviewSection findings={findingsAvailable} />,
     );
-    expect(container.textContent).toContain(
-      'Your account has no role that grants access to agents.',
-    );
+    expect(container.textContent).toContain('You have no permissions');
     expect(container.textContent).not.toContain(
       'This instance has no agents registered.',
     );
