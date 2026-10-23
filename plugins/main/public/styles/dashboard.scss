@@ -10,8 +10,10 @@
       height: calc(100vh - 44px) !important;
     }
   }
+}
 
-  /* Fit table columns to narrow panels: OSD sets them only on load */
+/* Configuration Assessment: fit table columns to narrow panels; OSD sets them only on load */
+.wz-sca-dashboard {
   .visTable {
     container-type: inline-size;
   }
