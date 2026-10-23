@@ -19,7 +19,7 @@ export type ConsumerSyncState =
  * Share of the remote content already synced, in [0, 1], or `null` when the
  * remote offset is unknown.
  */
-function getSyncProgress(consumer: CtiConsumer): number | null {
+export function getSyncProgress(consumer: CtiConsumer): number | null {
   if (consumer.remote_offset <= 0) {
     return null;
   }
@@ -74,9 +74,4 @@ export function getFeedSyncSummary(consumers: CtiConsumer[]): FeedSyncSummary {
     return 'unknown';
   }
   return 'upToDate';
-}
-
-/** Whether the sync is still moving, so its state is worth polling. */
-export function isFeedSyncInProgress(summary: FeedSyncSummary): boolean {
-  return summary === 'syncing' || summary === 'pending';
 }

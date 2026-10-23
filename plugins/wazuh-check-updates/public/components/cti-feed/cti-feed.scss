@@ -49,3 +49,24 @@
     height: $euiSizeXXL;
   }
 }
+
+// Feed sync rows open the feed details: an inset primary outline on hover makes
+// the whole row read as one target. A shadow, because OUI's `--noBorder` wins
+// over any border set here.
+.ctiFeed__feedRow.euiPanel--isClickable:hover {
+  box-shadow: inset 0 0 0 $euiBorderWidthThin $euiColorPrimary;
+}
+
+// Feed details: short labels, long identifiers (types, URLs) get the room.
+// Compound selector to win over OUI's own column widths.
+.ctiFeed__details.euiDescriptionList--column {
+  .euiDescriptionList__title {
+    width: 35%;
+  }
+
+  .euiDescriptionList__description {
+    width: 65%;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+}
