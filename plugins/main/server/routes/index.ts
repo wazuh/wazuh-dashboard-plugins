@@ -4,6 +4,7 @@ import { WazuhElasticRoutes } from './wazuh-elastic';
 import { WazuhHostsRoutes } from './wazuh-hosts';
 import { WazuhUtilsRoutes, UiLogsRoutes } from './wazuh-utils';
 import { WazuhReportingRoutes } from './wazuh-reporting';
+import { WazuhAiRoutes } from './wazuh-ai';
 
 export const setupRoutes = (router: IRouter, services) => {
   WazuhApiRoutes(router, services);
@@ -11,5 +12,6 @@ export const setupRoutes = (router: IRouter, services) => {
   WazuhHostsRoutes(router, services);
   WazuhUtilsRoutes(router, services);
   WazuhReportingRoutes(router, services);
+  WazuhAiRoutes(router);
   UiLogsRoutes(router, services);
 };

@@ -6,6 +6,23 @@ manage the configuration and capabilities of the Wazuh server.
 
 ## Description
 
+### SOC AI analysis runtime prerequisite
+
+The optional AI analysis server route forwards alerts to the local SOC AI
+service at `http://127.0.0.1:5000/api/ai/analyze-alert`. The Python service
+must be running in the same host or network namespace as the Wazuh Dashboard
+server, and `SOC_AI_INTERNAL_TOKEN` must be configured in the Dashboard server
+process environment to match the Python service. The token is sent only from
+the server and is never returned to the browser. This loopback endpoint has
+not been verified as reachable in every deployment layout.
+
+The analysis route accepts an alert index and document ID, then retrieves the
+alert through the signed-in user's OpenSearch client. OpenSearch index
+permissions and document/field-level security therefore apply to analysts and
+administrators alike. Only a fixed set of timestamp, rule, decoder, agent ID,
+and selected network/authentication fields is forwarded to the AI service.
+The browser-provided alert contents are not trusted or forwarded.
+
 This plugin for Wazuh dashboard allows you to visualize and analyze Wazuh alerts stored in
 the Wazuh Indexer. The plugin provides the following capabilities:
 

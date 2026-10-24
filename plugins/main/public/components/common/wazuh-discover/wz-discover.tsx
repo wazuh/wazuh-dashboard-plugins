@@ -24,15 +24,15 @@ import {
   getAllCustomRenders,
 } from '../data-grid';
 import { DocumentViewTableAndJson } from './components/document-view-table-and-json';
+import { AIAnalysisTab } from './components/ai-analysis-tab';
 import {
   ErrorHandler,
   ErrorFactory,
   HttpError,
 } from '../../../react-services/error-management';
 import useSearchBar from '../search-bar/use-search-bar';
-import { getPlugins } from '../../../kibana-services';
+import { getPlugins, getWazuhCorePlugin } from '../../../kibana-services';
 import { histogramChartInput } from './config/histogram-chart';
-import { getWazuhCorePlugin } from '../../../kibana-services';
 import './discover.scss';
 import { withErrorBoundary } from '../hocs';
 import {
@@ -220,6 +220,22 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   };
 
   const closeFlyoutHandler = () => setInspectedHit(undefined);
+  const additionalDocumentDetailsTabs =
+    moduleId === 'threat-hunting' && inspectedHit?._source
+      ? [
+        {
+          id: 'ai-analysis',
+          name: 'AI Analysis',
+          content: (
+            <AIAnalysisTab
+              key={`${inspectedHit._index}:${inspectedHit._id}`}
+              index={inspectedHit._index}
+              id={inspectedHit._id}
+            />
+          ),
+        },
+      ]
+      : [];
 
   return (
     <IntlProvider locale='en'>
@@ -329,6 +345,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
                         filters={filters}
                         setFilters={setFilters}
                         onFilter={closeFlyoutHandler}
+                        additionalTabs={additionalDocumentDetailsTabs}
+                        showFilterButtons={true}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
