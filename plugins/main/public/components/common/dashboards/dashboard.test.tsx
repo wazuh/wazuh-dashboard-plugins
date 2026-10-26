@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import { createDashboard } from './dashboard';
+import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
 
 let mockDataSourceAction: { data?: unknown; error?: unknown };
 
@@ -89,5 +90,17 @@ describe('createDashboard', () => {
     mockDataSourceAction = { data: null, error: new Error('Gateway Timeout') };
     renderDashboard();
     expect(screen.getByText('Gateway Timeout')).toBeInTheDocument();
+  });
+
+  it('reports no results to the report button while a search error shows', () => {
+    // A failed refetch keeps the hits of the previous successful one
+    mockDataSourceAction = {
+      data: { hits: { total: 5 } },
+      error: Object.assign(new Error('security_exception'), { status: 403 }),
+    };
+    renderDashboard();
+    expect(useReportingCommunicateSearchContext).toHaveBeenLastCalledWith(
+      expect.objectContaining({ totalResults: 0 }),
+    );
   });
 });

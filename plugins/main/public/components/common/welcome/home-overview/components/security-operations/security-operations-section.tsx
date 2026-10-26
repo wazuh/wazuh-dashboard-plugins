@@ -78,7 +78,9 @@ const SecurityOperationsSectionComponent: React.FC<
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={itHygieneDenied ? 'error' : 'available'}
-            errorLabel={operatingSystems.error?.message}
+            errorLabel={
+              itHygieneDenied ? operatingSystems.error?.message : undefined
+            }
             isPermissionDenied={itHygieneDenied}
             title={i18n.translate(
               'wazuh.common.homeOverviewSecurityOperations.itHygieneTitle',

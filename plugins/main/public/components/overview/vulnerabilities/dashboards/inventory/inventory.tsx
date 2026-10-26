@@ -180,12 +180,20 @@ const InventoryVulsComponent = () => {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
+    // Ignore the response of a request that a newer one replaced.
+    let ignore = false;
     fetchData({ query, pagination, sorting })
       .then(results => {
+        if (ignore) {
+          return;
+        }
         setFetchError(undefined);
         setResults(results);
       })
       .catch(error => {
+        if (ignore) {
+          return;
+        }
         // Drop stale hits so only the error prompt is shown
         setResults({} as SearchResponse);
         setFetchError(error);
@@ -200,6 +208,9 @@ const InventoryVulsComponent = () => {
         });
         ErrorHandler.handleError(searchError);
       });
+    return () => {
+      ignore = true;
+    };
   }, [
     /* FIX: If changing any filter and the results total is the same, the page is not reset to the
      initial page but it causes a request. This has a different behavior compared with the table

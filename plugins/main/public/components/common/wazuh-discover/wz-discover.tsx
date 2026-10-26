@@ -179,6 +179,8 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     }
     setIndexPattern(dataSource?.indexPattern);
 
+    // Ignore the response of a request that a newer one replaced.
+    let ignore = false;
     fetchData({
       query,
       pagination,
@@ -186,10 +188,16 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       dateRange: absoluteDateRange,
     })
       .then(results => {
+        if (ignore) {
+          return;
+        }
         setFetchError(undefined);
         setResults(results);
       })
       .catch(error => {
+        if (ignore) {
+          return;
+        }
         // Drop stale hits so only the error prompt is shown
         setResults({} as SearchResponse);
         setFetchError(error);
@@ -201,6 +209,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         });
         ErrorHandler.handleError(searchError);
       });
+    return () => {
+      ignore = true;
+    };
   }, [absoluteDateRange, JSON.stringify(sorting), JSON.stringify(pagination)]);
 
   useEffect(() => {

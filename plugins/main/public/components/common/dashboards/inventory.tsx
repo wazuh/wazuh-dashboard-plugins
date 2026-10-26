@@ -101,7 +101,7 @@ const InventoryDashboard = compose(
         {categoriesSampleData && (
           <div
             className={classnames(classNameDashboardWrapper, {
-              'wz-no-display': !shouldHideDashboard,
+              'wz-no-display': Boolean(fetchError) || !shouldHideDashboard,
             })}
           >
             <SampleDataWarning categoriesSampleData={categoriesSampleData} />
