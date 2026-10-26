@@ -278,6 +278,24 @@ describe('ProviderFormFlyout — API key for hosted endpoints', () => {
     fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
     await waitFor(() => expect(baseProps.onSubmit).toHaveBeenCalled());
   });
+
+  // Anchored on the hostname: a self-hosted proxy whose name merely contains a vendor's needs no key.
+  it.each([
+    ['https://generativelanguage-proxy.corp/v1', false],
+    ['https://my-bedrock-mantle.internal/v1', false],
+    ['https://bedrock-mantle.us-east-1.api.aws/v1', true],
+    ['https://generativelanguage.googleapis.com/v1beta/openai', true],
+  ])('treats %s as requiring a key: %s', (baseUrl, required) => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: baseUrl },
+    });
+
+    expect(
+      screen.queryByText(/^Required for this hosted endpoint\./) !== null,
+    ).toBe(required);
+  });
 });
 
 describe('ProviderFormFlyout — unsaved changes confirmation', () => {

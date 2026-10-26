@@ -141,7 +141,7 @@ const PROVIDER_API_KEY_GUIDANCE: Record<
 };
 
 /** Replaces the openai_compatible "Optional" line when the endpoint is a hosted service that needs a
- * key (see `requiresApiKey` in VENDOR_MODEL_SUGGESTIONS). */
+ * key (see `keyRequiredHost` in VENDOR_MODEL_SUGGESTIONS). */
 const HOSTED_API_KEY_REQUIREMENT = i18n.translate(
   'wazuhAiAssistant.settings.form.apiKeyRequirementHosted',
   {
@@ -397,28 +397,31 @@ const PROVIDER_MODEL_GUIDANCE: Record<
  * be a guaranteed-broken config), and every other entry is an OpenAI-compatible-only
  * gateway/service, so it is gated to `openai_compatible`.
  *
- * `requiresApiKey` marks a hosted service that refuses every request without a key, so the form
+ * `keyRequiredHost` marks a hosted service that refuses every request without a key, so the form
  * blocks Save without one there. Only these hosts: an openai_compatible key is "Optional" for local
- * runtimes such as Ollama, and an Anthropic-compatible proxy may have no auth. Groq has an entry for this flag alone: it gets no model suggestions
- * (see PROVIDER_URL_GUIDANCE).
+ * runtimes such as Ollama, and an Anthropic-compatible proxy may have no auth. It is anchored on the
+ * whole hostname (exact host or a subdomain of it), unlike `match`: a self-hosted proxy whose name
+ * merely CONTAINS a vendor's (`generativelanguage-proxy.corp`, `my-bedrock-mantle.internal`) is not
+ * that service and may need no key. Groq has an entry for this field alone: it gets no model
+ * suggestions (see PROVIDER_URL_GUIDANCE).
  */
 const VENDOR_MODEL_SUGGESTIONS: Array<{
   match: string;
   forType: ProviderInput['type'];
   models: string[];
-  requiresApiKey?: boolean;
+  keyRequiredHost?: RegExp;
 }> = [
   {
     match: 'api.anthropic.com',
     forType: 'anthropic',
     models: ['claude-sonnet-5', 'claude-haiku-4-5', 'claude-opus-5'],
-    requiresApiKey: true,
+    keyRequiredHost: /(^|\.)api\.anthropic\.com$/,
   },
   {
     match: 'api.openai.com',
     forType: 'openai_compatible',
     models: ['gpt-4o', 'gpt-4o-mini'],
-    requiresApiKey: true,
+    keyRequiredHost: /(^|\.)api\.openai\.com$/,
   },
   {
     match: 'bedrock-mantle',
@@ -429,25 +432,25 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
       'qwen.qwen3-32b',
       'deepseek.v3.2',
     ],
-    requiresApiKey: true,
+    keyRequiredHost: /^bedrock-mantle\..+\.api\.aws$/,
   },
   {
     match: 'openrouter.ai',
     forType: 'openai_compatible',
     models: ['openai/gpt-oss-20b:free'],
-    requiresApiKey: true,
+    keyRequiredHost: /(^|\.)openrouter\.ai$/,
   },
   {
     match: 'generativelanguage',
     forType: 'openai_compatible',
     models: ['gemini-flash-latest', 'gemini-3-flash-preview'],
-    requiresApiKey: true,
+    keyRequiredHost: /(^|\.)generativelanguage\.googleapis\.com$/,
   },
   {
     match: 'api.groq.com',
     forType: 'openai_compatible',
     models: [],
-    requiresApiKey: true,
+    keyRequiredHost: /(^|\.)api\.groq\.com$/,
   },
   {
     match: 'localhost:11434',
@@ -475,22 +478,22 @@ function getVendorModelSuggestions(
   return vendor?.models ?? [];
 }
 
-/** Matched against the HOST only, unlike the suggestions above: a gateway that names its upstream
- * in its path or query (`…/proxy?upstream=https://api.openai.com`) is not that hosted service and
- * may hold the key itself. */
+/** Matched against the HOSTNAME only (no port, path or query), unlike the suggestions above: a
+ * gateway that names its upstream in its path or query (`…/proxy?upstream=https://api.openai.com`)
+ * is not that hosted service and may hold the key itself. */
 function isHostedEndpointRequiringKey(
   baseUrl: string,
   type: ProviderInput['type'],
 ): boolean {
-  let host: string;
+  let hostname: string;
   try {
-    host = new URL(baseUrl.trim()).host.toLowerCase();
+    hostname = new URL(baseUrl.trim()).hostname.toLowerCase();
   } catch {
     return false;
   }
   return VENDOR_MODEL_SUGGESTIONS.some(
-    ({ match, forType, requiresApiKey }) =>
-      requiresApiKey && forType === type && host.includes(match),
+    ({ forType, keyRequiredHost }) =>
+      forType === type && Boolean(keyRequiredHost?.test(hostname)),
   );
 }
 
