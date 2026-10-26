@@ -60,7 +60,7 @@ const DocumentationLink = ({
 export const ButtonAboutSecurity = () => {
   const [isOpen, setIsOpen] = useState(false);
   const title = i18n.translate('wazuh.security.aboutFlyout.title', {
-    defaultMessage: 'About Wazuh API access',
+    defaultMessage: 'About API access control',
   });
 
   return (
