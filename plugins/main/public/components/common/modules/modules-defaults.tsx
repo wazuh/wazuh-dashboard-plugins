@@ -45,6 +45,7 @@ import {
   TAB_VIEW_NAME_EVENTS,
   TAB_VIEW_NAME_RESPONSES,
   WAZUH_MODULES_ID,
+  WAZUH_SAMPLE_ACTIVE_RESPONSES,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
@@ -735,7 +736,7 @@ export const ModulesDefaults = {
             tableColumns={activeResponsesColumns}
             DataSource={ActiveResponsesDataSource}
             DataSourceRepository={ActiveResponsesDataSourceRepository}
-            categoriesSampleData={[]}
+            categoriesSampleData={[WAZUH_SAMPLE_ACTIVE_RESPONSES]}
             flyoutTitle={i18n.translate(
               'wazuh.common.moduleTabs.activeResponses.flyoutTitle',
               { defaultMessage: 'Active response details' },
