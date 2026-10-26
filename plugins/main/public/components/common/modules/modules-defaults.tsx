@@ -121,6 +121,7 @@ import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
 import { MalwareDetectionEmptyState } from '../../overview/malware-detection/components/empty-state/malware-detection-empty-state';
+import { ThreatHuntingEmptyState } from '../../overview/threat-hunting/components/empty-state/threat-hunting-empty-state';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
@@ -210,6 +211,7 @@ export const ModulesDefaults = {
           WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
           WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
         ],
+        emptyState: <ThreatHuntingEmptyState />,
       }),
     ],
     availableFor: ['manager', 'agent'],
