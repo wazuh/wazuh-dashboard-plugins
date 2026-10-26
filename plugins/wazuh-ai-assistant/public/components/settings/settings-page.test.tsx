@@ -1813,7 +1813,11 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
   });
 
   it('dispatches PROVIDERS_CHANGED_EVENT when a provider is created', async () => {
-    mockService.list.mockResolvedValue([]);
+    // An existing default keeps the new provider from being promoted, which would announce a
+    // second change of its own.
+    mockService.list.mockResolvedValue([
+      { ...PROVIDER, id: 'p0', name: 'Current default', isDefault: true },
+    ]);
     mockService.create.mockResolvedValue({ ...PROVIDER, name: 'Gemini lab' });
     const heard = listenFor(PROVIDERS_CHANGED_EVENT);
 
@@ -2284,6 +2288,11 @@ async function saveNewProviderThroughFlyout(): Promise<void> {
 }
 
 describe('SettingsPage — Save & test feedback', () => {
+  beforeEach(() => {
+    // An earlier describe leaves `setDefault` rejecting; `clearAllMocks` keeps implementations.
+    mockService.setDefault.mockResolvedValue(undefined);
+  });
+
   it('warns instead of confirming when the connection test fails', async () => {
     mockService.create.mockResolvedValue(PROVIDER);
     mockService.test.mockResolvedValue({
@@ -2308,6 +2317,11 @@ describe('SettingsPage — Save & test feedback', () => {
     );
     expect(toasts.addSuccess).not.toHaveBeenCalled();
     expect(await screen.findByRole('alert')).toHaveTextContent('HTTP 401');
+    // The first provider is created off default and stays there while its test fails.
+    expect(mockService.create).toHaveBeenCalledWith(
+      expect.objectContaining({ isDefault: false }),
+    );
+    expect(mockService.setDefault).not.toHaveBeenCalled();
   });
 
   it('confirms the save only after the connection test passes', async () => {
@@ -2331,6 +2345,57 @@ describe('SettingsPage — Save & test feedback', () => {
       toasts.addSuccess.mock.invocationCallOrder[0],
     );
     expect(toasts.addWarning).not.toHaveBeenCalled();
+    // No provider is the default yet, so the one that just passed becomes it.
+    await waitFor(() =>
+      expect(mockService.setDefault).toHaveBeenCalledWith('p1'),
+    );
+  });
+
+  it('reports a failed promotion to default on the page', async () => {
+    mockService.create.mockResolvedValue(PROVIDER);
+    mockService.setDefault.mockRejectedValueOnce({
+      body: { message: 'Default write refused.' },
+    });
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+      />,
+    );
+
+    await saveNewProviderThroughFlyout();
+
+    expect(
+      await screen.findByText('Default write refused.'),
+    ).toBeInTheDocument();
+    expect(toasts.addSuccess).toHaveBeenCalledWith(
+      'Provider "My OpenAI" added.',
+    );
+  });
+
+  it('leaves an existing default alone when a new provider passes', async () => {
+    mockService.list.mockResolvedValue([
+      { ...PROVIDER, id: 'p0', name: 'Current default', isDefault: true },
+    ]);
+    mockService.create.mockResolvedValue(PROVIDER);
+    render(
+      <SettingsPageWithRouter
+        core={coreWithToasts}
+        onProvidersChanged={jest.fn()}
+        autoOpenCreateForm={true}
+      />,
+    );
+    await screen.findAllByText('Current default');
+
+    await saveNewProviderThroughFlyout();
+
+    await waitFor(() =>
+      expect(toasts.addSuccess).toHaveBeenCalledWith(
+        'Provider "My OpenAI" added.',
+      ),
+    );
+    expect(mockService.setDefault).not.toHaveBeenCalled();
   });
 });
 
