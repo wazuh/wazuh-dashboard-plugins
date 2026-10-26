@@ -127,8 +127,11 @@ query($owner:String!,$repo:String!,$number:Int!){repository(owner:$owner,name:$r
 Save `ISSUE_URL`, `ISSUE_REPO`, `ITEM_ID`, `ISSUE_NODE_ID` (the issue's GraphQL
 `id`), and whether the issue is **internal**:
 
-- **Internal** — URL contains `internal-devel-request` (e.g.
-  `wazuh/internal-devel-requests`): the issue link is **not** exposed in the PR
+- **Internal** — URL is under `github.com/$WZSS_INTERNAL_ISSUES_REPO/`, the internal
+  requests repository (read the variable from the local env file, see
+  `setup-local-secrets` section 5; not set, or the repo is neither this one nor clearly
+  public → ask the user whether the issue is internal and offer to run
+  `setup-local-secrets`): the issue link is **not** exposed in the PR
   (`## Description` does not reference it), there is **no CHANGELOG entry**, and the
   PR has no issue reference at all.
 - **Public** — any other repo (e.g. `wazuh/wazuh-dashboard-plugins`): link it in the
@@ -427,8 +430,8 @@ changes, to add the screenshot before marking the PR ready.
 - Never force-push, close issues, merge PRs, or move a card to "Done".
 - The CI watch is read-only: never re-run jobs, push fixes, or change the status
   based on CI results without the active mode's confirmation.
-- Never expose an internal-devel-requests link in a public repo (PR body, commit
-  message, CHANGELOG, public comments).
+- Never expose an internal issue link, or the internal repository's name, in a public
+  repo (PR body, commit message, CHANGELOG, public comments).
 - All commits DCO-signed; don't touch unrelated uncommitted changes.
 - Temp files (comment bodies, PR body) go outside the repo (the session scratch
   directory or the system temp directory), never in the working tree.

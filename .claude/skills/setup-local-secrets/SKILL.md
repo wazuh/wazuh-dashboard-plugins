@@ -73,6 +73,16 @@ A Status option name becomes `<NAME>` in upper case with spaces replaced by `_`.
 Values that don't belong to the board use their own `WZSS_<AREA>_…` prefix. To add
 one, add a row here and describe how it is obtained.
 
+| Variable                    | Meaning                                                        |
+| --------------------------- | -------------------------------------------------------------- |
+| `WZSS_INTERNAL_ISSUES_REPO` | `<owner>/<repo>` of the internal requests repository (private) |
+
+`WZSS_INTERNAL_ISSUES_REPO` can't be discovered with `gh`, and its name must not appear
+in this repository. Ask the user to add it themselves with the `!` prefix:
+`! read -r v && printf "export WZSS_INTERNAL_ISSUES_REPO='%s'\n" "$v" >> "${WZSS_FILE:-$HOME/.config/wzss/secrets.env}"`.
+Skills use it to tell internal issues apart: an issue is internal when its URL is under
+`github.com/$WZSS_INTERNAL_ISSUES_REPO/`.
+
 ## 4. Adding a secret
 
 Never take a secret as a command-line argument or echo it: it would end up in the
@@ -88,7 +98,7 @@ the values (shell state does not persist between calls), with tracing off:
 
 ```bash
 f="${WZSS_FILE:-$HOME/.config/wzss/secrets.env}"
-[ "$(stat -c %a "$f" 2>/dev/null)" = 600 ] && { set +x; . "$f"; }
+[ "$(stat -c %a "$f" 2>/dev/null || stat -f %Lp "$f" 2>/dev/null)" = 600 ] && { set +x; . "$f"; }
 [ -n "${WZSS_DASHBOARD_PROJECT_ID:-}" ] || echo "not set: resolve it another way"
 ```
 
