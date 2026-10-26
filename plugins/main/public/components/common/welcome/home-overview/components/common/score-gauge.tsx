@@ -12,8 +12,6 @@ export interface ScoreGaugeProps {
   title?: React.ReactNode;
   /** Score as a fraction (0..1); undefined renders the track with no marker. */
   score?: number;
-  /** Shown instead of the track when there is no score. */
-  emptyMessage?: React.ReactNode;
   ['data-test-subj']?: string;
 }
 
@@ -38,7 +36,6 @@ const zoneColor = (pct: number) => {
 export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
   title,
   score,
-  emptyMessage,
   ...rest
 }) => {
   const pct =
@@ -47,26 +44,14 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
     pct === undefined ? HOME_OVERVIEW_COLOR.disabled : zoneColor(pct);
   const formattedScore =
     score === undefined ? undefined : decimalFormat().convert(score);
-  const titleNode = title && (
-    <EuiText size='xs' color='subdued'>
-      <strong>{title}</strong>
-    </EuiText>
-  );
-
-  if (pct === undefined && emptyMessage) {
-    return (
-      <div data-test-subj={rest['data-test-subj']}>
-        {titleNode}
-        <EuiText size='s' color='subdued' style={{ marginTop: 4 }}>
-          <p>{emptyMessage}</p>
-        </EuiText>
-      </div>
-    );
-  }
 
   return (
     <div data-test-subj={rest['data-test-subj']}>
-      {titleNode}
+      {title && (
+        <EuiText size='xs' color='subdued'>
+          <strong>{title}</strong>
+        </EuiText>
+      )}
       <div style={{ position: 'relative', margin: '22px 0 4px' }}>
         {pct !== undefined && (
           <>

@@ -119,7 +119,7 @@ describe('EndpointSecuritySection', () => {
     expect(getFileIntegrityMonitoringInventoryFilesUrl).toHaveBeenCalled();
   });
 
-  it('shows no score instead of 0% when there are no SCA checks', () => {
+  it('hides the score and says why when there are no SCA checks', () => {
     asMock(useSCAOverview).mockReturnValue({
       status: 'available',
       data: {
@@ -134,9 +134,29 @@ describe('EndpointSecuritySection', () => {
       />,
     );
     expect(
-      screen.getByText('No score: no passed or failed checks found'),
+      screen.getByText(
+        'No Configuration Assessment results found. The score appears once checks are reported.',
+      ),
     ).toBeInTheDocument();
+    expect(screen.queryByText('Overall score')).not.toBeInTheDocument();
     expect(screen.queryByText('0%')).not.toBeInTheDocument();
+  });
+
+  it('says no files are baselined instead of 0 when FIM has no files', () => {
+    asMock(useFIMOverview).mockReturnValue({
+      status: 'available',
+      data: { total: 0, files: [] },
+    });
+    render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
+    expect(screen.getByText('No files baselined yet')).toBeInTheDocument();
+    expect(
+      screen.queryByText('File integrity baselined fleet-wide'),
+    ).not.toBeInTheDocument();
   });
 
   it('still renders Configuration Assessment when the SCA index is unavailable', () => {
