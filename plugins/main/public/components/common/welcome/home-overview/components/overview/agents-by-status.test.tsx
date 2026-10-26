@@ -75,4 +75,32 @@ describe('AgentsByStatus', () => {
     fireEvent.click(screen.getByText('Disconnected').closest('button')!);
     expect(onStatusSelect).toHaveBeenCalledWith('disconnected');
   });
+
+  it('shows the missing permissions when an empty fleet comes from missing agent:read', () => {
+    const { container } = render(
+      <AgentsByStatus
+        data={{
+          active: 0,
+          disconnected: 0,
+          pending: 0,
+          neverConnected: 0,
+          total: 0,
+        }}
+        deployAgentUrl='https://example.test/deploy'
+        missingPermissions={[
+          [
+            { action: 'agent:read', resource: 'agent:id:*' },
+            { action: 'agent:read', resource: 'agent:group:*' },
+          ],
+        ]}
+      />,
+    );
+    expect(container.textContent).toContain('You have no permissions');
+    expect(container.textContent).toContain('agent:id:*');
+    expect(container.textContent).toContain('agent:group:*');
+    expect(container.textContent).not.toContain(
+      'This instance has no agents registered.',
+    );
+    expect(screen.queryByText('Deploy new agent')).not.toBeInTheDocument();
+  });
 });
