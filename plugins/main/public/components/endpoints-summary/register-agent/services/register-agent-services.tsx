@@ -226,21 +226,10 @@ export const parseRegisterAgentFormValues = (
   emitted beside one. The fields keep their values in the form, so clearing the
   token restores the command they produced.
 
-  TLS is not one of them. The token carries a pin, a digest of the manager CA's
-  public key, which the agent checks against a CA it still has to obtain
-  separately -- so how the endpoint trusts the listener stays the operator's to
-  say, with or without a token. */
+  The verification opt-out is not one of them: it still applies with a token. */
   if (parsedForm.optionalParams.enrollmentToken) {
     parsedForm.optionalParams.serverAddress = '';
     parsedForm.optionalParams.wazuhPassword = '';
-  }
-
-  /* A CA pins the certificate the agent checks, so it means nothing once
-  verification is off -- and the agent would still write it to the config,
-  leaving a command that both supplies a CA and refuses to use it. The field
-  keeps its value in the form so toggling verification back on restores it. */
-  if (parsedForm.optionalParams.sslVerification === false) {
-    parsedForm.optionalParams.managerCa = '';
   }
 
   return parsedForm;

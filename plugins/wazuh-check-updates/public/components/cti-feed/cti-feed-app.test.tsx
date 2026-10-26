@@ -1,6 +1,9 @@
 /* eslint-disable camelcase -- CTI consumer and query fields keep their API names */
 jest.mock('../../plugin-services', () => ({
   getCore: jest.fn(),
+  getWazuhCore: () => ({
+    utils: { formatUIDate: (date: string) => `formatted ${date}` },
+  }),
 }));
 
 jest.mock('../../services/cti-feed', () => ({
@@ -31,6 +34,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { of } from 'rxjs';
 import { getCore } from '../../plugin-services';
 import {
   fetchCtiConsumers,
@@ -40,7 +44,6 @@ import {
 import { useCtiRegistrationModal } from '../../shared-components/cti-registration/hooks/use-cti-registration-modal';
 import { statusCodes } from '../../../common/constants';
 import { CtiFeedApp } from './cti-feed-app';
-import { CTI_FEED_SYNC_POLL_MS } from './hooks/use-cti-consumers';
 
 configure({ testIdAttribute: 'data-test-subj' });
 
@@ -85,6 +88,12 @@ describe('CtiFeedApp', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getCore as jest.Mock).mockReturnValue({
+      application: {
+        currentAppId$: of('cti-feed'),
+        getUrlForApp: (appId: string, { path = '' } = {}) =>
+          `/app/${appId}${path}`,
+        navigateToUrl: jest.fn(),
+      },
       notifications: {
         toasts: { addSuccess: mockAddSuccess, addError: mockAddError },
       },
@@ -125,49 +134,79 @@ describe('CtiFeedApp', () => {
     await settle();
   });
 
-  test('requests a content update and watches the sync', async () => {
+  test('shows when the indexer last checked for updates', async () => {
+    mockFetchConsumers.mockResolvedValue({
+      data: [consumer('ready')],
+      last_checked_at: new Date(Date.now() - 5 * 60000).toISOString(),
+    });
     render(<CtiFeedApp />);
     await settle();
-    const fetchesBefore = mockFetchConsumers.mock.calls.length;
 
-    fireEvent.click(screen.getByTestId('ctiFeedUpdateButton'));
+    expect(screen.getByTestId('ctiFeedLastCheckedAt')).toHaveTextContent(
+      'Last checked: 5 minutes ago',
+    );
+  });
+
+  test('shows a dash when the indexer does not report the last check', async () => {
+    render(<CtiFeedApp />);
+    await settle();
+
+    expect(screen.getByTestId('ctiFeedLastCheckedAt')).toHaveTextContent(
+      'Last checked: -',
+    );
+  });
+
+  test('checks for updates and reads the last check time back', async () => {
+    render(<CtiFeedApp />);
+    await settle();
+    const checkedAt = new Date(Date.now() - 1000).toISOString();
+    mockFetchConsumers.mockResolvedValue({
+      data: [consumer('ready')],
+      last_checked_at: checkedAt,
+    });
+
+    fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
     await waitFor(() =>
       expect(mockAddSuccess).toHaveBeenCalledWith(
-        expect.objectContaining({ title: 'CTI update requested' }),
+        expect.objectContaining({ title: 'Checking for updates' }),
       ),
     );
     expect(mockRequestUpdate).toHaveBeenCalledTimes(1);
     await waitFor(() =>
-      expect(mockFetchConsumers.mock.calls.length).toBeGreaterThan(
-        fetchesBefore,
+      expect(screen.getByTestId('ctiFeedLastCheckedAt')).toHaveTextContent(
+        'Last checked: a few seconds ago',
       ),
     );
     await waitFor(() =>
-      expect(screen.getByTestId('ctiFeedUpdateButton')).not.toBeDisabled(),
+      expect(
+        screen.getByTestId('ctiFeedCheckForUpdatesButton'),
+      ).not.toBeDisabled(),
     );
   });
 
-  test('reports a failed content update', async () => {
+  test('reports a failed update check', async () => {
     const error = new Error('Forbidden');
     mockRequestUpdate.mockRejectedValue(error);
     render(<CtiFeedApp />);
     await settle();
 
-    fireEvent.click(screen.getByTestId('ctiFeedUpdateButton'));
+    fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
     await waitFor(() =>
       expect(mockAddError).toHaveBeenCalledWith(error, {
-        title: 'Error updating CTI feeds',
+        title: 'Could not check for updates',
       }),
     );
     expect(mockAddSuccess).not.toHaveBeenCalled();
     await waitFor(() =>
-      expect(screen.getByTestId('ctiFeedUpdateButton')).not.toBeDisabled(),
+      expect(
+        screen.getByTestId('ctiFeedCheckForUpdatesButton'),
+      ).not.toBeDisabled(),
     );
   });
 
-  test('refreshes the content counts once a sync finishes', async () => {
+  test('does not poll; a refresh finding the sync done refreshes the counts', async () => {
     jest.useFakeTimers();
     try {
       mockFetchConsumers
@@ -179,9 +218,12 @@ describe('CtiFeedApp', () => {
       expect(mockFetchCounts).toHaveBeenCalledTimes(1);
 
       await act(async () => {
-        jest.advanceTimersByTime(CTI_FEED_SYNC_POLL_MS);
+        jest.advanceTimersByTime(5 * 60000);
         await Promise.resolve();
       });
+      expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
+
+      fireEvent.click(screen.getByTestId('ctiFeedSyncRefresh'));
 
       await screen.findByText('All feeds are up to date');
       await waitFor(() => expect(mockFetchCounts).toHaveBeenCalledTimes(2));

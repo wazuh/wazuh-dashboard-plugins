@@ -3,8 +3,8 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import type { CtiConsumer } from '../../../../common/cti-consumers';
 import { fetchCtiConsumers } from '../../../services/cti-feed';
 import {
-  CTI_FEED_SYNC_POLL_MS,
-  CTI_FEED_SYNC_WATCH_MS,
+  CTI_CHECK_RETRIES,
+  CTI_CHECK_RETRY_MS,
   useCtiConsumers,
 } from './use-cti-consumers';
 
@@ -26,81 +26,71 @@ const consumer = (overrides: Partial<CtiConsumer> = {}): CtiConsumer => ({
   ...overrides,
 });
 
-/** Lets the timer fire and the fetch it starts settle. */
-const advance = async (ms: number) => {
-  await act(async () => {
-    jest.advanceTimersByTime(ms);
-    await Promise.resolve();
-  });
-};
-
 describe('useCtiConsumers', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
     mockFetch.mockReset();
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  test('loads the consumers and summarizes their sync state', async () => {
-    mockFetch.mockResolvedValue({ data: [consumer()] });
+  test('loads the consumers, the last check time and the sync summary', async () => {
+    mockFetch.mockResolvedValue({
+      data: [consumer()],
+      last_checked_at: '2026-05-21T12:26:16.581939Z',
+    });
 
     const { result } = renderHook(() => useCtiConsumers());
 
     expect(result.current.loading).toBe(true);
+    expect(result.current.refreshing).toBe(true);
     await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.refreshing).toBe(false);
     expect(result.current.consumers).toHaveLength(1);
+    expect(result.current.lastCheckedAt).toBe('2026-05-21T12:26:16.581939Z');
     expect(result.current.summary).toBe('upToDate');
     expect(result.current.error).toBeNull();
   });
 
-  test('does not poll once every feed is up to date', async () => {
-    mockFetch.mockResolvedValue({ data: [consumer()] });
+  test('does not poll, even while a feed is syncing', async () => {
+    jest.useFakeTimers();
+    try {
+      mockFetch.mockResolvedValue({ data: [consumer({ status: 'running' })] });
 
-    const { result } = renderHook(() => useCtiConsumers());
-    await waitFor(() => expect(result.current.loading).toBe(false));
+      const { result } = renderHook(() => useCtiConsumers());
+      await waitFor(() => expect(result.current.summary).toBe('syncing'));
 
-    await advance(CTI_FEED_SYNC_POLL_MS * 3);
-    expect(mockFetch).toHaveBeenCalledTimes(1);
+      await act(async () => {
+        jest.advanceTimersByTime(5 * 60000);
+        await Promise.resolve();
+      });
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
-  test('polls while a feed is syncing and stops when it finishes', async () => {
+  test('reads the state again on refetch, keeping it on screen meanwhile', async () => {
     mockFetch
       .mockResolvedValueOnce({ data: [consumer({ status: 'running' })] })
-      .mockResolvedValue({ data: [consumer()] });
+      .mockResolvedValue({
+        data: [consumer()],
+        last_checked_at: '2026-05-21T12:30:00Z',
+      });
 
     const { result } = renderHook(() => useCtiConsumers());
     await waitFor(() => expect(result.current.summary).toBe('syncing'));
+    expect(result.current.lastCheckedAt).toBeUndefined();
 
-    await advance(CTI_FEED_SYNC_POLL_MS);
-    await waitFor(() => expect(result.current.summary).toBe('upToDate'));
-    expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    await advance(CTI_FEED_SYNC_POLL_MS * 3);
-    expect(mockFetch).toHaveBeenCalledTimes(2);
-  });
-
-  test('keeps polling for a while after an update request', async () => {
-    mockFetch.mockResolvedValue({ data: [consumer()] });
-
-    const { result } = renderHook(() => useCtiConsumers());
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    await act(async () => {
-      result.current.watch();
-      await Promise.resolve();
+    let refetching: Promise<void> = Promise.resolve();
+    act(() => {
+      refetching = result.current.refetch();
     });
-    expect(mockFetch).toHaveBeenCalledTimes(2);
+    expect(result.current.refreshing).toBe(true);
+    expect(result.current.loading).toBe(false);
+    expect(result.current.summary).toBe('syncing');
 
-    await advance(CTI_FEED_SYNC_POLL_MS);
-    expect(mockFetch).toHaveBeenCalledTimes(3);
-
-    await advance(CTI_FEED_SYNC_WATCH_MS);
-    const callsAfterWindow = mockFetch.mock.calls.length;
-    await advance(CTI_FEED_SYNC_POLL_MS * 3);
-    expect(mockFetch).toHaveBeenCalledTimes(callsAfterWindow);
+    await act(() => refetching);
+    expect(result.current.refreshing).toBe(false);
+    expect(result.current.summary).toBe('upToDate');
+    expect(result.current.lastCheckedAt).toBe('2026-05-21T12:30:00Z');
   });
 
   test('reports a failed read and recovers on refetch', async () => {
@@ -114,5 +104,87 @@ describe('useCtiConsumers', () => {
     await act(() => result.current.refetch());
     expect(result.current.error).toBeNull();
     expect(result.current.summary).toBe('upToDate');
+  });
+
+  describe('after an update check', () => {
+    const checked = (lastCheckedAt?: string) => ({
+      data: [consumer()],
+      last_checked_at: lastCheckedAt,
+    });
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    /** Lets the given number of retry pauses pass, one at a time. */
+    const passRetryPauses = async (count: number): Promise<void> => {
+      if (count === 0) {
+        return;
+      }
+      await act(async () => {
+        await Promise.resolve();
+        jest.advanceTimersByTime(CTI_CHECK_RETRY_MS);
+        await Promise.resolve();
+      });
+      await passRetryPauses(count - 1);
+    };
+
+    /** Runs the follow-up reads to completion. */
+    const runAfterCheck = async (
+      refetchAfterCheck: () => Promise<void>,
+    ): Promise<void> => {
+      let settled: Promise<void> = Promise.resolve();
+      act(() => {
+        settled = refetchAfterCheck();
+      });
+      await passRetryPauses(CTI_CHECK_RETRIES + 1);
+      await act(() => settled);
+    };
+
+    test('stops reading as soon as the new check time lands', async () => {
+      mockFetch
+        .mockResolvedValueOnce(checked('2026-05-21T12:00:00Z'))
+        .mockResolvedValueOnce(checked('2026-05-21T12:00:00Z'))
+        .mockResolvedValue(checked('2026-05-21T12:30:00Z'));
+
+      const { result } = renderHook(() => useCtiConsumers());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      await runAfterCheck(result.current.refetchAfterCheck);
+
+      expect(result.current.lastCheckedAt).toBe('2026-05-21T12:30:00Z');
+      // The first load, one read with the old time, one with the new.
+      expect(mockFetch).toHaveBeenCalledTimes(3);
+    });
+
+    test('gives up after a few retries if the check time never moves', async () => {
+      mockFetch.mockResolvedValue(checked('2026-05-21T12:00:00Z'));
+
+      const { result } = renderHook(() => useCtiConsumers());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      await runAfterCheck(result.current.refetchAfterCheck);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1 + 1 + CTI_CHECK_RETRIES);
+      expect(result.current.lastCheckedAt).toBe('2026-05-21T12:00:00Z');
+    });
+
+    test('does not retry a read that failed', async () => {
+      mockFetch
+        .mockResolvedValueOnce(checked('2026-05-21T12:00:00Z'))
+        .mockRejectedValue(new Error('Forbidden'));
+
+      const { result } = renderHook(() => useCtiConsumers());
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      await runAfterCheck(result.current.refetchAfterCheck);
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(result.current.error).toBe('Forbidden');
+    });
   });
 });

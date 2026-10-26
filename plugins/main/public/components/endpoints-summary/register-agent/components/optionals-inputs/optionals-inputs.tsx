@@ -87,64 +87,19 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
         ))}
       </EuiFlexGroup>
       {/* Enrollment authenticates one way, so TLS is the only thing that
-      proves the endpoint is talking to the real manager. An enrollment token
-      bootstraps the trust anchor: the agent fetches the manager CA on first
-      start and checks it against the pin (or embedded CA) the token carries,
-      so a self-signed manager CA verifies without a path. Without a token the
-      agent falls back to the endpoint's system store unless a path is given.
-      The switch carries its own label, so no form row label is passed here. */}
+      proves the endpoint is talking to the real manager. The switch carries its
+      own label, so no form row label is passed here. */}
       <InputForm {...formFields.sslVerification} />
-      <EuiSpacer size='m' />
-      {sslVerificationIsEnabled ? (
-        <InputForm
-          {...formFields.managerCa}
-          fullWidth={false}
-          label={
-            <span className='registerAgentLabels'>
-              <FormattedMessage
-                id='wazuh.endpointsSummary.optionalsInputs.managerCaLabel'
-                defaultMessage='Manager CA file path on the endpoint - {optional}'
-                values={{
-                  optional: (
-                    <em>
-                      {i18n.translate(
-                        'wazuh.endpointsSummary.optionalsInputs.managerCaOptional',
-                        { defaultMessage: 'optional' },
-                      )}
-                    </em>
-                  ),
-                }}
-              />
-            </span>
-          }
-          footer={
-            <EuiText size='xs' color='subdued'>
-              {usesEnrollmentToken
-                ? i18n.translate(
-                    'wazuh.endpointsSummary.optionalsInputs.managerCaHelpEnrollmentToken',
-                    {
-                      defaultMessage:
-                        'If left empty, the agent fetches the manager CA on first start and checks it against the enrollment token, so self-signed certificates work. Enter a path only to use a CA file already placed on the endpoint.',
-                    },
-                  )
-                : i18n.translate(
-                    'wazuh.endpointsSummary.optionalsInputs.managerCaHelp',
-                    {
-                      defaultMessage:
-                        "If left empty, the endpoint's system CA store is used, which only trusts publicly issued certificates. Supply the manager CA to verify a self-signed certificate.",
-                    },
-                  )}
-            </EuiText>
-          }
-          placeholder='/var/ossec/etc/manager-ca.pem'
-        />
-      ) : (
-        <EuiCallOut
-          color='warning'
-          title={warningForSslVerification}
-          iconType='alert'
-          className='warningForAgentName'
-        />
+      {!sslVerificationIsEnabled && (
+        <>
+          <EuiSpacer size='m' />
+          <EuiCallOut
+            color='warning'
+            title={warningForSslVerification}
+            iconType='alert'
+            className='warningForAgentName'
+          />
+        </>
       )}
       <EuiSpacer size='m' />
       <InputForm

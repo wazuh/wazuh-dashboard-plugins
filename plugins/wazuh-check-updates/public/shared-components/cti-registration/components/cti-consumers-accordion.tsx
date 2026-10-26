@@ -23,12 +23,18 @@ import type {
   CtiConsumersResponse,
 } from '../../../../common/cti-consumers';
 import { getConsumerSyncState } from '../../../services/cti-consumer-sync-state';
+import {
+  MISSING_CTI_VALUE,
+  formatCtiTimestamp,
+} from '../../../services/cti-timestamp';
 
 const CTI_CONSUMER_FIELDS: Array<{
   key: keyof CtiConsumer;
   label: string;
   isLink?: boolean;
   dataTestSubj?: string;
+  /** Formats the value when the generic formatting does not fit. */
+  format?: (consumer: CtiConsumer) => string;
 }> = [
   {
     key: 'name',
@@ -82,6 +88,33 @@ const CTI_CONSUMER_FIELDS: Array<{
         defaultMessage: 'Remote offset',
       },
     ),
+  },
+  {
+    key: 'updated_at',
+    label: i18n.translate('wazuhCheckUpdates.ctiConsumers.fields.updatedAt', {
+      defaultMessage: 'Last updated',
+    }),
+    dataTestSubj: 'ctiConsumersUpdatedAtItem',
+    format: consumer => formatCtiTimestamp(consumer.updated_at),
+  },
+  {
+    key: 'pending_sync_phases',
+    label: i18n.translate(
+      'wazuhCheckUpdates.ctiConsumers.fields.pendingSyncPhases',
+      { defaultMessage: 'Pending phases' },
+    ),
+    dataTestSubj: 'ctiConsumersPendingSyncPhasesItem',
+    format: ({ pending_sync_phases: phases }) => {
+      if (!phases) {
+        return MISSING_CTI_VALUE;
+      }
+      return phases.length > 0
+        ? phases.join(', ')
+        : i18n.translate(
+            'wazuhCheckUpdates.ctiConsumers.fields.pendingSyncPhasesNone',
+            { defaultMessage: 'None' },
+          );
+    },
   },
 ];
 
@@ -340,7 +373,11 @@ export const CtiConsumersAccordion: React.FC = () => {
                       <ConsumerField
                         key={String(field.key)}
                         title={field.label}
-                        value={formatFieldValue(consumer[field.key])}
+                        value={
+                          field.format
+                            ? field.format(consumer)
+                            : formatFieldValue(consumer[field.key])
+                        }
                         href={field.isLink ? consumer.resource : undefined}
                         dataTestSubj={field.dataTestSubj}
                       />
