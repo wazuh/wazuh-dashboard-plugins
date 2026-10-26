@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  EuiButton,
   EuiCallOut,
   EuiCode,
   EuiFlexGroup,
@@ -15,6 +16,7 @@ import { useSelector } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { endpointSummary } from '../../../../../utils/applications';
+import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import { FIM_CONFIGURE_DOCS_PATH } from '../../fim-documentation';
 import {
   MonitoredDirectories,
@@ -27,7 +29,9 @@ interface FimEmptyStateProps {
   /** Tab the empty state is shown in: Findings lists changes, Dashboard the current state. */
   kind: EmptyStateKind;
   /** Pinned agent, an empty object when no agent is pinned. */
-  agent?: { id?: string };
+  agent?: { id?: string; name?: string };
+  /** Unpins the agent so the tab shows all agents. */
+  onUnpinAgent: () => void;
 }
 
 const getTitle = (kind: EmptyStateKind) =>
@@ -39,6 +43,29 @@ const getTitle = (kind: EmptyStateKind) =>
         'wazuh.fileIntegrityMonitoring.emptyState.dashboardTitle',
         { defaultMessage: 'No monitored files found' },
       );
+
+/** Names the pinned agent in the title, so the user sees which agent filters the tab. */
+const getPinnedAgentTitle = (
+  kind: EmptyStateKind,
+  { id, name }: { id: string; name?: string },
+) => {
+  const agent = name ? `${name} (${id})` : id;
+  return kind === 'findings'
+    ? i18n.translate(
+        'wazuh.fileIntegrityMonitoring.emptyState.findingsTitleForAgent',
+        {
+          defaultMessage: 'No file changes found for {agent}',
+          values: { agent },
+        },
+      )
+    : i18n.translate(
+        'wazuh.fileIntegrityMonitoring.emptyState.dashboardTitleForAgent',
+        {
+          defaultMessage: 'No monitored files found for {agent}',
+          values: { agent },
+        },
+      );
+};
 
 /**
  * `withCurrentState` says that the Dashboard and Inventory can have data while Findings is empty;
@@ -109,8 +136,10 @@ const Actions = ({ children }: { children: React.ReactNode }) => (
   <>
     <EuiSpacer size='s' />
     <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false} wrap>
-      {React.Children.map(children, child => (
-        <EuiFlexItem grow={false}>{child}</EuiFlexItem>
+      {React.Children.toArray(children).map((child, index) => (
+        <EuiFlexItem grow={false} key={index}>
+          {child}
+        </EuiFlexItem>
       ))}
     </EuiFlexGroup>
   </>
@@ -168,9 +197,14 @@ const EndpointDirectories = ({
 
 /**
  * Shown instead of the default no results callout of the File Integrity Monitoring tabs, with the
- * same layout. Says what to try, which directories the pinned agent monitors and how to add more.
+ * same layout. Says what to try, which directories the pinned agent monitors and how to add more,
+ * and offers to unpin the agent.
  */
-export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
+export const FimEmptyStateView = ({
+  kind,
+  agent,
+  onUnpinAgent,
+}: FimEmptyStateProps) => {
   const agentId = agent?.id;
   const directories = useMonitoredDirectories(agentId);
   const pinned = agentId ? directories : undefined;
@@ -178,7 +212,11 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
   return (
     <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
       <EuiCallOut
-        title={getTitle(kind)}
+        title={
+          agentId
+            ? getPinnedAgentTitle(kind, { ...agent, id: agentId })
+            : getTitle(kind)
+        }
         color='warning'
         iconType='help'
         data-test-subj='wzFimEmptyState'
@@ -206,30 +244,44 @@ export const FimEmptyStateView = ({ kind, agent }: FimEmptyStateProps) => {
           <Actions>
             <ConfigureLink />
           </Actions>
-        ) : pinned.status !== 'loading' ? (
+        ) : (
           <Actions>
-            <EuiLink
-              href={NavigationService.getInstance().getUrlForApp(
-                endpointSummary.id,
-                { path: `#/agents?tab=configuration&agent=${agentId}` },
-              )}
+            <EuiButton
+              size='s'
+              onClick={onUnpinAgent}
+              data-test-subj='wzFimEmptyStateUnpin'
             >
               {i18n.translate(
-                'wazuh.fileIntegrityMonitoring.emptyState.viewConfiguration',
-                { defaultMessage: 'View the endpoint configuration' },
+                'wazuh.fileIntegrityMonitoring.emptyState.unpinAgent',
+                { defaultMessage: 'Unpin agent' },
               )}
-            </EuiLink>
-            <ConfigureLink />
+            </EuiButton>
+            {pinned.status !== 'loading' && (
+              <EuiLink
+                href={NavigationService.getInstance().getUrlForApp(
+                  endpointSummary.id,
+                  { path: `#/agents?tab=configuration&agent=${agentId}` },
+                )}
+              >
+                {i18n.translate(
+                  'wazuh.fileIntegrityMonitoring.emptyState.viewConfiguration',
+                  { defaultMessage: 'View the endpoint configuration' },
+                )}
+              </EuiLink>
+            )}
+            {pinned.status !== 'loading' && <ConfigureLink />}
           </Actions>
-        ) : null}
+        )}
       </EuiCallOut>
     </EuiPanel>
   );
 };
 
 interface PinnedAgentState {
-  appStateReducers?: { currentAgentData?: { id?: string } };
+  appStateReducers?: { currentAgentData?: { id?: string; name?: string } };
 }
+
+const unPinAgent = () => new PinnedAgentManager().unPinAgent();
 
 /** Empty state of the File Integrity Monitoring tabs for the pinned agent, if any. */
 export const FimEmptyState = ({ kind }: Pick<FimEmptyStateProps, 'kind'>) => {
@@ -237,5 +289,7 @@ export const FimEmptyState = ({ kind }: Pick<FimEmptyStateProps, 'kind'>) => {
     (state: PinnedAgentState) => state.appStateReducers?.currentAgentData,
   );
 
-  return <FimEmptyStateView kind={kind} agent={agent} />;
+  return (
+    <FimEmptyStateView kind={kind} agent={agent} onUnpinAgent={unPinAgent} />
+  );
 };

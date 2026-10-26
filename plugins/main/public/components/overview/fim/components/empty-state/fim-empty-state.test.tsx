@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { I18nProvider } from '@osd/i18n/react';
 import {
   clearAgentReportedConfigurationCache,
@@ -15,6 +15,9 @@ jest.mock(
     clearAgentReportedConfigurationCache: jest.fn(),
   }),
 );
+jest.mock('../../../../wz-agent-selector/wz-agent-selector-service', () => ({
+  PinnedAgentManager: jest.fn(),
+}));
 jest.mock('../../../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
 }));
@@ -29,11 +32,20 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 }));
 
 const getReport = getAgentReportedConfiguration as jest.Mock;
+const onUnpinAgent = jest.fn();
 
-const renderView = (kind: 'findings' | 'dashboard', agentId?: string) =>
+const renderView = (
+  kind: 'findings' | 'dashboard',
+  agentId?: string,
+  agentName?: string,
+) =>
   render(
     <I18nProvider>
-      <FimEmptyStateView kind={kind} agent={{ id: agentId }} />
+      <FimEmptyStateView
+        kind={kind}
+        agent={{ id: agentId, name: agentName }}
+        onUnpinAgent={onUnpinAgent}
+      />
     </I18nProvider>,
   );
 
@@ -93,6 +105,17 @@ describe('FimEmptyStateView', () => {
     unmount();
 
     expect(clearAgentReportedConfigurationCache).toHaveBeenCalled();
+  });
+
+  it('names the pinned agent and offers to unpin it while loading', () => {
+    getReport.mockReturnValue(new Promise(() => {}));
+    renderView('findings', '001', 'web-01');
+
+    expect(
+      screen.getByText('No file changes found for web-01 (001)'),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Unpin agent' }));
+    expect(onUnpinAgent).toHaveBeenCalledTimes(1);
   });
 
   it('says when FIM is disabled on the pinned agent', async () => {
