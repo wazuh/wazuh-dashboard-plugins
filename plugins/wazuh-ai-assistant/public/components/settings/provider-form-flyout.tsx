@@ -774,6 +774,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   // its own error to it — `''` for "nothing", `null` for "no error has been shown yet". See the
   // effect that maintains those attributes below.
   const describedByBeforeErrorRef = useRef<string | null>(null);
+  const testResultRef = useRef<HTMLDivElement | null>(null);
   // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
   // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
   // base URL while the field is still empty or holds one of the OLD type's own known defaults —
@@ -867,6 +868,18 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       describedByBeforeErrorRef.current = null;
     }
   }, [modelError]);
+
+  // Each "Save & test" hands over a new outcome object, so a retry that fails again brings the
+  // result back into view too. A passing test closes the flyout (settings-page.tsx), so only a
+  // failure needs this.
+  useEffect(() => {
+    if (!testOutcome || testOutcome.status === 'ok') {
+      return;
+    }
+    const node = testResultRef.current;
+    node?.scrollIntoView?.({ block: 'start' });
+    node?.focus();
+  }, [testOutcome]);
 
   // Deliberately does NOT set `baseUrlTouched` — this fills the field from one of the type's own
   // "Examples:" chips, which is still just a suggested value (see `handleTypeChange` above), not
@@ -1076,6 +1089,57 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
+          {/* First in the body, not after the form: at the bottom it sat below the tool-calling
+              warning, behind the sticky footer and the toasts, so a failed "Save & test" looked
+              like a success. The wrapper is focusable and an alert, so it is also announced. */}
+          {testOutcome && (
+            <>
+              <div
+                ref={testResultRef}
+                tabIndex={-1}
+                role={testOutcome.status === 'ok' ? 'status' : 'alert'}
+              >
+                <EuiCallOut
+                  size='s'
+                  color={
+                    testOutcome.status === 'ok'
+                      ? 'success'
+                      : testOutcome.status === 'failed'
+                      ? 'danger'
+                      : 'warning'
+                  }
+                  iconType={testOutcome.status === 'ok' ? 'check' : 'alert'}
+                  title={
+                    testOutcome.status === 'ok'
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultSuccessTitle',
+                          {
+                            defaultMessage:
+                              'Connection test succeeded ({latencyMs} ms)',
+                            values: { latencyMs: testOutcome.latencyMs },
+                          },
+                        )
+                      : testOutcome.status === 'failed'
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultFailureTitle',
+                          { defaultMessage: 'Connection test failed' },
+                        )
+                      : i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
+                          {
+                            defaultMessage: 'Could not verify the connection',
+                          },
+                        )
+                  }
+                >
+                  {/* Success needs no body: the title already carries the latency, which is the
+                      whole result. Only a failure has something more to say. */}
+                  {testOutcome.status !== 'ok' && <p>{testOutcome.message}</p>}
+                </EuiCallOut>
+              </div>
+              <EuiSpacer size='m' />
+            </>
+          )}
           {apiKeyEncryptionEnabled === false && (
             <>
               <EuiCallOut
@@ -1695,49 +1759,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 />
               </p>
             </EuiCallOut>
-
-            {testOutcome && (
-              <>
-                <EuiSpacer size='m' />
-                <EuiCallOut
-                  size='s'
-                  color={
-                    testOutcome.status === 'ok'
-                      ? 'success'
-                      : testOutcome.status === 'failed'
-                      ? 'danger'
-                      : 'warning'
-                  }
-                  iconType={testOutcome.status === 'ok' ? 'check' : 'alert'}
-                  title={
-                    testOutcome.status === 'ok'
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.testResultSuccessTitle',
-                          {
-                            defaultMessage:
-                              'Connection test succeeded ({latencyMs} ms)',
-                            values: { latencyMs: testOutcome.latencyMs },
-                          },
-                        )
-                      : testOutcome.status === 'failed'
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.testResultFailureTitle',
-                          { defaultMessage: 'Connection test failed' },
-                        )
-                      : i18n.translate(
-                          'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
-                          {
-                            defaultMessage: 'Could not verify the connection',
-                          },
-                        )
-                  }
-                >
-                  {/* Success needs no body: the title already carries the latency, which is the
-                      whole result. Only a failure has something more to say. */}
-                  {testOutcome.status !== 'ok' && <p>{testOutcome.message}</p>}
-                </EuiCallOut>
-              </>
-            )}
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>

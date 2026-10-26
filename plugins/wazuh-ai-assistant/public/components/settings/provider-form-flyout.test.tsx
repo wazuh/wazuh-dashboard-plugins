@@ -177,6 +177,31 @@ describe('ProviderFormFlyout — submit error', () => {
   });
 });
 
+describe('ProviderFormFlyout — failed connection test result', () => {
+  it('shows a failed test above the form fields and moves focus to it', () => {
+    // jsdom does not implement scrollIntoView.
+    const scrollIntoView = jest.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        editingProvider={editingProvider}
+        testOutcome={{ status: 'failed', message: 'HTTP 401: invalid key' }}
+      />,
+    );
+
+    const result = screen.getByRole('alert');
+    expect(result).toHaveTextContent(/connection test failed/i);
+    expect(result).toHaveTextContent('HTTP 401: invalid key');
+    expect(
+      result.compareDocumentPosition(screen.getByLabelText(/^name/i)) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(document.activeElement).toBe(result);
+    expect(scrollIntoView).toHaveBeenCalled();
+  });
+});
+
 describe('ProviderFormFlyout — unsaved changes confirmation', () => {
   const dirtyTheForm = () => {
     fireEvent.change(screen.getByLabelText(/^name/i), {

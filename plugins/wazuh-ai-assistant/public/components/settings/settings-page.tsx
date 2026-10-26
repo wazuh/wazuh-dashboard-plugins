@@ -1059,22 +1059,43 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       reload();
       onProvidersChanged();
       notifyProvidersChanged();
-      core.notifications.toasts.addSuccess(
-        editingProvider
-          ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
-              defaultMessage: 'Provider "{name}" updated.',
-              values: { name: saved.name },
-            })
-          : i18n.translate('wazuhAiAssistant.settings.createSuccess', {
-              defaultMessage: 'Provider "{name}" added.',
-              values: { name: saved.name },
-            }),
-      );
+      // The toast waits for the test: a success toast fired before it read as "all good" while the
+      // failure was still on its way, and then covered the flyout's result panel.
       const outcome = await handleTest(saved);
       if (outcome.status === 'ok') {
+        core.notifications.toasts.addSuccess(
+          editingProvider
+            ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
+                defaultMessage: 'Provider "{name}" updated.',
+                values: { name: saved.name },
+              })
+            : i18n.translate('wazuhAiAssistant.settings.createSuccess', {
+                defaultMessage: 'Provider "{name}" added.',
+                values: { name: saved.name },
+              }),
+        );
         // A passing test needs no further confirmation from the admin — close the flyout.
         closeForm();
       } else {
+        core.notifications.toasts.addWarning(
+          editingProvider
+            ? i18n.translate(
+                'wazuhAiAssistant.settings.updateSavedTestFailed',
+                {
+                  defaultMessage:
+                    'Provider "{name}" was updated, but its connection test did not pass.',
+                  values: { name: saved.name },
+                },
+              )
+            : i18n.translate(
+                'wazuhAiAssistant.settings.createSavedTestFailed',
+                {
+                  defaultMessage:
+                    'Provider "{name}" was added, but its connection test did not pass.',
+                  values: { name: saved.name },
+                },
+              ),
+        );
         // Keep the flyout open with the result panel so the admin can fix the config and retry.
         setFlyoutTestOutcome(outcome);
       }
