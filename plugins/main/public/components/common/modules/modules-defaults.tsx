@@ -119,6 +119,7 @@ import {
 import { InventoryFIM } from '../../overview/fim';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
+import { ButtonAboutIncidentResponse } from '../../overview/active-responses/about/button-about-incident-response';
 import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
 import { MalwareDetectionEmptyState } from '../../overview/malware-detection/components/empty-state/malware-detection-empty-state';
 import { ReportingService } from '../../../react-services';
@@ -705,6 +706,7 @@ export const ModulesDefaults = {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [
+          ButtonAboutIncidentResponse,
           ({ ...props }) => (
             <ButtonExploreAgent
               {...props}
@@ -719,6 +721,7 @@ export const ModulesDefaults = {
         id: TAB_VIEW_ID_RESPONSES,
         name: TAB_VIEW_NAME_RESPONSES,
         buttons: [
+          ButtonAboutIncidentResponse,
           ({ ...props }) => (
             <ButtonExploreAgent
               {...props}
