@@ -30,4 +30,16 @@ describe('ScoreGauge', () => {
     expect(screen.queryByText('%')).not.toBeInTheDocument();
     expect(container.querySelectorAll('div').length).toBeGreaterThan(0);
   });
+
+  it('shows the empty message instead of the track when there is no score', () => {
+    render(<ScoreGauge emptyMessage='No score' data-test-subj='sca-gauge' />);
+    expect(screen.getByText('No score')).toBeInTheDocument();
+    expect(screen.queryByText('100')).not.toBeInTheDocument();
+  });
+
+  it('ignores the empty message when there is a score', () => {
+    render(<ScoreGauge score={0} emptyMessage='No score' />);
+    expect(screen.getByText('0%')).toBeInTheDocument();
+    expect(screen.queryByText('No score')).not.toBeInTheDocument();
+  });
 });

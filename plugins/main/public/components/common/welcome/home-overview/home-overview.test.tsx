@@ -8,9 +8,9 @@ jest.mock('./components/overview', () => ({
   OverviewSection: () => <div data-test-subj='overview-section' />,
 }));
 jest.mock('./components/endpoint-security', () => ({
-  EndpointSecuritySection: jest.fn(() => (
+  EndpointSecuritySection: () => (
     <div data-test-subj='endpoint-security-section' />
-  )),
+  ),
 }));
 jest.mock('./components/threat-hunting', () => ({
   ThreatHuntingSection: () => <div data-test-subj='threat-hunting-section' />,
@@ -29,7 +29,6 @@ jest.mock('./components/threat-intel-feed', () => ({
   ),
 }));
 jest.mock('./hooks/use-overview-data', () => ({
-  useAgentStatus: jest.fn(() => ({ status: 'loading' })),
   useFindingsOverview: jest.fn(() => ({ status: 'loading' })),
   useFindingsBreakdowns: jest.fn(() => ({ status: 'loading' })),
   useVulnerabilityOverview: jest.fn(() => ({
@@ -53,12 +52,6 @@ jest.mock('../../hocs', () => ({
 }));
 
 import { HomeOverview } from './home-overview';
-import { EndpointSecuritySection } from './components/endpoint-security';
-import { useAgentStatus } from './hooks/use-overview-data';
-
-const asMock = (fn: unknown) => fn as jest.Mock;
-const lastNoAgents = () =>
-  asMock(EndpointSecuritySection).mock.calls.at(-1)[0].noAgents;
 
 describe('HomeOverview shell', () => {
   it('renders the header and every section', () => {
@@ -76,24 +69,5 @@ describe('HomeOverview shell', () => {
         container.querySelector(`[data-test-subj="${section}"]`),
       ).toBeInTheDocument();
     }
-  });
-
-  it('flags no agents only when the agent count loads as zero', () => {
-    asMock(useAgentStatus).mockReturnValue({
-      status: 'available',
-      data: { total: 0 },
-    });
-    render(<HomeOverview />);
-    expect(lastNoAgents()).toBe(true);
-  });
-
-  it.each([
-    ['agents are registered', { status: 'available', data: { total: 3 } }],
-    ['the agent count failed', { status: 'error' }],
-    ['the agent count is loading', { status: 'loading' }],
-  ])('keeps the cards as they are when %s', (_, agents) => {
-    asMock(useAgentStatus).mockReturnValue(agents);
-    render(<HomeOverview />);
-    expect(lastNoAgents()).toBe(false);
   });
 });

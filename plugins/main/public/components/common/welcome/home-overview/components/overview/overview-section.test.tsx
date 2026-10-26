@@ -3,11 +3,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
+import { useAgentStatus } from '../../hooks/use-overview-data';
 import * as navigation from '../../utils/navigation';
 
 // Explicit factories so the real modules (and their heavy data-source imports)
 // are never loaded — this section is tested purely against the seam boundary.
-jest.mock('../../hooks/use-overview-data', () => ({}));
+jest.mock('../../hooks/use-overview-data', () => ({
+  useAgentStatus: jest.fn(),
+}));
 jest.mock('../../utils/navigation', () => ({
   getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
   getAgentsUrl: jest.fn(() => '#agents'),
@@ -29,6 +32,8 @@ jest.mock('../../../../permissions/button', () => ({
   ),
 }));
 
+const asMock = (fn: unknown) => fn as jest.Mock;
+
 const findingsAvailable = {
   status: 'available' as const,
   data: {
@@ -42,25 +47,24 @@ const findingsAvailable = {
   indexPatternId: 'idx-1',
 };
 
-const agentsAvailable = {
-  status: 'available' as const,
-  data: {
-    active: 5,
-    disconnected: 0,
-    pending: 0,
-    neverConnected: 2,
-    total: 7,
-  },
-};
-
 beforeEach(() => {
   jest.clearAllMocks();
+  asMock(useAgentStatus).mockReturnValue({
+    status: 'available',
+    data: {
+      active: 5,
+      disconnected: 0,
+      pending: 0,
+      neverConnected: 2,
+      total: 7,
+    },
+  });
 });
 
 describe('OverviewSection', () => {
   it('renders every OVERVIEW widget when all groups are available', () => {
     const { container } = render(
-      <OverviewSection agents={agentsAvailable} findings={findingsAvailable} />,
+      <OverviewSection findings={findingsAvailable} />,
     );
     expect(screen.getByText('Agents by status')).toBeInTheDocument();
     expect(screen.getByText('Findings')).toBeInTheDocument();
@@ -73,10 +77,7 @@ describe('OverviewSection', () => {
 
   it('shows a contained error for a failed group (distinct from hidden)', () => {
     const { container } = render(
-      <OverviewSection
-        agents={agentsAvailable}
-        findings={{ status: 'error' }}
-      />,
+      <OverviewSection findings={{ status: 'error' }} />,
     );
     // findings + mitre panels (same group) render, with error boxes
     expect(
@@ -87,9 +88,7 @@ describe('OverviewSection', () => {
   });
 
   it('links each top tactic to the MITRE Framework tab, filtered to that tactic', () => {
-    render(
-      <OverviewSection agents={agentsAvailable} findings={findingsAvailable} />,
-    );
+    render(<OverviewSection findings={findingsAvailable} />);
     expect(screen.getByText('Initial Access').closest('a')).toBeInTheDocument();
     expect(navigation.getMitreFrameworkTacticUrl).toHaveBeenCalledWith(
       { key: 'Initial Access', count: 36231, id: 'TA0001' },
@@ -98,36 +97,30 @@ describe('OverviewSection', () => {
   });
 
   it('navigates to Threat Hunting from the Findings card title', () => {
-    render(
-      <OverviewSection agents={agentsAvailable} findings={findingsAvailable} />,
-    );
+    render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Findings'));
     expect(navigation.getThreatHuntingUrl).toHaveBeenCalled();
   });
 
   it('navigates to Agents from the "Agents by status" card title', () => {
-    render(
-      <OverviewSection agents={agentsAvailable} findings={findingsAvailable} />,
-    );
+    render(<OverviewSection findings={findingsAvailable} />);
     fireEvent.click(screen.getByText('Agents by status'));
     expect(navigation.getAgentsUrl).toHaveBeenCalled();
   });
 
   it('shows a "deploy new agent" prompt instead of counts when the fleet is empty', () => {
+    asMock(useAgentStatus).mockReturnValue({
+      status: 'available',
+      data: {
+        active: 0,
+        disconnected: 0,
+        pending: 0,
+        neverConnected: 0,
+        total: 0,
+      },
+    });
     const { container } = render(
-      <OverviewSection
-        agents={{
-          status: 'available',
-          data: {
-            active: 0,
-            disconnected: 0,
-            pending: 0,
-            neverConnected: 0,
-            total: 0,
-          },
-        }}
-        findings={findingsAvailable}
-      />,
+      <OverviewSection findings={findingsAvailable} />,
     );
     expect(container.textContent).toContain(
       'This instance has no agents registered.',

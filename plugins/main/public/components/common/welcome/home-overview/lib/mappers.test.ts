@@ -148,7 +148,7 @@ describe('mappers', () => {
       });
     });
 
-    it('scores 0 only when passed and failed are explicit 0s', () => {
+    it('leaves the score undefined when there are no passed or failed checks', () => {
       const tiles = mapScaTiles({
         sca_result: {
           buckets: {
@@ -159,7 +159,7 @@ describe('mappers', () => {
         },
       });
       expect(tiles.passed).toBe(0);
-      expect(tiles.score).toBe(0);
+      expect(tiles.score).toBeUndefined();
     });
 
     it('leaves values and score undefined when there is no data', () => {

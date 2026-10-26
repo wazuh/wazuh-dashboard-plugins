@@ -26,16 +26,15 @@ import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
 export interface OverviewSectionProps {
-  /** Owned by the page shell, which also uses the count for no-agents states. */
-  agents: ReturnType<typeof useAgentStatus>;
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
   findings: ReturnType<typeof useFindingsOverview>;
 }
 
 const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
-  agents,
   findings,
 }) => {
+  const agents = useAgentStatus();
+
   return (
     <div>
       <EuiFlexGroup>
