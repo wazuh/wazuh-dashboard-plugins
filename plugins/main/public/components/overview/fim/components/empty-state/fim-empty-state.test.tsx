@@ -21,15 +21,6 @@ jest.mock('../../../../wz-agent-selector/wz-agent-selector-service', () => ({
 jest.mock('../../../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
 }));
-jest.mock('../../../../../react-services/navigation-service', () => ({
-  __esModule: true,
-  default: {
-    getInstance: () => ({
-      getUrlForApp: (appId: string, { path }: { path: string }) =>
-        `/app/${appId}${path}`,
-    }),
-  },
-}));
 
 const getReport = getAgentReportedConfiguration as jest.Mock;
 const onUnpinAgent = jest.fn();
@@ -95,12 +86,6 @@ describe('FimEmptyStateView', () => {
     expect(
       [...container.querySelectorAll('code')].map(code => code.textContent),
     ).toEqual(['/etc', '/home']);
-    expect(
-      screen.getByRole('link', { name: 'View the endpoint configuration' }),
-    ).toHaveAttribute(
-      'href',
-      '/app/endpoints-summary#/agents?tab=configuration&agent=001',
-    );
 
     unmount();
 

@@ -14,8 +14,6 @@ import {
 import { i18n } from '@osd/i18n';
 import { useSelector } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import NavigationService from '../../../../../react-services/navigation-service';
-import { endpointSummary } from '../../../../../utils/applications';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import { FIM_CONFIGURE_DOCS_PATH } from '../../fim-documentation';
 import {
@@ -240,12 +238,8 @@ export const FimEmptyStateView = ({
             )}
           </p>
         </EuiText>
-        {!pinned ? (
-          <Actions>
-            <ConfigureLink />
-          </Actions>
-        ) : (
-          <Actions>
+        <Actions>
+          {pinned && (
             <EuiButton
               size='s'
               onClick={onUnpinAgent}
@@ -256,22 +250,9 @@ export const FimEmptyStateView = ({
                 { defaultMessage: 'Unpin agent' },
               )}
             </EuiButton>
-            {pinned.status !== 'loading' && (
-              <EuiLink
-                href={NavigationService.getInstance().getUrlForApp(
-                  endpointSummary.id,
-                  { path: `#/agents?tab=configuration&agent=${agentId}` },
-                )}
-              >
-                {i18n.translate(
-                  'wazuh.fileIntegrityMonitoring.emptyState.viewConfiguration',
-                  { defaultMessage: 'View the endpoint configuration' },
-                )}
-              </EuiLink>
-            )}
-            {pinned.status !== 'loading' && <ConfigureLink />}
-          </Actions>
-        )}
+          )}
+          <ConfigureLink />
+        </Actions>
       </EuiCallOut>
     </EuiPanel>
   );
