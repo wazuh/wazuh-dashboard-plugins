@@ -1833,7 +1833,7 @@ describe('SettingsPage — announcing saved changes to the mounted chat', () => 
         target: { value: 'Gemini lab' },
       });
       fireEvent.change(screen.getByLabelText(/endpoint url/i), {
-        target: { value: 'https://api.openai.com/v1' },
+        target: { value: 'http://localhost:11434/v1' },
       });
       const modelField = screen.getByLabelText(/^model/i);
       fireEvent.change(modelField, { target: { value: 'gpt-4o' } });

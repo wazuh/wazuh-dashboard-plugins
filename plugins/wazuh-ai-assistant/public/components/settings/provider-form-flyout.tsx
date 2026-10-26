@@ -140,6 +140,17 @@ const PROVIDER_API_KEY_GUIDANCE: Record<
   },
 };
 
+/** Replaces the openai_compatible "Optional" line when the endpoint is a hosted service that needs a
+ * key (see `requiresApiKey` in VENDOR_MODEL_SUGGESTIONS). */
+const HOSTED_API_KEY_REQUIREMENT = i18n.translate(
+  'wazuhAiAssistant.settings.form.apiKeyRequirementHosted',
+  {
+    defaultMessage:
+      'Required for this hosted endpoint. Stored encrypted at rest if an encryption key is ' +
+      'configured.',
+  },
+);
+
 interface ProviderUrlDoc {
   label: string;
   url: string;
@@ -385,11 +396,17 @@ const PROVIDER_MODEL_GUIDANCE: Record<
  * makes sense for the `anthropic` type (an `openai_compatible` provider pointed at that URL would
  * be a guaranteed-broken config), and every other entry is an OpenAI-compatible-only
  * gateway/service, so it is gated to `openai_compatible`.
+ *
+ * `requiresApiKey` marks a hosted service that refuses every request without a key, so the form
+ * makes the key required there instead of showing the type's "Optional" (which only holds for local
+ * runtimes such as Ollama). Groq has an entry for this flag alone: it gets no model suggestions
+ * (see PROVIDER_URL_GUIDANCE).
  */
 const VENDOR_MODEL_SUGGESTIONS: Array<{
   match: string;
   forType: ProviderInput['type'];
   models: string[];
+  requiresApiKey?: boolean;
 }> = [
   {
     match: 'api.anthropic.com',
@@ -400,6 +417,7 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
     match: 'api.openai.com',
     forType: 'openai_compatible',
     models: ['gpt-4o', 'gpt-4o-mini'],
+    requiresApiKey: true,
   },
   {
     match: 'bedrock-mantle',
@@ -410,16 +428,25 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
       'qwen.qwen3-32b',
       'deepseek.v3.2',
     ],
+    requiresApiKey: true,
   },
   {
     match: 'openrouter.ai',
     forType: 'openai_compatible',
     models: ['openai/gpt-oss-20b:free'],
+    requiresApiKey: true,
   },
   {
     match: 'generativelanguage',
     forType: 'openai_compatible',
     models: ['gemini-flash-latest', 'gemini-3-flash-preview'],
+    requiresApiKey: true,
+  },
+  {
+    match: 'api.groq.com',
+    forType: 'openai_compatible',
+    models: [],
+    requiresApiKey: true,
   },
   {
     match: 'localhost:11434',
@@ -445,6 +472,25 @@ function getVendorModelSuggestions(
     ({ match, forType }) => forType === type && normalized.includes(match),
   );
   return vendor?.models ?? [];
+}
+
+/** Matched against the HOST only, unlike the suggestions above: a gateway that names its upstream
+ * in its path or query (`…/proxy?upstream=https://api.openai.com`) is not that hosted service and
+ * may hold the key itself. */
+function isHostedEndpointRequiringKey(
+  baseUrl: string,
+  type: ProviderInput['type'],
+): boolean {
+  let host: string;
+  try {
+    host = new URL(baseUrl.trim()).host.toLowerCase();
+  } catch {
+    return false;
+  }
+  return VENDOR_MODEL_SUGGESTIONS.some(
+    ({ match, forType, requiresApiKey }) =>
+      requiresApiKey && forType === type && host.includes(match),
+  );
 }
 
 /**
@@ -759,6 +805,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
   const [modelError, setModelError] = useState<string | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   // What the Model combo box's search input currently holds, i.e. text the admin has typed but not
   // committed (by picking a suggestion or pressing Enter on the custom-option row). EuiComboBox
   // keeps that text purely internally, which is how a form could be submitted with the model field
@@ -766,10 +813,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [modelSearchText, setModelSearchText] = useState('');
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   // Submit moves focus to the FIRST field it rejected (in the form's own reading order: Name,
-  // Endpoint URL, Model), so a rejected save does not leave a keyboard/screen-reader user at the
+  // API key, Endpoint URL, Model), so a rejected save does not leave a keyboard/screen-reader user at the
   // footer button hunting for which of the errors above it appeared.
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const baseUrlInputRef = useRef<HTMLInputElement | null>(null);
+  const apiKeyInputRef = useRef<HTMLInputElement | null>(null);
   // Whatever the model combo box's search input had in `aria-describedby` before this form added
   // its own error to it — `''` for "nothing", `null` for "no error has been shown yet". See the
   // effect that maintains those attributes below.
@@ -813,6 +861,13 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     form.baseUrl,
     form.type,
   );
+  // A hosted endpoint needs a key, unless an edited provider already stores one: an empty field
+  // then means "keep the current key".
+  const apiKeyRequired =
+    isHostedEndpointRequiringKey(form.baseUrl, form.type) &&
+    !editingProvider?.hasApiKey;
+  // Only while the key is still required: switching the endpoint to a local one drops the error.
+  const visibleApiKeyError = apiKeyRequired ? apiKeyError : null;
   // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
   //
   // No deduplication against `modelGuidance.examples`: an id curated in BOTH tables (Anthropic's
@@ -1018,13 +1073,28 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             'Pick a suggestion, or type a model id and press Enter.',
         });
 
+    const nextApiKeyError =
+      apiKeyRequired && !trimmedForm.apiKey
+        ? i18n.translate('wazuhAiAssistant.settings.form.apiKeyRequired', {
+            defaultMessage: 'Enter the API key for this hosted endpoint.',
+          })
+        : null;
+
     setNameError(nextNameError);
+    setApiKeyError(nextApiKeyError);
     setBaseUrlError(nextBaseUrlError);
     setModelError(nextModelError);
-    if (nextNameError || nextBaseUrlError || nextModelError) {
+    if (
+      nextNameError ||
+      nextApiKeyError ||
+      nextBaseUrlError ||
+      nextModelError
+    ) {
       // Form reading order, so focus lands on the topmost problem rather than the last one checked.
       if (nextNameError) {
         nameInputRef.current?.focus();
+      } else if (nextApiKeyError) {
+        apiKeyInputRef.current?.focus();
       } else if (nextBaseUrlError) {
         baseUrlInputRef.current?.focus();
       } else {
@@ -1376,10 +1446,25 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     id='wz-ai-provider-api-key'
-                    label={i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKey',
-                      { defaultMessage: 'API key' },
-                    )}
+                    label={
+                      apiKeyRequired ? (
+                        <RequiredLabel
+                          label={i18n.translate(
+                            'wazuhAiAssistant.settings.form.apiKey',
+                            { defaultMessage: 'API key' },
+                          )}
+                        />
+                      ) : (
+                        i18n.translate(
+                          'wazuhAiAssistant.settings.form.apiKey',
+                          {
+                            defaultMessage: 'API key',
+                          },
+                        )
+                      )
+                    }
+                    isInvalid={Boolean(visibleApiKeyError)}
+                    error={visibleApiKeyError}
                     labelAppend={
                       editingProvider?.hasApiKey ? (
                         <EuiBadge color='hollow'>
@@ -1407,21 +1492,31 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                                     'rest if an encryption key is configured.',
                                 },
                               )
+                            : apiKeyRequired
+                            ? HOSTED_API_KEY_REQUIREMENT
                             : apiKeyGuidance.requirement}
                         </p>
                         <p>{apiKeyGuidance.help}</p>
                       </>
                     }
                   >
-                    {/* Deliberately no `isInvalid` here: a shape mismatch is a non-blocking
-                        warning (below), not a form error — a red-invalid field would read as
-                        blocking even though Save stays enabled. */}
+                    {/* `isInvalid` only for a missing required key: a shape mismatch is a
+                        non-blocking warning (below), not a form error — a red-invalid field would
+                        read as blocking even though Save stays enabled. */}
                     <EuiFieldPassword
                       type='dual'
                       value={form.apiKey}
-                      onChange={event =>
-                        setForm({ ...form, apiKey: event.target.value })
-                      }
+                      aria-required={apiKeyRequired ? 'true' : undefined}
+                      inputRef={node => {
+                        apiKeyInputRef.current = node;
+                      }}
+                      isInvalid={Boolean(visibleApiKeyError)}
+                      onChange={event => {
+                        setForm({ ...form, apiKey: event.target.value });
+                        if (apiKeyError) {
+                          setApiKeyError(null);
+                        }
+                      }}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
