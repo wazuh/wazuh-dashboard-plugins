@@ -566,7 +566,7 @@ test('buildSystemPrompt: the five decline classes point at a concrete dashboard 
     prompt,
     /Agents\s+management or Server management > Active response/,
   );
-  assert.match(prompt, /Server management > Wazuh API access > Roles/);
+  assert.match(prompt, /Server management > API access control > Roles/);
   assert.match(
     prompt,
     /Server management > Rules \(or Decoders\s+\/ SCA policies\)/,
