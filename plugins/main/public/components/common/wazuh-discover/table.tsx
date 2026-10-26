@@ -59,7 +59,6 @@ import {
   tUseDataSourceLoadedReturns,
 } from '../data-source';
 import { DiscoverNoResults } from '../no-results/no-results';
-import { QueryErrorPrompt } from '../query-error';
 import {
   withDataSourceInitiated,
   withErrorBoundary,
@@ -596,7 +595,6 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
   }: TableDataGridWithSearchBarInspectedHitFetchDataProps) => {
     const {
       results,
-      error,
       dataGridProps,
       inspectedHit,
       removeInspectedHit,
@@ -614,15 +612,6 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
       fingerprint,
       autoRefreshFingerprint,
     });
-
-    if (error) {
-      return (
-        <QueryErrorPrompt
-          error={error}
-          indexPatternTitle={dataSource?.indexPattern?.title}
-        />
-      );
-    }
 
     return (
       <TableDataGridWithSearchBarInspectedHit
