@@ -253,6 +253,31 @@ describe('ProviderFormFlyout — API key for hosted endpoints', () => {
       ),
     );
   });
+
+  it('requires a key for api.anthropic.com, but not for an Anthropic proxy', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+    fillRequiredFields('https://api.anthropic.com');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText('Enter the API key for this hosted endpoint.'),
+    ).toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByLabelText(/^api key/i));
+    // Anthropic's own "Required." line stays the only requirement line.
+    expect(screen.getByText(/^Required\./)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/^Required for this hosted endpoint\./),
+    ).toBeNull();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://claude-proxy.corp' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await waitFor(() => expect(baseProps.onSubmit).toHaveBeenCalled());
+  });
 });
 
 describe('ProviderFormFlyout — unsaved changes confirmation', () => {
@@ -532,10 +557,11 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   });
 
   it('shows a non-blocking warning when the key shape does not match the Anthropic type', () => {
+    // The label ends in the required marker here: switching to anthropic prefills api.anthropic.com.
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
-    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
       target: { value: 'sk-not-anthropic-shaped' },
     });
 
@@ -552,7 +578,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
-    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
       target: { value: 'sk-ant-abc123' },
     });
 
@@ -565,13 +591,13 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
-    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
       target: { value: 'not-anthropic-shaped-at-all' },
     });
 
     // A shape mismatch must surface only as the warning EuiCallOut above, never as a red-invalid
     // field — that would read as a blocking error to an admin even though Save stays enabled.
-    expect(screen.getByLabelText(/^api key$/i)).not.toHaveAttribute(
+    expect(screen.getByLabelText(/^api key/i)).not.toHaveAttribute(
       'aria-invalid',
       'true',
     );

@@ -398,8 +398,8 @@ const PROVIDER_MODEL_GUIDANCE: Record<
  * gateway/service, so it is gated to `openai_compatible`.
  *
  * `requiresApiKey` marks a hosted service that refuses every request without a key, so the form
- * makes the key required there instead of showing the type's "Optional" (which only holds for local
- * runtimes such as Ollama). Groq has an entry for this flag alone: it gets no model suggestions
+ * blocks Save without one there. Only these hosts: an openai_compatible key is "Optional" for local
+ * runtimes such as Ollama, and an Anthropic-compatible proxy may have no auth. Groq has an entry for this flag alone: it gets no model suggestions
  * (see PROVIDER_URL_GUIDANCE).
  */
 const VENDOR_MODEL_SUGGESTIONS: Array<{
@@ -412,6 +412,7 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
     match: 'api.anthropic.com',
     forType: 'anthropic',
     models: ['claude-sonnet-5', 'claude-haiku-4-5', 'claude-opus-5'],
+    requiresApiKey: true,
   },
   {
     match: 'api.openai.com',
@@ -868,6 +869,11 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     !editingProvider?.hasApiKey;
   // Only while the key is still required: switching the endpoint to a local one drops the error.
   const visibleApiKeyError = apiKeyRequired ? apiKeyError : null;
+  // The hosted line replaces only openai_compatible's "Optional": Anthropic's says "Required" already.
+  const apiKeyRequirement =
+    apiKeyRequired && form.type === 'openai_compatible'
+      ? HOSTED_API_KEY_REQUIREMENT
+      : apiKeyGuidance.requirement;
   // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
   //
   // No deduplication against `modelGuidance.examples`: an id curated in BOTH tables (Anthropic's
@@ -1492,9 +1498,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                                     'rest if an encryption key is configured.',
                                 },
                               )
-                            : apiKeyRequired
-                            ? HOSTED_API_KEY_REQUIREMENT
-                            : apiKeyGuidance.requirement}
+                            : apiKeyRequirement}
                         </p>
                         <p>{apiKeyGuidance.help}</p>
                       </>
