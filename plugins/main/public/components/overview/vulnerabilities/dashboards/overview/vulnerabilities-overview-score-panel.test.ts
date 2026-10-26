@@ -7,7 +7,7 @@ const DEFINITION = path.resolve(
 );
 
 describe('vulnerabilities overview dashboard definition', () => {
-  it('excludes entries under evaluation from the score panel', () => {
+  it('excludes entries with a negative score from the score panel', () => {
     const visualization = fs
       .readFileSync(DEFINITION, 'utf8')
       .split('\n')
@@ -21,7 +21,7 @@ describe('vulnerabilities overview dashboard definition', () => {
 
     expect(searchSource.query).toEqual({
       language: 'kuery',
-      query: 'not vulnerability.under_evaluation:true',
+      query: 'vulnerability.score.base >= 0',
     });
   });
 });
