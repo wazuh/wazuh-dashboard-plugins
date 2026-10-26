@@ -103,10 +103,6 @@ const FIELD_LABELS: Record<tFormFieldsLabel, string> = {
     'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.serverPath',
     { defaultMessage: 'server path prefix' },
   ),
-  [tFormFieldsLabel.managerCa]: i18n.translate(
-    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.managerCa',
-    { defaultMessage: 'manager CA file path' },
-  ),
 };
 
 /* Joins the labels into one list, leaving the conjunction and the word order to
@@ -163,7 +159,6 @@ export const Steps = ({
       wazuhPassword: canCreateEnrollmentToken ? '' : wazuhPassword,
       enrollmentToken: enrollmentToken?.token || '',
       sslVerification: true,
-      managerCa: '',
     },
   } as IParseRegisterFormValues;
   const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
