@@ -28,6 +28,11 @@ jest.mock('./components/threat-intel-feed', () => ({
     <div data-test-subj='threat-intelligence-feed-section' />
   ),
 }));
+jest.mock('./components/log-data-analysis', () => ({
+  LogDataAnalysisSection: () => (
+    <div data-test-subj='log-data-analysis-section' />
+  ),
+}));
 jest.mock('./hooks/use-overview-data', () => ({
   useFindingsOverview: jest.fn(() => ({ status: 'loading' })),
   useFindingsBreakdowns: jest.fn(() => ({ status: 'loading' })),
@@ -63,6 +68,7 @@ describe('HomeOverview shell', () => {
       'threat-hunting-section',
       'security-operations-section',
       'cloud-security-section',
+      'log-data-analysis-section',
       'threat-intelligence-feed-section',
     ]) {
       expect(
