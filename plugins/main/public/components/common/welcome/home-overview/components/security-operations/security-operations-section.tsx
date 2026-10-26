@@ -53,6 +53,11 @@ const SecurityOperationsSectionComponent: React.FC<
   const activeResponse = useActiveResponseOverview(visible);
   const topOs = useTopOperatingSystems(visible);
   const topServices = useTopNetworkServices(visible);
+  // When every tile is denied, show the card-level permission message used by
+  // the other cards instead of four warning dashes.
+  const itHygieneDenied = [operatingSystems, packages, users, services].every(
+    ({ error }) => error?.kind === 'permission-denied',
+  );
 
   return (
     <div ref={sectionRef}>
@@ -72,7 +77,9 @@ const SecurityOperationsSectionComponent: React.FC<
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
-            status='available'
+            status={itHygieneDenied ? 'error' : 'available'}
+            errorLabel={operatingSystems.error?.message}
+            isPermissionDenied={itHygieneDenied}
             title={i18n.translate(
               'wazuh.common.homeOverviewSecurityOperations.itHygieneTitle',
               { defaultMessage: 'IT Hygiene' },

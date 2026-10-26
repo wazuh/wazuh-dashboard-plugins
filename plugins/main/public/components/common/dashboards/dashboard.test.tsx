@@ -4,27 +4,32 @@ import { render, screen } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import { createDashboard } from './dashboard';
 
+let mockDataSourceAction: { data?: unknown; error?: unknown };
+
 jest.mock('../hocs', () => {
   const { createElement } = jest.requireActual('react');
   return {
     withErrorBoundary: Component => Component,
     withInjectProps: inject => Component => props =>
       createElement(Component, { ...props, ...inject }),
-    // Simulates a data source fetch without hits
+    // Simulates a data source fetch; each test sets its outcome
     withDataSourceFetchSearchBar: () => Component => props =>
       createElement(Component, {
         ...props,
         dataSource: {
           dataSource: {
             isLoading: false,
-            indexPattern: { timeFieldName: 'timestamp' },
+            indexPattern: {
+              title: 'wazuh-states-inventory-*',
+              timeFieldName: 'timestamp',
+            },
             getPinnedAgentFilter: () => [],
           },
           searchBarProps: {},
           fixedFilters: [],
           fetchFilters: [],
         },
-        dataSourceAction: { data: { hits: { total: 0 } } },
+        dataSourceAction: mockDataSourceAction,
       }),
   };
 });
@@ -55,6 +60,10 @@ const renderDashboard = (emptyState?: React.ReactNode) => {
 };
 
 describe('createDashboard', () => {
+  beforeEach(() => {
+    mockDataSourceAction = { data: { hits: { total: 0 } } };
+  });
+
   it('renders the default no results callout when there are no hits', () => {
     expect(renderDashboard()).toBeInTheDocument();
   });
@@ -62,5 +71,23 @@ describe('createDashboard', () => {
   it('renders the module empty state instead when it is given', () => {
     expect(renderDashboard(<div>No files yet</div>)).toBeNull();
     expect(screen.getByText('No files yet')).toBeInTheDocument();
+  });
+
+  it('renders a permission prompt naming the index pattern when the search is forbidden', () => {
+    mockDataSourceAction = {
+      data: null,
+      error: Object.assign(new Error('security_exception'), { status: 403 }),
+    };
+    expect(renderDashboard()).toBeNull();
+    expect(
+      screen.getByText("You don't have permission to view this data."),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/wazuh-states-inventory-\*/)).toBeInTheDocument();
+  });
+
+  it('surfaces any other search error instead of a blank page', () => {
+    mockDataSourceAction = { data: null, error: new Error('Gateway Timeout') };
+    renderDashboard();
+    expect(screen.getByText('Gateway Timeout')).toBeInTheDocument();
   });
 });

@@ -143,6 +143,32 @@ describe('SecurityOperationsSection', () => {
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
   });
 
+  it('shows the permission message on the IT Hygiene card when every tile is denied', () => {
+    const denied = {
+      status: 'error',
+      error: {
+        kind: 'permission-denied',
+        message: "You don't have permission to view this data.",
+      },
+    };
+    asMock(useItHygieneOperatingSystemsCount).mockReturnValue(denied);
+    asMock(useItHygienePackagesCount).mockReturnValue(denied);
+    asMock(useItHygieneUsersCount).mockReturnValue(denied);
+    asMock(useItHygieneServicesCount).mockReturnValue(denied);
+    const { container } = render(
+      <SecurityOperationsSection complianceControls={complianceControls} />,
+    );
+    const card = container.querySelector(
+      '[data-test-subj="home-overview-it-hygiene"]',
+    ) as HTMLElement;
+    expect(
+      within(card).getByText("You don't have permission to view this data."),
+    ).toBeInTheDocument();
+    expect(
+      card.querySelector('[data-test-subj="it-hygiene-tile-packages"]'),
+    ).not.toBeInTheDocument();
+  });
+
   it('keeps every IT Hygiene tile; an unavailable one shows "-"', () => {
     asMock(useItHygienePackagesCount).mockReturnValue({
       status: 'unavailable',

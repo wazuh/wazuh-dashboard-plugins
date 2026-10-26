@@ -4,7 +4,7 @@ import {
   ErrorHandler,
   HttpError,
 } from '../../../../../react-services/error-management';
-import { describeError } from './classify-query-error';
+import { describeError } from '../../../query-error';
 
 /**
  * Coalesces Home overview query failures into a single toast.

@@ -83,7 +83,7 @@ import {
   DataGroupResult,
 } from '../interfaces/data-group';
 import { reportQueryError } from '../lib/report-query-error';
-import { classifyQueryError } from '../lib/classify-query-error';
+import { classifyQueryError } from '../../../query-error';
 
 // Data hooks for the Home overview. Every widget reads its data through one of
 // these; they wrap SearchSource aggregations, the Wazuh API, and Security

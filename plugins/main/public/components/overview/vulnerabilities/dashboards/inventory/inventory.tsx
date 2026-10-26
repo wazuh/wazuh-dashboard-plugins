@@ -69,6 +69,7 @@ import { vulnerabilityManagedFilters } from '../../common/vulnerability-managed-
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
 import managedFilters from './managed-filters';
 import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
+import { QueryErrorPrompt } from '../../../../common/query-error';
 
 const InventoryVulsComponent = () => {
   const {
@@ -92,6 +93,7 @@ const InventoryVulsComponent = () => {
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [fetchError, setFetchError] = useState<unknown>(undefined);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
@@ -180,9 +182,13 @@ const InventoryVulsComponent = () => {
     setIndexPattern(dataSource?.indexPattern);
     fetchData({ query, pagination, sorting })
       .then(results => {
+        setFetchError(undefined);
         setResults(results);
       })
       .catch(error => {
+        // Drop stale hits so only the error prompt is shown
+        setResults({} as SearchResponse);
+        setFetchError(error);
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate(
@@ -250,6 +256,12 @@ const InventoryVulsComponent = () => {
                 </HideOnErrorInitializatingDataSource>
               </>
             )}
+            {fetchError ? (
+              <QueryErrorPrompt
+                error={fetchError}
+                indexPatternTitle={dataSource?.indexPattern?.title}
+              />
+            ) : null}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}

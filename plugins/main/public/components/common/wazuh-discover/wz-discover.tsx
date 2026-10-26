@@ -17,6 +17,7 @@ import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
+import { QueryErrorPrompt } from '../query-error';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import {
   useDataGrid,
@@ -92,6 +93,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   }
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [fetchError, setFetchError] = useState<unknown>(undefined);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const { onDocumentMutated: handleDocumentMutated, caseRefreshKey } =
     useDocumentMutationSync({ inspectedHit, setInspectedHit, setResults });
@@ -183,8 +185,14 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
       sorting,
       dateRange: absoluteDateRange,
     })
-      .then(results => setResults(results))
+      .then(results => {
+        setFetchError(undefined);
+        setResults(results);
+      })
       .catch(error => {
+        // Drop stale hits so only the error prompt is shown
+        setResults({} as SearchResponse);
+        setFetchError(error);
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
@@ -285,6 +293,12 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               />
               <SampleDataWarning categoriesSampleData={categoriesSampleData} />
             </HideOnErrorInitializatingDataSource>
+            {fetchError ? (
+              <QueryErrorPrompt
+                error={fetchError}
+                indexPatternTitle={dataSource?.indexPattern?.title}
+              />
+            ) : null}
             {!isDataSourceLoading && results?.hits?.total === 0
               ? emptyState ?? (
                   <DiscoverNoResults

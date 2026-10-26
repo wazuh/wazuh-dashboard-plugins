@@ -59,6 +59,7 @@ import {
   tUseDataSourceLoadedReturns,
 } from '../data-source';
 import { DiscoverNoResults } from '../no-results/no-results';
+import { QueryErrorPrompt } from '../query-error';
 import {
   withDataSourceInitiated,
   withErrorBoundary,
@@ -323,6 +324,7 @@ export const useTableDataGridFetch = ({
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [error, setError] = useState<unknown>(undefined);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const { onDocumentMutated, caseRefreshKey } = useDocumentMutationSync({
     inspectedHit,
@@ -387,9 +389,11 @@ export const useTableDataGridFetch = ({
         : {}),
     })
       .then(results => {
+        setError(undefined);
         setResults(results);
       })
       .catch(error => {
+        setError(error);
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
@@ -433,6 +437,7 @@ export const useTableDataGridFetch = ({
 
   return {
     results,
+    error,
     dataGridProps,
     inspectedHit,
     removeInspectedHit,
@@ -591,6 +596,7 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
   }: TableDataGridWithSearchBarInspectedHitFetchDataProps) => {
     const {
       results,
+      error,
       dataGridProps,
       inspectedHit,
       removeInspectedHit,
@@ -608,6 +614,15 @@ export const TableDataGridWithSearchBarInspectedHitFetchData: React.FunctionComp
       fingerprint,
       autoRefreshFingerprint,
     });
+
+    if (error) {
+      return (
+        <QueryErrorPrompt
+          error={error}
+          indexPatternTitle={dataSource?.indexPattern?.title}
+        />
+      );
+    }
 
     return (
       <TableDataGridWithSearchBarInspectedHit
