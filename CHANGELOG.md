@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed the location shown for active responses in Server management > Settings [#9426](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9426)
+- Fixed an error screen shown before the login page when the session expired [#9524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9524)
 
 ## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 01
 
