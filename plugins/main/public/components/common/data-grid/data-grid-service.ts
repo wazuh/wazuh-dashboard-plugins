@@ -187,7 +187,13 @@ const mapToDataGridColumn = (
     name: field.name,
     display: React.createElement(
       EuiToolTip,
-      { content: field.name },
+      // A block anchor that truncates itself: the default inline-block anchor
+      // cannot be shortened with an ellipsis by the header cell.
+      {
+        content: field.name,
+        display: 'inlineBlock',
+        anchorClassName: 'oui-textTruncate wz-display-inline',
+      },
       React.createElement('span', null, field.name),
     ),
     schema: field.type,
