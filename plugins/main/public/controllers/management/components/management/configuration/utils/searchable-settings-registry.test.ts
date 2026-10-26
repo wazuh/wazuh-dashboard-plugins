@@ -311,9 +311,14 @@ describe('searchableSettingsRegistry', () => {
           configurationHeaderKey('global-configuration', 'Global', 'agents')
         ];
       expect(logging.title).toBe('Logging settings');
-      expect(agents.title).toBe('Agents settings');
+      expect(agents.title).toBe('Agent disconnection');
       expect(logging.title).not.toBe(agents.title);
       expect(logging.help).not.toEqual(agents.help);
+      expect(
+        configurationHeaders[
+          configurationHeaderKey('global-configuration', 'Remote', 'agents')
+        ].title,
+      ).toBe('Agent compatibility');
     });
   });
 
