@@ -1,5 +1,11 @@
 import React from 'react';
-import { EuiButton, EuiCallOut, EuiPanel, EuiText } from '@elastic/eui';
+import {
+  EuiButton,
+  EuiCallOut,
+  EuiPanel,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { withAgent } from '../../../../common/hocs/with-agent';
 import { DiscoverNoResults } from '../../../../common/no-results/no-results';
@@ -55,6 +61,7 @@ export const ThreatHuntingEmptyPrompt = ({
             )}
           </p>
         </EuiText>
+        <EuiSpacer size='s' />
         <EuiButton
           size='s'
           onClick={onUnpinAgent}
