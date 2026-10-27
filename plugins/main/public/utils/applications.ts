@@ -9,6 +9,7 @@ import {
 } from '../components/common/logos';
 import { getWzCurrentAppID } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
+import { FIM_DOCS_PATH } from '../components/overview/fim/fim-documentation';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -133,9 +134,10 @@ export const fileIntegrityMonitoring = {
   ),
   description: i18n.translate('wazuh.fileIntegrityMonitoring.app.description', {
     defaultMessage:
-      'Alerts related to file changes, including permissions, content, ownership, and attributes.',
+      'Detects when monitored files and registry entries are created, modified or deleted, and who changed them when who-data is enabled.',
   }),
   euiIconType: 'sqlApp',
+  docsUrl: webDocumentationLink(FIM_DOCS_PATH),
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
