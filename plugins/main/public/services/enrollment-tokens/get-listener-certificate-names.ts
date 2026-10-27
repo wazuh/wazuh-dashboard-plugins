@@ -26,7 +26,8 @@ const toListenerTlsDocument = (
   const items = (payload as { affected_items?: unknown[] })?.affected_items;
 
   return (Array.isArray(items) ? items[0] : payload) as
-    ListenerTlsDocument | undefined;
+    | ListenerTlsDocument
+    | undefined;
 };
 
 const getListenerNames = (document?: ListenerTlsDocument): string[] => {
