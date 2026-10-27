@@ -19,6 +19,11 @@ const DATE_MATH_OR_ISO_RE =
 export const DEFAULT_TIME_RANGE_GTE = 'now-90d';
 export const DEFAULT_TIME_RANGE_LTE = 'now';
 
+/** Newest first. `numeric_type` keeps the order right when indices mix `date` and `date_nanos`. */
+export const TIMESTAMP_DESC_SORT = [
+  { '@timestamp': { order: 'desc', numeric_type: 'date_nanos' } },
+];
+
 /** Ruleset Management content (get_rules, get_threat_intel_components) is namespaced across these
  * four spaces (confirmed live via each index's own `space.name` field) -- shared here so both
  * tools' `space` parameter and executor.ts's `resolveSecurityAnalyticsSpace` fallback agree on the

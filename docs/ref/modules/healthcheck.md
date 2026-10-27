@@ -39,6 +39,12 @@ The checks represents the unit to check and some could do some write actions suc
 | `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md) for details.                         |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
 
+### Index pattern fields
+
+`saved-objects:index-patterns` creates missing index patterns. It does not refresh the fields of existing ones. After an indexer mapping change, refresh the fields in **Dashboards Management** > **Index patterns** > _pattern_ > **Refresh field list**.
+
+For example, `@timestamp` is `date_nanos` in the events, findings and metrics templates. An index pattern created before that change keeps `date`, so it shows `@timestamp` with millisecond precision until its fields are refreshed. Sorting by `@timestamp` is right either way.
+
 ### Notifications and Alerting
 
 For details about the default notification channels the Wazuh indexer provisions (and Health Check validates) and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).

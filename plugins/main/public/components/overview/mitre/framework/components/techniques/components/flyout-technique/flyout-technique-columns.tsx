@@ -1,6 +1,5 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { formatUIDate } from '../../../../../../../../react-services';
 import { tDataGridColumn } from '../../../../../../../common/data-grid';
 
 export const techniquesColumns: tDataGridColumn[] = [
@@ -14,7 +13,6 @@ export const techniquesColumns: tDataGridColumn[] = [
         defaultMessage: 'Time',
       },
     ),
-    render: value => formatUIDate(value),
   },
   {
     id: 'wazuh.agent.id',
@@ -94,7 +92,6 @@ export const agentTechniquesColumns: tDataGridColumn[] = [
         defaultMessage: 'Time',
       },
     ),
-    render: value => formatUIDate(value),
   },
   {
     id: 'wazuh.rule.mitre.technique.id',

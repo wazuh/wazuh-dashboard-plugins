@@ -79,7 +79,7 @@ let generated = 0;
 function generateDocument(params = {}) {
   const position =
     typeof params.index === 'number' ? params.index : generated++;
-  const timestamp = random.date(DAYS);
+  const timestamp = random.dateNanos(DAYS);
   const compliance = generateCompliance(position);
 
   return {
