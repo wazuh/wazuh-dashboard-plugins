@@ -31,7 +31,7 @@ const getTotal = (response?: {
 };
 
 /**
- * Tells whether any Docker event has ever reached the indexer, regardless of the time range, the
+ * Tells whether any Docker finding has ever reached the indexer, regardless of the time range, the
  * search and the pinned agent. It is what separates a page that is not set up from one whose
  * current search has no results.
  */

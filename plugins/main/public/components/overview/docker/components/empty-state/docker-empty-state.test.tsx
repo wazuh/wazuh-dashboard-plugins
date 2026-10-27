@@ -39,7 +39,7 @@ const renderView = (
 describe('DockerEmptyStateView', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it('explains how to set up Docker monitoring when no event has ever arrived', () => {
+  it('explains how to set up Docker monitoring when no finding has ever arrived', () => {
     renderView('never-received');
 
     expect(
@@ -67,7 +67,7 @@ describe('DockerEmptyStateView', () => {
     dataStatus => {
       renderView(dataStatus);
 
-      expect(screen.getByText('No Docker events found')).toBeInTheDocument();
+      expect(screen.getByText('No Docker findings found')).toBeInTheDocument();
       expect(
         screen.getByText('Try changing the search or time range.'),
       ).toBeInTheDocument();
