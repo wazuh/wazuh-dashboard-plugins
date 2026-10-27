@@ -20,7 +20,7 @@ describe('ButtonAboutSecurity', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'About Wazuh API access' }),
+      screen.getByRole('button', { name: 'About API access control' }),
     );
 
     const flyout = screen.getByRole('dialog');
@@ -50,7 +50,7 @@ describe('ButtonAboutSecurity', () => {
   it('links the header to the API RBAC docs and the warning to the indexer security docs', () => {
     render(<ButtonAboutSecurity />);
     fireEvent.click(
-      screen.getByRole('button', { name: 'About Wazuh API access' }),
+      screen.getByRole('button', { name: 'About API access control' }),
     );
 
     const links = screen.getAllByRole('link', { name: /documentation/ });
@@ -69,7 +69,7 @@ describe('ButtonAboutSecurity', () => {
   it('closes the flyout', () => {
     render(<ButtonAboutSecurity />);
     fireEvent.click(
-      screen.getByRole('button', { name: 'About Wazuh API access' }),
+      screen.getByRole('button', { name: 'About API access control' }),
     );
 
     fireEvent.click(

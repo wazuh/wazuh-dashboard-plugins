@@ -265,6 +265,9 @@ export const ITHygiene = {
     defaultMessage:
       'Assess system, software, processes, and network layers to detect misconfigurations, unauthorized changes, and anomalies.',
   }),
+  docsUrl: webDocumentationLink(
+    'user-manual/capabilities/system-inventory/index.html',
+  ),
   euiIconType: 'indexPatternApp',
   order: 400,
   showInOverviewApp: true,
@@ -702,13 +705,13 @@ export const security = {
   category: 'wz-category-server-management',
   id: 'security',
   title: i18n.translate('wazuh.security.app.title', {
-    defaultMessage: 'Wazuh API access',
+    defaultMessage: 'API access control',
   }),
   tabTitle: i18n.translate('wazuh.security.app.tabTitle', {
-    defaultMessage: 'Wazuh API access',
+    defaultMessage: 'API access control',
   }),
   breadcrumbLabel: i18n.translate('wazuh.security.app.breadcrumbLabel', {
-    defaultMessage: 'Wazuh API access',
+    defaultMessage: 'API access control',
   }),
   description: i18n.translate('wazuh.security.app.description', {
     defaultMessage:
