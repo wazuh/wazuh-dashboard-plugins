@@ -17,7 +17,7 @@ import {
   STANDARD_FINDING_TABLE_COLUMN_FIELDS,
   STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
-  TIMESTAMP_DESC_SORT,
+  timestampDescSort,
 } from './common';
 
 const COMPLIANCE_ROW_FIELDS = COMPLIANCE_FRAMEWORKS.map(
@@ -120,7 +120,7 @@ export const getComplianceAlertsTool: ToolDefinition = {
             ...(excludeClauses.length > 0 ? { must_not: excludeClauses } : {}),
           },
         },
-        sort: TIMESTAMP_DESC_SORT,
+        sort: timestampDescSort(),
         size: limit,
         // Population-true agent/rule-title breakdown over the FULL matched set -- same mechanism
         // as the other finding-hits tools (common.ts's FINDING_BREAKDOWN_AGGS doc comment).

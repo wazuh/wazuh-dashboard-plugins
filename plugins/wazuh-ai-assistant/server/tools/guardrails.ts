@@ -226,6 +226,39 @@ export function checkIndexAllowlist(index: string): GuardrailCheck {
  * threshold a distinct count is EXACT; above it, HyperLogLog++ returns an estimate. */
 export const MAX_CARDINALITY_PRECISION_THRESHOLD = 40000;
 
+const TIMESTAMP_FIELD = '@timestamp';
+
+/** Keeps `@timestamp` sorts in order across `date` and `date_nanos` indices; never mutates input. */
+function sortTimestampAsNanos(sort: unknown): unknown {
+  if (Array.isArray(sort)) {
+    return sort.map(sortTimestampAsNanos);
+  }
+  if (sort === TIMESTAMP_FIELD) {
+    return { [TIMESTAMP_FIELD]: { numeric_type: 'date_nanos' } };
+  }
+  if (!sort || typeof sort !== 'object') {
+    return sort;
+  }
+  const entry = sort as Record<string, unknown>;
+  const value = entry[TIMESTAMP_FIELD];
+  if (value === undefined) {
+    return sort;
+  }
+  const options =
+    typeof value === 'string'
+      ? { order: value }
+      : value && typeof value === 'object'
+      ? (value as Record<string, unknown>)
+      : undefined;
+  if (!options || options.numeric_type !== undefined) {
+    return sort;
+  }
+  return {
+    ...entry,
+    [TIMESTAMP_FIELD]: { ...options, numeric_type: 'date_nanos' },
+  };
+}
+
 /**
  * Raises every `cardinality` aggregation's `precision_threshold` to the engine maximum, recursively
  * (a cardinality can sit under a bucket agg as a sub-aggregation).
@@ -319,6 +352,9 @@ export function applySafetyValves(
   // practice.
   next.track_total_hits = true;
   raiseCardinalityPrecision(next.aggs ?? next.aggregations);
+  if (next.sort !== undefined) {
+    next.sort = sortTimestampAsNanos(next.sort);
+  }
   // allow_partial_search_results is deliberately NOT set here: it is a transport/URL parameter,
   // not a body field (a body key would 400 the whole search), and the cluster default is already
   // `true`, which is the behavior we want.

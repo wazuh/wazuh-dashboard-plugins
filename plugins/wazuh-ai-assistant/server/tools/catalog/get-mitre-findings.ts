@@ -11,7 +11,7 @@ import {
   optionalStringParam,
   resolveTimeRange,
   timeRangeProperties,
-  TIMESTAMP_DESC_SORT,
+  timestampDescSort,
 } from './common';
 
 /** Bare parent technique id, e.g. "T1059" -- no sub-technique dot. A dotted id ("T1059.001") names
@@ -166,7 +166,7 @@ export const getMitreFindingsTool: ToolDefinition = {
             filter: [mitreFilter, { range: { '@timestamp': { gte, lte } } }],
           },
         },
-        sort: TIMESTAMP_DESC_SORT,
+        sort: timestampDescSort(),
         size: limit,
         // Population-true breakdowns over the FULL matched set — BOTH halves are load-bearing:
         // FINDING_BREAKDOWN_AGGS (agent/rule-title distribution, the same mechanism as every

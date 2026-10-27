@@ -1269,6 +1269,39 @@ test('checkIndexAllowlist: rejects a path-traversal-shaped value even though the
 
 // --- applySafetyValves ------------------------------------------------------------------------
 
+test('applySafetyValves: sorts @timestamp as date_nanos in every sort shape', () => {
+  const result = applySafetyValves({
+    query: timeBoundedFilter(),
+    sort: [
+      '@timestamp',
+      { '@timestamp': 'asc' },
+      { '@timestamp': { order: 'desc' } },
+      { 'wazuh.rule.level': { order: 'desc' } },
+    ],
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.deepEqual(result.body.sort, [
+      { '@timestamp': { numeric_type: 'date_nanos' } },
+      { '@timestamp': { order: 'asc', numeric_type: 'date_nanos' } },
+      { '@timestamp': { order: 'desc', numeric_type: 'date_nanos' } },
+      { 'wazuh.rule.level': { order: 'desc' } },
+    ]);
+  }
+});
+
+test('applySafetyValves: keeps an explicit numeric_type and does not mutate the input sort', () => {
+  const sort = [{ '@timestamp': { order: 'desc', numeric_type: 'date' } }];
+  const input = [{ '@timestamp': { order: 'desc' } }];
+  const explicit = applySafetyValves({ query: timeBoundedFilter(), sort });
+  const added = applySafetyValves({ query: timeBoundedFilter(), sort: input });
+  assert.equal(explicit.ok && added.ok, true);
+  if (explicit.ok) {
+    assert.deepEqual(explicit.body.sort, sort);
+  }
+  assert.deepEqual(input, [{ '@timestamp': { order: 'desc' } }]);
+});
+
 test('applySafetyValves: clamps size to <= 500', () => {
   const result = applySafetyValves({ query: timeBoundedFilter(), size: 5000 });
   assert.equal(result.ok, true);

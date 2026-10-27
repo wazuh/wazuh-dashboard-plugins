@@ -6,7 +6,7 @@ import {
   optionalStringParam,
   resolveTimeRange,
   timeRangeProperties,
-  TIMESTAMP_DESC_SORT,
+  timestampDescSort,
 } from './common';
 
 /**
@@ -61,7 +61,7 @@ export const getEventsByAgentTool: ToolDefinition = {
       index: 'wazuh-events-v5*',
       body: {
         query: { bool: { filter } },
-        sort: TIMESTAMP_DESC_SORT,
+        sort: timestampDescSort(),
         size: limit,
       },
     };

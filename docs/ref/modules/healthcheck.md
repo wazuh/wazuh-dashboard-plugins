@@ -43,7 +43,11 @@ The checks represents the unit to check and some could do some write actions suc
 
 `saved-objects:index-patterns` creates missing index patterns. It does not refresh the fields of existing ones. After an indexer mapping change, refresh the fields in **Dashboards Management** > **Index patterns** > _pattern_ > **Refresh field list**.
 
-For example, `@timestamp` is `date_nanos` in the events, findings and metrics templates. An index pattern created before that change keeps `date`, so it shows `@timestamp` with millisecond precision until its fields are refreshed. Sorting by `@timestamp` is right either way.
+For example, `@timestamp` is `date_nanos` in the events, events-raw, findings and metrics templates. An index pattern created before that change keeps `date` until its fields are refreshed:
+
+- It shows `@timestamp` with millisecond precision.
+- **Discover** sorts `@timestamp` out of order when the pattern covers indices created both before and after the change.
+- The Wazuh views sort correctly either way.
 
 ### Notifications and Alerting
 
