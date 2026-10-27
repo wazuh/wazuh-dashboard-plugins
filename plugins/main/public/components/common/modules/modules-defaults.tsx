@@ -119,6 +119,7 @@ import {
 import { InventoryFIM } from '../../overview/fim';
 import { ButtonAboutFileIntegrityMonitoring } from '../../overview/fim/components/about/button-about-file-integrity-monitoring';
 import { FimEmptyState } from '../../overview/fim/components/empty-state/fim-empty-state';
+import { DockerEmptyState } from '../../overview/docker/components/empty-state';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ButtonAboutITHygiene } from '../../overview/it-hygiene/components/about/button-about-it-hygiene';
@@ -514,6 +515,7 @@ export const ModulesDefaults = {
         tableColumns: dockerColumns,
         DataSource: DockerDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
+        emptyState: <DockerEmptyState />,
       }),
     ],
     availableFor: ['manager', 'agent'],
