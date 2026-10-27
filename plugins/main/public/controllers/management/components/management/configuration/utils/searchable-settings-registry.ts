@@ -55,7 +55,7 @@ export interface SearchableSettingField {
   /** Only needed when one `tab` must render more than one separately
    * titled/helped header (currently only Global Configuration's `Global`
    * tab, which had two original sub-headers -- "Logging settings" and
-   * "Agents settings" -- with different help links). Looked up together
+   * "Agent disconnection" -- with different help links). Looked up together
    * with `tab` via `configurationHeaderKey`. */
   group?: string;
   /** Per-field help tooltip (`EuiIconTip`), verbatim from the original
@@ -542,13 +542,14 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     title: i18n.translate(
       'wazuh.configuration.settingsHeaders.globalConfigurationGlobalAgentsTitle',
       {
-        defaultMessage: 'Agents settings',
+        defaultMessage: 'Agent disconnection',
       },
     ),
     description: i18n.translate(
       'wazuh.configuration.settingsHeaders.globalConfigurationGlobalAgentsDescription',
       {
-        defaultMessage: 'Time alert agents settings',
+        defaultMessage:
+          'Time after which an agent that stops reporting is marked as disconnected',
       },
     ),
     help: [
@@ -601,7 +602,7 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     title: i18n.translate(
       'wazuh.configuration.settingsHeaders.globalConfigurationRemoteAgentsTitle',
       {
-        defaultMessage: 'Agents settings',
+        defaultMessage: 'Agent compatibility',
       },
     ),
     description: i18n.translate(
@@ -1557,7 +1558,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     label,
     category: 'Global Configuration',
     tab: 'Remote',
-    // The 3 original sub-headers (HTTPS/Legacy/Agents settings) map 1:1 to
+    // The 3 original sub-headers (HTTPS/Legacy/Agent compatibility) map 1:1 to
     // the field's own prefix.
     group: field.split('.')[0],
     goto: 'global-configuration',
