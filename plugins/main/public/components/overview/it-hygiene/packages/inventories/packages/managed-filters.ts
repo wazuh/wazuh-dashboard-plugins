@@ -6,7 +6,7 @@ export default [
     key: 'package.vendor',
     placeholder: i18n.translate(
       'wazuh.itHygiene.packagesFilters.vendor.placeholder',
-      { defaultMessage: 'Vendor' },
+      { defaultMessage: 'Vendor or maintainer' },
     ),
   },
   {
