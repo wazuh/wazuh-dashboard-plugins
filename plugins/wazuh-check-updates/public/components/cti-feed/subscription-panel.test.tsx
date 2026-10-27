@@ -88,9 +88,7 @@ describe('SubscriptionPanel', () => {
     expect(screen.getByTestId('ctiFeedSubscriptionStatus')).toHaveTextContent(
       'Registered',
     );
-    expect(screen.getByTestId('ctiFeedSubscriptionAction')).toHaveTextContent(
-      'View registration',
-    );
+    expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
     expect(screen.queryByTestId('ctiFeedSubscriptionTiers')).toBeNull();
   });
 

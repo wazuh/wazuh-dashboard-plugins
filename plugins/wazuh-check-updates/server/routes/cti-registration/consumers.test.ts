@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- consumer fields keep the index's snake_case names */
 import { Router } from '../../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
@@ -108,6 +109,128 @@ describe(`GET ${routes.ctiConsumers}`, () => {
     expect(mockSearch).toHaveBeenCalledWith(
       expect.objectContaining({ index: '.wazuh-cti-consumers' }),
     );
+  });
+
+  test('passes the last update time through, and drops an unusable one', async () => {
+    const source = {
+      name: 'consumer-1',
+      context: 'ctx-1',
+      type: 'type-1',
+      resource: '',
+      is_public: true,
+      status: 'ready',
+      local_offset: 12,
+      remote_offset: 12,
+    };
+    mockSearch.mockResolvedValue({
+      body: {
+        hits: {
+          hits: [
+            {
+              _source: { ...source, updated_at: '2026-05-21T12:26:16.581939Z' },
+            },
+            { _source: { ...source, name: 'consumer-2', updated_at: 42 } },
+          ],
+        },
+      },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiConsumers)
+      .expect(200);
+
+    expect(response.body.data[0].updated_at).toBe(
+      '2026-05-21T12:26:16.581939Z',
+    );
+    expect(response.body.data[1]).not.toHaveProperty('updated_at');
+  });
+
+  test('reads the last check time from the global document, not as a feed', async () => {
+    mockSearch.mockResolvedValue({
+      body: {
+        hits: {
+          hits: [
+            {
+              _id: 'cti:catalog:global',
+              _source: { last_checked_at: '2026-05-21T12:26:16.581939Z' },
+            },
+            {
+              _id: 'cti:catalog:consumer:ruleset',
+              _source: {
+                name: 'public-ruleset-5',
+                context: 'rc2-t1-ruleset-5',
+                type: 'cti:catalog:consumer:ruleset',
+                resource: '',
+                is_public: true,
+                status: 'ready',
+                local_offset: 1056,
+                remote_offset: 1056,
+                pending_sync_phases: [],
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiConsumers)
+      .expect(200);
+
+    expect(response.body.last_checked_at).toBe('2026-05-21T12:26:16.581939Z');
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.data[0].name).toBe('public-ruleset-5');
+  });
+
+  test('passes the pending sync phases through, keeping only names', async () => {
+    const source = {
+      name: 'consumer-1',
+      context: 'ctx-1',
+      type: 'type-1',
+      resource: '',
+      is_public: true,
+      status: 'ready',
+      local_offset: 12,
+      remote_offset: 12,
+    };
+    mockSearch.mockResolvedValue({
+      body: {
+        hits: {
+          hits: [
+            { _source: { ...source, pending_sync_phases: ['rules', 7, ''] } },
+            { _source: { ...source, name: 'c-2', pending_sync_phases: [] } },
+            { _source: { ...source, name: 'c-3', pending_sync_phases: 'x' } },
+            { _source: { ...source, name: 'c-4' } },
+          ],
+        },
+      },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiConsumers)
+      .expect(200);
+
+    const phases = response.body.data.map(
+      (consumer: { pending_sync_phases?: string[] }) =>
+        consumer.pending_sync_phases,
+    );
+    expect(phases).toEqual([['rules'], [], undefined, undefined]);
+  });
+
+  test('leaves the last check time out when the indexer does not report it', async () => {
+    mockSearch.mockResolvedValue({
+      body: {
+        hits: {
+          hits: [{ _id: 'cti:catalog:global', _source: {} }],
+        },
+      },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiConsumers)
+      .expect(200);
+
+    expect(response.body).toEqual({ data: [] });
   });
 
   test('returns an empty list when the index has zero documents', async () => {

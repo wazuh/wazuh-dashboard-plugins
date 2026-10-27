@@ -95,9 +95,7 @@ describe('EndpointSecuritySection', () => {
       screen.getByText('CIS Ubuntu Linux 24.04 LTS v1.0.0'),
     ).toBeInTheDocument();
     expect(screen.getAllByText('/etc/passwd').length).toBeGreaterThan(0);
-    expect(
-      screen.getByText('File integrity baselined fleet-wide'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Monitored files fleet-wide')).toBeInTheDocument();
     expect(screen.getByText('IOC matches')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });

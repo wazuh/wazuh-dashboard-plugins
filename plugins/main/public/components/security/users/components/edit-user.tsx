@@ -16,6 +16,7 @@ import {
   EuiPanel,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { getAllowRunAsHelpText } from './allow-run-as-help-text';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -320,13 +321,7 @@ export const EditUser = ({ currentUser, closeFlyout, rolesObject }) => {
                   })}
                 </h2>
               </EuiTitle>
-              <EuiFormRow
-                label=''
-                helpText={i18n.translate(
-                  'wazuh.security.editUser.allowRunAsHelpText',
-                  { defaultMessage: 'Set if the user is able to use run as' },
-                )}
-              >
+              <EuiFormRow label='' helpText={getAllowRunAsHelpText()}>
                 <WzButtonPermissions
                   buttonType='switch'
                   label={i18n.translate(

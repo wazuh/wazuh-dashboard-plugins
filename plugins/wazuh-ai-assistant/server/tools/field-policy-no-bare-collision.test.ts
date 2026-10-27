@@ -3,7 +3,7 @@ import { FIELD_POLICY_DEFAULTS } from './privacy';
 
 /**
  * P-1 regression: pins the CHECKABLE claim privacy.ts's
- * `FIELD_POLICY_DEFAULTS` header comment relies on for its 19 bare-name CTI/content-manager/
+ * `FIELD_POLICY_DEFAULTS` header comment relies on for its 22 bare-name CTI/content-manager/
  * Security-Analytics entries -- not "no WCS schema ever exposes a personal field bare at root"
  * (live-verified FALSE: `message`, `related`, `url` are all bare root leaves on
  * `.ds-wazuh-events-v5-security-000001`), but the narrower claim that actually holds and that this
