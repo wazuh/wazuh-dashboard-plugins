@@ -10,22 +10,34 @@ describe('getDockerListener', () => {
     expect(getDockerListener(null)).toEqual({ status: 'not-reported' });
   });
 
-  it('is not configured when the report has no Docker section', () => {
-    expect(getDockerListener(report({ fim: {} }))).toEqual({
-      status: 'not-configured',
-    });
+  it.each([[{ fim: {} }], [{ docker: { disabled: 'no' } }]])(
+    'is not configured without a docker-listener section',
+    content => {
+      expect(getDockerListener(report(content))).toEqual({
+        status: 'not-configured',
+      });
+    },
+  );
+
+  it('is enabled when the docker-listener section is not disabled', () => {
+    expect(
+      getDockerListener(
+        report({
+          'docker-listener': {
+            disabled: 'no',
+            interval: 60,
+            // eslint-disable-next-line camelcase -- field name as the agent reports it
+            run_on_start: 'yes',
+            attempts: 5,
+          },
+        }),
+      ),
+    ).toEqual({ status: 'enabled' });
   });
 
-  it('is enabled when the Docker section is not disabled', () => {
-    expect(getDockerListener(report({ docker: { disabled: 'no' } }))).toEqual({
-      status: 'enabled',
-    });
-  });
-
-  it.each([
-    [{ 'docker-listener': { disabled: 'yes' } }],
-    [{ docker: { 'docker-listener': { disabled: 'yes' } } }],
-  ])('is disabled when the listener is turned off', content => {
-    expect(getDockerListener(report(content))).toEqual({ status: 'disabled' });
+  it('is disabled when the docker-listener section is turned off', () => {
+    expect(
+      getDockerListener(report({ 'docker-listener': { disabled: 'yes' } })),
+    ).toEqual({ status: 'disabled' });
   });
 });

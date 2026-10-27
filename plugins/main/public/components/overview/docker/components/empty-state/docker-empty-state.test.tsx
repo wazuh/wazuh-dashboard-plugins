@@ -77,8 +77,8 @@ describe('DockerEmptyStateView', () => {
 
   it('says that the listener of the pinned agent is disabled and unpins it', async () => {
     getReport.mockResolvedValue({
-      content: { docker: { disabled: 'yes' } },
-      modules: ['docker'],
+      content: { 'docker-listener': { disabled: 'yes' } },
+      modules: ['docker-listener'],
     });
     renderView('never-received', '001');
 

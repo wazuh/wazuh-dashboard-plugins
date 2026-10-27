@@ -13,23 +13,13 @@ export type DockerListener =
   | { status: 'not-reported' }
   | { status: 'error' };
 
-const isDisabled = (section: unknown): boolean => {
-  if (!section || typeof section !== 'object') {
-    return false;
-  }
-  const { disabled, ...rest } = section as Record<string, unknown>;
-  return (
-    disabled === 'yes' ||
-    Object.values(rest).some(
-      value => isDisabled(value) && !Array.isArray(value),
-    )
-  );
-};
+/** Key of the Docker listener in the module-keyed configuration an agent reports. */
+const DOCKER_LISTENER_MODULE = 'docker-listener';
 
 /**
  * Reads the Docker listener out of the configuration an agent reported. The report is keyed by
- * module, so the Docker section is the one whose key names it. A report without that section
- * means the agent has no listener configured.
+ * module, so the `docker-listener` section tells whether it is turned off. A report without that
+ * section means the agent has no listener configured.
  */
 export const getDockerListener = (
   report: AgentReportedConfiguration | null,
@@ -37,13 +27,13 @@ export const getDockerListener = (
   if (!report) {
     return { status: 'not-reported' };
   }
-  const key = Object.keys(report.content ?? {}).find(name =>
-    name.toLowerCase().includes('docker'),
-  );
-  if (!key) {
+  const section = report.content?.[DOCKER_LISTENER_MODULE] as
+    | { disabled?: string }
+    | undefined;
+  if (!section) {
     return { status: 'not-configured' };
   }
-  return isDisabled(report.content[key])
+  return section.disabled === 'yes'
     ? { status: 'disabled' }
     : { status: 'enabled' };
 };
