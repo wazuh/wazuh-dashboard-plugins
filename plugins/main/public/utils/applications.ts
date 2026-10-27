@@ -8,6 +8,8 @@ import {
   LogoOffice365,
 } from '../components/common/logos';
 import { getWzCurrentAppID } from '../kibana-services';
+import { webDocumentationLink } from '../../common/services/web_documentation';
+import { FIM_DOCS_PATH } from '../components/overview/fim/fim-documentation';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -132,9 +134,10 @@ export const fileIntegrityMonitoring = {
   ),
   description: i18n.translate('wazuh.fileIntegrityMonitoring.app.description', {
     defaultMessage:
-      'Alerts related to file changes, including permissions, content, ownership, and attributes.',
+      'Detects when monitored files and registry entries are created, modified or deleted, and who changed them when who-data is enabled.',
   }),
   euiIconType: 'sqlApp',
+  docsUrl: webDocumentationLink(FIM_DOCS_PATH),
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
@@ -262,6 +265,9 @@ export const ITHygiene = {
     defaultMessage:
       'Assess system, software, processes, and network layers to detect misconfigurations, unauthorized changes, and anomalies.',
   }),
+  docsUrl: webDocumentationLink(
+    'user-manual/capabilities/system-inventory/index.html',
+  ),
   euiIconType: 'indexPatternApp',
   order: 400,
   showInOverviewApp: true,
@@ -699,13 +705,13 @@ export const security = {
   category: 'wz-category-server-management',
   id: 'security',
   title: i18n.translate('wazuh.security.app.title', {
-    defaultMessage: 'Wazuh API access',
+    defaultMessage: 'API access control',
   }),
   tabTitle: i18n.translate('wazuh.security.app.tabTitle', {
-    defaultMessage: 'Wazuh API access',
+    defaultMessage: 'API access control',
   }),
   breadcrumbLabel: i18n.translate('wazuh.security.app.breadcrumbLabel', {
-    defaultMessage: 'Wazuh API access',
+    defaultMessage: 'API access control',
   }),
   description: i18n.translate('wazuh.security.app.description', {
     defaultMessage:
