@@ -1,3 +1,5 @@
+import React from 'react';
+import { EuiToolTip } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { SearchParams, search } from '../search-bar/search-bar-service';
@@ -11,7 +13,6 @@ import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
-import { formatUIDate } from '../../../react-services';
 import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
 
 type ParseData<T> =
@@ -130,15 +131,15 @@ export const exportSearchToCSV = async (
   }
 
   const resultsFields = fields;
+  const dateFields = indexPattern.fields.getByType('date');
   const data = allHits.map(hit => {
-    // check if the field type is a date
-    const dateFields = indexPattern.fields.getByType('date');
-    const dateFieldsNames = dateFields.map(field => field.name);
     const flattenHit = indexPattern.flattenHit(hit);
-    // replace the date fields with the formatted date
-    dateFieldsNames.forEach(field => {
-      if (flattenHit[field]) {
-        flattenHit[field] = formatUIDate(flattenHit[field]);
+    // The field formatter keeps the nanoseconds of date_nanos fields
+    dateFields.forEach(field => {
+      if (flattenHit[field.name]) {
+        flattenHit[field.name] = indexPattern
+          .getFormatterForField(field)
+          .convert(flattenHit[field.name]);
       }
     });
     return flattenHit;
@@ -183,6 +184,17 @@ const mapToDataGridColumn = (
     ...field,
     id: field.name,
     name: field.name,
+    display: React.createElement(
+      EuiToolTip,
+      // A block anchor that truncates itself: the default inline-block anchor
+      // cannot be shortened with an ellipsis by the header cell.
+      {
+        content: field.name,
+        display: 'inlineBlock',
+        anchorClassName: 'oui-textTruncate wz-display-inline',
+      },
+      React.createElement('span', null, field.name),
+    ),
     schema: field.type,
     actions: { showHide: true },
     // Non-aggregatable fields (e.g. ECS match_only_text) have no doc_values

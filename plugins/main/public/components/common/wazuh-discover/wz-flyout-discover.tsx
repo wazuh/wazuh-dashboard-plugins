@@ -97,6 +97,32 @@ const GetExpandedRow = withErrorBoundary(
   },
 );
 
+export const toTableColumns = (
+  columns: tDataGridColumn[],
+  indexPattern?: IndexPattern,
+): EuiBasicTableProps<Record<string, unknown>>['columns'] =>
+  columns.map(column => {
+    const field = indexPattern?.fields?.getByName?.(column.id);
+    // The field formatter keeps the nanoseconds of date_nanos fields
+    const renderValue =
+      field?.type === 'date'
+        ? value =>
+            value
+              ? indexPattern.getFormatterForField(field).convert(value)
+              : value
+        : value => value;
+    return {
+      field: column.id,
+      name: column.displayAsText,
+      sortable: true,
+      truncateText: true,
+      width: column.width ? `${column.width}px` : undefined,
+      render: column.render
+        ? (value, record) => column?.render?.(value, record)
+        : renderValue,
+    };
+  });
+
 const WazuhFlyoutDiscoverComponentRender = compose(
   withDataSourceLoading({
     isLoadingNameProp: 'isDataSourceLoading',
@@ -367,22 +393,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     setSorting({ sort: { field, direction: direction as Direction } });
   };
 
-  const getColumns = (): EuiBasicTableProps<any>['columns'] => {
-    const defaultCols = defaultTableColumns.map(column => {
-      return {
-        field: column.id,
-        name: column.displayAsText,
-        sortable: true,
-        truncateText: true,
-        width: column.width ? `${column.width}px` : undefined,
-        render: column.render
-          ? (value, record) => column?.render?.(value, record)
-          : (value, record) => value,
-      };
-    });
-
-    return defaultCols;
-  };
+  const getColumns = (): EuiBasicTableProps<any>['columns'] =>
+    toTableColumns(defaultTableColumns, indexPattern);
 
   const parsedItems = useMemo(() => {
     return (

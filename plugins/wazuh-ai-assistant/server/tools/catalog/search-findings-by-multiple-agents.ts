@@ -19,6 +19,7 @@ import {
   STANDARD_FINDING_TABLE_COLUMN_FIELDS,
   STANDARD_FINDING_TABLE_COLUMNS,
   timeRangeProperties,
+  timestampDescSort,
 } from './common';
 
 /**
@@ -91,7 +92,7 @@ export const searchFindingsByMultipleAgentsTool: ToolDefinition = {
       index: 'wazuh-findings-v5*',
       body: {
         query: { bool: { filter } },
-        sort: [{ '@timestamp': { order: 'desc' } }],
+        sort: timestampDescSort(),
         size: limit,
         aggs: FINDING_BREAKDOWN_AGGS,
       },
