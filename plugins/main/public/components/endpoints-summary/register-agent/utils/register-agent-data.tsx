@@ -77,7 +77,7 @@ export const ENROLLMENT_TOKEN_TEXTS = [
       'wazuh.endpointsSummary.enrollmentTokenStep.subtitle',
       {
         defaultMessage:
-          'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, open the advanced options to set those values yourself, or reuse a token kept from an earlier deployment.',
+          'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the default 1 day lifetime, open the advanced options to set the lifetime and the number of enrollments yourself, or reuse a token kept from an earlier deployment.',
       },
     ),
   },
