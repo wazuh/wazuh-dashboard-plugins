@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
 import {
+  EuiBasicTableColumn,
   EuiButton,
   EuiCallOut,
   EuiCode,
@@ -7,6 +8,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiFormRow,
+  EuiInMemoryTable,
   EuiLink,
   EuiSwitch,
   EuiTab,
@@ -58,6 +60,42 @@ const TOKEN_REQUEST_FIELDS = [
 /* How many of the newest tokens are looked at when searching for unused ones
 left over from earlier mints. */
 const UNUSED_TOKENS_LOOKUP_LIMIT = 100;
+
+const UNUSED_TOKENS_PAGE_SIZE = 5;
+
+const columnName = (id: string, defaultMessage: string) =>
+  i18n.translate(
+    `wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModal.columns.${id}`,
+    { defaultMessage },
+  );
+
+/* What the operator needs to tell the tokens apart before revoking them. */
+const UNUSED_TOKEN_COLUMNS: EuiBasicTableColumn<EnrollmentTokenSummary>[] = [
+  {
+    field: 'id',
+    name: columnName('id', 'ID'),
+    sortable: true,
+    render: (id: string) => <EuiCode>{id}</EuiCode>,
+  },
+  {
+    field: 'description',
+    name: columnName('description', 'Description'),
+    sortable: true,
+    render: (description?: string | null) => description || '-',
+  },
+  {
+    field: 'created',
+    name: columnName('created', 'Created'),
+    sortable: true,
+    render: (created?: string) => formatUIDate(created),
+  },
+  {
+    field: 'expires',
+    name: columnName('expires', 'Expires'),
+    sortable: true,
+    render: (expires?: string) => formatUIDate(expires),
+  },
+];
 
 type TokenSource = 'generate' | 'existing';
 
@@ -842,28 +880,20 @@ const EnrollmentTokenInput = ({
                                 },
                               )}
                             </p>
-                            <ul>
-                              {unusedTokens.map(token => (
-                                <li key={token.id}>
-                                  <EuiCode>{token.id}</EuiCode>
-                                  {token.description
-                                    ? ` ${token.description}`
-                                    : ''}
-                                  {' — '}
-                                  {i18n.translate(
-                                    'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModalDates',
-                                    {
-                                      defaultMessage:
-                                        'created {created}, expires {expires}',
-                                      values: {
-                                        created: formatUIDate(token.created),
-                                        expires: formatUIDate(token.expires),
-                                      },
-                                    },
-                                  )}
-                                </li>
-                              ))}
-                            </ul>
+                            <EuiSpacer size='s' />
+                            <EuiInMemoryTable
+                              items={unusedTokens}
+                              columns={UNUSED_TOKEN_COLUMNS}
+                              itemId='id'
+                              sorting={{
+                                sort: { field: 'created', direction: 'desc' },
+                              }}
+                              pagination={
+                                unusedTokens.length > UNUSED_TOKENS_PAGE_SIZE
+                                  ? { pageSize: UNUSED_TOKENS_PAGE_SIZE }
+                                  : false
+                              }
+                            />
                           </EuiText>
                         ),
                       }}

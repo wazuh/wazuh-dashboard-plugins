@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import EnrollmentTokenInput from './enrollment-token';
 import {
@@ -610,6 +616,12 @@ describe('EnrollmentTokenInput unused tokens', () => {
     fireEvent.click(generateButton());
     await screen.findByText(/1 earlier token is still active and unused/);
     const body = screen.getByTestId('revoke-modal-body');
+    ['ID', 'Description', 'Created', 'Expires'].forEach(header =>
+      expect(
+        within(body).getByRole('columnheader', { name: header }),
+      ).toBeInTheDocument(),
+    );
+    expect(within(body).getByRole('table')).toBeInTheDocument();
     expect(body).toHaveTextContent('id-old');
     expect(body).toHaveTextContent('staged rollout');
     expect(
