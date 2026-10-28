@@ -4,14 +4,10 @@ describe('itHygieneFindingsColumns', () => {
   it('lists when, where and what changed', () => {
     expect(itHygieneFindingsColumns.map(({ id }) => id)).toEqual([
       '@timestamp',
-      'wazuh.agent.id',
       'wazuh.agent.name',
       'wazuh.rule.title',
+      'wazuh.rule.level',
       'event.action',
-      'package.name',
-      'user.target.name',
-      'group.name',
-      'service.name',
     ]);
   });
 
