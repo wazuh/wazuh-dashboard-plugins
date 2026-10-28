@@ -8,6 +8,7 @@ export const itHygieneFindingsColumns: tDataGridColumn[] = [
   { id: 'wazuh.rule.title' },
   { id: 'event.action' },
   { id: 'package.name' },
-  { id: 'user.name' },
+  { id: 'user.target.name' },
+  { id: 'group.name' },
   { id: 'service.name' },
 ];

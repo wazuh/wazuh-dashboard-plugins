@@ -9,7 +9,8 @@ describe('itHygieneFindingsColumns', () => {
       'wazuh.rule.title',
       'event.action',
       'package.name',
-      'user.name',
+      'user.target.name',
+      'group.name',
       'service.name',
     ]);
   });
