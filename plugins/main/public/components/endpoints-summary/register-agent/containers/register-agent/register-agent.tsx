@@ -162,8 +162,8 @@ export const RegisterAgent = compose(
       validate: validateExistingEnrollmentToken,
     },
     /* These three parameterize the token the server mints, not the agent
-    install, and all are optional: left empty the server applies its own
-    defaults, a 30 day lifetime and unlimited enrollments. */
+    install, and all are optional: left empty the wizard asks for a 1 day
+    lifetime and the server allows unlimited enrollments. */
     enrollmentTokenTtl: {
       type: 'text',
       initialValue: '',

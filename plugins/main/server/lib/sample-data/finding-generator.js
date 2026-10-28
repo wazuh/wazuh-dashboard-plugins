@@ -27,7 +27,7 @@ function generateFinding(params = {}, targetDir) {
       ? index % docs.length
       : Math.floor(Math.random() * docs.length);
   const doc = JSON.parse(JSON.stringify(docs[baseIdx]));
-  const iso = random.date(DAYS);
+  const iso = random.dateNanos(DAYS);
   doc['@timestamp'] = iso;
   if (doc.event && typeof doc.event === 'object') {
     for (const key of EVENT_TIMESTAMPS) {
