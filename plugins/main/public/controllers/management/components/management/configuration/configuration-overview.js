@@ -374,6 +374,7 @@ class WzConfigurationOverview extends Component {
             list={list}
             items={this.state.searchData?.values?.[list.id]}
             query={query}
+            agent={this.props.agent}
           />
         ))}
         <EuiSpacer size='m' />
