@@ -19,6 +19,7 @@ import { updateGroupDetail } from '../../../../../redux/actions/groupsActions';
 import {
   updateShowAddAgents,
   resetGroup,
+  cleanFileContent,
 } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -35,7 +36,7 @@ import { endpointGroups } from '../../../../../utils/applications';
 import { ManageAgents } from '../../../../../components/management/groups/manage-agents';
 import NavigationService from '../../../../../react-services/navigation-service';
 
-class WzGroups extends Component {
+export class WzGroups extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -77,9 +78,13 @@ class WzGroups extends Component {
 
   async componentDidUpdate(prevProps) {
     if (this.props.search?.group !== prevProps.search?.group) {
-      this.props.search?.group === undefined
-        ? this.props.updateGroupDetail(false)
-        : await this.getGroupDetail();
+      if (this.props.search?.group === undefined) {
+        // Leaving the group also closes the file editor opened from it
+        this.props.cleanFileContent();
+        this.props.updateGroupDetail(false);
+      } else {
+        await this.getGroupDetail();
+      }
     }
   }
 
@@ -118,6 +123,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     resetGroup: () => dispatch(resetGroup()),
+    cleanFileContent: () => dispatch(cleanFileContent()),
     updateShowAddAgents: showAddAgents =>
       dispatch(updateShowAddAgents(showAddAgents)),
     updateGroupDetail: groupDetail => dispatch(updateGroupDetail(groupDetail)),

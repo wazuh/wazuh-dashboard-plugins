@@ -13,7 +13,7 @@
  */
 import React from 'react';
 import { shallow } from 'enzyme';
-import WzGroups from './groups-main';
+import WzGroups, { WzGroups as WzGroupsClass } from './groups-main';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 
@@ -53,5 +53,37 @@ describe('Group main component', () => {
     );
 
     expect(wrapper).toMatchSnapshot();
+  });
+});
+
+describe('Group main component navigation', () => {
+  const buildInstance = (search: { group?: string }) => {
+    const props = {
+      search,
+      state: {},
+      cleanFileContent: jest.fn(),
+      updateGroupDetail: jest.fn(),
+    };
+    const instance = new WzGroupsClass(props);
+    instance.getGroupDetail = jest.fn();
+    return { instance, props };
+  };
+
+  it('closes the file editor and the group detail when the group is removed from the URL', async () => {
+    const { instance, props } = buildInstance({});
+
+    await instance.componentDidUpdate({ search: { group: 'default' } });
+
+    expect(props.cleanFileContent).toHaveBeenCalledTimes(1);
+    expect(props.updateGroupDetail).toHaveBeenCalledWith(false);
+  });
+
+  it('keeps the file editor when the group does not change', async () => {
+    const { instance, props } = buildInstance({ group: 'default' });
+
+    await instance.componentDidUpdate({ search: { group: 'default' } });
+
+    expect(props.cleanFileContent).not.toHaveBeenCalled();
+    expect(instance.getGroupDetail).not.toHaveBeenCalled();
   });
 });
