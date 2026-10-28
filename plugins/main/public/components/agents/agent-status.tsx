@@ -42,8 +42,7 @@ export const AgentStatus = ({
       <ColumnWithStatusIcon
         text={children || label.toLowerCase()}
         color={agentStatusColorByAgentStatus(status)}
-        tooltip={description ?? label.toLowerCase()}
-        tooltipTitle={description ? label : undefined}
+        tooltip={label.toLowerCase()}
       />
       <EuiIconTip
         anchorClassName='wz-agent-icon-tip'
