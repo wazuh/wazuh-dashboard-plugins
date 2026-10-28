@@ -1037,6 +1037,32 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoOpenCreateForm]);
 
+  // Defined before `handleSubmit`, which also calls it once a first provider passes its test.
+  const handleSetDefault = async (provider: ProviderSummary) => {
+    setError(null);
+    try {
+      await service.setDefault(provider.id);
+      reload();
+      onProvidersChanged();
+      notifyProvidersChanged();
+      core.notifications.toasts.addSuccess(
+        i18n.translate('wazuhAiAssistant.settings.setDefaultSuccess', {
+          defaultMessage: '"{name}" is now the default provider.',
+          values: { name: provider.name },
+        }),
+      );
+    } catch (setDefaultError) {
+      setError(
+        describeHttpError(
+          setDefaultError,
+          i18n.translate('wazuhAiAssistant.settings.setDefaultError', {
+            defaultMessage: 'Could not set the default provider.',
+          }),
+        ),
+      );
+    }
+  };
+
   // Still no per-provider privacy toggle in THIS form, deliberately (UX iteration 4 item 3 added
   // the toggle itself, but not here). `AssistantSettings.privacyDefaultPerProvider` is keyed by
   // provider id and lives in a SEPARATE document from `ProviderInput`/`ProviderSummary`
@@ -1050,31 +1076,62 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     setError(null);
     setIsSubmittingProvider(true);
     try {
+      // A new provider is created off default, even the first one: it is promoted below only once
+      // its connection test passes, so a broken provider never becomes the chat's default.
       const saved = editingProvider
         ? await service.update(editingProvider.id, input)
-        : await service.create(input);
+        : await service.create({ ...input, isDefault: false });
       // From here on, a retry (after a failed test) must UPDATE this same provider rather than
       // create a duplicate — the save itself already succeeded, only the test result is pending.
       setEditingProvider(saved);
       reload();
       onProvidersChanged();
       notifyProvidersChanged();
-      core.notifications.toasts.addSuccess(
-        editingProvider
-          ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
-              defaultMessage: 'Provider "{name}" updated.',
-              values: { name: saved.name },
-            })
-          : i18n.translate('wazuhAiAssistant.settings.createSuccess', {
-              defaultMessage: 'Provider "{name}" added.',
-              values: { name: saved.name },
-            }),
-      );
+      // The toast waits for the test: a success toast fired before it read as "all good" while the
+      // failure was still on its way, and then covered the flyout's result panel.
       const outcome = await handleTest(saved);
       if (outcome.status === 'ok') {
+        core.notifications.toasts.addSuccess(
+          editingProvider
+            ? i18n.translate('wazuhAiAssistant.settings.updateSuccess', {
+                defaultMessage: 'Provider "{name}" updated.',
+                values: { name: saved.name },
+              })
+            : i18n.translate('wazuhAiAssistant.settings.createSuccess', {
+                defaultMessage: 'Provider "{name}" added.',
+                values: { name: saved.name },
+              }),
+        );
         // A passing test needs no further confirmation from the admin — close the flyout.
         closeForm();
+        // Covers the first provider, and a retry that passes after a failed first test. Runs after
+        // `closeForm` (which clears `error`), so a set-default failure stays on the page.
+        if (
+          !saved.isDefault &&
+          !providers.some(provider => provider.isDefault)
+        ) {
+          await handleSetDefault(saved);
+        }
       } else {
+        core.notifications.toasts.addWarning(
+          editingProvider
+            ? i18n.translate(
+                'wazuhAiAssistant.settings.updateSavedTestFailed',
+                {
+                  defaultMessage:
+                    'Provider "{name}" was updated, but its connection test did not pass.',
+                  values: { name: saved.name },
+                },
+              )
+            : i18n.translate(
+                'wazuhAiAssistant.settings.createSavedTestFailed',
+                {
+                  defaultMessage:
+                    'Provider "{name}" was added, but its connection test did not pass.',
+                  values: { name: saved.name },
+                },
+              ),
+        );
         // Keep the flyout open with the result panel so the admin can fix the config and retry.
         setFlyoutTestOutcome(outcome);
       }
@@ -1167,31 +1224,6 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     reload();
     onProvidersChanged();
     notifyProvidersChanged();
-  };
-
-  const handleSetDefault = async (provider: ProviderSummary) => {
-    setError(null);
-    try {
-      await service.setDefault(provider.id);
-      reload();
-      onProvidersChanged();
-      notifyProvidersChanged();
-      core.notifications.toasts.addSuccess(
-        i18n.translate('wazuhAiAssistant.settings.setDefaultSuccess', {
-          defaultMessage: '"{name}" is now the default provider.',
-          values: { name: provider.name },
-        }),
-      );
-    } catch (setDefaultError) {
-      setError(
-        describeHttpError(
-          setDefaultError,
-          i18n.translate('wazuhAiAssistant.settings.setDefaultError', {
-            defaultMessage: 'Could not set the default provider.',
-          }),
-        ),
-      );
-    }
   };
 
   // Row action wrapper: kept as its own named function so call sites (row "Test" action, the

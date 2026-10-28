@@ -326,6 +326,17 @@ export const isCtiFeedRegistered = (
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
 export const getDecodersUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.decoders);
+
+/**
+ * Whether the Decoders / Rules apps are registered. They are not when the Ruleset management
+ * plugin is missing or disabled, and their URLs then open "Application Not Found".
+ */
+export const isDecodersRegistered = (
+  applications: ReadonlyMap<string, unknown>,
+): boolean => applications.has(SECURITY_ANALYTICS_APP_IDS.decoders);
+export const isRulesRegistered = (
+  applications: ReadonlyMap<string, unknown>,
+): boolean => applications.has(SECURITY_ANALYTICS_APP_IDS.rules);
 export const getIntegrationsUrl = () =>
   getUrlForApp(SECURITY_ANALYTICS_APP_IDS.integrations);
 export const getDetectorsUrl = () =>

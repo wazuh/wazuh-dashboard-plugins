@@ -322,8 +322,10 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
     }, logger),
   );
 
-  // Create a provider. The first provider ever created automatically becomes the default;
-  // any later provider explicitly created with isDefault=true takes over as the sole default.
+  // Create a provider. When isDefault is omitted, the first provider ever created becomes the
+  // default; an explicit isDefault=false keeps it off (the settings page sends that and promotes
+  // the provider only after its connection test passes). Any provider explicitly created with
+  // isDefault=true takes over as the sole default.
   router.post(
     {
       path: API_PATHS.PROVIDERS,
@@ -377,7 +379,7 @@ export function registerSettingsRoutes(router: IRouter, logger: Logger): void {
       }
       const isFirstProvider =
         (await context.wazuh_ai_assistant.aiProviders.count(context)) === 0;
-      const isDefault = isFirstProvider || Boolean(request.body.isDefault);
+      const isDefault = request.body.isDefault ?? isFirstProvider;
       // THE CREATE-BEFORE-ID PROBLEM (AAD binding, server/crypto/api-key-cipher.ts): `enc:v1:`
       // binds the ciphertext to the id `PUT .../providers/{id}` is called with, but there is no
       // id to bind against until AFTER a create call that lets the server mint one (`POST
