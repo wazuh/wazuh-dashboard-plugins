@@ -1,6 +1,7 @@
 import {
   UI_COLOR_AGENT_STATUS,
   UI_LABEL_NAME_AGENT_STATUS,
+  UI_DESCRIPTION_AGENT_STATUS,
   API_NAME_AGENT_STATUS,
 } from '../constants';
 
@@ -24,4 +25,10 @@ export function agentStatusLabelByAgentStatus(
   return (
     UI_LABEL_NAME_AGENT_STATUS[status] || UI_LABEL_NAME_AGENT_STATUS.default
   );
+}
+
+export function agentStatusDescriptionByAgentStatus(
+  status: TAgentStatus,
+): string | undefined {
+  return UI_DESCRIPTION_AGENT_STATUS[status];
 }
