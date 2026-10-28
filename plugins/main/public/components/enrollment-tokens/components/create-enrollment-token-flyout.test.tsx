@@ -2,13 +2,17 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import { CreateEnrollmentTokenFlyout } from './create-enrollment-token-flyout';
-import { createEnrollmentToken } from '../../../services/enrollment-tokens';
+import {
+  createEnrollmentToken,
+  getListenerCertificateNames,
+} from '../../../services/enrollment-tokens';
 
 type AppConfigState = { appConfig: { data: Record<string, string> } };
 
 /* The plugin settings the flyout reads its defaults from. Reset before each
 test so only the tests that set them see prefilled fields. */
 let mockAppConfig: Record<string, string> = {};
+let mockAddressError: (value: string) => string | undefined = () => undefined;
 
 jest.mock('react-redux', () => ({
   useSelector: (selector: (state: AppConfigState) => unknown) =>
@@ -18,7 +22,7 @@ jest.mock('react-redux', () => ({
 jest.mock('../../../kibana-services', () => ({
   getWazuhCorePlugin: () => ({
     SettingsValidator: {
-      serverEndpointAddress: () => undefined,
+      serverEndpointAddress: (value: string) => mockAddressError(value),
       serverEndpointPort: () => undefined,
       serverEndpointPathPrefix: () => undefined,
     },
@@ -32,12 +36,14 @@ jest.mock('../../../react-services/time-service', () => ({
 jest.mock('../../../services/enrollment-tokens', () => ({
   ...jest.requireActual('../../../services/enrollment-tokens/constants'),
   createEnrollmentToken: jest.fn(),
+  getListenerCertificateNames: jest.fn(),
   validateEnrollmentTokenDescription: () => undefined,
   validateEnrollmentTokenTtl: () => undefined,
   validateEnrollmentTokenMaxUses: () => undefined,
 }));
 
 const createToken = createEnrollmentToken as jest.Mock;
+const getNames = getListenerCertificateNames as jest.Mock;
 
 const renderFlyout = (onClose: jest.Mock = jest.fn()) => {
   render(<CreateEnrollmentTokenFlyout onClose={onClose} />);
@@ -54,10 +60,22 @@ const closeFlyout = () =>
 const cancel = () =>
   fireEvent.click(screen.getByText('Cancel').closest('button') as HTMLElement);
 
-const fillAddress = () =>
-  fireEvent.change(screen.getByPlaceholderText('wazuh-manager.example.com'), {
-    target: { value: 'manager.example.com' },
-  });
+const addressInput = () =>
+  document.querySelector(
+    '[data-test-subj="enrollmentTokenAddress"] input',
+  ) as HTMLElement;
+
+const addressValue = () =>
+  document.querySelector(
+    '[data-test-subj="enrollmentTokenAddress"] .euiComboBoxPill',
+  )?.textContent ?? '';
+
+const typeAddress = (address: string) => {
+  fireEvent.change(addressInput(), { target: { value: address } });
+  fireEvent.keyDown(addressInput(), { key: 'Enter' });
+};
+
+const fillAddress = () => typeAddress('manager.example.com');
 
 const confirmationIsOpen = () =>
   screen.queryByText('Unsubmitted changes') !== null;
@@ -84,7 +102,10 @@ const mint = async () => {
 
 beforeEach(() => {
   mockAppConfig = {};
+  mockAddressError = () => undefined;
   createToken.mockReset();
+  getNames.mockReset();
+  getNames.mockResolvedValue([]);
   createToken.mockResolvedValue({
     token: 'abc',
     id: 'id-1',
@@ -165,9 +186,7 @@ describe('CreateEnrollmentTokenFlyout', () => {
       };
       renderFlyout();
 
-      expect(
-        screen.getByPlaceholderText('wazuh-manager.example.com'),
-      ).toHaveValue('manager.example.com');
+      expect(addressValue()).toBe('manager.example.com');
       expect(portInput()).toHaveValue('443');
       expect(prefixInput()).toHaveValue('/wazuh-manager/');
 
@@ -206,6 +225,89 @@ describe('CreateEnrollmentTokenFlyout', () => {
       closeFlyout();
       expect(confirmationIsOpen()).toBe(false);
       expect(onClose).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('address suggestions', () => {
+    const createButton = () =>
+      screen.getByText('Create').closest('button') as HTMLElement;
+
+    it('suggests the names in the listener certificates', async () => {
+      getNames.mockResolvedValue(['manager.example.com', '10.0.0.5']);
+      renderFlyout();
+
+      fireEvent.focus(addressInput());
+
+      expect(
+        await screen.findByText('manager.example.com'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('10.0.0.5')).toBeInTheDocument();
+    });
+
+    it('mints with the suggestion the user picks', async () => {
+      getNames.mockResolvedValue(['manager.example.com', '10.0.0.5']);
+      renderFlyout();
+
+      fireEvent.focus(addressInput());
+      fireEvent.click(await screen.findByText('10.0.0.5'));
+      fireEvent.click(createButton());
+
+      await waitFor(() => expect(createToken).toHaveBeenCalled());
+      expect(createToken.mock.calls[0][0]).toEqual(
+        expect.objectContaining({ address: '10.0.0.5' }),
+      );
+    });
+
+    it('accepts a typed address that is not suggested', async () => {
+      getNames.mockResolvedValue(['manager.example.com']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      typeAddress('other.example.com');
+      expect(addressValue()).toBe('other.example.com');
+
+      fireEvent.click(createButton());
+      await waitFor(() => expect(createToken).toHaveBeenCalled());
+      expect(createToken.mock.calls[0][0]).toEqual(
+        expect.objectContaining({ address: 'other.example.com' }),
+      );
+    });
+
+    it('takes a typed address when the names cannot be loaded', async () => {
+      getNames.mockRejectedValue(new Error('403 Forbidden'));
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      const request = await mint();
+      expect(request).toEqual(
+        expect.objectContaining({ address: 'manager.example.com' }),
+      );
+      expect(screen.queryByText('403 Forbidden')).not.toBeInTheDocument();
+    });
+
+    it('shows a loading state while the names are fetched', () => {
+      getNames.mockReturnValue(new Promise(() => {}));
+      renderFlyout();
+
+      expect(
+        document.querySelector(
+          '[data-test-subj="enrollmentTokenAddress"] .euiLoadingSpinner',
+        ),
+      ).not.toBeNull();
+    });
+
+    it('validates the address and blocks the mint while it is invalid', async () => {
+      mockAddressError = value =>
+        value.includes(' ') ? 'It should be a valid address.' : undefined;
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      typeAddress('bad address');
+
+      expect(
+        screen.getByText('It should be a valid address.'),
+      ).toBeInTheDocument();
+      expect(createButton()).toBeDisabled();
     });
   });
 
@@ -248,9 +350,7 @@ describe('CreateEnrollmentTokenFlyout', () => {
       fireEvent.click(screen.getByText("No, don't do it"));
       expect(confirmationIsOpen()).toBe(false);
       expect(onClose).not.toHaveBeenCalled();
-      expect(
-        screen.getByPlaceholderText('wazuh-manager.example.com'),
-      ).toHaveValue('manager.example.com');
+      expect(addressValue()).toBe('manager.example.com');
     });
 
     it('discards the form once the confirmation is accepted', () => {

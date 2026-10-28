@@ -15,4 +15,5 @@ export * from './types';
 export * from './create-enrollment-token';
 export * from './get-enrollment-tokens';
 export * from './delete-enrollment-tokens';
+export * from './get-listener-certificate-names';
 export * from './validations';

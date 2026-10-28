@@ -11,6 +11,9 @@
  */
 
 export const ENROLLMENT_TOKENS_ENDPOINT = '/agents/enrollment-tokens';
+export const CLUSTER_NODES_ENDPOINT = '/cluster/nodes';
+export const listenerTlsEndpoint = (nodeId: string) =>
+  `/cluster/${encodeURIComponent(nodeId)}/daemons/remoted/tls`;
 
 /* Limits the manager enforces on the token request, shared by the validators
 and the texts that state them. */
