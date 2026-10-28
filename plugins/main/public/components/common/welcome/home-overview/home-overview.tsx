@@ -9,6 +9,7 @@ import { ThreatHuntingSection } from './components/threat-hunting';
 import { SecurityOperationsSection } from './components/security-operations';
 import { CloudSecuritySection } from './components/cloud-security';
 import { ThreatIntelligenceFeedSection } from './components/threat-intel-feed';
+import { LogDataAnalysisSection } from './components/log-data-analysis';
 import {
   useFindingsBreakdowns,
   useFindingsOverview,
@@ -63,6 +64,8 @@ const HomeOverviewBody: React.FC = () => {
           vulnerabilities={vulnerabilities}
         />
       </div>
+      <EuiSpacer size='l' />
+      <LogDataAnalysisSection />
       <EuiSpacer size='l' />
       <ThreatIntelligenceFeedSection threatIntel={threatIntel} />
       <EuiSpacer size='l' />

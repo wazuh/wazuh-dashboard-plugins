@@ -4,7 +4,12 @@ const kbnDir = path.resolve(__dirname, '../../../../');
 
 export default {
   rootDir: path.resolve(__dirname, '../..'),
-  roots: ['<rootDir>/public', '<rootDir>/server', '<rootDir>/common'],
+  roots: [
+    '<rootDir>/public',
+    '<rootDir>/server',
+    '<rootDir>/common',
+    '<rootDir>/scripts',
+  ],
   modulePaths: [`${kbnDir}/node_modules`],
   collectCoverageFrom: ['**/*.{js,jsx,ts,tsx}', './!**/node_modules/**'],
   moduleNameMapper: {
