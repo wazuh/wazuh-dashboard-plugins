@@ -37,6 +37,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { activeResponsesColumns } from '../../overview/active-responses/events/active-responses-columns';
 import { ActiveResponseFlyoutBody } from '../../overview/active-responses/events/active-response-flyout-body';
 import { azureColumns } from '../../overview/azure/events/azure-columns';
+import { itHygieneFindingsColumns } from '../../overview/it-hygiene/events/it-hygiene-findings-columns';
 import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
@@ -78,6 +79,7 @@ import {
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
   FIMFindingsDataSource,
+  ITHygieneFindingsDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
   TSCDataSource,
@@ -713,6 +715,15 @@ export const ModulesDefaults = {
         name: TAB_NAMES.services,
         buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
         component: ITHygieneServicesInventory,
+      },
+      {
+        ...renderFindingsDiscoverTab({
+          moduleId: 'it-hygiene',
+          tableColumns: itHygieneFindingsColumns,
+          DataSource: ITHygieneFindingsDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
       },
     ],
     availableFor: ['manager', 'agent'],
