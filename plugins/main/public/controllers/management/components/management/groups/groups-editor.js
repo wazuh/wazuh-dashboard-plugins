@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { debounce } from 'lodash';
 import { FormattedMessage } from '@osd/i18n/react';
 import { i18n } from '@osd/i18n';
 
@@ -37,7 +38,10 @@ import GroupsHandler from './utils/groups-handler';
 
 import { getToasts } from '../../../../../kibana-services';
 import { readXMLError } from '../configuration/utils/xml';
-import { toXMLErrorAnnotations } from '../configuration/utils/xml-manager';
+import {
+  toXMLErrorAnnotations,
+  XML_VALIDATION_DELAY_MS,
+} from '../configuration/utils/xml-manager';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
 import { ButtonAboutCentralizedConfiguration } from './button-about-centralized-configuration';
@@ -79,8 +83,21 @@ class WzGroupsEditor extends Component {
       isEditable,
       initContent: content,
       groupName: groupName,
+      // Checked right away so a broken file shows its error when it opens.
+      xmlIssue: readXMLError(content),
     };
+    // Parsing a large file on every keystroke blocks typing: check it once
+    // the changes pause. Save checks the current content again.
+    this.validateContentDebounced = debounce(
+      () => this.setState({ xmlIssue: readXMLError(this.state.content) }),
+      XML_VALIDATION_DELAY_MS,
+    );
   }
+
+  onContentChange = content => {
+    this.setState({ content });
+    this.validateContentDebounced();
+  };
 
   updateHeight = () => {
     this.height = window.innerHeight - 275; //eslint-disable-line
@@ -98,6 +115,7 @@ class WzGroupsEditor extends Component {
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
     this._isMounted = false;
+    this.validateContentDebounced.cancel();
     window.removeEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
@@ -116,9 +134,17 @@ class WzGroupsEditor extends Component {
     if (!this._isMounted) {
       return;
     }
+    // The pending check may still reflect older content: never send
+    // content that is not well-formed.
+    this.validateContentDebounced.cancel();
+    const xmlIssue = readXMLError(this.state.content);
+    if (xmlIssue) {
+      this.setState({ xmlIssue });
+      return;
+    }
     try {
       const { content, groupName } = this.state;
-      this.setState({ isSaving: true, error: false });
+      this.setState({ isSaving: true, error: false, xmlIssue });
       let saver = this.groupsHandler.sendGroupConfiguration;
       await saver(name, groupName, content);
       await validateConfigAfterSent();
@@ -163,9 +189,8 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { name, content, isEditable, groupName } = this.state;
+    const { name, content, isEditable, groupName, xmlIssue } = this.state;
 
-    const xmlIssue = readXMLError(content);
     const xmlError = xmlIssue && xmlIssue.message;
     const saveButton = (
       <WzButtonPermissions
@@ -314,9 +339,7 @@ class WzGroupsEditor extends Component {
                             width='100%'
                             height={`calc(100vh - ${xmlError ? 250 : 230}px)`}
                             value={content}
-                            onChange={newContent =>
-                              this.setState({ content: newContent })
-                            }
+                            onChange={this.onContentChange}
                             mode='xml'
                             wrapEnabled
                             setOptions={this.codeEditorOptions}

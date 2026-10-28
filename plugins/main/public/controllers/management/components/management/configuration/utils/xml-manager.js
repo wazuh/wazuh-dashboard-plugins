@@ -14,6 +14,12 @@ import { i18n } from '@osd/i18n';
 const parser = new DOMParser();
 
 /**
+ * How long the configuration editors wait after the last change before
+ * checking the XML. Parsing a large file on every keystroke blocks typing.
+ */
+export const XML_VALIDATION_DELAY_MS = 300;
+
+/**
  * Where the parser stopped, read from the `parsererror` text. Every engine
  * words it differently — `error on line 9 at column 19`, `Line Number 9,
  * Column 19` and `9:19: unclosed tag` — so this reads the numbers rather than

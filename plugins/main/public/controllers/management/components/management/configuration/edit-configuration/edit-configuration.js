@@ -12,6 +12,7 @@
 
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { debounce } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 
@@ -46,6 +47,7 @@ import {
 import {
   readManagerXMLError,
   toXMLErrorAnnotations,
+  XML_VALIDATION_DELAY_MS,
 } from '../utils/xml-manager';
 import { getToasts } from '../../../../../..//kibana-services';
 
@@ -55,6 +57,10 @@ import { compose } from 'redux';
 import { UI_LOGGER_LEVELS } from '../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../react-services/common-services';
+
+// An empty editor has nothing to check.
+const readEditorXMLError = value =>
+  value ? readManagerXMLError(value) : false;
 
 class WzEditConfiguration extends Component {
   constructor(props) {
@@ -69,15 +75,37 @@ class WzEditConfiguration extends Component {
       hasChanges: false,
       infoChangesAfterRestart: false,
       disableSaveRestartButtons: false,
+      xmlIssue: false,
     };
+    // Parsing a large file on every keystroke blocks typing: check it once
+    // the changes pause. Save checks the current value again.
+    this.validateEditorValueDebounced = debounce(
+      () =>
+        this.setState({
+          xmlIssue: readEditorXMLError(this.state.editorValue),
+        }),
+      XML_VALIDATION_DELAY_MS,
+    );
+  }
+
+  componentWillUnmount() {
+    this.validateEditorValueDebounced.cancel();
   }
 
   addToast(toast) {
     getToasts().add(toast);
   }
   async editorSave() {
+    // The pending check may still reflect an older value: never send a value
+    // that is not well-formed.
+    this.validateEditorValueDebounced.cancel();
+    const xmlIssue = readEditorXMLError(this.state.editorValue);
+    if (xmlIssue) {
+      this.setState({ xmlIssue });
+      return;
+    }
     try {
-      this.setState({ saving: true });
+      this.setState({ saving: true, xmlIssue });
 
       await saveFileCluster(
         this.state.editorValue,
@@ -160,12 +188,15 @@ class WzEditConfiguration extends Component {
   }
   onChange(editorValue) {
     this.setState({ editorValue });
+    this.validateEditorValueDebounced();
   }
   onDidMount(xmlFetched, errorXMLFetched) {
     this.setState({
       editorValue: xmlFetched,
       disableSaveRestartButtons: errorXMLFetched,
       initialValue: xmlFetched,
+      // Checked right away so a broken file shows its error when it loads.
+      xmlIssue: readEditorXMLError(xmlFetched),
     });
   }
   onLoadingConfiguration(disableSaveRestartButtons) {
@@ -258,15 +289,9 @@ class WzEditConfiguration extends Component {
     }
   }
   render() {
-    const {
-      restart,
-      restarting,
-      saving,
-      editorValue,
-      disableSaveRestartButtons,
-    } = this.state;
+    const { restart, restarting, saving, disableSaveRestartButtons, xmlIssue } =
+      this.state;
     const { clusterNodeSelected, agent } = this.props;
-    const xmlIssue = editorValue && readManagerXMLError(editorValue);
     const xmlError = xmlIssue && xmlIssue.message;
     return (
       <Fragment>
