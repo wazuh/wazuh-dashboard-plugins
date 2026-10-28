@@ -124,6 +124,10 @@ Enforced by tooling — run the linter/formatter, don't hand-format:
   ([`eslint.config.mjs`](eslint.config.mjs), [`.prettierrc`](.prettierrc)).
 - Filenames follow `filenames-simple` (kebab-case, e.g. `wz-menu.tsx`).
 - `camelCase`, `eqeqeq`, `no-var`, `curly`, no duplicate imports, `require-await`.
+- Avoid brand references (the product name "Wazuh") in the user-facing text, comments and
+  docs you write: say "the indexer", "the agents", etc. Add them only when asked, and keep
+  them where they are part of an identifier (index names such as `wazuh-states-inventory-*`,
+  i18n ids, constants, URLs).
 - English everywhere (code, comments, commits, docs). Full guide:
   [`STYLEGUIDE.md`](STYLEGUIDE.md).
 - User-facing text goes through `i18n.translate` with ids
@@ -143,11 +147,12 @@ Full detail in [`docs/dev/pull-requests.md`](docs/dev/pull-requests.md) and
 - Open PRs as **Draft** (CI skips drafts); run lint + tests locally, then "Ready
   for review". Use squash merge for single-purpose PRs.
 - Update [`CHANGELOG.md`](CHANGELOG.md) for any user-facing change; the entry
-  **links to the issue, not the PR**. Add no entry for `internal-devel-requests`
-  issues or tooling/doc/test-only PRs (use the `no-changelog` label).
-- Issues are shared as URLs and may live in another repo. Issues from
-  `internal-devel-requests` are internal: don't expose their link in the PR
-  (`## Description` omits it) and add no CHANGELOG entry.
+  **links to the issue, not the PR**. Add no entry for internal issues or
+  tooling/doc/test-only PRs (use the `no-changelog` label).
+- Issues are shared as URLs and may live in another repo. Issues from the internal
+  requests repository are internal: don't expose their link or the repository's name in
+  the PR (`## Description` omits it) and add no CHANGELOG entry. Its name is kept only in
+  the local env file (`WZSS_INTERNAL_ISSUES_REPO`, see the `setup-local-secrets` skill).
 - UI changes require a screenshot/video in the PR (`### Results and Evidence`
   section of the [PR template](.github/pull_request_template.md)); manual
   verification steps go in `### How to Test`.

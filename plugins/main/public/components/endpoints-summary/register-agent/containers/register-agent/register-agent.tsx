@@ -38,7 +38,6 @@ import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateAgentName,
   validateExistingEnrollmentToken,
-  validateManagerCaPath,
 } from '../../utils/validations';
 import {
   validateEnrollmentTokenDescription,
@@ -188,11 +187,9 @@ export const RegisterAgent = compose(
       validate: validateAgentName,
     },
     /* Enrollment authenticates one way, agent to manager, so the manager is
-    authenticated solely by TLS. The agent verifies by default -- against the
-    CA bootstrapped from the enrollment token, the endpoint's system CA store
-    without a token, or the CA below when one is given -- and
-    turning this off generates an explicit WAZUH_SSL_VERIFICATION=none
-    opt-out. */
+    authenticated solely by TLS. The agent verifies by default against the CA
+    the enrollment token delivers, and turning this off generates an explicit
+    WAZUH_SSL_VERIFICATION=none opt-out. */
     sslVerification: {
       type: 'switch',
       initialValue: true,
@@ -210,11 +207,6 @@ export const RegisterAgent = compose(
           },
         },
       },
-    },
-    managerCa: {
-      type: 'text',
-      initialValue: '',
-      validate: validateManagerCaPath,
     },
 
     agentGroups: {
