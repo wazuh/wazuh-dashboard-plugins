@@ -25,9 +25,11 @@ interface, for example in end-to-end testing scenarios.
 ![Set manager address](../img/agent-deploy-oneliner/set-server-address.webp)
 
 5. In **Enrollment token**, select **Generate token**. The server mints one for
-   the address typed in the previous step, with its own defaults -- a 30 day
-   lifetime and unlimited enrollments -- and answers with its identifier and
-   expiry.
+   the address typed in the previous step, with a 1 day lifetime unless
+   **Lifetime** is set, and unlimited enrollments unless **Enrollments allowed**
+   is set, and answers with its identifier and expiry. After minting, the step
+   lists how many earlier tokens are still active and have enrolled no agent,
+   and offers to revoke them or to review them in **Enrollment tokens**.
 
    The step offers the two ways of obtaining a token as tabs, since they
    exclude each other and only the open one is in effect. **Generate a new

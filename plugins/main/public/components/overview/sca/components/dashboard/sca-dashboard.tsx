@@ -1,4 +1,3 @@
-import React from 'react';
 import { compose } from 'redux';
 import { withErrorBoundary } from '../../../../common/hocs';
 import {
@@ -24,6 +23,7 @@ export const SCADashboard = compose(
       {
         dashboardId: CONFIGURATION_ASSESSMENT_DASHBOARD_ID,
         agentDashboardId: CONFIGURATION_ASSESSMENT_AGENT_DASHBOARD_ID,
+        className: 'wz-sca-dashboard',
       },
     ],
     sampleDataWarningCategories: [
