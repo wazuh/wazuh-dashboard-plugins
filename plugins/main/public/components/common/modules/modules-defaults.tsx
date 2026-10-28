@@ -712,12 +712,15 @@ export const ModulesDefaults = {
         buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
         component: ITHygieneServicesInventory,
       },
-      renderFindingsDiscoverTab({
-        moduleId: 'it-hygiene',
-        tableColumns: itHygieneFindingsColumns,
-        DataSource: ITHygieneFindingsDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
+      {
+        ...renderFindingsDiscoverTab({
+          moduleId: 'it-hygiene',
+          tableColumns: itHygieneFindingsColumns,
+          DataSource: ITHygieneFindingsDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+      },
     ],
     availableFor: ['manager', 'agent'],
   },
