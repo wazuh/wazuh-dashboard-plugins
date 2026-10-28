@@ -46,8 +46,8 @@ interface, for example in end-to-end testing scenarios.
 
 6. **Optional configuration** (when required):
    - **Verify the manager certificate**: leave it enabled unless the endpoint
-     cannot verify the manager listener. A token install needs no certificate
-     authority path: the agent obtains its trust anchor through the token. See
+     cannot verify the manager listener. A token install gets its trust anchor
+     through the token. See
      [Manager certificate verification](#manager-certificate-verification).
    - **Agent name**: define how the agent is identified.
    - **Agent group**: assign the agent to an existing group (for example, `default`).
@@ -168,15 +168,10 @@ The tokens the server has minted are listed, revoked and purged in the
 Enrollment authenticates the agent to the manager, not the manager to the
 agent. What establishes that the endpoint is talking to the real manager is the
 TLS certificate its listener presents, and the **Optional settings** step
-decides how that certificate is verified through two controls, both shown
-whether or not the deployment uses an enrollment token:
+decides how that certificate is verified through one control, **Verify the
+manager certificate**, enabled by default.
 
-- **Verify the manager certificate**, enabled by default.
-- **Manager CA file path on the endpoint**, shown while verification is
-  enabled. It takes the path of a certificate authority already present on the
-  endpoint.
-
-A token install needs neither. The token carries a **pin**, the SHA-256 digest
+The token carries a **pin**, the SHA-256 digest
 of the public key of the certificate authority that signs the manager's
 agent-facing certificate. On its first start the agent fetches that authority
 from the manager, checks it against the pin, installs it as its trust anchor at
@@ -187,13 +182,16 @@ anchor `etc/certs/root-ca.pem` is present, and to `none` otherwise; it never
 falls back to the system CA store. After a token install the mode is therefore
 `full`, and `WAZUH_SSL_VERIFICATION` only overrides it.
 
-Three combinations are possible, and each generates a different command:
+Each state of the switch generates a different command:
 
-| Wizard state                           | What the generated command carries                                                                                                                                                                                                                                                                                          |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verification enabled, no CA path       | Nothing. After a token install the agent verifies the manager against the trust anchor the token delivered.                                                                                                                                                                                                                 |
-| Verification enabled, CA path supplied | `WAZUH_REGISTRATION_CA='<path>'`. This variable was removed in 5.0 and the installer ignores it, so the path has no effect. A token install does not need it; on an agent configured by hand, place the authority at `etc/certs/root-ca.pem` or name it in `<agent><ssl><certificate_authorities>` in `ossec.conf` instead. |
-| Verification disabled                  | `WAZUH_SSL_VERIFICATION='none'`, and the CA path input is hidden, since an authority to verify against means nothing once nothing is verified. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only.                              |
+| Wizard state          | What the generated command carries                                                                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verification enabled  | Nothing. After a token install the agent verifies the manager against the trust anchor the token delivered.                                                                      |
+| Verification disabled | `WAZUH_SSL_VERIFICATION='none'`. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only. |
+
+The wizard offers no CA path: the 5.0 installer has no variable for it. To use
+another authority, place it at `etc/certs/root-ca.pem` on the endpoint or name
+it in `<agent><ssl><certificate_authorities>` in `ossec.conf`.
 
 `WAZUH_SSL_VERIFICATION` also accepts `full`, `certificate` and `system`, which
 the wizard does not generate. `system` suits a manager fronted by a publicly
