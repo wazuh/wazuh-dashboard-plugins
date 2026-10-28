@@ -63,6 +63,20 @@ export function transformDateRange(dateRange: TimeRange) {
 
 ////////////////////////////////////////////////////////////////////////////////////
 
+export function getSortForColumn(
+  column: { id?: string; direction?: string },
+  timeFieldName?: string,
+): OpenSearchQuerySortValue {
+  const field = column?.id || '';
+  const order = column?.direction === 'asc' ? 'asc' : 'desc';
+  // Always set: mixed date/date_nanos indices sort wrong without it; saved esTypes may be stale
+  if (field && field === timeFieldName) {
+    // eslint-disable-next-line camelcase
+    return { [field]: { order, numeric_type: 'date_nanos' } };
+  }
+  return { [field]: order } as OpenSearchQuerySortValue;
+}
+
 export const search = async (
   params: SearchParams,
 ): Promise<SearchResponse | void> => {
@@ -92,10 +106,9 @@ export const search = async (
       ? paginationPageSize
       : MAX_ENTRIES_PER_QUERY - fromField;
   const sortOrder: OpenSearchQuerySortValue[] =
-    sorting?.columns?.map(column => {
-      const sortDirection = column.direction === 'asc' ? 'asc' : 'desc';
-      return { [column?.id || '']: sortDirection } as OpenSearchQuerySortValue;
-    }) || [];
+    sorting?.columns?.map(column =>
+      getSortForColumn(column, indexPattern.timeFieldName),
+    ) || [];
   let filters = defaultFilters;
 
   // check if dateRange is defined

@@ -394,6 +394,7 @@ function mapIndexFieldType(esType, field) {
     match_only_text: 'string',
     flat_object: 'string',
     date: 'date',
+    date_nanos: 'date',
     long: 'number',
     integer: 'number',
     short: 'number',
