@@ -1,3 +1,5 @@
+import React from 'react';
+import { EuiToolTip } from '@elastic/eui';
 import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { SearchParams, search } from '../search-bar/search-bar-service';
@@ -183,6 +185,17 @@ const mapToDataGridColumn = (
     ...field,
     id: field.name,
     name: field.name,
+    display: React.createElement(
+      EuiToolTip,
+      // A block anchor that truncates itself: the default inline-block anchor
+      // cannot be shortened with an ellipsis by the header cell.
+      {
+        content: field.name,
+        display: 'inlineBlock',
+        anchorClassName: 'oui-textTruncate wz-display-inline',
+      },
+      React.createElement('span', null, field.name),
+    ),
     schema: field.type,
     actions: { showHide: true },
     // Non-aggregatable fields (e.g. ECS match_only_text) have no doc_values
