@@ -19,6 +19,7 @@ import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import { UseFormReturn } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
+import { WzButtonPermissionsModalConfirm } from '../../../../common/buttons';
 import AdvancedOptions from '../advanced-options/advanced-options';
 import { ENROLLMENT_TOKEN_TEXTS } from '../../utils/register-agent-data';
 import {
@@ -29,12 +30,14 @@ import {
   ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS,
   ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH,
   ENROLLMENT_TOKEN_TTL_MAX_DAYS,
+  EnrollmentTokenSummary,
 } from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
 import { enrollmentTokens } from '../../../../../utils/applications';
 import NavigationService from '../../../../../react-services/navigation-service';
 import { formatUIDate } from '../../../../../react-services/time-service';
 import { getEnrollmentTokenStatus } from '../../../../enrollment-tokens/utils/token-status';
+import { getToasts } from '../../../../../kibana-services';
 import '../group-input/group-input.scss';
 
 interface EnrollmentTokenInputProps {
@@ -95,10 +98,17 @@ const EnrollmentTokenInput = ({
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  /* Ids of other tokens that are still active and have enrolled nobody, found
-  after a mint. They are offered for revocation rather than revoked: an earlier
-  command may be in use on a machine that has not enrolled yet. */
-  const [unusedTokenIds, setUnusedTokenIds] = useState<string[]>([]);
+  /* Other tokens that are still active and have enrolled nobody, found after a
+  mint. They are offered for revocation rather than revoked: an earlier command
+  may be in use on a machine that has not enrolled yet. */
+  const [unusedTokens, setUnusedTokens] = useState<EnrollmentTokenSummary[]>(
+    [],
+  );
+  /* More tokens exist than the lookup reads, so the count is a lower bound. */
+  const [unusedTokensTruncated, setUnusedTokensTruncated] = useState(false);
+  /* Bumped on every mint so that the answer to a lookup or a revoke that
+  started before it is not applied over the fresh list. */
+  const generationRef = useRef(0);
   const [isRevoking, setIsRevoking] = useState(false);
   const [revokeError, setRevokeError] = useState<string | null>(null);
   /* Not part of the validated form state: plain booleans with no validation of
@@ -197,42 +207,63 @@ const EnrollmentTokenInput = ({
     Boolean(formFields[field]?.error),
   );
 
-  const findUnusedTokens = async (mintedId: string) => {
+  const findUnusedTokens = async (mintedId: string, generation: number) => {
     try {
-      const { tokens } = await getEnrollmentTokens(
+      const { tokens, total } = await getEnrollmentTokens(
         0,
         UNUSED_TOKENS_LOOKUP_LIMIT,
         '-created',
       );
-      setUnusedTokenIds(
-        tokens
-          .filter(
-            token =>
-              token.id &&
-              token.id !== mintedId &&
-              (token.uses ?? 0) === 0 &&
-              getEnrollmentTokenStatus(token) === 'active',
-          )
-          .map(token => token.id as string),
+      if (generation !== generationRef.current) {
+        return;
+      }
+      setUnusedTokens(
+        tokens.filter(
+          token =>
+            token.id &&
+            token.id !== mintedId &&
+            (token.uses ?? 0) === 0 &&
+            getEnrollmentTokenStatus(token) === 'active',
+        ),
       );
+      setUnusedTokensTruncated(total > UNUSED_TOKENS_LOOKUP_LIMIT);
     } catch {
       /* The lookup only informs a suggestion, so failing to make it is not
       worth interrupting a token that was minted. */
-      setUnusedTokenIds([]);
+      if (generation === generationRef.current) {
+        setUnusedTokens([]);
+      }
     }
   };
 
   const revokeUnusedTokens = async () => {
+    const generation = generationRef.current;
+    const candidates = unusedTokens;
     setIsRevoking(true);
     setRevokeError(null);
     const results = await Promise.allSettled(
-      unusedTokenIds.map(id => revokeEnrollmentToken(id)),
+      candidates.map(token => revokeEnrollmentToken(token.id as string)),
     );
-    const failed = unusedTokenIds.filter(
+    setIsRevoking(false);
+    if (generation !== generationRef.current) {
+      return;
+    }
+    const failed = candidates.filter(
       (_, index) => results[index].status === 'rejected',
     );
-    setUnusedTokenIds(failed);
-    if (failed.length > 0) {
+    setUnusedTokens(failed);
+    if (failed.length === 0) {
+      getToasts().addSuccess(
+        i18n.translate(
+          'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedSuccess',
+          {
+            defaultMessage:
+              '{count, plural, one {# unused enrollment token was} other {# unused enrollment tokens were}} revoked.',
+            values: { count: candidates.length },
+          },
+        ),
+      );
+    } else {
       const reason = (
         results.find(result => result.status === 'rejected') as
           | PromiseRejectedResult
@@ -248,14 +279,15 @@ const EnrollmentTokenInput = ({
           ),
       );
     }
-    setIsRevoking(false);
   };
 
   const generateEnrollmentToken = async () => {
     setIsGenerating(true);
     setError(null);
     setRevokeError(null);
-    setUnusedTokenIds([]);
+    setUnusedTokens([]);
+    setUnusedTokensTruncated(false);
+    const generation = ++generationRef.current;
     try {
       const token = await createEnrollmentToken({
         address: serverAddress.value,
@@ -272,7 +304,7 @@ const EnrollmentTokenInput = ({
       const minted: EnrollmentToken = { ...token, source: 'generated' };
       setGeneratedToken(minted);
       onEnrollmentTokenChange(minted);
-      await findUnusedTokens(minted.id);
+      void findUnusedTokens(minted.id, generation);
     } catch (requestError) {
       /* Whatever the manager answered is shown as it wrote it. It is the
       manager that checks the address against the names in its listener
@@ -628,7 +660,9 @@ const EnrollmentTokenInput = ({
               <EuiButton
                 fill={!enrollmentToken}
                 isLoading={isGenerating}
-                isDisabled={endpointIsInvalid || tokenRequestIsInvalid}
+                isDisabled={
+                  endpointIsInvalid || tokenRequestIsInvalid || isRevoking
+                }
                 onClick={generateEnrollmentToken}
               >
                 {enrollmentToken?.source === 'generated'
@@ -745,19 +779,22 @@ const EnrollmentTokenInput = ({
             </>
           ) : null}
           {enrollmentToken?.source === 'generated' &&
-          (unusedTokenIds.length > 0 || revokeError) ? (
+          (unusedTokens.length > 0 || revokeError) ? (
             <>
               <EuiSpacer size='m' />
               <EuiCallOut
                 color='warning'
-                iconType='iInCircle'
+                iconType='alert'
                 className='warningForAgentName'
                 title={i18n.translate(
                   'wazuh.endpointsSummary.enrollmentTokenInput.unusedTokensTitle',
                   {
                     defaultMessage:
-                      '{count, plural, one {# earlier token is} other {# earlier tokens are}} still active and unused',
-                    values: { count: unusedTokenIds.length },
+                      '{atLeast, select, true {At least } other {}}{count, plural, one {# earlier token is} other {# earlier tokens are}} still active and unused',
+                    values: {
+                      count: unusedTokens.length,
+                      atLeast: String(unusedTokensTruncated),
+                    },
                   },
                 )}
               >
@@ -774,12 +811,63 @@ const EnrollmentTokenInput = ({
                 {revokeError ? <p>{revokeError}</p> : null}
                 <EuiFlexGroup wrap gutterSize='s' alignItems='center'>
                   <EuiFlexItem grow={false}>
-                    <EuiButton
+                    <WzButtonPermissionsModalConfirm
                       size='s'
                       color='warning'
+                      permissions={[
+                        {
+                          action: 'enrollment_token:delete',
+                          resource: '*:*:*',
+                        },
+                      ]}
                       isLoading={isRevoking}
-                      isDisabled={unusedTokenIds.length === 0}
-                      onClick={revokeUnusedTokens}
+                      isDisabled={unusedTokens.length === 0}
+                      modalTitle={i18n.translate(
+                        'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModalTitle',
+                        {
+                          defaultMessage:
+                            'Do you want to revoke these enrollment tokens?',
+                        },
+                      )}
+                      modalProps={{
+                        buttonColor: 'danger',
+                        children: (
+                          <EuiText size='s'>
+                            <p>
+                              {i18n.translate(
+                                'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModalBody',
+                                {
+                                  defaultMessage:
+                                    'Revoking cannot be undone. Agents that have not enrolled yet with these tokens will no longer be able to.',
+                                },
+                              )}
+                            </p>
+                            <ul>
+                              {unusedTokens.map(token => (
+                                <li key={token.id}>
+                                  <EuiCode>{token.id}</EuiCode>
+                                  {token.description
+                                    ? ` ${token.description}`
+                                    : ''}
+                                  {' — '}
+                                  {i18n.translate(
+                                    'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModalDates',
+                                    {
+                                      defaultMessage:
+                                        'created {created}, expires {expires}',
+                                      values: {
+                                        created: formatUIDate(token.created),
+                                        expires: formatUIDate(token.expires),
+                                      },
+                                    },
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </EuiText>
+                        ),
+                      }}
+                      onConfirm={revokeUnusedTokens}
                     >
                       {i18n.translate(
                         'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedButton',
@@ -787,7 +875,7 @@ const EnrollmentTokenInput = ({
                           defaultMessage: 'Revoke unused tokens',
                         },
                       )}
-                    </EuiButton>
+                    </WzButtonPermissionsModalConfirm>
                   </EuiFlexItem>
                   <EuiFlexItem grow={false}>
                     <EuiLink
