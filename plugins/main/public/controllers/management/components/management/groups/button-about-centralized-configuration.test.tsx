@@ -23,6 +23,10 @@ describe('ButtonAboutCentralizedConfiguration', () => {
       'Applying changes',
       'Validation',
     ].forEach(term => expect(flyout).toHaveTextContent(term));
+    expect(flyout).toHaveTextContent(
+      'merged in the order the groups were assigned to the agent',
+    );
+    expect(flyout).toHaveTextContent('the group assigned last wins');
     expect(screen.getByRole('link', { name: /documentation/ })).toHaveAttribute(
       'href',
       'https://docs.example/user-manual/reference/centralized-configuration.html',

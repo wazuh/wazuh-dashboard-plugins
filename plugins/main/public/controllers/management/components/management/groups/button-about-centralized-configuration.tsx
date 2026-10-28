@@ -48,7 +48,7 @@ const getGuideItems = () => [
     description: (
       <FormattedMessage
         id='wazuh.endpointGroups.editor.aboutFlyout.precedenceDescription'
-        defaultMessage="{agentConf} settings override the same settings in the agent's local configuration. If an agent belongs to several groups, their configurations are merged, and on a conflict the group whose name comes first alphabetically wins."
+        defaultMessage="{agentConf} settings override the same settings in the agent's local configuration. If an agent belongs to several groups, their configurations are merged in the order the groups were assigned to the agent, and on a conflict the group assigned last wins."
         values={{ agentConf: <EuiCode>agent.conf</EuiCode> }}
       />
     ),
