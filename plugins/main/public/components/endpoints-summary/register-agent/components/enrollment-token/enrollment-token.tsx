@@ -63,35 +63,41 @@ const UNUSED_TOKENS_LOOKUP_LIMIT = 100;
 
 const UNUSED_TOKENS_PAGE_SIZE = 5;
 
-const columnName = (id: string, defaultMessage: string) =>
-  i18n.translate(
-    `wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModal.columns.${id}`,
-    { defaultMessage },
-  );
-
 /* What the operator needs to tell the tokens apart before revoking them. */
 const UNUSED_TOKEN_COLUMNS: EuiBasicTableColumn<EnrollmentTokenSummary>[] = [
   {
     field: 'id',
-    name: columnName('id', 'ID'),
+    name: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModal.columns.id',
+      { defaultMessage: 'ID' },
+    ),
     sortable: true,
     render: (id: string) => <EuiCode>{id}</EuiCode>,
   },
   {
     field: 'description',
-    name: columnName('description', 'Description'),
+    name: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModal.columns.description',
+      { defaultMessage: 'Description' },
+    ),
     sortable: true,
     render: (description?: string | null) => description || '-',
   },
   {
     field: 'created',
-    name: columnName('created', 'Created'),
+    name: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModal.columns.created',
+      { defaultMessage: 'Created' },
+    ),
     sortable: true,
     render: (created?: string) => formatUIDate(created),
   },
   {
     field: 'expires',
-    name: columnName('expires', 'Expires'),
+    name: i18n.translate(
+      'wazuh.endpointsSummary.enrollmentTokenInput.revokeUnusedModal.columns.expires',
+      { defaultMessage: 'Expires' },
+    ),
     sortable: true,
     render: (expires?: string) => formatUIDate(expires),
   },
