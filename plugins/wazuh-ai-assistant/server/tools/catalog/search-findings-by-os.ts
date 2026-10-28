@@ -16,6 +16,7 @@ import {
   severityFilterValues,
   severityProperty,
   timeRangeProperties,
+  timestampDescSort,
 } from './common';
 
 const TABLE_COLUMNS = [
@@ -110,7 +111,7 @@ export const searchFindingsByOsTool: ToolDefinition = {
             ],
           },
         },
-        sort: [{ '@timestamp': { order: 'desc' } }],
+        sort: timestampDescSort(),
         size: limit,
         // Population-true agent/rule-title breakdown over the FULL matched set. Same mechanism
         // as the other finding-hits tools (common.ts's FINDING_BREAKDOWN_AGGS doc comment).

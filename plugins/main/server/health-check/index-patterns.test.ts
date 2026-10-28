@@ -1,5 +1,8 @@
 import fs from 'fs';
-import { initializationTaskCreatorIndexPatternBatch } from './index-patterns';
+import {
+  defineTimeFieldNameIfExist,
+  initializationTaskCreatorIndexPatternBatch,
+} from './index-patterns';
 import {
   TASK_RESULT,
   withTaskResult,
@@ -430,5 +433,25 @@ describe('initializationTaskCreatorIndexPatternBatch - known fields lazy loading
 
     expect(readFileSpy).not.toHaveBeenCalled();
     expect(savedObjectsClient.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('defineTimeFieldNameIfExist', () => {
+  it('sets the time field when the known field is date_nanos', () => {
+    const fields = JSON.stringify([
+      { name: '@timestamp', type: 'date', esTypes: ['date_nanos'] },
+    ]);
+    expect(defineTimeFieldNameIfExist('@timestamp')({ fields })).toEqual({
+      timeFieldName: '@timestamp',
+    });
+  });
+
+  it('throws when the time field is not a date', () => {
+    const fields = JSON.stringify([
+      { name: '@timestamp', type: 'string', esTypes: ['date_nanos'] },
+    ]);
+    expect(() => defineTimeFieldNameIfExist('@timestamp')({ fields })).toThrow(
+      'time field name was not found',
+    );
   });
 });
