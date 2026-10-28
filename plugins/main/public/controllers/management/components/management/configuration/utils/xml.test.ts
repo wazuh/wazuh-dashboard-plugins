@@ -1,10 +1,12 @@
 /* eslint-disable */
 import {
   validateXML,
+  readXMLError,
   replaceIllegalXML,
   replaceXML,
   normalizeQueryEscapes,
 } from './xml';
+import { readManagerXMLError } from './xml-manager';
 global.DOMParser = class DOMParser {
   parseFromString(string, contentType) {
     if (contentType !== 'text/xml' && contentType !== 'text/html') {
@@ -71,6 +73,21 @@ describe('XML Utils', () => {
         '<localfile><query>\\<QueryList\\>\\<Query Id="0"\\>\\</Query\\>\\</QueryList\\></query></localfile>';
       const result = validateXML(xmlWithEscapedBrackets);
       expect(result).toBe(false);
+    });
+
+    it('reports the line of a format error', () => {
+      const xml = '<agent_config>\n  <syscheck>\n</agent_config>';
+      expect(validateXML(xml)).toMatch(/^XML is not well-formed at line 3\b/);
+    });
+  });
+
+  describe('readXMLError', () => {
+    it('reports the column of the edited text, not of the wrapped document', () => {
+      const xml = '<agent_config></syscheck>';
+      expect(readXMLError(xml)).toMatchObject({
+        line: 1,
+        column: readManagerXMLError(xml).column,
+      });
     });
   });
 

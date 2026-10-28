@@ -43,7 +43,10 @@ import {
   saveFileCluster,
   clusterNodes,
 } from '../utils/wz-fetch';
-import { validateManagerXML } from '../utils/xml-manager';
+import {
+  readManagerXMLError,
+  toXMLErrorAnnotations,
+} from '../utils/xml-manager';
 import { getToasts } from '../../../../../..//kibana-services';
 
 import { connect } from 'react-redux';
@@ -263,7 +266,8 @@ class WzEditConfiguration extends Component {
       disableSaveRestartButtons,
     } = this.state;
     const { clusterNodeSelected, agent } = this.props;
-    const xmlError = editorValue && validateManagerXML(editorValue);
+    const xmlIssue = editorValue && readManagerXMLError(editorValue);
+    const xmlError = xmlIssue && xmlIssue.message;
     return (
       <Fragment>
         <WzConfigurationPath
@@ -350,6 +354,7 @@ class WzEditConfiguration extends Component {
           {...this.state}
           agent={agent}
           xmlError={xmlError}
+          xmlAnnotations={toXMLErrorAnnotations(xmlIssue)}
         />
         {restart && !restarting && (
           <EuiOverlayMask>
@@ -434,6 +439,10 @@ const WzEditorConfiguration = compose(
 )(
   // eslint-disable-next-line react/no-multi-comp
   class WzEditorConfiguration extends Component {
+    static propTypes = {
+      xmlAnnotations: PropTypes.array,
+    };
+
     constructor(props) {
       super(props);
     }
@@ -445,6 +454,7 @@ const WzEditorConfiguration = compose(
         clusterNodes,
         clusterNodeSelected,
         xmlError,
+        xmlAnnotations,
         infoChangesAfterRestart,
         editorValue,
         onChange,
@@ -509,6 +519,7 @@ const WzEditorConfiguration = compose(
                   mode='xml'
                   value={editorValue}
                   onChange={value => onChange(value)}
+                  annotations={xmlAnnotations}
                   minusHeight={
                     wazuhNotReadyYet || infoChangesAfterRestart ? 320 : 270
                   }

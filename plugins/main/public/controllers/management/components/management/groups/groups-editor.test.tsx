@@ -6,21 +6,22 @@ import configureMockStore from 'redux-mock-store';
 import { queryDataTestAttr } from '../../../../../../test/public/query-attr';
 import WzGroupsEditor from './groups-editor';
 
+const mockCodeEditorProps = jest.fn();
 jest.mock('@elastic/eui', () => ({
   ...jest.requireActual('@elastic/eui'),
-  EuiCodeEditor: ({
-    value,
-    onChange,
-  }: {
+  EuiCodeEditor: (props: {
     value: string;
     onChange: (value: string) => void;
-  }) => (
-    <textarea
-      aria-label='Code Editor'
-      value={value}
-      onChange={event => onChange(event.target.value)}
-    />
-  ),
+  }) => {
+    mockCodeEditorProps(props);
+    return (
+      <textarea
+        aria-label='Code Editor'
+        value={props.value}
+        onChange={event => props.onChange(event.target.value)}
+      />
+    );
+  },
 }));
 
 jest.mock('../../../../../components/common/permissions/button', () => ({
@@ -60,13 +61,29 @@ const store = configureMockStore()({
   },
 });
 
+const renderEditor = () =>
+  render(
+    <Provider store={store}>
+      <WzGroupsEditor />
+    </Provider>,
+  );
+
 describe('WzGroupsEditor', () => {
+  it('marks the format error line without the editor worker', () => {
+    renderEditor();
+    fireEvent.change(screen.getByLabelText('Code Editor'), {
+      target: { value: '<agent_config>\n  <syscheck>\n</agent_config>' },
+    });
+
+    const props = mockCodeEditorProps.mock.lastCall[0];
+    expect(props.setOptions.useWorker).toBe(false);
+    expect(props.annotations).toEqual([
+      expect.objectContaining({ row: 2, type: 'error' }),
+    ]);
+  });
+
   it('keeps unsaved changes after opening and closing the guide', () => {
-    render(
-      <Provider store={store}>
-        <WzGroupsEditor />
-      </Provider>,
-    );
+    renderEditor();
     const editedContent =
       '<agent_config os="Linux"><syscheck></syscheck></agent_config>';
     fireEvent.change(screen.getByLabelText('Code Editor'), {

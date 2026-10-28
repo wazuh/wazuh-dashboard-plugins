@@ -36,11 +36,11 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { getToasts } from '../../../../../kibana-services';
-import { validateXML } from '../configuration/utils/xml';
+import { readXMLError } from '../configuration/utils/xml';
+import { toXMLErrorAnnotations } from '../configuration/utils/xml-manager';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
 import { ButtonAboutCentralizedConfiguration } from './button-about-centralized-configuration';
-import WazuhXmlMode from '../configuration/utils/wz-xml-mode';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -60,6 +60,9 @@ class WzGroupsEditor extends Component {
       enableSnippets: true,
       enableLiveAutocompletion: true,
       behavioursEnabled: false,
+      // The format is checked on the main thread (see readXMLError): the
+      // editor worker is not needed and cannot be loaded on every platform.
+      useWorker: false,
     };
     this.groupsHandler = GroupsHandler;
     const { fileContent } = this.props.state;
@@ -162,7 +165,8 @@ class WzGroupsEditor extends Component {
   render() {
     const { name, content, isEditable, groupName } = this.state;
 
-    const xmlError = validateXML(content);
+    const xmlIssue = readXMLError(content);
+    const xmlError = xmlIssue && xmlIssue.message;
     const saveButton = (
       <WzButtonPermissions
         permissions={[
@@ -316,13 +320,11 @@ class WzGroupsEditor extends Component {
                             mode='xml'
                             wrapEnabled
                             setOptions={this.codeEditorOptions}
+                            annotations={toXMLErrorAnnotations(xmlIssue)}
                             aria-label={i18n.translate(
                               'wazuh.endpointGroups.editor.codeEditorAriaLabel',
                               { defaultMessage: 'Code Editor' },
                             )}
-                            onLoad={editor => {
-                              editor.getSession().setMode(new WazuhXmlMode());
-                            }}
                           />
                         )) || (
                           <EuiCodeBlock

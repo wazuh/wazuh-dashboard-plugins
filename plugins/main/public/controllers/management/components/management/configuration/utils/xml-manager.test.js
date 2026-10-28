@@ -1,4 +1,8 @@
-import { validateManagerXML } from './xml-manager';
+import {
+  readErrorPosition,
+  toXMLErrorAnnotations,
+  validateManagerXML,
+} from './xml-manager';
 
 describe('validateManagerXML', () => {
   it('rejects an unescaped ampersand', () => {
@@ -43,5 +47,33 @@ describe('validateManagerXML error position', () => {
     expect(validateManagerXML('<a>\n  <b>unclosed\n</a>')).not.toBe(
       'Error validating XML',
     );
+  });
+});
+
+describe('readErrorPosition', () => {
+  it('reads the browser parser error text', () => {
+    const text =
+      'This page contains the following errors:error on line 6 at column 1: ' +
+      'Unexpected token inside closing tag: </Below is a rendering of the page';
+    expect(readErrorPosition(text)).toEqual({ line: 6, column: 1 });
+  });
+});
+
+describe('toXMLErrorAnnotations', () => {
+  it('marks the error position as a 0-based editor annotation', () => {
+    expect(
+      toXMLErrorAnnotations({ message: 'Bad XML', line: 6, column: 3 }),
+    ).toEqual([{ row: 5, column: 2, type: 'error', text: 'Bad XML' }]);
+  });
+
+  it('marks the start of the line when the column is unknown', () => {
+    expect(toXMLErrorAnnotations({ message: 'Bad XML', line: 6 })).toEqual([
+      { row: 5, column: 0, type: 'error', text: 'Bad XML' },
+    ]);
+  });
+
+  it('returns no annotation without an error position', () => {
+    expect(toXMLErrorAnnotations(false)).toEqual([]);
+    expect(toXMLErrorAnnotations({ message: 'Bad XML' })).toEqual([]);
   });
 });
