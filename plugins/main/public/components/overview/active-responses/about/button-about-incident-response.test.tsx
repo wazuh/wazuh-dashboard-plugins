@@ -53,6 +53,10 @@ describe('ButtonAboutIncidentResponse', () => {
       'An active response is an automatic action',
     );
     expect(dialog).toHaveTextContent('Location');
+    expect(dialog).toHaveTextContent(
+      'Other values are a specific agent (defined-agent) or every agent (all).',
+    );
+    expect(dialog).not.toHaveTextContent('server');
     expect(dialog).toHaveTextContent('stateless');
     ['executable', 'location', 'type'].forEach(field =>
       expect(dialog).toHaveTextContent(`wazuh.active_response.${field}`),

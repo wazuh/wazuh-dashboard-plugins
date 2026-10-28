@@ -115,10 +115,9 @@ export const ButtonAboutIncidentResponse = () => (
           description: (
             <FormattedMessage
               id='wazuh.incidentResponse.aboutFlyout.locationDescription'
-              defaultMessage='Where the executable runs. {local} is the agent that generated the finding. Other values are the manager ({server}), a specific agent ({definedAgent}) or every agent ({all}).'
+              defaultMessage='Where the executable runs. {local} is the agent that generated the finding. Other values are a specific agent ({definedAgent}) or every agent ({all}).'
               values={{
                 local: <EuiCode>local</EuiCode>,
-                server: <EuiCode>server</EuiCode>,
                 definedAgent: <EuiCode>defined-agent</EuiCode>,
                 all: <EuiCode>all</EuiCode>,
               }}
