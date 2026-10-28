@@ -21,7 +21,7 @@ jest.mock('brace', () => {
   };
   return { acequire };
 });
-jest.mock('brace/mode/xml', () => ({}), { virtual: true });
+jest.mock('brace/mode/xml', () => ({}));
 
 import WazuhXmlMode from './wz-xml-mode';
 
