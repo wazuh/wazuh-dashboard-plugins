@@ -16,8 +16,14 @@ import {
 } from 'opensearch_dashboards/server';
 import { getCookieValueByName } from './cookie';
 
-// Logout routes of the security plugin: /auth/logout, /api/v1/auth/logout, /auth/<type>/logout
-const LOGOUT_PATH = /\/auth\/(?:[a-z]+\/)?logout$/;
+// Logout routes of the security plugin: basic, JWT, proxy, OpenID, SAML
+const LOGOUT_ROUTES = new Set([
+  'post /auth/logout',
+  'post /api/v1/auth/logout',
+  'post /auth/proxy/logout',
+  'get /auth/openid/logout',
+  'get /auth/saml/logout',
+]);
 
 interface ServerAPIClient {
   asScoped: (
@@ -39,19 +45,28 @@ interface ServerAPIClient {
  * does not reuse it.
  */
 export function registerRevokeAPITokenOnLogout(
-  http: Pick<HttpServiceSetup, 'registerOnPostAuth' | 'registerOnPreResponse'>,
+  http: Pick<HttpServiceSetup, 'registerOnPreResponse'>,
   {
     serverAPIClient,
     logger,
   }: { serverAPIClient: ServerAPIClient; logger: Logger },
 ) {
-  // Post-auth, so the core XSRF check rejects forged requests first
-  http.registerOnPostAuth((request, response, toolkit) => {
+  // On the response, so only a completed logout counts: not a 404, an XSRF
+  // rejection (400) or a failed logout
+  http.registerOnPreResponse((request, response, toolkit) => {
     const { cookie } = request.headers;
     const token = getCookieValueByName(cookie, 'wz-token');
     const apiHostID = getCookieValueByName(cookie, 'wz-api');
 
-    if (token && apiHostID && LOGOUT_PATH.test(request.url.pathname || '')) {
+    if (
+      response.statusCode >= 400 ||
+      !token ||
+      !LOGOUT_ROUTES.has(`${request.route.method} ${request.route.path}`)
+    ) {
+      return toolkit.next();
+    }
+
+    if (apiHostID) {
       // Not awaited, so the logout is not delayed by the Server API
       serverAPIClient
         .asScoped({}, request)
@@ -65,21 +80,10 @@ export function registerRevokeAPITokenOnLogout(
         );
     }
 
-    return toolkit.next();
-  });
-
-  // Only on a completed logout, not on one the XSRF check rejected
-  http.registerOnPreResponse((request, response, toolkit) => {
-    if (
-      response.statusCode < 400 &&
-      LOGOUT_PATH.test(request.url.pathname || '') &&
-      getCookieValueByName(request.headers.cookie, 'wz-token')
-    ) {
-      return toolkit.next({
-        headers: { 'set-cookie': 'wz-token=; Path=/; Max-Age=0; HttpOnly' },
-      });
-    }
-
-    return toolkit.next();
+    // Replaces any set-cookie header of the logout response. The security
+    // plugin clears its session through hapi state, which is added later.
+    return toolkit.next({
+      headers: { 'set-cookie': 'wz-token=; Path=/; Max-Age=0; HttpOnly' },
+    });
   });
 }

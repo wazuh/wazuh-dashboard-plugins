@@ -1,45 +1,42 @@
 import { registerRevokeAPITokenOnLogout } from './revoke-api-token-on-logout';
 
 const COOKIE = 'wz-token=abc; wz-api=default; security_authentication=xyz';
+const EXPIRE_COOKIE = {
+  headers: { 'set-cookie': 'wz-token=; Path=/; Max-Age=0; HttpOnly' },
+};
 
 function setup(requestImpl = jest.fn().mockResolvedValue({})) {
   let handler;
-  let preResponse;
-  const http = {
-    registerOnPostAuth: jest.fn(fn => (handler = fn)),
-    registerOnPreResponse: jest.fn(fn => (preResponse = fn)),
-  };
+  const http = { registerOnPreResponse: jest.fn(fn => (handler = fn)) };
   const logger = { warn: jest.fn() };
   const asScoped = jest.fn(() => ({ request: requestImpl }));
   registerRevokeAPITokenOnLogout(http, {
     serverAPIClient: { asScoped },
     logger,
   });
-  const toolkit = { next: jest.fn(() => 'next') };
-  const run = (pathname: string, cookie = COOKIE) =>
-    handler({ url: { pathname }, headers: { cookie } }, {}, toolkit);
-  const respond = (pathname: string, cookie = COOKIE, statusCode = 200) => {
-    preResponse(
-      { url: { pathname }, headers: { cookie } },
+  const toolkit = { next: jest.fn(headers => headers) };
+  const run = (route: string, { cookie = COOKIE, statusCode = 200 } = {}) => {
+    const [method, path] = route.split(' ');
+    return handler(
+      { route: { method, path }, headers: { cookie } },
       { statusCode },
       toolkit,
     );
-    return toolkit.next.mock.calls[0][0];
   };
-  return { run, respond, request: requestImpl, logger, toolkit };
+  return { run, request: requestImpl, logger };
 }
 
 describe('registerRevokeAPITokenOnLogout', () => {
   it.each([
-    '/auth/logout',
-    '/api/v1/auth/logout',
-    '/auth/openid/logout',
-    '/auth/saml/logout',
-    '/auth/proxy/logout',
-  ])('revokes the token on %s', pathname => {
+    ['post /auth/logout', 200],
+    ['post /api/v1/auth/logout', 200],
+    ['post /auth/proxy/logout', 200],
+    ['get /auth/openid/logout', 302],
+    ['get /auth/saml/logout', 302],
+  ])('revokes the token and expires its cookie on %s', (route, statusCode) => {
     const { run, request } = setup();
 
-    expect(run(pathname)).toBe('next');
+    expect(run(route, { statusCode })).toEqual(EXPIRE_COOKIE);
     expect(request).toHaveBeenCalledWith(
       'DELETE',
       '/security/user/authenticate',
@@ -48,52 +45,47 @@ describe('registerRevokeAPITokenOnLogout', () => {
     );
   });
 
-  it.each(['/api/request', '/auth/login', '/app/wz-home', '/auth/logout/x'])(
-    'does nothing on %s',
-    pathname => {
-      const { run, request } = setup();
+  it.each([
+    ['get /auth/logout', 404],
+    ['post /x/auth/logout', 404],
+    ['post /auth/logout', 400],
+    ['get /auth/saml/logout', 400],
+    ['post /api/request', 200],
+    ['post /auth/login', 200],
+  ])('does nothing on %s (status %p)', (route, statusCode) => {
+    const { run, request } = setup();
 
-      expect(run(pathname)).toBe('next');
-      expect(request).not.toHaveBeenCalled();
-    },
-  );
+    expect(run(route, { statusCode })).toBeUndefined();
+    expect(request).not.toHaveBeenCalled();
+  });
 
-  it.each(['', 'wz-api=default', 'wz-token=abc'])(
-    'does nothing without both cookies (%p)',
-    cookie => {
-      const { run, request } = setup();
+  it('does nothing without the wz-token cookie', () => {
+    const { run, request } = setup();
 
-      run('/auth/logout', cookie);
-      expect(request).not.toHaveBeenCalled();
-    },
-  );
+    expect(run('post /auth/logout', { cookie: 'wz-api=default' })).toBe(
+      undefined,
+    );
+    expect(request).not.toHaveBeenCalled();
+  });
+
+  it('expires the cookie without revoking when the API host is unknown', () => {
+    const { run, request } = setup();
+
+    expect(run('post /auth/logout', { cookie: 'wz-token=abc' })).toEqual(
+      EXPIRE_COOKIE,
+    );
+    expect(request).not.toHaveBeenCalled();
+  });
 
   it('logs a failed revocation without blocking the logout', async () => {
     const { run, logger } = setup(
       jest.fn().mockRejectedValue(new Error('timeout')),
     );
 
-    expect(run('/auth/logout')).toBe('next');
+    expect(run('post /auth/logout')).toEqual(EXPIRE_COOKIE);
     await new Promise(process.nextTick);
     expect(logger.warn).toHaveBeenCalledWith(
       'Could not revoke the Server API token on logout: timeout',
     );
   });
-
-  it('expires the wz-token cookie on logout', () => {
-    expect(setup().respond('/auth/logout')).toEqual({
-      headers: { 'set-cookie': 'wz-token=; Path=/; Max-Age=0; HttpOnly' },
-    });
-  });
-
-  it.each([
-    ['/api/request', COOKIE, 200],
-    ['/auth/logout', 'wz-api=default', 200],
-    ['/auth/logout', COOKIE, 400],
-  ])(
-    'keeps the response headers on %s (cookie: %p, status %p)',
-    (pathname, cookie, statusCode) => {
-      expect(setup().respond(pathname, cookie, statusCode)).toBeUndefined();
-    },
-  );
 });
