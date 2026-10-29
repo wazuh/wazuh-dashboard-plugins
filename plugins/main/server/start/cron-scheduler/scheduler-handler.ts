@@ -4,6 +4,7 @@ import cron from 'node-cron';
 import { WAZUH_STATISTICS_TEMPLATE_NAME } from '../../../common/constants';
 import statisticsTemplate from '../../integration-files/statistics-template.json';
 import { delayAsPromise } from '../../../common/utils';
+import { isValidCronInterval } from '../../../common/services/cron-interval';
 
 const schedulerJobs = [];
 
@@ -103,6 +104,12 @@ export async function jobSchedulerRun(context) {
   await checkPluginPlatformStatus(context);
   const jobs = await configuredJobs(context, {});
   for (const job in jobs) {
+    if (!isValidCronInterval(jobs[job].interval)) {
+      context.wazuh.logger.error(
+        `Invalid interval [${jobs[job].interval}] for the ${job} job. Skipped.`,
+      );
+      continue;
+    }
     const schedulerJob: SchedulerJob = new SchedulerJob(job, context);
     schedulerJobs.push(schedulerJob);
     const task = cron.schedule(jobs[job].interval, () => schedulerJob.run());
