@@ -22,16 +22,18 @@ describe('ButtonAboutITHygiene', () => {
       'has to be configured in the agents',
     );
     [
-      ['system', 'wazuh-states-inventory-system'],
-      ['packages', 'wazuh-states-inventory-packages'],
-      ['ports', 'wazuh-states-inventory-ports'],
-      ['dashboard', 'wazuh-states-inventory'],
+      ['system', 'wazuh-states-inventory-system*'],
+      ['packages', 'wazuh-states-inventory-packages*'],
+      ['ports', 'wazuh-states-inventory-ports*'],
+      ['dashboard', 'wazuh-states-inventory*'],
+      ['findings', 'wazuh-findings-v5*'],
     ].forEach(([id, index]) =>
       expect(
         screen
           .getByRole('dialog')
-          .querySelector(`[data-test-subj="itHygieneIndex-${id}"]`),
-      ).toHaveTextContent(new RegExp(`^${index}$`)),
+          .querySelector(`[data-test-subj="itHygieneIndex-${id}"]`)
+          ?.textContent,
+      ).toBe(index),
     );
     [
       [/available fields/, 'available-inventory-fields.html'],

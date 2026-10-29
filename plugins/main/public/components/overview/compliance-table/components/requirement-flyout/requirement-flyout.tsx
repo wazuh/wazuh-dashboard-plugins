@@ -40,7 +40,6 @@ import {
   PatternDataSourceFilterManager,
   FILTER_OPERATOR,
 } from '../../../../common/data-source';
-import { formatUIDate } from '../../../../../react-services';
 import TechniqueRowDetails from '../../../mitre/framework/components/techniques/components/flyout-technique/technique-row-details';
 import {
   buildPhraseFilter,
@@ -136,7 +135,6 @@ export const RequirementFlyout = connect(mapStateToProps)(
               defaultMessage: 'Time',
             },
           ),
-          render: value => formatUIDate(value),
         },
         {
           id: this.props.getRequirementKey(),
@@ -179,7 +177,6 @@ export const RequirementFlyout = connect(mapStateToProps)(
             },
           ),
           width: 140,
-          render: value => formatUIDate(value),
         },
         {
           id: 'wazuh.agent.id',

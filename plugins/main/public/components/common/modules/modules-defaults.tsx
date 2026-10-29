@@ -37,6 +37,7 @@ import { malwareDetectionColumns } from '../../overview/malware-detection/events
 import { activeResponsesColumns } from '../../overview/active-responses/events/active-responses-columns';
 import { ActiveResponseFlyoutBody } from '../../overview/active-responses/events/active-response-flyout-body';
 import { azureColumns } from '../../overview/azure/events/azure-columns';
+import { itHygieneFindingsColumns } from '../../overview/it-hygiene/events/it-hygiene-findings-columns';
 import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
@@ -78,6 +79,7 @@ import {
   AlertsVulnerabilitiesDataSource,
   AWSDataSource,
   FIMFindingsDataSource,
+  ITHygieneFindingsDataSource,
   GitHubDataSource,
   MalwareDetectionDataSource,
   TSCDataSource,
@@ -119,11 +121,13 @@ import {
 import { InventoryFIM } from '../../overview/fim';
 import { ButtonAboutFileIntegrityMonitoring } from '../../overview/fim/components/about/button-about-file-integrity-monitoring';
 import { FimEmptyState } from '../../overview/fim/components/empty-state/fim-empty-state';
+import { DockerEmptyState } from '../../overview/docker/components/empty-state';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ButtonAboutITHygiene } from '../../overview/it-hygiene/components/about/button-about-it-hygiene';
 import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
 import { MalwareDetectionEmptyState } from '../../overview/malware-detection/components/empty-state/malware-detection-empty-state';
+import { ThreatHuntingEmptyState } from '../../overview/threat-hunting/components/empty-state/threat-hunting-empty-state';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 
@@ -213,6 +217,7 @@ export const ModulesDefaults = {
           WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
           WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
         ],
+        emptyState: <ThreatHuntingEmptyState />,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -514,6 +519,7 @@ export const ModulesDefaults = {
         tableColumns: dockerColumns,
         DataSource: DockerDataSource,
         categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
+        emptyState: <DockerEmptyState />,
       }),
     ],
     availableFor: ['manager', 'agent'],
@@ -709,6 +715,15 @@ export const ModulesDefaults = {
         name: TAB_NAMES.services,
         buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
         component: ITHygieneServicesInventory,
+      },
+      {
+        ...renderFindingsDiscoverTab({
+          moduleId: 'it-hygiene',
+          tableColumns: itHygieneFindingsColumns,
+          DataSource: ITHygieneFindingsDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
       },
     ],
     availableFor: ['manager', 'agent'],

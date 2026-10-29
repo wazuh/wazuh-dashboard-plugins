@@ -9,6 +9,7 @@ import {
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
 import {
+  WAZUH_FINDINGS_PATTERN,
   WAZUH_IT_HYGIENE_BROWSER_EXTENSIONS_PATTERN,
   WAZUH_IT_HYGIENE_GROUPS_PATTERN,
   WAZUH_IT_HYGIENE_HARDWARE_PATTERN,
@@ -28,8 +29,6 @@ import {
   AboutFlyoutButton,
   AboutFlyoutDocsLink,
 } from '../../../../common/flyouts/about-flyout-button';
-
-const indexName = (pattern: string) => pattern.replace(/\*$/, '');
 
 const indices = [
   {
@@ -130,6 +129,13 @@ const indices = [
       defaultMessage: 'Services',
     }),
     pattern: WAZUH_IT_HYGIENE_SERVICES_PATTERN,
+  },
+  {
+    id: 'findings',
+    label: i18n.translate('wazuh.itHygiene.aboutFlyout.indices.findings', {
+      defaultMessage: 'Findings',
+    }),
+    pattern: WAZUH_FINDINGS_PATTERN,
   },
 ];
 
@@ -241,6 +247,18 @@ export const ButtonAboutITHygiene = () => (
             },
           ),
         },
+        {
+          title: i18n.translate('wazuh.itHygiene.aboutFlyout.findingsTab', {
+            defaultMessage: 'Findings',
+          }),
+          description: i18n.translate(
+            'wazuh.itHygiene.aboutFlyout.findingsTabDescription',
+            {
+              defaultMessage:
+                'Lists the changes detected between inventory scans, such as a package, user or service that was created, modified or deleted. It stays empty until something changes after the first scan.',
+            },
+          ),
+        },
       ]}
     />
     <EuiSpacer size='m' />
@@ -256,7 +274,7 @@ export const ButtonAboutITHygiene = () => (
       <p>
         <FormattedMessage
           id='wazuh.itHygiene.aboutFlyout.indicesDescription'
-          defaultMessage='The indexer stores the inventory in one index for each type of data. See the {link} of each index.'
+          defaultMessage='The indexer stores the inventory in one index for each type of data, and the changes in the findings index. See the {link} of each index.'
           values={{
             link: (
               <AboutFlyoutDocsLink path='user-manual/capabilities/system-inventory/available-inventory-fields.html'>
@@ -275,9 +293,7 @@ export const ButtonAboutITHygiene = () => (
       listItems={indices.map(({ id, label, pattern }) => ({
         title: label,
         description: (
-          <EuiCode data-test-subj={`itHygieneIndex-${id}`}>
-            {indexName(pattern)}
-          </EuiCode>
+          <EuiCode data-test-subj={`itHygieneIndex-${id}`}>{pattern}</EuiCode>
         ),
       }))}
     />
