@@ -69,6 +69,7 @@ import { vulnerabilityManagedFilters } from '../../common/vulnerability-managed-
 import RestoreStateColumnsButton from '../../../../common/wazuh-discover/components/restore-state-columns';
 import managedFilters from './managed-filters';
 import DashboardRenderer from '../../../../common/dashboards/dashboard-renderer/dashboard-renderer';
+import { QueryErrorPrompt } from '../../../../common/query-error';
 
 const InventoryVulsComponent = () => {
   const {
@@ -92,6 +93,7 @@ const InventoryVulsComponent = () => {
   });
   const { query } = searchBarProps;
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [fetchError, setFetchError] = useState<unknown>(undefined);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const [indexPattern, setIndexPattern] = useState<IndexPattern | undefined>(
     undefined,
@@ -178,11 +180,23 @@ const InventoryVulsComponent = () => {
       return;
     }
     setIndexPattern(dataSource?.indexPattern);
+    // Ignore the response of a request that a newer one replaced.
+    let ignore = false;
     fetchData({ query, pagination, sorting })
       .then(results => {
+        if (ignore) {
+          return;
+        }
+        setFetchError(undefined);
         setResults(results);
       })
       .catch(error => {
+        if (ignore) {
+          return;
+        }
+        // Drop stale hits so only the error prompt is shown
+        setResults({} as SearchResponse);
+        setFetchError(error);
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate(
@@ -194,6 +208,9 @@ const InventoryVulsComponent = () => {
         });
         ErrorHandler.handleError(searchError);
       });
+    return () => {
+      ignore = true;
+    };
   }, [
     /* FIX: If changing any filter and the results total is the same, the page is not reset to the
      initial page but it causes a request. This has a different behavior compared with the table
@@ -250,6 +267,12 @@ const InventoryVulsComponent = () => {
                 </HideOnErrorInitializatingDataSource>
               </>
             )}
+            {fetchError ? (
+              <QueryErrorPrompt
+                error={fetchError}
+                indexPatternTitle={dataSource?.indexPattern?.title}
+              />
+            ) : null}
             {!isDataSourceLoading && results?.hits?.total === 0 ? (
               <DiscoverNoResults />
             ) : null}
