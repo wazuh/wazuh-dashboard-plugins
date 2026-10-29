@@ -8,7 +8,10 @@ import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/
 import { i18n } from '@osd/i18n';
 import { WzRequest } from '../../../react-services/wz-request';
 import { getColorPaletteByIndex } from './get-color-palette-by-index';
-import { agentStatusLabelByAgentStatus } from '../../../../common/services/wz_agent_status';
+import {
+  agentStatusDescriptionByAgentStatus,
+  agentStatusLabelByAgentStatus,
+} from '../../../../common/services/wz_agent_status';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../common/welcome/home-overview/lib/theme-colors';
 
 /* eslint-enable */
@@ -32,6 +35,7 @@ interface AgentDataItem {
   value: number;
   color: string;
   status?: string;
+  description?: string;
 }
 
 interface AgentsInfoResult {
@@ -62,6 +66,7 @@ export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
     const AGENT_STATUS = UI_ORDER_AGENT_STATUS.map(agentStatus => ({
       status: agentStatus,
       label: agentStatusLabelByAgentStatus(agentStatus),
+      description: agentStatusDescriptionByAgentStatus(agentStatus),
       color: HOME_OVERVIEW_AGENT_STATUS_COLOR[agentStatus],
     }));
 
@@ -85,11 +90,9 @@ export const getAgentsInfo = async (): Promise<AgentsInfoResult> => {
       },
     );
 
-    const statusData = AGENT_STATUS.map(({ label, status, color }) => ({
-      status,
-      label,
-      value: agentSummaryData.status?.[status] ?? 0,
-      color,
+    const statusData = AGENT_STATUS.map(item => ({
+      ...item,
+      value: agentSummaryData.status?.[item.status] ?? 0,
     }));
 
     return {

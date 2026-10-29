@@ -3,6 +3,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { AgentsByStatus } from './agents-by-status';
+import { UI_DESCRIPTION_AGENT_STATUS } from '../../../../../../../common/constants';
 
 // WzButtonPermissions pulls in a react-redux `useSelector` for RBAC checks —
 // out of scope for this presentational widget's tests, so stub it down to a
@@ -74,6 +75,27 @@ describe('AgentsByStatus', () => {
     );
     fireEvent.click(screen.getByText('Disconnected').closest('button')!);
     expect(onStatusSelect).toHaveBeenCalledWith('disconnected');
+  });
+
+  it('explains each status in a tooltip on its legend entry', async () => {
+    render(
+      <AgentsByStatus
+        data={{
+          active: 2,
+          disconnected: 1,
+          pending: 0,
+          neverConnected: 0,
+          total: 3,
+        }}
+        deployAgentUrl='https://example.test/deploy'
+      />,
+    );
+
+    fireEvent.mouseOver(screen.getByText('Pending'));
+
+    expect(
+      await screen.findByRole('tooltip', { hidden: true }),
+    ).toHaveTextContent(UI_DESCRIPTION_AGENT_STATUS.pending);
   });
 
   it('shows the missing permissions when an empty fleet comes from missing agent:read', () => {

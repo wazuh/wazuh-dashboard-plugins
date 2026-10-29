@@ -4,6 +4,7 @@ import {
   EuiFlexGroup,
   EuiFlexItem,
   EuiLink,
+  EuiScreenReaderOnly,
   EuiText,
   EuiToolTip,
 } from '@elastic/eui';
@@ -24,6 +25,8 @@ export interface DistributionBarSegment {
   /** Present only for a clickable segment; navigates via callback. */
   onClick?: () => void;
   tooltip?: React.ReactNode;
+  /** Explains the category in a tooltip on its legend entry. */
+  description?: string;
 }
 
 export interface DistributionBarProps {
@@ -59,12 +62,28 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
   const total = segments.reduce((sum, segment) => sum + segment.count, 0);
 
   const renderLegendItem = (segment: DistributionBarSegment) => {
-    const content = (
+    const legendItem = (
       <LegendItem
         color={segment.color}
         label={segment.label}
         count={segment.count}
       />
+    );
+    const content = segment.description ? (
+      <>
+        <EuiToolTip
+          position='top'
+          title={segment.label}
+          content={segment.description}
+        >
+          {legendItem}
+        </EuiToolTip>
+        <EuiScreenReaderOnly>
+          <span>{segment.description}</span>
+        </EuiScreenReaderOnly>
+      </>
+    ) : (
+      legendItem
     );
 
     if (!segment.href && !segment.onClick) {

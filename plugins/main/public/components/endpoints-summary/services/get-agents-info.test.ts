@@ -5,7 +5,10 @@ import { getColorPaletteByIndex } from './get-color-palette-by-index';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
-import { agentStatusLabelByAgentStatus } from '../../../../common/services/wz_agent_status';
+import {
+  agentStatusDescriptionByAgentStatus,
+  agentStatusLabelByAgentStatus,
+} from '../../../../common/services/wz_agent_status';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../common/welcome/home-overview/lib/theme-colors';
 
 jest.mock('../../../react-services/wz-request', () => ({
@@ -24,6 +27,7 @@ jest.mock('../../../react-services/common-services', () => ({
 
 jest.mock('../../../../common/services/wz_agent_status', () => ({
   agentStatusLabelByAgentStatus: jest.fn(),
+  agentStatusDescriptionByAgentStatus: jest.fn(),
 }));
 
 describe('getAgents', () => {
@@ -66,24 +70,28 @@ describe('getAgents', () => {
         {
           status: 'active',
           label: 'ACTIVE',
+          description: 'active description',
           value: 24,
           color: HOME_OVERVIEW_AGENT_STATUS_COLOR.active,
         },
         {
           status: 'disconnected',
           label: 'DISCONNECTED',
+          description: 'disconnected description',
           value: 0,
           color: HOME_OVERVIEW_AGENT_STATUS_COLOR.disconnected,
         },
         {
           status: 'pending',
           label: 'PENDING',
+          description: 'pending description',
           value: 15,
           color: HOME_OVERVIEW_AGENT_STATUS_COLOR.pending,
         },
         {
           status: 'never_connected',
           label: 'NEVER_CONNECTED',
+          description: 'never_connected description',
           value: 11,
           color: HOME_OVERVIEW_AGENT_STATUS_COLOR.never_connected,
         },
@@ -96,6 +104,10 @@ describe('getAgents', () => {
       (label: string) => {
         return label.toUpperCase();
       },
+    );
+
+    (agentStatusDescriptionByAgentStatus as jest.Mock).mockImplementation(
+      (status: string) => `${status} description`,
     );
 
     (getColorPaletteByIndex as jest.Mock).mockImplementation(

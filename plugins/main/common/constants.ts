@@ -832,6 +832,37 @@ export const UI_LABEL_NAME_AGENT_STATUS = {
   }),
 } as const;
 
+export const UI_DESCRIPTION_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: i18n.translate(
+    'wazuh.common.agentStatusDescription.active',
+    {
+      defaultMessage:
+        'The agent is connected and sends keep-alive messages to the manager.',
+    },
+  ),
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: i18n.translate(
+    'wazuh.common.agentStatusDescription.disconnected',
+    {
+      defaultMessage:
+        'The agent stopped, sent no keep-alive for agents_disconnection_time (15 minutes by default), or the manager restarted and is waiting for its next keep-alive.',
+    },
+  ),
+  [API_NAME_AGENT_STATUS.PENDING]: i18n.translate(
+    'wazuh.common.agentStatusDescription.pending',
+    {
+      defaultMessage:
+        'The agent started and contacted the manager, which is waiting for its first keep-alive.',
+    },
+  ),
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: i18n.translate(
+    'wazuh.common.agentStatusDescription.neverConnected',
+    {
+      defaultMessage:
+        'The agent is enrolled but has never connected to the manager.',
+    },
+  ),
+} as const;
+
 export const UI_ORDER_AGENT_STATUS = [
   API_NAME_AGENT_STATUS.ACTIVE,
   API_NAME_AGENT_STATUS.DISCONNECTED,

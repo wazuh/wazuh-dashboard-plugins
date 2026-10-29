@@ -274,7 +274,7 @@ export class WzGroupsOverview extends Component {
               'wazuh.endpointGroups.overview.description',
               {
                 defaultMessage:
-                  'From here you can list and check your groups, its agents and files.',
+                  'Agents in a group receive its shared configuration (agent.conf) and files, so you can configure many agents at once. Select a group to see its agents and files.',
               },
             )}
             tableColumns={this.tableColumns}

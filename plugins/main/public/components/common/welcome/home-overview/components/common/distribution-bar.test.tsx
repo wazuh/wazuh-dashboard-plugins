@@ -47,6 +47,25 @@ describe('DistributionBar', () => {
     expect(link).toHaveAttribute('href', '#/agents?status=active');
   });
 
+  it('explains a segment with a description in a tooltip on its legend entry', async () => {
+    render(
+      <DistributionBar
+        segments={[
+          { ...segments[1], description: 'No keep-alive received.' },
+          segments[0],
+        ]}
+      />,
+    );
+    // Screen readers get the description without hovering
+    expect(screen.getByText('No keep-alive received.')).toBeInTheDocument();
+
+    fireEvent.mouseOver(screen.getByText('Disconnected'));
+
+    const tooltip = await screen.findByRole('tooltip', { hidden: true });
+    expect(tooltip).toHaveTextContent('Disconnected');
+    expect(tooltip).toHaveTextContent('No keep-alive received.');
+  });
+
   it('renders the empty message instead of a blank bar when there are no segments', () => {
     render(<DistributionBar segments={[]} emptyMessage='No data available' />);
     expect(screen.getByText('No data available')).toBeInTheDocument();
