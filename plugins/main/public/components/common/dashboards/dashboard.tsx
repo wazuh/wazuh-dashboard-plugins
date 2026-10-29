@@ -12,6 +12,7 @@ import { SampleDataWarning } from '../../visualize/components';
 import { compose } from 'redux';
 import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 import classnames from 'classnames';
+import { QueryErrorPrompt } from '../query-error';
 
 export const Dashboard = props => {
   const hasPinnedAgent = Boolean(
@@ -21,7 +22,10 @@ export const Dashboard = props => {
   // This is not used by the SCA dashboard.
   useReportingCommunicateSearchContext({
     isSearching: props.dataSource.dataSource.isLoading,
-    totalResults: props.dataSourceAction?.data?.hits?.total ?? 0,
+    // A failed search keeps the previous hits, so report none while it shows.
+    totalResults: props.dataSourceAction?.error
+      ? 0
+      : props.dataSourceAction?.data?.hits?.total ?? 0,
     indexPattern: props.dataSource.dataSource?.indexPattern,
     dashboardSavedObjectId: hasPinnedAgent
       ? props.getDashboardPanels[0].agentDashboardId
@@ -34,9 +38,10 @@ export const Dashboard = props => {
     },
   });
 
-  const shouldHideDashboard = !Boolean(
-    props.dataSourceAction?.data?.hits?.total > 0,
-  );
+  const fetchError = props.dataSourceAction?.error;
+  const shouldHideDashboard =
+    Boolean(fetchError) ||
+    !Boolean(props.dataSourceAction?.data?.hits?.total > 0);
 
   return (
     <>
@@ -50,7 +55,13 @@ export const Dashboard = props => {
         showQueryInput={true}
         showQueryBar={true}
       />
-      {props.dataSourceAction?.data?.hits?.total === 0
+      {fetchError ? (
+        <QueryErrorPrompt
+          error={fetchError}
+          indexPatternTitle={props.dataSource.dataSource.indexPattern.title}
+        />
+      ) : null}
+      {!fetchError && props.dataSourceAction?.data?.hits?.total === 0
         ? props.emptyState ?? <DiscoverNoResults />
         : null}
       <div>

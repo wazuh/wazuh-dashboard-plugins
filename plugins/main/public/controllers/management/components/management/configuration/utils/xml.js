@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { i18n } from '@osd/i18n';
+import { readErrorPosition } from './xml-manager';
 
 const parser = new DOMParser();
 
@@ -71,29 +72,66 @@ export const normalizeQueryEscapes = xml =>
       open + content.replace(/\\<([^<]*?)\\>/g, '\\<$1>') + close,
   );
 
+const WRAPPER_OPEN_TAG = '<file>';
+
 /**
- * Validate XML
+ * Check the agent group configuration XML. The content is normalized
+ * (EventChannel query escapes, illegal characters, XML declaration) and wrapped
+ * in a single root before parsing, so several root elements are accepted.
+ *
+ * The reported line matches the edited text. The column is shifted back by the
+ * wrapper on the first line, and stays approximate on lines the normalization
+ * rewrites.
+ *
  * @param {string} xml
- * @returns {string|boolean}
+ * @returns {false | { message: string, line?: number, column?: number }} The
+ * error and where the parser stopped, or `false` when well-formed.
  */
-export const validateXML = xml => {
+export const readXMLError = xml => {
   const xmlNormalized = normalizeQueryEscapes(xml);
   const xmlReplaced = replaceIllegalXML(xmlNormalized)
     .replace(/..xml.+\?>/, '')
     .replace(/\\</gm, '');
   const xmlDoc = parser.parseFromString(
-    `<file>${xmlReplaced}</file>`,
+    `${WRAPPER_OPEN_TAG}${xmlReplaced}</file>`,
     'text/xml',
   );
   const parsererror = xmlDoc.getElementsByTagName('parsererror');
-  if (parsererror.length) {
-    const xmlFullError = parsererror[0].textContent;
-    return (
-      (xmlFullError.match('error\\s.+\n') || [])[0] ||
-      i18n.translate('wazuh.configuration.xml.validationError', {
-        defaultMessage: 'Error validating XML',
-      })
-    );
+  if (!parsererror.length) {
+    return false;
   }
-  return false;
+  const position = readErrorPosition(parsererror[0].textContent);
+  if (!position) {
+    return {
+      message: i18n.translate('wazuh.configuration.xml.validationError', {
+        defaultMessage: 'Error validating XML',
+      }),
+    };
+  }
+  const { line } = position;
+  const column =
+    position.column && line === 1
+      ? Math.max(position.column - WRAPPER_OPEN_TAG.length, 1)
+      : position.column;
+  const message = column
+    ? i18n.translate('wazuh.configuration.xml.notWellFormedAtColumn', {
+        defaultMessage:
+          'XML is not well-formed at line {line}, column {column}',
+        values: { line, column },
+      })
+    : i18n.translate('wazuh.configuration.xml.notWellFormedAtLine', {
+        defaultMessage: 'XML is not well-formed at line {line}',
+        values: { line },
+      });
+  return { message, line, column };
+};
+
+/**
+ * Validate XML. See `readXMLError`.
+ * @param {string} xml
+ * @returns {string|boolean} An error message, or `false` when well-formed.
+ */
+export const validateXML = xml => {
+  const error = readXMLError(xml);
+  return error ? error.message : false;
 };

@@ -10,11 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+import { debounce } from 'lodash';
 import { FormattedMessage } from '@osd/i18n/react';
 import { i18n } from '@osd/i18n';
 
 import { connect } from 'react-redux';
-import { cleanFileContent } from '../../../../../redux/actions/groupsActions';
+import {
+  cleanFileContent,
+  updateFileEditorHasChanges,
+} from '../../../../../redux/actions/groupsActions';
 import validateConfigAfterSent from './utils/valid-configuration';
 
 // Eui components
@@ -36,11 +40,14 @@ import {
 import GroupsHandler from './utils/groups-handler';
 
 import { getToasts } from '../../../../../kibana-services';
-import { validateXML } from '../configuration/utils/xml';
+import { readXMLError } from '../configuration/utils/xml';
+import {
+  toXMLErrorAnnotations,
+  XML_VALIDATION_DELAY_MS,
+} from '../configuration/utils/xml-manager';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
 import { ButtonAboutCentralizedConfiguration } from './button-about-centralized-configuration';
-import WazuhXmlMode from '../configuration/utils/wz-xml-mode';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -60,6 +67,9 @@ class WzGroupsEditor extends Component {
       enableSnippets: true,
       enableLiveAutocompletion: true,
       behavioursEnabled: false,
+      // The format is checked on the main thread (see readXMLError): the
+      // editor worker is not needed and cannot be loaded on every platform.
+      useWorker: false,
     };
     this.groupsHandler = GroupsHandler;
     const { fileContent } = this.props.state;
@@ -76,8 +86,21 @@ class WzGroupsEditor extends Component {
       isEditable,
       initContent: content,
       groupName: groupName,
+      // Checked right away so a broken file shows its error when it opens.
+      xmlIssue: readXMLError(content),
     };
+    // Parsing a large file on every keystroke blocks typing: check it once
+    // the changes pause. Save checks the current content again.
+    this.validateContentDebounced = debounce(
+      () => this.setState({ xmlIssue: readXMLError(this.state.content) }),
+      XML_VALIDATION_DELAY_MS,
+    );
   }
+
+  onContentChange = content => {
+    this.setState({ content });
+    this.validateContentDebounced();
+  };
 
   updateHeight = () => {
     this.height = window.innerHeight - 275; //eslint-disable-line
@@ -90,11 +113,16 @@ class WzGroupsEditor extends Component {
         hasChanges: this.state.content !== this.state.initContent,
       });
     }
+    if (prevState.hasChanges !== this.state.hasChanges) {
+      this.props.updateFileEditorHasChanges(this.state.hasChanges);
+    }
   }
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
     this._isMounted = false;
+    this.props.updateFileEditorHasChanges(false);
+    this.validateContentDebounced.cancel();
     window.removeEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
@@ -113,9 +141,17 @@ class WzGroupsEditor extends Component {
     if (!this._isMounted) {
       return;
     }
+    // The pending check may still reflect older content: never send
+    // content that is not well-formed.
+    this.validateContentDebounced.cancel();
+    const xmlIssue = readXMLError(this.state.content);
+    if (xmlIssue) {
+      this.setState({ xmlIssue });
+      return;
+    }
     try {
       const { content, groupName } = this.state;
-      this.setState({ isSaving: true, error: false });
+      this.setState({ isSaving: true, error: false, xmlIssue });
       let saver = this.groupsHandler.sendGroupConfiguration;
       await saver(name, groupName, content);
       await validateConfigAfterSent();
@@ -160,9 +196,9 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { name, content, isEditable, groupName } = this.state;
+    const { name, content, isEditable, groupName, xmlIssue } = this.state;
 
-    const xmlError = validateXML(content);
+    const xmlError = xmlIssue && xmlIssue.message;
     const saveButton = (
       <WzButtonPermissions
         permissions={[
@@ -197,7 +233,7 @@ class WzGroupsEditor extends Component {
               { defaultMessage: 'Unsubmitted changes' },
             )}
             onConfirm={() => {
-              closeModal;
+              closeModal();
               this.props.cleanFileContent();
             }}
             onCancel={closeModal}
@@ -310,19 +346,15 @@ class WzGroupsEditor extends Component {
                             width='100%'
                             height={`calc(100vh - ${xmlError ? 250 : 230}px)`}
                             value={content}
-                            onChange={newContent =>
-                              this.setState({ content: newContent })
-                            }
+                            onChange={this.onContentChange}
                             mode='xml'
                             wrapEnabled
                             setOptions={this.codeEditorOptions}
+                            annotations={toXMLErrorAnnotations(xmlIssue)}
                             aria-label={i18n.translate(
                               'wazuh.endpointGroups.editor.codeEditorAriaLabel',
                               { defaultMessage: 'Code Editor' },
                             )}
-                            onLoad={editor => {
-                              editor.getSession().setMode(new WazuhXmlMode());
-                            }}
                           />
                         )) || (
                           <EuiCodeBlock
@@ -357,6 +389,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     cleanFileContent: () => dispatch(cleanFileContent()),
+    updateFileEditorHasChanges: hasChanges =>
+      dispatch(updateFileEditorHasChanges(hasChanges)),
   };
 };
 
