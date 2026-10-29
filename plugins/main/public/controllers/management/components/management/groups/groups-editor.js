@@ -14,7 +14,10 @@ import { FormattedMessage } from '@osd/i18n/react';
 import { i18n } from '@osd/i18n';
 
 import { connect } from 'react-redux';
-import { cleanFileContent } from '../../../../../redux/actions/groupsActions';
+import {
+  cleanFileContent,
+  updateFileEditorHasChanges,
+} from '../../../../../redux/actions/groupsActions';
 import validateConfigAfterSent from './utils/valid-configuration';
 
 // Eui components
@@ -89,11 +92,15 @@ class WzGroupsEditor extends Component {
         hasChanges: this.state.content !== this.state.initContent,
       });
     }
+    if (prevState.hasChanges !== this.state.hasChanges) {
+      this.props.updateFileEditorHasChanges(this.state.hasChanges);
+    }
   }
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
     this._isMounted = false;
+    this.props.updateFileEditorHasChanges(false);
     window.removeEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
@@ -196,7 +203,7 @@ class WzGroupsEditor extends Component {
               { defaultMessage: 'Unsubmitted changes' },
             )}
             onConfirm={() => {
-              closeModal;
+              closeModal();
               this.props.cleanFileContent();
             }}
             onCancel={closeModal}
@@ -353,6 +360,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     cleanFileContent: () => dispatch(cleanFileContent()),
+    updateFileEditorHasChanges: hasChanges =>
+      dispatch(updateFileEditorHasChanges(hasChanges)),
   };
 };
 
