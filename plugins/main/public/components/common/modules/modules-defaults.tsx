@@ -46,6 +46,7 @@ import {
   TAB_VIEW_NAME_EVENTS,
   TAB_VIEW_NAME_RESPONSES,
   WAZUH_MODULES_ID,
+  WAZUH_SAMPLE_ACTIVE_RESPONSES,
   WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
@@ -124,6 +125,7 @@ import { FimEmptyState } from '../../overview/fim/components/empty-state/fim-emp
 import { DockerEmptyState } from '../../overview/docker/components/empty-state';
 import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
+import { ButtonAboutIncidentResponse } from '../../overview/active-responses/about/button-about-incident-response';
 import { ButtonAboutITHygiene } from '../../overview/it-hygiene/components/about/button-about-it-hygiene';
 import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
 import { MalwareDetectionEmptyState } from '../../overview/malware-detection/components/empty-state/malware-detection-empty-state';
@@ -735,6 +737,7 @@ export const ModulesDefaults = {
         id: TAB_VIEW_ID_DASHBOARD,
         name: TAB_VIEW_NAME_DASHBOARD,
         buttons: [
+          ButtonAboutIncidentResponse,
           ({ ...props }) => (
             <ButtonExploreAgent
               {...props}
@@ -749,6 +752,7 @@ export const ModulesDefaults = {
         id: TAB_VIEW_ID_RESPONSES,
         name: TAB_VIEW_NAME_RESPONSES,
         buttons: [
+          ButtonAboutIncidentResponse,
           ({ ...props }) => (
             <ButtonExploreAgent
               {...props}
@@ -762,7 +766,7 @@ export const ModulesDefaults = {
             tableColumns={activeResponsesColumns}
             DataSource={ActiveResponsesDataSource}
             DataSourceRepository={ActiveResponsesDataSourceRepository}
-            categoriesSampleData={[]}
+            categoriesSampleData={[WAZUH_SAMPLE_ACTIVE_RESPONSES]}
             flyoutTitle={i18n.translate(
               'wazuh.common.moduleTabs.activeResponses.flyoutTitle',
               { defaultMessage: 'Active response details' },

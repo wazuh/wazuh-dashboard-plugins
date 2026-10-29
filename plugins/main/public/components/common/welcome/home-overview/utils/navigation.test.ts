@@ -1,6 +1,8 @@
 import rison from 'rison-node';
 import {
   getAiAssistantUrl,
+  getCreateActiveResponseUrl,
+  isActiveResponsesRegistered,
   getMitreFindingsByTechniqueUrl,
   getMitreIntelligenceResourceUrl,
   getMitreFrameworkTacticUrl,
@@ -214,6 +216,26 @@ describe('isAiAssistantRegistered', () => {
 
   it('is false when the plugin is disabled, so its app is not registered', () => {
     expect(isAiAssistantRegistered(new Map([['wz-home', {}]]))).toBe(false);
+  });
+});
+
+describe('getCreateActiveResponseUrl', () => {
+  it('opens the create form of the Active Responses app', () => {
+    expect(getCreateActiveResponseUrl()).toBe(
+      '/app/active-responses#/create-active-response',
+    );
+  });
+});
+
+describe('isActiveResponsesRegistered', () => {
+  it('is true when the Active Responses app is registered', () => {
+    expect(
+      isActiveResponsesRegistered(new Map([['active-responses', {}]])),
+    ).toBe(true);
+  });
+
+  it('is false when the plugin is not installed', () => {
+    expect(isActiveResponsesRegistered(new Map([['wz-home', {}]]))).toBe(false);
   });
 });
 

@@ -259,6 +259,24 @@ export const getActiveResponseResponsesUrl = () =>
     path: '#overview/?tab=incident-response-dashboard&tabView=responses',
   });
 
+/**
+ * The Active Responses app id, owned by the separate `wazuh-dashboard-notifications` plugin
+ * (`PLUGIN_ACTIVE_RESPONSES_ID`). Kept as a literal for the same reason as `AI_ASSISTANT_APP_ID`.
+ */
+const ACTIVE_RESPONSES_APP_ID = 'active-responses';
+
+/** Opens the form that creates an active response in the Active Responses app. */
+export const getCreateActiveResponseUrl = () =>
+  getUrlForApp(ACTIVE_RESPONSES_APP_ID, { path: '#/create-active-response' });
+
+/**
+ * Whether the Active Responses app is registered. It is not when its plugin is not installed, and
+ * its URL then opens "Application Not Found".
+ */
+export const isActiveResponsesRegistered = (
+  applications: ReadonlyMap<string, unknown>,
+): boolean => applications.has(ACTIVE_RESPONSES_APP_ID);
+
 export const getRegulatoryComplianceUrlHome = () =>
   getUrlForApp(regulatoryCompliance.id);
 

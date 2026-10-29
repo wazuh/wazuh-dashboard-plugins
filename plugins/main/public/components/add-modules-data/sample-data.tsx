@@ -38,6 +38,7 @@ import {
   WAZUH_SAMPLE_METRICS_COMMS,
   WAZUH_SAMPLE_VULNERABILITIES,
   WAZUH_SAMPLE_AGENT_STATS,
+  WAZUH_SAMPLE_ACTIVE_RESPONSES,
 } from '../../../common/constants';
 import { getErrorOrchestrator } from '../../react-services/common-services';
 import { malwareDetection } from '../../utils/applications';
@@ -225,6 +226,21 @@ export default class WzSampleData extends Component {
         ),
         image: '',
         categorySampleDataIndex: WAZUH_SAMPLE_AGENT_STATS,
+      },
+      {
+        title: i18n.translate(
+          'wazuh.sampleData.categories.incidentResponse.title',
+          { defaultMessage: 'Sample incident response' },
+        ),
+        description: i18n.translate(
+          'wazuh.sampleData.categories.incidentResponse.description',
+          {
+            defaultMessage:
+              'Sample data, visualizations and dashboards for Incident Response (active responses).',
+          },
+        ),
+        image: '',
+        categorySampleDataIndex: WAZUH_SAMPLE_ACTIVE_RESPONSES,
       },
     ];
     this.state = {};

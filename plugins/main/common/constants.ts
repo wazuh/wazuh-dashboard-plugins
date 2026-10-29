@@ -250,6 +250,7 @@ export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
 export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_SAMPLE_METRICS_NORMALIZATION = 'metrics-normalization';
 export const WAZUH_SAMPLE_AGENT_STATS = 'agent-stats';
+export const WAZUH_SAMPLE_ACTIVE_RESPONSES = 'active-responses';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
@@ -346,6 +347,11 @@ export const WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_AGENT_STATS_PATTERN.replace('*', ''),
   dataSet: 'agent-stats',
+};
+
+export const WAZUH_SETTING_ACTIVE_RESPONSES_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_ACTIVE_RESPONSES_PATTERN.replace('*', ''),
+  dataSet: 'active-responses',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
@@ -559,6 +565,14 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       indexPatternPrefix:
         WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.indexPatternPrefix,
       dataSet: WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.dataSet,
+    },
+  ],
+  [WAZUH_SAMPLE_ACTIVE_RESPONSES]: [
+    {
+      count: 200,
+      indexPatternPrefix:
+        WAZUH_SETTING_ACTIVE_RESPONSES_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_ACTIVE_RESPONSES_SAMPLE_PREFIX.dataSet,
     },
   ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
