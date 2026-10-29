@@ -54,18 +54,19 @@ export function registerRevokeAPITokenOnLogout(
   // On the response, so only a completed logout counts: not a 404, an XSRF
   // rejection (400) or a failed logout
   http.registerOnPreResponse((request, response, toolkit) => {
-    const { cookie } = request.headers;
-    const token = getCookieValueByName(cookie, 'wz-token');
-    const apiHostID = getCookieValueByName(cookie, 'wz-api');
-
     if (
       response.statusCode >= 400 ||
-      !token ||
       !LOGOUT_ROUTES.has(`${request.route.method} ${request.route.path}`)
     ) {
       return toolkit.next();
     }
 
+    const { cookie } = request.headers;
+    if (!getCookieValueByName(cookie, 'wz-token')) {
+      return toolkit.next();
+    }
+
+    const apiHostID = getCookieValueByName(cookie, 'wz-api');
     if (apiHostID) {
       // Not awaited, so the logout is not delayed by the Server API
       serverAPIClient
