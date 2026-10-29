@@ -4,7 +4,11 @@ const COOKIE = 'wz-token=abc; wz-api=default; security_authentication=xyz';
 
 function setup(requestImpl = jest.fn().mockResolvedValue({})) {
   let handler;
-  const http = { registerOnPostAuth: jest.fn(fn => (handler = fn)) };
+  let preResponse;
+  const http = {
+    registerOnPostAuth: jest.fn(fn => (handler = fn)),
+    registerOnPreResponse: jest.fn(fn => (preResponse = fn)),
+  };
   const logger = { warn: jest.fn() };
   const asScoped = jest.fn(() => ({ request: requestImpl }));
   registerRevokeAPITokenOnLogout(http, {
@@ -14,7 +18,15 @@ function setup(requestImpl = jest.fn().mockResolvedValue({})) {
   const toolkit = { next: jest.fn(() => 'next') };
   const run = (pathname: string, cookie = COOKIE) =>
     handler({ url: { pathname }, headers: { cookie } }, {}, toolkit);
-  return { run, request: requestImpl, logger, toolkit };
+  const respond = (pathname: string, cookie = COOKIE, statusCode = 200) => {
+    preResponse(
+      { url: { pathname }, headers: { cookie } },
+      { statusCode },
+      toolkit,
+    );
+    return toolkit.next.mock.calls[0][0];
+  };
+  return { run, respond, request: requestImpl, logger, toolkit };
 }
 
 describe('registerRevokeAPITokenOnLogout', () => {
@@ -67,4 +79,21 @@ describe('registerRevokeAPITokenOnLogout', () => {
       'Could not revoke the Server API token on logout: timeout',
     );
   });
+
+  it('expires the wz-token cookie on logout', () => {
+    expect(setup().respond('/auth/logout')).toEqual({
+      headers: { 'set-cookie': 'wz-token=; Path=/; Max-Age=0; HttpOnly' },
+    });
+  });
+
+  it.each([
+    ['/api/request', COOKIE, 200],
+    ['/auth/logout', 'wz-api=default', 200],
+    ['/auth/logout', COOKIE, 400],
+  ])(
+    'keeps the response headers on %s (cookie: %p, status %p)',
+    (pathname, cookie, statusCode) => {
+      expect(setup().respond(pathname, cookie, statusCode)).toBeUndefined();
+    },
+  );
 });

@@ -35,10 +35,11 @@ interface ServerAPIClient {
 
 /**
  * Revoke the Server API token of the user when they log out of the dashboard,
- * from any app and any logout method.
+ * from any app and any logout method, and expire its cookie so the next login
+ * does not reuse it.
  */
 export function registerRevokeAPITokenOnLogout(
-  http: Pick<HttpServiceSetup, 'registerOnPostAuth'>,
+  http: Pick<HttpServiceSetup, 'registerOnPostAuth' | 'registerOnPreResponse'>,
   {
     serverAPIClient,
     logger,
@@ -62,6 +63,21 @@ export function registerRevokeAPITokenOnLogout(
             }`,
           ),
         );
+    }
+
+    return toolkit.next();
+  });
+
+  // Only on a completed logout, not on one the XSRF check rejected
+  http.registerOnPreResponse((request, response, toolkit) => {
+    if (
+      response.statusCode < 400 &&
+      LOGOUT_PATH.test(request.url.pathname || '') &&
+      getCookieValueByName(request.headers.cookie, 'wz-token')
+    ) {
+      return toolkit.next({
+        headers: { 'set-cookie': 'wz-token=; Path=/; Max-Age=0; HttpOnly' },
+      });
     }
 
     return toolkit.next();
