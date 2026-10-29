@@ -192,7 +192,7 @@ const EndpointSecuritySectionComponent: React.FC<
                   >
                     <p>
                       {i18n.translate(
-                        'wazuh.common.homeOverviewEndpointSecurity.fimNoFiles',
+                        'wazuh.common.homeOverviewEndpointSecurity.fimNoFilesBaselined',
                         {
                           defaultMessage: 'No files baselined yet',
                         },
