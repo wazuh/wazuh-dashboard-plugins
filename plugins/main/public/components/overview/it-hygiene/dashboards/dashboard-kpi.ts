@@ -6,6 +6,11 @@ import {
   createIndexPatternReferences,
   createSearchSource,
 } from '../common/saved-vis/create-saved-vis-data';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../common/data-source';
+import { WAZUH_IT_HYGIENE_PACKAGES_PATTERN } from '../../../../../common/constants';
 
 export const getVisStateHostsTotalFreeMemoryTable = (
   indexPatternId: string,
@@ -155,6 +160,14 @@ export const getDashboardKPIs = (
             valueAxesTitleText: ' ',
             fieldCustomLabel: 'Package type',
             seriesLabel: 'Package type',
+            searchFilter: [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.WILDCARD,
+                '_index',
+                WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+                indexPatternId,
+              ),
+            ],
           },
         ),
       },
