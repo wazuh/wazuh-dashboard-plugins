@@ -1,6 +1,12 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLink,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import {
   WidgetGroup,
@@ -61,7 +67,9 @@ const EndpointSecuritySectionComponent: React.FC<
       <SectionHeader
         title={i18n.translate(
           'wazuh.common.homeOverviewEndpointSecurity.title',
-          { defaultMessage: 'Endpoint security' },
+          {
+            defaultMessage: 'Endpoint security',
+          },
         )}
         description={i18n.translate(
           'wazuh.common.homeOverviewEndpointSecurity.description',
@@ -87,7 +95,9 @@ const EndpointSecuritySectionComponent: React.FC<
             titleLink={{ href: getConfigurationAssessmentUrl() }}
             caption={i18n.translate(
               'wazuh.common.homeOverviewWidget.captionCurrentState',
-              { defaultMessage: 'Current state' },
+              {
+                defaultMessage: 'Current state',
+              },
             )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-sca'
@@ -99,15 +109,19 @@ const EndpointSecuritySectionComponent: React.FC<
                   indexPatternId={sca.indexPatternId}
                 />
                 <EuiSpacer size='m' />
-                <ScoreGauge
-                  title={i18n.translate(
-                    'wazuh.common.homeOverviewEndpointSecurity.scaOverallScore',
-                    { defaultMessage: 'Overall score' },
-                  )}
-                  score={sca.data.tiles.score}
-                  data-test-subj='sca-score-gauge'
-                />
-                <EuiSpacer size='m' />
+                {sca.data.tiles.score !== undefined && (
+                  <>
+                    <ScoreGauge
+                      title={i18n.translate(
+                        'wazuh.common.homeOverviewEndpointSecurity.scaOverallScore',
+                        { defaultMessage: 'Overall score' },
+                      )}
+                      score={sca.data.tiles.score}
+                      data-test-subj='sca-score-gauge'
+                    />
+                    <EuiSpacer size='m' />
+                  </>
+                )}
                 <DualBarList
                   title={i18n.translate(
                     'wazuh.common.homeOverviewEndpointSecurity.scaTopBenchmarks',
@@ -120,13 +134,23 @@ const EndpointSecuritySectionComponent: React.FC<
                     failed: benchmark.failed,
                     score: benchmark.score,
                   }))}
-                  emptyMessage={i18n.translate(
-                    'wazuh.common.homeOverviewEndpointSecurity.scaNoBenchmarks',
-                    {
-                      defaultMessage:
-                        'No Configuration Assessment benchmarks found',
-                    },
-                  )}
+                  emptyMessage={
+                    sca.data.tiles.score === undefined
+                      ? i18n.translate(
+                          'wazuh.common.homeOverviewEndpointSecurity.scaNoResults',
+                          {
+                            defaultMessage:
+                              'No Configuration Assessment results found. The score appears once checks are reported.',
+                          },
+                        )
+                      : i18n.translate(
+                          'wazuh.common.homeOverviewEndpointSecurity.scaNoBenchmarks',
+                          {
+                            defaultMessage:
+                              'No Configuration Assessment benchmarks found',
+                          },
+                        )
+                  }
                   data-test-subj='sca-benchmarks'
                 />
               </>
@@ -143,39 +167,61 @@ const EndpointSecuritySectionComponent: React.FC<
             isPermissionDenied={fim.error?.kind === 'permission-denied'}
             title={i18n.translate(
               'wazuh.common.homeOverviewEndpointSecurity.fimTitle',
-              { defaultMessage: 'File Integrity Monitoring' },
+              {
+                defaultMessage: 'File Integrity Monitoring',
+              },
             )}
             titleLink={{ href: getFileIntegrityMonitoringUrl() }}
             caption={i18n.translate(
               'wazuh.common.homeOverviewWidget.captionCurrentState',
-              { defaultMessage: 'Current state' },
+              {
+                defaultMessage: 'Current state',
+              },
             )}
             loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
             data-test-subj='home-overview-fim'
           >
             {fim.data && (
               <>
-                <StatTile
-                  value={
-                    <RedirectAppLinks application={getCore().application}>
-                      <EuiLink
-                        style={{ fontWeight: 'inherit' }}
-                        color='text'
-                        href={getFileIntegrityMonitoringInventoryFilesUrl()}
-                        data-test-subj='fim-hero-link'
-                      >
-                        <TabNumber value={fim.data.total} />
-                      </EuiLink>
-                    </RedirectAppLinks>
-                  }
-                  label={i18n.translate(
-                    'wazuh.common.homeOverviewEndpointSecurity.fimHeroLabel',
-                    { defaultMessage: 'Monitored files fleet-wide' },
-                  )}
-                  reverse
-                  textAlign='center'
-                  data-test-subj='fim-hero'
-                />
+                {fim.data.total === 0 ? (
+                  <EuiText
+                    size='s'
+                    color='subdued'
+                    textAlign='center'
+                    data-test-subj='fim-hero-empty'
+                  >
+                    <p>
+                      {i18n.translate(
+                        'wazuh.common.homeOverviewEndpointSecurity.fimNoMonitoredFiles',
+                        {
+                          defaultMessage: 'No monitored files yet',
+                        },
+                      )}
+                    </p>
+                  </EuiText>
+                ) : (
+                  <StatTile
+                    value={
+                      <RedirectAppLinks application={getCore().application}>
+                        <EuiLink
+                          style={{ fontWeight: 'inherit' }}
+                          color='text'
+                          href={getFileIntegrityMonitoringInventoryFilesUrl()}
+                          data-test-subj='fim-hero-link'
+                        >
+                          <TabNumber value={fim.data.total} />
+                        </EuiLink>
+                      </RedirectAppLinks>
+                    }
+                    label={i18n.translate(
+                      'wazuh.common.homeOverviewEndpointSecurity.fimHeroLabel',
+                      { defaultMessage: 'Monitored files fleet-wide' },
+                    )}
+                    reverse
+                    textAlign='center'
+                    data-test-subj='fim-hero'
+                  />
+                )}
                 <EuiSpacer size='s' />
                 <FimTopFilesTable items={fim.data.files} />
               </>

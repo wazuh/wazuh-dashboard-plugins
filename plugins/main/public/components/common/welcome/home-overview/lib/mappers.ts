@@ -72,11 +72,12 @@ export function mapScaTiles(aggregations: Aggregations): ScaTilesData {
   const passed = buckets[SCA_RESULT_BUCKET.passed]?.doc_count;
   const failed = buckets[SCA_RESULT_BUCKET.failed]?.doc_count;
   const notApplicable = buckets[SCA_RESULT_BUCKET.notApplicable]?.doc_count;
+  // No passed or failed checks means nothing to score, not a 0% score.
   const score =
-    typeof passed === 'number' && typeof failed === 'number'
-      ? passed + failed > 0
-        ? passed / (passed + failed)
-        : 0
+    typeof passed === 'number' &&
+    typeof failed === 'number' &&
+    passed + failed > 0
+      ? passed / (passed + failed)
       : undefined;
   return { passed, failed, notApplicable, score };
 }
