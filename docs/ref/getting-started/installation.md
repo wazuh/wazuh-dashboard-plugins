@@ -93,6 +93,9 @@ certificate authority (CA) is shipped.
   `dashboard.pem` and `dashboard-key.pem` in `/etc/wazuh-dashboard/certs/`, and publishes the CA
   certificate as `/etc/wazuh-dashboard/export/ca.pem`.
 - **AI Assistant**: a fresh install generates `wazuh_ai_assistant.encryptionKey` in the keystore.
+- **Session cookie**: a fresh install generates a random `opensearch_security.cookie.password` in the
+  keystore, so each installation seals its session cookie with its own value. Nodes behind a load
+  balancer must share one value: see [Session cookie password](credentials.md#session-cookie-password).
 
 The steps depend on where the Wazuh indexer and the Wazuh manager run:
 
