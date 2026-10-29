@@ -407,6 +407,9 @@ export const RuleEditor = ({
                   mode='json'
                   onChange={onChangeRuleJson}
                   wrapEnabled
+                  // The JSON is validated when saving: the editor worker is
+                  // not needed and cannot be loaded on every platform.
+                  setOptions={{ useWorker: false }}
                   aria-label={i18n.translate(
                     'wazuh.security.ruleEditor.codeEditorAriaLabel',
                     { defaultMessage: 'Code Editor' },
