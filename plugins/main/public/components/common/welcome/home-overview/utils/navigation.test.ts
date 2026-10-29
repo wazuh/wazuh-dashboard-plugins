@@ -8,6 +8,8 @@ import {
   getMitreFrameworkTacticUrl,
   getVulnerabilityDetectionBySeverityUrl,
   isAiAssistantRegistered,
+  isDecodersRegistered,
+  isRulesRegistered,
 } from './navigation';
 
 jest.mock('../../../../../react-services/navigation-service', () => ({
@@ -234,5 +236,22 @@ describe('isActiveResponsesRegistered', () => {
 
   it('is false when the plugin is not installed', () => {
     expect(isActiveResponsesRegistered(new Map([['wz-home', {}]]))).toBe(false);
+  });
+});
+
+describe('isDecodersRegistered / isRulesRegistered', () => {
+  it('are true when the apps are registered', () => {
+    const apps = new Map([
+      ['decoders', {}],
+      ['rules', {}],
+    ]);
+    expect(isDecodersRegistered(apps)).toBe(true);
+    expect(isRulesRegistered(apps)).toBe(true);
+  });
+
+  it('are false when the Ruleset management apps are not registered', () => {
+    const apps = new Map([['wz-home', {}]]);
+    expect(isDecodersRegistered(apps)).toBe(false);
+    expect(isRulesRegistered(apps)).toBe(false);
   });
 });

@@ -713,6 +713,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
   'azure-rule-group'; // TODO: change this to 'azure-rule-group' if needed when Azure data source is implemented
 export const DATA_SOURCE_FILTER_CONTROLLED_CASES_EXIST = 'cases-status-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_IT_HYGIENE_RULE_GROUP =
+  'it-hygiene-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST =

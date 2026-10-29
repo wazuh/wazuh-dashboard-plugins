@@ -13,7 +13,6 @@ import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
-import { formatUIDate } from '../../../react-services';
 import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
 
 type ParseData<T> =
@@ -132,15 +131,15 @@ export const exportSearchToCSV = async (
   }
 
   const resultsFields = fields;
+  const dateFields = indexPattern.fields.getByType('date');
   const data = allHits.map(hit => {
-    // check if the field type is a date
-    const dateFields = indexPattern.fields.getByType('date');
-    const dateFieldsNames = dateFields.map(field => field.name);
     const flattenHit = indexPattern.flattenHit(hit);
-    // replace the date fields with the formatted date
-    dateFieldsNames.forEach(field => {
-      if (flattenHit[field]) {
-        flattenHit[field] = formatUIDate(flattenHit[field]);
+    // The field formatter keeps the nanoseconds of date_nanos fields
+    dateFields.forEach(field => {
+      if (flattenHit[field.name]) {
+        flattenHit[field.name] = indexPattern
+          .getFormatterForField(field)
+          .convert(flattenHit[field.name]);
       }
     });
     return flattenHit;

@@ -22,9 +22,6 @@ jest.mock('json-2-csv', () => ({
 jest.mock('../../../services/file-saver', () => ({
   saveAs: jest.fn(),
 }));
-jest.mock('../../../react-services', () => ({
-  formatUIDate: (date: string) => date,
-}));
 
 describe('describe-grid-test', () => {
   describe('parseData', () => {
@@ -121,6 +118,27 @@ describe('describe-grid-test', () => {
         },
       ]);
       expect(FileSaver.saveAs).toHaveBeenCalled();
+    });
+
+    it('formats date fields with the index pattern formatter', async () => {
+      const timestamp = '2026-10-27T12:00:00.123456789Z';
+      const convert = jest.fn(() => 'formatted-date');
+      (search as jest.Mock).mockResolvedValue({
+        hits: { hits: [{ _id: 'id-1', _source: { '@timestamp': timestamp } }] },
+      });
+
+      await exportSearchToCSV({
+        ...buildParams(),
+        indexPattern: {
+          ...indexPattern,
+          fields: { getByType: () => [{ name: '@timestamp' }] },
+          getFormatterForField: () => ({ convert }),
+        },
+      } as unknown as SearchParams);
+
+      expect(convert).toHaveBeenCalledWith(timestamp);
+      const [data] = (converter.json2csvAsync as jest.Mock).mock.calls[0];
+      expect(data).toEqual([{ '@timestamp': 'formatted-date' }]);
     });
 
     it('keeps the writer options and column selectors untouched', async () => {

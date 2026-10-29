@@ -74,6 +74,16 @@ function date(daysAgo = 10) {
 }
 
 /**
+ * Generate a random ISO date with nanosecond precision, for date_nanos fields
+ * @param {number} daysAgo - Maximum number of days in the past
+ * @returns {string} ISO date with 9 fractional digits
+ */
+function dateNanos(daysAgo = 10) {
+  const subMillis = String(int(0, 999999)).padStart(6, '0');
+  return date(daysAgo).replace('Z', `${subMillis}Z`);
+}
+
+/**
  * Generate a random unix timestamp
  * @returns {number} Random unix timestamp
  */
@@ -133,6 +143,7 @@ module.exports = {
   choice,
   boolean,
   date,
+  dateNanos,
   unixTimestamp,
   ip,
   macAddress,
