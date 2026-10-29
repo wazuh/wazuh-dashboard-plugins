@@ -76,16 +76,16 @@ tokens removes.
 Select **Create token** to open the creation panel. The action requires the
 `enrollment_token:create` permission.
 
-| Field                   | Required | Description                                                                                                                                                        |
-| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Address**             | Yes      | The name agents connect to. It must be one of the names in the manager listener certificate; the manager refuses an address outside it.                            |
-| **Port**                | No       | Written into the token when it differs from the port the manager is configured with.                                                                               |
-| **Path prefix**         | No       | Written into the token when it differs from the prefix the manager is configured with.                                                                             |
-| **Lifetime**            | No       | A number of seconds, or a number followed by `d`, `h`, `m` or `s`. Left empty, the manager applies its default of 30 days.                                         |
-| **Enrollments allowed** | No       | How many agents the token can enroll. Left empty, or set to `0`, the token allows unlimited enrollments.                                                           |
-| **Description**         | No       | Free text kept with the token on the manager and shown in the listing. It is not sent to the agent.                                                                |
-| **Embed CA**            | No       | Carries the certificate authority inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger. |
-| **Without credential**  | No       | Mints a token carrying only the address and the pin. It can point an agent at the manager, but it cannot authenticate the enrollment.                              |
+| Field                   | Required | Description                                                                                                                                                                             |
+| ----------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Address**             | Yes      | The name agents connect to. It suggests the names in the listener certificate of every manager node; another address can be typed, but the manager refuses one outside the certificate. |
+| **Port**                | No       | Written into the token when it differs from the port the manager is configured with.                                                                                                    |
+| **Path prefix**         | No       | Written into the token when it differs from the prefix the manager is configured with.                                                                                                  |
+| **Lifetime**            | No       | A number of seconds, or a number followed by `d`, `h`, `m` or `s`. Left empty, the manager applies its default of 30 days.                                                              |
+| **Enrollments allowed** | No       | How many agents the token can enroll. Left empty, or set to `0`, the token allows unlimited enrollments.                                                                                |
+| **Description**         | No       | Free text kept with the token on the manager and shown in the listing. It is not sent to the agent.                                                                                     |
+| **Embed CA**            | No       | Carries the certificate authority inside the token instead of its pin, so the agent does not fetch it from the manager when it enrolls. It makes the token larger.                      |
+| **Without credential**  | No       | Mints a token carrying only the address and the pin. It can point an agent at the manager, but it cannot authenticate the enrollment.                                                   |
 
 Every optional field left empty is omitted from the request, so the manager applies its own
 default rather than a value decided by the interface.

@@ -95,9 +95,7 @@ describe('EndpointSecuritySection', () => {
       screen.getByText('CIS Ubuntu Linux 24.04 LTS v1.0.0'),
     ).toBeInTheDocument();
     expect(screen.getAllByText('/etc/passwd').length).toBeGreaterThan(0);
-    expect(
-      screen.getByText('File integrity baselined fleet-wide'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Monitored files fleet-wide')).toBeInTheDocument();
     expect(screen.getByText('IOC matches')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });
@@ -142,7 +140,7 @@ describe('EndpointSecuritySection', () => {
     expect(screen.queryByText('0%')).not.toBeInTheDocument();
   });
 
-  it('says no files are baselined instead of 0 when FIM has no files', () => {
+  it('says there are no monitored files instead of 0 when FIM has no files', () => {
     asMock(useFIMOverview).mockReturnValue({
       status: 'available',
       data: { total: 0, files: [] },
@@ -153,9 +151,9 @@ describe('EndpointSecuritySection', () => {
         threatIntel={threatIntelAvailable}
       />,
     );
-    expect(screen.getByText('No files baselined yet')).toBeInTheDocument();
+    expect(screen.getByText('No monitored files yet')).toBeInTheDocument();
     expect(
-      screen.queryByText('File integrity baselined fleet-wide'),
+      screen.queryByText('Monitored files fleet-wide'),
     ).not.toBeInTheDocument();
   });
 

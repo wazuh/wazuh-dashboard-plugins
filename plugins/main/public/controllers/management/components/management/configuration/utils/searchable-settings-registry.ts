@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
+import type { ComponentType } from 'react';
 import { get } from 'lodash';
 import { i18n } from '@osd/i18n';
 import { webDocumentationLink } from '../../../../../../../common/services/web_documentation';
@@ -22,6 +23,7 @@ import {
   renderValueOrYes,
   renderValueOrDefault,
 } from './utils';
+import { CommandsEmptyState } from '../util-components/commands-empty-state';
 
 /** How to source a field's raw value in the manager branch. Mirrors the two
  * shapes `withWzConfig`/`getCurrentConfig` already support, so the fetch
@@ -53,7 +55,7 @@ export interface SearchableSettingField {
   /** Only needed when one `tab` must render more than one separately
    * titled/helped header (currently only Global Configuration's `Global`
    * tab, which had two original sub-headers -- "Logging settings" and
-   * "Agents settings" -- with different help links). Looked up together
+   * "Agent disconnection" -- with different help links). Looked up together
    * with `tab` via `configurationHeaderKey`. */
   group?: string;
   /** Per-field help tooltip (`EuiIconTip`), verbatim from the original
@@ -110,6 +112,8 @@ export interface SearchableSettingList {
    * lookup -- just set directly, verbatim from the original section's
    * `helpLinks`. */
   help?: HelpLink[];
+  /** Replaces "Nothing configured yet." when the list is empty. */
+  emptyState?: ComponentType<{ agent?: unknown }>;
   agentPath?: string;
   /** For a raw shape a plain path can't express (bare-value-or-array, two
    * possible field names, app-side filtering of one shared field). */
@@ -341,6 +345,18 @@ const FIM_HELP: HelpLink[] = [
   },
 ];
 
+const COMMAND_MONITORING_HELP_LINK: HelpLink = {
+  text: i18n.translate(
+    'wazuh.configuration.settingsHelpLinks.commandMonitoring',
+    {
+      defaultMessage: 'Command monitoring',
+    },
+  ),
+  href: webDocumentationLink(
+    'user-manual/capabilities/command-monitoring/index.html',
+  ),
+};
+
 const LOG_COLLECTION_HELP: HelpLink[] = [
   {
     text: i18n.translate(
@@ -353,17 +369,7 @@ const LOG_COLLECTION_HELP: HelpLink[] = [
       'user-manual/capabilities/log-data-collection/index.html',
     ),
   },
-  {
-    text: i18n.translate(
-      'wazuh.configuration.settingsHelpLinks.commandMonitoring',
-      {
-        defaultMessage: 'Command monitoring',
-      },
-    ),
-    href: webDocumentationLink(
-      'user-manual/capabilities/command-monitoring/index.html',
-    ),
-  },
+  COMMAND_MONITORING_HELP_LINK,
   {
     text: i18n.translate(
       'wazuh.configuration.settingsHelpLinks.localfileReference',
@@ -536,13 +542,14 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     title: i18n.translate(
       'wazuh.configuration.settingsHeaders.globalConfigurationGlobalAgentsTitle',
       {
-        defaultMessage: 'Agents settings',
+        defaultMessage: 'Agent disconnection',
       },
     ),
     description: i18n.translate(
       'wazuh.configuration.settingsHeaders.globalConfigurationGlobalAgentsDescription',
       {
-        defaultMessage: 'Time alert agents settings',
+        defaultMessage:
+          'Time after which an agent that stops reporting is marked as disconnected',
       },
     ),
     help: [
@@ -595,7 +602,7 @@ export const configurationHeaders: Record<string, ConfigurationHeader> = {
     title: i18n.translate(
       'wazuh.configuration.settingsHeaders.globalConfigurationRemoteAgentsTitle',
       {
-        defaultMessage: 'Agents settings',
+        defaultMessage: 'Agent compatibility',
       },
     ),
     description: i18n.translate(
@@ -1551,7 +1558,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     label,
     category: 'Global Configuration',
     tab: 'Remote',
-    // The 3 original sub-headers (HTTPS/Legacy/Agents settings) map 1:1 to
+    // The 3 original sub-headers (HTTPS/Legacy/Agent compatibility) map 1:1 to
     // the field's own prefix.
     group: field.split('.')[0],
     goto: 'global-configuration',
@@ -3106,10 +3113,11 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
     description: i18n.translate(
       'wazuh.configuration.settingsRegistry.commandsCommandDescription',
       {
-        defaultMessage: 'Find here all the currently defined commands',
+        defaultMessage: 'Commands this endpoint runs',
       },
     ),
     help: [
+      COMMAND_MONITORING_HELP_LINK,
       {
         text: i18n.translate(
           'wazuh.configuration.settingsHelpLinks.commandModuleReference',
@@ -3122,6 +3130,7 @@ export const searchableSettingsRegistry: SearchableSettingEntry[] = [
         ),
       },
     ],
+    emptyState: CommandsEmptyState,
     agentExtract: content => {
       const reported = get(content, 'command');
       if (!reported || typeof reported === 'string') {

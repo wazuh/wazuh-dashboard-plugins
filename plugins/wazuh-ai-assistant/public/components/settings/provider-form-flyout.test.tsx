@@ -110,6 +110,9 @@ describe('ProviderFormFlyout — create mode', () => {
     fireEvent.change(screen.getByLabelText(/^name/i), {
       target: { value: '  Groq  ' },
     });
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
+      target: { value: '  gsk_test  ' },
+    });
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
       target: { value: ' https://api.groq.com/openai/v1 ' },
     });
@@ -128,7 +131,7 @@ describe('ProviderFormFlyout — create mode', () => {
         type: 'openai_compatible',
         baseUrl: 'https://api.groq.com/openai/v1',
         model: 'llama-3.3-70b-versatile',
-        apiKey: '',
+        apiKey: 'gsk_test',
       });
     });
   });
@@ -174,6 +177,124 @@ describe('ProviderFormFlyout — submit error', () => {
     expect(
       screen.getByText('Could not save the provider.'),
     ).toBeInTheDocument();
+  });
+});
+
+describe('ProviderFormFlyout — failed connection test result', () => {
+  it('shows a failed test above the form fields and moves focus to it', () => {
+    // jsdom does not implement scrollIntoView.
+    const scrollIntoView = jest.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+    render(
+      <ProviderFormFlyout
+        {...baseProps}
+        editingProvider={editingProvider}
+        testOutcome={{ status: 'failed', message: 'HTTP 401: invalid key' }}
+      />,
+    );
+
+    const result = screen.getByRole('alert');
+    expect(result).toHaveTextContent(/connection test failed/i);
+    expect(result).toHaveTextContent('HTTP 401: invalid key');
+    expect(
+      result.compareDocumentPosition(screen.getByLabelText(/^name/i)) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(document.activeElement).toBe(result);
+    expect(scrollIntoView).toHaveBeenCalled();
+  });
+});
+
+describe('ProviderFormFlyout — API key for hosted endpoints', () => {
+  function fillRequiredFields(baseUrl: string): void {
+    fireEvent.change(screen.getByLabelText(/^name/i), {
+      target: { value: 'OpenAI' },
+    });
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: baseUrl },
+    });
+    fireEvent.change(modelSearchInput(), { target: { value: 'gpt-4o-mini' } });
+    fireEvent.keyDown(modelSearchInput(), { key: 'Enter', code: 'Enter' });
+  }
+
+  it('requires a key for a hosted endpoint, and not for a local one', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fillRequiredFields('https://api.openai.com/v1');
+    expect(
+      screen.getByText(/^Required for this hosted endpoint\./),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText('Enter the API key for this hosted endpoint.'),
+    ).toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByLabelText(/^api key/i));
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'http://localhost:11434/v1' },
+    });
+    expect(screen.getByText(/^Optional\./)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await waitFor(() => expect(baseProps.onSubmit).toHaveBeenCalled());
+  });
+
+  it('keeps the stored key when editing with the key field empty', async () => {
+    render(
+      <ProviderFormFlyout {...baseProps} editingProvider={editingProvider} />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    await waitFor(() =>
+      expect(baseProps.onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({ apiKey: '' }),
+      ),
+    );
+  });
+
+  it('requires a key for api.anthropic.com, but not for an Anthropic proxy', async () => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.click(providerTypeOption('anthropic'));
+    fillRequiredFields('https://api.anthropic.com');
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+
+    expect(
+      await screen.findByText('Enter the API key for this hosted endpoint.'),
+    ).toBeInTheDocument();
+    expect(document.activeElement).toBe(screen.getByLabelText(/^api key/i));
+    // Anthropic's own "Required." line stays the only requirement line.
+    expect(screen.getByText(/^Required\./)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/^Required for this hosted endpoint\./),
+    ).toBeNull();
+    expect(baseProps.onSubmit).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: 'https://claude-proxy.corp' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
+    await waitFor(() => expect(baseProps.onSubmit).toHaveBeenCalled());
+  });
+
+  // Anchored on the hostname: a self-hosted proxy whose name merely contains a vendor's needs no key.
+  it.each([
+    ['https://generativelanguage-proxy.corp/v1', false],
+    ['https://my-bedrock-mantle.internal/v1', false],
+    ['https://bedrock-mantle.us-east-1.api.aws/v1', true],
+    ['https://generativelanguage.googleapis.com/v1beta/openai', true],
+  ])('treats %s as requiring a key: %s', (baseUrl, required) => {
+    render(<ProviderFormFlyout {...baseProps} />);
+
+    fireEvent.change(screen.getByLabelText(/endpoint url/i), {
+      target: { value: baseUrl },
+    });
+
+    expect(
+      screen.queryByText(/^Required for this hosted endpoint\./) !== null,
+    ).toBe(required);
   });
 });
 
@@ -454,10 +575,11 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
   });
 
   it('shows a non-blocking warning when the key shape does not match the Anthropic type', () => {
+    // The label ends in the required marker here: switching to anthropic prefills api.anthropic.com.
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
-    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
       target: { value: 'sk-not-anthropic-shaped' },
     });
 
@@ -474,7 +596,7 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
-    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
       target: { value: 'sk-ant-abc123' },
     });
 
@@ -487,13 +609,13 @@ describe('ProviderFormFlyout — Anthropic onboarding clarity', () => {
     render(<ProviderFormFlyout {...baseProps} />);
 
     fireEvent.click(providerTypeOption('anthropic'));
-    fireEvent.change(screen.getByLabelText(/^api key$/i), {
+    fireEvent.change(screen.getByLabelText(/^api key/i), {
       target: { value: 'not-anthropic-shaped-at-all' },
     });
 
     // A shape mismatch must surface only as the warning EuiCallOut above, never as a red-invalid
     // field — that would read as a blocking error to an admin even though Save stays enabled.
-    expect(screen.getByLabelText(/^api key$/i)).not.toHaveAttribute(
+    expect(screen.getByLabelText(/^api key/i)).not.toHaveAttribute(
       'aria-invalid',
       'true',
     );
@@ -1293,12 +1415,13 @@ describe('ProviderFormFlyout — duplicate provider names', () => {
 
   /** Fills the three required fields with a valid endpoint and model, so the ONLY thing that can
    * block Save in these cases is the name check under test. */
+  // A local endpoint, so no API key is needed for the form to be valid.
   const fillValidForm = (name: string) => {
     fireEvent.change(screen.getByLabelText(/^name/i), {
       target: { value: name },
     });
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
-      target: { value: 'https://api.openai.com/v1' },
+      target: { value: 'http://localhost:11434/v1' },
     });
     const modelField = screen.getByLabelText(/^model/i);
     fireEvent.change(modelField, { target: { value: 'gpt-4o' } });
@@ -1522,7 +1645,7 @@ describe('ProviderFormFlyout — required-field validation', () => {
 
     // Only the model left: focus lands on the combo box's search input.
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
-      target: { value: 'https://api.openai.com/v1' },
+      target: { value: 'http://localhost:11434/v1' },
     });
     fireEvent.click(screen.getByRole('button', { name: /save & test/i }));
     expect(document.activeElement).toBe(modelSearchInput());
@@ -1599,7 +1722,7 @@ describe('ProviderFormFlyout — required-field validation', () => {
       target: { value: 'Gemini lab' },
     });
     fireEvent.change(screen.getByLabelText(/endpoint url/i), {
-      target: { value: 'https://api.openai.com/v1' },
+      target: { value: 'http://localhost:11434/v1' },
     });
     // Typed, never committed with Enter — the field LOOKS filled in on screen.
     fireEvent.change(modelSearchInput(), { target: { value: 'gpt-4o' } });

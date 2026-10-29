@@ -1,5 +1,5 @@
 import { classifyQueryError, describeError } from './classify-query-error';
-import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
+import { ErrorDataSourceNotFound } from '../../../utils/errors';
 
 describe('classifyQueryError', () => {
   it('classifies a missing index pattern using its own remediation message', () => {

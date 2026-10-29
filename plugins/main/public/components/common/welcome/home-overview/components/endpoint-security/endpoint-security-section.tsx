@@ -192,9 +192,9 @@ const EndpointSecuritySectionComponent: React.FC<
                   >
                     <p>
                       {i18n.translate(
-                        'wazuh.common.homeOverviewEndpointSecurity.fimNoFilesBaselined',
+                        'wazuh.common.homeOverviewEndpointSecurity.fimNoMonitoredFiles',
                         {
-                          defaultMessage: 'No files baselined yet',
+                          defaultMessage: 'No monitored files yet',
                         },
                       )}
                     </p>
@@ -215,7 +215,7 @@ const EndpointSecuritySectionComponent: React.FC<
                     }
                     label={i18n.translate(
                       'wazuh.common.homeOverviewEndpointSecurity.fimHeroLabel',
-                      { defaultMessage: 'File integrity baselined fleet-wide' },
+                      { defaultMessage: 'Monitored files fleet-wide' },
                     )}
                     reverse
                     textAlign='center'
