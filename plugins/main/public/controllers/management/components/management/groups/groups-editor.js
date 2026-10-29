@@ -42,6 +42,7 @@ import { getToasts } from '../../../../../kibana-services';
 import { validateXML } from '../configuration/utils/xml';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
+import { ButtonAboutCentralizedConfiguration } from './button-about-centralized-configuration';
 import WazuhXmlMode from '../configuration/utils/wz-xml-mode';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
@@ -292,6 +293,9 @@ class WzGroupsEditor extends Component {
                     </EuiTitle>
                   </EuiFlexItem>
                   <EuiFlexItem />
+                  <EuiFlexItem grow={false}>
+                    <ButtonAboutCentralizedConfiguration />
+                  </EuiFlexItem>
                   {isEditable && (
                     <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
                   )}
