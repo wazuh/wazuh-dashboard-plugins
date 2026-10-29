@@ -10,6 +10,7 @@ import {
 } from '../common';
 import {
   API_NAME_AGENT_STATUS,
+  UI_DESCRIPTION_AGENT_STATUS,
   UI_LABEL_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../../common/constants';
@@ -91,6 +92,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
     status => ({
       key: status,
       label: UI_LABEL_NAME_AGENT_STATUS[status],
+      description: UI_DESCRIPTION_AGENT_STATUS[status],
       count: data[COUNT_BY_STATUS[status]] ?? 0,
       color: HOME_OVERVIEW_AGENT_STATUS_COLOR[status],
       onClick: onStatusSelect ? () => onStatusSelect(status) : undefined,
