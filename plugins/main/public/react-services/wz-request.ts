@@ -17,7 +17,7 @@ import { WazuhConfig } from './wazuh-config';
 import IApiResponse from './interfaces/api-response.interface';
 import { getHttp } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { request } from '../services/request-handler';
+import { request, isLoggingOut } from '../services/request-handler';
 import NavigationService from './navigation-service';
 
 export class WzRequest {
@@ -85,7 +85,7 @@ export class WzRequest {
       return Promise.resolve(data);
     } catch (error) {
       //if the requests fails, we need to check if the API is down
-      if (checkCurrentApiIsUp) {
+      if (checkCurrentApiIsUp && !isLoggingOut()) {
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
         if (currentApi && currentApi.id) {
           try {
