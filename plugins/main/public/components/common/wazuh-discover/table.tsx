@@ -77,6 +77,7 @@ export interface TableDataGridBasicProps<K> {
   query: { query: string; language: string };
   isDataSourceLoading: boolean;
   displayOnlyNoResultsCalloutOnNoResults?: boolean;
+  exportFileName?: string;
 }
 
 const Padding = ({ children, style }: { children; style?: object }) => (
@@ -118,6 +119,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
       dataSource,
       fetchFilters,
       query,
+      exportFileName,
     }: TableDataGridBasicProps) => {
       const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
       const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -136,7 +138,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
         };
         try {
           setIsExporting(true);
-          await exportSearchToCSV(params);
+          await exportSearchToCSV(params, { fileName: exportFileName });
         } catch (error) {
           const searchError = ErrorFactory.create(HttpError, {
             error,
@@ -258,6 +260,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
     query,
     displayOnlyNoResultsCalloutOnNoResults,
     isDataSourceLoading,
+    exportFileName,
   }: TableDataGridWithSearchBarProps<K>) => (
     <>
       {title && (
@@ -293,6 +296,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
             displayOnlyNoResultsCalloutOnNoResults
           }
           isDataSourceLoading={isDataSourceLoading}
+          exportFileName={exportFileName}
         />
       </Padding>
     </>
@@ -514,6 +518,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     removeInspectedHit,
     onDocumentMutated,
     dataGridProps,
+    exportFileName,
   }: TableDataGridWithSearchBarInspectedHitProps) => {
     return (
       <>
@@ -532,6 +537,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
             displayOnlyNoResultsCalloutOnNoResults
           }
           isDataSourceLoading={isDataSourceLoading}
+          exportFileName={exportFileName}
         />
         {inspectedHit && (
           <DocumentDetailsOnFlyout

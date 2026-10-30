@@ -14,7 +14,10 @@ import { i18n } from '@osd/i18n';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
-import { ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent } from '../modules/buttons';
+import {
+  ButtonInventoryGenerateReport as ButtonInventoryGenerateReportComponent,
+  ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent,
+} from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import {
@@ -175,6 +178,10 @@ const TAB_NAMES = {
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
   component: ButtonModuleGenerateReportComponent,
+};
+
+const ButtonInventoryGenerateReport = {
+  component: ButtonInventoryGenerateReportComponent,
 };
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
@@ -685,37 +692,61 @@ export const ModulesDefaults = {
       {
         id: 'system',
         name: TAB_NAMES.system,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneSystemInventory,
       },
       {
         id: 'software',
         name: TAB_NAMES.software,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygienePackagesInventory,
       },
       {
         id: 'processes',
         name: TAB_NAMES.processes,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneProcessesInventory,
       },
       {
         id: 'network',
         name: TAB_NAMES.network,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneNetworksInventory,
       },
       {
         id: 'users',
         name: TAB_NAMES.identity,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneUsersInventory,
       },
       {
         id: 'services',
         name: TAB_NAMES.services,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneServicesInventory,
       },
       {

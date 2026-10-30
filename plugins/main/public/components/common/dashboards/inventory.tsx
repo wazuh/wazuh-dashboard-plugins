@@ -18,6 +18,12 @@ import { QueryErrorPrompt } from '../query-error';
 import { SampleDataWarning } from '../../visualize/components';
 import classnames from 'classnames';
 import { compose } from 'redux';
+import { exportSearchToCSV } from '../data-grid';
+import { useReportingCommunicateTableContext } from '../hooks/use-reporting-communicate-table-context';
+import {
+  getInventoryExportFileName,
+  getInventoryReportFields,
+} from './inventory-report';
 
 const InventoryDashboard = compose(
   withDataSourceLoading({
@@ -49,6 +55,7 @@ const InventoryDashboard = compose(
     categoriesSampleData,
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
+    exportFileName = getInventoryExportFileName(tableId),
   }: InventoryDashboardTableProps) => {
     const {
       results,
@@ -73,6 +80,25 @@ const InventoryDashboard = compose(
     });
 
     const dashboardFingerprint = (fingerprint ?? 0) + caseRefreshKey;
+
+    useReportingCommunicateTableContext({
+      totalResults: fetchError ? 0 : results?.hits?.total,
+      generateReport: () =>
+        exportSearchToCSV(
+          {
+            indexPattern: dataSource.indexPattern,
+            filters: fetchFilters,
+            query: searchBarProps.query,
+            fields: getInventoryReportFields(
+              dataGridProps.columnVisibility.visibleColumns,
+              dataSource.indexPattern,
+            ),
+            pagination: { pageIndex: 0, pageSize: results.hits.total },
+            sorting: dataGridProps.sorting,
+          },
+          { fileName: exportFileName },
+        ),
+    });
 
     const shouldHideDashboard =
       Boolean(fetchError) || !Boolean(results?.hits?.total > 0);
@@ -167,6 +193,8 @@ const InventoryDashboard = compose(
                   isDataSourceLoading={isDataSourceLoading}
                   setFilters={setFilters}
                   searchBarProps={searchBarProps}
+                  query={searchBarProps.query}
+                  exportFileName={exportFileName}
                   displayOnlyNoResultsCalloutOnNoResults={true}
                   showSearchBar={false}
                   dataGridProps={dataGridProps}
@@ -201,6 +229,8 @@ export interface InventoryDashboardTableProps {
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
+  // Name of the exported files when the table id does not match the tab name
+  exportFileName?: string;
 }
 
 export const InventoryDashboardTable = ({
@@ -214,6 +244,7 @@ export const InventoryDashboardTable = ({
   tableId,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
+  exportFileName,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -261,6 +292,7 @@ export const InventoryDashboardTable = ({
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}
+      exportFileName={exportFileName}
     />
   );
 };

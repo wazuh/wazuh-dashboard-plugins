@@ -64,3 +64,14 @@ export const updateReportingCommunicateSearchContext =
       dataSourceSearchContext,
     };
   };
+
+/**
+ * Update the inventory table that the Generate report button exports
+ * @param {Object} tableReportContext
+ */
+export const updateReportingTableContext = tableReportContext => {
+  return {
+    type: 'UPDATE_REPORTING_TABLE_CONTEXT',
+    tableReportContext,
+  };
+};
