@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.11
 
+### Fixed
+
+- Fixed the validation of visualization images in module reports [#9414](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9414)
+
 ## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 00
 
 ### Added
