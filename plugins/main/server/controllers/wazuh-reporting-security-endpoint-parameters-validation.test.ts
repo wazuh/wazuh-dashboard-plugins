@@ -280,6 +280,18 @@ describe('[endpoint][security] POST /reports/modules/{moduleID} - Parameters val
     },
   );
 
+  it('Undecodable PNG image: POST /reports/modules/general - responseStatusCode: 400', async () => {
+    const png = Buffer.from(PNG_IMAGE.split(',')[1], 'base64');
+    // Zero the image data so that it no longer inflates
+    png.fill(0, 41, 52);
+    const response = await sendReportRequest([
+      { element: `data:image/png;base64,${png.toString('base64')}` },
+    ]).expect(400);
+    expect(response.body.message).toBe(
+      '[request body.array]: image 0 must contain valid PNG image data',
+    );
+  });
+
   it.each`
     testTitle                 | array                                                 | field
     ${'Missing element'}      | ${[{ width: 300, height: 100 }]}                      | ${'array.0.element'}

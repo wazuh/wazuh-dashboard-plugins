@@ -74,4 +74,23 @@ describe('ReportPrinter.addVisualizations', () => {
       expect(getContent(printer)).toHaveLength(0);
     },
   );
+
+  it('throws before adding any content when an image cannot be decoded', () => {
+    const printer = createPrinter();
+    const png = Buffer.from(PNG_DATA_URI.split(',')[1], 'base64');
+    // Zero the image data so that it no longer inflates
+    png.fill(0, 41, 52);
+
+    expect(() =>
+      printer.addVisualizations([
+        {
+          title: 'Corrupt',
+          element: `data:image/png;base64,${png.toString('base64')}`,
+          width: 300,
+          height: 100,
+        },
+      ]),
+    ).toThrow('image 0 must contain valid PNG image data');
+    expect(getContent(printer)).toHaveLength(0);
+  });
 });
