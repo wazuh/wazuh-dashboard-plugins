@@ -31,7 +31,7 @@ describe('ButtonAboutITHygiene', () => {
       expect(
         screen
           .getByRole('dialog')
-          .querySelector(`[data-test-subj="itHygieneIndex-${id}"]`)
+          .querySelector(`[data-test-subj="wzAboutITHygieneIndex-${id}"]`)
           ?.textContent,
       ).toBe(index),
     );

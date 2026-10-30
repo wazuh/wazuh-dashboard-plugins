@@ -14,7 +14,7 @@ import { i18n } from '@osd/i18n';
 import { useSelector } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import { DOCKER_DOCS_PATH } from '../../docker-documentation';
+import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 import {
   DockerDataStatus,
   useDockerDataEverReceived,
@@ -190,7 +190,7 @@ export const DockerEmptyStateView = ({
             <RulesetManagementLink application={rulesetManagement} />
           )}
           <EuiLink
-            href={webDocumentationLink(DOCKER_DOCS_PATH)}
+            href={webDocumentationLink(DOCS_PATHS.docker)}
             target='_blank'
             rel='noopener noreferrer'
             external

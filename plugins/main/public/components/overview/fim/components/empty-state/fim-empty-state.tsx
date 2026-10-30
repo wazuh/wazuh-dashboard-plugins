@@ -15,7 +15,7 @@ import { i18n } from '@osd/i18n';
 import { useSelector } from 'react-redux';
 import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import { FIM_CONFIGURE_DOCS_PATH } from '../../fim-documentation';
+import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 import {
   MonitoredDirectories,
   useMonitoredDirectories,
@@ -145,7 +145,7 @@ const Actions = ({ children }: { children: React.ReactNode }) => (
 
 const ConfigureLink = () => (
   <EuiLink
-    href={webDocumentationLink(FIM_CONFIGURE_DOCS_PATH)}
+    href={webDocumentationLink(DOCS_PATHS.fileIntegrityMonitoringConfigure)}
     target='_blank'
     rel='noopener noreferrer'
     external

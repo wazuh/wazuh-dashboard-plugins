@@ -1322,5 +1322,44 @@ export const TAB_VIEW_NAME_RESPONSES = i18n.translate(
   { defaultMessage: 'Responses' },
 );
 
+export const TAB_NAMES = {
+  cases: i18n.translate('wazuh.common.moduleTabs.cases', {
+    defaultMessage: 'Cases',
+  }),
+  inventory: i18n.translate('wazuh.common.moduleTabs.inventory', {
+    defaultMessage: 'Inventory',
+  }),
+  panel: i18n.translate('wazuh.common.moduleTabs.panel', {
+    defaultMessage: 'Panel',
+  }),
+  intelligence: i18n.translate('wazuh.common.moduleTabs.intelligence', {
+    defaultMessage: 'Intelligence',
+  }),
+  framework: i18n.translate('wazuh.common.moduleTabs.framework', {
+    defaultMessage: 'Framework',
+  }),
+  controls: i18n.translate('wazuh.common.moduleTabs.controls', {
+    defaultMessage: 'Controls',
+  }),
+  system: i18n.translate('wazuh.common.moduleTabs.system', {
+    defaultMessage: 'System',
+  }),
+  software: i18n.translate('wazuh.common.moduleTabs.software', {
+    defaultMessage: 'Software',
+  }),
+  processes: i18n.translate('wazuh.common.moduleTabs.processes', {
+    defaultMessage: 'Processes',
+  }),
+  network: i18n.translate('wazuh.common.moduleTabs.network', {
+    defaultMessage: 'Network',
+  }),
+  identity: i18n.translate('wazuh.common.moduleTabs.identity', {
+    defaultMessage: 'Identity',
+  }),
+  services: i18n.translate('wazuh.common.moduleTabs.services', {
+    defaultMessage: 'Services',
+  }),
+};
+
 export const CTI_CVE_LINK_BASE_PATH =
   'https://cti.wazuh.com/vulnerabilities/cves/';

@@ -42,6 +42,7 @@ import {
   TAB_VIEW_ID_DASHBOARD,
   TAB_VIEW_ID_EVENTS,
   TAB_VIEW_ID_RESPONSES,
+  TAB_NAMES,
   TAB_VIEW_NAME_DASHBOARD,
   TAB_VIEW_NAME_EVENTS,
   TAB_VIEW_NAME_RESPONSES,
@@ -127,50 +128,22 @@ import { SCAInventory, SCADashboard } from '../../overview/sca';
 import { ButtonAboutConfigurationAssessment } from '../../overview/sca/components/about/button-about-configuration-assessment';
 import { ButtonAboutIncidentResponse } from '../../overview/active-responses/about/button-about-incident-response';
 import { ButtonAboutITHygiene } from '../../overview/it-hygiene/components/about/button-about-it-hygiene';
+import { ButtonAboutThreatHunting } from '../../overview/threat-hunting/components/about/button-about-threat-hunting';
+import { ButtonAboutVulnerabilityDetection } from '../../overview/vulnerabilities/components/about/button-about-vulnerability-detection';
+import { ButtonAboutMitreAttack } from '../../overview/mitre/components/about/button-about-mitre-attack';
+import { ButtonAboutCaseManagement } from '../../overview/case-management/components/about/button-about-case-management';
+import { ButtonAboutRegulatoryCompliance } from '../../overview/regulatory-compliance/components/about/button-about-regulatory-compliance';
+import { ButtonAboutDocker } from '../../overview/docker/components/about/button-about-docker';
+import { ButtonAboutAmazonWebServices } from '../../overview/amazon-web-services/components/about/button-about-amazon-web-services';
+import { ButtonAboutGoogleCloud } from '../../overview/google-cloud/components/about/button-about-google-cloud';
+import { ButtonAboutGitHub } from '../../overview/github/components/about/button-about-github';
+import { ButtonAboutOffice365 } from '../../overview/office/components/about/button-about-office-365';
+import { ButtonAboutMicrosoftGraphApi } from '../../overview/azure/components/about/button-about-microsoft-graph-api';
 import { ButtonAboutMalwareDetection } from '../../overview/malware-detection/components/about/button-about-malware-detection';
 import { MalwareDetectionEmptyState } from '../../overview/malware-detection/components/empty-state/malware-detection-empty-state';
 import { ThreatHuntingEmptyState } from '../../overview/threat-hunting/components/empty-state/threat-hunting-empty-state';
 import { ReportingService } from '../../../react-services';
 import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
-
-const TAB_NAMES = {
-  cases: i18n.translate('wazuh.common.moduleTabs.cases', {
-    defaultMessage: 'Cases',
-  }),
-  inventory: i18n.translate('wazuh.common.moduleTabs.inventory', {
-    defaultMessage: 'Inventory',
-  }),
-  panel: i18n.translate('wazuh.common.moduleTabs.panel', {
-    defaultMessage: 'Panel',
-  }),
-  intelligence: i18n.translate('wazuh.common.moduleTabs.intelligence', {
-    defaultMessage: 'Intelligence',
-  }),
-  framework: i18n.translate('wazuh.common.moduleTabs.framework', {
-    defaultMessage: 'Framework',
-  }),
-  controls: i18n.translate('wazuh.common.moduleTabs.controls', {
-    defaultMessage: 'Controls',
-  }),
-  system: i18n.translate('wazuh.common.moduleTabs.system', {
-    defaultMessage: 'System',
-  }),
-  software: i18n.translate('wazuh.common.moduleTabs.software', {
-    defaultMessage: 'Software',
-  }),
-  processes: i18n.translate('wazuh.common.moduleTabs.processes', {
-    defaultMessage: 'Processes',
-  }),
-  network: i18n.translate('wazuh.common.moduleTabs.network', {
-    defaultMessage: 'Network',
-  }),
-  identity: i18n.translate('wazuh.common.moduleTabs.identity', {
-    defaultMessage: 'Identity',
-  }),
-  services: i18n.translate('wazuh.common.moduleTabs.services', {
-    defaultMessage: 'Services',
-  }),
-};
 
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
@@ -200,48 +173,72 @@ const renderFindingsDiscoverTab = (
     additionalDocumentDetailsTabs: findingsDocumentDetailsTabs,
   });
 
+/**
+ * Adds an About button at the start of the buttons of every tab of a module, so the About flyout
+ * is available in all its views.
+ */
+const withAboutButton = <
+  T extends { tabs: Array<{ buttons?: unknown[]; [key: string]: unknown }> },
+>(
+  module: T,
+  AboutButton: React.ComponentType,
+): T =>
+  ({
+    ...module,
+    tabs: module.tabs.map(tab => ({
+      ...tab,
+      buttons: [AboutButton, ...(tab.buttons ?? [])],
+    })),
+  } as T);
+
 export const ModulesDefaults = {
-  general: {
-    init: TAB_VIEW_ID_DASHBOARD, // The apps define a redirection URL when accessing so this value could be ignored. There is a recovery mechanism to select an available tab if the tabView URL query parameter has a value that is not one of the availabels in the tabs IDs
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardThreatHunting,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'threat-hunting',
-        tableColumns: threatHuntingColumns,
-        DataSource: ThreatHuntingDataSource,
-        categoriesSampleData: [
-          WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-          WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
-          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
-        ],
-        emptyState: <ThreatHuntingEmptyState />,
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  caseManagement: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardCaseManagement,
-      },
-      {
-        id: 'cases',
-        name: TAB_NAMES.cases,
-        buttons: [ButtonExploreAgent],
-        component: CaseManagementCases,
-      },
-    ],
-    availableFor: ['manager', 'agent'],
-  },
+  general: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD, // The apps define a redirection URL when accessing so this value could be ignored. There is a recovery mechanism to select an available tab if the tabView URL query parameter has a value that is not one of the availabels in the tabs IDs
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardThreatHunting,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'threat-hunting',
+          tableColumns: threatHuntingColumns,
+          DataSource: ThreatHuntingDataSource,
+          categoriesSampleData: [
+            WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+            WAZUH_SAMPLE_ALERTS_CATEGORY_AUDITING_POLICY_MONITORING,
+            WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+          ],
+          emptyState: <ThreatHuntingEmptyState />,
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutThreatHunting,
+  ),
+  caseManagement: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardCaseManagement,
+        },
+        {
+          id: 'cases',
+          name: TAB_NAMES.cases,
+          buttons: [ButtonExploreAgent],
+          component: CaseManagementCases,
+        },
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutCaseManagement,
+  ),
   fim: {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
@@ -274,60 +271,69 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  microsoftGraphAPI: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardAzure,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'microsoftGraphAPI',
-        tableColumns: azureColumns,
-        DataSource: AzureDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  aws: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardAWS,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'aws',
-        tableColumns: amazonWebServicesColumns,
-        DataSource: AWSDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  gcp: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        component: DashboardGoogleCloud,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'gcp',
-        tableColumns: googleCloudColumns,
-        DataSource: GoogleCloudDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
+  microsoftGraphAPI: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardAzure,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'microsoftGraphAPI',
+          tableColumns: azureColumns,
+          DataSource: AzureDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutMicrosoftGraphApi,
+  ),
+  aws: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardAWS,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'aws',
+          tableColumns: amazonWebServicesColumns,
+          DataSource: AWSDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutAmazonWebServices,
+  ),
+  gcp: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          component: DashboardGoogleCloud,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'gcp',
+          tableColumns: googleCloudColumns,
+          DataSource: GoogleCloudDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutGoogleCloud,
+  ),
   // This module is Malware Detection. Ref: https://github.com/wazuh/wazuh-dashboard-plugins/issues/5893
   pm: {
     init: TAB_VIEW_ID_DASHBOARD,
@@ -385,147 +391,162 @@ export const ModulesDefaults = {
     buttons: ['settings'],
     availableFor: ['manager', 'agent'],
   },
-  office: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        component: DashboardOffice365,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-      },
-      {
-        id: 'inventory',
-        name: TAB_NAMES.panel,
-        buttons: [ButtonExploreAgent],
-        component: OfficePanel,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'office',
-        tableColumns: office365Columns,
-        DataSource: Office365DataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  github: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardGitHub,
-      },
-      {
-        id: 'inventory',
-        name: TAB_NAMES.panel,
-        buttons: [ButtonExploreAgent],
-        component: GitHubPanel,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'github',
-        tableColumns: githubColumns,
-        DataSource: GitHubDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  vuls: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        component: DashboardVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
-        buttons: [
-          ({ ...props }) => (
-            <ButtonExploreAgent
-              {...props}
-              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-            />
-          ),
-          ButtonModuleGenerateReport,
-        ],
-      },
-      {
-        id: 'inventory',
-        name: TAB_NAMES.inventory,
-        component: InventoryVuls,
-        /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
-        buttons: [
-          ({ ...props }) => (
-            <ButtonExploreAgent
-              {...props}
-              moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
-            />
-          ),
-        ],
-      },
-      renderDiscoverTab({
-        moduleId: 'vuls',
-        tableColumns: vulnerabilitiesColumns,
-        DataSource: AlertsVulnerabilitiesDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
-      }),
-    ],
-    buttons: ['settings'],
-    availableFor: ['manager', 'agent'],
-  },
-  mitre: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardMITRE,
-      },
-      {
-        id: 'intelligence',
-        name: TAB_NAMES.intelligence,
-        component: ModuleMitreAttackIntelligence,
-      },
-      {
-        id: 'inventory',
-        name: TAB_NAMES.framework,
-        buttons: [ButtonExploreAgent],
-        component: MainMitre,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'mitre',
-        DataSource: MitreAttackDataSource,
-        tableColumns: mitreAttackColumns,
-        categoriesSampleData: [
-          WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
-          WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
-        ],
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
-  docker: {
-    init: TAB_VIEW_ID_DASHBOARD,
-    tabs: [
-      {
-        id: TAB_VIEW_ID_DASHBOARD,
-        name: TAB_VIEW_NAME_DASHBOARD,
-        buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
-        component: DashboardDocker,
-      },
-      renderFindingsDiscoverTab({
-        moduleId: 'docker',
-        tableColumns: dockerColumns,
-        DataSource: DockerDataSource,
-        categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
-        emptyState: <DockerEmptyState />,
-      }),
-    ],
-    availableFor: ['manager', 'agent'],
-  },
+  office: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          component: DashboardOffice365,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+        },
+        {
+          id: 'inventory',
+          name: TAB_NAMES.panel,
+          buttons: [ButtonExploreAgent],
+          component: OfficePanel,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'office',
+          tableColumns: office365Columns,
+          DataSource: Office365DataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutOffice365,
+  ),
+  github: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardGitHub,
+        },
+        {
+          id: 'inventory',
+          name: TAB_NAMES.panel,
+          buttons: [ButtonExploreAgent],
+          component: GitHubPanel,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'github',
+          tableColumns: githubColumns,
+          DataSource: GitHubDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutGitHub,
+  ),
+  vuls: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          component: DashboardVuls,
+          /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
+          buttons: [
+            ({ ...props }) => (
+              <ButtonExploreAgent
+                {...props}
+                moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+              />
+            ),
+            ButtonModuleGenerateReport,
+          ],
+        },
+        {
+          id: 'inventory',
+          name: TAB_NAMES.inventory,
+          component: InventoryVuls,
+          /* For ButtonExploreAgent to insert correctly according to the module's index pattern, the moduleIndexPatternTitle parameter is added. By default it applies the index pattern wazuh-events-v5* */
+          buttons: [
+            ({ ...props }) => (
+              <ButtonExploreAgent
+                {...props}
+                moduleIndexPatternTitle={WAZUH_VULNERABILITIES_PATTERN}
+              />
+            ),
+          ],
+        },
+        renderDiscoverTab({
+          moduleId: 'vuls',
+          tableColumns: vulnerabilitiesColumns,
+          DataSource: AlertsVulnerabilitiesDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
+        }),
+      ],
+      buttons: ['settings'],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutVulnerabilityDetection,
+  ),
+  mitre: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardMITRE,
+        },
+        {
+          id: 'intelligence',
+          name: TAB_NAMES.intelligence,
+          component: ModuleMitreAttackIntelligence,
+        },
+        {
+          id: 'inventory',
+          name: TAB_NAMES.framework,
+          buttons: [ButtonExploreAgent],
+          component: MainMitre,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'mitre',
+          DataSource: MitreAttackDataSource,
+          tableColumns: mitreAttackColumns,
+          categoriesSampleData: [
+            WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
+            WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
+          ],
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutMitreAttack,
+  ),
+  docker: withAboutButton(
+    {
+      init: TAB_VIEW_ID_DASHBOARD,
+      tabs: [
+        {
+          id: TAB_VIEW_ID_DASHBOARD,
+          name: TAB_VIEW_NAME_DASHBOARD,
+          buttons: [ButtonExploreAgent, ButtonModuleGenerateReport],
+          component: DashboardDocker,
+        },
+        renderFindingsDiscoverTab({
+          moduleId: 'docker',
+          tableColumns: dockerColumns,
+          DataSource: DockerDataSource,
+          categoriesSampleData: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
+          emptyState: <DockerEmptyState />,
+        }),
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutDocker,
+  ),
   pci: {
     init: TAB_VIEW_ID_DASHBOARD,
     tabs: [
@@ -787,72 +808,75 @@ export const ModulesDefaults = {
     ],
     availableFor: ['manager', 'agent'],
   },
-  'regulatory-compliance': {
-    init: 'pci-dss',
-    tabs: [
-      {
-        id: WAZUH_MODULES_ID.PCI_DSS,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryCompliancePCIDSS,
-      },
-      {
-        id: WAZUH_MODULES_ID.CMMC,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.CMMC].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceCMMC,
-      },
-      {
-        id: WAZUH_MODULES_ID.FEDRAMP,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.FEDRAMP].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceFedRAMP,
-      },
-      {
-        id: WAZUH_MODULES_ID.GDPR,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.GDPR].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceGDPR,
-      },
-      {
-        id: WAZUH_MODULES_ID.HIPAA,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.HIPAA].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceHIPAA,
-      },
-      {
-        id: WAZUH_MODULES_ID.ISO_27001,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.ISO_27001].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceISO27001,
-      },
-      {
-        id: WAZUH_MODULES_ID.NIS2,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.NIS2].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceNIS2,
-      },
-      {
-        id: WAZUH_MODULES_ID.NIST_800_53,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_53].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceNIST80053,
-      },
-      {
-        id: WAZUH_MODULES_ID.NIST_800_171,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_171].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceNIST800171,
-      },
-      {
-        id: WAZUH_MODULES_ID.TSC,
-        name: WAZUH_MODULES[WAZUH_MODULES_ID.TSC].title,
-        buttons: [ButtonExploreAgent],
-        component: RegulatoryComplianceTSC,
-      },
-    ],
-    availableFor: ['manager', 'agent'],
-  },
+  'regulatory-compliance': withAboutButton(
+    {
+      init: 'pci-dss',
+      tabs: [
+        {
+          id: WAZUH_MODULES_ID.PCI_DSS,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryCompliancePCIDSS,
+        },
+        {
+          id: WAZUH_MODULES_ID.CMMC,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.CMMC].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceCMMC,
+        },
+        {
+          id: WAZUH_MODULES_ID.FEDRAMP,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.FEDRAMP].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceFedRAMP,
+        },
+        {
+          id: WAZUH_MODULES_ID.GDPR,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.GDPR].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceGDPR,
+        },
+        {
+          id: WAZUH_MODULES_ID.HIPAA,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.HIPAA].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceHIPAA,
+        },
+        {
+          id: WAZUH_MODULES_ID.ISO_27001,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.ISO_27001].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceISO27001,
+        },
+        {
+          id: WAZUH_MODULES_ID.NIS2,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.NIS2].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceNIS2,
+        },
+        {
+          id: WAZUH_MODULES_ID.NIST_800_53,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_53].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceNIST80053,
+        },
+        {
+          id: WAZUH_MODULES_ID.NIST_800_171,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_171].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceNIST800171,
+        },
+        {
+          id: WAZUH_MODULES_ID.TSC,
+          name: WAZUH_MODULES[WAZUH_MODULES_ID.TSC].title,
+          buttons: [ButtonExploreAgent],
+          component: RegulatoryComplianceTSC,
+        },
+      ],
+      availableFor: ['manager', 'agent'],
+    },
+    ButtonAboutRegulatoryCompliance,
+  ),
   software: {
     notModule: true,
   },

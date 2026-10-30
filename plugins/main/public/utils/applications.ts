@@ -9,7 +9,7 @@ import {
 } from '../components/common/logos';
 import { getWzCurrentAppID } from '../kibana-services';
 import { webDocumentationLink } from '../../common/services/web_documentation';
-import { FIM_DOCS_PATH } from '../components/overview/fim/fim-documentation';
+import { DOCS_PATHS } from '../../common/services/docs-paths';
 
 /* Applications
 Convention: the order of each application must according to the order of the category
@@ -81,6 +81,7 @@ export const configurationAssessment = {
       'Scan your assets as part of a configuration assessment audit.',
   }),
   order: 200,
+  docsUrl: webDocumentationLink(DOCS_PATHS.configurationAssessment),
   euiIconType: 'managementApp',
   showInOverviewApp: true,
   showInAgentMenu: true,
@@ -108,6 +109,7 @@ export const malwareDetection = {
     defaultMessage:
       'Check indicators of compromise triggered by malware infections or cyberattacks.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.malwareDetection),
   euiIconType: 'indexRollupApp',
   order: 201,
   showInOverviewApp: true,
@@ -137,7 +139,7 @@ export const fileIntegrityMonitoring = {
       'Detects when monitored files and registry entries are created, modified or deleted, and who changed them when who-data is enabled.',
   }),
   euiIconType: 'sqlApp',
-  docsUrl: webDocumentationLink(FIM_DOCS_PATH),
+  docsUrl: webDocumentationLink(DOCS_PATHS.fileIntegrityMonitoring),
   showInOverviewApp: true,
   showInAgentMenu: true,
   order: 202,
@@ -162,6 +164,7 @@ export const threatHunting = {
     defaultMessage:
       'Browse through your security alerts, identifying issues and threats in your environment.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.threatHunting),
   euiIconType: 'securityAnalyticsApp',
   order: 300,
   showInOverviewApp: true,
@@ -190,6 +193,7 @@ export const vulnerabilityDetection = {
     defaultMessage:
       'Discover what applications in your environment are affected by well-known vulnerabilities.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.vulnerabilityDetection),
   euiIconType: 'heartbeatApp',
   order: 302,
   showInOverviewApp: true,
@@ -215,6 +219,7 @@ export const mitreAttack = {
     defaultMessage:
       'Explore security alerts mapped to adversary tactics and techniques for better threat understanding.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.mitreAttack),
   euiIconType: 'grokApp',
   order: 301,
   showInOverviewApp: true,
@@ -240,6 +245,7 @@ export const caseManagement = {
     defaultMessage:
       'Track, triage, and manage cases created from security findings across your environment.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.caseManagement),
   euiIconType: 'securityApp',
   order: 303,
   showInOverviewApp: true,
@@ -265,9 +271,7 @@ export const ITHygiene = {
     defaultMessage:
       'Assess system, software, processes, and network layers to detect misconfigurations, unauthorized changes, and anomalies.',
   }),
-  docsUrl: webDocumentationLink(
-    'user-manual/capabilities/system-inventory/index.html',
-  ),
+  docsUrl: webDocumentationLink(DOCS_PATHS.itHygiene),
   euiIconType: 'indexPatternApp',
   order: 400,
   showInOverviewApp: true,
@@ -296,6 +300,7 @@ export const activeResponses = {
     defaultMessage:
       'Analyze the active response actions triggered across your environment.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.incidentResponse),
   euiIconType: 'bolt',
   order: 402,
   showInOverviewApp: true,
@@ -324,6 +329,7 @@ export const regulatoryCompliance = {
     defaultMessage:
       'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIST2 and NIST 800-171.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.regulatoryCompliance),
   euiIconType: 'usersRolesApp',
   order: 401,
   showInOverviewApp: true,
@@ -349,6 +355,7 @@ export const docker = {
     defaultMessage:
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.docker),
   euiIconType: LogoDocker,
   order: 500,
   showInOverviewApp: true,
@@ -377,6 +384,7 @@ export const amazonWebServices = {
     defaultMessage:
       'Security events related to your Amazon AWS services, collected directly via AWS API.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.amazonWebServices),
   euiIconType: 'logoAWSMono',
   order: 501,
   showInOverviewApp: true,
@@ -402,6 +410,7 @@ export const googleCloud = {
     defaultMessage:
       'Security events related to your Google Cloud Platform services, collected directly via GCP API.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.googleCloud),
   euiIconType: LogoGoogleCloud,
   order: 502,
   showInOverviewApp: true,
@@ -427,6 +436,7 @@ export const github = {
     defaultMessage:
       'Monitoring events from audit logs of your GitHub organizations.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.github),
   euiIconType: LogoGitHub,
   order: 503,
   showInOverviewApp: true,
@@ -451,6 +461,7 @@ export const office365 = {
   description: i18n.translate('wazuh.office365.app.description', {
     defaultMessage: 'Security events related to your Office 365 services.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.office365),
   euiIconType: LogoOffice365,
   order: 504,
   showInOverviewApp: true,
@@ -479,6 +490,7 @@ export const microsoftGraphAPI = {
     defaultMessage:
       'Security events related to your Microsoft Graph services, collected directly via Microsoft Graph API.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.microsoftGraphApi),
   euiIconType: LogoMicrosoftGraphAPI,
   order: 505,
   showInOverviewApp: true,
@@ -717,6 +729,7 @@ export const security = {
     defaultMessage:
       'Manage permissions to system resources based on the roles and policies.',
   }),
+  docsUrl: webDocumentationLink(DOCS_PATHS.apiRbac),
   euiIconType: 'securityAnalyticsApp',
   order: 710,
   showInOverviewApp: false,
