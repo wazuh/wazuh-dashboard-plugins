@@ -11,3 +11,4 @@
  */
 
 export * from './generate_report';
+export * from './generate-inventory-report';

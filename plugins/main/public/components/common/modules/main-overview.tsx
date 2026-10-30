@@ -13,6 +13,7 @@
 import React, { Component } from 'react';
 import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import '../../common/modules/module.scss';
+import { ModuleHeaderButtons } from './module-header-buttons';
 import { ReportingService } from '../../../react-services/reporting';
 import { connect } from 'react-redux';
 
@@ -71,30 +72,24 @@ export const MainModuleOverview = connect(mapStateToProps)(
                     grow={false}
                     style={{ marginTop: 6.25, marginRight: 5 }}
                   >
-                    <EuiFlexGroup>
-                      {ModuleTabView &&
-                        ModuleTabView.buttons &&
-                        ModuleTabView.buttons
+                    {ModuleTabView && (
+                      <ModuleHeaderButtons
+                        key={ModuleTabView.id}
+                        buttons={(ModuleTabView.buttons || [])
                           .filter(button =>
                             button?.condition
                               ? button?.condition(this.props)
                               : true,
                           )
-                          .map((button, index) => {
-                            const ModuleViewButton = button.component || button;
-                            return typeof ModuleViewButton !== 'string' ? (
-                              <EuiFlexItem key={`module_button_${index}`}>
-                                <ModuleViewButton
-                                  {...{
-                                    ...this.props,
-                                    ...this.props.agentsSelectionProps,
-                                  }}
-                                  moduleID={section}
-                                />
-                              </EuiFlexItem>
-                            ) : null;
-                          })}
-                    </EuiFlexGroup>
+                          .map(button => button.component || button)
+                          .filter(button => typeof button !== 'string')}
+                        buttonProps={{
+                          ...this.props,
+                          ...this.props.agentsSelectionProps,
+                          moduleID: section,
+                        }}
+                      />
+                    )}
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </div>
