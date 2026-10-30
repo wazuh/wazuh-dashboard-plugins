@@ -215,7 +215,7 @@ This displays information about the overall result and checks details. It allows
 
 An introduction under the status says what the checks cover: the connection to the server API, the manager certificates, and the objects the dashboard creates in the indexer. They do not report the overall health of the manager or the indexer.
 
-Each check shows a plain title and a one-line description, with its name below. Its details flyout adds what to do when it fails. The header popover lists failing checks by title. The `main` plugin registers these texts in `public/utils/health-check-descriptions.ts`:
+Each check shows a plain title and a one-line description, with its name below. When a check is yellow or red, its details flyout adds **What to check**. The header popover lists failing checks by title. The `main` plugin registers these texts in `public/utils/health-check-descriptions.ts`:
 
 | Name                                          | Title                         |
 | --------------------------------------------- | ----------------------------- |

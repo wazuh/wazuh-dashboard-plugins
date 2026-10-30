@@ -32,7 +32,7 @@ export const getHealthCheckDescriptions = (): Record<
       'wazuh.healthCheck.notificationChannels.remediation',
       {
         defaultMessage:
-          'The indexer creates these channels when it starts. Check that its notifications plugin is installed, then restart the indexer to create the missing ones.',
+          'The indexer creates the missing channels when its elected cluster manager node starts. Check that the indexer notifications plugin is installed, then restart that node.',
       },
     ),
   },
@@ -55,11 +55,11 @@ export const getHealthCheckDescriptions = (): Record<
     }),
     description: i18n.translate('wazuh.healthCheck.indexPatterns.description', {
       defaultMessage:
-        'Creates the index patterns the modules use when they are missing, and checks their time field and required fields.',
+        'Creates the index patterns the modules use when they are missing, and checks that the time-based ones have a time field.',
     }),
     remediation: i18n.translate('wazuh.healthCheck.indexPatterns.remediation', {
       defaultMessage:
-        'Check that the indexer is running and has the index templates, then restart the dashboard.',
+        'Check that the indexer is reachable. The details name each failing index pattern. If one has no time field, delete it in Dashboards Management > Index patterns. The next scheduled run creates the missing ones.',
     }),
   },
   [HEALTH_CHECK_TASK_SERVER_API_CONNECTION]: {
@@ -77,7 +77,7 @@ export const getHealthCheckDescriptions = (): Record<
       'wazuh.healthCheck.serverApiConnection.remediation',
       {
         defaultMessage:
-          'Check that the manager is running and reachable at the configured host, and that its version matches the dashboard. See Dashboard management > Server API.',
+          'Check that the manager is running and reachable at the configured host, that the API username and password are right, and that its version matches the dashboard. See Dashboard management > Server API.',
       },
     ),
   },
@@ -89,14 +89,14 @@ export const getHealthCheckDescriptions = (): Record<
       'wazuh.healthCheck.serverApiRunAs.description',
       {
         defaultMessage:
-          "Checks that the server API applies each dashboard user's own permissions (run_as).",
+          "Checks that the dashboard can use run_as, so the server API applies each dashboard user's own permissions.",
       },
     ),
     remediation: i18n.translate(
       'wazuh.healthCheck.serverApiRunAs.remediation',
       {
         defaultMessage:
-          'Set run_as: true for the host in the dashboard configuration, and allow run_as for the API user on the manager.',
+          'If the details say it could not check, fix the Server API connection first. Otherwise, set run_as: true for the host in the dashboard configuration and allow run_as for the API user on the manager. Then restart the dashboard.',
       },
     ),
   },
@@ -115,7 +115,7 @@ export const getHealthCheckDescriptions = (): Record<
       'wazuh.healthCheck.certificateValidity.remediation',
       {
         defaultMessage:
-          'Renew the certificate the details name. After replacing the listener certificate, restart the manager so it serves the new one.',
+          'Follow the action the details give for each certificate. A replaced listener certificate takes effect only after the manager restarts.',
       },
     ),
   },
