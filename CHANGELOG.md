@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the location shown for active responses in Server management > Settings [#9426](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9426)
 - Fixed browser extensions counted as packages in the Top 5 installed packages and Package types panels of IT Hygiene > Dashboard [#9546](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9546)
+- Fixed the IT Hygiene inventories exporting rows that ignored the search bar query in Export Formatted [#9567](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9567)
 
 ## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 01
 
