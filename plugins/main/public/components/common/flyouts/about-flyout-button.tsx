@@ -12,12 +12,17 @@
 
 import React, { useState } from 'react';
 import {
+  EuiAccordion,
   EuiButtonEmpty,
+  EuiCallOut,
   EuiCode,
   EuiDescriptionList,
+  EuiFlexGroup,
+  EuiFlexItem,
   EuiFlyout,
   EuiFlyoutBody,
   EuiFlyoutHeader,
+  EuiHorizontalRule,
   EuiLink,
   EuiSpacer,
   EuiText,
@@ -57,26 +62,6 @@ export interface AboutFlyoutSectionDefinition {
   title: string;
   content: React.ReactNode;
 }
-
-/**
- * Titled section of the flyout body: an h3 heading followed by its content.
- */
-export const AboutFlyoutSection = ({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) => (
-  <>
-    <EuiSpacer size='m' />
-    <EuiTitle size='xs'>
-      <h3>{title}</h3>
-    </EuiTitle>
-    <EuiSpacer size='s' />
-    {children}
-  </>
-);
 
 /** Definitions of the terms of a module, in the format shared by all the flyouts. */
 export const AboutFlyoutTerms = ({ terms }: { terms: AboutFlyoutTerm[] }) => (
@@ -136,7 +121,7 @@ interface AboutFlyoutButtonProps {
   overview: React.ReactNode;
   /** What the data and the terms of the module mean. */
   terms?: AboutFlyoutTerm[];
-  /** Extra sections rendered after the terms, with the same heading style. */
+  /** Extra collapsible sections rendered after the terms. */
   extraSections?: AboutFlyoutSectionDefinition[];
   /** Index patterns that the module reads and the tab that reads each one. */
   indices?: AboutFlyoutIndex[];
@@ -146,8 +131,9 @@ interface AboutFlyoutButtonProps {
 
 /**
  * Button that opens a flyout explaining a module, with a link to its
- * documentation under the title. The body always renders, in this order: the
- * overview, the terms, the extra sections, the indices and how to start.
+ * documentation under the title. The body renders, in this order: the overview,
+ * how to start, links to the sections and the collapsible sections (terms,
+ * extra sections and indices). The first section starts open.
  */
 export const AboutFlyoutButton = ({
   title,
@@ -161,6 +147,48 @@ export const AboutFlyoutButton = ({
 }: AboutFlyoutButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const titleId = `wzAbout${testSubj}Title`;
+  const sections = [
+    ...(terms?.length
+      ? [
+          {
+            key: 'terms',
+            title: i18n.translate('wazuh.common.aboutFlyout.termsTitle', {
+              defaultMessage: 'Terms',
+            }),
+            content: <AboutFlyoutTerms terms={terms} />,
+          },
+        ]
+      : []),
+    ...(extraSections ?? []).map(({ title: sectionTitle, content }, index) => ({
+      key: `extra-${index}`,
+      title: sectionTitle,
+      content,
+    })),
+    ...(indices?.length
+      ? [
+          {
+            key: 'indices',
+            title: i18n.translate('wazuh.common.aboutFlyout.indicesTitle', {
+              defaultMessage: 'Indices',
+            }),
+            content: (
+              <AboutFlyoutIndices testSubj={testSubj} indices={indices} />
+            ),
+          },
+        ]
+      : []),
+  ];
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(
+    sections.length ? { [sections[0].key]: true } : {},
+  );
+  const getSectionId = (key: string) => `wzAbout${testSubj}Section-${key}`;
+  const jumpToSection = (key: string) => {
+    setOpenSections(previous => ({ ...previous, [key]: true }));
+    document.getElementById(getSectionId(key))?.scrollIntoView?.({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   return (
     <>
@@ -204,40 +232,76 @@ export const AboutFlyoutButton = ({
             </EuiText>
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
-            <EuiText size='s'>{overview}</EuiText>
-            {terms?.length ? (
-              <AboutFlyoutSection
-                title={i18n.translate('wazuh.common.aboutFlyout.termsTitle', {
-                  defaultMessage: 'Terms',
-                })}
-              >
-                <AboutFlyoutTerms terms={terms} />
-              </AboutFlyoutSection>
-            ) : null}
-            {extraSections?.map(({ title: sectionTitle, content }) => (
-              <AboutFlyoutSection key={sectionTitle} title={sectionTitle}>
-                {content}
-              </AboutFlyoutSection>
-            ))}
-            {indices?.length ? (
-              <AboutFlyoutSection
-                title={i18n.translate('wazuh.common.aboutFlyout.indicesTitle', {
-                  defaultMessage: 'Indices',
-                })}
-              >
-                <AboutFlyoutIndices testSubj={testSubj} indices={indices} />
-              </AboutFlyoutSection>
-            ) : null}
+            <EuiText size='m'>{overview}</EuiText>
             {howToStart ? (
-              <AboutFlyoutSection
-                title={i18n.translate(
-                  'wazuh.common.aboutFlyout.howToStartTitle',
-                  { defaultMessage: 'How to start' },
-                )}
-              >
-                <EuiText size='s'>{howToStart}</EuiText>
-              </AboutFlyoutSection>
+              <>
+                <EuiSpacer size='m' />
+                <EuiCallOut
+                  size='m'
+                  iconType='play'
+                  title={i18n.translate(
+                    'wazuh.common.aboutFlyout.howToStartTitle',
+                    { defaultMessage: 'How to start' },
+                  )}
+                  data-test-subj={`wzAbout${testSubj}HowToStart`}
+                >
+                  <EuiText size='s'>{howToStart}</EuiText>
+                </EuiCallOut>
+              </>
             ) : null}
+            {sections.length > 1 ? (
+              <>
+                <EuiSpacer size='m' />
+                <EuiFlexGroup
+                  gutterSize='m'
+                  alignItems='center'
+                  responsive={false}
+                  wrap
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiText size='s' color='subdued'>
+                      {i18n.translate('wazuh.common.aboutFlyout.jumpTo', {
+                        defaultMessage: 'Jump to',
+                      })}
+                    </EuiText>
+                  </EuiFlexItem>
+                  {sections.map(({ key, title: sectionTitle }) => (
+                    <EuiFlexItem grow={false} key={key}>
+                      <EuiLink onClick={() => jumpToSection(key)}>
+                        {sectionTitle}
+                      </EuiLink>
+                    </EuiFlexItem>
+                  ))}
+                </EuiFlexGroup>
+              </>
+            ) : null}
+            {sections.length ? <EuiSpacer size='m' /> : null}
+            {sections.map(({ key, title: sectionTitle, content }) => (
+              <React.Fragment key={key}>
+                <EuiHorizontalRule margin='s' />
+                <EuiAccordion
+                  id={getSectionId(key)}
+                  data-test-subj={getSectionId(key)}
+                  arrowDisplay='left'
+                  paddingSize='m'
+                  buttonContent={
+                    <EuiTitle size='xs'>
+                      <h3>{sectionTitle}</h3>
+                    </EuiTitle>
+                  }
+                  forceState={openSections[key] ? 'open' : 'closed'}
+                  onToggle={isSectionOpen =>
+                    setOpenSections(previous => ({
+                      ...previous,
+                      [key]: isSectionOpen,
+                    }))
+                  }
+                >
+                  {content}
+                </EuiAccordion>
+              </React.Fragment>
+            ))}
+            {sections.length ? <EuiHorizontalRule margin='s' /> : null}
           </EuiFlyoutBody>
         </EuiFlyout>
       )}

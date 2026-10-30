@@ -27,16 +27,18 @@ available in all its views. Modules with tabs use `withAboutButton(module, Butto
 
 ## Content of the flyout
 
-The flyout always renders these sections, in this order (extra sections come after the terms and `indices` before how to start). `AboutFlyoutButton` owns the headings,
-spacing and order, so a module only provides the content through its props:
+The flyout renders the overview and how to start at the top, always visible, then a "Jump to" row and the
+collapsible sections: terms, extra sections and indices. The first collapsible section starts open.
+`AboutFlyoutButton` owns the headings, spacing, order and collapsing, so a module only provides the content
+through its props:
 
 | Prop            | Section      | Content                                                                                                                                                                               |
 | :-------------- | :----------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `overview`      | _(no title)_ | What the module is and what it reports. Required.                                                                                                                                     |
+| `overview`      | _(no title)_ | What the module is and what it reports. Required. Shown as lead text.                                                                                                                 |
 | `terms`         | Terms        | What the data and the terms of the module mean, as `{ title, description }` pairs.                                                                                                    |
-| `extraSections` | Custom       | Optional sections after the terms, such as the tabs of the module or a related warning.                                                                                               |
+| `extraSections` | Custom       | Optional collapsible sections after the terms, such as the tabs of the module or a related warning.                                                                                   |
 | `indices`       | Indices      | The index patterns that each tab reads, as `{ id, tab, patterns }`. Build them from the `WAZUH_*_PATTERN` constants and the tab names of the UI. Omit it for modules with no indices. |
-| `howToStart`    | How to start | Where to start and what is needed to get data, including why the views can be empty.                                                                                                  |
+| `howToStart`    | How to start | Shown in a call-out under the overview. Where to start and what is needed to get data, including why the views can be empty.                                                          |
 
 Write the content as follows:
 
