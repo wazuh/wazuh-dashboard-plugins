@@ -7,7 +7,7 @@ import * as TimSort from 'timsort';
 import { REPORTS_PRIMARY_COLOR } from '../../../common/constants';
 import { Logger } from 'opensearch-dashboards/server';
 import { IConfigurationEnhanced } from '../../../../wazuh-core/server';
-import { validateVisualizationImages } from './visualization-image';
+import { parseVisualizationImages } from './visualization-image';
 
 interface IVisualization {
   title: string;
@@ -473,15 +473,17 @@ export class ReportPrinter {
   }
   addVisualizations(visualizations: IVisualization[]) {
     this.logger.debug(`Add visualizations [${visualizations.length}]`);
-    const validationError = validateVisualizationImages(
+    // Add the images rebuilt from the validated data instead of the received ones
+    const result = parseVisualizationImages(
       visualizations.map(visualization => visualization?.element),
     );
-    if (validationError) {
-      throw new Error(`Invalid visualizations: ${validationError}`);
+    if ('error' in result) {
+      throw new Error(`Invalid visualizations: ${result.error}`);
     }
     const sanitazedVisualizations: IVisualizationExtended[] =
       visualizations.map((visualization, index) => ({
         ...visualization,
+        element: result.images[index],
         title: visualization.title || '',
         id: `${visualization.title || ''}.${index}`,
       }));

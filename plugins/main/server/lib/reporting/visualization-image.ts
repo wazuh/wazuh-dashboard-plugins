@@ -20,6 +20,10 @@ const PNG_HEADER_BASE64_LENGTH = 44;
 // grayscale (0), RGB (2), grayscale with alpha (4) and RGBA (6)
 const BYTES_PER_PIXEL: Record<number, number> = { 0: 1, 2: 3, 4: 2, 6: 4 };
 const MAX_PNG_FILTER_TYPE = 4;
+const MAX_PNG_CHUNK_LENGTH = 0x7fffffff;
+// Chunks the PDF library reads with a layout of its own. The header chunk is
+// only valid first, and the client never produces the palette or transparency.
+const REJECTED_PNG_CHUNK_TYPES = ['IHDR', 'PLTE', 'tRNS'];
 
 const FORMAT_MESSAGE = 'must be a base64-encoded PNG data URI';
 const SIZE_MESSAGE =
@@ -40,6 +44,7 @@ function readPNGHeader(png: Buffer): PNGHeader | string {
   if (
     png.length < PNG_HEADER_LENGTH ||
     !png.subarray(0, 8).equals(PNG_SIGNATURE) ||
+    png.readUInt32BE(8) !== 13 ||
     png.toString('latin1', 12, 16) !== 'IHDR'
   ) {
     return FORMAT_MESSAGE;
@@ -81,57 +86,95 @@ function readImageHeader(value: unknown): PNGHeader | string {
   );
 }
 
+// CRC-32 lookup table of the PNG chunks
+const CRC_TABLE = new Uint32Array(256).map((_, value) => {
+  let crc = value;
+  for (let bit = 0; bit < 8; bit++) {
+    crc = crc & 1 ? 0xedb88320 ^ (crc >>> 1) : crc >>> 1;
+  }
+  return crc;
+});
+
+function crc32(data: Buffer): number {
+  let crc = 0xffffffff;
+  for (let index = 0; index < data.length; index++) {
+    crc = CRC_TABLE[(crc ^ data[index]) & 0xff] ^ (crc >>> 8);
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function createPNGChunk(type: string, data: Buffer): Buffer {
+  const chunk = Buffer.alloc(data.length + 12);
+  chunk.writeUInt32BE(data.length, 0);
+  chunk.write(type, 4, 'latin1');
+  data.copy(chunk, 8);
+  chunk.writeUInt32BE(
+    crc32(chunk.subarray(4, data.length + 8)),
+    data.length + 8,
+  );
+  return chunk;
+}
+
 /**
- * Check that the PNG can be decoded by the PDF library without throwing outside
- * of the report generation promise: image data that inflates to exactly the
- * expected size with valid row filters.
+ * Decode the PNG as the PDF library does and rebuild it from the validated
+ * parts only: the header, the image data and the end chunk. The image data must
+ * inflate to exactly the expected size with valid row filters, so the PDF
+ * library cannot throw outside of the report generation promise.
+ * Returns the rebuilt PNG or undefined if the image is not valid.
  */
-function isDecodablePNG(png: Buffer): boolean {
+function rebuildPNG(png: Buffer): Buffer | undefined {
   const header = readPNGHeader(png);
   if (typeof header === 'string') {
-    return false;
+    return undefined;
   }
   const { width, height, bytesPerPixel } = header;
 
-  // Read the chunks as the PDF library does: it stops at IEND and ignores the
-  // image data after it
+  // Walk the chunks strictly so that the PDF library cannot read them in
+  // another way: every chunk fits in the data and the walk stops at the
+  // required end chunk, as the PDF library does
   const imageData: Buffer[] = [];
-  let hasEnd = false;
-  for (let pos = 8; pos + 8 <= png.length; ) {
+  for (let pos = PNG_HEADER_LENGTH, hasEnd = false; !hasEnd; ) {
+    if (pos + 12 > png.length) {
+      return undefined;
+    }
     const length = png.readUInt32BE(pos);
+    if (length > MAX_PNG_CHUNK_LENGTH || pos + length + 12 > png.length) {
+      return undefined;
+    }
     const type = png.toString('latin1', pos + 4, pos + 8);
-    if (type === 'IEND') {
-      hasEnd = true;
-      break;
+    if (REJECTED_PNG_CHUNK_TYPES.includes(type)) {
+      return undefined;
     }
     if (type === 'IDAT') {
       imageData.push(png.subarray(pos + 8, pos + 8 + length));
     }
+    hasEnd = type === 'IEND';
     pos += length + 12;
   }
-  if (!hasEnd) {
-    return false;
-  }
 
+  const data = Buffer.concat(imageData);
   const rowLength = width * bytesPerPixel + 1;
   const expectedLength = rowLength * height;
   let pixels: Buffer;
   try {
-    pixels = zlib.inflateSync(Buffer.concat(imageData), {
-      maxOutputLength: expectedLength,
-    });
+    pixels = zlib.inflateSync(data, { maxOutputLength: expectedLength });
   } catch {
-    return false;
+    return undefined;
   }
   if (pixels.length !== expectedLength) {
-    return false;
+    return undefined;
   }
   for (let row = 0; row < height; row++) {
     if (pixels[row * rowLength] > MAX_PNG_FILTER_TYPE) {
-      return false;
+      return undefined;
     }
   }
-  return true;
+  return Buffer.concat([
+    PNG_SIGNATURE,
+    createPNGChunk('IHDR', png.subarray(16, 29)),
+    createPNGChunk('IDAT', data),
+    createPNGChunk('IEND', Buffer.alloc(0)),
+  ]);
 }
 
 /**
@@ -146,37 +189,60 @@ export function validateVisualizationImage(value: unknown): string | undefined {
   return typeof header === 'string' ? header : undefined;
 }
 
+export type VisualizationImagesParseResult =
+  | { error: string }
+  | { images: string[] };
+
 /**
  * Check that the report visualization images can be safely decoded by the PDF
- * library. The cheap checks (count, headers and total size) run on every image
- * before decoding any of them.
- * Returns the validation error message, if any.
+ * library and rebuild them from the validated parts, so the PDF library only
+ * reads data built here. The cheap checks (count, headers and total size) run
+ * on every image before decoding any of them.
+ * Returns the validation error message or the rebuilt PNG data URIs.
  */
-export function validateVisualizationImages(
+export function parseVisualizationImages(
   values: unknown[],
-): string | undefined {
+): VisualizationImagesParseResult {
   if (values.length > MAX_VISUALIZATION_IMAGES) {
-    return `must contain at most ${MAX_VISUALIZATION_IMAGES} images`;
+    return { error: `must contain at most ${MAX_VISUALIZATION_IMAGES} images` };
   }
   let totalPixels = 0;
   for (let index = 0; index < values.length; index++) {
     const header = readImageHeader(values[index]);
     if (typeof header === 'string') {
-      return `image ${index} ${header}`;
+      return { error: `image ${index} ${header}` };
     }
     totalPixels += header.width * header.height;
   }
   if (totalPixels > MAX_VISUALIZATION_IMAGES_TOTAL_PIXELS) {
-    return `images must have at most ${MAX_VISUALIZATION_IMAGES_TOTAL_PIXELS} pixels in total`;
+    return {
+      error: `images must have at most ${MAX_VISUALIZATION_IMAGES_TOTAL_PIXELS} pixels in total`,
+    };
   }
+  const images: string[] = [];
   for (let index = 0; index < values.length; index++) {
-    const png = Buffer.from(
-      (values[index] as string).slice(PNG_DATA_URI_PREFIX.length),
-      'base64',
+    const png = rebuildPNG(
+      Buffer.from(
+        (values[index] as string).slice(PNG_DATA_URI_PREFIX.length),
+        'base64',
+      ),
     );
-    if (!isDecodablePNG(png)) {
-      return `image ${index} must contain valid PNG image data`;
+    if (!png) {
+      return { error: `image ${index} must contain valid PNG image data` };
     }
+    images.push(`${PNG_DATA_URI_PREFIX}${png.toString('base64')}`);
   }
-  return undefined;
+  return { images };
+}
+
+/**
+ * Check that the report visualization images can be safely decoded by the PDF
+ * library. See parseVisualizationImages.
+ * Returns the validation error message, if any.
+ */
+export function validateVisualizationImages(
+  values: unknown[],
+): string | undefined {
+  const result = parseVisualizationImages(values);
+  return 'error' in result ? result.error : undefined;
 }

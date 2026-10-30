@@ -4,6 +4,7 @@ import {
   MAX_VISUALIZATION_IMAGE_WIDTH,
   MAX_VISUALIZATION_IMAGES,
   MAX_VISUALIZATION_IMAGES_TOTAL_PIXELS,
+  parseVisualizationImages,
   validateVisualizationImage,
   validateVisualizationImages,
 } from './visualization-image';
@@ -35,36 +36,54 @@ interface PNGOptions {
   colorType?: number;
   filter?: number;
   imageData?: Buffer;
-  imageDataAfterEnd?: Buffer;
 }
 
-// Build an 8-bit PNG data URI. The image data defaults to deflated RGBA rows.
-const createPNG = ({
-  width = 2,
-  height = 2,
-  colorType = 6,
-  filter = 0,
-  imageData,
-  imageDataAfterEnd,
-}: PNGOptions = {}) => {
+const createHeader = ({ width = 2, height = 2, colorType = 6 }: PNGOptions) => {
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);
   header.writeUInt32BE(height, 4);
   header[8] = 8;
   header[9] = colorType;
+  return header;
+};
+
+// Deflated RGBA rows
+const createImageData = ({ width = 2, height = 2, filter = 0 }: PNGOptions) => {
   const row = Buffer.alloc(width * 4 + 1);
   row[0] = filter;
-  const png = Buffer.concat([
-    PNG_SIGNATURE,
-    createChunk('IHDR', header),
-    createChunk(
-      'IDAT',
-      imageData ?? zlib.deflateSync(Buffer.concat(Array(height).fill(row))),
-    ),
-    createChunk('IEND', Buffer.alloc(0)),
-    ...(imageDataAfterEnd ? [createChunk('IDAT', imageDataAfterEnd)] : []),
-  ]);
-  return `data:image/png;base64,${png.toString('base64')}`;
+  return zlib.deflateSync(Buffer.concat(Array(height).fill(row)));
+};
+
+const createDataURI = (...chunks: Buffer[]) =>
+  `data:image/png;base64,${Buffer.concat([PNG_SIGNATURE, ...chunks]).toString(
+    'base64',
+  )}`;
+
+const HEADER_CHUNK = createChunk('IHDR', createHeader({}));
+const IMAGE_DATA = createImageData({});
+const END_CHUNK = createChunk('IEND', Buffer.alloc(0));
+
+// Build an 8-bit PNG data URI. The image data defaults to deflated RGBA rows.
+const createPNG = (options: PNGOptions = {}) =>
+  createDataURI(
+    createChunk('IHDR', createHeader(options)),
+    createChunk('IDAT', options.imageData ?? createImageData(options)),
+    END_CHUNK,
+  );
+
+const readChunks = (dataURI: string) => {
+  const png = Buffer.from(dataURI.split(',')[1], 'base64');
+  const chunks: { type: string; data: Buffer; crc: number }[] = [];
+  for (let pos = 8; pos < png.length; ) {
+    const length = png.readUInt32BE(pos);
+    chunks.push({
+      type: png.toString('latin1', pos + 4, pos + 8),
+      data: png.subarray(pos + 8, pos + 8 + length),
+      crc: png.readUInt32BE(pos + 8 + length),
+    });
+    pos += length + 12;
+  }
+  return chunks;
 };
 
 describe('validateVisualizationImage', () => {
@@ -113,42 +132,88 @@ describe('validateVisualizationImages', () => {
   it.each([
     [
       'width over the limit',
-      { width: MAX_VISUALIZATION_IMAGE_WIDTH + 1, imageData: noImageData },
+      createPNG({
+        width: MAX_VISUALIZATION_IMAGE_WIDTH + 1,
+        imageData: noImageData,
+      }),
       SIZE_MESSAGE,
     ],
     [
       'height over the limit',
-      { height: MAX_VISUALIZATION_IMAGE_HEIGHT + 1, imageData: noImageData },
+      createPNG({
+        height: MAX_VISUALIZATION_IMAGE_HEIGHT + 1,
+        imageData: noImageData,
+      }),
       SIZE_MESSAGE,
     ],
     [
       'palette color type',
-      { colorType: 3 },
+      createPNG({ colorType: 3 }),
       'must be an 8-bit, non-interlaced and non-palette PNG',
     ],
     [
+      'header chunk longer than 13 bytes',
+      createDataURI(
+        createChunk('IHDR', Buffer.concat([createHeader({}), END_CHUNK])),
+        createChunk('IDAT', IMAGE_DATA),
+        END_CHUNK,
+      ),
+      'must be a base64-encoded PNG data URI',
+    ],
+    [
       'corrupt image data',
-      { imageData: Buffer.from('not zlib data') },
+      createPNG({ imageData: Buffer.from('not zlib data') }),
       DATA_MESSAGE,
     ],
-    ['invalid row filter', { filter: 9 }, DATA_MESSAGE],
+    ['invalid row filter', createPNG({ filter: 9 }), DATA_MESSAGE],
     [
       'truncated image data',
-      { imageData: zlib.deflateSync(Buffer.alloc(17)) },
+      createPNG({ imageData: zlib.deflateSync(Buffer.alloc(17)) }),
       DATA_MESSAGE,
     ],
     [
       'image data split around the end chunk',
-      {
-        imageData: zlib.deflateSync(Buffer.alloc(18)).subarray(0, 4),
-        imageDataAfterEnd: zlib.deflateSync(Buffer.alloc(18)).subarray(4),
-      },
+      createDataURI(
+        HEADER_CHUNK,
+        createChunk('IDAT', IMAGE_DATA.subarray(0, 4)),
+        END_CHUNK,
+        createChunk('IDAT', IMAGE_DATA.subarray(4)),
+      ),
       DATA_MESSAGE,
     ],
-  ])('rejects an image with %s', (_title, options, message) => {
-    expect(
-      validateVisualizationImages([PNG_DATA_URI, createPNG(options)]),
-    ).toBe(`image 1 ${message}`);
+    [
+      'second header chunk',
+      createDataURI(
+        HEADER_CHUNK,
+        createChunk('IDAT', IMAGE_DATA),
+        createChunk('IHDR', createHeader({ width: 8192, height: 4096 })),
+        END_CHUNK,
+      ),
+      DATA_MESSAGE,
+    ],
+    [
+      'transparency chunk',
+      createDataURI(
+        HEADER_CHUNK,
+        createChunk('tRNS', END_CHUNK),
+        createChunk('IDAT', IMAGE_DATA),
+        END_CHUNK,
+      ),
+      DATA_MESSAGE,
+    ],
+    [
+      'end chunk running past the data',
+      createDataURI(
+        HEADER_CHUNK,
+        createChunk('IDAT', IMAGE_DATA),
+        END_CHUNK.subarray(0, 8),
+      ),
+      DATA_MESSAGE,
+    ],
+  ])('rejects an image with %s', (_title, image, message) => {
+    expect(validateVisualizationImages([PNG_DATA_URI, image])).toBe(
+      `image 1 ${message}`,
+    );
   });
 
   it('rejects too many images', () => {
@@ -164,11 +229,35 @@ describe('validateVisualizationImages', () => {
     const image = createPNG({
       width: MAX_VISUALIZATION_IMAGE_WIDTH,
       height: MAX_VISUALIZATION_IMAGE_HEIGHT,
-      imageData: Buffer.alloc(0),
+      imageData: noImageData,
     });
     expect(MAX_VISUALIZATION_IMAGES_TOTAL_PIXELS).toBe(32 * 1024 * 1024);
     expect(validateVisualizationImages([image, image])).toBe(
       'images must have at most 33554432 pixels in total',
     );
+  });
+});
+
+describe('parseVisualizationImages', () => {
+  it('rebuilds the images with only the header, image data and end chunks', () => {
+    const image = createDataURI(
+      HEADER_CHUNK,
+      createChunk('tEXt', Buffer.from('Software\0test', 'latin1')),
+      createChunk('IDAT', IMAGE_DATA.subarray(0, 5)),
+      createChunk('IDAT', IMAGE_DATA.subarray(5)),
+      END_CHUNK,
+    );
+
+    const { images } = parseVisualizationImages([image]) as {
+      images: string[];
+    };
+
+    const chunks = readChunks(images[0]);
+    expect(chunks.map(({ type }) => type)).toEqual(['IHDR', 'IDAT', 'IEND']);
+    expect(chunks[0].data.readUInt32BE(0)).toBe(2);
+    expect(chunks[0].data.readUInt32BE(4)).toBe(2);
+    expect(chunks[1].data).toEqual(IMAGE_DATA);
+    // The chunks carry real CRCs: the one of the end chunk is a constant
+    expect(chunks[2].crc).toBe(0xae426082);
   });
 });

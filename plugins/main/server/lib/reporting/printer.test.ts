@@ -4,6 +4,16 @@ import { ReportPrinter } from './printer';
 const PNG_DATA_URI =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0' +
   'lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+// The same PNG with a text chunk (zero CRC) after the header chunk
+const PNG_WITH_TEXT_DATA_URI = (() => {
+  const png = Buffer.from(PNG_DATA_URI.split(',')[1], 'base64');
+  const text = Buffer.from('\0\0\0\x01tEXtx\0\0\0\0', 'latin1');
+  return `data:image/png;base64,${Buffer.concat([
+    png.subarray(0, 33),
+    text,
+    png.subarray(33),
+  ]).toString('base64')}`;
+})();
 
 type PrinterParameters = ConstructorParameters<typeof ReportPrinter>;
 type Visualizations = Parameters<ReportPrinter['addVisualizations']>[0];
@@ -26,12 +36,22 @@ const getContent = (printer: ReportPrinter): ContentNode[] =>
   (printer as unknown as { _content: ContentNode[] })._content;
 
 describe('ReportPrinter.addVisualizations', () => {
-  it('adds PNG data URI visualizations as images', () => {
+  it('adds the visualizations as images rebuilt from the validated chunks', () => {
     const printer = createPrinter();
 
     printer.addVisualizations([
-      { title: 'Full', element: PNG_DATA_URI, width: 800, height: 100 },
-      { title: 'Split', element: PNG_DATA_URI, width: 300, height: 100 },
+      {
+        title: 'Full',
+        element: PNG_WITH_TEXT_DATA_URI,
+        width: 800,
+        height: 100,
+      },
+      {
+        title: 'Split',
+        element: PNG_WITH_TEXT_DATA_URI,
+        width: 300,
+        height: 100,
+      },
     ]);
 
     const images = getContent(printer)
