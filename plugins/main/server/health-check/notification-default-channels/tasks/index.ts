@@ -1,6 +1,7 @@
 import { ILegacyClusterClient } from '../../../../../../src/core/server';
 import { ChannelDefinition, defaultChannels } from '../common/constants';
 import type { InitializationTaskRunContext } from '../../types';
+import { HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS } from '../../../../common/constants';
 
 const verifyExistingDefaultChannels = async (
   client: ILegacyClusterClient,
@@ -43,7 +44,7 @@ export const initializeDefaultNotificationChannel = (
   client: ILegacyClusterClient,
 ): Record<string, any> => {
   return {
-    name: 'integrations:default-notifications-channels',
+    name: HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS,
     async run(ctx: InitializationTaskRunContext) {
       try {
         ctx.logger.info(

@@ -55,6 +55,7 @@ import _ from 'lodash';
 import { registerPanelInfoActions } from './components/common/dashboards/panel-info/panel-info-actions';
 import { panelInfos } from './components/common/dashboards/panel-info/panel-infos';
 import { setAppHelpExtension } from './utils/help-extension';
+import { registerHealthCheckDescriptions } from './utils/health-check-descriptions';
 
 export class WazuhPlugin
   implements
@@ -71,6 +72,8 @@ export class WazuhPlugin
     // Store Wazuh build info from the dashboard's injected metadata so that
     // public modules can access the release stage and revision at runtime.
     initWazuhBuildInfoFromCore(core.injectedMetadata);
+
+    registerHealthCheckDescriptions(core.healthCheck);
 
     // Get custom logos configuration to start up the app with the correct logos
 
