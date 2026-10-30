@@ -12,6 +12,11 @@
 import { WazuhReportingCtrl } from '../controllers';
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
+import {
+  MAX_VISUALIZATION_IMAGES,
+  validateVisualizationImage,
+  validateVisualizationImages,
+} from '../lib/reporting/visualization-image';
 
 export function WazuhReportingRoutes(router: IRouter) {
   const ctrl = new WazuhReportingCtrl();
@@ -61,12 +66,29 @@ export function WazuhReportingRoutes(router: IRouter) {
     schema.literal('it-hygiene'),
   ]);
 
+  const visualizationValidation = schema.object(
+    {
+      // Only the image header is read here; the array validation decodes them
+      element: schema.string({ validate: validateVisualizationImage }),
+      title: schema.maybe(schema.string()),
+      width: schema.maybe(schema.number()),
+      height: schema.maybe(schema.number()),
+    },
+    { unknowns: 'allow' },
+  );
+
+  const visualizationsValidation = schema.arrayOf(visualizationValidation, {
+    maxSize: MAX_VISUALIZATION_IMAGES,
+    validate: visualizations =>
+      validateVisualizationImages(visualizations.map(({ element }) => element)),
+  });
+
   router.post(
     {
       path: '/reports/modules/{moduleID}',
       validate: {
         body: schema.object({
-          array: schema.any(),
+          array: visualizationsValidation,
           browserTimezone: schema.string(),
           serverSideQuery: schema.maybe(schema.any()),
           filters: schema.maybe(schema.any()),
