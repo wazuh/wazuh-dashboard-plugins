@@ -50,6 +50,8 @@ import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERNS,
   HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
+  HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
+  HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
@@ -770,7 +772,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // server API connection-compatibility
     core.healthCheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
-        taskName: 'server-api:connection-compatibility',
+        taskName: HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
         services: plugins.wazuhCore,
         rateLimitRerun: this.rateLimitRerun,
       }),
@@ -779,7 +781,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // server API run_as (allow_run_as)
     core.healthCheck.register(
       initializationTaskCreatorServerAPIRunAs({
-        taskName: 'server-api:run-as',
+        taskName: HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
         services: plugins.wazuhCore,
         rateLimitRerun: this.rateLimitRerun,
       }),

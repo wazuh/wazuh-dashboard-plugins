@@ -1113,6 +1113,16 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 export const HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY =
   'server-api:certificate-validity';
 
+export const HEALTH_CHECK_TASK_SERVER_API_CONNECTION =
+  'server-api:connection-compatibility';
+
+export const HEALTH_CHECK_TASK_SERVER_API_RUN_AS = 'server-api:run-as';
+
+export const HEALTH_CHECK_TASK_DASHBOARDS = 'saved-objects:dashboards';
+
+export const HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS =
+  'integrations:default-notifications-channels';
+
 // Certificate validity health check
 export const CERTIFICATE_EXPIRY_WARNING_SETTING =
   'healthCheckCertificateExpiryWarningDays';
