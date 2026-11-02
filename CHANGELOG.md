@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed the location shown for active responses in Server management > Settings [#9426](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9426)
+- Fixed an error screen shown before the login page when the session expired [#9524](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9524)
 - Fixed browser extensions counted as packages in the Top 5 installed packages and Package types panels of IT Hygiene > Dashboard [#9546](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9546)
 - Fixed the validation of visualization images in module reports [#9414](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9414)
 - Fixed the scheduled jobs, such as the statistics and monitoring collection, occasionally skipping a run [#9552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9552)
