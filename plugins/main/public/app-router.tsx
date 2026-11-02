@@ -19,7 +19,6 @@ import WzManagement from './controllers/management/components/management/managem
 import { Overview } from './components/overview/overview';
 import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
-import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 
@@ -44,18 +43,6 @@ export function Application(props) {
 
     // Load the app state
     loadAppConfig();
-
-    // TODO: Replace this with document insteat
-    // Bind deleteExistentToken on Log out component.
-    $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
-      'mouseleave',
-      function () {
-        // opendistro
-        $('button:contains(Log out)').on('click', function () {
-          WzAuthentication.deleteExistentToken();
-        });
-      },
-    );
   }, []);
 
   return (

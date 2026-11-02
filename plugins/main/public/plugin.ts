@@ -25,7 +25,7 @@ import {
   setHeaderActionMenuMounter,
   setWazuhCorePlugin,
 } from './kibana-services';
-import { validate as validateNodeCronInterval } from 'node-cron';
+import { isValidCronInterval } from '../common/services/cron-interval';
 import {
   AppPluginStartDependencies,
   WazuhSetup,
@@ -152,7 +152,7 @@ export class WazuhPlugin
               });
             !setting.validate &&
               (setting.validate = function (value: string) {
-                return validateNodeCronInterval(value)
+                return isValidCronInterval(value)
                   ? undefined
                   : 'Interval is not valid.';
               });
