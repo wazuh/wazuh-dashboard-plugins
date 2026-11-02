@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.11
 
+### Changed
+
+- Server management > Dev Tools shows the Server API error body and the request duration when a request fails [#9428](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9428)
+
 ### Fixed
 
 - Fixed the location shown for active responses in Server management > Settings [#9426](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9426)

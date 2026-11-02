@@ -262,7 +262,7 @@ describe('DevToolsActions.send', () => {
     expect(hooks.onEnd).not.toHaveBeenCalled();
   });
 
-  it('handles thrown HTTP errors: logs, renders error JSON {error, message}, and calls onEnd with error metadata', async () => {
+  it('handles thrown HTTP errors without body: renders {error, message} and the duration', async () => {
     const editorOutput = createOutput();
     const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
 
@@ -281,6 +281,11 @@ describe('DevToolsActions.send', () => {
       jsonErrors: [],
     });
 
+    const nowSpy = jest
+      .spyOn(Date, 'now')
+      .mockReturnValueOnce(4000)
+      .mockReturnValueOnce(4250);
+
     const actions = new DevToolsActions(
       http,
       errors as any,
@@ -298,12 +303,75 @@ describe('DevToolsActions.send', () => {
     expect(hooks.onEnd).toHaveBeenCalledWith({
       status: 500,
       statusText: 'Internal',
-      durationMs: 0,
+      durationMs: 250,
       ok: false,
     });
+
+    nowSpy.mockRestore();
   });
 
-  it('renders error output using payload error code and HTTP status text when response body has error', async () => {
+  it('renders the Server API body as is when it refuses a request (403, error 4000)', async () => {
+    const editorOutput = createOutput();
+    const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
+
+    const desired = group({ requestText: 'POST /groups' });
+    const apiBody = {
+      title: 'Permission Denied',
+      detail: 'Permission denied: Resource type: *:*',
+      remediation: 'Please, make sure you have permissions',
+      dapi_errors: {
+        node01: { error: 'Permission denied: Resource type: *:*' },
+      },
+      error: 4000,
+    };
+    const refusal = Object.assign(
+      new Error('Request failed with status code 403'),
+      { response: { status: 403, statusText: 'Forbidden', data: apiBody } },
+    );
+
+    const http = createHttp(() => Promise.reject(refusal));
+    const errors = createErrors();
+    const requests = createRequests({
+      method: 'POST',
+      path: '/groups',
+      body: { group_id: 'test' },
+    });
+    const responses = createResponses();
+    const grouping = createGrouping({
+      desiredGroup: desired,
+      groups: [desired],
+      jsonErrors: [],
+    });
+
+    const nowSpy = jest
+      .spyOn(Date, 'now')
+      .mockReturnValueOnce(5000)
+      .mockReturnValueOnce(5430);
+
+    const actions = new DevToolsActions(
+      http,
+      errors as any,
+      requests as any,
+      responses as any,
+      grouping as any,
+    );
+
+    await actions.send({} as any, editorOutput, false, hooks);
+
+    expect(editorOutput.setValue).toHaveBeenCalledWith(
+      JSON.stringify(apiBody, null, 2),
+    );
+    expect(hooks.onEnd).toHaveBeenCalledWith({
+      status: 403,
+      statusText: 'Forbidden',
+      durationMs: 430,
+      ok: false,
+    });
+
+    nowSpy.mockRestore();
+  });
+
+  it('renders the response body as is when it has an API error', async () => {
     const editorOutput = createOutput();
     const hooks: SendHooks = { onStart: jest.fn(), onEnd: jest.fn() };
 
@@ -346,7 +414,7 @@ describe('DevToolsActions.send', () => {
     await actions.send({} as any, editorOutput, false, hooks);
 
     expect(editorOutput.setValue).toHaveBeenCalledWith(
-      JSON.stringify({ error: '3013', message: '404 - Not Found' }, null, 2),
+      JSON.stringify(httpResponse.data, null, 2),
     );
     expect(hooks.onEnd).toHaveBeenCalledWith({
       status: 404,
