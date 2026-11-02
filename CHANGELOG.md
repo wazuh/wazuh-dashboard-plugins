@@ -11,6 +11,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Fixed override of Server API authorization header [#9143](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9143)
+- Fixed an error screen shown before the login page when the session expired [#9621](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9621)
 
 ## Wazuh v4.10.5 - OpenSearch Dashboards 2.19.6 - Revision 01
 

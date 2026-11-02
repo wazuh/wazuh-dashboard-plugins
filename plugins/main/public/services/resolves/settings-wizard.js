@@ -18,6 +18,7 @@ import { GenericRequest } from '../../react-services';
 import NavigationService from '../../react-services/navigation-service';
 import { getWzCurrentAppID } from '../../kibana-services';
 import { serverApis } from '../../utils/applications';
+import { isLoggingOut } from '../request-handler';
 
 export function settingsWizard(_, wzMisc, disableErrors = false) {
   try {
@@ -124,6 +125,7 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
             }
           })
           .catch(error => {
+            if (isLoggingOut()) return;
             !disableErrors && ErrorHandler.handle(error);
             wzMisc.setWizard(true);
             if (
@@ -165,6 +167,7 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
             }
           })
           .catch(error => {
+            if (isLoggingOut()) return;
             setUpCredentials('Please set up API credentials.');
           });
       }

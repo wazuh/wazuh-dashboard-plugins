@@ -2,14 +2,22 @@ import axios from 'axios';
 import { HTTP_STATUS_CODES } from '../../common/constants';
 
 let allow = true;
+let unloading = false;
 export let unregisterInterceptor = () => {};
 const source = axios.CancelToken.source();
+
+window.addEventListener('beforeunload', () => {
+  unloading = true;
+});
 
 const disableRequests = () => {
   allow = false;
   source.cancel('Requests cancelled');
   return;
 };
+
+// True once a 401 ended the session and the page is leaving for the login page
+export const isLoggingOut = () => !allow && unloading;
 
 export const initializeInterceptor = core => {
   unregisterInterceptor = core.http.intercept({
