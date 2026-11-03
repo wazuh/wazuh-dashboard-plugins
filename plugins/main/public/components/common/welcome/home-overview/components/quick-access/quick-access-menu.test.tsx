@@ -109,6 +109,7 @@ describe('QuickAccessMenu', () => {
     );
     expect(link).toHaveTextContent('AI Assistant');
     expect(link).toHaveAttribute('href', '/mock/wazuhAiAssistant');
+    expect(link).toHaveStyle({ fontWeight: 'inherit' });
     expect(getAiAssistantUrl).toHaveBeenCalled();
   });
 

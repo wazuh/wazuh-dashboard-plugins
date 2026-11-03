@@ -8,6 +8,7 @@ import { ScaTilesData } from '../../interfaces/types';
 import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
 import { getConfigurationAssessmentByStatusUrl } from '../../utils/navigation';
 import { CheckResult } from '../../../../../overview/sca/utils/constants';
+import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
 
 export interface ScaTilesProps {
   tiles: ScaTilesData;
@@ -68,7 +69,7 @@ export const ScaTiles: React.FC<ScaTilesProps> = ({
               indexPatternId ? (
                 <RedirectAppLinks application={getCore().application}>
                   <EuiLink
-                    style={{ fontWeight: 'inherit', color: tile.color }}
+                    style={{ ...NON_TITLE_LINK_STYLE, color: tile.color }}
                     href={getConfigurationAssessmentByStatusUrl(
                       tile.status,
                       indexPatternId,

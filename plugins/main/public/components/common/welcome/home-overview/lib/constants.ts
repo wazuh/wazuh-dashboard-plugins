@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Aggregation and bucket keys shared between the query builders (queries.ts)
  * and the mappers/hooks that read the responses back. Naming each key once here
@@ -59,3 +61,10 @@ export const VALUE_PLACEHOLDER = '-';
  * viewport narrower than the floor from overflowing.
  */
 export const CARD_MIN_WIDTH = 'min(320px, 100%)';
+
+/**
+ * OUI renders every `EuiLink` semibold. Links that are not titles (list rows, legends, KPI
+ * values, calls to action) take the weight of the text around them instead, so only titles
+ * read bold.
+ */
+export const NON_TITLE_LINK_STYLE: CSSProperties = { fontWeight: 'inherit' };

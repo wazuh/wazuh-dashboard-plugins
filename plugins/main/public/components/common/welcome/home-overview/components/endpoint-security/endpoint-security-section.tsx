@@ -35,6 +35,7 @@ import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
 
 export interface EndpointSecuritySectionProps {
   /** Malware Detection's IOC-match hero rides the shared findings search. */
@@ -204,7 +205,7 @@ const EndpointSecuritySectionComponent: React.FC<
                     value={
                       <RedirectAppLinks application={getCore().application}>
                         <EuiLink
-                          style={{ fontWeight: 'inherit' }}
+                          style={NON_TITLE_LINK_STYLE}
                           color='text'
                           href={getFileIntegrityMonitoringInventoryFilesUrl()}
                           data-test-subj='fim-hero-link'

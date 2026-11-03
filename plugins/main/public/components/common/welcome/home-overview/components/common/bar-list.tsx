@@ -9,6 +9,7 @@ import { EmptyState } from './empty-state';
 import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
 import { ListTitle, MoreItemsNote, getMissingSlots } from './list-chrome';
 import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
+import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
 
 export interface BarListProps {
   items: TopItem[];
@@ -73,6 +74,7 @@ export const BarList: React.FC<BarListProps> = ({
                 {isInteractive ? (
                   <RedirectAppLinks application={getCore().application}>
                     <EuiLink
+                      style={NON_TITLE_LINK_STYLE}
                       href={getHref?.(item)}
                       onClick={onSelect ? () => onSelect(item) : undefined}
                     >
