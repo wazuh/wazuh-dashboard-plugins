@@ -29,32 +29,32 @@
  */
 
 import React from 'react';
-import { FormattedMessage, I18nProvider } from '@osd/i18n/react';
-
-import { EuiCallOut, EuiPanel } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
+import { ModuleEmptyState } from './module-empty-state';
 
 interface Props {
   message?: string;
 }
 
-export const DiscoverNoResults = ({ message }: Props) => {
-  return (
-    <I18nProvider>
-      <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
-        <EuiCallOut
-          title={
-            message ?? (
-              <FormattedMessage
-                id='wazuh.common.noResults.title'
-                defaultMessage='No results match your search criteria'
-              />
-            )
-          }
-          color='warning'
-          iconType='help'
-          data-test-subj='discoverNoResults'
-        />
-      </EuiPanel>
-    </I18nProvider>
-  );
-};
+/**
+ * Empty state of the tabs without a module-specific text: the title for a search that matches
+ * nothing and what to try. Modules with their own situations use `ModuleEmptyState`.
+ */
+export const DiscoverNoResults = ({ message }: Props) => (
+  <ModuleEmptyState
+    testSubj='Discover'
+    dataTestSubj='discoverNoResults'
+    title={
+      message ??
+      i18n.translate('wazuh.common.noResults.title', {
+        defaultMessage: 'No results match your search criteria',
+      })
+    }
+  >
+    <p>
+      {i18n.translate('wazuh.common.noResults.hint', {
+        defaultMessage: 'Try widening the time range or removing filters.',
+      })}
+    </p>
+  </ModuleEmptyState>
+);
