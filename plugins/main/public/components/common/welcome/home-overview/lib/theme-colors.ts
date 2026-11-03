@@ -13,6 +13,8 @@ export const HOME_OVERVIEW_COLOR = {
   info: 'var(--wz-ho-info)',
   disabled: 'var(--wz-ho-disabled)',
   failed: 'var(--wz-ho-failed)',
+  /** Light gray (3:1 against the panel) for low-priority values, such as Informational. */
+  subdued: 'var(--wz-ho-subdued)',
 } as const;
 
 /** AA-contrast-boosted variants (OUI's `makeHighContrastColor` tokens) for status colors rendered

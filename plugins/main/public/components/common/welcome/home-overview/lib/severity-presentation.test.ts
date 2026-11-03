@@ -23,6 +23,6 @@ describe('SEVERITY_PRESENTATION', () => {
     ).toBe(HOME_OVERVIEW_COLOR.success);
     expect(
       SEVERITY_PRESENTATION.find(({ band }) => band === 'informational')?.color,
-    ).toBe(HOME_OVERVIEW_COLOR.disabled);
+    ).toBe(HOME_OVERVIEW_COLOR.subdued);
   });
 });

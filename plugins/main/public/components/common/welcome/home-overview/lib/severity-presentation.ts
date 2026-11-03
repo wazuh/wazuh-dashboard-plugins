@@ -47,6 +47,6 @@ export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
     label: i18n.translate('wazuh.common.homeOverviewSeverity.informational', {
       defaultMessage: 'Informational',
     }),
-    color: HOME_OVERVIEW_COLOR.disabled,
+    color: HOME_OVERVIEW_COLOR.subdued,
   },
 ];
