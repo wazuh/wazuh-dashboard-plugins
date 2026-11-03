@@ -45,7 +45,7 @@ describe('DistributionBar', () => {
     );
     const link = screen.getByText('Active').closest('a');
     expect(link).toHaveAttribute('href', '#/agents?status=active');
-    expect(link).toHaveStyle({ fontWeight: 'inherit' });
+    expect(link).toHaveStyle({ fontWeight: 'normal' });
   });
 
   it('explains a segment with a description in a tooltip on its legend entry', async () => {

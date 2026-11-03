@@ -63,17 +63,17 @@ export const VALUE_PLACEHOLDER = '-';
 export const CARD_MIN_WIDTH = 'min(320px, 100%)';
 
 /**
- * OUI renders every `EuiLink` semibold. Links that are not titles (list rows, legends, KPI
- * values, calls to action) take the weight of the text around them instead, so only titles
- * read bold.
+ * OUI renders every `EuiLink` semibold. Links that are not titles (list rows, legends, calls to
+ * action) use the normal weight, so only titles read bold. `normal` rather than `inherit`: a link
+ * placed in a bold container, such as a popover title, must not pick its weight up.
  */
-export const NON_TITLE_LINK_STYLE: CSSProperties = { fontWeight: 'inherit' };
+export const NON_TITLE_LINK_STYLE: CSSProperties = { fontWeight: 'normal' };
 
 /**
- * A link wrapping a KPI value takes the tile's color (`StatTile`'s `color`) instead of the link
- * color, so linked and plain values read the same.
+ * A link wrapping a KPI value takes the tile's weight and color (`StatTile`'s `color`) instead of
+ * the link ones, so linked and plain values read the same.
  */
 export const KPI_LINK_STYLE: CSSProperties = {
-  ...NON_TITLE_LINK_STYLE,
+  fontWeight: 'inherit',
   color: 'inherit',
 };
