@@ -10,7 +10,7 @@ import {
 } from '../../utils/navigation';
 
 export interface ItHygieneTilesProps {
-  operatingSystems: DataGroupResult<number>;
+  platforms: DataGroupResult<number>;
   packages: DataGroupResult<number>;
   users: DataGroupResult<number>;
   services: DataGroupResult<number>;
@@ -18,12 +18,11 @@ export interface ItHygieneTilesProps {
 
 const TILES: ReadonlyArray<StatTileSpec<keyof ItHygieneTilesProps>> = [
   {
-    key: 'operatingSystems',
-    label: i18n.translate(
-      'wazuh.common.homeOverviewItHygieneTiles.operatingSystems',
-      { defaultMessage: 'Operating systems' },
-    ),
-    testSubj: 'it-hygiene-tile-operating-systems',
+    key: 'platforms',
+    label: i18n.translate('wazuh.common.homeOverviewItHygieneTiles.platform', {
+      defaultMessage: 'Platform',
+    }),
+    testSubj: 'it-hygiene-tile-platform',
     onSelect: () => getItHygieneSystemOsUrl(),
   },
   {

@@ -15,6 +15,7 @@ import {
   FIM_FILE_MTIME_FIELD,
   FIM_FILE_PATH_FIELD,
   FINDING_SEVERITY_FIELD,
+  HOST_OS_PLATFORM_FIELD,
   INTEGRATION_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
@@ -128,6 +129,13 @@ export function buildComplianceControlsAgg() {
     },
     {} as Record<string, unknown>,
   );
+}
+
+/** IT Hygiene Platform tile: distinct OS platforms across the system inventory. */
+export function buildPlatformsCountAgg() {
+  return {
+    [AGG.platformsCount]: { cardinality: { field: HOST_OS_PLATFORM_FIELD } },
+  };
 }
 
 /** Configuration Assessment tiles: Passed/Failed/N-A counts, one search. */

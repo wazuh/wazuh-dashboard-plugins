@@ -13,11 +13,13 @@ import {
   buildThreatIntelByThreatTypeAgg,
   buildThreatIntelFeedByTypeAgg,
   buildCloudSecurityByModuleAgg,
+  buildPlatformsCountAgg,
 } from './queries';
 import {
   FINDING_SEVERITY_BANDS,
   VULNERABILITY_SEVERITY_BANDS,
   FINDING_SEVERITY_FIELD,
+  HOST_OS_PLATFORM_FIELD,
   INTEGRATION_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TACTIC_ID_FIELD,
@@ -48,6 +50,12 @@ describe('query builders', () => {
     });
     expect(filters.informational).toEqual({
       match_phrase: { [FINDING_SEVERITY_FIELD]: 'informational' },
+    });
+  });
+
+  it('counts distinct platforms with a cardinality agg', () => {
+    expect(buildPlatformsCountAgg()).toEqual({
+      platforms_count: { cardinality: { field: HOST_OS_PLATFORM_FIELD } },
     });
   });
 

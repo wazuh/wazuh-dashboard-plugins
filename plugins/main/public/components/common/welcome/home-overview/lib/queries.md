@@ -330,11 +330,21 @@ DQL: `*`.
 
 ## 8. IT Hygiene counts ×4 — `wazuh-states-inventory-{system,packages,users,services}*`, current
 
-No aggregation — a plain `size: 0` search per index; the tile value is
-`hits.total`. One search per index so a missing index hides only its own tile.
+One `size: 0` search per index, so a missing index hides only its own tile.
+Packages, Users and Services read `hits.total`. Platform reads the number of
+distinct OS platforms on the system inventory (`buildPlatformsCountAgg()`).
 
 ```jsonc
+// Packages, Users, Services
 { "size": 0 } // value = hits.total, per index pattern
+
+// Platform — wazuh-states-inventory-system*
+{
+  "size": 0,
+  "aggs": {
+    "platforms_count": { "cardinality": { "field": "host.os.platform" } }
+  }
+}
 ```
 
 DQL: `*`.

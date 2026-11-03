@@ -12,6 +12,8 @@ export const AGG = {
   techniquesCount: 'techniques_count',
   topTechniques: 'top_techniques',
   topOs: 'top_os',
+  /** Distinct `host.os.platform` values on the system inventory. */
+  platformsCount: 'platforms_count',
   topServices: 'top_services',
   scaResult: 'sca_result',
   scaBenchmarks: 'sca_benchmarks',

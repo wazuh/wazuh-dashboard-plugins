@@ -22,7 +22,7 @@ import { useInViewport } from '../../../../hooks';
 import { CARD_MIN_WIDTH } from '../../lib/constants';
 import {
   useActiveResponseOverview,
-  useItHygieneOperatingSystemsCount,
+  useItHygienePlatformsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
   useItHygieneUsersCount,
@@ -46,7 +46,7 @@ const SecurityOperationsSectionComponent: React.FC<
   SecurityOperationsSectionProps
 > = ({ complianceControls }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
-  const operatingSystems = useItHygieneOperatingSystemsCount(visible);
+  const platforms = useItHygienePlatformsCount(visible);
   const packages = useItHygienePackagesCount(visible);
   const users = useItHygieneUsersCount(visible);
   const services = useItHygieneServicesCount(visible);
@@ -55,7 +55,7 @@ const SecurityOperationsSectionComponent: React.FC<
   const topServices = useTopNetworkServices(visible);
   // When every tile is denied, show the card-level permission message used by
   // the other cards instead of four warning dashes.
-  const itHygieneDenied = [operatingSystems, packages, users, services].every(
+  const itHygieneDenied = [platforms, packages, users, services].every(
     ({ error }) => error?.kind === 'permission-denied',
   );
 
@@ -78,9 +78,7 @@ const SecurityOperationsSectionComponent: React.FC<
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={itHygieneDenied ? 'error' : 'available'}
-            errorLabel={
-              itHygieneDenied ? operatingSystems.error?.message : undefined
-            }
+            errorLabel={itHygieneDenied ? platforms.error?.message : undefined}
             isPermissionDenied={itHygieneDenied}
             title={i18n.translate(
               'wazuh.common.homeOverviewSecurityOperations.itHygieneTitle',
@@ -95,7 +93,7 @@ const SecurityOperationsSectionComponent: React.FC<
             data-test-subj='home-overview-it-hygiene'
           >
             <ItHygieneTiles
-              operatingSystems={operatingSystems}
+              platforms={platforms}
               packages={packages}
               users={users}
               services={services}
