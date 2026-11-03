@@ -16,14 +16,18 @@ import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-se
 /** Unpins the pinned agent, like the header button, so the tab shows all agents. */
 export const unpinPinnedAgent = () => new PinnedAgentManager().unPinAgent();
 
+/** Id of the mounted application, `undefined` outside the app (the getter throws there). */
+export const getCurrentAppId = (): string | undefined => {
+  try {
+    return getWzCurrentAppID();
+  } catch {
+    return undefined;
+  }
+};
+
 /** Documentation of the current application, the page its About flyout and Help menu link. */
 const useCurrentAppDocs = () => {
-  let currentAppId: string | undefined;
-  try {
-    currentAppId = getWzCurrentAppID();
-  } catch {
-    // The getter throws when no application was mounted, e.g. outside the app
-  }
+  const currentAppId = getCurrentAppId();
   const app = Applications.find(({ id }) => id === currentAppId);
   return app?.docsUrl
     ? {

@@ -30,7 +30,8 @@
 
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { ModuleEmptyState } from './module-empty-state';
+import { ModuleEmptyState, getCurrentAppId } from './module-empty-state';
+import { getModuleEmptyStateTexts } from './module-empty-state-texts';
 
 interface Props {
   message?: string;
@@ -39,25 +40,34 @@ interface Props {
 }
 
 /**
- * Empty state of the tabs without a module-specific text: the title for a search that matches
- * nothing and what to try. Modules with their own situations use `ModuleEmptyState`.
+ * Empty state of the tabs without a module-specific component: the text of the current module
+ * when it has one, otherwise the title for a search that matches nothing and what to try. Modules
+ * with their own situations use `ModuleEmptyState`.
  */
-export const DiscoverNoResults = ({ message, allowUnpinAgent }: Props) => (
-  <ModuleEmptyState
-    testSubj='Discover'
-    dataTestSubj='discoverNoResults'
-    allowUnpinAgent={allowUnpinAgent}
-    title={
-      message ??
-      i18n.translate('wazuh.common.noResults.title', {
-        defaultMessage: 'No results match your search criteria',
-      })
-    }
-  >
-    <p>
-      {i18n.translate('wazuh.common.noResults.hint', {
-        defaultMessage: 'Try widening the time range or removing filters.',
-      })}
-    </p>
-  </ModuleEmptyState>
-);
+export const DiscoverNoResults = ({ message, allowUnpinAgent }: Props) => {
+  const moduleTexts = message
+    ? undefined
+    : getModuleEmptyStateTexts(getCurrentAppId());
+
+  return (
+    <ModuleEmptyState
+      testSubj='Discover'
+      dataTestSubj='discoverNoResults'
+      allowUnpinAgent={allowUnpinAgent}
+      title={
+        message ??
+        moduleTexts?.title ??
+        i18n.translate('wazuh.common.noResults.title', {
+          defaultMessage: 'No results match your search criteria',
+        })
+      }
+    >
+      <p>
+        {moduleTexts?.description ??
+          i18n.translate('wazuh.common.noResults.hint', {
+            defaultMessage: 'Try widening the time range or removing filters.',
+          })}
+      </p>
+    </ModuleEmptyState>
+  );
+};
