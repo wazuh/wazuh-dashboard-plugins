@@ -14,6 +14,7 @@ import store from '../redux/store';
 import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
 import { CheckDaemonsStatus } from './check-daemons-status';
+import { isLoggingOut } from '../services/request-handler';
 
 interface IHistoryItem {
   text: string;
@@ -159,7 +160,7 @@ export class ErrorHandler {
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
 
-    if (wzMisc.getBlankScr()) {
+    if (wzMisc.getBlankScr() || isLoggingOut()) {
       params.silent = true;
     }
 
