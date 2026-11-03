@@ -641,7 +641,7 @@ function useIndexDocCount(
 
 /**
  * IT Hygiene counts: one search per inventory index, so a missing index shows
- * "-" on only its own tile (never hidden). Platform counts distinct
+ * "-" on only its own tile (never hidden). Platforms counts distinct
  * `host.os.platform` values; the other tiles count documents.
  */
 export function useItHygienePlatformsCount(

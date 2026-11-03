@@ -19,10 +19,10 @@ export interface ItHygieneTilesProps {
 const TILES: ReadonlyArray<StatTileSpec<keyof ItHygieneTilesProps>> = [
   {
     key: 'platforms',
-    label: i18n.translate('wazuh.common.homeOverviewItHygieneTiles.platform', {
-      defaultMessage: 'Platform',
+    label: i18n.translate('wazuh.common.homeOverviewItHygieneTiles.platforms', {
+      defaultMessage: 'Platforms',
     }),
-    testSubj: 'it-hygiene-tile-platform',
+    testSubj: 'it-hygiene-tile-platforms',
     onSelect: () => getItHygieneSystemOsUrl(),
   },
   {

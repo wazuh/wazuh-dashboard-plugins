@@ -131,7 +131,7 @@ export function buildComplianceControlsAgg() {
   );
 }
 
-/** IT Hygiene Platform tile: distinct OS platforms across the system inventory. */
+/** IT Hygiene Platforms tile: distinct OS platforms across the system inventory. */
 export function buildPlatformsCountAgg() {
   return {
     [AGG.platformsCount]: { cardinality: { field: HOST_OS_PLATFORM_FIELD } },

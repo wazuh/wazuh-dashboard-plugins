@@ -32,7 +32,7 @@ const allAvailable = {
 describe('ItHygieneTiles', () => {
   it('navigates to each tab on click', () => {
     render(<ItHygieneTiles {...allAvailable} />);
-    fireEvent.click(screen.getByText('Platform'));
+    fireEvent.click(screen.getByText('Platforms'));
     expect(getItHygieneSystemOsUrl).toHaveBeenCalledWith();
     fireEvent.click(screen.getByText('Packages'));
     expect(getItHygieneSoftwareUrl).toHaveBeenCalled();
@@ -57,7 +57,7 @@ describe('ItHygieneTiles', () => {
     expect(packages).toBeInTheDocument();
     expect(packages?.textContent).toContain('-');
     expect(
-      container.querySelector('[data-test-subj="it-hygiene-tile-platform"]'),
+      container.querySelector('[data-test-subj="it-hygiene-tile-platforms"]'),
     ).toBeInTheDocument();
   });
 

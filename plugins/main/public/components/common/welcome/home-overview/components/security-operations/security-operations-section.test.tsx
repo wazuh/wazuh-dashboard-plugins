@@ -83,7 +83,7 @@ describe('SecurityOperationsSection', () => {
     expect(within(itHygienePanel).getByText('IT Hygiene')).toBeInTheDocument();
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
     expect(screen.getByText('Regulatory Compliance')).toBeInTheDocument();
-    expect(screen.getByText('Platform')).toBeInTheDocument();
+    expect(screen.getByText('Platforms')).toBeInTheDocument();
     expect(screen.getByText('35,682')).toBeInTheDocument();
     expect(
       screen.getByText('Actions triggered, last 24 hours'),
