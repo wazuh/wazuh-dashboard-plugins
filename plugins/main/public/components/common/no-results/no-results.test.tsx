@@ -36,6 +36,22 @@ describe('DiscoverNoResults', () => {
     ).toBeVisible();
   });
 
+  it('renders the message and the description of the caller instead of the module text', () => {
+    (getWzCurrentAppID as jest.Mock).mockReturnValue('mitre-attack');
+    render(
+      <DiscoverNoResults
+        message='No techniques'
+        description='Try another term.'
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'No techniques' }),
+    ).toBeVisible();
+    expect(screen.getByText('Try another term.')).toBeVisible();
+    expect(screen.queryByText(/findings/i)).not.toBeInTheDocument();
+  });
+
   it('keeps the message of the caller over the module text', () => {
     (getWzCurrentAppID as jest.Mock).mockReturnValue('case-management');
     render(<DiscoverNoResults message='Custom message' />);

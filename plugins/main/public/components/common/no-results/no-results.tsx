@@ -34,7 +34,10 @@ import { ModuleEmptyState, getCurrentAppId } from './module-empty-state';
 import { getModuleEmptyStateTexts } from './module-empty-state-texts';
 
 interface Props {
+  /** Title. Replaces the text of the module, for lists that are not the data of the module. */
   message?: string;
+  /** Explanation, shown under the title instead of the one of the module or the generic one. */
+  description?: string;
   /** Set it to `false` in flyouts: the prompt then never offers to unpin the agent. */
   allowUnpinAgent?: boolean;
 }
@@ -44,7 +47,11 @@ interface Props {
  * when it has one, otherwise the title for a search that matches nothing and what to try. Modules
  * with their own situations use `ModuleEmptyState`.
  */
-export const DiscoverNoResults = ({ message, allowUnpinAgent }: Props) => {
+export const DiscoverNoResults = ({
+  message,
+  description,
+  allowUnpinAgent,
+}: Props) => {
   const moduleTexts = message
     ? undefined
     : getModuleEmptyStateTexts(getCurrentAppId());
@@ -63,7 +70,8 @@ export const DiscoverNoResults = ({ message, allowUnpinAgent }: Props) => {
       }
     >
       <p>
-        {moduleTexts?.description ??
+        {description ??
+          moduleTexts?.description ??
           i18n.translate('wazuh.common.noResults.hint', {
             defaultMessage: 'Try widening the time range or removing filters.',
           })}
