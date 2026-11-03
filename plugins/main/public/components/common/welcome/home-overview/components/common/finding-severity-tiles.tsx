@@ -6,7 +6,7 @@ import { SeverityBand, SeverityCounts } from '../../interfaces/types';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { SEVERITY_PRESENTATION } from '../../lib/severity-presentation';
-import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
+import { KPI_LINK_STYLE } from '../../lib/constants';
 
 export interface FindingSeverityTilesProps {
   counts: SeverityCounts;
@@ -34,7 +34,7 @@ export const FindingSeverityTiles: React.FC<FindingSeverityTilesProps> = ({
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
                 className='tab-num'
-                style={{ ...NON_TITLE_LINK_STYLE, color: severity.color }}
+                style={KPI_LINK_STYLE}
                 href={onSelect(severity.band)}
               >
                 {formatValueSafely(bandCount)}

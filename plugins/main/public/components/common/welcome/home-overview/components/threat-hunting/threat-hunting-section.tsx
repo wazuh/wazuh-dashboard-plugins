@@ -26,7 +26,7 @@ import {
   getVulnerabilityDetectionBySeverityUrl,
   getVulnerabilityDetectionUrl,
 } from '../../utils/navigation';
-import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
+import { KPI_LINK_STYLE } from '../../lib/constants';
 
 export interface ThreatHuntingSectionProps {
   /** Reuses the Overview on-mount findings search. */
@@ -137,8 +137,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
                   value={
                     <RedirectAppLinks application={getCore().application}>
                       <EuiLink
-                        style={NON_TITLE_LINK_STYLE}
-                        color='text'
+                        style={KPI_LINK_STYLE}
                         href={getThreatHuntingUrl()}
                         data-test-subj='total-findings-hero-link'
                       >

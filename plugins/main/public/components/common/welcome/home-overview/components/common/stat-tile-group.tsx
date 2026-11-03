@@ -7,7 +7,7 @@ import { WidgetGroupBody } from './widget-group';
 import { StatTile } from './stat-tile';
 import { TabNumber } from './tab-number';
 import { DataGroupResult } from '../../interfaces/data-group';
-import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
+import { KPI_LINK_STYLE } from '../../lib/constants';
 
 export interface StatTileSpec<K extends string> {
   key: K;
@@ -65,9 +65,8 @@ export function StatTileGroup<K extends string>({
             value={
               tile.onSelect ? (
                 <EuiLink
-                  style={NON_TITLE_LINK_STYLE}
+                  style={KPI_LINK_STYLE}
                   href={tile.onSelect()}
-                  color='text'
                   data-test-subj={`${tile.testSubj}-link`}
                 >
                   {number}

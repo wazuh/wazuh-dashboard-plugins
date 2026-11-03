@@ -68,3 +68,12 @@ export const CARD_MIN_WIDTH = 'min(320px, 100%)';
  * read bold.
  */
 export const NON_TITLE_LINK_STYLE: CSSProperties = { fontWeight: 'inherit' };
+
+/**
+ * A link wrapping a KPI value takes the tile's color (`StatTile`'s `color`) instead of the link
+ * color, so linked and plain values read the same.
+ */
+export const KPI_LINK_STYLE: CSSProperties = {
+  ...NON_TITLE_LINK_STYLE,
+  color: 'inherit',
+};

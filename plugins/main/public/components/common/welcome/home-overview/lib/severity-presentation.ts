@@ -1,6 +1,6 @@
 import { i18n } from '@osd/i18n';
 import { SeverityBand } from '../interfaces/types';
-import { HOME_OVERVIEW_COLOR, HOME_OVERVIEW_TEXT_COLOR } from './theme-colors';
+import { HOME_OVERVIEW_COLOR } from './theme-colors';
 
 export interface SeverityPresentation {
   band: SeverityBand;
@@ -47,6 +47,6 @@ export const SEVERITY_PRESENTATION: SeverityPresentation[] = [
     label: i18n.translate('wazuh.common.homeOverviewSeverity.informational', {
       defaultMessage: 'Informational',
     }),
-    color: HOME_OVERVIEW_TEXT_COLOR.text,
+    color: HOME_OVERVIEW_COLOR.disabled,
   },
 ];

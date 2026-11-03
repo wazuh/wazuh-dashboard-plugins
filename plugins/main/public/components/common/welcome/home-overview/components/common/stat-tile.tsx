@@ -5,6 +5,7 @@ import { HOME_OVERVIEW_TEXT_COLOR } from '../../lib/theme-colors';
 export interface StatTileProps {
   value: React.ReactNode;
   label: React.ReactNode;
+  /** Status color of the value; neutral counts default to the primary text color. */
   color?: string;
   textAlign?: EuiStatProps['textAlign'];
   titleSize?: EuiStatProps['titleSize'];
@@ -17,7 +18,7 @@ export interface StatTileProps {
 export const StatTile: React.FC<StatTileProps> = ({
   value,
   label,
-  color = HOME_OVERVIEW_TEXT_COLOR.text,
+  color = HOME_OVERVIEW_TEXT_COLOR.info,
   textAlign = 'center',
   titleSize = 'l',
   reverse = false,

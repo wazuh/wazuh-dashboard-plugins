@@ -19,7 +19,7 @@ import {
 } from './regulatory-compliance-badges';
 import { TopNetworkServicesTable } from '../overview/top-network-services-table';
 import { useInViewport } from '../../../../hooks';
-import { CARD_MIN_WIDTH, NON_TITLE_LINK_STYLE } from '../../lib/constants';
+import { CARD_MIN_WIDTH, KPI_LINK_STYLE } from '../../lib/constants';
 import {
   useActiveResponseOverview,
   useItHygienePlatformsCount,
@@ -129,8 +129,7 @@ const SecurityOperationsSectionComponent: React.FC<
               value={
                 <RedirectAppLinks application={getCore().application}>
                   <EuiLink
-                    style={NON_TITLE_LINK_STYLE}
-                    color='text'
+                    style={KPI_LINK_STYLE}
                     href={getActiveResponseResponsesUrl()}
                     data-test-subj='active-response-stat-link'
                   >
