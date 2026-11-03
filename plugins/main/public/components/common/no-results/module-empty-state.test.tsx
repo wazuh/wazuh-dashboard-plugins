@@ -105,6 +105,25 @@ describe('ModuleEmptyState', () => {
       expect(unPinAgent).toHaveBeenCalledTimes(1);
     });
 
+    it('does not offer it when allowUnpinAgent is false', () => {
+      render(
+        <Provider
+          store={createStore(() => ({
+            appStateReducers: { currentAgentData: { id: '001' } },
+          }))}
+        >
+          <ModuleEmptyState
+            testSubj='Some'
+            title='Nothing here'
+            allowUnpinAgent={false}
+            onUnpinAgent={jest.fn()}
+          />
+        </Provider>,
+      );
+
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
     it('does not offer it when no agent is pinned', () => {
       renderWithStore({});
 

@@ -34,16 +34,19 @@ import { ModuleEmptyState } from './module-empty-state';
 
 interface Props {
   message?: string;
+  /** Set it to `false` in flyouts: the prompt then never offers to unpin the agent. */
+  allowUnpinAgent?: boolean;
 }
 
 /**
  * Empty state of the tabs without a module-specific text: the title for a search that matches
  * nothing and what to try. Modules with their own situations use `ModuleEmptyState`.
  */
-export const DiscoverNoResults = ({ message }: Props) => (
+export const DiscoverNoResults = ({ message, allowUnpinAgent }: Props) => (
   <ModuleEmptyState
     testSubj='Discover'
     dataTestSubj='discoverNoResults'
+    allowUnpinAgent={allowUnpinAgent}
     title={
       message ??
       i18n.translate('wazuh.common.noResults.title', {

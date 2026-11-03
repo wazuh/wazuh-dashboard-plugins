@@ -77,6 +77,11 @@ export interface ModuleEmptyStateProps {
    * default action, or to show the button without a store.
    */
   onUnpinAgent?: () => void;
+  /**
+   * Whether the prompt can unpin the agent (default). Set it to `false` where unpinning would change
+   * the page behind, such as inside a flyout: no button is shown even with a pinned agent.
+   */
+  allowUnpinAgent?: boolean;
   /** Module actions, rendered after the unpin button. */
   actions?: React.ReactNode[];
   /**
@@ -100,6 +105,7 @@ export const ModuleEmptyState = ({
   title,
   children,
   onUnpinAgent,
+  allowUnpinAgent = true,
   actions = [],
   docs,
   iconType = 'search',
@@ -110,7 +116,9 @@ export const ModuleEmptyState = ({
   const docsLink = docs
     ? { href: webDocumentationLink(docs.path), ...docs }
     : appDocs;
-  const unpin = onUnpinAgent ?? (pinnedAgentId ? unpinPinnedAgent : undefined);
+  const unpin = allowUnpinAgent
+    ? onUnpinAgent ?? (pinnedAgentId ? unpinPinnedAgent : undefined)
+    : undefined;
   const allActions = [
     ...(unpin
       ? [
