@@ -211,6 +211,25 @@ describe('SecurityOperationsSection', () => {
     expect(navigation.getItHygieneUrl).toHaveBeenCalled();
   });
 
+  it('gives Incident Response half the width of the other two cards', () => {
+    const { container } = render(
+      <SecurityOperationsSection complianceControls={complianceControls} />,
+    );
+    const growOf = (testSubj: string) =>
+      container
+        .querySelector(`[data-test-subj="${testSubj}"]`)
+        ?.closest('.euiFlexItem')?.className;
+    expect(growOf('home-overview-it-hygiene')).toContain(
+      'euiFlexItem--flexGrow2',
+    );
+    expect(growOf('home-overview-active-response')).toContain(
+      'euiFlexItem--flexGrow1',
+    );
+    expect(growOf('home-overview-regulatory-compliance')).toContain(
+      'euiFlexItem--flexGrow2',
+    );
+  });
+
   it('fetches lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(

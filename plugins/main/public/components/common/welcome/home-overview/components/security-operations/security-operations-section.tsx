@@ -74,8 +74,9 @@ const SecurityOperationsSectionComponent: React.FC<
           },
         )}
       />
+      {/* Incident Response holds a single KPI, so it takes half the width of the other two. */}
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={itHygieneDenied ? 'error' : 'available'}
             errorLabel={itHygieneDenied ? platforms.error?.message : undefined}
@@ -100,7 +101,7 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem grow={1} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={activeResponse.status}
             errorLabel={activeResponse.error?.message}
@@ -145,7 +146,7 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
             title={i18n.translate(
