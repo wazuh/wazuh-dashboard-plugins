@@ -31,7 +31,10 @@ export const renderCtiFeedApp = (
   const root = createRoot(element);
   root.render(
     <I18nProvider>
-      <CtiFeedApp openRegistration={Boolean(state?.openRegistration)} />
+      <CtiFeedApp
+        openRegistration={Boolean(state?.openRegistration)}
+        history={history}
+      />
     </I18nProvider>,
   );
 

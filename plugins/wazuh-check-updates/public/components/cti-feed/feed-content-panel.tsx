@@ -88,7 +88,12 @@ interface ContentTile {
   iconType: string;
   /** Page that manages this content. Reference-only content omits it. */
   page?: RulesetManagementPage;
+  /** Names the catalog tab of this app that explores the content. */
+  catalogTooltip?: string;
 }
+
+/** Content explored by a catalog tab of this app instead of another page. */
+export type CatalogContentKey = 'iocs' | 'vulnerabilities';
 
 const CONTENT_TILES: ContentTile[] = [
   {
@@ -130,6 +135,10 @@ const CONTENT_TILES: ContentTile[] = [
       defaultMessage: 'Indicators of compromise',
     }),
     iconType: 'bug',
+    catalogTooltip: i18n.translate(
+      'wazuhCheckUpdates.ctiFeed.content.links.iocs',
+      { defaultMessage: 'Explore the indicator catalog' },
+    ),
   },
   {
     key: 'vulnerabilities',
@@ -138,6 +147,10 @@ const CONTENT_TILES: ContentTile[] = [
       { defaultMessage: 'Vulnerabilities (CVEs)' },
     ),
     iconType: 'alert',
+    catalogTooltip: i18n.translate(
+      'wazuhCheckUpdates.ctiFeed.content.links.vulnerabilities',
+      { defaultMessage: 'Explore the vulnerability catalog' },
+    ),
   },
 ];
 
@@ -149,13 +162,27 @@ const Tile: React.FC<{
   tile: ContentTile;
   value: number | null | undefined;
   loading: boolean;
-}> = ({ tile, value, loading }) => {
+  onOpenCatalog?: (key: CatalogContentKey) => void;
+}> = ({ tile, value, loading, onOpenCatalog }) => {
   const unavailable = !loading && (value === null || value === undefined);
   const formatted = unavailable
     ? UNAVAILABLE_VALUE
     : numberFormat.format(value ?? 0);
+  const catalogLink =
+    tile.catalogTooltip && onOpenCatalog && !unavailable && !loading ? (
+      <EuiToolTip content={tile.catalogTooltip}>
+        <EuiLink
+          onClick={() => onOpenCatalog(tile.key as CatalogContentKey)}
+          color='text'
+          data-test-subj={`ctiFeedContentStat-${tile.key}-link`}
+        >
+          {formatted}
+        </EuiLink>
+      </EuiToolTip>
+    ) : null;
   const title =
-    tile.page && !unavailable && !loading ? (
+    catalogLink ??
+    (tile.page && !unavailable && !loading ? (
       <EuiToolTip content={tile.page.tooltip}>
         <EuiLink
           href={getRulesetManagementUrl(tile.page)}
@@ -167,7 +194,7 @@ const Tile: React.FC<{
       </EuiToolTip>
     ) : (
       formatted
-    );
+    ));
 
   const stat = (
     <EuiStat
@@ -215,12 +242,15 @@ export interface FeedContentPanelProps {
   counts: FeedContentCounts | null;
   loading: boolean;
   onRefresh: () => void;
+  /** Opens the catalog tab that explores indicators or vulnerabilities. */
+  onOpenCatalog?: (key: CatalogContentKey) => void;
 }
 
 export const FeedContentPanel: React.FC<FeedContentPanelProps> = ({
   counts,
   loading,
   onRefresh,
+  onOpenCatalog,
 }) => (
   <EuiPanel hasBorder paddingSize='l' data-test-subj='ctiFeedContentPanel'>
     <EuiFlexGroup
@@ -261,7 +291,12 @@ export const FeedContentPanel: React.FC<FeedContentPanelProps> = ({
       <EuiFlexGrid columns={3} gutterSize='m'>
         {CONTENT_TILES.map(tile => (
           <EuiFlexItem key={tile.key}>
-            <Tile tile={tile} value={counts?.[tile.key]} loading={loading} />
+            <Tile
+              tile={tile}
+              value={counts?.[tile.key]}
+              loading={loading}
+              onOpenCatalog={onOpenCatalog}
+            />
           </EuiFlexItem>
         ))}
       </EuiFlexGrid>

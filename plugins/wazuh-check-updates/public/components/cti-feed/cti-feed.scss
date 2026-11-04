@@ -70,3 +70,90 @@
     overflow-wrap: break-word;
   }
 }
+
+// Catalog values (domains, URLs, hashes) are long and have no spaces: break
+// them anywhere instead of overflowing the column.
+.ctiCatalog__value {
+  min-width: 0;
+  font-family: $euiCodeFontFamily;
+  font-size: $euiFontSizeS;
+  overflow-wrap: anywhere;
+
+  &--truncate {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+  }
+}
+
+// Third-party prose on a card: a few lines, the flyout has the rest.
+.ctiCatalog__clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ctiCatalog__details.euiDescriptionList--column {
+  .euiDescriptionList__title {
+    width: 30%;
+  }
+
+  .euiDescriptionList__description {
+    width: 70%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.ctiCatalog__breakdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  > li + li {
+    margin-top: $euiSizeXS;
+  }
+}
+
+.ctiCatalog__breakdownLabel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+// Each breakdown row filters the browser: the whole row is the target.
+.ctiCatalog__breakdownRow {
+  display: block;
+  width: 100%;
+  padding: $euiSizeXS $euiSizeS;
+  border-radius: $euiBorderRadius;
+  text-align: left;
+
+  &--selected {
+    background-color: tintOrShade($euiColorAccent, 85%, 70%);
+  }
+}
+
+button.ctiCatalog__breakdownRow {
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $euiColorLightShade;
+  }
+}
+
+.ctiCatalog__references {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  > li {
+    padding: $euiSizeXS 0;
+    overflow-wrap: anywhere;
+    border-bottom: $euiBorderThin;
+  }
+}

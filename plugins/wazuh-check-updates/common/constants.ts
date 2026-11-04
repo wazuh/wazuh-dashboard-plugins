@@ -9,6 +9,7 @@ export const SAVED_OBJECT_USER_PREFERENCES =
 
 const ctiBasePath = '/api/wazuh-check-updates/cti-registration';
 const ctiFeedBasePath = '/api/wazuh-check-updates/cti-feed';
+const ctiCatalogBasePath = `${ctiFeedBasePath}/catalog`;
 export enum routes {
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
@@ -18,6 +19,13 @@ export enum routes {
   ctiRegistrationPermission = `${ctiBasePath}/permission`,
   ctiFeedContentUpdate = `${ctiFeedBasePath}/update`,
   ctiFeedIndicators = `${ctiFeedBasePath}/indicators`,
+  ctiCatalogIndicatorsSummary = `${ctiCatalogBasePath}/indicators/summary`,
+  ctiCatalogIndicatorsLookup = `${ctiCatalogBasePath}/indicators/lookup`,
+  ctiCatalogIndicatorsSearch = `${ctiCatalogBasePath}/indicators/search`,
+  ctiCatalogVulnerabilitiesSummary = `${ctiCatalogBasePath}/vulnerabilities/summary`,
+  ctiCatalogVulnerabilitiesSearch = `${ctiCatalogBasePath}/vulnerabilities/search`,
+  /** Followed by `/{id}`. */
+  ctiCatalogVulnerabilityRecord = `${ctiCatalogBasePath}/vulnerabilities/record`,
 }
 
 /** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
