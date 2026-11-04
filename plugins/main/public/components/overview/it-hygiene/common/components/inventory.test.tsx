@@ -20,7 +20,7 @@ jest.mock('../../../../common/hooks/use-data-source-search-context', () => ({
     filters: [],
     fetchFilters: [],
     fixedFilters: [],
-    isDataSourceLoading: false,
+    isLoading: false,
     setFilters: jest.fn(),
     fetchData: jest.fn(),
     fingerprint: 0,
