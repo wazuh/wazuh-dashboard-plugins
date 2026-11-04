@@ -206,6 +206,31 @@ describe('CtiFeedApp', () => {
     );
   });
 
+  test('reports the server message of a failed update check', async () => {
+    const error = Object.assign(new Error('Conflict'), {
+      body: {
+        statusCode: 409,
+        error: 'Conflict',
+        message:
+          'Could not update the CTI content: A content update is already in progress.',
+      },
+    });
+    mockRequestUpdate.mockRejectedValue(error);
+    render(<CtiFeedApp />);
+    await settle();
+
+    fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
+
+    await waitFor(() => expect(mockAddError).toHaveBeenCalledTimes(1));
+    const [reported, options] = mockAddError.mock.calls[0];
+    expect(reported).toBeInstanceOf(Error);
+    expect(reported.message).toBe(
+      'Could not update the CTI content: A content update is already in progress.',
+    );
+    expect(reported.body).toBe(error.body);
+    expect(options).toEqual({ title: 'Could not check for updates' });
+  });
+
   test('does not poll; a refresh finding the sync done refreshes the counts', async () => {
     jest.useFakeTimers();
     try {
