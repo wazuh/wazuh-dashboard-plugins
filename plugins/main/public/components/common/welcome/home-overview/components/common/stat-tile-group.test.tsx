@@ -66,4 +66,36 @@ describe('StatTileGroup', () => {
     render(<StatTileGroup tiles={TILES} results={results} />);
     expect(screen.getByText('42')).toBeInTheDocument();
   });
+
+  it('captions each group of tiles once, in order', () => {
+    type GroupedKey = 'decoders' | 'kvdbs' | 'rules';
+    const tiles: ReadonlyArray<StatTileSpec<GroupedKey>> = [
+      {
+        key: 'decoders',
+        label: 'Decoders',
+        testSubj: 'decoders-tile',
+        group: 'Normalization',
+      },
+      {
+        key: 'kvdbs',
+        label: 'KVDBs',
+        testSubj: 'kvdbs-tile',
+        group: 'Normalization',
+      },
+      {
+        key: 'rules',
+        label: 'Rules',
+        testSubj: 'rules-tile',
+        group: 'Detection',
+      },
+    ];
+    const results: Record<GroupedKey, DataGroupResult<number | undefined>> = {
+      decoders: { status: 'available', data: 1 },
+      kvdbs: { status: 'available', data: 2 },
+      rules: { status: 'available', data: 3 },
+    };
+    render(<StatTileGroup tiles={tiles} results={results} />);
+    expect(screen.getAllByText('Normalization')).toHaveLength(1);
+    expect(screen.getAllByText('Detection')).toHaveLength(1);
+  });
 });

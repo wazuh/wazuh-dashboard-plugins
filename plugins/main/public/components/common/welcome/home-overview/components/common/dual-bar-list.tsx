@@ -121,7 +121,7 @@ export const DualBarList: React.FC<DualBarListProps> = ({
                 </BarTrack>
               </div>
               <EuiText size='s' className='tab-num'>
-                <strong>{formatter.convert(item.score)}</strong>
+                {formatter.convert(item.score)}
               </EuiText>
             </React.Fragment>
           );

@@ -14,6 +14,7 @@ import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensea
 import { EmptyState } from './empty-state';
 import { WIDGET_LOADING_MIN_HEIGHT } from './widget-group';
 import { BAR_HEIGHT, BarTrack, LegendItem } from './bar-track';
+import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
 
 export interface DistributionBarSegment {
   key: string;
@@ -93,6 +94,7 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
     return (
       <RedirectAppLinks application={getCore().application}>
         <EuiLink
+          style={NON_TITLE_LINK_STYLE}
           href={segment.href}
           onClick={segment.onClick}
           color='text'
