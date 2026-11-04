@@ -14,4 +14,9 @@ describe('RegulatoryComplianceBadges', () => {
     fireEvent.click(screen.getByText('HIPAA'));
     expect(getRegulatoryComplianceUrl).toHaveBeenCalledWith('hipaa');
   });
+
+  it('renders the framework labels without bold', () => {
+    render(<RegulatoryComplianceBadges controls={{ status: 'loading' }} />);
+    expect(screen.getByText('HIPAA').tagName).not.toBe('STRONG');
+  });
 });
