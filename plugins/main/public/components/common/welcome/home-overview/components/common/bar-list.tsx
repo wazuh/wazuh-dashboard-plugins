@@ -104,7 +104,7 @@ export const BarList: React.FC<BarListProps> = ({
                 />
               </div>
               <EuiText size='s' className='tab-num'>
-                <strong>{formatUINumber(item.count)}</strong>
+                {formatUINumber(item.count)}
               </EuiText>
             </React.Fragment>
           ))
