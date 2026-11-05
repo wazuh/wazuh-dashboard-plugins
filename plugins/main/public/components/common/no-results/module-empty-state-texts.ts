@@ -42,7 +42,7 @@ const MODULE_EMPTY_STATE_TEXTS: Record<string, () => ModuleEmptyStateTexts> = {
       'wazuh.configurationAssessment.emptyState.description',
       {
         defaultMessage:
-          'Checks appear after an agent reports its first scan. Findings only list the checks whose result changed between scans, so that tab can be empty while States has data.',
+          'Checks appear after an agent reports its first scan. Findings only list the checks whose result changed between scans, so the Findings tab can be empty while the Dashboard and Inventory show the current results.',
       },
     ),
   }),
