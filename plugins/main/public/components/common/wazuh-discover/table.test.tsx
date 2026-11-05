@@ -7,7 +7,9 @@ const mockExportSearchToCSV = jest.fn();
 // EuiDataGrid renders nothing in jsdom (no measured size), so only render its toolbar controls.
 jest.mock('@elastic/eui', () => ({
   ...jest.requireActual('@elastic/eui'),
-  EuiDataGrid: ({ toolbarVisibility }: any) => <div>{toolbarVisibility?.additionalControls}</div>,
+  EuiDataGrid: ({ toolbarVisibility }: any) => (
+    <div>{toolbarVisibility?.additionalControls}</div>
+  ),
 }));
 
 jest.mock('../data-grid', () => ({
@@ -27,9 +29,12 @@ jest.mock('../../../react-services/error-management', () => ({
   HttpError: jest.fn(),
 }));
 
-jest.mock('../../../kibana-integrations/discover/application/components/hits_counter', () => ({
-  HitsCounter: () => null,
-}));
+jest.mock(
+  '../../../kibana-integrations/discover/application/components/hits_counter',
+  () => ({
+    HitsCounter: () => null,
+  }),
+);
 jest.mock('../../../kibana-integrations/discover/application/helpers', () => ({
   formatNumWithCommas: (value: number) => String(value),
 }));
@@ -53,7 +58,9 @@ jest.mock('../hooks/use-data-source-search-context', () => ({
   useDataSourceWithSearchBar: jest.fn(),
 }));
 jest.mock('../data-source', () => ({ PatternDataSource: jest.fn() }));
-jest.mock('../no-results/no-results', () => ({ DiscoverNoResults: () => null }));
+jest.mock('../no-results/no-results', () => ({
+  DiscoverNoResults: () => null,
+}));
 jest.mock('../hooks', () => ({ useEffectEnsureComponentMounted: jest.fn() }));
 jest.mock('./table.scss', () => ({}));
 
@@ -78,7 +85,7 @@ const renderTable = (props: object = {}) =>
         renderCellValue: () => null,
       }}
       {...props}
-    />
+    />,
   );
 
 describe('TableDataGridWithSearchBarInspectedHit export', () => {
@@ -94,8 +101,8 @@ describe('TableDataGridWithSearchBarInspectedHit export', () => {
 
     await waitFor(() =>
       expect(mockExportSearchToCSV).toHaveBeenCalledWith(
-        expect.objectContaining({ query: searchBarQuery })
-      )
+        expect.objectContaining({ query: searchBarQuery }),
+      ),
     );
   });
 
@@ -107,7 +114,9 @@ describe('TableDataGridWithSearchBarInspectedHit export', () => {
     fireEvent.click(screen.getByText('Export Formatted'));
 
     await waitFor(() =>
-      expect(mockExportSearchToCSV).toHaveBeenCalledWith(expect.objectContaining({ query }))
+      expect(mockExportSearchToCSV).toHaveBeenCalledWith(
+        expect.objectContaining({ query }),
+      ),
     );
   });
 });
