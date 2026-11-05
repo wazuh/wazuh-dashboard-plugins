@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
+import { WAZUH_ACTIVE_RESPONSES_PATTERN } from '../../../../../common/constants';
 import { ButtonAboutIncidentResponse } from './button-about-incident-response';
 
 const mockApplications$ = new BehaviorSubject<ReadonlyMap<string, unknown>>(
@@ -83,5 +84,23 @@ describe('ButtonAboutIncidentResponse', () => {
     expect(
       screen.queryByRole('link', { name: 'Create active response' }),
     ).not.toBeInTheDocument();
+  });
+
+  it('lists the index patterns that each tab reads', () => {
+    render(<ButtonAboutIncidentResponse />);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'About Incident Response' }),
+    );
+
+    const getIndices = (id: string) =>
+      Array.from(
+        screen
+          .getByRole('dialog')
+          .querySelectorAll(`[data-test-subj$="Index-${id}"]`),
+      ).map(element => element.textContent);
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Indices');
+    expect(getIndices('dashboard')).toEqual([WAZUH_ACTIVE_RESPONSES_PATTERN]);
+    expect(getIndices('responses')).toEqual([WAZUH_ACTIVE_RESPONSES_PATTERN]);
   });
 });

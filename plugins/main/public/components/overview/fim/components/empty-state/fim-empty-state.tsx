@@ -1,21 +1,12 @@
 import React from 'react';
-import {
-  EuiButton,
-  EuiCallOut,
-  EuiCode,
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiLoadingSpinner,
-  EuiPanel,
-  EuiSpacer,
-  EuiText,
-} from '@elastic/eui';
+import { EuiCode, EuiLoadingSpinner, EuiSpacer } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { useSelector } from 'react-redux';
-import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
-import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
-import { FIM_CONFIGURE_DOCS_PATH } from '../../fim-documentation';
+import {
+  ModuleEmptyState,
+  unpinPinnedAgent,
+} from '../../../../common/no-results/module-empty-state';
+import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 import {
   MonitoredDirectories,
   useMonitoredDirectories,
@@ -39,7 +30,9 @@ const getTitle = (kind: EmptyStateKind) =>
       })
     : i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.dashboardTitle',
-        { defaultMessage: 'No monitored files found' },
+        {
+          defaultMessage: 'No monitored files found',
+        },
       );
 
 /** Names the pinned agent in the title, so the user sees which agent filters the tab. */
@@ -101,7 +94,9 @@ const getEndpointStatusMessage = (
     case 'none':
       return i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.noDirectories',
-        { defaultMessage: 'This endpoint reports no monitored directories.' },
+        {
+          defaultMessage: 'This endpoint reports no monitored directories.',
+        },
       );
     case 'disabled':
       return i18n.translate(
@@ -130,33 +125,6 @@ const getEndpointStatusMessage = (
   }
 };
 
-const Actions = ({ children }: { children: React.ReactNode }) => (
-  <>
-    <EuiSpacer size='s' />
-    <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false} wrap>
-      {React.Children.toArray(children).map((child, index) => (
-        <EuiFlexItem grow={false} key={index}>
-          {child}
-        </EuiFlexItem>
-      ))}
-    </EuiFlexGroup>
-  </>
-);
-
-const ConfigureLink = () => (
-  <EuiLink
-    href={webDocumentationLink(FIM_CONFIGURE_DOCS_PATH)}
-    target='_blank'
-    rel='noopener noreferrer'
-    external
-  >
-    {i18n.translate(
-      'wazuh.fileIntegrityMonitoring.emptyState.addDirectoriesLink',
-      { defaultMessage: 'How to configure File Integrity Monitoring' },
-    )}
-  </EuiLink>
-);
-
 const EndpointDirectories = ({
   directories,
 }: {
@@ -169,7 +137,9 @@ const EndpointDirectories = ({
           <EuiLoadingSpinner size='s' />{' '}
           {i18n.translate(
             'wazuh.fileIntegrityMonitoring.emptyState.loadingDirectories',
-            { defaultMessage: 'Loading the monitored directories' },
+            {
+              defaultMessage: 'Loading the monitored directories',
+            },
           )}
         </>
       );
@@ -178,7 +148,9 @@ const EndpointDirectories = ({
         <>
           {i18n.translate(
             'wazuh.fileIntegrityMonitoring.emptyState.monitoredDirectories',
-            { defaultMessage: 'Monitored directories:' },
+            {
+              defaultMessage: 'Monitored directories:',
+            },
           )}
           {directories.directories.map(directory => (
             <React.Fragment key={directory}>
@@ -208,61 +180,51 @@ export const FimEmptyStateView = ({
   const pinned = agentId ? directories : undefined;
 
   return (
-    <EuiPanel hasBorder={false} hasShadow={false} color='transparent'>
-      <EuiCallOut
-        title={
-          agentId
-            ? getPinnedAgentTitle(kind, { ...agent, id: agentId })
-            : getTitle(kind)
-        }
-        color='warning'
-        iconType='help'
-        data-test-subj='wzFimEmptyState'
-      >
-        <EuiText size='s'>
-          <p>
-            {getDescription(
-              kind,
-              !pinned || ['loading', 'monitored'].includes(pinned.status),
-            )}{' '}
-            {pinned ? (
-              <EndpointDirectories directories={pinned} />
-            ) : (
-              i18n.translate(
-                'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
-                {
-                  defaultMessage:
-                    'Use Explore agent to see the directories an agent monitors.',
-                },
-              )
-            )}
-          </p>
-        </EuiText>
-        <Actions>
-          {pinned && (
-            <EuiButton
-              size='s'
-              onClick={onUnpinAgent}
-              data-test-subj='wzFimEmptyStateUnpin'
-            >
-              {i18n.translate(
-                'wazuh.fileIntegrityMonitoring.emptyState.unpinAgent',
-                { defaultMessage: 'Unpin agent' },
-              )}
-            </EuiButton>
-          )}
-          <ConfigureLink />
-        </Actions>
-      </EuiCallOut>
-    </EuiPanel>
+    <ModuleEmptyState
+      testSubj='Fim'
+      title={
+        agentId
+          ? getPinnedAgentTitle(kind, { ...agent, id: agentId })
+          : getTitle(kind)
+      }
+      onUnpinAgent={pinned ? onUnpinAgent : undefined}
+      docs={{
+        path: DOCS_PATHS.fileIntegrityMonitoringConfigure,
+        label: i18n.translate(
+          'wazuh.fileIntegrityMonitoring.emptyState.addDirectoriesLink',
+          {
+            defaultMessage: 'How to configure File Integrity Monitoring',
+          },
+        ),
+      }}
+    >
+      <p>
+        {getDescription(
+          kind,
+          !pinned || ['loading', 'monitored'].includes(pinned.status),
+        )}
+      </p>
+      <EuiSpacer size='m' />
+      <p>
+        {pinned ? (
+          <EndpointDirectories directories={pinned} />
+        ) : (
+          i18n.translate(
+            'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
+            {
+              defaultMessage:
+                'Use Explore agent to see the directories an agent monitors.',
+            },
+          )
+        )}
+      </p>
+    </ModuleEmptyState>
   );
 };
 
 interface PinnedAgentState {
   appStateReducers?: { currentAgentData?: { id?: string; name?: string } };
 }
-
-const unPinAgent = () => new PinnedAgentManager().unPinAgent();
 
 /** Empty state of the File Integrity Monitoring tabs for the pinned agent, if any. */
 export const FimEmptyState = ({ kind }: Pick<FimEmptyStateProps, 'kind'>) => {
@@ -271,6 +233,10 @@ export const FimEmptyState = ({ kind }: Pick<FimEmptyStateProps, 'kind'>) => {
   );
 
   return (
-    <FimEmptyStateView kind={kind} agent={agent} onUnpinAgent={unPinAgent} />
+    <FimEmptyStateView
+      kind={kind}
+      agent={agent}
+      onUnpinAgent={unpinPinnedAgent}
+    />
   );
 };
