@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed the validation of visualization images in module reports [#9414](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9414)
 - Fixed the scheduled jobs, such as the statistics and monitoring collection, occasionally skipping a run [#9552](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9552)
 - Fixed the Server API token not being revoked when logging out from a page outside the apps of wazuh plugin [#9547](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9547)
+- Fixed the inventories (IT Hygiene, including Users and Groups, and FIM) exporting rows that ignored the search bar query in Export Formatted [#9570](https://github.com/wazuh/wazuh-dashboard-plugins/pull/9570)
 
 ## Wazuh v4.14.10 - OpenSearch Dashboards 2.19.6 - Revision 01
 
