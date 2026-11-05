@@ -228,6 +228,11 @@ export const WAZUH_THREATINTEL_ENRICHMENTS_PATTERN =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
   'index-pattern:threatintel-enrichments';
 
+// Index patterns - Security audit logs, written by the indexer's security plugin
+export const SECURITY_AUDITLOGS_PATTERN = 'security-auditlogs*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_SECURITY_AUDITLOGS =
+  'index-pattern:security-auditlogs';
+
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
 

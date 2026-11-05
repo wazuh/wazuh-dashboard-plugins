@@ -47,8 +47,18 @@ function interpolate(template, variables) {
   });
 }
 
+// Mapping that OpenSearch's dynamic mapping gives to a string field
+function dynamicStringField() {
+  return {
+    type: 'text',
+    fields: { keyword: { type: 'keyword', ignore_above: 256 } },
+  };
+}
+
 // Configuration for different template sources
 // Template resource: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
+// A source defines either `urls` to fetch the template from, or an inline `template`
+// for indices that have no template with field mappings.
 const TEMPLATE_SOURCES = {
   'states-vulnerabilities': {
     urls: [
@@ -381,6 +391,29 @@ const TEMPLATE_SOURCES = {
       wazuhUrl('plugins/setup/src/main/resources/templates/content/ioc.json'),
     ],
     outputFile: 'threatintel-enrichments.json',
+  },
+  // The indexer's security plugin creates the security-auditlogs data stream
+  // from a template without field mappings, so OpenSearch maps each field from
+  // the first event that carries it. This template lists the time field and the
+  // most useful audit fields with the mapping they get.
+  // Reference: https://github.com/wazuh/wazuh-indexer-plugins/blob/5.0.0/docs/ref/security/audit-logs.md
+  'security-auditlogs': {
+    template: {
+      mappings: {
+        properties: {
+          '@timestamp': { type: 'date' },
+          audit_category: dynamicStringField(),
+          audit_request_body: dynamicStringField(),
+          audit_request_effective_user: dynamicStringField(),
+          audit_request_privilege: dynamicStringField(),
+          audit_request_remote_address: dynamicStringField(),
+          audit_rest_request_method: dynamicStringField(),
+          audit_rest_request_path: dynamicStringField(),
+          audit_trace_resolved_indices: dynamicStringField(),
+        },
+      },
+    },
+    outputFile: 'security-auditlogs.json',
   },
 };
 
@@ -869,12 +902,19 @@ async function processTemplate(templateConfig, config) {
   console.log(`⚙️  Processing ${templateConfig.name} template...`);
 
   try {
-    const { template, url } = await fetchTemplateFromUrls(
-      templateConfig.urls.map(url =>
-        interpolate(url, { branch: config.branch }),
-      ),
-    );
-    console.log(`  ✅ Successfully fetched from: ${url}`);
+    let template;
+    if (templateConfig.template) {
+      template = templateConfig.template;
+      console.log('  ✅ Using inline template');
+    } else {
+      const fetched = await fetchTemplateFromUrls(
+        templateConfig.urls.map(url =>
+          interpolate(url, { branch: config.branch }),
+        ),
+      );
+      template = fetched.template;
+      console.log(`  ✅ Successfully fetched from: ${fetched.url}`);
+    }
 
     // Extract mappings - handle different template structures:
     // 1. Index template:           { "mappings": { "properties": {...} } }
@@ -1161,6 +1201,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  TEMPLATE_SOURCES,
   processTemplate,
   extractFields: extractFieldsFromProperties,
   mapIndexFieldType,

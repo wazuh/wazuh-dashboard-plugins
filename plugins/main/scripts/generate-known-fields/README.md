@@ -46,6 +46,12 @@ The script generates JSON files in the destination directory: events, states, mo
 
 The templates can be retrieved from: https://github.com/wazuh/wazuh-indexer-plugins/tree/main/plugins/setup/src/main/resources
 
+**Inline templates** are defined in `TEMPLATE_SOURCES` with a `template` property instead of `urls`, for indices that have no template with field mappings to fetch:
+
+| File                      | Index pattern         | Reason                                                                                                                                                                                                                     |
+| ------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `security-auditlogs.json` | `security-auditlogs*` | The indexer's security plugin creates the data stream from a template without mappings, so fields are mapped dynamically. The inline template lists `@timestamp` and the most useful audit fields as mapped by OpenSearch. |
+
 ## Integration
 
 The generated files are stored in the destination directory and consumed by:
@@ -61,7 +67,7 @@ The generated files are stored in the destination directory and consumed by:
 
 To add support for a new template:
 
-1. Add configuration to `TEMPLATE_SOURCES` in `generate-known-fields.js`
+1. Add configuration to `TEMPLATE_SOURCES` in `generate-known-fields.js`, with the template `urls` or an inline `template`
 
 ## Recent Improvements
 
