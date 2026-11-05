@@ -38,7 +38,10 @@ interface Props {
   message?: string;
   /** Explanation, shown under the title instead of the one of the module or the generic one. */
   description?: string;
-  /** Set it to `false` in flyouts: the prompt then never offers to unpin the agent. */
+  /**
+   * Set it to `false` in flyouts and in views not filtered by the pinned agent: the prompt then
+   * never offers to unpin the agent.
+   */
   allowUnpinAgent?: boolean;
 }
 

@@ -30,7 +30,7 @@ const MODULE_EMPTY_STATE_TEXTS: Record<string, () => ModuleEmptyStateTexts> = {
       'wazuh.vulnerabilityDetection.emptyState.description',
       {
         defaultMessage:
-          'Vulnerabilities appear after the agents report their inventory and the scanner matches it against the vulnerability feed. Try changing the search or time range.',
+          'Vulnerabilities appear after the agents report their inventory and the scanner matches it against the vulnerability feed. Try changing the search.',
       },
     ),
   }),
