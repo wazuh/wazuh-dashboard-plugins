@@ -18,7 +18,6 @@ import {
   EuiTitle,
   EuiFieldSearch,
   EuiSpacer,
-  EuiCallOut,
   EuiToolTip,
   EuiSwitch,
   EuiPopover,
@@ -46,6 +45,7 @@ import {
   getRequirementLabel,
   getRequirementName,
 } from '../../../../../../common/compliance-requirements/requirement-text';
+import { DiscoverNoResults } from '../../../../common/no-results/no-results';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
@@ -384,16 +384,21 @@ export class ComplianceSubrequirements extends Component {
       );
     } else {
       return (
-        <EuiCallOut
-          title={i18n.translate(
+        <DiscoverNoResults
+          message={i18n.translate(
             'wazuh.complianceTable.subrequirements.noResultsTitle',
             {
-              defaultMessage: 'There are no results.',
+              defaultMessage: 'No requirements found',
             },
           )}
-          iconType='help'
-          color='warning'
-        ></EuiCallOut>
+          description={i18n.translate(
+            'wazuh.complianceTable.subrequirements.noResultsDescription',
+            {
+              defaultMessage:
+                'No requirement of this standard matches the current search. Try changing it.',
+            },
+          )}
+        />
       );
     }
   }

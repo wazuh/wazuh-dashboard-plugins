@@ -74,6 +74,8 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
   HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
   WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_SECURITY_AUDITLOGS,
+  SECURITY_AUDITLOGS_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
@@ -667,6 +669,18 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
       fieldsNoIndicesFilePath: knownFieldsFilePath(
         'threatintel-enrichments.json',
       ),
+    },
+  },
+  {
+    // The indexer's security plugin creates the data stream on the first audit
+    // event, so the index pattern is created from the known fields before any
+    // data exists.
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SECURITY_AUDITLOGS,
+    indexPatternID: SECURITY_AUDITLOGS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('security-auditlogs.json'),
     },
   },
 ];

@@ -8,3 +8,8 @@
     }
   }
 }
+
+// The search bar adds padding below the date picker, which moves it above the node selector.
+.server-management-statistics-toolbar > .globalQueryBar:not(:empty) {
+  padding-bottom: 0;
+}

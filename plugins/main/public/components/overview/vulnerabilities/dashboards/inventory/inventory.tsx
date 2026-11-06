@@ -30,7 +30,7 @@ import {
   MAX_ENTRIES_PER_QUERY,
   getAllCustomRenders,
 } from '../../../../common/data-grid/data-grid-service';
-import { DiscoverNoResults } from '../../common/components/no_results';
+import { DiscoverNoResults } from '../../../../common/no-results/no-results';
 import { LoadingSearchbarProgress } from '../../../../../../public/components/common/loading-searchbar-progress/loading-searchbar-progress';
 // common components/hooks
 import useSearchBar from '../../../../common/search-bar/use-search-bar';

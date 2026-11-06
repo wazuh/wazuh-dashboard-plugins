@@ -106,6 +106,20 @@ describe('useCtiConsumers', () => {
     expect(result.current.summary).toBe('upToDate');
   });
 
+  test('reports the server message of a failed read', async () => {
+    mockFetch.mockRejectedValue(
+      Object.assign(new Error('Forbidden'), {
+        body: { message: 'No permissions to read the consumers' },
+      }),
+    );
+
+    const { result } = renderHook(() => useCtiConsumers());
+
+    await waitFor(() =>
+      expect(result.current.error).toBe('No permissions to read the consumers'),
+    );
+  });
+
   describe('after an update check', () => {
     const checked = (lastCheckedAt?: string) => ({
       data: [consumer()],

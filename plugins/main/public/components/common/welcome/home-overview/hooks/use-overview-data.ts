@@ -35,6 +35,7 @@ import {
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
   buildMalwareFilterAgg,
+  buildPlatformsCountAgg,
   buildSCATilesAgg,
   buildSCATopBenchmarksAgg,
   buildThreatIntelByThreatTypeAgg,
@@ -640,20 +641,29 @@ function useIndexDocCount(
 
 /**
  * IT Hygiene counts: one search per inventory index, so a missing index shows
- * "-" on only its own tile (never hidden).
+ * "-" on only its own tile (never hidden). Platforms counts distinct
+ * `host.os.platform` values; the other tiles count documents.
  */
-export function useItHygieneOperatingSystemsCount(
+export function useItHygienePlatformsCount(
   enabled: boolean,
 ): DataGroupResult<number | undefined> {
-  return useIndexDocCount(
-    SystemInventoryStatesDataSource,
-    () => new SystemInventorySystemStatesDataSourceRepository(),
+  return useAggregationGroup<number | undefined>({
+    DataSource: SystemInventoryStatesDataSource,
+    createRepository: () =>
+      new SystemInventorySystemStatesDataSourceRepository(),
     enabled,
-    i18n.translate(
-      'wazuh.common.homeOverviewDataGroup.itHygieneOperatingSystems',
-      { defaultMessage: 'IT Hygiene: operating systems' },
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.itHygienePlatforms',
+      { defaultMessage: 'IT Hygiene: platforms' },
     ),
-  );
+    fetch: async fetchData => {
+      const response = await fetchData({
+        aggs: buildPlatformsCountAgg(),
+        pagination: NO_HITS,
+      });
+      return mapCardinality(response?.aggregations, AGG.platformsCount);
+    },
+  });
 }
 
 export function useItHygienePackagesCount(

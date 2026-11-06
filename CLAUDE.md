@@ -128,6 +128,11 @@ Enforced by tooling — run the linter/formatter, don't hand-format:
   docs you write: say "the indexer", "the agents", etc. Add them only when asked, and keep
   them where they are part of an identifier (index names such as `wazuh-states-inventory-*`,
   i18n ids, constants, URLs).
+- Every module view has an **About \<module\>** button (`AboutFlyoutButton`) and links the
+  documentation page of the view (`DOCS_PATHS` in `plugins/main/common/services/docs-paths.ts`,
+  used by the flyout and by `docsUrl` of the application). Never rebuild the flyout or write
+  documentation paths inline. Content and placement:
+  [`docs/dev/modules/about-flyout.md`](docs/dev/modules/about-flyout.md).
 - English everywhere (code, comments, commits, docs). Full guide:
   [`STYLEGUIDE.md`](STYLEGUIDE.md).
 - User-facing text goes through `i18n.translate` with ids
