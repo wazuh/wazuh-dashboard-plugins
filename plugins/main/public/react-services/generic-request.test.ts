@@ -11,6 +11,7 @@
  */
 import { GenericRequest } from './generic-request';
 import { AppState } from './app-state';
+import { ApiCheck } from './wz-api-check';
 
 // axios
 import axios, { AxiosResponse } from 'axios';
@@ -35,15 +36,22 @@ jest.mock('../kibana-services', () => ({
 // app state
 jest.mock('./app-state');
 
+const mockNavigate = jest.fn();
 jest.mock('./navigation-service', () => ({
   getInstance() {
     return {
       getPathname() {
         return '';
       },
-      navigate() {},
+      navigate: mockNavigate,
     };
   },
+}));
+
+const mockIsLoggingOut = jest.fn().mockReturnValue(false);
+jest.mock('../services/request-handler', () => ({
+  ...(jest.requireActual('../services/request-handler') as object),
+  isLoggingOut: () => mockIsLoggingOut(),
 }));
 
 // mock window location
@@ -126,5 +134,40 @@ describe('Generic Request', () => {
       }
       expect(typeof error).not.toBe('string');
     }
+  });
+
+  describe('When the request fails and the API check fails', () => {
+    beforeEach(() => {
+      (axios as jest.MockedFunction<typeof axios>).mockRejectedValue(
+        new Error('Error message'),
+      );
+      AppState.getCurrentAPI = jest
+        .fn()
+        .mockReturnValue(JSON.stringify({ id: 'mocked-api-id' }));
+      jest.spyOn(ApiCheck, 'checkStored').mockRejectedValue(new Error('down'));
+      mockNavigate.mockClear();
+    });
+
+    it('Should redirect to the health check', async () => {
+      mockIsLoggingOut.mockReturnValue(false);
+
+      await expect(
+        GenericRequest.request('GET', '/api/request'),
+      ).rejects.toThrow('Error message');
+
+      expect(ApiCheck.checkStored).toHaveBeenCalledWith('mocked-api-id');
+      expect(mockNavigate).toHaveBeenCalledWith('/health-check');
+    });
+
+    it('Should not check the API nor redirect while logging out', async () => {
+      mockIsLoggingOut.mockReturnValue(true);
+
+      await expect(
+        GenericRequest.request('GET', '/api/request'),
+      ).rejects.toThrow('Error message');
+
+      expect(ApiCheck.checkStored).not.toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 });

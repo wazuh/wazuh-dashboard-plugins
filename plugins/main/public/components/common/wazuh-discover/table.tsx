@@ -458,7 +458,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     title,
     showSearchBar,
     results,
-    query,
+    query = searchBarProps?.query,
     inspectedHit,
     removeInspectedHit,
     dataGridProps,

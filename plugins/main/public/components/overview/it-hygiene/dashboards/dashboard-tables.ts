@@ -1,6 +1,11 @@
 import { DashboardPanelState } from '../../../../../../../../src/plugins/dashboard/public/application';
 import { EmbeddableInput } from '../../../../../../../../src/plugins/embeddable/public';
 import { getVisStateTable } from '../common/saved-vis/generators';
+import {
+  FILTER_OPERATOR,
+  PatternDataSourceFilterManager,
+} from '../../../common/data-source';
+import { WAZUH_IT_HYGIENE_PACKAGES_PATTERN } from '../../../../../common/constants';
 
 const getVisStateFilter = (
   id: string,
@@ -105,6 +110,14 @@ export const getDashboardTables = (
           'it-hygiene-top-packages',
           {
             customLabel: 'Top 5 installed packages',
+            filter: [
+              PatternDataSourceFilterManager.createFilter(
+                FILTER_OPERATOR.WILDCARD,
+                '_index',
+                WAZUH_IT_HYGIENE_PACKAGES_PATTERN,
+                indexPatternId,
+              ),
+            ],
           },
         ),
       },
