@@ -89,7 +89,7 @@ export const WzMenu = withWindowSize(
         const options = {
           context: `${WzMenu.name}.componentDidMount`,
           level: UI_LOGGER_LEVELS.ERROR,
-          severity: UI_ERROR_SEVERITIES.CRITICAL,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
           display: true,
           error: {
