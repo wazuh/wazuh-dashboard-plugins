@@ -174,6 +174,13 @@ export const MultiSelectInput: React.FC<MultiSelectProps> = ({
       numActiveFilters={activeFilters}
       isDisabled={isDisabled}
       size='s'
+      aria-label={i18n.translate(
+        'wazuh.common.customSearchBar.filterButtonAriaLabel',
+        {
+          defaultMessage: '{filterName} filter, {selected} selected',
+          values: { filterName: item.placeholder, selected: activeFilters },
+        },
+      )}
     >
       {item.placeholder}
     </EuiFilterButton>

@@ -1,6 +1,15 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { RuleEditor } from './rule-editor';
+
+const mockCodeEditorProps = jest.fn();
+jest.mock('@elastic/eui', () => ({
+  ...jest.requireActual('@elastic/eui'),
+  EuiCodeEditor: (props: object) => {
+    mockCodeEditorProps(props);
+    return null;
+  },
+}));
 
 jest.mock('../../../common/permissions/button', () => ({
   WzButtonPermissions: ({ children }: { children?: React.ReactNode }) => (
@@ -45,4 +54,16 @@ describe('RuleEditor logical operator button', () => {
       expect(screen.getByRole('button', { name: 'Any are true' })).toBeTruthy();
     },
   );
+});
+
+describe('RuleEditor JSON editor', () => {
+  it('does not start the editor validation worker', () => {
+    renderEditor({ AND: [{ FIND: { a: 'b' } }] });
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Switch to JSON editor' }),
+    );
+
+    const props = mockCodeEditorProps.mock.lastCall[0];
+    expect(props.setOptions.useWorker).toBe(false);
+  });
 });

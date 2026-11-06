@@ -7,9 +7,9 @@ import {
 import {
   FIM_DASHBOARD_ID,
   FIM_AGENT_DASHBOARD_ID,
-  WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
 } from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards/dashboard';
+import { FimEmptyState } from '../components/empty-state/fim-empty-state';
 
 export const DashboardFIM = createDashboard({
   DataSource: FIMDataSource,
@@ -21,4 +21,5 @@ export const DashboardFIM = createDashboard({
     },
   ],
   // sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+  emptyState: <FimEmptyState kind='dashboard' />,
 });

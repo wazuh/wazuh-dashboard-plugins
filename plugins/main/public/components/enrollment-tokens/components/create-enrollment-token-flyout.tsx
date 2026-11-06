@@ -53,6 +53,7 @@ import {
   validateEnrollmentTokenTtl,
 } from '../../../services/enrollment-tokens';
 import { TruncatedValuePopover } from './truncated-value-popover';
+import { AddressComboBox } from './address-combo-box';
 
 interface CreateEnrollmentTokenFlyoutProps {
   /* Called with `true` once a token was minted, so the listing behind the
@@ -87,9 +88,10 @@ const CreateEnrollmentTokenFlyoutContent = ({
 
   const initialFields: FormConfiguration = {
     address: {
-      type: 'text',
+      type: 'custom',
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
+      component: props => <AddressComboBox {...props} />,
     },
     /* Offered from the same settings the deploy wizard reads, so a token
     minted here points the agent at the same endpoint as one minted there. */
@@ -293,7 +295,7 @@ const CreateEnrollmentTokenFlyoutContent = ({
                     'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
                     {
                       defaultMessage:
-                        'The name agents connect to. It must be one of the names in the manager listener certificate; an address outside it is refused.',
+                        'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
                     },
                   )}
                 </EuiText>

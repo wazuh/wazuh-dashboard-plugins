@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import EnrollmentTokenInput from './enrollment-token';
-import { createEnrollmentToken } from '../../../../../services/enrollment-tokens';
+import {
+  createEnrollmentToken,
+  getEnrollmentTokens,
+  revokeEnrollmentToken,
+} from '../../../../../services/enrollment-tokens';
 import {
   EnhancedFieldConfiguration,
   UseFormReturn,
@@ -13,6 +23,7 @@ import { EnrollmentToken } from '../../interfaces/types';
 which the wizard's data module is pulled in by the component under test. The
 token expiry is formatted with the dashboard's date format and time zone, set
 here to a zone other than UTC so that the conversion shows. */
+const mockAddSuccess = jest.fn();
 jest.mock('../../../../../kibana-services', () => {
   const uiSettings: Record<string, unknown> = {
     dateFormat: 'MMM D, YYYY @ HH:mm:ss.SSS',
@@ -23,12 +34,40 @@ jest.mock('../../../../../kibana-services', () => {
     getUiSettings: jest.fn().mockReturnValue({
       get: (key: string) => uiSettings[key] ?? false,
     }),
+    getToasts: () => ({ addSuccess: mockAddSuccess }),
   };
 });
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
   ...jest.requireActual('../../../../../services/enrollment-tokens/constants'),
   createEnrollmentToken: jest.fn(),
+  getEnrollmentTokens: jest.fn(),
+  revokeEnrollmentToken: jest.fn(),
+}));
+
+/* The confirmation modal and the permission check belong to the shared button;
+here it is a plain button that confirms on click and exposes the modal body. */
+jest.mock('../../../../common/buttons', () => ({
+  WzButtonPermissionsModalConfirm: ({
+    onConfirm,
+    isDisabled,
+    children,
+    modalProps,
+    permissions,
+  }: {
+    onConfirm: () => void;
+    isDisabled?: boolean;
+    children: React.ReactNode;
+    modalProps?: { children?: React.ReactNode };
+    permissions: unknown;
+  }) => (
+    <div data-permissions={JSON.stringify(permissions)}>
+      <button disabled={isDisabled} onClick={onConfirm}>
+        {children}
+      </button>
+      <div data-testid='revoke-modal-body'>{modalProps?.children}</div>
+    </div>
+  ),
 }));
 
 /* The link to the Enrollment tokens app resolves its URL through the
@@ -43,6 +82,8 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 }));
 
 const createToken = createEnrollmentToken as jest.Mock;
+const listTokens = getEnrollmentTokens as jest.Mock;
+const revokeToken = revokeEnrollmentToken as jest.Mock;
 
 const MINTED = {
   token: 'abc',
@@ -155,7 +196,7 @@ const renderInput = (props: RenderOptions = {}) => {
 
 const existingTokenInput = () =>
   screen.getByPlaceholderText('Paste a stored enrollment token');
-const lifetimeInput = () => screen.getByPlaceholderText('30d');
+const lifetimeInput = () => screen.getByPlaceholderText('1d');
 const enrollmentsInput = () => screen.getByPlaceholderText('Unlimited');
 const descriptionInput = () =>
   screen.getByPlaceholderText('What this token is for');
@@ -176,6 +217,9 @@ const noCredentialSwitch = () =>
 
 beforeEach(() => {
   createToken.mockReset();
+  listTokens.mockReset();
+  listTokens.mockResolvedValue({ tokens: [], total: 0 });
+  revokeToken.mockReset();
 });
 
 /* A token is either minted here or reused from an earlier deployment. Reading
@@ -197,7 +241,7 @@ describe('EnrollmentTokenInput token source tabs', () => {
     fireEvent.click(existingTab());
 
     expect(existingTokenInput()).toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('30d')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('1d')).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText('Unlimited')).not.toBeInTheDocument();
     expect(
       screen.queryByPlaceholderText('What this token is for'),
@@ -321,7 +365,7 @@ describe('EnrollmentTokenInput token source tabs', () => {
 describe('EnrollmentTokenInput advanced options', () => {
   it('keeps the mint inputs folded away until the operator asks for them', () => {
     renderInput({ collapsed: true });
-    expect(screen.queryByPlaceholderText('30d')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('1d')).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText('Unlimited')).not.toBeInTheDocument();
     expect(
       screen.queryByPlaceholderText('What this token is for'),
@@ -504,5 +548,201 @@ describe('EnrollmentTokenInput', () => {
     expect(onEnrollmentTokenChange).toHaveBeenCalledWith(
       expect.objectContaining({ source: 'generated', token: 'abc' }),
     );
+  });
+});
+
+describe('EnrollmentTokenInput unused tokens', () => {
+  const future = new Date(Date.now() + 86400000).toISOString();
+  const activeUnused = (id: string) => ({ id, uses: 0, expires: future });
+
+  it('mints with a 1 day lifetime when none was entered', async () => {
+    createToken.mockResolvedValue(MINTED);
+    renderInput();
+    fireEvent.click(generateButton());
+    await waitFor(() =>
+      expect(createToken).toHaveBeenCalledWith(
+        expect.objectContaining({ ttl: '1d' }),
+      ),
+    );
+  });
+
+  it('keeps the lifetime the operator entered', async () => {
+    createToken.mockResolvedValue(MINTED);
+    renderInput({ formFields: { enrollmentTokenTtl: field('12h') } });
+    fireEvent.click(generateButton());
+    await waitFor(() =>
+      expect(createToken).toHaveBeenCalledWith(
+        expect.objectContaining({ ttl: '12h' }),
+      ),
+    );
+  });
+
+  it('offers to revoke the other active tokens that enrolled nobody', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [
+        activeUnused('id-1'),
+        activeUnused('id-old'),
+        { id: 'id-used', uses: 2, expires: future },
+        { id: 'id-revoked', uses: 0, revoked: true, expires: future },
+      ],
+      total: 4,
+    });
+    renderInput();
+    fireEvent.click(generateButton());
+    expect(
+      await screen.findByText(/1 earlier token is still active and unused/),
+    ).toBeInTheDocument();
+    revokeToken.mockResolvedValue(['id-old']);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Revoke unused tokens' }),
+    );
+    await waitFor(() => expect(revokeToken).toHaveBeenCalledWith('id-old'));
+    expect(revokeToken).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/still active and unused/),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it('lists the tokens to revoke and gates the action on the delete permission', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [{ ...activeUnused('id-old'), description: 'staged rollout' }],
+      total: 1,
+    });
+    renderInput();
+    fireEvent.click(generateButton());
+    await screen.findByText(/1 earlier token is still active and unused/);
+    const body = screen.getByTestId('revoke-modal-body');
+    ['ID', 'Description', 'Created', 'Expires'].forEach(header =>
+      expect(
+        within(body).getByRole('columnheader', { name: header }),
+      ).toBeInTheDocument(),
+    );
+    expect(within(body).getByRole('table')).toBeInTheDocument();
+    expect(body).toHaveTextContent('id-old');
+    expect(body).toHaveTextContent('staged rollout');
+    expect(
+      screen.getByRole('button', { name: 'Revoke unused tokens' })
+        .parentElement,
+    ).toHaveAttribute(
+      'data-permissions',
+      JSON.stringify([
+        { action: 'enrollment_token:delete', resource: '*:*:*' },
+      ]),
+    );
+  });
+
+  it('says so when more tokens exist than were looked at', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [activeUnused('id-old')],
+      total: 250,
+    });
+    renderInput();
+    fireEvent.click(generateButton());
+    expect(
+      await screen.findByText(/At least 1 earlier token is still active/),
+    ).toBeInTheDocument();
+  });
+
+  it('confirms with a toast once every token was revoked', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [activeUnused('id-old')],
+      total: 1,
+    });
+    revokeToken.mockResolvedValue(['id-old']);
+    mockAddSuccess.mockClear();
+    renderInput();
+    fireEvent.click(generateButton());
+    await screen.findByText(/still active and unused/);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Revoke unused tokens' }),
+    );
+    await waitFor(() => expect(mockAddSuccess).toHaveBeenCalled());
+  });
+
+  it('keeps the tokens that could not be revoked and shows the error', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [activeUnused('id-a'), activeUnused('id-b')],
+      total: 2,
+    });
+    revokeToken.mockImplementation((id: string) =>
+      id === 'id-a'
+        ? Promise.resolve([id])
+        : Promise.reject(new Error('forbidden')),
+    );
+    mockAddSuccess.mockClear();
+    renderInput();
+    fireEvent.click(generateButton());
+    await screen.findByText(/2 earlier tokens are still active and unused/);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Revoke unused tokens' }),
+    );
+    expect(
+      await screen.findByText(/1 earlier token is still active and unused/),
+    ).toBeInTheDocument();
+    expect(screen.getByText('forbidden')).toBeInTheDocument();
+    expect(mockAddSuccess).not.toHaveBeenCalled();
+  });
+
+  it('hides the callout on the existing token tab', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [activeUnused('id-old')],
+      total: 1,
+    });
+    renderInput();
+    fireEvent.click(generateButton());
+    await screen.findByText(/still active and unused/);
+    fireEvent.click(existingTab());
+    expect(
+      screen.queryByText(/still active and unused/),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not let a new token be generated while revoking', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({
+      tokens: [activeUnused('id-old')],
+      total: 1,
+    });
+    revokeToken.mockReturnValue(new Promise(() => {}));
+    renderInput();
+    fireEvent.click(generateButton());
+    await screen.findByText(/still active and unused/);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Revoke unused tokens' }),
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Generate a new token/ }),
+      ).toBeDisabled(),
+    );
+  });
+
+  it('shows nothing when there are no other unused tokens', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockResolvedValue({ tokens: [activeUnused('id-1')], total: 1 });
+    renderInput();
+    fireEvent.click(generateButton());
+    await screen.findByText('Enrollment token generated');
+    expect(
+      screen.queryByText(/still active and unused/),
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps the minted token when the lookup fails', async () => {
+    createToken.mockResolvedValue(MINTED);
+    listTokens.mockRejectedValue(new Error('boom'));
+    renderInput();
+    fireEvent.click(generateButton());
+    expect(
+      await screen.findByText('Enrollment token generated'),
+    ).toBeInTheDocument();
   });
 });

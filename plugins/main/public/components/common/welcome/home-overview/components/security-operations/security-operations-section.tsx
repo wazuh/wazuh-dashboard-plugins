@@ -19,10 +19,10 @@ import {
 } from './regulatory-compliance-badges';
 import { TopNetworkServicesTable } from '../overview/top-network-services-table';
 import { useInViewport } from '../../../../hooks';
-import { CARD_MIN_WIDTH } from '../../lib/constants';
+import { CARD_MIN_WIDTH, KPI_LINK_STYLE } from '../../lib/constants';
 import {
   useActiveResponseOverview,
-  useItHygieneOperatingSystemsCount,
+  useItHygienePlatformsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
   useItHygieneUsersCount,
@@ -46,13 +46,18 @@ const SecurityOperationsSectionComponent: React.FC<
   SecurityOperationsSectionProps
 > = ({ complianceControls }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
-  const operatingSystems = useItHygieneOperatingSystemsCount(visible);
+  const platforms = useItHygienePlatformsCount(visible);
   const packages = useItHygienePackagesCount(visible);
   const users = useItHygieneUsersCount(visible);
   const services = useItHygieneServicesCount(visible);
   const activeResponse = useActiveResponseOverview(visible);
   const topOs = useTopOperatingSystems(visible);
   const topServices = useTopNetworkServices(visible);
+  // When every tile is denied, show the card-level permission message used by
+  // the other cards instead of four warning dashes.
+  const itHygieneDenied = [platforms, packages, users, services].every(
+    ({ error }) => error?.kind === 'permission-denied',
+  );
 
   return (
     <div ref={sectionRef}>
@@ -69,10 +74,13 @@ const SecurityOperationsSectionComponent: React.FC<
           },
         )}
       />
+      {/* Incident Response holds a single KPI, so it takes half the width of the other two. */}
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
-            status='available'
+            status={itHygieneDenied ? 'error' : 'available'}
+            errorLabel={itHygieneDenied ? platforms.error?.message : undefined}
+            isPermissionDenied={itHygieneDenied}
             title={i18n.translate(
               'wazuh.common.homeOverviewSecurityOperations.itHygieneTitle',
               { defaultMessage: 'IT Hygiene' },
@@ -86,14 +94,14 @@ const SecurityOperationsSectionComponent: React.FC<
             data-test-subj='home-overview-it-hygiene'
           >
             <ItHygieneTiles
-              operatingSystems={operatingSystems}
+              platforms={platforms}
               packages={packages}
               users={users}
               services={services}
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem grow={1} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={activeResponse.status}
             errorLabel={activeResponse.error?.message}
@@ -121,8 +129,7 @@ const SecurityOperationsSectionComponent: React.FC<
               value={
                 <RedirectAppLinks application={getCore().application}>
                   <EuiLink
-                    style={{ fontWeight: 'normal' }}
-                    color='text'
+                    style={KPI_LINK_STYLE}
                     href={getActiveResponseResponsesUrl()}
                     data-test-subj='active-response-stat-link'
                   >
@@ -138,7 +145,7 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
             title={i18n.translate(

@@ -29,13 +29,13 @@ import {
   withSystemInventorySystemDataSource,
 } from '../../../overview/it-hygiene/common/hocs/validate-system-inventory-index-pattern';
 import { getCore } from '../../../../kibana-services';
-import NavigationService from '../../../../react-services/navigation-service';
 import { ITHygiene } from '../../../../utils/applications';
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { IndexPatternFormattedField } from '../../../common/index-pattern';
 import { withDataSourceInitiated } from '../../../common/hocs';
 import { Typography } from '../../../common/typography/typography';
 import { compose } from 'redux';
+import { getItHygieneHardwareUrl } from './it-hygiene-hardware-url';
 
 const RibbonBodyProtected = withDataSourceInitiated({})(
   ({ items, 'data-test-subj': dataTestSubj }: IWzRibbonBody) => (
@@ -210,9 +210,7 @@ export const InventoryMetrics = compose(
                     iconType='popout'
                     color='primary'
                     className='EuiButtonIcon'
-                    href={NavigationService.getInstance().getAppURL(
-                      ITHygiene.id,
-                    )}
+                    href={getItHygieneHardwareUrl()}
                     aria-label={openAppLabel}
                   />
                 </EuiToolTip>

@@ -39,6 +39,16 @@ The checks represents the unit to check and some could do some write actions suc
 | `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md) for details.                         |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
 
+### Index pattern fields
+
+`saved-objects:index-patterns` creates missing index patterns. It does not refresh the fields of existing ones. After an indexer mapping change, refresh the fields in **Dashboards Management** > **Index patterns** > _pattern_ > **Refresh field list**.
+
+For example, `@timestamp` is `date_nanos` in the events, events-raw, findings and metrics templates. An index pattern created before that change keeps `date` until its fields are refreshed:
+
+- It shows `@timestamp` with millisecond precision.
+- **Discover** sorts `@timestamp` out of order when the pattern covers indices created both before and after the change.
+- The Wazuh views sort correctly either way.
+
 ### Notifications and Alerting
 
 For details about the default notification channels the Wazuh indexer provisions (and Health Check validates) and the steps to finalize configuration, see [Notifications and Alerting](./notifications-alerting.md).
@@ -202,6 +212,21 @@ healthcheck.checks_enabled:
 The health check data can be explored in the **Dashboard management > Health Check** app.
 
 This displays information about the overall result and checks details. It allows to export the health check data to JSON to be shared for troubleshooting.
+
+An introduction under the status says what the checks cover: the connection to the server API, the manager certificates, and the objects the dashboard creates in the indexer. They do not report the overall health of the manager or the indexer.
+
+Each check shows a plain title and a one-line description, with its name below. When a check is yellow or red, its details flyout adds **What to check**. The header popover lists failing checks by title. The `main` plugin registers these texts in `public/utils/health-check-descriptions.ts`:
+
+| Name                                          | Title                         |
+| --------------------------------------------- | ----------------------------- |
+| `integrations:default-notifications-channels` | Default notification channels |
+| `saved-objects:dashboards`                    | Built-in dashboards           |
+| `saved-objects:index-patterns`                | Index patterns                |
+| `server-api:certificate-validity`             | Manager certificates          |
+| `server-api:connection-compatibility`         | Server API connection         |
+| `server-api:run-as`                           | Server API run as             |
+
+The **Wazuh dashboard is not ready yet** page and the exported JSON keep the check names.
 
 Overview:
 

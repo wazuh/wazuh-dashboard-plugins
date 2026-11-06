@@ -11,6 +11,9 @@
  */
 
 export const ENROLLMENT_TOKENS_ENDPOINT = '/agents/enrollment-tokens';
+export const CLUSTER_NODES_ENDPOINT = '/cluster/nodes';
+export const listenerTlsEndpoint = (nodeId: string) =>
+  `/cluster/${encodeURIComponent(nodeId)}/daemons/remoted/tls`;
 
 /* Limits the manager enforces on the token request, shared by the validators
 and the texts that state them. */
@@ -19,3 +22,9 @@ export const ENROLLMENT_TOKEN_TTL_MAX_YEARS = 10;
 export const ENROLLMENT_TOKEN_DESCRIPTION_MAX_LENGTH = 256;
 export const ENROLLMENT_TOKEN_DESCRIPTION_ALLOWED_SYMBOLS =
   ',*<>!-.+:/()[]\'"|=~#'.split('').join(' ');
+
+/* Lifetime of the tokens the Deploy new agent wizard mints when the operator
+does not set one. The wizard cannot show the token again once it is left, so a
+long-lived default leaves unseen credentials active; the server default of 30
+days is still available by typing it under the advanced options. */
+export const ENROLLMENT_TOKEN_WIZARD_DEFAULT_TTL = '1d';

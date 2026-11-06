@@ -2,6 +2,7 @@ export * from './events-data-source';
 export * from './events-data-source-repository';
 export * from './findings-data-source-repository';
 export * from './fim';
+export * from './it-hygiene';
 export * from './vulnerabilities';
 export * from './github';
 export * from './aws';

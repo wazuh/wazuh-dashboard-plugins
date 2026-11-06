@@ -3,6 +3,7 @@ import { i18n } from '@osd/i18n';
 import { EuiButton } from '@elastic/eui';
 import { getCore } from '../../plugin-services';
 import { requestCtiContentUpdate } from '../../services/cti-feed';
+import { withHttpErrorBodyMessage } from '../../../common/http-error';
 
 export interface CheckForUpdatesButtonProps {
   /** Runs after a successful request; the button waits for it to settle. */
@@ -40,7 +41,7 @@ export const CheckForUpdatesButton: React.FC<CheckForUpdatesButtonProps> = ({
       });
       await onRequested();
     } catch (error) {
-      toasts.addError(error as Error, {
+      toasts.addError(withHttpErrorBodyMessage(error), {
         title: i18n.translate(
           'wazuhCheckUpdates.ctiFeed.checkForUpdatesButton.errorToastTitle',
           { defaultMessage: 'Could not check for updates' },

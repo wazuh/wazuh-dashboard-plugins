@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 /* eslint-disable camelcase */
+import '@testing-library/jest-dom';
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import {
+  ComplianceTable,
   computeOthersCount,
   buildComplianceObject,
   buildRequirementFilter,
@@ -19,6 +24,21 @@ import {
 import { WAZUH_MODULES_ID } from '../../../../common/constants';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
+
+// The data source wrappers are replaced so the view gets its data source as a prop.
+jest.mock('../../common/hocs', () => ({
+  withAgentSupportModule: Component => Component,
+  withDataSourceSearchBar: () => Component => Component,
+  withDataSourceLoading: () => Component => Component,
+  withDataSourceInitiated: () => Component => Component,
+}));
+jest.mock('../../common/search-bar', () => ({ WzSearchBar: () => null }));
+jest.mock('../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({ handleError: jest.fn() }),
+}));
+jest.mock('./components', () => ({
+  ComplianceSubrequirements: () => <div data-test-subj='subrequirements' />,
+}));
 
 describe('computeOthersCount', () => {
   it('totals the findings of the codes no requirement claims', () => {
@@ -149,5 +169,63 @@ describe('buildRequirementFilter', () => {
 
   it('returns no filter when the requirement has no code', () => {
     expect(buildRequirementFilter(field, [], 'index-pattern')).toEqual([]);
+  });
+});
+
+describe('ComplianceTable', () => {
+  const renderTable = (fetchData: jest.Mock) =>
+    render(
+      <ComplianceTable
+        section={WAZUH_MODULES_ID.PCI_DSS}
+        dataSource={{
+          dataSource: {
+            indexPattern: { id: 'id', title: 'wazuh-findings-v5*' },
+          },
+          fetchData,
+          fetchFilters: [],
+          filters: [],
+          fixedFilters: [],
+          setFilters: jest.fn(),
+          searchBarProps: {
+            query: { query: '' },
+            dateRangeFrom: '',
+            dateRangeTo: '',
+          },
+        }}
+      />,
+    ).container;
+
+  it('renders the permission prompt instead of the requirements on a 403', async () => {
+    const container = renderTable(
+      jest.fn().mockRejectedValue({ status: 403, message: 'Forbidden' }),
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector(
+          queryDataTestAttr('query-error-prompt-permission-denied'),
+        ),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      container.querySelector(queryDataTestAttr('subrequirements')),
+    ).toBeNull();
+  });
+
+  it('renders the requirements when the search succeeds', async () => {
+    const container = renderTable(
+      jest
+        .fn()
+        .mockResolvedValue({ aggregations: { tactics: { buckets: [] } } }),
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector(queryDataTestAttr('subrequirements')),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      container.querySelector('[data-test-subj^="query-error-prompt"]'),
+    ).toBeNull();
   });
 });

@@ -19,7 +19,6 @@ export const getAllOptionals = (
       'agentGroups',
       'agentName',
       'sslVerification',
-      'managerCa',
     ];
 
   if (!optionals) return '';
@@ -48,7 +47,6 @@ export const getAllOptionalsMacos = (
       'agentName',
       'wazuhPassword',
       'sslVerification',
-      'managerCa',
     ];
 
   if (!optionals) return '';

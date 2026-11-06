@@ -158,4 +158,30 @@ describe('fetchCtiRegistrationStatus', () => {
 
     expect(mockHttpGet).toHaveBeenCalledTimes(2);
   });
+
+  it('reports the server message of a failed device-code poll', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    /* eslint-disable camelcase -- status API body uses snake_case */
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: true,
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      subscription: {
+        message: { plan: { name: '', is_public: true }, is_registered: false },
+        status: 200,
+      },
+    });
+    /* eslint-enable camelcase */
+    mockHttpPost.mockRejectedValue(
+      Object.assign(new Error('Bad Gateway'), {
+        body: { message: 'The CTI console is unreachable' },
+      }),
+    );
+
+    await expect(fetchCtiRegistrationStatus()).rejects.toMatchObject({
+      message: 'The CTI console is unreachable',
+    });
+  });
 });

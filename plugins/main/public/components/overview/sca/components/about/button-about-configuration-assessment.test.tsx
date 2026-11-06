@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
+import {
+  WAZUH_FINDINGS_PATTERN,
+  WAZUH_SCA_PATTERN,
+} from '../../../../../../common/constants';
 import { ButtonAboutConfigurationAssessment } from './button-about-configuration-assessment';
 
 jest.mock('../../../../../../common/services/web_documentation', () => ({
@@ -47,5 +51,24 @@ describe('ButtonAboutConfigurationAssessment', () => {
     );
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('lists the index patterns that each tab reads', () => {
+    render(<ButtonAboutConfigurationAssessment />);
+    fireEvent.click(
+      screen.getByRole('button', { name: 'About Configuration Assessment' }),
+    );
+
+    const getIndices = (id: string) =>
+      Array.from(
+        screen
+          .getByRole('dialog')
+          .querySelectorAll(`[data-test-subj$="Index-${id}"]`),
+      ).map(element => element.textContent);
+
+    expect(screen.getByRole('dialog')).toHaveTextContent('Indices');
+    expect(getIndices('dashboard')).toEqual([WAZUH_SCA_PATTERN]);
+    expect(getIndices('inventory')).toEqual([WAZUH_SCA_PATTERN]);
+    expect(getIndices('findings')).toEqual([WAZUH_FINDINGS_PATTERN]);
   });
 });

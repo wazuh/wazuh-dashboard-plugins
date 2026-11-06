@@ -15,6 +15,7 @@ import { updateWazuhNotReadyYet } from '../redux/actions/appStateActions';
 import { WzMisc } from '../factories/misc';
 import { CheckDaemonsStatus } from './check-daemons-status';
 import { i18n } from '@osd/i18n';
+import { isLoggingOut } from '../services/request-handler';
 
 interface IHistoryItem {
   text: string;
@@ -172,6 +173,10 @@ export class ErrorHandler {
 
     const origin = ((error || {}).config || {}).url || '';
     const originIsString = typeof origin === 'string' && origin.length;
+
+    if (isLoggingOut()) {
+      params.silent = true;
+    }
 
     const hasOrigin = messageIsString && originIsString;
 

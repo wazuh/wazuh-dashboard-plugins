@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { StatTile } from './stat-tile';
+import { HOME_OVERVIEW_TEXT_COLOR } from '../../lib/theme-colors';
 
 describe('StatTile', () => {
   it('renders the label before the value by default', () => {
@@ -15,6 +16,15 @@ describe('StatTile', () => {
       label.compareDocumentPosition(value) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(container).toBeInTheDocument();
+  });
+
+  // jsdom drops `var(...)` colors from inline styles, so read the prop EuiStat receives.
+  it('renders a neutral count in the primary text color by default', () => {
+    const tile = StatTile({
+      value: '42',
+      label: 'Passed',
+    }) as React.ReactElement;
+    expect(tile.props.titleColor).toBe(HOME_OVERVIEW_TEXT_COLOR.info);
   });
 
   it('renders the value before the label when reverse is set', () => {

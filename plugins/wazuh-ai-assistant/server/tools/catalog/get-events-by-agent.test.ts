@@ -86,9 +86,11 @@ test('clamps a non-positive limit up to the floor of 1', () => {
   assert.equal(req.body.size, 1);
 });
 
-test('sorts by @timestamp descending, most recent first', () => {
+test('sorts by @timestamp descending as date_nanos, most recent first', () => {
   const req = buildIndexer({});
-  assert.deepEqual(req.body.sort, [{ '@timestamp': { order: 'desc' } }]);
+  assert.deepEqual(req.body.sort, [
+    { '@timestamp': { order: 'desc', numeric_type: 'date_nanos' } },
+  ]);
 });
 
 test('spec: exposes agent_name as optional (not in the required list)', () => {
