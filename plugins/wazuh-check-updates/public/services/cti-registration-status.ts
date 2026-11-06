@@ -6,6 +6,7 @@ import {
   routes,
   statusCodes,
 } from '../../common/constants';
+import { getHttpErrorMessage } from '../../common/http-error';
 import type { CtiRegistrationStatusApiBody } from '../../common/cti-registration-status-api';
 import type { CtiDeviceAuthorization } from '../shared-components/cti-registration/types';
 import { ctiFlowState } from './cti-flow-state';
@@ -205,15 +206,13 @@ async function requestCtiRegistrationStatus(): Promise<CtiRegistrationStatusResu
   } catch (error: unknown) {
     console.error('Error fetching CTI registration status:', error);
     const e = error as {
-      body?: { message?: string; statusCode?: number };
+      body?: { statusCode?: number };
       statusCode?: number;
-      message?: string;
     };
     const statusCode =
       e.statusCode ?? e.body?.statusCode ?? statusCodes.NOT_FOUND;
     const message =
-      e.message ??
-      e.body?.message ??
+      getHttpErrorMessage(error) ??
       i18n.translate('wazuhCheckUpdates.ctiRegistration.statusRequestFailed', {
         defaultMessage: 'Registration status request failed',
       });

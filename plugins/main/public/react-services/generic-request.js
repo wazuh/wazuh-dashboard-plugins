@@ -14,7 +14,7 @@ import { ApiCheck } from './wz-api-check';
 import { WzMisc } from '../factories/misc';
 import { getHttp, getDataPlugin, getWazuhCorePlugin } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { request } from '../services/request-handler';
+import { request, isLoggingOut } from '../services/request-handler';
 import NavigationService from './navigation-service';
 import { AppState } from './app-state';
 import { i18n } from '@osd/i18n';
@@ -103,7 +103,7 @@ export class GenericRequest {
     } catch (err) {
       //if the requests fails, we need to check if the API is down
       const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
-      if (currentApi && currentApi.id) {
+      if (currentApi && currentApi.id && !isLoggingOut()) {
         try {
           await ApiCheck.checkStored(currentApi.id);
         } catch (err) {

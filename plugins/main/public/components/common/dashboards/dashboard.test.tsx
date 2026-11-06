@@ -3,6 +3,9 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import { createDashboard } from './dashboard';
+import { useReportingCommunicateSearchContext } from '../hooks/use-reporting-communicate-search-context';
+
+let mockDataSourceAction: { data?: unknown; error?: unknown };
 
 jest.mock('../hocs', () => {
   const { createElement } = jest.requireActual('react');
@@ -10,21 +13,24 @@ jest.mock('../hocs', () => {
     withErrorBoundary: Component => Component,
     withInjectProps: inject => Component => props =>
       createElement(Component, { ...props, ...inject }),
-    // Simulates a data source fetch without hits
+    // Simulates a data source fetch; each test sets its outcome
     withDataSourceFetchSearchBar: () => Component => props =>
       createElement(Component, {
         ...props,
         dataSource: {
           dataSource: {
             isLoading: false,
-            indexPattern: { timeFieldName: 'timestamp' },
+            indexPattern: {
+              title: 'wazuh-states-inventory-*',
+              timeFieldName: 'timestamp',
+            },
             getPinnedAgentFilter: () => [],
           },
           searchBarProps: {},
           fixedFilters: [],
           fetchFilters: [],
         },
-        dataSourceAction: { data: { hits: { total: 0 } } },
+        dataSourceAction: mockDataSourceAction,
       }),
   };
 });
@@ -55,6 +61,10 @@ const renderDashboard = (emptyState?: React.ReactNode) => {
 };
 
 describe('createDashboard', () => {
+  beforeEach(() => {
+    mockDataSourceAction = { data: { hits: { total: 0 } } };
+  });
+
   it('renders the default no results callout when there are no hits', () => {
     expect(renderDashboard()).toBeInTheDocument();
   });
@@ -62,5 +72,35 @@ describe('createDashboard', () => {
   it('renders the module empty state instead when it is given', () => {
     expect(renderDashboard(<div>No files yet</div>)).toBeNull();
     expect(screen.getByText('No files yet')).toBeInTheDocument();
+  });
+
+  it('renders a permission prompt naming the index pattern when the search is forbidden', () => {
+    mockDataSourceAction = {
+      data: null,
+      error: Object.assign(new Error('security_exception'), { status: 403 }),
+    };
+    expect(renderDashboard()).toBeNull();
+    expect(
+      screen.getByText("You don't have permission to view this data."),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/wazuh-states-inventory-\*/)).toBeInTheDocument();
+  });
+
+  it('surfaces any other search error instead of a blank page', () => {
+    mockDataSourceAction = { data: null, error: new Error('Gateway Timeout') };
+    renderDashboard();
+    expect(screen.getByText('Gateway Timeout')).toBeInTheDocument();
+  });
+
+  it('reports no results to the report button while a search error shows', () => {
+    // A failed refetch keeps the hits of the previous successful one
+    mockDataSourceAction = {
+      data: { hits: { total: 5 } },
+      error: Object.assign(new Error('security_exception'), { status: 403 }),
+    };
+    renderDashboard();
+    expect(useReportingCommunicateSearchContext).toHaveBeenLastCalledWith(
+      expect.objectContaining({ totalResults: 0 }),
+    );
   });
 });

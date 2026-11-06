@@ -23,7 +23,6 @@ beforeEach(() => {
       serverAddress: "WAZUH_MANAGER_ENDPOINT='1.1.1.1:1517/wazuh-manager/'",
       wazuhPassword: "WAZUH_REGISTRATION_PASSWORD='<CUSTOM_PASSWORD>'",
       sslVerification: "WAZUH_SSL_VERIFICATION='none'",
-      managerCa: "WAZUH_REGISTRATION_CA='/var/ossec/etc/manager-ca.pem'",
     },
     urlPackage: 'https://test.com/agent.deb',
     wazuhVersion: '4.8.0',
@@ -43,12 +42,9 @@ describe('getAllOptionals', () => {
       agentGroups: 'group1',
       agentName: 'agent1',
       sslVerification: 'sslVerification',
-      managerCa: 'managerCa',
     };
     const result = getAllOptionals(optionals, 'linux');
-    expect(result).toBe(
-      'localhost password group1 agent1 sslVerification managerCa ',
-    );
+    expect(result).toBe('localhost password group1 agent1 sslVerification ');
   });
 });
 
@@ -75,14 +71,13 @@ describe('getDEBAMD64InstallCommand', () => {
 describe('getDEBAMD64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent_${test.wazuhVersion}-beta2_amd64.deb`;
-    let expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} ${test.optionals.managerCa} dpkg -i ./${test.packageName}`;
+    let expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} dpkg -i ./${test.packageName}`;
     const withAllOptionals = getDEBAMD64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
-    delete test.optionals.managerCa;
 
     expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} dpkg -i ./${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
@@ -94,14 +89,13 @@ describe('getDEBAMD64InstallCommand', () => {
 describe('getDEBARM64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent_${test.wazuhVersion}-beta2_arm64.deb`;
-    let expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} ${test.optionals.managerCa} dpkg -i ./${test.packageName}`;
+    let expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} dpkg -i ./${test.packageName}`;
     const withAllOptionals = getDEBARM64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
-    delete test.optionals.managerCa;
 
     expected = `wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} dpkg -i ./${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
@@ -113,14 +107,13 @@ describe('getDEBARM64InstallCommand', () => {
 describe('getRPMAMD64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.x86_64.rpm`;
-    let expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} ${test.optionals.managerCa} rpm -ihv ${test.packageName}`;
+    let expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} rpm -ihv ${test.packageName}`;
     const withAllOptionals = getRPMAMD64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
-    delete test.optionals.managerCa;
 
     expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} rpm -ihv ${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
@@ -132,14 +125,13 @@ describe('getRPMAMD64InstallCommand', () => {
 describe('getRPMARM64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.aarch64.rpm`;
-    let expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} ${test.optionals.managerCa} rpm -ihv ${test.packageName}`;
+    let expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} rpm -ihv ${test.packageName}`;
     const withAllOptionals = getRPMARM64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
-    delete test.optionals.managerCa;
 
     expected = `curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} rpm -ihv ${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
@@ -163,7 +155,7 @@ describe('getLinuxStartCommand', () => {
 describe('getWindowsInstallCommand', () => {
   it('should return the correct install command', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.msi`;
-    let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} ${test.optionals.managerCa} `;
+    let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} `;
 
     const withAllOptionals = getWindowsInstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -171,7 +163,6 @@ describe('getWindowsInstallCommand', () => {
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
-    delete test.optionals.managerCa;
 
     expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.agentGroups} `;
     const withServerAddresAndAgentGroupsOptions =
@@ -206,11 +197,10 @@ describe('getAllOptionalsMacos', () => {
       agentName: 'agent1',
       wazuhPassword: 'password',
       sslVerification: 'sslVerification',
-      managerCa: 'managerCa',
     };
     const result = getAllOptionalsMacos(optionals);
     expect(result).toBe(
-      'localhost && group1 && agent1 && password && sslVerification && managerCa',
+      'localhost && group1 && agent1 && password && sslVerification',
     );
   });
 });
@@ -229,7 +219,7 @@ describe('transformOptionalsParamatersMacOSCommand', () => {
 describe('getMacOsInstallCommand', () => {
   it('should return the correct macOS installation script', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.intel64.pkg`;
-    let expected = `curl -so ${test.packageName} ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword} && ${test.optionals.sslVerification} && ${test.optionals.managerCa}\" > /tmp/wazuh_envs && sudo installer -pkg ./${test.packageName} -target /`;
+    let expected = `curl -so ${test.packageName} ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups} && ${test.optionals.agentName} && ${test.optionals.wazuhPassword} && ${test.optionals.sslVerification}\" > /tmp/wazuh_envs && sudo installer -pkg ./${test.packageName} -target /`;
 
     const withAllOptionals = getMacOsInstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -237,7 +227,6 @@ describe('getMacOsInstallCommand', () => {
     delete test.optionals.wazuhPassword;
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
-    delete test.optionals.managerCa;
     expected = `curl -so ${test.packageName} ${test.urlPackage} && echo "${test.optionals.serverAddress} && ${test.optionals.agentGroups}" > /tmp/wazuh_envs && sudo installer -pkg ./${test.packageName} -target /`;
 
     const withServerAddresAndAgentGroupsOptions = getMacOsInstallCommand(test);
@@ -256,23 +245,20 @@ describe('getMacosStartCommand', () => {
 
 // SSL verification
 
-/* The three states the wizard can produce. Verification is on by default and
+/* The two states the wizard can produce. Verification is on by default and
 the agent already verifies on its own, so that state contributes no token at
-all; only a CA path or the explicit opt-out reach the command. */
+all; only the explicit opt-out reaches the command. */
 describe('SSL verification states', () => {
   const serverAddress = "WAZUH_MANAGER_ENDPOINT='1.1.1.1:1517/wazuh-manager/'";
-  const managerCa = "WAZUH_REGISTRATION_CA='/var/ossec/etc/manager-ca.pem'";
   const sslVerificationOff = "WAZUH_SSL_VERIFICATION='none'";
 
   const states = {
-    'verification on without a CA': { serverAddress },
-    'verification on with a CA': { serverAddress, managerCa },
+    'verification on': { serverAddress },
     'verification off': { serverAddress, sslVerification: sslVerificationOff },
   };
 
   const expectedTail = {
-    'verification on without a CA': '',
-    'verification on with a CA': `${managerCa} `,
+    'verification on': '',
     'verification off': `${sslVerificationOff} `,
   };
 
@@ -335,8 +321,7 @@ describe('SSL verification states', () => {
   /* macOS joins the variables with && into /tmp/wazuh_envs instead of
   prefixing them to the installer call. */
   const expectedMacosEnvs = {
-    'verification on without a CA': serverAddress,
-    'verification on with a CA': `${serverAddress} && ${managerCa}`,
+    'verification on': serverAddress,
     'verification off': `${serverAddress} && ${sslVerificationOff}`,
   };
 
@@ -349,16 +334,5 @@ describe('SSL verification states', () => {
     expect(result).toEqual(
       `curl -so wazuh-agent-5.0.0.intel64.pkg https://example.com/package.pkg && echo "${expectedMacosEnvs[state]}" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent-5.0.0.intel64.pkg -target /`,
     );
-  });
-
-  it('keeps a CA path containing spaces inside its quotes', () => {
-    const windowsCa = "WAZUH_REGISTRATION_CA='C:\\Program Files\\ca.pem'";
-    const result = getWindowsInstallCommand({
-      optionals: { serverAddress, managerCa: windowsCa },
-      urlPackage: 'https://example.com/package.msi',
-      packageName: 'wazuh-agent-5.0.0.msi',
-      name: 'windows',
-    });
-    expect(result).toContain(windowsCa);
   });
 });

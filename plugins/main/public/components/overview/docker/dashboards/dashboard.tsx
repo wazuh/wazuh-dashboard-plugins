@@ -9,6 +9,7 @@ import {
   WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION,
 } from '../../../../../common/constants';
 import { createDashboard } from '../../../common/dashboards';
+import { DockerEmptyState } from '../components/empty-state';
 
 export const DashboardDocker = createDashboard({
   DataSource: DockerDataSource,
@@ -20,4 +21,5 @@ export const DashboardDocker = createDashboard({
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_THREAT_DETECTION],
+  emptyState: <DockerEmptyState />,
 });

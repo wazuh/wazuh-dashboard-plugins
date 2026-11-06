@@ -90,7 +90,7 @@ export const ModuleEnabledCheck = () => {
       <p>
         <FormattedMessage
           id='wazuh.vulnerabilityDetection.moduleEnabledCheck.callout.description'
-          defaultMessage='Vulnerabilies detection module is not enabled. You can learn to how to configure following the {documentationLink}.'
+          defaultMessage='Vulnerability detection module is not enabled. You can learn how to configure following the {documentationLink}.'
           values={{
             documentationLink: (
               <EuiLink

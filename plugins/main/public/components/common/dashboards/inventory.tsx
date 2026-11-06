@@ -14,6 +14,7 @@ import { CustomSearchBarProps } from '../custom-search-bar/custom-search-bar';
 import { withDataSourceInitiated, withDataSourceLoading } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../no-results/no-results';
+import { QueryErrorPrompt } from '../query-error';
 import { SampleDataWarning } from '../../visualize/components';
 import classnames from 'classnames';
 import { compose } from 'redux';
@@ -48,9 +49,11 @@ const InventoryDashboard = compose(
     categoriesSampleData,
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
+    emptyState,
   }: InventoryDashboardTableProps) => {
     const {
       results,
+      error: fetchError,
       dataGridProps,
       inspectedHit,
       removeInspectedHit,
@@ -72,7 +75,8 @@ const InventoryDashboard = compose(
 
     const dashboardFingerprint = (fingerprint ?? 0) + caseRefreshKey;
 
-    const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
+    const shouldHideDashboard =
+      Boolean(fetchError) || !Boolean(results?.hits?.total > 0);
 
     return (
       <>
@@ -85,12 +89,20 @@ const InventoryDashboard = compose(
           filterInputsProps={managedFiltersProps}
         />
 
-        {results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
+        {fetchError ? (
+          <QueryErrorPrompt
+            error={fetchError}
+            indexPatternTitle={dataSource?.indexPattern?.title}
+          />
+        ) : null}
+        {!fetchError && results?.hits?.total === 0
+          ? emptyState ?? <DiscoverNoResults />
+          : null}
 
         {categoriesSampleData && (
           <div
             className={classnames(classNameDashboardWrapper, {
-              'wz-no-display': !shouldHideDashboard,
+              'wz-no-display': Boolean(fetchError) || !shouldHideDashboard,
             })}
           >
             <SampleDataWarning categoriesSampleData={categoriesSampleData} />
@@ -136,7 +148,7 @@ const InventoryDashboard = compose(
             </>
           )}
         </div>
-        {results?.hits?.total > 0 && (
+        {!fetchError && results?.hits?.total > 0 && (
           <IntlProvider locale='en'>
             <>
               <EuiPageTemplate
@@ -190,6 +202,8 @@ export interface InventoryDashboardTableProps {
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
+  /** Rendered instead of the default no results prompt when the search has no hits. */
+  emptyState?: React.ReactNode;
 }
 
 export const InventoryDashboardTable = ({
@@ -203,6 +217,7 @@ export const InventoryDashboardTable = ({
   tableId,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
+  emptyState,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -250,6 +265,7 @@ export const InventoryDashboardTable = ({
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}
+      emptyState={emptyState}
     />
   );
 };

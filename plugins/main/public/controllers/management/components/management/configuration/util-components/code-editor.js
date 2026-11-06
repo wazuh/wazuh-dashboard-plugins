@@ -41,6 +41,7 @@ class WzCodeEditor extends Component {
       height,
       minusHeight,
       setOptions,
+      annotations,
     } = this.props;
     return (
       <Fragment>
@@ -68,8 +69,13 @@ class WzCodeEditor extends Component {
                 fontSize: '14px',
                 enableSnippets: true,
                 behavioursEnabled: false,
+                // The callers validate the content on the main thread: the
+                // editor worker is not needed and cannot be loaded on every
+                // platform.
+                useWorker: false,
               }
             }
+            annotations={annotations}
             aria-label={i18n.translate(
               'wazuh.configuration.codeEditor.ariaLabel',
               { defaultMessage: 'Code Editor' },
@@ -87,6 +93,14 @@ WzCodeEditor.propTypes = {
   value: PropTypes.string,
   height: PropTypes.string,
   minusHeight: PropTypes.number,
+  annotations: PropTypes.arrayOf(
+    PropTypes.shape({
+      row: PropTypes.number,
+      column: PropTypes.number,
+      type: PropTypes.string,
+      text: PropTypes.string,
+    }),
+  ),
 };
 
 export default WzCodeEditor;

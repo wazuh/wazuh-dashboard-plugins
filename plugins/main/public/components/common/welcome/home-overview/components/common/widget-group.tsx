@@ -11,7 +11,7 @@ import {
   EuiEmptyPrompt,
 } from '@elastic/eui';
 import { DataGroupStatus } from '../../interfaces/data-group';
-import { VALUE_PLACEHOLDER } from '../../lib/constants';
+import { NON_TITLE_LINK_STYLE, VALUE_PLACEHOLDER } from '../../lib/constants';
 import { ErrorValuePlaceholder } from './tab-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -62,6 +62,7 @@ const MANAGE_INDEX_PATTERNS_PATH = '/opensearch-dashboards/indexPatterns';
 const ManageIndexPatternsLink: React.FC = () => (
   <RedirectAppLinks application={getCore().application}>
     <EuiLink
+      style={NON_TITLE_LINK_STYLE}
       href={getCore().application.getUrlForApp('management', {
         path: MANAGE_INDEX_PATTERNS_PATH,
       })}

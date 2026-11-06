@@ -31,19 +31,23 @@ you to create/open/submit it.
 
 Detect the source repo from the issue URL:
 
-- **Internal** — the URL/repo contains `internal-devel-request` (e.g.
-  `https://github.com/wazuh/internal-devel-requests/issues/5526`):
+- **Internal** — the URL is under `github.com/$WZSS_INTERNAL_ISSUES_REPO/`, the
+  internal requests repository:
   - PR `## Description`: **do not reference the issue** — never expose the
     internal link.
-  - CHANGELOG: **no entry** for internal-devel-requests issues.
+  - CHANGELOG: **no entry** for internal issues.
 - **Public** — any other repo (e.g.
   `https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760`):
   - PR `## Description`: `Closes #<n>` (same repo) or `Closes <issue-url>`
     (another public repo).
   - CHANGELOG: add an entry linking to the **issue** (see step 4).
 
-> **repo-specific:** the internal repo is `wazuh/internal-devel-requests`; match
-> it by the substring `internal-devel-request` in the URL.
+> The internal repository is never named in this repo. Read
+> `WZSS_INTERNAL_ISSUES_REPO` from the local env file (see the `setup-local-secrets`
+> skill, section 5) in the same command that checks the URL. If it is not set, or the
+> issue lives in a repo that is neither this one nor clearly public, **ask the user
+> whether the issue is internal** and offer to run `setup-local-secrets`. Never expose
+> an issue link on a guess.
 
 ## Workflow
 
@@ -103,7 +107,7 @@ the PR.**
 
 **Skip the entry entirely when:**
 
-- The issue is from **internal-devel-requests** (internal request → no changelog).
+- The issue is **internal** (internal request → no changelog).
 - The PR is internal-tooling / docs-only / test-only / dependency-bump with no
   user-facing impact — add the **`no-changelog`** label to the PR instead.
 
@@ -117,8 +121,8 @@ sections here.
 
 Fill each section with real content; check the boxes that genuinely apply. In
 `## Description`: public issue → closing keyword (`Closes`, `Fixes`, `Fix`)
-with `#<n>` or the full issue URL; **internal-devel-requests issue → do not
-reference the issue at all** (see "Issue source" above). UI changes require
+with `#<n>` or the full issue URL; **internal issue → do not reference the
+issue at all** (see "Issue source" above). UI changes require
 evidence under `### Results and Evidence`.
 
 > That closing keyword is not just prose — it is what creates the actual
@@ -129,7 +133,7 @@ evidence under `### Results and Evidence`.
 > `ConnectedEvent`, and the PR's `closingIssuesReferences` listed the issue —
 > both immediately on open, and independent of the PR's base branch (this
 > repo's PRs target version branches like `5.0.0`, not the default branch,
-> and the link still forms). Internal-devel-requests issues intentionally get
+> and the link still forms). Internal issues intentionally get
 > no link this way, since no issue reference is exposed in their PR body at
 > all — that is the expected privacy trade-off, not a gap to fix.
 >
@@ -153,7 +157,7 @@ PR pre-flight
 - Suggested base: <version-branch>   (confirm before creating)
 - Commits DCO-signed: yes / no (missing: <hashes>)
 - check-standards: PASS / FAIL (<summary>)
-- Issue source: public (<url>) / internal-devel-requests (link withheld)
+- Issue source: public (<url>) / internal (link withheld)
 - CHANGELOG: entry added (links to issue) / not needed (internal / `no-changelog`)
 - UI change: yes → evidence attached? / no
 - Assignee: <user> (via --assignee @me)
