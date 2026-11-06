@@ -11,6 +11,7 @@
  */
 import React, { Component } from 'react';
 import { i18n } from '@osd/i18n';
+import { EuiConfirmModal, EuiOverlayMask } from '@elastic/eui';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
@@ -19,6 +20,8 @@ import { updateGroupDetail } from '../../../../../redux/actions/groupsActions';
 import {
   updateShowAddAgents,
   resetGroup,
+  cleanFileContent,
+  updateShowDiscardChangesModal,
 } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -35,7 +38,7 @@ import { endpointGroups } from '../../../../../utils/applications';
 import { ManageAgents } from '../../../../../components/management/groups/manage-agents';
 import NavigationService from '../../../../../react-services/navigation-service';
 
-class WzGroups extends Component {
+export class WzGroups extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -77,9 +80,13 @@ class WzGroups extends Component {
 
   async componentDidUpdate(prevProps) {
     if (this.props.search?.group !== prevProps.search?.group) {
-      this.props.search?.group === undefined
-        ? this.props.updateGroupDetail(false)
-        : await this.getGroupDetail();
+      if (this.props.search?.group === undefined) {
+        // Leaving the group also closes the file editor opened from it
+        this.props.cleanFileContent();
+        this.props.updateGroupDetail(false);
+      } else {
+        await this.getGroupDetail();
+      }
     }
   }
 
@@ -93,10 +100,50 @@ class WzGroups extends Component {
     this.props.resetGroup();
   }
 
+  closeDiscardModal = () => this.props.updateShowDiscardChangesModal(false);
+
+  confirmDiscard = () => {
+    this.closeDiscardModal();
+    NavigationService.getInstance().updateAndNavigateSearchParams({
+      group: null,
+    });
+  };
+
   render() {
-    const { itemDetail, showAddAgents, fileContent } = this.props.state;
+    const { itemDetail, showAddAgents, fileContent, showDiscardChangesModal } =
+      this.props.state;
     return (
       <>
+        {showDiscardChangesModal && (
+          <EuiOverlayMask>
+            <EuiConfirmModal
+              title={i18n.translate(
+                'wazuh.endpointGroups.editor.unsavedChangesModalTitle',
+                { defaultMessage: 'Unsubmitted changes' },
+              )}
+              onConfirm={this.confirmDiscard}
+              onCancel={this.closeDiscardModal}
+              cancelButtonText={i18n.translate(
+                'wazuh.endpointGroups.editor.unsavedChangesModalCancel',
+                { defaultMessage: "No, don't do it" },
+              )}
+              confirmButtonText={i18n.translate(
+                'wazuh.endpointGroups.editor.unsavedChangesModalConfirm',
+                { defaultMessage: 'Yes, do it' },
+              )}
+            >
+              <p style={{ textAlign: 'center' }}>
+                {i18n.translate(
+                  'wazuh.endpointGroups.editor.unsavedChangesModalBody',
+                  {
+                    defaultMessage:
+                      'There are unsaved changes. Are you sure you want to proceed?',
+                  },
+                )}
+              </p>
+            </EuiConfirmModal>
+          </EuiOverlayMask>
+        )}
         {!showAddAgents &&
           ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
             (fileContent && <WzGroupEditor />) || <WzGroupsOverview />)}
@@ -118,6 +165,9 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     resetGroup: () => dispatch(resetGroup()),
+    cleanFileContent: () => dispatch(cleanFileContent()),
+    updateShowDiscardChangesModal: show =>
+      dispatch(updateShowDiscardChangesModal(show)),
     updateShowAddAgents: showAddAgents =>
       dispatch(updateShowAddAgents(showAddAgents)),
     updateGroupDetail: groupDetail => dispatch(updateGroupDetail(groupDetail)),
@@ -132,6 +182,11 @@ export default compose(
             text: endpointGroups.breadcrumbLabel,
             onClick: ev => {
               ev.preventDefault();
+              // Leaving the group would silently drop the unsaved editor changes
+              if (props.state?.fileEditorHasChanges) {
+                props.updateShowDiscardChangesModal(true);
+                return;
+              }
               NavigationService.getInstance().updateAndNavigateSearchParams({
                 group: null,
               });

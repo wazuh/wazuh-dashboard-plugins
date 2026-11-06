@@ -28,11 +28,21 @@ function fakeContext(
   } as unknown as CtiContext;
 }
 
-test('get_cti_status: default body is match_all against .wazuh-cti-consumers', () => {
+const ALL_FEEDS_QUERY = {
+  bool: { must_not: [{ ids: { values: ['cti:catalog:global'] } }] },
+};
+
+test('get_cti_status: default body reads every feed of .wazuh-cti-consumers, not the global doc', () => {
   const request = build({});
   assert.equal(request.index, '.wazuh-cti-consumers');
-  assert.deepEqual(request.body.query, { match_all: {} });
+  assert.deepEqual(request.body.query, ALL_FEEDS_QUERY);
   assert.equal(request.body.size, 10);
+});
+
+test('get_cti_status: reads the last update and the pending sync steps of each feed', () => {
+  const source = build({}).body._source as string[];
+  assert.ok(source.includes('updated_at'));
+  assert.ok(source.includes('pending_sync_phases'));
 });
 
 test('get_cti_status: feed filter resolves to an ids query on the stable per-feed doc id', () => {
@@ -42,9 +52,9 @@ test('get_cti_status: feed filter resolves to an ids query on the stable per-fee
   });
 });
 
-test('get_cti_status: an unrecognized feed value is ignored (match_all, no throw)', () => {
+test('get_cti_status: an unrecognized feed value is ignored (every feed, no throw)', () => {
   const request = build({ feed: 'not-a-real-feed' });
-  assert.deepEqual(request.body.query, { match_all: {} });
+  assert.deepEqual(request.body.query, ALL_FEEDS_QUERY);
 });
 
 // Default body must pass the same guardrail chain the real escape-hatch path already
@@ -122,5 +132,60 @@ test('get_cti_status: resolveParams degrades honestly when the schedule lookup f
   assert.equal(result.ok, true);
   if (result.ok) {
     assert.match(result.resolved.note ?? '', /could not be checked/);
+  }
+});
+
+test('get_cti_status: resolveParams adds the last check for updates from the global doc', async () => {
+  const search = jest.fn((req: { index: string }) =>
+    Promise.resolve({
+      body: {
+        hits: {
+          hits:
+            req.index === '.wazuh-cti-consumers'
+              ? [
+                  {
+                    _source: { last_checked_at: '2026-05-21T12:26:16.581939Z' },
+                  },
+                ]
+              : [],
+        },
+      },
+    }),
+  );
+  const result = await getCtiStatusTool.resolveParams!(
+    {},
+    fakeContext(search as unknown as (req: unknown) => Promise<unknown>),
+    {} as unknown as CtiRequest,
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.match(
+      result.resolved.note ?? '',
+      /Last check for updates: 2026-05-21T12:26:16\.581939Z\./,
+    );
+  }
+  expect(search).toHaveBeenCalledWith(
+    expect.objectContaining({
+      index: '.wazuh-cti-consumers',
+      body: expect.objectContaining({
+        query: { ids: { values: ['cti:catalog:global'] } },
+      }),
+    }),
+  );
+});
+
+test('get_cti_status: resolveParams says when the indexer does not report the last check', async () => {
+  const search = jest.fn().mockResolvedValue({ body: { hits: { hits: [] } } });
+  const result = await getCtiStatusTool.resolveParams!(
+    {},
+    fakeContext(search),
+    {} as unknown as CtiRequest,
+  );
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.match(
+      result.resolved.note ?? '',
+      /Last check for updates: not reported by this indexer\./,
+    );
   }
 });

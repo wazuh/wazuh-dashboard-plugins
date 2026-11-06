@@ -45,11 +45,11 @@ jest.mock('../../common/permissions/button', () => ({
 }));
 
 describe('Policies', () => {
-  it('shows a description clarifying these policies belong to the Wazuh manager API', () => {
+  it('shows a description clarifying these policies belong to the Wazuh API', () => {
     render(<Policies />);
 
     expect(
-      screen.getByText(/Manage the policies of the manager API/),
+      screen.getByText(/Manage the policies of the Wazuh API/),
     ).toBeTruthy();
   });
 });

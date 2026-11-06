@@ -13,6 +13,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { statusCodes } from '../../../common/constants';
+import type { CtiSubscriptionPlan } from '../../../common/cti-registration-status-api';
 import { ctiFlowState } from '../../services/cti-flow-state';
 import { ISubscriptionResponse } from '../../services/types';
 
@@ -26,8 +27,11 @@ interface SubscriptionView {
   title: string;
   status: string;
   description: string;
-  action: string;
+  /** Opens the registration flow; a registered environment has none. */
+  action?: string;
   fillAction: boolean;
+  /** Open versus Professional, for environments that do not have the latter. */
+  showFeedTiers: boolean;
 }
 
 export function getSubscriptionState(
@@ -50,35 +54,47 @@ const OPEN_FEED_TITLE = i18n.translate(
 
 function getSubscriptionView(
   state: SubscriptionState,
-  planName: string | undefined,
+  plan: CtiSubscriptionPlan | undefined,
 ): SubscriptionView {
   switch (state) {
     case 'registered':
       return {
         tone: 'success',
         iconType: 'checkInCircleFilled',
-        title:
-          planName ||
-          i18n.translate(
-            'wazuhCheckUpdates.ctiFeed.subscription.registeredTitle',
-            { defaultMessage: 'Wazuh CTI subscription' },
-          ),
+        title: plan?.name
+          ? i18n.translate(
+              'wazuhCheckUpdates.ctiFeed.subscription.registeredPlanTitle',
+              {
+                defaultMessage: '{planName} feed',
+                values: { planName: plan.name },
+              },
+            )
+          : i18n.translate(
+              'wazuhCheckUpdates.ctiFeed.subscription.registeredTitle',
+              { defaultMessage: 'Wazuh CTI subscription' },
+            ),
         status: i18n.translate(
           'wazuhCheckUpdates.ctiFeed.subscription.registeredStatus',
           { defaultMessage: 'Registered' },
         ),
-        description: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.registeredDescription',
-          {
-            defaultMessage:
-              'This environment is registered with Wazuh Cyber Threat Intelligence. Manage the subscription and upgrade the plan from the Wazuh Console.',
-          },
-        ),
-        action: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.registeredAction',
-          { defaultMessage: 'View registration' },
-        ),
+        // A public plan is the Open feed: suggest upgrading to the Professional one.
+        description: plan?.is_public
+          ? i18n.translate(
+              'wazuhCheckUpdates.ctiFeed.subscription.registeredOpenDescription',
+              {
+                defaultMessage:
+                  'This environment is registered with Wazuh Cyber Threat Intelligence and receives the Open feed. Upgrade it to the Professional feed from the Wazuh Console to get vulnerabilities, IOCs and rules with no delay.',
+              },
+            )
+          : i18n.translate(
+              'wazuhCheckUpdates.ctiFeed.subscription.registeredDescription',
+              {
+                defaultMessage:
+                  'This environment is registered with Wazuh Cyber Threat Intelligence. Manage the subscription and upgrade the plan from the Wazuh Console.',
+              },
+            ),
         fillAction: false,
+        showFeedTiers: Boolean(plan?.is_public),
       };
     case 'pending':
       return {
@@ -104,6 +120,7 @@ function getSubscriptionView(
           { defaultMessage: 'View activation details' },
         ),
         fillAction: true,
+        showFeedTiers: false,
       };
     case 'failed':
       return {
@@ -126,6 +143,7 @@ function getSubscriptionView(
           { defaultMessage: 'View details' },
         ),
         fillAction: true,
+        showFeedTiers: false,
       };
     default:
       return {
@@ -148,6 +166,7 @@ function getSubscriptionView(
           { defaultMessage: 'Register' },
         ),
         fillAction: true,
+        showFeedTiers: true,
       };
   }
 }
@@ -180,7 +199,7 @@ const FeedTier: React.FC<{
   </EuiFlexGroup>
 );
 
-/** Open versus Professional, so the paid tier is visible before registering. */
+/** Open versus Professional, so the paid tier is visible to those without it. */
 const FeedTiers: React.FC = () => (
   <EuiFlexGroup
     direction='column'
@@ -215,8 +234,7 @@ const FeedTiers: React.FC = () => (
         description={i18n.translate(
           'wazuhCheckUpdates.ctiFeed.subscription.tiers.proDescription',
           {
-            defaultMessage:
-              'Vulnerabilities, IOCs and rules delivered with no delay.',
+            defaultMessage: 'Vulnerabilities, IOCs and rules delivered faster.',
           },
         )}
       />
@@ -240,7 +258,7 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
   const state = getSubscriptionState(statusCTI, deviceFlowActive);
   const view = getSubscriptionView(
     state,
-    ctiFlowState.getSubscription()?.message?.plan?.name,
+    ctiFlowState.getSubscription()?.message?.plan,
   );
 
   return (
@@ -289,21 +307,25 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
           <EuiText size='s' color='subdued'>
             <p>{view.description}</p>
           </EuiText>
-          {state === 'notRegistered' ? (
+          {view.showFeedTiers ? (
             <>
               <EuiSpacer size='m' />
               <FeedTiers />
             </>
           ) : null}
-          <EuiSpacer size='l' />
-          <EuiButton
-            fill={view.fillAction}
-            onClick={onOpenRegistration}
-            iconType={state === 'notRegistered' ? 'globe' : undefined}
-            data-test-subj='ctiFeedSubscriptionAction'
-          >
-            {view.action}
-          </EuiButton>
+          {view.action ? (
+            <>
+              <EuiSpacer size='l' />
+              <EuiButton
+                fill={view.fillAction}
+                onClick={onOpenRegistration}
+                iconType={state === 'notRegistered' ? 'globe' : undefined}
+                data-test-subj='ctiFeedSubscriptionAction'
+              >
+                {view.action}
+              </EuiButton>
+            </>
+          ) : null}
         </>
       )}
     </EuiPanel>

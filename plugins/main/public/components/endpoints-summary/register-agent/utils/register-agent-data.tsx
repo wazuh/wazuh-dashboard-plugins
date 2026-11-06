@@ -55,7 +55,14 @@ export const OPTIONAL_PARAMETERS_TEXT = [
       'wazuh.endpointsSummary.optionalSettingsStep.subtitle',
       {
         defaultMessage:
-          'The agent verifies the manager certificate by default, against the endpoint system CA store or against a manager CA file given below. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
+          'The agent verifies the manager certificate only against a manager CA placed on the endpoint by hand. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
+      },
+    ),
+    subtitleEnrollmentToken: i18n.translate(
+      'wazuh.endpointsSummary.optionalSettingsStep.subtitleEnrollmentToken',
+      {
+        defaultMessage:
+          'The agent verifies the manager certificate by default, against the manager CA it fetches on first start and checks with the enrollment token. The deployment also uses the hostname as the agent name. Optionally, you can turn the verification off and use a different agent name in the fields below.',
       },
     ),
   },
@@ -70,7 +77,7 @@ export const ENROLLMENT_TOKEN_TEXTS = [
       'wazuh.endpointsSummary.enrollmentTokenStep.subtitle',
       {
         defaultMessage:
-          'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the server defaults, a 30 day lifetime and unlimited enrollments, open the advanced options to set those values yourself, or reuse a token kept from an earlier deployment.',
+          'The agent enrolls with a token that names this manager and pins its certificate authority. Generate one with the default 1 day lifetime, open the advanced options to set the lifetime and the number of enrollments yourself, or reuse a token kept from an earlier deployment.',
       },
     ),
   },

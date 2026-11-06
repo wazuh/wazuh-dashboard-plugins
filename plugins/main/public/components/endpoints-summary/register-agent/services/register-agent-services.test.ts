@@ -89,70 +89,6 @@ describe('parseRegisterAgentFormValues', () => {
     );
     expect(result.optionalParams.sslVerification).toBe(false);
   });
-
-  it('forwards the manager CA path', () => {
-    const result = RegisterAgentService.parseRegisterAgentFormValues(
-      [
-        ...formValues,
-        { name: 'sslVerification', value: true },
-        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
-      ],
-      osOptions,
-    );
-    expect(result.optionalParams.sslVerification).toBe(true);
-    expect(result.optionalParams.managerCa).toBe(
-      '/var/ossec/etc/manager-ca.pem',
-    );
-  });
-});
-
-describe('parseRegisterAgentFormValues - CA and verification interaction', () => {
-  const osOptions = [
-    {
-      icon: '',
-      title: 'LINUX',
-      hr: true,
-      architecture: ['DEB amd64'],
-    },
-  ] as any;
-
-  const baseValues = [
-    { name: 'operatingSystemSelection', value: 'DEB amd64' },
-    { name: 'serverAddress', value: '1.1.1.1' },
-    { name: 'serverPort', value: '' },
-    { name: 'serverPath', value: '' },
-    { name: 'agentName', value: '' },
-    { name: 'agentGroups', value: [] },
-  ] as any;
-
-  /* Otherwise turning the switch off after typing a path would emit both
-  WAZUH_SSL_VERIFICATION='none' and the CA, a command that supplies a CA and
-  then refuses to use it. */
-  it('drops the CA when verification is disabled', () => {
-    const result = RegisterAgentService.parseRegisterAgentFormValues(
-      [
-        ...baseValues,
-        { name: 'sslVerification', value: false },
-        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
-      ],
-      osOptions,
-    );
-    expect(result.optionalParams.managerCa).toBe('');
-  });
-
-  it('keeps the CA when verification is enabled', () => {
-    const result = RegisterAgentService.parseRegisterAgentFormValues(
-      [
-        ...baseValues,
-        { name: 'sslVerification', value: true },
-        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
-      ],
-      osOptions,
-    );
-    expect(result.optionalParams.managerCa).toBe(
-      '/var/ossec/etc/manager-ca.pem',
-    );
-  });
 });
 
 describe('parseRegisterAgentFormValues - enrollment token interaction', () => {
@@ -184,7 +120,6 @@ describe('parseRegisterAgentFormValues - enrollment token interaction', () => {
         agentName: '',
         agentGroups: '',
         sslVerification: true,
-        managerCa: '',
       },
     } as any);
 
@@ -220,39 +155,14 @@ describe('parseRegisterAgentFormValues - enrollment token interaction', () => {
     expect(result.optionalParams.wazuhPassword).toBe('');
   });
 
-  /* A token carries a pin, not the CA itself, so the agent still has to be
-  told which CA to check the manager against -- the token settles nothing about
-  TLS and neither field is dropped beside one. */
-  it('keeps the CA beside a token', () => {
+  it('keeps verification turned off beside a token', () => {
     const result = RegisterAgentService.parseRegisterAgentFormValues(
-      [
-        ...baseValues,
-        { name: 'sslVerification', value: true },
-        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
-      ],
-      osOptions,
-      initialValuesWithToken(),
-    );
-
-    expect(result.optionalParams.sslVerification).toBe(true);
-    expect(result.optionalParams.managerCa).toBe(
-      '/var/ossec/etc/manager-ca.pem',
-    );
-  });
-
-  it('keeps verification turned off beside a token, without the CA', () => {
-    const result = RegisterAgentService.parseRegisterAgentFormValues(
-      [
-        ...baseValues,
-        { name: 'sslVerification', value: false },
-        { name: 'managerCa', value: '/var/ossec/etc/manager-ca.pem' },
-      ],
+      [...baseValues, { name: 'sslVerification', value: false }],
       osOptions,
       initialValuesWithToken(),
     );
 
     expect(result.optionalParams.sslVerification).toBe(false);
-    expect(result.optionalParams.managerCa).toBe('');
   });
 
   it('keeps composing the endpoint when no token is in use', () => {

@@ -7,6 +7,7 @@ import {
   EuiSpacer,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { Markdown } from '../../../common/util';
 
 type MitreCategory = { id?: string[]; name?: string[] };
 
@@ -88,7 +89,9 @@ export const CheckDetails: React.FC<CheckDetailsProps> = ({ check }) => {
         </EuiTitle>
         <EuiSpacer size='s' />
         <EuiText>
-          <p>{check.remediation}</p>
+          {check.remediation ? (
+            <Markdown markdown={check.remediation} copyableCodeBlocks />
+          ) : null}
         </EuiText>
       </EuiFlexItem>
 

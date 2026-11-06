@@ -96,6 +96,25 @@ describe('RemoveAgentsModal component', () => {
     expect(getByText('Apply agents removal')).toBeInTheDocument();
   });
 
+  test('should warn that running agents cannot connect after removal', () => {
+    const { getByText, queryByText } = render(
+      <RemoveAgentsModal
+        selectedAgents={[{ id: '001', name: 'agent1' } as Agent]}
+        allAgentsSelected={false}
+        filters={{}}
+        onClose={() => {}}
+        reloadAgents={() => {}}
+      />,
+    );
+
+    expect(
+      getByText(
+        "Any selected agent that is still running can't connect after it is removed. To connect it again, enroll it with a new token.",
+      ),
+    ).toBeInTheDocument();
+    expect(queryByText(/auto-enrollment/)).not.toBeInTheDocument();
+  });
+
   describe('pinned agent', () => {
     const mockRemoveAgentsService = removeAgentsService as jest.Mock;
 

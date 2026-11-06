@@ -20,10 +20,13 @@
   --wz-ho-info: #{$ouiColorPrimary};
   --wz-ho-disabled: #{$ouiColorDarkShade};
   --wz-ho-failed: #{$ouiColorDanger};
-
-  /* Matches EuiLink's `color="text"` exactly, so EuiStat tiles without an explicit
-     status color (StatTile's default) read the same as the linked KPI numbers next to them. */
-  --wz-ho-text: #{$ouiTextColor};
+  /* The lightest gray that still reaches 3:1 against the panel (enough for large KPI values),
+     derived from the medium shade so it follows the theme. */
+  --wz-ho-subdued: #{makeHighContrastColor(
+      $ouiColorMediumShade,
+      $ouiColorEmptyShade,
+      3
+    )};
 
   --wz-ho-success-text: #{$ouiColorSuccessText};
   --wz-ho-danger-text: #{$ouiColorDangerText};

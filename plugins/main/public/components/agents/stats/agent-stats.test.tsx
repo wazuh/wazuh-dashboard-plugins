@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, act, RenderResult } from '@testing-library/react';
+import { render, act, fireEvent, RenderResult } from '@testing-library/react';
 import { AgentStats } from './agent-stats';
 import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import { CSS } from '../../../../test/utils/CSS';
@@ -251,6 +251,73 @@ describe('AgentStats', () => {
       ),
     ).toHaveLength(0);
     expect(container.textContent).toContain('No statistics reported');
+  });
+
+  it('should name the stats_report option and link to its reference in the empty state', async () => {
+    fetchDataMock.mockResolvedValue(noDocumentResponse);
+
+    const { container } = await renderAndSettle({ id: agent002 });
+
+    expect(container.textContent).toContain('<agent><stats_report>');
+    expect(
+      container
+        .querySelector(queryDataTestAttr('agent-stats-stats-report-docs'))
+        ?.getAttribute('href'),
+    ).toContain('user-manual/reference/ossec-conf/agent.html#stats-report');
+  });
+
+  it('should fetch the statistics again when Refresh is clicked in the empty state', async () => {
+    fetchDataMock.mockResolvedValue(noDocumentResponse);
+
+    const { container } = await renderAndSettle({ id: agent002 });
+    expect(fetchDataMock).toHaveBeenCalledTimes(1);
+
+    fetchDataMock.mockResolvedValue(
+      statisticsResponse({ agent: { status: 'connected' } }),
+    );
+    await act(() =>
+      Promise.resolve(
+        fireEvent.click(
+          container.querySelector(queryDataTestAttr('agent-stats-refresh'))!,
+        ),
+      ),
+    );
+    await act(() =>
+      Promise.resolve(jest.advanceTimersByTime(MIN_LOADING_DURATION_MS)),
+    );
+
+    expect(fetchDataMock).toHaveBeenCalledTimes(2);
+    expect(
+      container.querySelector(queryDataTestAttr('ribbon-item-status'))
+        ?.textContent,
+    ).toContain('connected');
+  });
+
+  it('should ignore a stale fetch that resolves after the agent changed', async () => {
+    let resolveStale: (value: unknown) => void = () => undefined;
+    fetchDataMock.mockReturnValueOnce(
+      new Promise(resolve => {
+        resolveStale = resolve;
+      }),
+    );
+    const { container, rerender } = render(
+      <AgentStats agent={{ id: agent001 }} />,
+    );
+
+    fetchDataMock.mockResolvedValue(
+      statisticsResponse({ agent: { status: 'connected' } }),
+    );
+    await rerenderAndSettle(rerender, { id: agent002 });
+    await act(() => Promise.resolve(resolveStale(noDocumentResponse)));
+    await act(() =>
+      Promise.resolve(jest.advanceTimersByTime(MIN_LOADING_DURATION_MS)),
+    );
+
+    expect(container.querySelector('.euiProgress')).toBeFalsy();
+    expect(
+      container.querySelector(queryDataTestAttr('ribbon-item-status'))
+        ?.textContent,
+    ).toContain('connected');
   });
 
   it('should render - in the stats without value', async () => {

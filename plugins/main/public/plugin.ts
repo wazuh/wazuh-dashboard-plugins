@@ -53,7 +53,9 @@ import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 import { registerWazuhNavLinks } from './utils/nav-groups';
 import _ from 'lodash';
 import { registerPanelInfoActions } from './components/common/dashboards/panel-info/panel-info-actions';
-import { scaPanelInfos } from './components/overview/sca/utils/result-definitions';
+import { panelInfos } from './components/common/dashboards/panel-info/panel-infos';
+import { setAppHelpExtension } from './utils/help-extension';
+import { registerHealthCheckDescriptions } from './utils/health-check-descriptions';
 
 export class WazuhPlugin
   implements
@@ -70,6 +72,8 @@ export class WazuhPlugin
     // Store Wazuh build info from the dashboard's injected metadata so that
     // public modules can access the release stage and revision at runtime.
     initWazuhBuildInfoFromCore(core.injectedMetadata);
+
+    registerHealthCheckDescriptions(core.healthCheck);
 
     // Get custom logos configuration to start up the app with the correct logos
 
@@ -127,7 +131,7 @@ export class WazuhPlugin
       _.merge(this._mapping, _.zipObject(keysToMap, colorPalette));
     };
 
-    registerPanelInfoActions(plugins.uiActions, scaPanelInfos);
+    registerPanelInfoActions(plugins.uiActions, panelInfos);
 
     // Register the supported languages for the query bar, including Wazuh
     // applications IDs to enable the use of Saved queries in our search bar
@@ -157,6 +161,8 @@ export class WazuhPlugin
             if (getAppTabTitle(app) !== title) {
               getCore().chrome.docTitle.change(getAppTabTitle(app));
             }
+            // Link the app documentation from the Help menu for apps with a `docsUrl`
+            setAppHelpExtension(getCore().chrome, app);
             // Set the dynamic redirection
             setWzMainParams(redirectTo());
             initializeInterceptor(core);

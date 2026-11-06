@@ -84,29 +84,37 @@ The module also shows read-only metadata that the server sets: the **User** who 
 
 The **Status** field records the stage of the case. A case has one of these values:
 
-| Status           | Meaning                                                             |
-| ---------------- | ------------------------------------------------------------------- |
-| **Active**       | The case is open and under review.                                  |
-| **Acknowledged** | An analyst has confirmed the case and works on it.                  |
-| **Completed**    | The work on the case is done.                                       |
-| **Audit**        | The case is kept for review or for a compliance record.             |
-| **Error**        | The case is marked as a mistake, for example a false positive.      |
-| **Deleted**      | The case is marked as removed but the record stays for the history. |
+| Status           | Meaning                                            |
+| ---------------- | -------------------------------------------------- |
+| **Active**       | Open. No one is working on it yet.                 |
+| **Acknowledged** | Open. Someone is working on it.                    |
+| **Completed**    | Closed. No more work needed.                       |
+| **Audit**        | Kept for review or compliance.                     |
+| **Error**        | Marked as a mistake, for example a false positive. |
+| **Deleted**      | Marked as removed. Kept for history.               |
 
 A typical case moves from **Active** to **Acknowledged**, and then to **Completed**. The module
 does not force a fixed order, so you can set any status that fits your process.
+
+The **Status** list shows the meaning under each value. In read mode, point to or focus the status
+badge to see it.
 
 ### TLP (Traffic Light Protocol)
 
 The **TLP** field records how widely you can share the case. It uses the standard Traffic Light
 Protocol values.
 
-| Value         | Sharing rule                                                       |
-| ------------- | ------------------------------------------------------------------ |
-| **TLP:RED**   | Do not share outside the people named in the exchange.             |
-| **TLP:AMBER** | Share only with the members of your organization who need to know. |
-| **TLP:GREEN** | Share within your community, but not on public channels.           |
-| **TLP:CLEAR** | Share without a restriction.                                       |
+| Value         | Sharing rule                                                                  |
+| ------------- | ----------------------------------------------------------------------------- |
+| **TLP:RED**   | Not for disclosure, restricted to participants only.                          |
+| **TLP:AMBER** | Limited disclosure, restricted to participants' organization and its clients. |
+| **TLP:GREEN** | Limited disclosure, restricted to the community.                              |
+| **TLP:CLEAR** | Disclosure is not limited.                                                    |
+
+The **TLP** list shows the rule under each value. In read mode, point to or focus the TLP badge to
+see it. The rules follow the
+[CISA TLP definitions](https://www.cisa.gov/news-events/news/traffic-light-protocol-tlp-definitions-and-usage).
+The module does not support **TLP:AMBER+STRICT**: the server rejects it.
 
 ### Comments
 

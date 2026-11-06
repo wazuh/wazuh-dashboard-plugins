@@ -190,7 +190,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
           <EuiText size='s' color='subdued'>
             {i18n.translate('wazuh.security.rolesMapping.description', {
               defaultMessage:
-                'Map roles of the manager API to authentication contexts.',
+                "Give Wazuh roles to the users who sign in to the dashboard. Each role mapping gives its roles to the users who match its rules. The rules check the signed-in user's authentication context: user name, backend roles and indexer roles. This only applies when run as is enabled.",
             })}
           </EuiText>
         </EuiPageContentHeaderSection>

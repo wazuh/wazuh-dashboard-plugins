@@ -1270,6 +1270,31 @@ wz-xml-file-editor {
   max-width: 60vw;
 }
 
+.wz-markdown-code {
+  position: relative;
+}
+
+.wz-markdown-code > pre {
+  padding: 8px 90px 8px 8px;
+  background-color: $euiColorLightestShade;
+  border-radius: 3px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.wz-markdown-code > .wz-markdown-copy-button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+  color: $euiColorPrimaryText;
+  background-color: $euiColorEmptyShade;
+  border: 1px solid $euiBorderColor;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
 .wz-markdown-wrapper code {
   color: $euiColorDarkestShade;
   background-color: $euiColorLightestShade;

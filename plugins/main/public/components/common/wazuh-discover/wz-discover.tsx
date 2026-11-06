@@ -17,6 +17,7 @@ import { IntlProvider } from 'react-intl';
 import { IndexPattern } from '../../../../../../src/plugins/data/common';
 import { SearchResponse } from '../../../../../../src/core/server';
 import { DiscoverNoResults } from '../no-results/no-results';
+import { QueryErrorPrompt } from '../query-error';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import {
   useDataGrid,
@@ -71,6 +72,8 @@ export type WazuhDiscoverProps = {
   categoriesSampleData: string[];
   additionalDocumentDetailsTabs?: import('./components/document-view-table-and-json').DocumentViewTableAndJsonPropsAdditionalTabs;
   flyoutTitle?: string;
+  /** Rendered instead of the default no results callout when the search has no hits. */
+  emptyState?: React.ReactNode;
 };
 
 const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
@@ -82,6 +85,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     categoriesSampleData,
     additionalDocumentDetailsTabs,
     flyoutTitle,
+    emptyState,
   } = props;
 
   if (!DataSource) {
@@ -89,6 +93,7 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
   }
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [fetchError, setFetchError] = useState<unknown>(undefined);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const { onDocumentMutated: handleDocumentMutated, caseRefreshKey } =
     useDocumentMutationSync({ inspectedHit, setInspectedHit, setResults });
@@ -174,14 +179,28 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
     }
     setIndexPattern(dataSource?.indexPattern);
 
+    // Ignore the response of a request that a newer one replaced.
+    let ignore = false;
     fetchData({
       query,
       pagination,
       sorting,
       dateRange: absoluteDateRange,
     })
-      .then(results => setResults(results))
+      .then(results => {
+        if (ignore) {
+          return;
+        }
+        setFetchError(undefined);
+        setResults(results);
+      })
       .catch(error => {
+        if (ignore) {
+          return;
+        }
+        // Drop stale hits so only the error prompt is shown
+        setResults({} as SearchResponse);
+        setFetchError(error);
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
@@ -190,6 +209,9 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
         });
         ErrorHandler.handleError(searchError);
       });
+    return () => {
+      ignore = true;
+    };
   }, [absoluteDateRange, JSON.stringify(sorting), JSON.stringify(pagination)]);
 
   useEffect(() => {
@@ -282,9 +304,20 @@ const WazuhDiscoverComponent = (props: WazuhDiscoverProps) => {
               />
               <SampleDataWarning categoriesSampleData={categoriesSampleData} />
             </HideOnErrorInitializatingDataSource>
-            {!isDataSourceLoading && results?.hits?.total === 0 ? (
-              <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+            {fetchError ? (
+              <QueryErrorPrompt
+                error={fetchError}
+                indexPatternTitle={dataSource?.indexPattern?.title}
+              />
             ) : null}
+            {!isDataSourceLoading && results?.hits?.total === 0
+              ? emptyState ?? (
+                  <DiscoverNoResults
+                    timeFieldName={timeField}
+                    queryLanguage={''}
+                  />
+                )
+              : null}
             <div
               className={
                 !isDataSourceLoading && dataSource && results?.hits?.total > 0

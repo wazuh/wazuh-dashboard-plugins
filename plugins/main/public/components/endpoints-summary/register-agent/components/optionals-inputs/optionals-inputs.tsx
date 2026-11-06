@@ -19,10 +19,11 @@ import { PLUGIN_VERSION_SHORT } from '../../../../../../common/constants';
 import '../group-input/group-input.scss';
 interface OptionalsInputsProps {
   formFields: UseFormReturn['fields'];
+  usesEnrollmentToken: boolean;
 }
 
 const OptionalsInputs = (props: OptionalsInputsProps) => {
-  const { formFields } = props;
+  const { formFields, usesEnrollmentToken } = props;
   const [isPopoverAgentName, setIsPopoverAgentName] = useState(false);
   const onButtonAgentName = () =>
     setIsPopoverAgentName(isPopoverAgentName => !isPopoverAgentName);
@@ -77,61 +78,28 @@ const OptionalsInputs = (props: OptionalsInputsProps) => {
       <EuiFlexGroup gutterSize='s' wrap>
         {OPTIONAL_PARAMETERS_TEXT.map((data, index) => (
           <EuiFlexItem key={index}>
-            <EuiText className='stepSubtitle'>{data.subtitle}</EuiText>
+            <EuiText className='stepSubtitle'>
+              {usesEnrollmentToken
+                ? data.subtitleEnrollmentToken
+                : data.subtitle}
+            </EuiText>
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
       {/* Enrollment authenticates one way, so TLS is the only thing that
-      proves the endpoint is talking to the real manager. An enrollment token
-      does not settle this either way: it carries a pin -- a digest of the
-      manager CA's public key -- which the agent checks against a CA it still
-      has to obtain on its own, from the endpoint's system store or from this
-      path. The switch carries its own label, so no form row label is passed
-      here. */}
+      proves the endpoint is talking to the real manager. The switch carries its
+      own label, so no form row label is passed here. */}
       <InputForm {...formFields.sslVerification} />
-      <EuiSpacer size='m' />
-      {sslVerificationIsEnabled ? (
-        <InputForm
-          {...formFields.managerCa}
-          fullWidth={false}
-          label={
-            <span className='registerAgentLabels'>
-              <FormattedMessage
-                id='wazuh.endpointsSummary.optionalsInputs.managerCaLabel'
-                defaultMessage='Manager CA file path on the endpoint - {optional}'
-                values={{
-                  optional: (
-                    <em>
-                      {i18n.translate(
-                        'wazuh.endpointsSummary.optionalsInputs.managerCaOptional',
-                        { defaultMessage: 'optional' },
-                      )}
-                    </em>
-                  ),
-                }}
-              />
-            </span>
-          }
-          footer={
-            <EuiText size='xs' color='subdued'>
-              {i18n.translate(
-                'wazuh.endpointsSummary.optionalsInputs.managerCaHelp',
-                {
-                  defaultMessage:
-                    "If left empty, the endpoint's system CA store is used, which only trusts publicly issued certificates. Supply the manager CA to verify a self-signed certificate.",
-                },
-              )}
-            </EuiText>
-          }
-          placeholder='/var/ossec/etc/manager-ca.pem'
-        />
-      ) : (
-        <EuiCallOut
-          color='warning'
-          title={warningForSslVerification}
-          iconType='alert'
-          className='warningForAgentName'
-        />
+      {!sslVerificationIsEnabled && (
+        <>
+          <EuiSpacer size='m' />
+          <EuiCallOut
+            color='warning'
+            title={warningForSslVerification}
+            iconType='alert'
+            className='warningForAgentName'
+          />
+        </>
       )}
       <EuiSpacer size='m' />
       <InputForm

@@ -3,6 +3,17 @@ import { configure, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { FeedContentPanel } from './feed-content-panel';
 
+jest.mock('../../plugin-services', () => ({
+  getCore: () => ({
+    application: {
+      currentAppId$: jest.requireActual('rxjs').of('cti-feed'),
+      getUrlForApp: (appId: string, { path = '' } = {}) =>
+        `/app/${appId}${path}`,
+      navigateToUrl: jest.fn(),
+    },
+  }),
+}));
+
 configure({ testIdAttribute: 'data-test-subj' });
 
 const COUNTS = {
@@ -47,6 +58,56 @@ describe('FeedContentPanel', () => {
     expect(
       screen.getByTestId('ctiFeedContentStat-vulnerabilities'),
     ).toHaveTextContent('—');
+  });
+
+  test('links ruleset content to its Standard space in Ruleset Management', () => {
+    render(
+      <FeedContentPanel
+        counts={COUNTS}
+        loading={false}
+        onRefresh={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('ctiFeedContentStat-rules-link')).toHaveAttribute(
+      'href',
+      '/app/rules#/rules?space=standard',
+    );
+    expect(
+      screen.getByTestId('ctiFeedContentStat-integrations-link'),
+    ).toHaveAttribute(
+      'href',
+      '/app/sa-integrations#/integrations?space=standard',
+    );
+    expect(screen.queryByTestId('ctiFeedContentStat-iocs-link')).toBeNull();
+  });
+
+  test('names the destination of a link on hover', async () => {
+    render(
+      <FeedContentPanel
+        counts={COUNTS}
+        loading={false}
+        onRefresh={jest.fn()}
+      />,
+    );
+
+    fireEvent.mouseOver(screen.getByTestId('ctiFeedContentStat-kvdbs-link'));
+
+    expect(
+      await screen.findByText('View the Standard KVDBs in Ruleset Management'),
+    ).toBeInTheDocument();
+  });
+
+  test('does not link a count that could not be read', () => {
+    render(
+      <FeedContentPanel
+        counts={{ ...COUNTS, decoders: null }}
+        loading={false}
+        onRefresh={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByTestId('ctiFeedContentStat-decoders-link')).toBeNull();
   });
 
   test('does not show placeholder values while loading', () => {

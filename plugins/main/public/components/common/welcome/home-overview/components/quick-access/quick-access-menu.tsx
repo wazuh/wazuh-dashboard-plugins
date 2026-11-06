@@ -30,6 +30,7 @@ import {
   getCtiFeedUrl,
   isCtiFeedRegistered,
 } from '../../utils/navigation';
+import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
 
 interface QuickAccessItem {
   id: string;
@@ -179,6 +180,7 @@ const AiAssistantLink: React.FC = () => {
   return (
     <EuiFlexItem grow={false}>
       <EuiLink
+        style={NON_TITLE_LINK_STYLE}
         href={getAiAssistantUrl()}
         data-test-subj='quick-access-ai-assistant-link'
       >

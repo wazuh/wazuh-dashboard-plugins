@@ -2955,7 +2955,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
         })
       : i18n.translate('wazuhAiAssistant.chat.privacy.explainOff', {
           defaultMessage:
-            'Privacy off: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is sent as-is.',
+            'Privacy off: Wazuh data sent to the AI provider — hostnames, IP addresses, usernames, process command lines, and finding/rule text — is sent as-is. Fields set to Never send in the field policy are still dropped.',
         });
 
     // Conversation header title: the active conversation's own saved title when one is open

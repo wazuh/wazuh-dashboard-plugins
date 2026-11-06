@@ -1,5 +1,5 @@
 import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
-import { ClassifiedQueryError } from '../lib/classify-query-error';
+import { ClassifiedQueryError } from '../../../query-error';
 
 /**
  * Status of a single data group

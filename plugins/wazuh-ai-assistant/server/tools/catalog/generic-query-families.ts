@@ -96,8 +96,9 @@ const A1A_FAMILIES: GenericQueryFamily[] = [
   {
     pattern: '.wazuh-cti-consumers',
     label:
-      'CTI feed sync status (ruleset/vulnerabilities/iocs feeds: status, local vs. remote offset ' +
-      '— "is my threat intel up to date")',
+      'CTI feed sync status (ruleset/vulnerabilities/iocs feeds: status, local vs. remote offset, ' +
+      'last update, pending sync steps; doc "cti:catalog:global" holds the last check for ' +
+      'updates — "is my threat intel up to date")',
   },
   {
     pattern: '.wazuh-content-manager-jobs',

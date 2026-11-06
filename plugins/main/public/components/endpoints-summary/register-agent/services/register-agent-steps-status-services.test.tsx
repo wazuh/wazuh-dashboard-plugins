@@ -17,12 +17,8 @@ const defaultFormFieldData: EnhancedFieldConfiguration = {
 };
 
 const buildFormFields = ({
-  sslVerification,
-  managerCaError,
   agentNameError,
 }: {
-  sslVerification: boolean;
-  managerCaError?: string | null;
   agentNameError?: string | null;
 }): UseFormReturn['fields'] => ({
   agentName: {
@@ -33,45 +29,15 @@ const buildFormFields = ({
   sslVerification: {
     ...defaultFormFieldData,
     type: 'switch',
-    value: sslVerification,
+    value: true,
     error: null,
-  },
-  managerCa: {
-    ...defaultFormFieldData,
-    value: "/etc/ca's.pem",
-    error: managerCaError ?? null,
   },
 });
 
 describe('getInvalidFields', () => {
-  it('reports an invalid CA path while verification is enabled', () => {
+  it('reports an invalid field by its label', () => {
     const result = getInvalidFields(
       buildFormFields({
-        sslVerification: true,
-        managerCaError: 'The character "\'" is not valid in a file path.',
-      }),
-    );
-    expect(result).toEqual(['manager CA file path']);
-  });
-
-  /* The CA input is not rendered while verification is off, so an error on it
-  cannot be seen or corrected. Reporting it would hide the commands with no way
-  for the user to recover. */
-  it('ignores an invalid CA path while verification is disabled', () => {
-    const result = getInvalidFields(
-      buildFormFields({
-        sslVerification: false,
-        managerCaError: 'The character "\'" is not valid in a file path.',
-      }),
-    );
-    expect(result).toEqual([]);
-  });
-
-  it('keeps reporting other invalid fields while verification is disabled', () => {
-    const result = getInvalidFields(
-      buildFormFields({
-        sslVerification: false,
-        managerCaError: 'The character "\'" is not valid in a file path.',
         agentNameError: 'The minimum length is 2 characters.',
       }),
     );
@@ -79,7 +45,7 @@ describe('getInvalidFields', () => {
   });
 
   it('reports nothing when every field is valid', () => {
-    const result = getInvalidFields(buildFormFields({ sslVerification: true }));
+    const result = getInvalidFields(buildFormFields({}));
     expect(result).toEqual([]);
   });
 });

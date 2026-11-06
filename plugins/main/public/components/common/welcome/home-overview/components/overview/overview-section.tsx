@@ -24,6 +24,15 @@ import {
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
+import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
+
+// Same requirement as the Agents section.
+const AGENT_READ_PERMISSIONS = [
+  [
+    { action: 'agent:read', resource: 'agent:id:*' },
+    { action: 'agent:read', resource: 'agent:group:*' },
+  ],
+];
 
 export interface OverviewSectionProps {
   /** Owned by the page shell so Threat Hunting reuses the same on-mount search. */
@@ -34,6 +43,9 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   findings,
 }) => {
   const agents = useAgentStatus();
+  const [missingAgentRead] = useUserPermissionsRequirements(
+    AGENT_READ_PERMISSIONS,
+  );
 
   return (
     <div>
@@ -62,6 +74,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                 data={agents.data}
                 deployAgentUrl={getDeployAgentUrl()}
                 onStatusSelect={goToAgentsByStatus}
+                missingPermissions={missingAgentRead}
               />
             )}
           </WidgetGroup>
