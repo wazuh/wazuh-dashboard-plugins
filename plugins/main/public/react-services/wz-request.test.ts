@@ -70,5 +70,23 @@ describe('WzRequest.genericReq', () => {
       expect(ApiCheck.checkStored).not.toHaveBeenCalled();
       expect(mockNavigate).not.toHaveBeenCalled();
     });
+
+    it('Should not redirect when the API check times out', async () => {
+      mockIsLoggingOut.mockReturnValue(false);
+      jest
+        .spyOn(ApiCheck, 'checkStored')
+        .mockRejectedValue(
+          Object.assign(new Error('timeout of 20000ms exceeded'), {
+            code: 'ECONNABORTED',
+          }),
+        );
+
+      await expect(WzRequest.genericReq('GET', '/hosts/apis')).rejects.toThrow(
+        'Error message',
+      );
+
+      expect(ApiCheck.checkStored).toHaveBeenCalledWith('mocked-api-id');
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
   });
 });
