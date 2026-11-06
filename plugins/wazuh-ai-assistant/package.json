@@ -6,7 +6,7 @@
   "license": "GPL-2.0-only",
   "private": true,
   "pluginPlatform": {
-    "version": "3.6.0"
+    "version": "3.9.0"
   },
   "scripts": {
     "build": "yarn plugin-helpers build --opensearch-dashboards-version=$OPENSEARCH_DASHBOARDS_VERSION",
