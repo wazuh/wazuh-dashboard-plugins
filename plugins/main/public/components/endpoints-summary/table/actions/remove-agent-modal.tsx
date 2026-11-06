@@ -154,10 +154,10 @@ export const RemoveAgentModal = compose(withErrorBoundary)(
           <EuiSpacer />
           <EuiCallOut color='warning'>
             {i18n.translate(
-              'wazuh.endpointsSummary.removeAgentModal.autoEnrollmentWarning',
+              'wazuh.endpointsSummary.removeAgentModal.activeAgentWarning',
               {
                 defaultMessage:
-                  'If the selected agent is still active and auto-enrollment is enabled, they will automatically register again after deletion.',
+                  "An agent that is still running can't connect after it is removed. To connect it again, enroll it with a new token.",
               },
             )}
           </EuiCallOut>

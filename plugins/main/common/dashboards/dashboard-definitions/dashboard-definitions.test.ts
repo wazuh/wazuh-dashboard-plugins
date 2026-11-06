@@ -37,6 +37,38 @@ describe('Dashboard definitions', () => {
     expect(visualizations.length).toBeGreaterThan(0);
   });
 
+  // The legend of a chart with a single `Count` series only repeats the
+  // metric name already shown by the value axis.
+  it.each(visualizations.map(({ id, attributes }) => [id, attributes]))(
+    'visualization %s has no legend with a single Count series',
+    (_id, attributes) => {
+      const { type, params, aggs } = JSON.parse(attributes.visState);
+
+      if (
+        !['area', 'histogram', 'horizontal_bar', 'line'].includes(type) ||
+        !params?.addLegend
+      ) {
+        return;
+      }
+
+      const enabledAggs = aggs.filter(
+        (agg: { enabled?: boolean }) => agg.enabled !== false,
+      );
+      const metrics = enabledAggs.filter(
+        (agg: { schema: string }) => agg.schema === 'metric',
+      );
+      const hasGroup = enabledAggs.some(
+        (agg: { schema: string }) => agg.schema === 'group',
+      );
+      const isLoneCount =
+        metrics.length === 1 &&
+        metrics[0].type === 'count' &&
+        !metrics[0].params?.customLabel;
+
+      expect(hasGroup || !isLoneCount).toBe(true);
+    },
+  );
+
   // A document carrying several values of a field (e.g. several compliance
   // requirements) falls in one bucket per value, so splitting twice by that
   // field counts it once per value inside each of its buckets.
