@@ -47,10 +47,10 @@ export default function OsCommandWarning(props: OsWarningProps) {
         </ul>
         <p>
           {i18n.translate(
-            'wazuh.endpointsSummary.osWarning.powerShellTerminal',
+            'wazuh.endpointsSummary.osWarning.powerShellAdministratorTerminal',
             {
               defaultMessage:
-                'Keep in mind you need to run this command in a Windows PowerShell terminal.',
+                'Run these commands in a Windows PowerShell terminal opened as Administrator.',
             },
           )}
         </p>
