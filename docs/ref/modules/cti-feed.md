@@ -70,6 +70,10 @@ create is not counted.
 - Indicators of compromise are counted in the `wazuh-threatintel-enrichments*` indices.
 - Vulnerabilities are the CVE records in the `.wazuh-threatintel-vulnerabilities*` indices.
 
+The ruleset tiles open their Ruleset Management page on the `standard` space, and the
+indicators of compromise and vulnerabilities tiles open their tab of the
+[CTI Explorer](cti-explorer.md) app.
+
 A count shows **—** when it cannot be read, for example when the content is not synced yet or
 the user lacks access to it. The counts refresh after a sync finishes, or on demand with the
 refresh button.

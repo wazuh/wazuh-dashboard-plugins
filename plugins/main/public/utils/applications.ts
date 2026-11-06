@@ -252,6 +252,28 @@ export const caseManagement = {
     }`,
 };
 
+export const ctiExplorer = {
+  category: 'wz-category-threat-intelligence',
+  id: 'cti-explorer',
+  title: i18n.translate('wazuh.ctiExplorer.app.title', {
+    defaultMessage: 'CTI Explorer',
+  }),
+  breadcrumbLabel: i18n.translate('wazuh.ctiExplorer.app.breadcrumbLabel', {
+    defaultMessage: 'CTI Explorer',
+  }),
+  description: i18n.translate('wazuh.ctiExplorer.app.description', {
+    defaultMessage:
+      'Explore the indicators of compromise and vulnerability records that the CTI feed delivers.',
+  }),
+  euiIconType: 'searchProfilerApp',
+  /* Right after the module apps of the category and before the CTI feed app
+  (305) of the wazuh-check-updates plugin, which reports the sync of the same content. */
+  order: 304,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/cti-explorer/',
+};
+
 export const ITHygiene = {
   category: 'wz-category-security-operations',
   id: 'it-hygiene',
@@ -797,6 +819,7 @@ export const Applications = [
   vulnerabilityDetection,
   mitreAttack,
   caseManagement,
+  ctiExplorer,
   regulatoryCompliance,
   devTools,
   security,

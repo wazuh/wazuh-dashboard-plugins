@@ -79,7 +79,27 @@ describe('FeedContentPanel', () => {
       'href',
       '/app/sa-integrations#/integrations?space=standard',
     );
-    expect(screen.queryByTestId('ctiFeedContentStat-iocs-link')).toBeNull();
+  });
+
+  test('links the IOCs and vulnerabilities to their CTI Explorer tab', () => {
+    render(
+      <FeedContentPanel
+        counts={{ ...COUNTS, vulnerabilities: 416428 }}
+        loading={false}
+        onRefresh={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('ctiFeedContentStat-iocs-link')).toHaveAttribute(
+      'href',
+      '/app/cti-explorer#/cti-explorer/?tab=iocs',
+    );
+    expect(
+      screen.getByTestId('ctiFeedContentStat-vulnerabilities-link'),
+    ).toHaveAttribute(
+      'href',
+      '/app/cti-explorer#/cti-explorer/?tab=vulnerabilities',
+    );
   });
 
   test('names the destination of a link on hover', async () => {

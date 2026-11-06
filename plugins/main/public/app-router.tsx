@@ -18,6 +18,7 @@ import { WzCtiUpsellNotification } from './components/wz-cti-upsell-notification
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { MainEnrollmentTokens } from './components/enrollment-tokens';
+import { MainCtiExplorer } from './components/cti-explorer';
 import { AgentView } from './components/endpoints-summary/agent';
 import WzManagement from './controllers/management/components/management/management-provider';
 import { Overview } from './components/overview/overview';
@@ -133,6 +134,11 @@ export const Application = withGuardAsync(
             path={`/${SECTIONS.ENROLLMENT_TOKENS}/`}
             exact
             render={MainEnrollmentTokens}
+          ></Route>
+          <Route
+            path={`/${SECTIONS.CTI_EXPLORER}/`}
+            exact
+            render={MainCtiExplorer}
           ></Route>
           <Route
             path={`/${SECTIONS.MANAGER}`}
