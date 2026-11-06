@@ -53,7 +53,7 @@ const PerSpaceMetrics: React.FC<DashboardPerSpaceMetricsProps> = ({
   const combinedFilters = spaceFilter ? [...filters, spaceFilter] : filters;
 
   if (!spaces.length) {
-    return <DiscoverNoResults />;
+    return <DiscoverNoResults allowUnpinAgent={false} />;
   }
 
   return (

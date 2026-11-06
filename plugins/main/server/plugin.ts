@@ -50,6 +50,8 @@ import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERNS,
   HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
+  HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
+  HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
@@ -72,6 +74,8 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERN_FINDINGS_UNCLASSIFIED,
   HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS,
   WAZUH_THREATINTEL_ENRICHMENTS_PATTERN,
+  HEALTH_CHECK_TASK_INDEX_PATTERN_SECURITY_AUDITLOGS,
+  SECURITY_AUDITLOGS_PATTERN,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_FILES_STATES,
   HEALTH_CHECK_TASK_INDEX_PATTERN_FIM_REGISTRY_STATES,
@@ -667,6 +671,18 @@ const INDEX_PATTERN_HEALTH_CHECK_DEFINITIONS: IndexPatternTaskDefinition[] = [
       ),
     },
   },
+  {
+    // The indexer's security plugin creates the data stream on the first audit
+    // event, so the index pattern is created from the known fields before any
+    // data exists.
+    taskName: HEALTH_CHECK_TASK_INDEX_PATTERN_SECURITY_AUDITLOGS,
+    indexPatternID: SECURITY_AUDITLOGS_PATTERN,
+    options: {
+      savedObjectOverwrite: defineTimeFieldNameIfExist(FIELD_TIMESTAMP),
+      hasTimeFieldName: true,
+      fieldsNoIndicesFilePath: knownFieldsFilePath('security-auditlogs.json'),
+    },
+  },
 ];
 
 export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
@@ -770,7 +786,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // server API connection-compatibility
     core.healthCheck.register(
       initializationTaskCreatorServerAPIConnectionCompatibility({
-        taskName: 'server-api:connection-compatibility',
+        taskName: HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
         services: plugins.wazuhCore,
         rateLimitRerun: this.rateLimitRerun,
       }),
@@ -779,7 +795,7 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     // server API run_as (allow_run_as)
     core.healthCheck.register(
       initializationTaskCreatorServerAPIRunAs({
-        taskName: 'server-api:run-as',
+        taskName: HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
         services: plugins.wazuhCore,
         rateLimitRerun: this.rateLimitRerun,
       }),

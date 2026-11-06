@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { CtiConsumer } from '../../../../common/cti-consumers';
+import { getHttpErrorMessage } from '../../../../common/http-error';
 import { fetchCtiConsumers } from '../../../services/cti-feed';
 import {
   FeedSyncSummary,
@@ -66,11 +67,7 @@ export const useCtiConsumers = (): CtiConsumersState => {
       if (!mounted.current) {
         return false;
       }
-      setError(
-        fetchError instanceof Error && fetchError.message
-          ? fetchError.message
-          : String(fetchError),
-      );
+      setError(getHttpErrorMessage(fetchError) ?? String(fetchError));
       return false;
     } finally {
       if (mounted.current) {

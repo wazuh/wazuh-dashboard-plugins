@@ -15,8 +15,13 @@ import { EuiFlyout } from '@elastic/eui';
 
 export const WzFlyout = ({ children, flyoutProps = {}, onClose }) => {
   return (
-    <EuiFlyout onClose={onClose} maskProps={{ onClick: () => {} }} {...flyoutProps} outsideClickCloses={true}>
+    <EuiFlyout
+      onClose={onClose}
+      maskProps={{ onClick: () => {} }}
+      {...flyoutProps}
+      outsideClickCloses={true}
+    >
       {children}
     </EuiFlyout>
-  )
+  );
 };

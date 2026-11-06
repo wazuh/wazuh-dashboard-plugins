@@ -68,4 +68,42 @@ describe('InventoryDashboardTable', () => {
         ?.parentElement,
     ).toHaveClass('wz-no-display');
   });
+
+  describe('without hits', () => {
+    const renderWithoutHits = (emptyState?: React.ReactNode) => {
+      mockFetchData.mockResolvedValue({ hits: { total: 0, hits: [] } });
+      return render(
+        <InventoryDashboardTable
+          DataSource={jest.fn()}
+          DataSourceRepositoryCreator={jest.fn()}
+          tableDefaultColumns={[]}
+          getDashboardPanels={[]}
+          managedFilters={[]}
+          tableId='it-hygiene-packages'
+          emptyState={emptyState}
+        />,
+      );
+    };
+
+    it('renders the default no results prompt', async () => {
+      const { container } = renderWithoutHits();
+
+      await waitFor(() =>
+        expect(
+          container.querySelector(queryDataTestAttr('discoverNoResults')),
+        ).toBeInTheDocument(),
+      );
+    });
+
+    it('renders the emptyState of the module instead of the default', async () => {
+      const { container, findByText } = renderWithoutHits(
+        <p>Module empty state</p>,
+      );
+
+      expect(await findByText('Module empty state')).toBeInTheDocument();
+      expect(
+        container.querySelector(queryDataTestAttr('discoverNoResults')),
+      ).toBeNull();
+    });
+  });
 });

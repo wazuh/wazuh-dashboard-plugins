@@ -24,7 +24,6 @@ import {
   EuiText,
   EuiContextMenu,
   EuiIcon,
-  EuiCallOut,
   EuiLoadingSpinner,
 } from '@elastic/eui';
 import { FlyoutTechnique } from './components/flyout-technique/';
@@ -45,6 +44,7 @@ import { getErrorOrchestrator } from '../../../../../../react-services/common-se
 import { tFilter, tSearchParams } from '../../../../../common/data-source';
 import { tFilterParams } from '../../mitre';
 import { getDataPlugin } from '../../../../../../kibana-services';
+import { DiscoverNoResults } from '../../../../../common/no-results/no-results';
 
 const MITRE_ATTACK = 'mitre-attack';
 
@@ -553,13 +553,18 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       );
     } else {
       return (
-        <EuiCallOut
-          title={i18n.translate('wazuh.mitreAttack.techniques.noResults', {
-            defaultMessage: 'There are no results.',
+        <DiscoverNoResults
+          message={i18n.translate('wazuh.mitreAttack.techniques.noResults', {
+            defaultMessage: 'No techniques found',
           })}
-          iconType='help'
-          color='warning'
-        ></EuiCallOut>
+          description={i18n.translate(
+            'wazuh.mitreAttack.techniques.noResultsDescription',
+            {
+              defaultMessage:
+                'No MITRE ATT&CK technique matches the current search or filters. Try changing them.',
+            },
+          )}
+        />
       );
     }
   };

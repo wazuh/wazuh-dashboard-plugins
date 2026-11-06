@@ -18,6 +18,7 @@ import {
 } from '@elastic/eui';
 import { getCore } from '../../../plugin-services';
 import { routes } from '../../../../common/constants';
+import { getHttpErrorMessage } from '../../../../common/http-error';
 import type {
   CtiConsumer,
   CtiConsumersResponse,
@@ -246,7 +247,7 @@ export const CtiConsumersAccordion: React.FC = () => {
     } catch (fetchError: unknown) {
       setConsumers(null);
       setError(
-        (fetchError instanceof Error && fetchError.message) ||
+        getHttpErrorMessage(fetchError) ??
           i18n.translate('wazuhCheckUpdates.ctiConsumers.error.fallback', {
             defaultMessage: 'Could not load consumers',
           }),
