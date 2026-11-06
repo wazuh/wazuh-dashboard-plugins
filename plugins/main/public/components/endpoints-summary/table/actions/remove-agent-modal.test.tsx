@@ -62,6 +62,23 @@ describe('RemoveAgentModal component', () => {
     store.dispatch(updateCurrentAgentData({ id: '001', name: 'agent1' }));
   });
 
+  test('should warn that a running agent cannot connect after removal', () => {
+    const { getByText, queryByText } = render(
+      <RemoveAgentModal
+        agent={{ id: '001', name: 'agent1' }}
+        onClose={() => {}}
+        reloadAgents={() => {}}
+      />,
+    );
+
+    expect(
+      getByText(
+        "An agent that is still running can't connect after it is removed. To connect it again, enroll it with a new token.",
+      ),
+    ).toBeInTheDocument();
+    expect(queryByText(/auto-enrollment/)).not.toBeInTheDocument();
+  });
+
   test('should unpin the pinned agent when it is removed', async () => {
     mockRemoveAgentService.mockResolvedValue({
       data: { data: { affected_items: ['001'] } },
