@@ -66,6 +66,7 @@ import { i18n } from '@osd/i18n';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
+import { QueryErrorPrompt } from '../../common/query-error';
 import { compose } from 'redux';
 
 // Generous headroom above every framework's known-catalog size, so the
@@ -521,10 +522,8 @@ export const ComplianceTable = compose(
         },
       };
       getErrorOrchestrator().handleError(options);
-
-      // The result is read by the panels, so a failed search gives them an
-      // empty one instead of nothing.
-      return EMPTY_REQUIREMENTS_DATA;
+      // Rethrown so the view replaces the zero counts with the error prompt.
+      throw error;
     }
   };
 
@@ -637,68 +636,77 @@ export const ComplianceTable = compose(
             showSaveQuery={true}
           />
         </EuiPanel>
-        <EuiPanel
-          paddingSize='s'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          <EuiPanel paddingSize='none'>
-            <EuiFlexGroup paddingSize='none'>
-              <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-                {!!Object.keys(complianceData.complianceObject).length && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem
-                      grow={false}
-                      style={{
-                        width: '15%',
-                        minWidth: 145,
-                        maxHeight: 'calc(100vh - 320px)',
-                        overflowX: 'hidden',
-                        overflowY: 'auto',
-                        backgroundColor: '#80808014',
-                      }}
-                    >
-                      <ComplianceRequirements
-                        section={props.section}
-                        onChangeSelectedRequirements={selectedRequirements =>
-                          setComplianceData(state => ({
-                            ...state,
-                            selectedRequirements,
-                          }))
-                        }
-                        requirementCounts={requirementsData.counts}
-                        loadingAlerts={action.running}
-                        {...complianceData}
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem style={{ width: '15%' }}>
-                      <ComplianceSubrequirements
-                        section={props.section}
-                        requirementCounts={requirementsData.counts}
-                        requirementCodes={requirementsData.codesByRequirement}
-                        loadingAlerts={action.running}
-                        fetchFilters={dataSource.fetchFilters}
-                        getRegulatoryComplianceRequirementFilter={
-                          getRegulatoryComplianceRequirementFilter
-                        }
-                        othersCount={othersCount}
-                        othersBuckets={othersBuckets}
-                        indexPatternId={dataSource.dataSource?.indexPattern.id}
-                        getRegulatoryComplianceOtherRequirementsFilter={
-                          getRegulatoryComplianceOtherRequirementsFilter
-                        }
-                        {...complianceData}
-                        filters={dataSource.filters}
-                        setFilters={dataSource.setFilters}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
-              </EuiFlexItem>
-            </EuiFlexGroup>
+        {action.error ? (
+          <QueryErrorPrompt
+            error={action.error}
+            indexPatternTitle={dataSource.dataSource?.indexPattern?.title}
+          />
+        ) : (
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiPanel paddingSize='none'>
+              <EuiFlexGroup paddingSize='none'>
+                <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
+                  {!!Object.keys(complianceData.complianceObject).length && (
+                    <EuiFlexGroup>
+                      <EuiFlexItem
+                        grow={false}
+                        style={{
+                          width: '15%',
+                          minWidth: 145,
+                          maxHeight: 'calc(100vh - 320px)',
+                          overflowX: 'hidden',
+                          overflowY: 'auto',
+                          backgroundColor: '#80808014',
+                        }}
+                      >
+                        <ComplianceRequirements
+                          section={props.section}
+                          onChangeSelectedRequirements={selectedRequirements =>
+                            setComplianceData(state => ({
+                              ...state,
+                              selectedRequirements,
+                            }))
+                          }
+                          requirementCounts={requirementsData.counts}
+                          loadingAlerts={action.running}
+                          {...complianceData}
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem style={{ width: '15%' }}>
+                        <ComplianceSubrequirements
+                          section={props.section}
+                          requirementCounts={requirementsData.counts}
+                          requirementCodes={requirementsData.codesByRequirement}
+                          loadingAlerts={action.running}
+                          fetchFilters={dataSource.fetchFilters}
+                          getRegulatoryComplianceRequirementFilter={
+                            getRegulatoryComplianceRequirementFilter
+                          }
+                          othersCount={othersCount}
+                          othersBuckets={othersBuckets}
+                          indexPatternId={
+                            dataSource.dataSource?.indexPattern.id
+                          }
+                          getRegulatoryComplianceOtherRequirementsFilter={
+                            getRegulatoryComplianceOtherRequirementsFilter
+                          }
+                          {...complianceData}
+                          filters={dataSource.filters}
+                          setFilters={dataSource.setFilters}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
           </EuiPanel>
-        </EuiPanel>
+        )}
       </>
     </I18nProvider>
   );

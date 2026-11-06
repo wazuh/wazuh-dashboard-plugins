@@ -21,7 +21,7 @@ import {
   getWazuhCorePlugin,
 } from '../kibana-services';
 import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
-import { request } from '../services/request-handler';
+import { request, isLoggingOut } from '../services/request-handler';
 import { BehaviorSubject } from 'rxjs';
 import { first, distinctUntilChanged } from 'rxjs/operators';
 import { throttle } from 'lodash';
@@ -292,7 +292,7 @@ export class WzRequest {
       return Promise.resolve(data);
     } catch (error) {
       //if the requests fails, we need to check if the API is down
-      if (checkCurrentApiIsUp) {
+      if (checkCurrentApiIsUp && !isLoggingOut()) {
         const currentApi = JSON.parse(AppState.getCurrentAPI() || '{}');
         if (currentApi && currentApi.id) {
           try {

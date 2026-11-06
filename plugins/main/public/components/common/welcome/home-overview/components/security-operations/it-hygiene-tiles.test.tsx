@@ -23,7 +23,7 @@ const available = (value: number) => ({
 });
 
 const allAvailable = {
-  operatingSystems: available(12),
+  platforms: available(3),
   packages: available(35682),
   users: available(48),
   services: available(320),
@@ -32,7 +32,7 @@ const allAvailable = {
 describe('ItHygieneTiles', () => {
   it('navigates to each tab on click', () => {
     render(<ItHygieneTiles {...allAvailable} />);
-    fireEvent.click(screen.getByText('Operating systems'));
+    fireEvent.click(screen.getByText('Platforms'));
     expect(getItHygieneSystemOsUrl).toHaveBeenCalledWith();
     fireEvent.click(screen.getByText('Packages'));
     expect(getItHygieneSoftwareUrl).toHaveBeenCalled();
@@ -45,7 +45,7 @@ describe('ItHygieneTiles', () => {
   it('keeps every tile (never hidden); an unavailable index shows "-"', () => {
     const { container } = render(
       <ItHygieneTiles
-        operatingSystems={available(12)}
+        platforms={available(3)}
         packages={{ status: 'unavailable' }}
         users={available(48)}
         services={available(320)}
@@ -57,16 +57,14 @@ describe('ItHygieneTiles', () => {
     expect(packages).toBeInTheDocument();
     expect(packages?.textContent).toContain('-');
     expect(
-      container.querySelector(
-        '[data-test-subj="it-hygiene-tile-operating-systems"]',
-      ),
+      container.querySelector('[data-test-subj="it-hygiene-tile-platforms"]'),
     ).toBeInTheDocument();
   });
 
   it('shows "-" for a failed tile (never a hidden tile), no per-tile callout', () => {
     const { container } = render(
       <ItHygieneTiles
-        operatingSystems={available(12)}
+        platforms={available(3)}
         packages={{ status: 'error' }}
         users={available(48)}
         services={available(320)}
@@ -87,7 +85,7 @@ describe('ItHygieneTiles', () => {
   it('marks a failed tile with a persistent danger indicator, distinct from an unavailable one', () => {
     const { container } = render(
       <ItHygieneTiles
-        operatingSystems={available(12)}
+        platforms={available(3)}
         packages={{ status: 'error' }}
         users={{ status: 'unavailable' }}
         services={available(320)}

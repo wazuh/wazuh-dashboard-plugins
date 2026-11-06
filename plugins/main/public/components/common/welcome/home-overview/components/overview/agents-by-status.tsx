@@ -10,10 +10,13 @@ import {
 } from '../common';
 import {
   API_NAME_AGENT_STATUS,
+  UI_DESCRIPTION_AGENT_STATUS,
   UI_LABEL_NAME_AGENT_STATUS,
   UI_ORDER_AGENT_STATUS,
 } from '../../../../../../../common/constants';
 import { WzButtonPermissions } from '../../../../permissions/button';
+import { TUserPermissions } from '../../../../permissions/element';
+import { WzEmptyPromptNoPermissions } from '../../../../permissions/prompt';
 import { HOME_OVERVIEW_AGENT_STATUS_COLOR } from '../../lib/theme-colors';
 
 type AgentStatusName =
@@ -31,6 +34,8 @@ export interface AgentsByStatusProps {
   /** Deploy-agent CTA href; passed in so this stays a pure presentational widget. */
   deployAgentUrl: string;
   onStatusSelect?: (status: string) => void;
+  /** agent:read requirements the user lacks; the API then filters every agent out. */
+  missingPermissions?: TUserPermissions | false;
 }
 
 /** Shows a deploy prompt when the fleet is empty. */
@@ -38,7 +43,13 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
   data,
   deployAgentUrl,
   onStatusSelect,
+  missingPermissions,
 }) => {
+  // A total of 0 without agent:read means "filtered out", not "no agents".
+  if (data.total === 0 && missingPermissions) {
+    return <WzEmptyPromptNoPermissions permissions={missingPermissions} />;
+  }
+
   if (data.total === 0) {
     return (
       <EuiEmptyPrompt
@@ -81,6 +92,7 @@ export const AgentsByStatus: React.FC<AgentsByStatusProps> = ({
     status => ({
       key: status,
       label: UI_LABEL_NAME_AGENT_STATUS[status],
+      description: UI_DESCRIPTION_AGENT_STATUS[status],
       count: data[COUNT_BY_STATUS[status]] ?? 0,
       color: HOME_OVERVIEW_AGENT_STATUS_COLOR[status],
       onClick: onStatusSelect ? () => onStatusSelect(status) : undefined,

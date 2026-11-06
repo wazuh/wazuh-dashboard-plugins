@@ -95,9 +95,7 @@ describe('EndpointSecuritySection', () => {
       screen.getByText('CIS Ubuntu Linux 24.04 LTS v1.0.0'),
     ).toBeInTheDocument();
     expect(screen.getAllByText('/etc/passwd').length).toBeGreaterThan(0);
-    expect(
-      screen.getByText('File integrity baselined fleet-wide'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Monitored files fleet-wide')).toBeInTheDocument();
     expect(screen.getByText('IOC matches')).toBeInTheDocument();
     expect(screen.getAllByText('Domains').length).toBeGreaterThan(0);
   });
@@ -117,6 +115,46 @@ describe('EndpointSecuritySection', () => {
       container.querySelector('[data-test-subj="fim-hero-link"]'),
     ).toBeInTheDocument();
     expect(getFileIntegrityMonitoringInventoryFilesUrl).toHaveBeenCalled();
+  });
+
+  it('hides the score and says why when there are no SCA checks', () => {
+    asMock(useSCAOverview).mockReturnValue({
+      status: 'available',
+      data: {
+        tiles: { passed: 0, failed: 0, notApplicable: 0 },
+        benchmarks: [],
+      },
+    });
+    render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
+    expect(
+      screen.getByText(
+        'No Configuration Assessment results found. The score appears once checks are reported.',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Overall score')).not.toBeInTheDocument();
+    expect(screen.queryByText('0%')).not.toBeInTheDocument();
+  });
+
+  it('says there are no monitored files instead of 0 when FIM has no files', () => {
+    asMock(useFIMOverview).mockReturnValue({
+      status: 'available',
+      data: { total: 0, files: [] },
+    });
+    render(
+      <EndpointSecuritySection
+        findings={findingsAvailable}
+        threatIntel={threatIntelAvailable}
+      />,
+    );
+    expect(screen.getByText('No monitored files yet')).toBeInTheDocument();
+    expect(
+      screen.queryByText('Monitored files fleet-wide'),
+    ).not.toBeInTheDocument();
   });
 
   it('still renders Configuration Assessment when the SCA index is unavailable', () => {

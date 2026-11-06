@@ -1,10 +1,10 @@
 import { i18n } from '@osd/i18n';
-import { ErrorDataSourceNotFound } from '../../../../../utils/errors';
+import { ErrorDataSourceNotFound } from '../../../utils/errors';
 
 /**
- * Buckets a Home overview query failure so the UI can show something more
- * useful than a generic "could not load data": a missing index pattern (with
- * the already-crafted remediation message from the data-source layer), a
+ * Buckets a query failure so the UI can show something more useful than a
+ * generic "could not load data": a missing index pattern (with the
+ * already-crafted remediation message from the data-source layer), a
  * permission-denied response, or anything else.
  */
 export type QueryErrorKind =
@@ -52,7 +52,7 @@ export function describeError(error: unknown): string {
       return data.message;
     }
   }
-  return i18n.translate('wazuh.common.homeOverviewQueryError.unknownError', {
+  return i18n.translate('wazuh.common.queryError.unknownError', {
     defaultMessage: 'Unknown error',
   });
 }
@@ -64,10 +64,9 @@ export function classifyQueryError(error: unknown): ClassifiedQueryError {
   if (getHttpStatus(error) === 403) {
     return {
       kind: 'permission-denied',
-      message: i18n.translate(
-        'wazuh.common.homeOverviewQueryError.permissionDenied',
-        { defaultMessage: "You don't have permission to view this data." },
-      ),
+      message: i18n.translate('wazuh.common.queryError.permissionDenied', {
+        defaultMessage: "You don't have permission to view this data.",
+      }),
     };
   }
   return { kind: 'unknown', message: describeError(error) };

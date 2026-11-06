@@ -26,7 +26,7 @@ import { itemMatchesQuery } from './configuration-list-utils';
  * (entries on the left, selected entry's fields on the right) when items
  * expose several.
  */
-const WzConfigurationDynamicList = ({ list, items, query }) => {
+const WzConfigurationDynamicList = ({ list, items, query, agent }) => {
   const hasItems = Array.isArray(items) && items.length > 0;
   if (!hasItems) {
     // Hidden by an active search query -- unrelated to "nothing configured",
@@ -40,11 +40,18 @@ const WzConfigurationDynamicList = ({ list, items, query }) => {
         description={list.description}
         help={list.help}
       >
-        <EuiText size='s' color='subdued'>
-          {i18n.translate('wazuh.configuration.dynamicList.nothingConfigured', {
-            defaultMessage: 'Nothing configured yet.',
-          })}
-        </EuiText>
+        {list.emptyState ? (
+          <list.emptyState agent={agent} />
+        ) : (
+          <EuiText size='s' color='subdued'>
+            {i18n.translate(
+              'wazuh.configuration.dynamicList.nothingConfigured',
+              {
+                defaultMessage: 'Nothing configured yet.',
+              },
+            )}
+          </EuiText>
+        )}
       </WzConfigurationSettingsHeader>
     );
   }
@@ -86,9 +93,11 @@ WzConfigurationDynamicList.propTypes = {
     ),
     itemLabel: PropTypes.func.isRequired,
     itemFields: PropTypes.array.isRequired,
+    emptyState: PropTypes.elementType,
   }).isRequired,
   items: PropTypes.array,
   query: PropTypes.string,
+  agent: PropTypes.object,
 };
 
 export default WzConfigurationDynamicList;
