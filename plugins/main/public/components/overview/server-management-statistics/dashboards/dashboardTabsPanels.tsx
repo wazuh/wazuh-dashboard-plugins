@@ -41,6 +41,7 @@ import {
   WAZUH_SAMPLE_METRICS_NORMALIZATION,
 } from '../../../../../common/constants';
 import { PromptErrorInitializatingDataSource } from '../../../common/hocs';
+import './statistics_dashboard.scss';
 
 const SearchBar = getPlugins().data.ui.SearchBar;
 
@@ -223,7 +224,10 @@ export const DashboardTabsPanels = ({
             )}
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiFlexGroup alignItems='center'>
+            <EuiFlexGroup
+              alignItems='center'
+              className='server-management-statistics-toolbar'
+            >
               {!!(
                 clusterNodes &&
                 clusterNodes.length &&
@@ -235,6 +239,7 @@ export const DashboardTabsPanels = ({
                     options={clusterNodes}
                     value={clusterNodeSelected}
                     onChange={onSelectNode}
+                    compressed
                     aria-label={i18n.translate(
                       'wazuh.statistics.dashboardTabs.selectNodeAriaLabel',
                       {
@@ -271,7 +276,7 @@ export const DashboardTabsPanels = ({
           // WORKAROUND: This style mitigates the include styles in the DiscoverNoResults component to align with the SampleDataWarning component and the EuiCallOut with information about the tab. The components should not include wrappers with margin/padding and this should be set by the layout instead
           style={{ margin: '-8px' }}
         >
-          <DiscoverNoResults />
+          <DiscoverNoResults allowUnpinAgent={false} />
         </div>
       ) : null}
       {!isDataSourceLoading && dataSource && results?.hits?.total > 0 ? (

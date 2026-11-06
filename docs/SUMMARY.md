@@ -17,6 +17,7 @@
 - [Repository bumper](dev/bumper-repository.md)
 - [Documentation installation and setup](INSTALLATION.md)
 - [Modules](dev/modules/README.md)
+  - [About flyout and documentation links](dev/modules/about-flyout.md)
   - [Active responses](dev/modules/active-responses.md)
   - [Ruleset management](dev/modules/ruleset-management.md)
 

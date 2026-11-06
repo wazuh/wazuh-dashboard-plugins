@@ -156,7 +156,7 @@ describe('WidgetGroup', () => {
     );
     expect(
       screen.getByRole('link', { name: 'Manage index patterns' }),
-    ).toBeInTheDocument();
+    ).toHaveStyle({ fontWeight: 'normal' });
   });
 
   it('omits the "Manage index patterns" link on a plain error', () => {

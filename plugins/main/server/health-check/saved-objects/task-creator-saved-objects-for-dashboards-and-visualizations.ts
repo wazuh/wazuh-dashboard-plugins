@@ -16,6 +16,7 @@
 
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import type { InitializationTaskRunContext } from '../types';
+import { HEALTH_CHECK_TASK_DASHBOARDS } from '../../../common/constants';
 import { readDashboardDefinitionFiles } from './dashboard-definition-reader';
 import type {
   GenericAttributes,
@@ -196,7 +197,7 @@ async function ensureDashboardSavedObject(
 
 export const initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations =
   () => ({
-    name: 'saved-objects:dashboards',
+    name: HEALTH_CHECK_TASK_DASHBOARDS,
     async run(ctx: InitializationTaskRunContext) {
       try {
         ctx.logger.debug('Starting saved objects provisioning');

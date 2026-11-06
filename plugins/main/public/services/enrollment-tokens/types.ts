@@ -12,7 +12,10 @@
 
 /* What the Server API is asked to mint. Only the address is required: the
 manager reads the port and the path prefix from its own listener when they are
-omitted, applies a 30 day lifetime, and allows unlimited enrollments. */
+omitted, applies a 30 day lifetime unless `ttl` says otherwise, and allows
+unlimited enrollments. The register agent wizard always sends a `ttl`
+(`ENROLLMENT_TOKEN_WIZARD_DEFAULT_TTL`), so the 30 day default does not apply to
+it. */
 export interface EnrollmentTokenRequest {
   address: string;
   port?: string | number;

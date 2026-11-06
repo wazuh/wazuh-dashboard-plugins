@@ -227,7 +227,6 @@ export enum tFormFieldsLabel {
   serverAddress = 'server address',
   serverPort = 'server port',
   serverPath = 'server path prefix',
-  managerCa = 'manager CA file path',
 }
 
 /* The three fields that parameterize a mint request, none of which is sent when
@@ -246,9 +245,6 @@ const fieldIsNotApplicable = (
   fieldName: string,
   formFields: UseFormReturn['fields'],
 ): boolean => {
-  if (fieldName === 'managerCa' && !formFields.sslVerification?.value) {
-    return true;
-  }
   /* A token the operator already had is being reused, so no mint request is
   made and the fields that would parameterize it are disabled. */
   return (

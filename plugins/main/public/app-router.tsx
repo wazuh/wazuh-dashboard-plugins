@@ -23,7 +23,6 @@ import WzManagement from './controllers/management/components/management/managem
 import { Overview } from './components/overview/overview';
 import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
-import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
@@ -91,18 +90,6 @@ export const Application = withGuardAsync(
     checkPluginVersion().finally(() => {
       WzAuthentication.refresh();
     });
-
-    // TODO: Replace this with document insteat
-    // Bind deleteExistentToken on Log out component.
-    $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
-      'mouseleave',
-      function () {
-        // opendistro
-        $('button:contains(Log out)').on('click', function () {
-          WzAuthentication.deleteExistentToken();
-        });
-      },
-    );
   }, []);
 
   return (

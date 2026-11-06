@@ -228,6 +228,11 @@ export const WAZUH_THREATINTEL_ENRICHMENTS_PATTERN =
 export const HEALTH_CHECK_TASK_INDEX_PATTERN_THREATINTEL_ENRICHMENTS =
   'index-pattern:threatintel-enrichments';
 
+// Index patterns - Security audit logs, written by the indexer's security plugin
+export const SECURITY_AUDITLOGS_PATTERN = 'security-auditlogs*';
+export const HEALTH_CHECK_TASK_INDEX_PATTERN_SECURITY_AUDITLOGS =
+  'index-pattern:security-auditlogs';
+
 // Time field
 export const FIELD_TIMESTAMP = '@timestamp';
 
@@ -250,6 +255,7 @@ export const WAZUH_SAMPLE_METRICS_AGENTS = 'metrics-agents';
 export const WAZUH_SAMPLE_METRICS_COMMS = 'metrics-comms';
 export const WAZUH_SAMPLE_METRICS_NORMALIZATION = 'metrics-normalization';
 export const WAZUH_SAMPLE_AGENT_STATS = 'agent-stats';
+export const WAZUH_SAMPLE_ACTIVE_RESPONSES = 'active-responses';
 export const WAZUH_SAMPLE_ALERTS_DEFAULT_NUMBER_DOCUMENTS = 1500;
 export const WAZUH_SETTING_ALERTS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_EVENTS_PATTERN.replace('*', ''),
@@ -346,6 +352,11 @@ export const WAZUH_SETTING_METRICS_NORMALIZATION_SAMPLE_PREFIX = {
 export const WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX = {
   indexPatternPrefix: WAZUH_AGENT_STATS_PATTERN.replace('*', ''),
   dataSet: 'agent-stats',
+};
+
+export const WAZUH_SETTING_ACTIVE_RESPONSES_SAMPLE_PREFIX = {
+  indexPatternPrefix: WAZUH_ACTIVE_RESPONSES_PATTERN.replace('*', ''),
+  dataSet: 'active-responses',
 };
 
 export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
@@ -561,6 +572,14 @@ export const WAZUH_SAMPLE_DATA_CATEGORIES_TYPE_DATA = {
       dataSet: WAZUH_SETTING_AGENT_STATS_SAMPLE_PREFIX.dataSet,
     },
   ],
+  [WAZUH_SAMPLE_ACTIVE_RESPONSES]: [
+    {
+      count: 200,
+      indexPatternPrefix:
+        WAZUH_SETTING_ACTIVE_RESPONSES_SAMPLE_PREFIX.indexPatternPrefix,
+      dataSet: WAZUH_SETTING_ACTIVE_RESPONSES_SAMPLE_PREFIX.dataSet,
+    },
+  ],
   [WAZUH_SAMPLE_VULNERABILITIES]: [
     {
       vulnerabilities: true,
@@ -699,6 +718,8 @@ export const DATA_SOURCE_FILTER_CONTROLLED_AZURE_RULE_GROUP =
   'azure-rule-group'; // TODO: change this to 'azure-rule-group' if needed when Azure data source is implemented
 export const DATA_SOURCE_FILTER_CONTROLLED_CASES_EXIST = 'cases-status-exist';
 export const DATA_SOURCE_FILTER_CONTROLLED_FIM_RULE_GROUP = 'fim-rule-group';
+export const DATA_SOURCE_FILTER_CONTROLLED_IT_HYGIENE_RULE_GROUP =
+  'it-hygiene-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_CONFIGURATION_ASSASSMENT_RULE_GROUP =
   'configuration-assessment-rule-group';
 export const DATA_SOURCE_FILTER_CONTROLLED_ISO27001_EXIST =
@@ -814,6 +835,37 @@ export const UI_LABEL_NAME_AGENT_STATUS = {
   default: i18n.translate('wazuh.common.agentStatus.unknown', {
     defaultMessage: 'Unknown',
   }),
+} as const;
+
+export const UI_DESCRIPTION_AGENT_STATUS = {
+  [API_NAME_AGENT_STATUS.ACTIVE]: i18n.translate(
+    'wazuh.common.agentStatusDescription.active',
+    {
+      defaultMessage:
+        'The agent is connected and sends keep-alive messages to the manager.',
+    },
+  ),
+  [API_NAME_AGENT_STATUS.DISCONNECTED]: i18n.translate(
+    'wazuh.common.agentStatusDescription.disconnected',
+    {
+      defaultMessage:
+        'The agent stopped, sent no keep-alive for agents_disconnection_time (15 minutes by default), or the manager restarted and is waiting for its next keep-alive.',
+    },
+  ),
+  [API_NAME_AGENT_STATUS.PENDING]: i18n.translate(
+    'wazuh.common.agentStatusDescription.pending',
+    {
+      defaultMessage:
+        'The agent started and contacted the manager, which is waiting for its first keep-alive.',
+    },
+  ),
+  [API_NAME_AGENT_STATUS.NEVER_CONNECTED]: i18n.translate(
+    'wazuh.common.agentStatusDescription.neverConnected',
+    {
+      defaultMessage:
+        'The agent is enrolled but has never connected to the manager.',
+    },
+  ),
 } as const;
 
 export const UI_ORDER_AGENT_STATUS = [
@@ -1066,6 +1118,16 @@ export const HEALTH_CHECK_TASK_INDEX_PATTERNS = 'saved-objects:index-patterns';
 export const HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY =
   'server-api:certificate-validity';
 
+export const HEALTH_CHECK_TASK_SERVER_API_CONNECTION =
+  'server-api:connection-compatibility';
+
+export const HEALTH_CHECK_TASK_SERVER_API_RUN_AS = 'server-api:run-as';
+
+export const HEALTH_CHECK_TASK_DASHBOARDS = 'saved-objects:dashboards';
+
+export const HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS =
+  'integrations:default-notifications-channels';
+
 // Certificate validity health check
 export const CERTIFICATE_EXPIRY_WARNING_SETTING =
   'healthCheckCertificateExpiryWarningDays';
@@ -1274,6 +1336,45 @@ export const TAB_VIEW_NAME_RESPONSES = i18n.translate(
   'wazuh.common.moduleTabs.responses',
   { defaultMessage: 'Responses' },
 );
+
+export const TAB_NAMES = {
+  cases: i18n.translate('wazuh.common.moduleTabs.cases', {
+    defaultMessage: 'Cases',
+  }),
+  inventory: i18n.translate('wazuh.common.moduleTabs.inventory', {
+    defaultMessage: 'Inventory',
+  }),
+  panel: i18n.translate('wazuh.common.moduleTabs.panel', {
+    defaultMessage: 'Panel',
+  }),
+  intelligence: i18n.translate('wazuh.common.moduleTabs.intelligence', {
+    defaultMessage: 'Intelligence',
+  }),
+  framework: i18n.translate('wazuh.common.moduleTabs.framework', {
+    defaultMessage: 'Framework',
+  }),
+  controls: i18n.translate('wazuh.common.moduleTabs.controls', {
+    defaultMessage: 'Controls',
+  }),
+  system: i18n.translate('wazuh.common.moduleTabs.system', {
+    defaultMessage: 'System',
+  }),
+  software: i18n.translate('wazuh.common.moduleTabs.software', {
+    defaultMessage: 'Software',
+  }),
+  processes: i18n.translate('wazuh.common.moduleTabs.processes', {
+    defaultMessage: 'Processes',
+  }),
+  network: i18n.translate('wazuh.common.moduleTabs.network', {
+    defaultMessage: 'Network',
+  }),
+  identity: i18n.translate('wazuh.common.moduleTabs.identity', {
+    defaultMessage: 'Identity',
+  }),
+  services: i18n.translate('wazuh.common.moduleTabs.services', {
+    defaultMessage: 'Services',
+  }),
+};
 
 export const CTI_CVE_LINK_BASE_PATH =
   'https://cti.wazuh.com/vulnerabilities/cves/';

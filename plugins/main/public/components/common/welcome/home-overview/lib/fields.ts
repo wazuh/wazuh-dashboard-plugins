@@ -31,6 +31,8 @@ export const RULE_TITLE_FIELD = 'wazuh.rule.title';
 /** Integration a finding came from, i.e. the module that produced it. */
 export const INTEGRATION_NAME_FIELD = 'wazuh.integration.name';
 export const HOST_OS_NAME_FIELD = 'host.os.name';
+/** OS family of an agent on the system inventory (e.g. `windows`, `ubuntu`). */
+export const HOST_OS_PLATFORM_FIELD = 'host.os.platform';
 export const PROCESS_NAME_FIELD = 'process.name';
 export const SCA_CHECK_RESULT_FIELD = 'check.result';
 export const SCA_POLICY_NAME_FIELD = 'policy.name';

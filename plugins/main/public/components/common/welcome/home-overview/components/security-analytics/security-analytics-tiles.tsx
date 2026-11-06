@@ -20,8 +20,21 @@ export interface SecurityAnalyticsTilesProps {
   filters: DataGroupResult<number>;
 }
 
+const OVERVIEW_GROUP = i18n.translate(
+  'wazuh.common.homeOverviewRulesetTiles.overviewGroup',
+  { defaultMessage: 'Overview' },
+);
+const NORMALIZATION_GROUP = i18n.translate(
+  'wazuh.common.homeOverviewRulesetTiles.normalizationGroup',
+  { defaultMessage: 'Normalization' },
+);
+const DETECTION_GROUP = i18n.translate(
+  'wazuh.common.homeOverviewRulesetTiles.detectionGroup',
+  { defaultMessage: 'Detection' },
+);
+
 /**
- * Ordered by the Ruleset Management side menu: Overview (Integrations, with
+ * Ordered and grouped by the Ruleset Management side menu: Overview (Integrations, with
  * Filters as its second tab), then Normalization (Decoders, KVDBs), then
  * Detection (Detectors, Rules).
  */
@@ -33,6 +46,7 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
       { defaultMessage: 'Integrations' },
     ),
     testSubj: 'security-analytics-tile-integrations',
+    group: OVERVIEW_GROUP,
     onSelect: getIntegrationsUrl,
   },
   {
@@ -41,6 +55,7 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
       defaultMessage: 'Filters',
     }),
     testSubj: 'security-analytics-tile-filters',
+    group: OVERVIEW_GROUP,
     onSelect: getFiltersUrl,
   },
   {
@@ -49,6 +64,7 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
       defaultMessage: 'Decoders',
     }),
     testSubj: 'security-analytics-tile-decoders',
+    group: NORMALIZATION_GROUP,
     onSelect: getDecodersUrl,
   },
   {
@@ -57,6 +73,7 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
       defaultMessage: 'KVDBs',
     }),
     testSubj: 'security-analytics-tile-kvdbs',
+    group: NORMALIZATION_GROUP,
     onSelect: getKvdbsUrl,
   },
   {
@@ -65,6 +82,7 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
       defaultMessage: 'Detectors',
     }),
     testSubj: 'security-analytics-tile-detectors',
+    group: DETECTION_GROUP,
     onSelect: getDetectorsUrl,
   },
   {
@@ -73,6 +91,7 @@ const TILES: ReadonlyArray<StatTileSpec<keyof SecurityAnalyticsTilesProps>> = [
       defaultMessage: 'Rules',
     }),
     testSubj: 'security-analytics-tile-rules',
+    group: DETECTION_GROUP,
     onSelect: getRulesUrl,
   },
 ];
