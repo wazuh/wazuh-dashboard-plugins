@@ -159,6 +159,7 @@ const ITHygieneInventoryDashboard = ({
                     isDataSourceLoading={isDataSourceLoading}
                     setFilters={setFilters}
                     searchBarProps={searchBarProps}
+                    query={searchBarProps.query}
                     displayOnlyNoResultsCalloutOnNoResults={true}
                     showSearchBar={false}
                     dataGridProps={dataGridProps}

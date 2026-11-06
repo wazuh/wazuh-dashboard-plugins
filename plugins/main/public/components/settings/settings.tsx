@@ -45,6 +45,7 @@ import {
 import { Route, Switch } from '../router-search';
 import { useRouterSearch } from '../common/hooks';
 import NavigationService from '../../react-services/navigation-service';
+import { isLoggingOut } from '../../services/request-handler';
 import { AppInfo } from './types';
 
 const configurationTabID = 'configuration';
@@ -202,6 +203,7 @@ class SettingsComponent extends React.Component {
           indexPatterns: await SavedObject.getListOfWazuhValidIndexPatterns(),
         });
       } catch (error) {
+        if (isLoggingOut()) return;
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         NavigationService.getInstance().navigate('/blank-screen');
         return;

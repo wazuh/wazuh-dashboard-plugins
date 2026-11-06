@@ -37,6 +37,7 @@ import {
   jobSanitizeUploadedFilesTasksRun,
 } from './start';
 import { first } from 'rxjs/operators';
+import { registerRevokeAPITokenOnLogout } from './lib/revoke-api-token-on-logout';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -103,6 +104,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         'x-frame-options': 'sameorigin',
       };
       return toolkit.next({ headers: additionalHeaders });
+    });
+
+    registerRevokeAPITokenOnLogout(core.http, {
+      serverAPIClient: plugins.wazuhCore.serverAPIClient,
+      logger: this.logger.get('logout'),
     });
 
     // Routes

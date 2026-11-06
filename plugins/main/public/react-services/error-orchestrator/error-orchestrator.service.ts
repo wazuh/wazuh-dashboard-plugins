@@ -12,6 +12,7 @@
 
 import { errorOrchestratorFactory } from './error-orchestrator.factory';
 import { ErrorOrchestrator, UIErrorLog } from './types';
+import { isLoggingOut } from '../../services/request-handler';
 
 export class ErrorOrchestratorService {
   public constructor() {}
@@ -28,7 +29,14 @@ export class ErrorOrchestratorService {
     store = false,
     error,
   }: UIErrorLog) {
-    const uiErrorLog = { context, level, severity, display, store, error };
+    const uiErrorLog = {
+      context,
+      level,
+      severity,
+      display: display && !isLoggingOut(),
+      store,
+      error,
+    };
     const errorOrchestrator: ErrorOrchestrator = errorOrchestratorFactory(
       uiErrorLog.severity,
     );
