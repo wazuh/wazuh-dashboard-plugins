@@ -160,6 +160,7 @@ import { WazuhPluginConfigType } from './config';
 // process lifetime.
 const knownFieldsFilePath = (fileName: string) =>
   path.resolve(__dirname, '../common/known-fields', fileName);
+import { registerRevokeAPITokenOnLogout } from './lib/revoke-api-token-on-logout';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -738,6 +739,11 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       }
 
       return toolkit.next({ headers: additionalHeaders });
+    });
+
+    registerRevokeAPITokenOnLogout(core.http, {
+      serverAPIClient: plugins.wazuhCore.serverAPIClient,
+      logger: this.logger.get('logout'),
     });
 
     // Routes
