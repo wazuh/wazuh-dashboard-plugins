@@ -208,9 +208,9 @@ export const buildVulnerabilitySummaryBody = () => ({
 });
 
 /**
- * The stored parts a list row shows: CVE metadata and scores, the actions
- * and targets of a translation rule. The rest of a record stays on the server
- * until the record is opened.
+ * The stored parts a list row shows: CVE metadata and scores; the source
+ * patterns, translations, actions and targets of a translation rule. The rest
+ * of a record stays on the server until the record is opened.
  */
 export const VULNERABILITY_LIST_SOURCE = [
   'type',
@@ -222,6 +222,8 @@ export const VULNERABILITY_LIST_SOURCE = [
   'document.containers.adp.metrics',
   'document.action',
   'document.target',
+  'document.source',
+  'document.translation',
 ];
 
 /**

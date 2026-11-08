@@ -1,14 +1,6 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiLink,
-  EuiProgress,
-  EuiText,
-  EuiTextColor,
-  EuiToolTip,
-} from '@elastic/eui';
+import { EuiLink, EuiProgress, EuiText, EuiToolTip } from '@elastic/eui';
 import type { CtiBucket } from '../../../../common/cti-explorer/types';
 import { formatNumber } from '../utils/labels';
 import { NORMAL_FONT_WEIGHT } from '../utils/styles';
@@ -24,8 +16,28 @@ interface BreakdownListProps {
 }
 
 /**
- * A breakdown as rows of label, bar and count: the bar is the share of the
- * catalog total, so rows of different breakdowns compare on the same scale.
+ * Columns of the Home page bar lists: the label column is as wide as the longest
+ * label, so every bar starts right after it; count and share follow, each one
+ * right-aligned in its own column.
+ */
+const GRID_STYLE: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns:
+    'minmax(0, max-content) minmax(40px, 1fr) max-content max-content',
+  columnGap: 8,
+  rowGap: 10,
+  alignItems: 'center',
+  width: '100%',
+};
+
+const NUMBER_STYLE: React.CSSProperties = {
+  fontVariantNumeric: 'tabular-nums',
+  textAlign: 'right',
+};
+
+/**
+ * A breakdown as rows of label, bar, count and share: the bar is the share of
+ * the catalog total, so rows of different breakdowns compare on the same scale.
  */
 export const BreakdownList = ({
   buckets,
@@ -46,61 +58,51 @@ export const BreakdownList = ({
     );
   }
   return (
-    <div data-test-subj={dataTestSubj}>
+    <div style={GRID_STYLE} data-test-subj={dataTestSubj}>
       {buckets.map(bucket => {
         const label = getLabel(bucket.key);
         const share = total ? (bucket.count / total) * 100 : 0;
-        const shareText = `${share.toFixed(1)}%`;
         return (
-          <EuiFlexGroup
-            key={bucket.key}
-            gutterSize='s'
-            alignItems='center'
-            responsive={false}
-          >
-            <EuiFlexItem grow={4} style={{ minWidth: 0 }}>
-              <EuiText size='s' className='eui-textTruncate'>
-                {onSelect ? (
-                  <EuiToolTip
-                    content={i18n.translate(
-                      'wazuh.ctiExplorer.breakdown.filterTooltip',
-                      {
-                        defaultMessage: 'Show the records of {label}',
-                        values: { label },
-                      },
-                    )}
+          <React.Fragment key={bucket.key}>
+            <EuiText size='s' className='eui-textTruncate'>
+              {onSelect ? (
+                <EuiToolTip
+                  display='block'
+                  anchorClassName='eui-textTruncate'
+                  content={i18n.translate(
+                    'wazuh.ctiExplorer.breakdown.filterTooltip',
+                    {
+                      defaultMessage: 'Show the records of {label}',
+                      values: { label },
+                    },
+                  )}
+                >
+                  <EuiLink
+                    onClick={() => onSelect(bucket.key)}
+                    style={NORMAL_FONT_WEIGHT}
+                    data-test-subj={`${dataTestSubj}-${bucket.key}`}
                   >
-                    <EuiLink
-                      onClick={() => onSelect(bucket.key)}
-                      style={NORMAL_FONT_WEIGHT}
-                      data-test-subj={`${dataTestSubj}-${bucket.key}`}
-                    >
-                      {label}
-                    </EuiLink>
-                  </EuiToolTip>
-                ) : (
-                  label
-                )}
-              </EuiText>
-            </EuiFlexItem>
-            <EuiFlexItem grow={5}>
-              <EuiProgress
-                value={bucket.count}
-                max={total || 1}
-                size='s'
-                color='primary'
-                aria-label={label}
-              />
-            </EuiFlexItem>
-            <EuiFlexItem grow={false} style={{ minWidth: '9em' }}>
-              <EuiText size='s' textAlign='right'>
-                {formatNumber(bucket.count)}{' '}
-                <EuiTextColor color='subdued'>
-                  <small>{shareText}</small>
-                </EuiTextColor>
-              </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+                    {label}
+                  </EuiLink>
+                </EuiToolTip>
+              ) : (
+                <span title={label}>{label}</span>
+              )}
+            </EuiText>
+            <EuiProgress
+              value={bucket.count}
+              max={total || 1}
+              size='m'
+              color='primary'
+              aria-label={label}
+            />
+            <EuiText size='s' style={NUMBER_STYLE}>
+              {formatNumber(bucket.count)}
+            </EuiText>
+            <EuiText size='xs' color='subdued' style={NUMBER_STYLE}>
+              {`${share.toFixed(1)}%`}
+            </EuiText>
+          </React.Fragment>
         );
       })}
     </div>

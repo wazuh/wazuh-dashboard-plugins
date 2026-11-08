@@ -11,18 +11,18 @@
  */
 
 import React, { useCallback, useState } from 'react';
-import useObservable from 'react-use/lib/useObservable';
 import { i18n } from '@osd/i18n';
-import { EuiButtonEmpty, EuiPageHeader, EuiSpacer } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiPageHeader,
+  EuiSpacer,
+} from '@elastic/eui';
 import type { VulnerabilityRecordType } from '../../../common/cti-explorer/constants';
 import type { IocFilters } from '../../../common/cti-explorer/types';
-import { getCore } from '../../kibana-services';
+import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
 import NavigationService from '../../react-services/navigation-service';
 import { useRouterSearch } from '../common/hooks/use-router-search';
-import {
-  getCtiFeedUrl,
-  isCtiFeedRegistered,
-} from '../common/welcome/home-overview/utils/navigation';
 import { useCtiRequest } from './hooks/use-cti-request';
 import {
   fetchIocSummary,
@@ -50,7 +50,11 @@ const TAB_LABELS: Record<CtiExplorerTab, string> = {
   }),
 };
 
-const NO_APPLICATIONS = new Map();
+/** The feeds whose content the page shows. */
+const CTI_EXPLORER_FEEDS: Array<'iocs' | 'vulnerabilities'> = [
+  'iocs',
+  'vulnerabilities',
+];
 
 /**
  * The open tab and the open record live in the URL (`tab`, `ioc`, `record`),
@@ -62,10 +66,7 @@ export const CtiExplorer = () => {
     ? (search.tab as CtiExplorerTab)
     : 'overview';
 
-  const applications = useObservable(
-    getCore().application.applications$,
-    NO_APPLICATIONS,
-  );
+  const { CtiFeedSyncStatus } = getWazuhCheckUpdatesPlugin();
 
   // Read once for the page: the tabs share them and switching tabs keeps them.
   const iocSummary = useCtiRequest(fetchIocSummary, []);
@@ -104,20 +105,18 @@ export const CtiExplorer = () => {
         })}
         rightSideItems={[
           <AboutCtiExplorer key='about' />,
-          ...(isCtiFeedRegistered(applications)
-            ? [
-                <EuiButtonEmpty
-                  key='ctiFeed'
-                  iconType='globe'
-                  href={getCtiFeedUrl()}
-                  data-test-subj='ctiExplorerCtiFeedLink'
-                >
-                  {i18n.translate('wazuh.ctiExplorer.page.ctiFeed', {
-                    defaultMessage: 'CTI feed',
-                  })}
-                </EuiButtonEmpty>,
-              ]
-            : []),
+          // Centered on the height of the buttons beside it. Opens the CTI
+          // feed app, when it is enabled.
+          <EuiFlexGroup
+            key='feedSync'
+            alignItems='center'
+            responsive={false}
+            style={{ height: '100%' }}
+          >
+            <EuiFlexItem grow={false}>
+              <CtiFeedSyncStatus feeds={CTI_EXPLORER_FEEDS} />
+            </EuiFlexItem>
+          </EuiFlexGroup>,
         ]}
         tabs={TABS.map(id => ({
           label: TAB_LABELS[id],

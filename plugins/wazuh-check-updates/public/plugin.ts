@@ -22,6 +22,7 @@ import {
 } from './plugin-services';
 import { getAvailableUpdates } from './services';
 import { CtiUpsellNotification } from './shared-components/cti-registration/components/cti-upsell-notification';
+import { createCtiFeedSyncStatus } from './shared-components/cti-feed-sync-status';
 import {
   CTI_FEED_APP_ID,
   CTI_FEED_APP_ORDER,
@@ -103,6 +104,8 @@ export class WazuhCheckUpdatesPlugin
       ctiUpsellEnabled,
       ctiRegistrationStatusPollIntervalSec,
       CtiUpsellNotification,
+      // The CTI feed app exists only with the CTI registration UI.
+      CtiFeedSyncStatus: createCtiFeedSyncStatus(ctiRegistrationUiEnabled),
     };
   }
 

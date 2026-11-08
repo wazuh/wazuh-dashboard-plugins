@@ -263,36 +263,8 @@ const IocBreakdowns = ({
     <EuiSpacer size='m' />
     {summary ? (
       <EuiFlexGrid columns={3} gutterSize='m'>
-        <Breakdown
-          title={i18n.translate('wazuh.ctiExplorer.iocs.byType', {
-            defaultMessage: 'By type',
-          })}
-          buckets={summary.byType}
-          total={summary.total}
-          getLabel={getIocTypeLabel}
-          onSelect={value => onFilter('type', value)}
-          testSubj='type'
-        />
-        <Breakdown
-          title={i18n.translate('wazuh.ctiExplorer.iocs.byProvider', {
-            defaultMessage: 'By provider',
-          })}
-          buckets={summary.byProvider}
-          total={summary.total}
-          getLabel={getProviderName}
-          onSelect={value => onFilter('provider', value)}
-          testSubj='provider'
-        />
-        <Breakdown
-          title={i18n.translate('wazuh.ctiExplorer.iocs.byRole', {
-            defaultMessage: 'By malware role',
-          })}
-          buckets={summary.byRole}
-          total={summary.total}
-          getLabel={getMalwareRoleLabel}
-          onSelect={value => onFilter('role', value)}
-          testSubj='role'
-        />
+        {/* Rows group the breakdowns of similar length: the long top-N lists
+        first, the short fixed vocabularies after. */}
         <Breakdown
           title={i18n.translate('wazuh.ctiExplorer.iocs.byFamily', {
             defaultMessage: 'Top malware families',
@@ -310,6 +282,36 @@ const IocBreakdowns = ({
           total={summary.total}
           onSelect={value => onFilter('tag', value)}
           testSubj='tag'
+        />
+        <Breakdown
+          title={i18n.translate('wazuh.ctiExplorer.iocs.byProvider', {
+            defaultMessage: 'By provider',
+          })}
+          buckets={summary.byProvider}
+          total={summary.total}
+          getLabel={getProviderName}
+          onSelect={value => onFilter('provider', value)}
+          testSubj='provider'
+        />
+        <Breakdown
+          title={i18n.translate('wazuh.ctiExplorer.iocs.byType', {
+            defaultMessage: 'By type',
+          })}
+          buckets={summary.byType}
+          total={summary.total}
+          getLabel={getIocTypeLabel}
+          onSelect={value => onFilter('type', value)}
+          testSubj='type'
+        />
+        <Breakdown
+          title={i18n.translate('wazuh.ctiExplorer.iocs.byRole', {
+            defaultMessage: 'By malware role',
+          })}
+          buckets={summary.byRole}
+          total={summary.total}
+          getLabel={getMalwareRoleLabel}
+          onSelect={value => onFilter('role', value)}
+          testSubj='role'
         />
         <Breakdown
           title={i18n.translate('wazuh.ctiExplorer.iocs.byConfidence', {

@@ -5,6 +5,7 @@ import {
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiButtonGroup,
+  EuiCode,
   EuiFieldSearch,
   EuiFlexGroup,
   EuiFlexItem,
@@ -148,6 +149,73 @@ const CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
   },
 ];
 
+/** `vendor:product` of each translation, the CPE names a rule maps a package to. */
+const translationTargets = (item: VulnerabilityListItem) =>
+  (translationRule(item)?.translations ?? []).map(
+    translation => `${translation.vendor ?? ''}:${translation.product ?? ''}`,
+  );
+
+/** Columns of the exported translation rules, every one present in each rule. */
+const TID_CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
+  {
+    field: 'id',
+    title: i18n.translate('wazuh.ctiExplorer.vulnerabilities.csv.record', {
+      defaultMessage: 'Record',
+    }),
+    value: item => item.id,
+  },
+  {
+    field: 'vendorPattern',
+    title: i18n.translate(
+      'wazuh.ctiExplorer.vulnerabilities.csv.vendorPattern',
+      { defaultMessage: 'Vendor pattern' },
+    ),
+    value: item => translationRule(item)?.source.vendor,
+  },
+  {
+    field: 'productPattern',
+    title: i18n.translate(
+      'wazuh.ctiExplorer.vulnerabilities.csv.productPattern',
+      { defaultMessage: 'Product pattern' },
+    ),
+    value: item => translationRule(item)?.source.product,
+  },
+  {
+    field: 'translatesTo',
+    title: i18n.translate(
+      'wazuh.ctiExplorer.vulnerabilities.csv.translatesTo',
+      {
+        defaultMessage: 'Translates to',
+      },
+    ),
+    value: item => translationTargets(item).join('; '),
+  },
+  {
+    field: 'actions',
+    title: i18n.translate('wazuh.ctiExplorer.vulnerabilities.csv.tidActions', {
+      defaultMessage: 'Actions',
+    }),
+    value: item => translationRule(item)?.actions.join(', '),
+  },
+  {
+    field: 'targets',
+    title: i18n.translate('wazuh.ctiExplorer.vulnerabilities.csv.tidTargets', {
+      defaultMessage: 'Targets',
+    }),
+    value: item => translationRule(item)?.targets.join(', '),
+  },
+];
+
+/** A source pattern of a translation rule, a regular expression; `-` when empty. */
+const renderPattern = (pattern: string | undefined) =>
+  pattern ? (
+    <EuiCode transparentBackground className='eui-textBreakAll'>
+      {pattern}
+    </EuiCode>
+  ) : (
+    '-'
+  );
+
 interface VulnerabilitiesTabProps {
   summary: CtiRequestState<VulnerabilitySummaryResponse>;
   type: VulnerabilityRecordType | undefined;
@@ -243,25 +311,98 @@ export const VulnerabilitiesTab = ({
     }
   };
 
-  const columns: Array<EuiBasicTableColumn<VulnerabilityRow>> = [
+  const recordColumn: EuiBasicTableColumn<VulnerabilityRow> = {
+    field: 'id',
+    name: i18n.translate('wazuh.ctiExplorer.vulnerabilities.columns.record', {
+      defaultMessage: 'Record',
+    }),
+    render: (id: string) => (
+      <EuiLink
+        onClick={(event: React.MouseEvent) => {
+          event.stopPropagation();
+          onOpenVulnerability(id);
+        }}
+        style={NORMAL_FONT_WEIGHT}
+        className='eui-textNoWrap'
+        data-test-subj='ctiExplorerVulnerabilityId'
+      >
+        {id}
+      </EuiLink>
+    ),
+  };
+
+  // Translation rules have none of the CVE fields: they list what every rule
+  // holds instead, the package it matches and the names it maps it to.
+  const tidColumns: Array<EuiBasicTableColumn<VulnerabilityRow>> = [
+    recordColumn,
     {
-      field: 'id',
-      name: i18n.translate('wazuh.ctiExplorer.vulnerabilities.columns.record', {
-        defaultMessage: 'Record',
-      }),
-      render: (id: string) => (
-        <EuiLink
-          onClick={(event: React.MouseEvent) => {
-            event.stopPropagation();
-            onOpenVulnerability(id);
-          }}
-          style={NORMAL_FONT_WEIGHT}
-          data-test-subj='ctiExplorerVulnerabilityId'
-        >
-          {id}
-        </EuiLink>
+      name: i18n.translate(
+        'wazuh.ctiExplorer.vulnerabilities.columns.vendorPattern',
+        { defaultMessage: 'Vendor pattern' },
+      ),
+      width: '20%',
+      render: (item: VulnerabilityListItem) =>
+        renderPattern(translationRule(item)?.source.vendor),
+    },
+    {
+      name: i18n.translate(
+        'wazuh.ctiExplorer.vulnerabilities.columns.productPattern',
+        { defaultMessage: 'Product pattern' },
+      ),
+      width: '32%',
+      render: (item: VulnerabilityListItem) =>
+        renderPattern(translationRule(item)?.source.product),
+    },
+    {
+      name: i18n.translate(
+        'wazuh.ctiExplorer.vulnerabilities.columns.translatesTo',
+        { defaultMessage: 'Translates to' },
+      ),
+      width: '22%',
+      render: (item: VulnerabilityListItem) => (
+        <div>
+          {translationTargets(item).map((target, position) => (
+            <div key={position} className='eui-textBreakWord'>
+              {target}
+            </div>
+          ))}
+        </div>
       ),
     },
+    {
+      name: i18n.translate(
+        'wazuh.ctiExplorer.vulnerabilities.columns.actions',
+        { defaultMessage: 'Actions' },
+      ),
+      render: (item: VulnerabilityListItem) => (
+        <div>
+          {(translationRule(item)?.actions ?? []).map(action => (
+            <div key={action} className='eui-textNoWrap'>
+              {action}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      name: i18n.translate(
+        'wazuh.ctiExplorer.vulnerabilities.columns.targets',
+        { defaultMessage: 'Targets' },
+      ),
+      render: (item: VulnerabilityListItem) => (
+        <div>
+          {(translationRule(item)?.targets ?? []).map(target => (
+            <div key={target} className='eui-textNoWrap'>
+              {target}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ];
+
+  const columns: Array<EuiBasicTableColumn<VulnerabilityRow>> = [
+    recordColumn,
     {
       field: 'type',
       name: i18n.translate('wazuh.ctiExplorer.vulnerabilities.columns.type', {
@@ -376,7 +517,7 @@ export const VulnerabilitiesTab = ({
                   pageSize: exportPageSize,
                 })
               }
-              columns={CSV_COLUMNS}
+              columns={isTid ? TID_CSV_COLUMNS : CSV_COLUMNS}
               filename='cti-vulnerabilities'
               data-test-subj='ctiExplorerVulnerabilityExport'
             />
@@ -515,7 +656,7 @@ export const VulnerabilitiesTab = ({
           <EuiBasicTable<VulnerabilityRow>
             items={rows}
             itemId='rowKey'
-            columns={columns}
+            columns={isTid ? tidColumns : columns}
             loading={result.loading}
             tableLayout='auto'
             noItemsMessage={

@@ -113,6 +113,10 @@ type and offset are searchable. The tab therefore:
   column, which also reads the ADP containers, can show another band. The filter needs an index
   that maps these scores (as `half_float`); in an index without that mapping no record matches.
   Translation rules have no scores, so the filter is disabled for them.
+- Lists the translation rules, when **Translation rules (TID)** is selected, with the fields every
+  rule holds: the vendor and product patterns (regular expressions) it matches against an installed
+  package, the `vendor:product` names it translates the package to, its actions and its target
+  operating systems. **Export CSV** exports the same columns.
 - Opens any record by its full id, such as `CVE-2024-6387`. Free text cannot be searched.
 - Exports the listed records, of the selected type, with **Export CSV**: id, type, highest CVSS
   score, severity and version, dates, assigner and state of the CVE records, and the actions and

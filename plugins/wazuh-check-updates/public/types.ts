@@ -1,5 +1,6 @@
 import { WazuhCorePluginStart } from '../../wazuh-core/public';
 import { AvailableUpdates } from '../common/types';
+import type { CtiFeedSyncStatusProps } from './shared-components/cti-feed-sync-status';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface WazuhCheckUpdatesPluginSetup {}
@@ -15,6 +16,8 @@ export interface WazuhCheckUpdatesPluginStart {
   ctiUpsellEnabled: boolean;
   ctiRegistrationStatusPollIntervalSec: number;
   CtiUpsellNotification: () => JSX.Element | null;
+  /** Sync state of the CTI feed, linking to the CTI feed app when it is enabled. */
+  CtiFeedSyncStatus: (props: CtiFeedSyncStatusProps) => JSX.Element | null;
 }
 
 export interface AppPluginStartDependencies {
