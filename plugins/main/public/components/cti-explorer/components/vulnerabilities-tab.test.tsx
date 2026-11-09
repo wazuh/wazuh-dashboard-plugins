@@ -74,6 +74,10 @@ describe('VulnerabilitiesTab', () => {
     await waitFor(() =>
       expect(lastRequest()).toMatchObject({ type: 'TID', severities: [] }),
     );
+    // Translation rules have no scores: the filter is hidden.
+    expect(
+      screen.queryByTestId('ctiExplorerSeverityFilter'),
+    ).not.toBeInTheDocument();
 
     // Back on CVE records, the severity is not restored.
     rerender(renderTab('CVE'));

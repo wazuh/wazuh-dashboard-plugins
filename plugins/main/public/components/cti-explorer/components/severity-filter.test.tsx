@@ -35,8 +35,13 @@ describe('SeverityFilter', () => {
     expect(screen.getByText('High')).toBeInTheDocument();
   });
 
-  it('can be disabled', () => {
-    render(<SeverityFilter selected={[]} onChange={jest.fn()} isDisabled />);
-    expect(screen.getByTestId('comboBoxSearchInput')).toBeDisabled();
+  it('explains how the severities match the scores', async () => {
+    render(<SeverityFilter selected={[]} onChange={jest.fn()} />);
+    fireEvent.mouseOver(screen.getByTestId('ctiExplorerSeverityFilterHelp'));
+    expect(
+      await screen.findByText(
+        /at least one of its scores is in a selected range/,
+      ),
+    ).toBeInTheDocument();
   });
 });

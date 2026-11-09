@@ -418,13 +418,12 @@ export const VulnerabilitiesTab = ({
               data-test-subj='ctiExplorerVulnerabilityType'
             />
           </EuiFlexItem>
-          <EuiFlexItem grow={false} style={{ minWidth: 220 }}>
-            <SeverityFilter
-              selected={severities}
-              onChange={setSeverities}
-              isDisabled={type === 'TID'}
-            />
-          </EuiFlexItem>
+          {/* Translation rules have no scores: no severity to filter by. */}
+          {isTid ? null : (
+            <EuiFlexItem grow={false} style={{ minWidth: 250 }}>
+              <SeverityFilter selected={severities} onChange={setSeverities} />
+            </EuiFlexItem>
+          )}
           <EuiFlexItem style={{ minWidth: 260 }}>
             <EuiFormRow
               fullWidth
