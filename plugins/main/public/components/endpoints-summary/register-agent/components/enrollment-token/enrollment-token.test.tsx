@@ -10,6 +10,7 @@ import '@testing-library/jest-dom/extend-expect';
 import EnrollmentTokenInput from './enrollment-token';
 import {
   createEnrollmentToken,
+  getEnrollmentToken,
   getEnrollmentTokens,
   revokeEnrollmentToken,
 } from '../../../../../services/enrollment-tokens';
@@ -40,7 +41,11 @@ jest.mock('../../../../../kibana-services', () => {
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
   ...jest.requireActual('../../../../../services/enrollment-tokens/constants'),
+  ...jest.requireActual(
+    '../../../../../services/enrollment-tokens/decode-enrollment-token',
+  ),
   createEnrollmentToken: jest.fn(),
+  getEnrollmentToken: jest.fn(),
   getEnrollmentTokens: jest.fn(),
   revokeEnrollmentToken: jest.fn(),
 }));
@@ -83,6 +88,7 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 
 const createToken = createEnrollmentToken as jest.Mock;
 const listTokens = getEnrollmentTokens as jest.Mock;
+const lookupToken = getEnrollmentToken as jest.Mock;
 const revokeToken = revokeEnrollmentToken as jest.Mock;
 
 const MINTED = {
@@ -219,6 +225,8 @@ beforeEach(() => {
   createToken.mockReset();
   listTokens.mockReset();
   listTokens.mockResolvedValue({ tokens: [], total: 0 });
+  lookupToken.mockReset();
+  lookupToken.mockResolvedValue(undefined);
   revokeToken.mockReset();
 });
 
@@ -503,6 +511,36 @@ describe('EnrollmentTokenInput', () => {
     expect(onEnrollmentTokenChange).toHaveBeenCalledWith({
       source: 'existing',
       token: 'eyJ2ZXIiOjEs',
+    });
+  });
+
+  /* A pasted token is checked against the token list rather than trusted:
+  the step used to report a revoked token as in use without a warning. */
+  it('warns about a revoked stored token while still deploying with it', async () => {
+    const toBase64Url = (binary: string) =>
+      btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const key = toBase64Url(
+      String.fromCharCode(...Array.from({ length: 32 }, (_, i) => i)),
+    );
+    const stored = toBase64Url(
+      JSON.stringify({ ver: 1, adr: 'manager.example.com', pin: key, key }),
+    );
+    lookupToken.mockResolvedValue({
+      id: 'AAECAwQFBgcICQoLDA0ODw',
+      revoked: true,
+    });
+
+    const { onEnrollmentTokenChange } = renderInput({
+      formFields: { existingEnrollmentToken: field(stored) },
+    });
+
+    expect(
+      await screen.findByText('This token is revoked'),
+    ).toBeInTheDocument();
+    expect(lookupToken).toHaveBeenCalledWith('AAECAwQFBgcICQoLDA0ODw');
+    expect(onEnrollmentTokenChange).toHaveBeenCalledWith({
+      source: 'existing',
+      token: stored,
     });
   });
 

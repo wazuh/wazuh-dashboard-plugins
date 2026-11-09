@@ -23,6 +23,7 @@ import { UseFormReturn } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
 import { WzButtonPermissionsModalConfirm } from '../../../../common/buttons';
 import AdvancedOptions from '../advanced-options/advanced-options';
+import ExistingTokenStatus from './existing-token-status';
 import { ENROLLMENT_TOKEN_TEXTS } from '../../utils/register-agent-data';
 import {
   createEnrollmentToken,
@@ -457,30 +458,14 @@ const EnrollmentTokenInput = ({
             </EuiFlexItem>
           </EuiFlexGroup>
           {enrollmentToken?.source === 'existing' ? (
-            <>
-              <EuiSpacer size='m' />
-              <EuiCallOut
-                color='success'
-                title={i18n.translate(
-                  'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenInUseTitle',
-                  {
-                    defaultMessage: 'Using the token provided',
-                  },
-                )}
-                iconType='check'
-                className='warningForAgentName'
-              >
-                <p>
-                  {i18n.translate(
-                    'wazuh.endpointsSummary.enrollmentTokenInput.existingTokenInUseDescription',
-                    {
-                      defaultMessage:
-                        'The deployment command below installs the agent with this token. Its manager address, its lifetime and the enrollments it has left are not shown here: the server returns them only when it mints a token, and it is the server that refuses an expired or exhausted one at enrollment time.',
-                    },
-                  )}
-                </p>
-              </EuiCallOut>
-            </>
+            <ExistingTokenStatus
+              token={enrollmentToken.token}
+              expectedEndpoint={{
+                address: serverAddress?.value,
+                port: serverPort?.value,
+                prefix: serverPath?.value,
+              }}
+            />
           ) : null}
         </>
       ) : (
