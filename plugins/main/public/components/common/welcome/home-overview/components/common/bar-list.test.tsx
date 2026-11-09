@@ -22,6 +22,7 @@ describe('BarList', () => {
     render(<BarList items={items} getHref={item => `#/mitre/${item.key}`} />);
     const link = screen.getByText('Discovery').closest('a');
     expect(link).toHaveAttribute('href', '#/mitre/Discovery');
+    expect(link).toHaveStyle({ fontWeight: 'normal' });
   });
 
   it('renders the empty message instead of a blank list when items is empty', () => {

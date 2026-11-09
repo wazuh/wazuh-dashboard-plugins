@@ -83,13 +83,42 @@ describe('SubscriptionPanel', () => {
     renderPanel({ statusCTI: SUCCESS });
 
     expect(screen.getByTestId('ctiFeedSubscriptionTitle')).toHaveTextContent(
-      'Pro Plan',
+      'Pro Plan feed',
     );
     expect(screen.getByTestId('ctiFeedSubscriptionStatus')).toHaveTextContent(
       'Registered',
     );
     expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
     expect(screen.queryByTestId('ctiFeedSubscriptionTiers')).toBeNull();
+  });
+
+  test('suggests the Professional feed when registered on the Open one', () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Open', is_public: true },
+      },
+    });
+
+    renderPanel({ statusCTI: SUCCESS });
+
+    expect(screen.getByTestId('ctiFeedSubscriptionTitle')).toHaveTextContent(
+      'Open feed',
+    );
+    expect(screen.getByTestId('ctiFeedSubscriptionStatus')).toHaveTextContent(
+      'Registered',
+    );
+    expect(
+      screen.getByText(/Upgrade it to the Professional feed/),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
+      'Open feed (included)',
+    );
+    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
+      'Professional feed',
+    );
+    expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
   });
 
   test('falls back to a generic title when the plan is unknown', () => {

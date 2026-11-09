@@ -78,7 +78,7 @@ export const RegulatoryComplianceBadges: React.FC<
                           textOverflow: 'ellipsis',
                         }}
                       >
-                        <strong>{label}</strong>
+                        {label}
                       </EuiText>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>

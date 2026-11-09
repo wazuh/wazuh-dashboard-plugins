@@ -161,7 +161,11 @@ const WazuhFlyoutDiscoverComponentRender = compose(
             showSaveQueryButton={false}
           />
           {results?.hits?.total === 0 && (
-            <DiscoverNoResults timeFieldName={timeField} queryLanguage={''} />
+            <DiscoverNoResults
+              timeFieldName={timeField}
+              queryLanguage={''}
+              allowUnpinAgent={false}
+            />
           )}
           {dataSource && results?.hits?.total > 0 && (
             <>

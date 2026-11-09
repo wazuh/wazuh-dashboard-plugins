@@ -269,4 +269,18 @@ describe('CtiConsumersAccordion', () => {
       await screen.findByText('Could not load consumers'),
     ).toBeInTheDocument();
   });
+
+  it('shows the server message of a failed request', async () => {
+    mockedHttpGet.mockRejectedValue(
+      Object.assign(new Error('Forbidden'), {
+        body: { message: 'No permissions to read the consumers' },
+      }),
+    );
+
+    render(<CtiConsumersAccordion />);
+
+    expect(
+      await screen.findByText('No permissions to read the consumers'),
+    ).toBeInTheDocument();
+  });
 });

@@ -55,7 +55,7 @@ describe('ButtonAboutSecurity', () => {
 
     const links = screen.getAllByRole('link', { name: /documentation/ });
     expect(links.map(link => link.getAttribute('href'))).toEqual([
-      'https://docs.example/user-manual/api/rbac/index.html',
+      'https://docs.example/user-manual/user-administration/rbac.html',
       'https://docs.example/user-manual/wazuh-indexer/security.html#roles',
     ]);
     links.forEach(link => {

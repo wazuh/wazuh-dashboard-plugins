@@ -56,6 +56,7 @@ const InventoryDashboard = compose(
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
     exportFileName = getInventoryExportFileName(tableId),
+    emptyState,
   }: InventoryDashboardTableProps) => {
     const {
       results,
@@ -120,9 +121,9 @@ const InventoryDashboard = compose(
             indexPatternTitle={dataSource?.indexPattern?.title}
           />
         ) : null}
-        {!fetchError && results?.hits?.total === 0 ? (
-          <DiscoverNoResults />
-        ) : null}
+        {!fetchError && results?.hits?.total === 0
+          ? emptyState ?? <DiscoverNoResults />
+          : null}
 
         {categoriesSampleData && (
           <div
@@ -193,7 +194,6 @@ const InventoryDashboard = compose(
                   isDataSourceLoading={isDataSourceLoading}
                   setFilters={setFilters}
                   searchBarProps={searchBarProps}
-                  query={searchBarProps.query}
                   exportFileName={exportFileName}
                   displayOnlyNoResultsCalloutOnNoResults={true}
                   showSearchBar={false}
@@ -231,6 +231,8 @@ export interface InventoryDashboardTableProps {
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
   // Name of the exported files when the table id does not match the tab name
   exportFileName?: string;
+  /** Rendered instead of the default no results prompt when the search has no hits. */
+  emptyState?: React.ReactNode;
 }
 
 export const InventoryDashboardTable = ({
@@ -245,6 +247,7 @@ export const InventoryDashboardTable = ({
   additionalDocumentDetailsTabs,
   categoriesSampleData,
   exportFileName,
+  emptyState,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -293,6 +296,7 @@ export const InventoryDashboardTable = ({
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}
       exportFileName={exportFileName}
+      emptyState={emptyState}
     />
   );
 };
