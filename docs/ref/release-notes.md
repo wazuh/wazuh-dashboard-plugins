@@ -32,7 +32,6 @@
   - **Cases** tab added to the Threat Hunting module [#8583](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8583) [#8608](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8608).
   - Dashboard modules migrated to consume findings index patterns [#8174](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8174).
   - Statistics dashboard adapted to the new metrics data streams [#8159](https://github.com/wazuh/wazuh-dashboard-plugins/issues/8159).
-  - Updated to UI theme v9 [wazuh/wazuh-dashboard#1052](https://github.com/wazuh/wazuh-dashboard/issues/1052).
 - Redesigned "[Health Check][healthcheck-module]" service [#7532](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7532).
   - Login no longer triggers a blocking health check — validation runs as a background service integrated with the server lifecycle [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610).
     - Initial startup blocks the server only when **critical** checks fail. Non-critical checks — including index pattern provisioning and saved-object dashboard creation — surface warnings without preventing the dashboard from starting. See the [Health check lifecycle][healthcheck-lifecycle] and [not-ready page behavior][healthcheck-not-ready] in the module reference, and [#7610](https://github.com/wazuh/wazuh-dashboard-plugins/issues/7610).
