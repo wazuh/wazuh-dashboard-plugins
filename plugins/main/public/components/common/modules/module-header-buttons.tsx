@@ -92,7 +92,6 @@ export const ModuleHeaderButtons = ({
               <EuiButtonIcon
                 iconType='boxesVertical'
                 size='m'
-                style={{ marginTop: 6 }}
                 aria-label={moreLabel}
                 onClick={() => setIsMenuOpen(isOpen => !isOpen)}
                 data-test-subj='wzModuleHeaderMoreActions'
