@@ -77,6 +77,8 @@ export interface TableDataGridBasicProps<K> {
   query: { query: string; language: string };
   isDataSourceLoading: boolean;
   displayOnlyNoResultsCalloutOnNoResults?: boolean;
+  /** Rendered instead of the default no results prompt when there are no hits. */
+  emptyState?: React.ReactNode;
 }
 
 const Padding = ({ children, style }: { children; style?: object }) => (
@@ -109,7 +111,9 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
         displayOnlyNoResultsCalloutOnNoResults &&
         !isDataSourceLoading &&
         results?.hits?.total === 0,
-      DiscoverNoResults,
+      ({ emptyState }: TableDataGridBasicProps) => (
+        <>{emptyState ?? <DiscoverNoResults />}</>
+      ),
     ),
   )(
     ({
@@ -509,7 +513,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     title,
     showSearchBar,
     results,
-    query,
+    query = searchBarProps?.query,
     inspectedHit,
     removeInspectedHit,
     onDocumentMutated,

@@ -1,12 +1,9 @@
 import React from 'react';
-import { EuiCode, EuiDescriptionList, EuiSpacer, EuiText } from '@elastic/eui';
+import { EuiCode } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
+import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 import { AboutFlyoutButton } from '../../../../../components/common/flyouts/about-flyout-button';
-
-/** Documentation page of the centralized configuration (agent.conf). */
-export const CENTRALIZED_CONFIGURATION_DOCS_PATH =
-  'user-manual/reference/centralized-configuration.html';
 
 const getGuideItems = () => [
   {
@@ -87,9 +84,8 @@ export const ButtonAboutCentralizedConfiguration = () => (
       defaultMessage: 'About centralized configuration',
     })}
     testSubj='CentralizedConfiguration'
-    docsPath={CENTRALIZED_CONFIGURATION_DOCS_PATH}
-  >
-    <EuiText size='s'>
+    docsPath={DOCS_PATHS.centralizedConfiguration}
+    overview={
       <p>
         <FormattedMessage
           id='wazuh.endpointGroups.editor.aboutFlyout.whatItDoes'
@@ -97,8 +93,16 @@ export const ButtonAboutCentralizedConfiguration = () => (
           values={{ agentConf: <EuiCode>agent.conf</EuiCode> }}
         />
       </p>
-    </EuiText>
-    <EuiSpacer size='m' />
-    <EuiDescriptionList compressed listItems={getGuideItems()} />
-  </AboutFlyoutButton>
+    }
+    terms={getGuideItems()}
+    howToStart={
+      <p>
+        <FormattedMessage
+          id='wazuh.endpointGroups.editor.aboutFlyout.howToStart'
+          defaultMessage='Add an {agentConfig} block with the settings that the agents of the group need, then save the file.'
+          values={{ agentConfig: <EuiCode>{'<agent_config>'}</EuiCode> }}
+        />
+      </p>
+    }
+  />
 );

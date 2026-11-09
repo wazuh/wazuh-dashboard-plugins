@@ -17,13 +17,13 @@ import { i18n } from '@osd/i18n';
 import {
   EuiAccordion,
   EuiButtonEmpty,
-  EuiCallOut,
   EuiProgress,
   EuiSpacer,
   EuiButton,
 } from '@elastic/eui';
 
 import { withGuard } from '../../../../components/common/hocs';
+import { DiscoverNoResults } from '../../../common/no-results/no-results';
 
 const LoadingProgress = () => <EuiProgress color='primary' size='s' />;
 
@@ -81,12 +81,21 @@ export const ModuleMitreAttackIntelligenceAllResourcesSearchResults = withGuard(
       )
       .reduce((accum, cur) => [accum, <EuiSpacer size='m' />, cur])
   ) : (
-    <EuiCallOut
-      title={i18n.translate(
+    <DiscoverNoResults
+      message={i18n.translate(
         'wazuh.mitreAttack.intelligenceSearchResults.noResults',
-        { defaultMessage: 'No results found' },
+        {
+          defaultMessage: 'No MITRE ATT&CK resources found',
+        },
       )}
-      color='warning'
+      description={i18n.translate(
+        'wazuh.mitreAttack.intelligenceSearchResults.noResultsDescription',
+        {
+          defaultMessage:
+            'No group, mitigation, software, tactic or technique matches the search. Try another term.',
+        },
+      )}
+      allowUnpinAgent={false}
     />
   );
 });
