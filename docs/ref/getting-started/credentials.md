@@ -359,9 +359,11 @@ to `root:wazuh-dashboard 0640` before the dashboard starts.
 
 - On a **new installation** the package has already generated a value, so `--force` is required to
   replace it. Without it, `add --stdin` leaves an existing entry untouched.
-- When **upgrading existing nodes**, run the same command **before** upgrading each node and omit
-  `--force`, because the entry does not exist yet. A value in the keystore or in
-  `opensearch_dashboards.yml` counts as already set, so nothing is generated.
+- When **upgrading existing nodes**, run the same command, with `--force`, **before** upgrading each
+  node. `--force` also covers a node that already has a generated entry, where `add` without it
+  changes nothing and still exits `0`. A value in the keystore counts as already set, so nothing is
+  generated. A value in `opensearch_dashboards.yml` does too, but only on a node with no keystore
+  entry, because the keystore wins.
 - A value in `opensearch_dashboards.yml` does not take effect while the keystore holds an entry,
   because the keystore is merged over the file. To keep it in the file, remove the entry first, and
   restart:
