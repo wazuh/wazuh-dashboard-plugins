@@ -49,6 +49,8 @@ export const DOCS_PATHS = {
     'user-manual/reference/centralized-configuration.html',
   apiRbac: 'user-manual/user-administration/rbac.html',
   indexerSecurityRoles: 'user-manual/wazuh-indexer/security.html#roles',
+  /** Page of the CTI feed (published in 5.0-rc). */
+  ctiExplorer: 'wazuh-cti/index.html',
 } as const;
 
 export type DocsPathKey = keyof typeof DOCS_PATHS;

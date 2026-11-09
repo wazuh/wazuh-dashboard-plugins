@@ -278,6 +278,7 @@ export const ctiExplorer = {
   showInOverviewApp: false,
   showInAgentMenu: false,
   redirectTo: () => '/cti-explorer/',
+  docsUrl: webDocumentationLink(DOCS_PATHS.ctiExplorer),
 };
 
 export const ITHygiene = {
