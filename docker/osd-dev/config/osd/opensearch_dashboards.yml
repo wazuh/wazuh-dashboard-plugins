@@ -5,6 +5,7 @@ opensearch.ssl.verificationMode: certificate
 opensearch.requestHeadersAllowlist: ['securitytenant', 'Authorization']
 opensearch_security.multitenancy.enabled: false
 opensearch_security.readonly_mode.roles: ['kibana_read_only']
+opensearch_security.cookie.password: '7wn9yeENCh+hlXzIcRIuTUmbFPzjVfww9WjxaSd89RU='
 server.ssl.enabled: true
 server.ssl.key: '/home/node/kbn/certs/osd.key'
 server.ssl.certificate: '/home/node/kbn/certs/osd.pem'
