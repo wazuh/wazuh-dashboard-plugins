@@ -21,12 +21,22 @@ import type {
 import { getCore } from '../../plugin-services';
 import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 
-interface RulesetManagementPage {
+/** Page a tile links to. */
+interface ContentPage {
   appId: string;
-  route: string;
-  /** Names the destination and the space it opens on. */
+  /** Hash path in the app. */
+  path: string;
+  /** Names the destination (and the space it opens on). */
   tooltip: string;
 }
+
+/**
+ * The counts only cover the content the feed delivers, which lives in the
+ * Standard space, so the pages open on it instead of the last space visited.
+ */
+const STANDARD_SPACE = 'standard';
+
+const rulesetPath = (route: string) => `#${route}?space=${STANDARD_SPACE}`;
 
 /**
  * Pages of the Ruleset Management dashboards plugin, by the app ids the Home page
@@ -34,17 +44,17 @@ interface RulesetManagementPage {
  * counts come from its own API, so when it is not installed the count is
  * unavailable and the tile is not linked.
  */
-const RULESET_MANAGEMENT_PAGES: Record<string, RulesetManagementPage> = {
+const RULESET_MANAGEMENT_PAGES: Record<string, ContentPage> = {
   rules: {
     appId: 'rules',
-    route: '/rules',
+    path: rulesetPath('/rules'),
     tooltip: i18n.translate('wazuhCheckUpdates.ctiFeed.content.links.rules', {
       defaultMessage: 'View the Standard rules in Ruleset Management',
     }),
   },
   decoders: {
     appId: 'decoders',
-    route: '/decoders',
+    path: rulesetPath('/decoders'),
     tooltip: i18n.translate(
       'wazuhCheckUpdates.ctiFeed.content.links.decoders',
       {
@@ -54,7 +64,7 @@ const RULESET_MANAGEMENT_PAGES: Record<string, RulesetManagementPage> = {
   },
   integrations: {
     appId: 'sa-integrations',
-    route: '/integrations',
+    path: rulesetPath('/integrations'),
     tooltip: i18n.translate(
       'wazuhCheckUpdates.ctiFeed.content.links.integrations',
       {
@@ -64,7 +74,7 @@ const RULESET_MANAGEMENT_PAGES: Record<string, RulesetManagementPage> = {
   },
   kvdbs: {
     appId: 'kvdbs',
-    route: '/kvdbs',
+    path: rulesetPath('/kvdbs'),
     tooltip: i18n.translate('wazuhCheckUpdates.ctiFeed.content.links.kvdbs', {
       defaultMessage: 'View the Standard KVDBs in Ruleset Management',
     }),
@@ -72,22 +82,39 @@ const RULESET_MANAGEMENT_PAGES: Record<string, RulesetManagementPage> = {
 };
 
 /**
- * The counts only cover the content the feed delivers, which lives in the
- * Standard space, so the pages open on it instead of the last space visited.
+ * The CTI Explorer app of the main plugin, which lists the IOCs and the
+ * vulnerability records. Its id is a literal for the same reason as above: the
+ * main plugin depends on this one, not the other way around.
  */
-const STANDARD_SPACE = 'standard';
+const CTI_EXPLORER_APP_ID = 'cti-explorer';
 
-const getRulesetManagementUrl = ({ appId, route }: RulesetManagementPage) =>
-  getCore().application.getUrlForApp(appId, {
-    path: `#${route}?space=${STANDARD_SPACE}`,
-  });
+const CTI_EXPLORER_PAGES: Record<string, ContentPage> = {
+  iocs: {
+    appId: CTI_EXPLORER_APP_ID,
+    path: '#/cti-explorer/?tab=iocs',
+    tooltip: i18n.translate('wazuhCheckUpdates.ctiFeed.content.links.iocs', {
+      defaultMessage: 'Browse the indicators of compromise in CTI Explorer',
+    }),
+  },
+  vulnerabilities: {
+    appId: CTI_EXPLORER_APP_ID,
+    path: '#/cti-explorer/?tab=vulnerabilities',
+    tooltip: i18n.translate(
+      'wazuhCheckUpdates.ctiFeed.content.links.vulnerabilities',
+      { defaultMessage: 'Browse the vulnerability records in CTI Explorer' },
+    ),
+  },
+};
+
+const getContentPageUrl = ({ appId, path }: ContentPage) =>
+  getCore().application.getUrlForApp(appId, { path });
 
 interface ContentTile {
   key: FeedContentKey;
   label: string;
   iconType: string;
-  /** Page that manages this content. Reference-only content omits it. */
-  page?: RulesetManagementPage;
+  /** Page that lists this content. */
+  page?: ContentPage;
 }
 
 const CONTENT_TILES: ContentTile[] = [
@@ -130,6 +157,7 @@ const CONTENT_TILES: ContentTile[] = [
       defaultMessage: 'Indicators of compromise',
     }),
     iconType: 'bug',
+    page: CTI_EXPLORER_PAGES.iocs,
   },
   {
     key: 'vulnerabilities',
@@ -138,6 +166,7 @@ const CONTENT_TILES: ContentTile[] = [
       { defaultMessage: 'Vulnerabilities (CVEs)' },
     ),
     iconType: 'alert',
+    page: CTI_EXPLORER_PAGES.vulnerabilities,
   },
 ];
 
@@ -158,7 +187,7 @@ const Tile: React.FC<{
     tile.page && !unavailable && !loading ? (
       <EuiToolTip content={tile.page.tooltip}>
         <EuiLink
-          href={getRulesetManagementUrl(tile.page)}
+          href={getContentPageUrl(tile.page)}
           color='text'
           data-test-subj={`ctiFeedContentStat-${tile.key}-link`}
         >

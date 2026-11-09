@@ -30,9 +30,6 @@ jest.mock('../../utils/navigation', () => ({
     apps.has('wazuhAiAssistant'),
   ),
   getCtiFeedUrl: jest.fn(() => '/mock/cti-feed'),
-  isCtiFeedRegistered: jest.fn((apps: ReadonlyMap<string, unknown>) =>
-    apps.has('cti-feed'),
-  ),
 }));
 
 // The apps OSD has registered; `wazuhAiAssistant` is absent when its plugin is disabled.
@@ -127,7 +124,6 @@ describe('QuickAccessMenu', () => {
 
   // The CTI feed app comes from wazuh-check-updates, not from `Applications`.
   it('links the CTI feed app from the Threat intelligence group', () => {
-    mockRegisteredApps(['cti-feed']);
     openMenu();
     const group = document.querySelector(
       '[data-test-subj="quick-access-group-wz-category-threat-intelligence"]',
@@ -136,14 +132,6 @@ describe('QuickAccessMenu', () => {
     expect(group).toContainElement(link);
     expect(link).toHaveAttribute('href', '/mock/cti-feed');
     expect(getCtiFeedUrl).toHaveBeenCalled();
-  });
-
-  it('leaves out the CTI feed app when it is not registered', () => {
-    mockRegisteredApps([]);
-    openMenu();
-    expect(screen.getByText('Threat intelligence')).toBeInTheDocument();
-    expect(screen.queryByText('CTI Feed')).not.toBeInTheDocument();
-    expect(getCtiFeedUrl).not.toHaveBeenCalled();
   });
 
   it('keeps the AI Assistant shortcut hidden until the trigger is clicked', () => {
