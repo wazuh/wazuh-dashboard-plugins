@@ -1,6 +1,12 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { queryDataTestAttr } from '../../../../../../test/public/query-attr';
@@ -50,14 +56,24 @@ jest.mock('./utils/groups-handler', () => ({
     mockSendGroupConfiguration(...args),
 }));
 jest.mock('./utils/valid-configuration', () => jest.fn());
+jest.mock('../../../../../../common/services/web_documentation', () => ({
+  webDocumentationLink: (path: string) => `https://docs.example/${path}`,
+}));
 jest.mock('../../../../../react-services/common-services', () => ({
   getErrorOrchestrator: jest.fn(),
 }));
 
 const validContent = '<agent_config></agent_config>';
 const invalidContent = '<agent_config>\n  <syscheck>\n</agent_config>';
+const commandContent = `<agent_config>
+  <wodle name="command">
+    <command>ss -ltnp</command>
+    <interval>1m</interval>
+    <tag>nc-check</tag>
+  </wodle>
+</agent_config>`;
 
-const renderEditor = (content = validContent) =>
+const renderEditor = (content = validContent, isEditable = true) =>
   render(
     <Provider
       store={configureMockStore()({
@@ -65,7 +81,7 @@ const renderEditor = (content = validContent) =>
           fileContent: {
             name: 'agent.conf',
             content,
-            isEditable: true,
+            isEditable,
             groupName: 'default',
           },
         },
@@ -121,6 +137,53 @@ describe('WzGroupsEditor', () => {
     expect(
       screen.getByRole('button', { name: 'XML format error' }),
     ).toBeDisabled();
+  });
+
+  it.each([
+    ['with a command', commandContent],
+    ['without a command', validContent],
+  ])('warns that agents ignore remote commands for a file %s', (_, content) => {
+    renderEditor(content);
+
+    const warning = document.querySelector(
+      queryDataTestAttr('wzGroupsEditorRemoteCommandsWarning'),
+    );
+    expect(warning).toBeInTheDocument();
+    expect(warning).toHaveTextContent('local_internal_options.conf');
+    expect(warning).toHaveTextContent('wazuh_command.remote_commands=1');
+    expect(warning).toHaveTextContent('logcollector.remote_commands=1');
+    const docsLink = screen.getByRole('link', { name: /Learn more/ });
+    expect(docsLink).toHaveAttribute(
+      'href',
+      'https://docs.example/user-manual/capabilities/command-monitoring/requirements.html#remote-command-execution',
+    );
+    expect(docsLink).toHaveAttribute('target', '_blank');
+    expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled();
+  });
+
+  it('saves a file with a command while the warning is shown', async () => {
+    renderEditor();
+    typeContent(commandContent);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() =>
+      expect(mockSendGroupConfiguration).toHaveBeenCalledWith(
+        'agent.conf',
+        'default',
+        commandContent,
+      ),
+    );
+  });
+
+  it('does not show the warning for a read-only file', () => {
+    renderEditor(commandContent, false);
+
+    expect(
+      document.querySelector(
+        queryDataTestAttr('wzGroupsEditorRemoteCommandsWarning'),
+      ),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps unsaved changes after opening and closing the guide', () => {
