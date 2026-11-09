@@ -45,7 +45,7 @@ import {
   getProviderName,
   shortenValue,
 } from '../utils/labels';
-import { NORMAL_FONT_WEIGHT } from '../utils/styles';
+import { NORMAL_FONT_WEIGHT, VISUALIZATION_TITLE_STYLE } from '../utils/styles';
 import { BreakdownList } from './breakdown-list';
 import { ExportCsvButton } from './export-csv-button';
 import { RequestErrorCallout } from './request-error-callout';
@@ -220,7 +220,7 @@ const Breakdown = ({
   <EuiFlexItem>
     <EuiPanel color='subdued' hasShadow={false} paddingSize='m'>
       <EuiTitle size='xxs'>
-        <h3>{title}</h3>
+        <h3 style={VISUALIZATION_TITLE_STYLE}>{title}</h3>
       </EuiTitle>
       <EuiSpacer size='s' />
       <BreakdownList

@@ -22,7 +22,7 @@ import {
 } from './plugin-services';
 import { getAvailableUpdates } from './services';
 import { CtiUpsellNotification } from './shared-components/cti-registration/components/cti-upsell-notification';
-import { createCtiFeedSyncStatus } from './shared-components/cti-feed-sync-status';
+import { CtiFeedSyncStatus } from './shared-components/cti-feed-sync-status';
 import {
   CTI_FEED_APP_ID,
   CTI_FEED_APP_ORDER,
@@ -43,11 +43,9 @@ export class WazuhCheckUpdatesPlugin
   ) {}
 
   public setup(core: CoreSetup): WazuhCheckUpdatesPluginSetup {
-    // The CTI feed app is part of the CTI registration UI, so the same setting
-    // decides whether it exists at all.
-    if (this.initializerContext.config.get().ctiRegistrationUiEnabled) {
-      this.registerCtiFeedApp(core);
-    }
+    // The CTI feed app is always registered: `ctiRegistrationUiEnabled` only
+    // decides whether the bottom bar that invites users to register is shown.
+    this.registerCtiFeedApp(core);
     return {};
   }
 
@@ -104,8 +102,7 @@ export class WazuhCheckUpdatesPlugin
       ctiUpsellEnabled,
       ctiRegistrationStatusPollIntervalSec,
       CtiUpsellNotification,
-      // The CTI feed app exists only with the CTI registration UI.
-      CtiFeedSyncStatus: createCtiFeedSyncStatus(ctiRegistrationUiEnabled),
+      CtiFeedSyncStatus,
     };
   }
 

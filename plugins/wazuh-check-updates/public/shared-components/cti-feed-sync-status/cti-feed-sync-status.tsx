@@ -100,11 +100,9 @@ export const getLastUpdatedAt = (
 const FeedLines = ({
   consumers,
   lastCheckedAt,
-  linksToFeedApp,
 }: {
   consumers: CtiConsumer[];
   lastCheckedAt?: string;
-  linksToFeedApp: boolean;
 }) => (
   <>
     {consumers.map(consumer => (
@@ -125,26 +123,20 @@ const FeedLines = ({
         values: { time: formatCtiTimestamp(lastCheckedAt) },
       })}
     </div>
-    {linksToFeedApp ? (
-      <div>
-        {i18n.translate('wazuhCheckUpdates.ctiFeedSyncStatus.opensFeedApp', {
-          defaultMessage: 'Select to open CTI feed.',
-        })}
-      </div>
-    ) : null}
+    <div>
+      {i18n.translate('wazuhCheckUpdates.ctiFeedSyncStatus.opensFeedApp', {
+        defaultMessage: 'Select to open CTI feed.',
+      })}
+    </div>
   </>
 );
 
 /**
  * Sync state of the CTI feed, read like the CTI feed app does, and the time of
  * its last content update with the `dateFormat` advanced settings. Opens the
- * CTI feed app when it is enabled. Renders nothing while loading or when the
- * state cannot be read.
+ * CTI feed app. Renders nothing while loading or when the state cannot be read.
  */
-export const CtiFeedSyncStatus = ({
-  feeds,
-  feedAppEnabled,
-}: CtiFeedSyncStatusProps & { feedAppEnabled: boolean }) => {
+export const CtiFeedSyncStatus = ({ feeds }: CtiFeedSyncStatusProps) => {
   const {
     consumers: allConsumers,
     lastCheckedAt,
@@ -191,43 +183,20 @@ export const CtiFeedSyncStatus = ({
     <EuiToolTip
       position='bottom'
       content={
-        <FeedLines
-          consumers={consumers}
-          lastCheckedAt={lastCheckedAt}
-          linksToFeedApp={feedAppEnabled}
-        />
+        <FeedLines consumers={consumers} lastCheckedAt={lastCheckedAt} />
       }
     >
-      {feedAppEnabled ? (
-        <RedirectAppLinks application={getCore().application}>
-          <EuiBadge
-            color='hollow'
-            href={getCore().application.getUrlForApp(CTI_FEED_APP_ID)}
-            // The tooltip describes it; no native title on top of it.
-            title={undefined}
-            data-test-subj='ctiFeedSyncStatus'
-          >
-            {content}
-          </EuiBadge>
-        </RedirectAppLinks>
-      ) : (
+      <RedirectAppLinks application={getCore().application}>
         <EuiBadge
           color='hollow'
+          href={getCore().application.getUrlForApp(CTI_FEED_APP_ID)}
+          // The tooltip describes it; no native title on top of it.
           title={undefined}
           data-test-subj='ctiFeedSyncStatus'
         >
           {content}
         </EuiBadge>
-      )}
+      </RedirectAppLinks>
     </EuiToolTip>
   );
-};
-
-/** The component of the plugin contract, bound to whether the CTI feed app exists. */
-export const createCtiFeedSyncStatus = (feedAppEnabled: boolean) => {
-  const BoundCtiFeedSyncStatus = (props: CtiFeedSyncStatusProps) => (
-    <CtiFeedSyncStatus {...props} feedAppEnabled={feedAppEnabled} />
-  );
-  BoundCtiFeedSyncStatus.displayName = 'CtiFeedSyncStatus';
-  return BoundCtiFeedSyncStatus;
 };

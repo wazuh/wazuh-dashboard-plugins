@@ -66,9 +66,7 @@ describe('CtiFeedSyncStatus', () => {
       consumer('iocs', { updated_at: '2026-11-08T16:41:50.265Z' }),
       consumer('vulnerabilities', { updated_at: '2026-11-08T16:42:38.876Z' }),
     ]);
-    render(
-      <CtiFeedSyncStatus feeds={['iocs', 'vulnerabilities']} feedAppEnabled />,
-    );
+    render(<CtiFeedSyncStatus feeds={['iocs', 'vulnerabilities']} />);
 
     const status = screen.getByTestId('ctiFeedSyncStatus');
     expect(status).toHaveTextContent('Feeds up to date');
@@ -85,16 +83,10 @@ describe('CtiFeedSyncStatus', () => {
       consumer('iocs', { status: 'running', local_offset: 5 }),
       consumer('vulnerabilities'),
     ]);
-    render(<CtiFeedSyncStatus feedAppEnabled />);
+    render(<CtiFeedSyncStatus />);
     expect(screen.getByTestId('ctiFeedSyncStatus')).toHaveTextContent(
       'Syncing feeds',
     );
-  });
-
-  it('does not link when the CTI feed app is disabled', () => {
-    withConsumers([consumer('iocs')]);
-    render(<CtiFeedSyncStatus feedAppEnabled={false} />);
-    expect(screen.getByTestId('ctiFeedSyncStatus')).not.toHaveAttribute('href');
   });
 
   it.each([
@@ -102,7 +94,7 @@ describe('CtiFeedSyncStatus', () => {
     ['when the state cannot be read', { error: 'Forbidden' }],
   ])('renders nothing %s', (_label, state) => {
     withConsumers([consumer('iocs')], state);
-    const { container } = render(<CtiFeedSyncStatus feedAppEnabled />);
+    const { container } = render(<CtiFeedSyncStatus />);
     expect(container).toBeEmptyDOMElement();
   });
 });

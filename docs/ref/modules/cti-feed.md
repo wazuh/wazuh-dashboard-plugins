@@ -20,9 +20,9 @@ feed**, which delivers vulnerabilities, IOCs and rules with no delay.
 
 Open the menu and go to **Threat intelligence > CTI feed**.
 
-The app is available when `wazuh_check_updates.ctiRegistrationUiEnabled` is `true` in
-`opensearch_dashboards.yml`. When it is `false`, the app is not registered. See
-[Configuration](../configuration.md).
+The app is always available. `wazuh_check_updates.ctiRegistrationUiEnabled` in
+`opensearch_dashboards.yml` only decides whether the bottom bar that invites users to register is
+shown. See [Configuration](../configuration.md).
 
 ## Subscription
 

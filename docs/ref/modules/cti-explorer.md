@@ -62,9 +62,12 @@ Type a domain, URL, IP address, host:port pair, file hash or CVE id and click **
 - The match is exact and ignores case. An IP address also finds its host:port records, and a URL
   also finds the domain of its host.
 - Defanged values, such as `hxxps://example[.]com`, are accepted.
-- A `CVE-…` or `TID-…` id is looked up in the vulnerabilities catalog and opens its record.
-- A listed value shows the providers that reported it, its highest confidence, a link to the
-  record and a **Hunt in Threat Hunting** link.
+- A match is listed in a table whose columns follow its type, with an **Actions** column:
+  - An IOC shows the providers that reported it and its highest confidence, with **Open the
+    record** and **Hunt in Threat Hunting**.
+  - A `CVE-…` id shows the CVE record with the columns of the Vulnerabilities tab (highest CVSS,
+    publication date, assigner), and a `TID-…` id the translation rule with its patterns,
+    translations, rule actions and targets. Both offer **Open the record**.
 - A value that is not found is only absent from the catalog: it is not a verdict that the value is
   safe.
 
@@ -100,7 +103,8 @@ as links, and only `http` and `https` references are linked.
 The records of `.wazuh-threatintel-vulnerabilities*` are stored without being indexed: only their
 type and offset are searchable. The tab therefore:
 
-- Lists the records newest first, filtered by type (**CVE** or **Translation rules (TID)**). The
+- Lists the records most recently published first, filtered by type (**CVE** or **Translation
+  rules (TID)**); translation rules, which have no publication date, newest delivered first. The
   newest 10,000 records can be paged through.
 - Sorts the CVE records by **Published** (`document.cveMetadata.datePublished`), in either order.
   Records without a publication date sort last, as do all records of an index that does not map

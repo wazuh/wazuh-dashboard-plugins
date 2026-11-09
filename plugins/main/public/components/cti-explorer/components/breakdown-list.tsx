@@ -3,7 +3,7 @@ import { i18n } from '@osd/i18n';
 import { EuiLink, EuiProgress, EuiText, EuiToolTip } from '@elastic/eui';
 import type { CtiBucket } from '../../../../common/cti-explorer/types';
 import { formatNumber } from '../utils/labels';
-import { NORMAL_FONT_WEIGHT } from '../utils/styles';
+import { CARD_TEXT_STYLE, NORMAL_FONT_WEIGHT } from '../utils/styles';
 
 interface BreakdownListProps {
   buckets: CtiBucket[];
@@ -31,6 +31,7 @@ const GRID_STYLE: React.CSSProperties = {
 };
 
 const NUMBER_STYLE: React.CSSProperties = {
+  ...CARD_TEXT_STYLE,
   fontVariantNumeric: 'tabular-nums',
   textAlign: 'right',
 };
@@ -48,7 +49,12 @@ export const BreakdownList = ({
 }: BreakdownListProps) => {
   if (!buckets.length) {
     return (
-      <EuiText size='s' color='subdued' data-test-subj={dataTestSubj}>
+      <EuiText
+        size='s'
+        color='subdued'
+        style={CARD_TEXT_STYLE}
+        data-test-subj={dataTestSubj}
+      >
         <p>
           {i18n.translate('wazuh.ctiExplorer.breakdown.empty', {
             defaultMessage: 'No records',
@@ -64,7 +70,11 @@ export const BreakdownList = ({
         const share = total ? (bucket.count / total) * 100 : 0;
         return (
           <React.Fragment key={bucket.key}>
-            <EuiText size='s' className='eui-textTruncate'>
+            <EuiText
+              size='s'
+              className='eui-textTruncate'
+              style={CARD_TEXT_STYLE}
+            >
               {onSelect ? (
                 <EuiToolTip
                   display='block'

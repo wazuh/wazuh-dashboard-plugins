@@ -83,7 +83,13 @@ export interface IocRecordResponse {
 
 export type LookupResponse =
   | { kind: 'ioc'; category: IocLookupCategory; records: IocRecord[] }
-  | { kind: 'vulnerability'; id: string; found: boolean };
+  | {
+      kind: 'vulnerability';
+      id: string;
+      found: boolean;
+      /** The record, with the fields the lists show; `null` when not found. */
+      record: VulnerabilityListItem | null;
+    };
 
 export type IocLookupCategory =
   | 'hash_md5'

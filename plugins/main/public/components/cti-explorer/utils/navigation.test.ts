@@ -62,10 +62,10 @@ describe('CTI Explorer navigation', () => {
     });
   });
 
-  it('opens Ruleset Management on the Standard space', () => {
-    expect(getRulesetPageUrl('rules')).toBe('/app/rules#/rules?space=standard');
-    expect(getRulesetPageUrl('integrations')).toBe(
-      '/app/sa-integrations#/integrations?space=standard',
-    );
+  it('opens Ruleset Management with the links of the Home page', () => {
+    expect(getRulesetPageUrl('rules')).toBe('/app/rules');
+    expect(getRulesetPageUrl('decoders')).toBe('/app/decoders');
+    expect(getRulesetPageUrl('integrations')).toBe('/app/sa-integrations');
+    expect(getRulesetPageUrl('kvdbs')).toBe('/app/kvdbs');
   });
 });

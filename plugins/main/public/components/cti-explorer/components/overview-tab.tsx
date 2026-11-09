@@ -29,6 +29,8 @@ import {
 } from '../services/cti-explorer-api';
 import { formatNumber, getIocTypeLabel } from '../utils/labels';
 import { getRulesetPageUrl } from '../utils/navigation';
+import { getCore } from '../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { NORMAL_FONT_WEIGHT } from '../utils/styles';
 import { BreakdownList } from './breakdown-list';
 import { LookupPanel } from './lookup-panel';
@@ -135,60 +137,63 @@ const DetectionContentPanel = () => {
   const counts = useCtiRequest(fetchDetectionContentCounts, []);
   return (
     <EuiPanel paddingSize='m' data-test-subj='ctiExplorerDetectionContent'>
-      <EuiFlexGroup alignItems='center' gutterSize='m' wrap>
-        <EuiFlexItem grow={false}>
-          <EuiIcon type='list' color='primary' />
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiText size='s'>
-            <strong>
-              {i18n.translate('wazuh.ctiExplorer.detectionContent.title', {
-                defaultMessage: 'Detection content',
+      {/* As the Home page tiles: the links switch apps without reloading the page. */}
+      <RedirectAppLinks application={getCore().application}>
+        <EuiFlexGroup alignItems='center' gutterSize='m' wrap>
+          <EuiFlexItem grow={false}>
+            <EuiIcon type='list' color='primary' />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiText size='s'>
+              <strong>
+                {i18n.translate('wazuh.ctiExplorer.detectionContent.title', {
+                  defaultMessage: 'Detection content',
+                })}
+              </strong>
+            </EuiText>
+          </EuiFlexItem>
+          {DETECTION_CONTENT.map(({ key, label }) => {
+            const value = counts.data?.[key];
+            return (
+              <EuiFlexItem grow={false} key={key}>
+                <EuiText size='s'>
+                  {value === null || value === undefined ? (
+                    <EuiToolTip
+                      content={i18n.translate(
+                        'wazuh.ctiExplorer.detectionContent.unavailable',
+                        {
+                          defaultMessage:
+                            'Ruleset Management did not return this count. It may not be installed, or your user may lack access to it.',
+                        },
+                      )}
+                    >
+                      <span>
+                        {counts.loading ? '…' : '-'} {label}
+                      </span>
+                    </EuiToolTip>
+                  ) : (
+                    <EuiLink
+                      href={getRulesetPageUrl(key)}
+                      style={NORMAL_FONT_WEIGHT}
+                      data-test-subj={`ctiExplorerDetectionContent-${key}`}
+                    >
+                      {formatNumber(value)} {label}
+                    </EuiLink>
+                  )}
+                </EuiText>
+              </EuiFlexItem>
+            );
+          })}
+          <EuiFlexItem />
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty size='s' href={getRulesetPageUrl('integrations')}>
+              {i18n.translate('wazuh.ctiExplorer.detectionContent.open', {
+                defaultMessage: 'Open in Ruleset Management',
               })}
-            </strong>
-          </EuiText>
-        </EuiFlexItem>
-        {DETECTION_CONTENT.map(({ key, label }) => {
-          const value = counts.data?.[key];
-          return (
-            <EuiFlexItem grow={false} key={key}>
-              <EuiText size='s'>
-                {value === null || value === undefined ? (
-                  <EuiToolTip
-                    content={i18n.translate(
-                      'wazuh.ctiExplorer.detectionContent.unavailable',
-                      {
-                        defaultMessage:
-                          'Ruleset Management did not return this count. It may not be installed, or your user may lack access to it.',
-                      },
-                    )}
-                  >
-                    <span>
-                      {counts.loading ? '…' : '-'} {label}
-                    </span>
-                  </EuiToolTip>
-                ) : (
-                  <EuiLink
-                    href={getRulesetPageUrl(key)}
-                    style={NORMAL_FONT_WEIGHT}
-                    data-test-subj={`ctiExplorerDetectionContent-${key}`}
-                  >
-                    {formatNumber(value)} {label}
-                  </EuiLink>
-                )}
-              </EuiText>
-            </EuiFlexItem>
-          );
-        })}
-        <EuiFlexItem />
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty size='s' href={getRulesetPageUrl('integrations')}>
-            {i18n.translate('wazuh.ctiExplorer.detectionContent.open', {
-              defaultMessage: 'Open in Ruleset Management',
-            })}
-          </EuiButtonEmpty>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </RedirectAppLinks>
     </EuiPanel>
   );
 };

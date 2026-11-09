@@ -12,6 +12,12 @@ import {
   FILTER_OPERATOR,
   PatternDataSourceFilterManager,
 } from '../../common/data-source';
+import {
+  getDecodersUrl,
+  getIntegrationsUrl,
+  getKvdbsUrl,
+  getRulesUrl,
+} from '../../common/welcome/home-overview/utils/navigation';
 import type { DetectionContentKey } from '../services/cti-explorer-api';
 
 /** Findings field that holds the IOC value an event matched. */
@@ -66,22 +72,13 @@ export const getVulnerabilityDetectionCveUrl = (id: string): string =>
     )}&_g=${STATE_G_STATE}`,
   });
 
-/**
- * Pages of the Ruleset Management plugin (a separate repository, so its app ids
- * are literals). The counts are of the feed content, in the Standard space,
- * so the pages open on it.
- */
-const RULESET_PAGES: Record<
-  DetectionContentKey,
-  { appId: string; route: string }
-> = {
-  rules: { appId: 'rules', route: '/rules' },
-  decoders: { appId: 'decoders', route: '/decoders' },
-  integrations: { appId: 'sa-integrations', route: '/integrations' },
-  kvdbs: { appId: 'kvdbs', route: '/kvdbs' },
+/** Ruleset Management pages, opened with the links of the Home page. */
+const RULESET_PAGE_URLS: Record<DetectionContentKey, () => string> = {
+  rules: getRulesUrl,
+  decoders: getDecodersUrl,
+  integrations: getIntegrationsUrl,
+  kvdbs: getKvdbsUrl,
 };
 
-export const getRulesetPageUrl = (key: DetectionContentKey): string => {
-  const { appId, route } = RULESET_PAGES[key];
-  return getUrlForApp(appId, { path: `#${route}?space=standard` });
-};
+export const getRulesetPageUrl = (key: DetectionContentKey): string =>
+  RULESET_PAGE_URLS[key]();

@@ -80,9 +80,9 @@ describe('LookupPanel', () => {
 
     const listed = await screen.findByTestId('ctiExplorerLookupListed');
     expect(mockLookup).toHaveBeenCalledWith('192.0.2[.]100');
-    expect(listed).toHaveTextContent(
-      'Listed by 2 providers: ThreatFox, Cisco Talos',
-    );
+    // A table of the matches, with no callout around it.
+    expect(listed).toHaveTextContent('ThreatFox, Cisco Talos');
+    expect(listed.closest('.euiCallOut')).toBeNull();
     expect(screen.getAllByTestId('ctiExplorerLookupOpenIoc')).toHaveLength(1);
     expect(screen.getByTestId('ctiExplorerLookupHunt')).toHaveAttribute(
       'href',
@@ -108,20 +108,67 @@ describe('LookupPanel', () => {
     ).toHaveTextContent('This is not a verdict that the value is safe');
   });
 
-  it('opens a vulnerability record that exists', async () => {
+  it('shows a CVE record with the CVE columns and opens it', async () => {
     mockLookup.mockResolvedValue({
       kind: 'vulnerability',
       id: 'CVE-2024-6387',
       found: true,
+      record: {
+        id: 'CVE-2024-6387',
+        type: 'CVE',
+        offset: 1,
+        document: {
+          cveMetadata: {
+            cveId: 'CVE-2024-6387',
+            assignerShortName: 'redhat',
+            state: 'PUBLISHED',
+          },
+        },
+      },
     });
     const { onOpenVulnerability } = renderPanel();
 
     check('cve-2024-6387');
-    fireEvent.click(
-      await screen.findByRole('button', { name: 'Open the record' }),
-    );
+    const found = await screen.findByTestId('ctiExplorerLookupRecordFound');
+    expect(found).toHaveTextContent('Highest CVSS');
+    expect(found).toHaveTextContent('Assigner: redhat');
+    expect(found).not.toHaveTextContent('Vendor pattern');
+    expect(found.closest('.euiCallOut')).toBeNull();
 
+    fireEvent.click(screen.getByTestId('ctiExplorerLookupOpenVulnerability'));
     expect(onOpenVulnerability).toHaveBeenCalledWith('CVE-2024-6387');
+  });
+
+  it('shows a translation rule with the rule columns', async () => {
+    mockLookup.mockResolvedValue({
+      kind: 'vulnerability',
+      id: 'TID-0048',
+      found: true,
+      record: {
+        id: 'TID-0048',
+        type: 'TID',
+        offset: 1,
+        document: {
+          action: ['replace_vendor'],
+          target: ['centos'],
+          source: { vendor: '', product: '^nodejs$' },
+          translation: [{ vendor: 'nodejs', product: 'node.js' }],
+        },
+      },
+    });
+    renderPanel();
+
+    check('TID-0048');
+    const found = await screen.findByTestId('ctiExplorerLookupRecordFound');
+    expect(found).toHaveTextContent('Product pattern');
+    expect(found).toHaveTextContent('^nodejs$');
+    expect(found).toHaveTextContent('nodejs:node.js');
+    expect(found).toHaveTextContent('replace_vendor');
+    expect(found).not.toHaveTextContent('Highest CVSS');
+    expect(
+      screen.getByTestId('ctiExplorerLookupOpenVulnerability'),
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId('ctiExplorerLookupHunt')).toBeNull();
   });
 
   it('names the index the user cannot read', async () => {

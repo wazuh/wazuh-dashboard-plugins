@@ -16,7 +16,7 @@ export interface WazuhCheckUpdatesPluginStart {
   ctiUpsellEnabled: boolean;
   ctiRegistrationStatusPollIntervalSec: number;
   CtiUpsellNotification: () => JSX.Element | null;
-  /** Sync state of the CTI feed, linking to the CTI feed app when it is enabled. */
+  /** Sync state of the CTI feed, linking to the CTI feed app. */
   CtiFeedSyncStatus: (props: CtiFeedSyncStatusProps) => JSX.Element | null;
 }
 

@@ -189,14 +189,6 @@ export const buildIocRelatedBody = (name: string, excludeId: string) => ({
   _source: ['document', 'offset'],
 });
 
-export const buildVulnerabilityExistsBody = (id: string) => ({
-  size: 1,
-  query: {
-    bool: { filter: [LISTED_RECORD_TYPES, { ids: { values: [id] } }] },
-  },
-  _source: false,
-});
-
 export const buildVulnerabilitySummaryBody = () => ({
   size: 0,
   query: { bool: { filter: [LISTED_RECORD_TYPES] } },
@@ -225,6 +217,15 @@ export const VULNERABILITY_LIST_SOURCE = [
   'document.source',
   'document.translation',
 ];
+
+/** A looked-up record id, with the fields the lists show. */
+export const buildVulnerabilityLookupBody = (id: string) => ({
+  size: 1,
+  query: {
+    bool: { filter: [LISTED_RECORD_TYPES, { ids: { values: [id] } }] },
+  },
+  _source: VULNERABILITY_LIST_SOURCE,
+});
 
 /**
  * A CVE record matches a severity when any CVSS score of its CNA container is

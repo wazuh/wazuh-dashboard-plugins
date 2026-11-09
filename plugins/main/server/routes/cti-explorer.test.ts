@@ -331,12 +331,62 @@ describe(`POST ${CTI_EXPLORER_ROUTES.lookup}`, () => {
       kind: 'vulnerability',
       id: 'CVE-2024-6387',
       found: false,
+      record: null,
     });
     expect(mockSearch).toHaveBeenCalledTimes(1);
     expect(mockSearch.mock.calls[0][0].index).toBe(CTI_VULNERABILITIES_PATTERN);
     expect(searchBody().query.bool.filter).toContainEqual({
       ids: { values: ['CVE-2024-6387'] },
     });
+  });
+
+  it('returns a found record with the fields the lists show', async () => {
+    mockSearch.mockResolvedValue({
+      body: {
+        hits: {
+          hits: [
+            {
+              _id: 'TID-0048',
+              _source: {
+                type: 'TID',
+                offset: 238178,
+                document: {
+                  action: ['replace_vendor'],
+                  target: ['centos'],
+                  source: { vendor: '', product: '^nodejs$' },
+                  translation: [{ vendor: 'nodejs', product: 'node.js' }],
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .post(CTI_EXPLORER_ROUTES.lookup)
+      .send({ value: 'TID-0048' })
+      .expect(200);
+
+    expect(response.body).toEqual({
+      kind: 'vulnerability',
+      id: 'TID-0048',
+      found: true,
+      record: {
+        id: 'TID-0048',
+        type: 'TID',
+        offset: 238178,
+        document: {
+          action: ['replace_vendor'],
+          target: ['centos'],
+          source: { vendor: '', product: '^nodejs$' },
+          translation: [{ vendor: 'nodejs', product: 'node.js' }],
+        },
+      },
+    });
+    expect(searchBody()._source).toEqual(
+      expect.arrayContaining(['document.cveMetadata', 'document.translation']),
+    );
   });
 
   it('refuses a value longer than the indexed limit', async () => {

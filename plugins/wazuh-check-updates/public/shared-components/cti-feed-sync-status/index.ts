@@ -1,7 +1,4 @@
-export {
-  CtiFeedSyncStatus,
-  createCtiFeedSyncStatus,
-} from './cti-feed-sync-status';
+export { CtiFeedSyncStatus } from './cti-feed-sync-status';
 export type {
   CtiFeedKey,
   CtiFeedSyncStatusProps,

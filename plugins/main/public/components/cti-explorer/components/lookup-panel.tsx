@@ -18,6 +18,7 @@ import {
 import type {
   IocRecord,
   LookupResponse,
+  VulnerabilityListItem,
 } from '../../../../common/cti-explorer/types';
 import {
   CtiRequestError,
@@ -31,6 +32,12 @@ import {
 } from '../utils/labels';
 import { getThreatHuntingIocUrl } from '../utils/navigation';
 import { RequestErrorCallout } from './request-error-callout';
+import {
+  VulnerabilityRow,
+  getCveColumns,
+  getTidColumns,
+  toVulnerabilityRows,
+} from './vulnerability-columns';
 
 /** Examples to try: a documentation address (RFC 5737), a reserved domain and a well-known CVE. */
 const EXAMPLES = ['192.0.2.100', 'example.com', 'CVE-2021-44228'];
@@ -72,6 +79,156 @@ interface LookupPanelProps {
   onOpenVulnerability: (id: string) => void;
 }
 
+const OPEN_RECORD = i18n.translate('wazuh.ctiExplorer.lookup.openRecord', {
+  defaultMessage: 'Open the record',
+});
+
+const ACTIONS_COLUMN_NAME = i18n.translate(
+  'wazuh.ctiExplorer.lookup.columns.actions',
+  { defaultMessage: 'Actions' },
+);
+
+/** A looked-up id that the index returned without its fields. */
+const recordOf = (
+  result: Extract<LookupResponse, { kind: 'vulnerability' }>,
+): VulnerabilityListItem =>
+  result.record ?? {
+    id: result.id,
+    type: result.id.startsWith('TID-') ? 'TID' : 'CVE',
+    offset: null,
+    document: null,
+  };
+
+/** A CVE record or translation rule, with the columns of its type. */
+const VulnerabilityMatch = ({
+  record,
+  onOpenVulnerability,
+}: {
+  record: VulnerabilityListItem;
+  onOpenVulnerability: (id: string) => void;
+}) => (
+  <EuiBasicTable<VulnerabilityRow>
+    items={toVulnerabilityRows([record])}
+    itemId='rowKey'
+    tableLayout='auto'
+    columns={[
+      {
+        field: 'id',
+        name: i18n.translate('wazuh.ctiExplorer.lookup.columns.record', {
+          defaultMessage: 'Record',
+        }),
+        render: (id: string) => <span className='eui-textNoWrap'>{id}</span>,
+      },
+      ...(record.type === 'TID'
+        ? getTidColumns()
+        : getCveColumns({ publishedSortable: false })),
+      {
+        name: ACTIONS_COLUMN_NAME,
+        render: (row: VulnerabilityRow) => (
+          <EuiButtonEmpty
+            size='xs'
+            onClick={() => onOpenVulnerability(row.id)}
+            data-test-subj='ctiExplorerLookupOpenVulnerability'
+          >
+            {OPEN_RECORD}
+          </EuiButtonEmpty>
+        ),
+      },
+    ]}
+    data-test-subj='ctiExplorerLookupRecordFound'
+  />
+);
+
+/** The IOC records of the value, one row per value and type. */
+const IocMatch = ({
+  records,
+  checkedAs,
+  onOpenIoc,
+}: {
+  records: IocRecord[];
+  checkedAs: string;
+  onOpenIoc: (id: string) => void;
+}) => (
+  <div data-test-subj='ctiExplorerLookupListed'>
+    <EuiBasicTable<ValueGroup>
+      items={groupByValue(records)}
+      tableLayout='auto'
+      columns={[
+        {
+          field: 'name',
+          name: i18n.translate('wazuh.ctiExplorer.lookup.columns.value', {
+            defaultMessage: 'Value',
+          }),
+          render: (name: string) => (
+            <EuiCode transparentBackground>{name}</EuiCode>
+          ),
+        },
+        {
+          field: 'type',
+          name: i18n.translate('wazuh.ctiExplorer.lookup.columns.type', {
+            defaultMessage: 'Type',
+          }),
+          render: (type: string) => getIocTypeLabel(type),
+        },
+        {
+          field: 'records',
+          name: i18n.translate('wazuh.ctiExplorer.lookup.columns.providers', {
+            defaultMessage: 'Providers',
+          }),
+          render: (groupRecords: IocRecord[]) =>
+            uniqueProviders(groupRecords).join(', '),
+        },
+        {
+          field: 'records',
+          name: i18n.translate('wazuh.ctiExplorer.lookup.columns.confidence', {
+            defaultMessage: 'Confidence',
+          }),
+          render: (groupRecords: IocRecord[]) =>
+            Math.max(...groupRecords.map(record => record.confidence ?? 0)),
+        },
+        {
+          name: ACTIONS_COLUMN_NAME,
+          render: (group: ValueGroup) => (
+            <EuiFlexGroup gutterSize='none' responsive={false} wrap>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  size='xs'
+                  onClick={() => onOpenIoc(group.records[0].id)}
+                  data-test-subj='ctiExplorerLookupOpenIoc'
+                >
+                  {OPEN_RECORD}
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  size='xs'
+                  iconType='search'
+                  href={getThreatHuntingIocUrl(group.name)}
+                  data-test-subj='ctiExplorerLookupHunt'
+                >
+                  {i18n.translate('wazuh.ctiExplorer.huntInThreatHunting', {
+                    defaultMessage: 'Hunt in Threat Hunting',
+                  })}
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          ),
+        },
+      ]}
+    />
+    <EuiSpacer size='s' />
+    <EuiText size='xs' color='subdued'>
+      <p>
+        {i18n.translate('wazuh.ctiExplorer.lookup.listedText', {
+          defaultMessage:
+            'A match is feed knowledge, not evidence that the value was seen on your agents. Hunt for it to find the events that matched it.',
+        })}{' '}
+        {checkedAs}
+      </p>
+    </EuiText>
+  </div>
+);
+
 const LookupResult = ({
   value,
   result,
@@ -83,21 +240,10 @@ const LookupResult = ({
 } & LookupPanelProps) => {
   if (result.kind === 'vulnerability') {
     return result.found ? (
-      <EuiCallOut
-        size='s'
-        iconType='document'
-        title={i18n.translate('wazuh.ctiExplorer.lookup.recordFound', {
-          defaultMessage: 'Vulnerability record {id}',
-          values: { id: result.id },
-        })}
-        data-test-subj='ctiExplorerLookupRecordFound'
-      >
-        <EuiButton size='s' onClick={() => onOpenVulnerability(result.id)}>
-          {i18n.translate('wazuh.ctiExplorer.lookup.openRecord', {
-            defaultMessage: 'Open the record',
-          })}
-        </EuiButton>
-      </EuiCallOut>
+      <VulnerabilityMatch
+        record={recordOf(result)}
+        onOpenVulnerability={onOpenVulnerability}
+      />
     ) : (
       <EuiCallOut
         size='s'
@@ -148,102 +294,12 @@ const LookupResult = ({
     );
   }
 
-  const providers = uniqueProviders(result.records);
-  const groups = groupByValue(result.records);
   return (
-    <EuiCallOut
-      size='s'
-      color='danger'
-      iconType='alert'
-      title={i18n.translate('wazuh.ctiExplorer.lookup.listed', {
-        defaultMessage:
-          'Listed by {count, plural, one {# provider} other {# providers}}: {providers}',
-        values: { count: providers.length, providers: providers.join(', ') },
-      })}
-      data-test-subj='ctiExplorerLookupListed'
-    >
-      <EuiBasicTable<ValueGroup>
-        items={groups}
-        tableLayout='auto'
-        columns={[
-          {
-            field: 'name',
-            name: i18n.translate('wazuh.ctiExplorer.lookup.columns.value', {
-              defaultMessage: 'Value',
-            }),
-            render: (name: string) => (
-              <EuiCode transparentBackground>{name}</EuiCode>
-            ),
-          },
-          {
-            field: 'type',
-            name: i18n.translate('wazuh.ctiExplorer.lookup.columns.type', {
-              defaultMessage: 'Type',
-            }),
-            render: (type: string) => getIocTypeLabel(type),
-          },
-          {
-            field: 'records',
-            name: i18n.translate('wazuh.ctiExplorer.lookup.columns.providers', {
-              defaultMessage: 'Providers',
-            }),
-            render: (records: IocRecord[]) =>
-              uniqueProviders(records).join(', '),
-          },
-          {
-            field: 'records',
-            name: i18n.translate(
-              'wazuh.ctiExplorer.lookup.columns.confidence',
-              { defaultMessage: 'Confidence' },
-            ),
-            render: (records: IocRecord[]) =>
-              Math.max(...records.map(record => record.confidence ?? 0)),
-          },
-          {
-            name: i18n.translate('wazuh.ctiExplorer.lookup.columns.actions', {
-              defaultMessage: 'Actions',
-            }),
-            render: (group: ValueGroup) => (
-              <EuiFlexGroup gutterSize='none' responsive={false} wrap>
-                <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty
-                    size='xs'
-                    onClick={() => onOpenIoc(group.records[0].id)}
-                    data-test-subj='ctiExplorerLookupOpenIoc'
-                  >
-                    {i18n.translate('wazuh.ctiExplorer.lookup.openRecord', {
-                      defaultMessage: 'Open the record',
-                    })}
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-                <EuiFlexItem grow={false}>
-                  <EuiButtonEmpty
-                    size='xs'
-                    iconType='search'
-                    href={getThreatHuntingIocUrl(group.name)}
-                    data-test-subj='ctiExplorerLookupHunt'
-                  >
-                    {i18n.translate('wazuh.ctiExplorer.huntInThreatHunting', {
-                      defaultMessage: 'Hunt in Threat Hunting',
-                    })}
-                  </EuiButtonEmpty>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            ),
-          },
-        ]}
-      />
-      <EuiSpacer size='s' />
-      <EuiText size='xs' color='subdued'>
-        <p>
-          {i18n.translate('wazuh.ctiExplorer.lookup.listedText', {
-            defaultMessage:
-              'A match is feed knowledge, not evidence that the value was seen on your agents. Hunt for it to find the events that matched it.',
-          })}{' '}
-          {checkedAs}
-        </p>
-      </EuiText>
-    </EuiCallOut>
+    <IocMatch
+      records={result.records}
+      checkedAs={checkedAs}
+      onOpenIoc={onOpenIoc}
+    />
   );
 };
 

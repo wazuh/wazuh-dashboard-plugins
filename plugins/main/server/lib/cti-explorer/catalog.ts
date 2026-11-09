@@ -25,7 +25,7 @@ import {
   buildIocRelatedBody,
   buildIocSearchBody,
   buildIocSummaryBody,
-  buildVulnerabilityExistsBody,
+  buildVulnerabilityLookupBody,
   buildVulnerabilityRecordBody,
   buildVulnerabilitySearchBody,
   buildVulnerabilitySummaryBody,
@@ -263,6 +263,17 @@ export async function getIocRecord(
   };
 }
 
+const toVulnerabilityItem = (hit: SearchHit): VulnerabilityListItem => {
+  const document = hit._source?.document;
+  return {
+    id: String(hit._id ?? ''),
+    type: String(hit._source?.type ?? ''),
+    offset: offsetOf(hit),
+    document:
+      document && typeof document === 'object' ? asRecord(document) : null,
+  };
+};
+
 export async function lookupValue(
   client: CatalogSearchClient,
   classification: Extract<
@@ -274,12 +285,14 @@ export async function lookupValue(
     const response = await search(
       client,
       CTI_VULNERABILITIES_PATTERN,
-      buildVulnerabilityExistsBody(classification.id),
+      buildVulnerabilityLookupBody(classification.id),
     );
+    const [hit] = hitsOf(response);
     return {
       kind: 'vulnerability',
       id: classification.id,
-      found: hitsOf(response).length > 0,
+      found: Boolean(hit),
+      record: hit ? toVulnerabilityItem(hit) : null,
     };
   }
   const response = await search(
@@ -304,17 +317,6 @@ export async function getVulnerabilitySummary(
   );
   return { byType: toBuckets(response.aggregations?.byType) };
 }
-
-const toVulnerabilityItem = (hit: SearchHit): VulnerabilityListItem => {
-  const document = hit._source?.document;
-  return {
-    id: String(hit._id ?? ''),
-    type: String(hit._source?.type ?? ''),
-    offset: offsetOf(hit),
-    document:
-      document && typeof document === 'object' ? asRecord(document) : null,
-  };
-};
 
 export async function searchVulnerabilities(
   client: CatalogSearchClient,

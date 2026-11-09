@@ -34,6 +34,7 @@ import { IocsTab } from './components/iocs-tab';
 import { VulnerabilitiesTab } from './components/vulnerabilities-tab';
 import { IocFlyout } from './components/ioc-flyout';
 import { VulnerabilityFlyout } from './components/vulnerability-flyout';
+import { NORMAL_FONT_WEIGHT, PAGE_DESCRIPTION_STYLE } from './utils/styles';
 
 const TABS = ['overview', 'iocs', 'vulnerabilities'] as const;
 type CtiExplorerTab = (typeof TABS)[number];
@@ -99,10 +100,14 @@ export const CtiExplorer = () => {
         pageTitle={i18n.translate('wazuh.ctiExplorer.page.title', {
           defaultMessage: 'CTI Explorer',
         })}
-        description={i18n.translate('wazuh.ctiExplorer.page.description', {
-          defaultMessage:
-            'Check a value against the threat intelligence the CTI feed delivers, and browse its indicators of compromise and vulnerability records.',
-        })}
+        description={
+          <span style={PAGE_DESCRIPTION_STYLE}>
+            {i18n.translate('wazuh.ctiExplorer.page.description', {
+              defaultMessage:
+                'Check a value against the threat intelligence the CTI feed delivers, and browse its indicators of compromise and vulnerability records.',
+            })}
+          </span>
+        }
         rightSideItems={[
           <AboutCtiExplorer key='about' />,
           // Centered on the height of the buttons beside it. Opens the CTI
@@ -119,7 +124,7 @@ export const CtiExplorer = () => {
           </EuiFlexGroup>,
         ]}
         tabs={TABS.map(id => ({
-          label: TAB_LABELS[id],
+          label: <span style={NORMAL_FONT_WEIGHT}>{TAB_LABELS[id]}</span>,
           isSelected: id === tab,
           onClick: () => setParams({ tab: id }),
           'data-test-subj': `ctiExplorerTab-${id}`,

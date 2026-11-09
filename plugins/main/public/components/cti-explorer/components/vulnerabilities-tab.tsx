@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import {
-  EuiBadge,
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiButtonGroup,
-  EuiCode,
   EuiFieldSearch,
   EuiFlexGroup,
   EuiFlexItem,
@@ -24,12 +22,6 @@ import {
   CveSeverityFilter,
   VulnerabilityRecordType,
 } from '../../../../common/cti-explorer/constants';
-import {
-  getCveMetadata,
-  getCveScores,
-  getHighestCveScore,
-  getTranslationRule,
-} from '../../../../common/cti-explorer/cve-record';
 import type {
   VulnerabilityListItem,
   VulnerabilitySummaryResponse,
@@ -37,12 +29,22 @@ import type {
 import { CtiRequestState, useCtiRequest } from '../hooks/use-cti-request';
 import { searchVulnerabilities } from '../services/cti-explorer-api';
 import type { CsvColumn } from '../services/export-csv';
-import { formatDate, formatNumber } from '../utils/labels';
+import { formatNumber } from '../utils/labels';
 import { NORMAL_FONT_WEIGHT } from '../utils/styles';
 import { ExportCsvButton } from './export-csv-button';
 import { RequestErrorCallout } from './request-error-callout';
-import { getSeverityLabel, SeverityBadge } from './severity-badge';
+import { getSeverityLabel } from './severity-badge';
 import { SeverityFilter } from './severity-filter';
+import {
+  VulnerabilityRow,
+  cveMetadata,
+  getCveColumns,
+  getTidColumns,
+  highestScore,
+  toVulnerabilityRows,
+  translationRule,
+  translationTargets,
+} from './vulnerability-columns';
 
 /** The full `_id` of a record: the index cannot match a part of it. */
 export const RECORD_ID_PATTERN = /^(CVE-\d{4}-\d{4,}|TID-\d+)$/i;
@@ -50,20 +52,7 @@ export const RECORD_ID_PATTERN = /^(CVE-\d{4}-\d{4,}|TID-\d+)$/i;
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 const ALL_TYPES = 'all';
 
-/** A listed record, with the values the table sorts on. */
-type VulnerabilityRow = VulnerabilityListItem & {
-  rowKey: string;
-  published: string | null;
-};
-
 const PUBLISHED_SORT_FIELD = 'document.cveMetadata.datePublished';
-
-const highestScore = (item: VulnerabilityListItem) =>
-  item.type === 'CVE' ? getHighestCveScore(getCveScores(item.document)) : null;
-const cveMetadata = (item: VulnerabilityListItem) =>
-  item.type === 'CVE' ? getCveMetadata(item.document) : null;
-const translationRule = (item: VulnerabilityListItem) =>
-  item.type === 'TID' ? getTranslationRule(item.document) : null;
 
 /** Columns of the exported file: dates as stored, in UTC. */
 const CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
@@ -149,12 +138,6 @@ const CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
   },
 ];
 
-/** `vendor:product` of each translation, the CPE names a rule maps a package to. */
-const translationTargets = (item: VulnerabilityListItem) =>
-  (translationRule(item)?.translations ?? []).map(
-    translation => `${translation.vendor ?? ''}:${translation.product ?? ''}`,
-  );
-
 /** Columns of the exported translation rules, every one present in each rule. */
 const TID_CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
   {
@@ -193,7 +176,7 @@ const TID_CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
   {
     field: 'actions',
     title: i18n.translate('wazuh.ctiExplorer.vulnerabilities.csv.tidActions', {
-      defaultMessage: 'Actions',
+      defaultMessage: 'Rule actions',
     }),
     value: item => translationRule(item)?.actions.join(', '),
   },
@@ -205,16 +188,6 @@ const TID_CSV_COLUMNS: Array<CsvColumn<VulnerabilityListItem>> = [
     value: item => translationRule(item)?.targets.join(', '),
   },
 ];
-
-/** A source pattern of a translation rule, a regular expression; `-` when empty. */
-const renderPattern = (pattern: string | undefined) =>
-  pattern ? (
-    <EuiCode transparentBackground className='eui-textBreakAll'>
-      {pattern}
-    </EuiCode>
-  ) : (
-    '-'
-  );
 
 interface VulnerabilitiesTabProps {
   summary: CtiRequestState<VulnerabilitySummaryResponse>;
@@ -234,10 +207,11 @@ export const VulnerabilitiesTab = ({
   const [idInput, setIdInput] = useState('');
   const [idInvalid, setIdInvalid] = useState(false);
   const [severities, setSeverities] = useState<CveSeverityFilter[]>([]);
-  /** Order by publication date; newest delivered first while unset. */
-  const [publishedSort, setPublishedSort] = useState<'asc' | 'desc' | null>(
-    null,
-  );
+  /**
+   * Order of the publication dates, wherever the Published column shows:
+   * newest first until the column header changes it.
+   */
+  const [publishedSort, setPublishedSort] = useState<'asc' | 'desc'>('desc');
 
   // Translation rules have no scores nor publication date: the severity filter
   // and the sort apply to CVE records only.
@@ -248,6 +222,14 @@ export const VulnerabilitiesTab = ({
   const sortParams = appliedSort
     ? { sortField: PUBLISHED_SORT_FIELD, sortDirection: appliedSort }
     : {};
+
+  // Selecting translation rules, here or from the Overview, clears the
+  // severities: they would not apply, and should not come back with CVE.
+  useEffect(() => {
+    if (isTid) {
+      setSeverities([]);
+    }
+  }, [isTid]);
 
   useEffect(() => setPage(0), [type, severitiesKey, appliedSort]);
 
@@ -264,15 +246,7 @@ export const VulnerabilitiesTab = ({
     [type, severitiesKey, appliedSort, page, pageSize],
   );
   const total = result.data?.total ?? 0;
-  // Rows are keyed by position: while two indices match the pattern, as during
-  // a reindex, a record is listed twice and its id is not unique.
-  const rows: VulnerabilityRow[] = (result.data?.items ?? []).map(
-    (item, position) => ({
-      ...item,
-      rowKey: `${position}-${item.id}`,
-      published: cveMetadata(item)?.published ?? null,
-    }),
-  );
+  const rows = toVulnerabilityRows(result.data?.items ?? []);
 
   const countOf = (recordType: string) =>
     summary.data?.byType.find(bucket => bucket.key === recordType)?.count;
@@ -331,74 +305,9 @@ export const VulnerabilitiesTab = ({
     ),
   };
 
-  // Translation rules have none of the CVE fields: they list what every rule
-  // holds instead, the package it matches and the names it maps it to.
   const tidColumns: Array<EuiBasicTableColumn<VulnerabilityRow>> = [
     recordColumn,
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.vendorPattern',
-        { defaultMessage: 'Vendor pattern' },
-      ),
-      width: '20%',
-      render: (item: VulnerabilityListItem) =>
-        renderPattern(translationRule(item)?.source.vendor),
-    },
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.productPattern',
-        { defaultMessage: 'Product pattern' },
-      ),
-      width: '32%',
-      render: (item: VulnerabilityListItem) =>
-        renderPattern(translationRule(item)?.source.product),
-    },
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.translatesTo',
-        { defaultMessage: 'Translates to' },
-      ),
-      width: '22%',
-      render: (item: VulnerabilityListItem) => (
-        <div>
-          {translationTargets(item).map((target, position) => (
-            <div key={position} className='eui-textBreakWord'>
-              {target}
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.actions',
-        { defaultMessage: 'Actions' },
-      ),
-      render: (item: VulnerabilityListItem) => (
-        <div>
-          {(translationRule(item)?.actions ?? []).map(action => (
-            <div key={action} className='eui-textNoWrap'>
-              {action}
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.targets',
-        { defaultMessage: 'Targets' },
-      ),
-      render: (item: VulnerabilityListItem) => (
-        <div>
-          {(translationRule(item)?.targets ?? []).map(target => (
-            <div key={target} className='eui-textNoWrap'>
-              {target}
-            </div>
-          ))}
-        </div>
-      ),
-    },
+    ...getTidColumns(),
   ];
 
   const columns: Array<EuiBasicTableColumn<VulnerabilityRow>> = [
@@ -409,68 +318,7 @@ export const VulnerabilitiesTab = ({
         defaultMessage: 'Type',
       }),
     },
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.severity',
-        { defaultMessage: 'Highest CVSS' },
-      ),
-      render: (item: VulnerabilityListItem) =>
-        item.type === 'CVE' ? (
-          <SeverityBadge
-            score={getHighestCveScore(getCveScores(item.document))}
-          />
-        ) : (
-          '-'
-        ),
-    },
-    {
-      field: 'published',
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.published',
-        { defaultMessage: 'Published' },
-      ),
-      sortable: !isTid,
-      render: (published: string | null) => formatDate(published),
-    },
-    {
-      name: i18n.translate(
-        'wazuh.ctiExplorer.vulnerabilities.columns.details',
-        {
-          defaultMessage: 'Details',
-        },
-      ),
-      render: (item: VulnerabilityListItem) => {
-        if (item.type === 'TID') {
-          const rule = getTranslationRule(item.document);
-          return i18n.translate(
-            'wazuh.ctiExplorer.vulnerabilities.tidDetails',
-            {
-              defaultMessage: '{actions} on {targets}',
-              values: {
-                actions: rule.actions.join(', ') || '-',
-                targets: rule.targets.join(', ') || '-',
-              },
-            },
-          );
-        }
-        const metadata = getCveMetadata(item.document);
-        return (
-          <EuiFlexGroup gutterSize='s' alignItems='center' responsive={false}>
-            <EuiFlexItem grow={false}>
-              {i18n.translate('wazuh.ctiExplorer.vulnerabilities.assigner', {
-                defaultMessage: 'Assigner: {assigner}',
-                values: { assigner: metadata.assigner ?? '-' },
-              })}
-            </EuiFlexItem>
-            {metadata.state && metadata.state !== 'PUBLISHED' ? (
-              <EuiFlexItem grow={false}>
-                <EuiBadge color='warning'>{metadata.state}</EuiBadge>
-              </EuiFlexItem>
-            ) : null}
-          </EuiFlexGroup>
-        );
-      },
-    },
+    ...getCveColumns({ publishedSortable: !isTid }),
   ];
 
   return (
@@ -499,7 +347,7 @@ export const VulnerabilitiesTab = ({
               <p>
                 {i18n.translate('wazuh.ctiExplorer.vulnerabilities.caption', {
                   defaultMessage:
-                    'Newest first, unless sorted by publication date. The records are stored without being indexed, except the CVSS scores of their CNA: they can be listed, filtered by severity and opened by their full id, but their content cannot be searched.',
+                    'Most recently published first; translation rules, newest delivered first. The records are stored without being indexed, except the CVSS scores of their CNA: they can be listed, filtered by severity and opened by their full id, but their content cannot be searched.',
                 })}
               </p>
             </EuiText>
