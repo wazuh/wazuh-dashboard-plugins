@@ -516,20 +516,6 @@ const IocList = ({
       </EuiFlexGroup>
       <EuiSpacer size='m' />
       <EuiFlexGroup gutterSize='s' wrap responsive={false}>
-        <EuiFlexItem grow={false}>
-          <EuiButtonGroup
-            legend={i18n.translate('wazuh.ctiExplorer.iocs.typeLegend', {
-              defaultMessage: 'Type of IOC',
-            })}
-            buttonSize='compressed'
-            idSelected={filters.type ?? ALL_TYPES}
-            onChange={id =>
-              setFilter('type', id === ALL_TYPES ? undefined : id)
-            }
-            options={TYPE_OPTIONS}
-            data-test-subj='ctiExplorerIocType'
-          />
-        </EuiFlexItem>
         <EuiFlexItem style={{ minWidth: 240 }}>
           <EuiFieldSearch
             compressed
@@ -551,6 +537,20 @@ const IocList = ({
               },
             )}
             data-test-subj='ctiExplorerIocPrefix'
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          <EuiButtonGroup
+            legend={i18n.translate('wazuh.ctiExplorer.iocs.typeLegend', {
+              defaultMessage: 'Type of IOC',
+            })}
+            buttonSize='compressed'
+            idSelected={filters.type ?? ALL_TYPES}
+            onChange={id =>
+              setFilter('type', id === ALL_TYPES ? undefined : id)
+            }
+            options={TYPE_OPTIONS}
+            data-test-subj='ctiExplorerIocType'
           />
         </EuiFlexItem>
       </EuiFlexGroup>

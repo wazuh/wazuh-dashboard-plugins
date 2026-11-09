@@ -15,8 +15,10 @@ import {
 } from '@elastic/eui';
 import {
   CTI_RECENT_DAYS,
+  CveSeverityFilter,
   VulnerabilityRecordType,
 } from '../../../../common/cti-explorer/constants';
+import type { CvssSeverity } from '../../../../common/cti-explorer/cve-record';
 import type {
   IocFilters,
   IocSummaryResponse,
@@ -35,12 +37,16 @@ import { NORMAL_FONT_WEIGHT } from '../utils/styles';
 import { BreakdownList } from './breakdown-list';
 import { LookupPanel } from './lookup-panel';
 import { RequestErrorCallout } from './request-error-callout';
+import { getSeverityColor, getSeverityLabel } from './severity-badge';
 
 interface OverviewTabProps {
   iocSummary: CtiRequestState<IocSummaryResponse>;
   vulnerabilitySummary: CtiRequestState<VulnerabilitySummaryResponse>;
   onBrowseIocs: (filters: IocFilters) => void;
-  onBrowseVulnerabilities: (type?: VulnerabilityRecordType) => void;
+  onBrowseVulnerabilities: (
+    type?: VulnerabilityRecordType,
+    severities?: CveSeverityFilter[],
+  ) => void;
   onOpenIoc: (id: string) => void;
   onOpenVulnerability: (id: string) => void;
 }
@@ -93,6 +99,9 @@ const StatTile = ({
     </EuiToolTip>
   </EuiFlexItem>
 );
+
+/** Panels side by side are as tall as the tallest one. */
+const FULL_HEIGHT: React.CSSProperties = { height: '100%' };
 
 const CURRENT_STATE = i18n.translate(
   'wazuh.ctiExplorer.overview.currentState',
@@ -210,6 +219,10 @@ export const OverviewTab = ({
   const countOf = (type: string) =>
     vulnerabilitySummary.data?.byType.find(bucket => bucket.key === type)
       ?.count;
+  const bySeverity = vulnerabilitySummary.data?.byHighestSeverity ?? [];
+  const scoredCves = bySeverity.reduce((sum, bucket) => sum + bucket.count, 0);
+  // Records with no CNA score, or only 0.0 (no severity), are in no band.
+  const unscoredCves = Math.max((countOf('CVE') ?? scoredCves) - scoredCves, 0);
 
   return (
     <>
@@ -331,39 +344,136 @@ export const OverviewTab = ({
         ) : null}
       </EuiFlexGroup>
       <EuiSpacer size='m' />
-      {iocs ? (
-        <EuiPanel paddingSize='m' data-test-subj='ctiExplorerIocsByType'>
-          <EuiFlexGroup
-            justifyContent='spaceBetween'
-            alignItems='center'
-            responsive={false}
-          >
-            <EuiFlexItem grow={false}>
-              <EuiTitle size='xs'>
-                <h2>
-                  {i18n.translate('wazuh.ctiExplorer.overview.byTypeTitle', {
-                    defaultMessage: 'IOC catalog by type',
-                  })}
-                </h2>
-              </EuiTitle>
+      {iocs || vulnerabilitySummary.data ? (
+        <EuiFlexGroup gutterSize='m'>
+          {iocs ? (
+            <EuiFlexItem>
+              <EuiPanel
+                paddingSize='m'
+                style={FULL_HEIGHT}
+                data-test-subj='ctiExplorerIocsByType'
+              >
+                <EuiFlexGroup
+                  justifyContent='spaceBetween'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiTitle size='xs'>
+                      <h2>
+                        {i18n.translate(
+                          'wazuh.ctiExplorer.overview.byTypeTitle',
+                          {
+                            defaultMessage: 'IOC catalog by type',
+                          },
+                        )}
+                      </h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty size='s' onClick={() => onBrowseIocs({})}>
+                      {i18n.translate('wazuh.ctiExplorer.overview.browseIocs', {
+                        defaultMessage: 'Browse IOCs',
+                      })}
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiSpacer size='s' />
+                <BreakdownList
+                  buckets={iocs.byType}
+                  total={iocs.total}
+                  getLabel={getIocTypeLabel}
+                  onSelect={type => onBrowseIocs({ type })}
+                  data-test-subj='ctiExplorerOverviewByType'
+                />
+              </EuiPanel>
             </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty size='s' onClick={() => onBrowseIocs({})}>
-                {i18n.translate('wazuh.ctiExplorer.overview.browseIocs', {
-                  defaultMessage: 'Browse IOCs',
-                })}
-              </EuiButtonEmpty>
+          ) : null}
+          {vulnerabilitySummary.data ? (
+            <EuiFlexItem>
+              <EuiPanel
+                paddingSize='m'
+                style={FULL_HEIGHT}
+                data-test-subj='ctiExplorerCvesBySeverity'
+              >
+                <EuiFlexGroup
+                  justifyContent='spaceBetween'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <EuiTitle size='xs'>
+                      <h2>
+                        {i18n.translate(
+                          'wazuh.ctiExplorer.overview.bySeverityTitle',
+                          { defaultMessage: 'CVE records by severity' },
+                        )}
+                      </h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      size='s'
+                      onClick={() => onBrowseVulnerabilities('CVE')}
+                    >
+                      {i18n.translate('wazuh.ctiExplorer.overview.browseCves', {
+                        defaultMessage: 'Browse CVE records',
+                      })}
+                    </EuiButtonEmpty>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiText size='xs' color='subdued'>
+                  <p>
+                    {i18n.translate(
+                      'wazuh.ctiExplorer.overview.bySeverityCaption',
+                      {
+                        defaultMessage:
+                          'Severity of the highest base score the CNA assigned to each record, in any CVSS version.',
+                      },
+                    )}
+                  </p>
+                </EuiText>
+                <EuiSpacer size='s' />
+                <BreakdownList
+                  // Most severe first.
+                  buckets={[...bySeverity].reverse()}
+                  total={scoredCves}
+                  getLabel={key => getSeverityLabel(key as CvssSeverity)}
+                  getColor={key => getSeverityColor(key as CvssSeverity)}
+                  // The list filtered by that severity: it also lists the
+                  // records with a higher score besides one in the band.
+                  onSelect={severity =>
+                    onBrowseVulnerabilities('CVE', [
+                      severity as CveSeverityFilter,
+                    ])
+                  }
+                  data-test-subj='ctiExplorerOverviewBySeverity'
+                />
+                {unscoredCves ? (
+                  <>
+                    <EuiSpacer size='s' />
+                    <EuiText
+                      size='xs'
+                      color='subdued'
+                      data-test-subj='ctiExplorerOverviewUnscored'
+                    >
+                      <p>
+                        {i18n.translate(
+                          'wazuh.ctiExplorer.overview.unscoredCves',
+                          {
+                            defaultMessage:
+                              '{count} CVE records without a CNA score, or scored 0.0, are not counted.',
+                            values: { count: formatNumber(unscoredCves) },
+                          },
+                        )}
+                      </p>
+                    </EuiText>
+                  </>
+                ) : null}
+              </EuiPanel>
             </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size='s' />
-          <BreakdownList
-            buckets={iocs.byType}
-            total={iocs.total}
-            getLabel={getIocTypeLabel}
-            onSelect={type => onBrowseIocs({ type })}
-            data-test-subj='ctiExplorerOverviewByType'
-          />
-        </EuiPanel>
+          ) : null}
+        </EuiFlexGroup>
       ) : null}
       <EuiSpacer size='m' />
       <DetectionContentPanel />

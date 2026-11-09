@@ -10,6 +10,8 @@ interface BreakdownListProps {
   /** Share of each bucket is of this total. */
   total: number;
   getLabel?: (key: string) => string;
+  /** Color of the bar of each row; the primary color when omitted. */
+  getColor?: (key: string) => string;
   /** Selecting a row filters the IOC list on it. */
   onSelect?: (key: string) => void;
   'data-test-subj'?: string;
@@ -44,6 +46,7 @@ export const BreakdownList = ({
   buckets,
   total,
   getLabel = key => key,
+  getColor,
   onSelect,
   'data-test-subj': dataTestSubj,
 }: BreakdownListProps) => {
@@ -103,7 +106,7 @@ export const BreakdownList = ({
               value={bucket.count}
               max={total || 1}
               size='m'
-              color='primary'
+              color={getColor?.(bucket.key) ?? 'primary'}
               aria-label={label}
             />
             <EuiText size='s' style={NUMBER_STYLE}>

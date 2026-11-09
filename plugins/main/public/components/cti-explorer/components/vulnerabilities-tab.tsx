@@ -193,6 +193,9 @@ interface VulnerabilitiesTabProps {
   summary: CtiRequestState<VulnerabilitySummaryResponse>;
   type: VulnerabilityRecordType | undefined;
   onTypeChange: (type: VulnerabilityRecordType | undefined) => void;
+  /** Kept by the page, so the Overview can open the list filtered by them. */
+  severities: CveSeverityFilter[];
+  onSeveritiesChange: (severities: CveSeverityFilter[]) => void;
   onOpenVulnerability: (id: string) => void;
 }
 
@@ -200,13 +203,16 @@ export const VulnerabilitiesTab = ({
   summary,
   type,
   onTypeChange,
+  severities,
+  onSeveritiesChange,
   onOpenVulnerability,
 }: VulnerabilitiesTabProps) => {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(CTI_DEFAULT_PAGE_SIZE);
   const [idInput, setIdInput] = useState('');
   const [idInvalid, setIdInvalid] = useState(false);
-  const [severities, setSeverities] = useState<CveSeverityFilter[]>([]);
+  /** The full id the list is filtered by, as the index stores it. */
+  const [recordId, setRecordId] = useState<string | undefined>();
   /**
    * Order of the publication dates, wherever the Published column shows:
    * newest first until the column header changes it.
@@ -226,24 +232,25 @@ export const VulnerabilitiesTab = ({
   // Selecting translation rules, here or from the Overview, clears the
   // severities: they would not apply, and should not come back with CVE.
   useEffect(() => {
-    if (isTid) {
-      setSeverities([]);
+    if (isTid && severities.length) {
+      onSeveritiesChange([]);
     }
-  }, [isTid]);
+  }, [isTid, severities.length, onSeveritiesChange]);
 
-  useEffect(() => setPage(0), [type, severitiesKey, appliedSort]);
+  useEffect(() => setPage(0), [type, severitiesKey, recordId, appliedSort]);
 
   const result = useCtiRequest(
     () =>
       searchVulnerabilities({
         type,
         severities: appliedSeverities,
+        id: recordId,
         ...sortParams,
         page,
         pageSize,
       }),
     // `severitiesKey` stands for `appliedSeverities`.
-    [type, severitiesKey, appliedSort, page, pageSize],
+    [type, severitiesKey, recordId, appliedSort, page, pageSize],
   );
   const total = result.data?.total ?? 0;
   const rows = toVulnerabilityRows(result.data?.items ?? []);
@@ -258,18 +265,15 @@ export const VulnerabilitiesTab = ({
           values: { label, count: formatNumber(count) },
         });
 
-  const openById = (value: string) => {
+  /** Filters the list by a full id; an empty search lists every record again. */
+  const filterById = (value: string) => {
     const id = value.trim();
-    if (!id) {
-      setIdInvalid(false);
-      return;
-    }
-    if (!RECORD_ID_PATTERN.test(id)) {
+    if (id && !RECORD_ID_PATTERN.test(id)) {
       setIdInvalid(true);
       return;
     }
     setIdInvalid(false);
-    onOpenVulnerability(id.toUpperCase());
+    setRecordId(id ? id.toUpperCase() : undefined);
   };
 
   const onTableChange = ({
@@ -312,12 +316,18 @@ export const VulnerabilitiesTab = ({
 
   const columns: Array<EuiBasicTableColumn<VulnerabilityRow>> = [
     recordColumn,
-    {
-      field: 'type',
-      name: i18n.translate('wazuh.ctiExplorer.vulnerabilities.columns.type', {
-        defaultMessage: 'Type',
-      }),
-    },
+    // Only where the list mixes both types: filtered by one, it says nothing.
+    ...(type
+      ? []
+      : [
+          {
+            field: 'type',
+            name: i18n.translate(
+              'wazuh.ctiExplorer.vulnerabilities.columns.type',
+              { defaultMessage: 'Type' },
+            ),
+          },
+        ]),
     ...getCveColumns({ publishedSortable: !isTid }),
   ];
 
@@ -347,7 +357,7 @@ export const VulnerabilitiesTab = ({
               <p>
                 {i18n.translate('wazuh.ctiExplorer.vulnerabilities.caption', {
                   defaultMessage:
-                    'Most recently published first; translation rules, newest delivered first. The records are stored without being indexed, except the CVSS scores of their CNA: they can be listed, filtered by severity and opened by their full id, but their content cannot be searched.',
+                    'Most recently published first; translation rules, newest delivered first. The records are stored without being indexed, except the CVSS scores of their CNA: they can be listed, filtered by severity and found by their full id, but their content cannot be searched.',
                 })}
               </p>
             </EuiText>
@@ -360,6 +370,7 @@ export const VulnerabilitiesTab = ({
                 searchVulnerabilities({
                   type,
                   severities: appliedSeverities,
+                  id: recordId,
                   ...sortParams,
                   page: exportPage,
                   pageSize: exportPageSize,
@@ -373,6 +384,51 @@ export const VulnerabilitiesTab = ({
         </EuiFlexGroup>
         <EuiSpacer size='m' />
         <EuiFlexGroup gutterSize='m' wrap alignItems='flexStart'>
+          <EuiFlexItem style={{ minWidth: 260 }}>
+            <EuiFormRow
+              fullWidth
+              isInvalid={idInvalid}
+              error={i18n.translate(
+                'wazuh.ctiExplorer.vulnerabilities.idInvalid',
+                {
+                  defaultMessage:
+                    'Enter a full record id, such as CVE-2024-6387 or TID-0048.',
+                },
+              )}
+            >
+              <EuiFieldSearch
+                compressed
+                fullWidth
+                value={idInput}
+                maxLength={CTI_RECORD_ID_MAX_LENGTH}
+                isInvalid={idInvalid}
+                incremental={false}
+                onChange={event => setIdInput(event.target.value)}
+                onSearch={filterById}
+                placeholder={i18n.translate(
+                  'wazuh.ctiExplorer.vulnerabilities.idPlaceholder',
+                  { defaultMessage: 'Filter by a full record id' },
+                )}
+                aria-label={i18n.translate(
+                  'wazuh.ctiExplorer.vulnerabilities.idAriaLabel',
+                  {
+                    defaultMessage:
+                      'Filter the vulnerability records by a full CVE or TID id',
+                  },
+                )}
+                data-test-subj='ctiExplorerVulnerabilityIdInput'
+              />
+            </EuiFormRow>
+          </EuiFlexItem>
+          {/* Translation rules have no scores: no severity to filter by. */}
+          {isTid ? null : (
+            <EuiFlexItem grow={false} style={{ minWidth: 250 }}>
+              <SeverityFilter
+                selected={severities}
+                onChange={onSeveritiesChange}
+              />
+            </EuiFlexItem>
+          )}
           <EuiFlexItem grow={false}>
             <EuiButtonGroup
               legend={i18n.translate(
@@ -418,48 +474,6 @@ export const VulnerabilitiesTab = ({
               data-test-subj='ctiExplorerVulnerabilityType'
             />
           </EuiFlexItem>
-          {/* Translation rules have no scores: no severity to filter by. */}
-          {isTid ? null : (
-            <EuiFlexItem grow={false} style={{ minWidth: 250 }}>
-              <SeverityFilter selected={severities} onChange={setSeverities} />
-            </EuiFlexItem>
-          )}
-          <EuiFlexItem style={{ minWidth: 260 }}>
-            <EuiFormRow
-              fullWidth
-              isInvalid={idInvalid}
-              error={i18n.translate(
-                'wazuh.ctiExplorer.vulnerabilities.idInvalid',
-                {
-                  defaultMessage:
-                    'Enter a full record id, such as CVE-2024-6387 or TID-0048.',
-                },
-              )}
-            >
-              <EuiFieldSearch
-                compressed
-                fullWidth
-                value={idInput}
-                maxLength={CTI_RECORD_ID_MAX_LENGTH}
-                isInvalid={idInvalid}
-                incremental={false}
-                onChange={event => setIdInput(event.target.value)}
-                onSearch={openById}
-                placeholder={i18n.translate(
-                  'wazuh.ctiExplorer.vulnerabilities.idPlaceholder',
-                  { defaultMessage: 'Open a record by its full id' },
-                )}
-                aria-label={i18n.translate(
-                  'wazuh.ctiExplorer.vulnerabilities.idAriaLabel',
-                  {
-                    defaultMessage:
-                      'Open a vulnerability record by its full CVE or TID id',
-                  },
-                )}
-                data-test-subj='ctiExplorerVulnerabilityIdInput'
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup
           gutterSize='s'
@@ -480,7 +494,7 @@ export const VulnerabilitiesTab = ({
                       'wazuh.ctiExplorer.vulnerabilities.countCapped',
                       {
                         defaultMessage:
-                          '{total} records. The newest {max} can be paged through; open any other one by its id.',
+                          '{total} records. The newest {max} can be paged through; find any other one by its full id.',
                         values: {
                           total: formatNumber(total),
                           max: formatNumber(CTI_MAX_RESULT_WINDOW),

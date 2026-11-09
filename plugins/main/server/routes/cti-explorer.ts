@@ -63,6 +63,15 @@ const pagination = {
 /** `CVE-YYYY-NNNN…` or `TID-NNNN`, the `_id` of a listed record. */
 const RECORD_ID = /^(CVE-\d{4}-\d{4,}|TID-\d+)$/;
 
+/** A full CVE or TID record id, in upper case as the index stores it. */
+const recordIdSchema = () =>
+  schema.string({
+    minLength: 1,
+    maxLength: CTI_RECORD_ID_MAX_LENGTH,
+    validate: value =>
+      RECORD_ID.test(value) ? undefined : 'must be a CVE or TID record id',
+  });
+
 /**
  * Lookup values arrive defanged (`hxxp://evil[.]example`), so the raw value may
  * be longer than the value it stands for: the limit applies after refanging.
@@ -208,6 +217,7 @@ export function CtiExplorerRoutes(router: IRouter) {
               maxSize: CVE_SEVERITY_FILTERS.length,
             }),
           ),
+          id: schema.maybe(recordIdSchema()),
           sortField: schema.maybe(literals(VULNERABILITY_SORT_FIELDS)),
           sortDirection: schema.maybe(literals(['asc', 'desc'] as const)),
         }),
@@ -223,14 +233,7 @@ export function CtiExplorerRoutes(router: IRouter) {
       path: `${CTI_EXPLORER_ROUTES.vulnerabilityRecord}/{id}`,
       validate: {
         params: schema.object({
-          id: schema.string({
-            minLength: 1,
-            maxLength: CTI_RECORD_ID_MAX_LENGTH,
-            validate: value =>
-              RECORD_ID.test(value)
-                ? undefined
-                : 'must be a CVE or TID record id',
-          }),
+          id: recordIdSchema(),
         }),
       },
     },

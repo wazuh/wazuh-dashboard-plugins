@@ -42,6 +42,9 @@ const SEVERITY: Record<CvssSeverity, { label: string; color: string }> = {
 export const getSeverityLabel = (severity: CvssSeverity): string =>
   SEVERITY[severity].label;
 
+export const getSeverityColor = (severity: CvssSeverity): string =>
+  SEVERITY[severity].color;
+
 /** Severity and score of a CVSS score: `High 8.1`. */
 export const SeverityBadge = ({ score }: { score: CveScore | null }) => {
   if (!score) {

@@ -25,11 +25,7 @@ import {
   lookupValue,
   toCtiRequestError,
 } from '../services/cti-explorer-api';
-import {
-  getIocTypeLabel,
-  getLookupCategoryLabel,
-  getProviderName,
-} from '../utils/labels';
+import { getIocTypeLabel, getProviderName } from '../utils/labels';
 import { getThreatHuntingIocUrl } from '../utils/navigation';
 import { RequestErrorCallout } from './request-error-callout';
 import {
@@ -142,11 +138,9 @@ const VulnerabilityMatch = ({
 /** The IOC records of the value, one row per value and type. */
 const IocMatch = ({
   records,
-  checkedAs,
   onOpenIoc,
 }: {
   records: IocRecord[];
-  checkedAs: string;
   onOpenIoc: (id: string) => void;
 }) => (
   <div data-test-subj='ctiExplorerLookupListed'>
@@ -222,8 +216,7 @@ const IocMatch = ({
         {i18n.translate('wazuh.ctiExplorer.lookup.listedText', {
           defaultMessage:
             'A match is feed knowledge, not evidence that the value was seen on your agents. Hunt for it to find the events that matched it.',
-        })}{' '}
-        {checkedAs}
+        })}
       </p>
     </EuiText>
   </div>
@@ -265,11 +258,6 @@ const LookupResult = ({
     );
   }
 
-  const checkedAs = i18n.translate('wazuh.ctiExplorer.lookup.checkedAs', {
-    defaultMessage: 'Checked as: {category}',
-    values: { category: getLookupCategoryLabel(result.category) },
-  });
-
   if (!result.records.length) {
     return (
       <EuiCallOut
@@ -287,20 +275,11 @@ const LookupResult = ({
               'This is not a verdict that the value is safe: the catalog only holds what its providers reported.',
           })}
         </p>
-        <EuiText size='xs' color='subdued'>
-          {checkedAs}
-        </EuiText>
       </EuiCallOut>
     );
   }
 
-  return (
-    <IocMatch
-      records={result.records}
-      checkedAs={checkedAs}
-      onOpenIoc={onOpenIoc}
-    />
-  );
+  return <IocMatch records={result.records} onOpenIoc={onOpenIoc} />;
 };
 
 export const LookupPanel = ({

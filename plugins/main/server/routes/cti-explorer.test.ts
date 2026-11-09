@@ -401,7 +401,7 @@ describe(`POST ${CTI_EXPLORER_ROUTES.lookup}`, () => {
 });
 
 describe('vulnerability routes', () => {
-  it('counts the CVE and TID records', async () => {
+  it('counts the CVE and TID records, and the CVE by highest severity', async () => {
     mockSearch.mockResolvedValue({
       body: {
         aggregations: {
@@ -411,6 +411,12 @@ describe('vulnerability routes', () => {
               { key: 'TID', doc_count: 212 },
             ],
           },
+          byHighestSeverity: {
+            buckets: {
+              high: { doc_count: 1200 },
+              critical: { doc_count: 300 },
+            },
+          },
         },
       },
     });
@@ -419,12 +425,29 @@ describe('vulnerability routes', () => {
       .get(CTI_EXPLORER_ROUTES.vulnerabilitiesSummary)
       .expect(200);
 
-    expect(response.body).toEqual({
-      byType: [
-        { key: 'CVE', count: 416428 },
-        { key: 'TID', count: 212 },
-      ],
-    });
+    expect(response.body.byType).toEqual([
+      { key: 'CVE', count: 416428 },
+      { key: 'TID', count: 212 },
+    ]);
+    // Every band, lowest first; a missing one counts no record.
+    expect(response.body.byHighestSeverity).toEqual([
+      { key: 'low', count: 0 },
+      { key: 'medium', count: 0 },
+      { key: 'high', count: 1200 },
+      { key: 'critical', count: 300 },
+    ]);
+
+    // A band holds the records with no score in a higher one.
+    const queryOf = (clause: { query_string: { query: string } }) =>
+      clause.query_string.query;
+    const filters =
+      mockSearch.mock.calls[0][0].body.aggs.byHighestSeverity.filters.filters;
+    expect(queryOf(filters.medium.bool.filter[0])).toBe('[4 TO 7}');
+    expect(filters.medium.bool.must_not.map(queryOf)).toEqual([
+      '[7 TO 9}',
+      '[9 TO 10]',
+    ]);
+    expect(queryOf(filters.critical)).toBe('[9 TO 10]');
   });
 
   it('lists the newest records of one type', async () => {
@@ -525,6 +548,22 @@ describe('vulnerability routes', () => {
     ]);
   });
 
+  it('filters the records by their full id', async () => {
+    mockSearch.mockResolvedValue({
+      body: { hits: { total: { value: 0 }, hits: [] } },
+    });
+
+    await supertest(innerServer.listener)
+      .post(CTI_EXPLORER_ROUTES.vulnerabilitiesSearch)
+      .send({ type: 'CVE', id: 'CVE-2024-6387', page: 0, pageSize: 25 })
+      .expect(200);
+
+    expect(searchBody().query.bool.filter).toEqual([
+      { term: { type: 'CVE' } },
+      { ids: { values: ['CVE-2024-6387'] } },
+    ]);
+  });
+
   it('adds no severity filter for an empty selection', async () => {
     mockSearch.mockResolvedValue({
       body: { hits: { total: { value: 0 }, hits: [] } },
@@ -543,6 +582,8 @@ describe('vulnerability routes', () => {
     ['a severity that is not a list', { severities: 'high' }],
     ['an unknown sort field', { sortField: 'document.cveMetadata.state' }],
     ['an unknown sort direction', { sortDirection: 'up' }],
+    ['a partial record id', { id: 'CVE-2024' }],
+    ['a record id in lower case', { id: 'cve-2024-6387' }],
   ])('rejects %s', async (_label, change) => {
     await supertest(innerServer.listener)
       .post(CTI_EXPLORER_ROUTES.vulnerabilitiesSearch)

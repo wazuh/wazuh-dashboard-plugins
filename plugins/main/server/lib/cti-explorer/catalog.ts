@@ -2,6 +2,7 @@ import {
   CTI_IOCS_PATTERN,
   CTI_MAX_RESULT_WINDOW,
   CTI_VULNERABILITIES_PATTERN,
+  CVE_SEVERITY_FILTERS,
   IOC_CONFIDENCE_BANDS,
 } from '../../../common/cti-explorer/constants';
 import type { LookupClassification } from '../../../common/cti-explorer/lookup';
@@ -51,7 +52,10 @@ interface SearchHit {
 interface Aggregation {
   doc_count?: number;
   value?: number;
-  buckets?: Array<{ key: string | number; doc_count?: number }>;
+  /** A list, or by key for a `filters` aggregation. */
+  buckets?:
+    | Array<{ key: string | number; doc_count?: number }>
+    | Record<string, { doc_count?: number } | undefined>;
 }
 
 interface SearchResponse {
@@ -140,10 +144,23 @@ const toTotal = (response: SearchResponse): number => {
 };
 
 const toBuckets = (aggregation: Aggregation | undefined): CtiBucket[] =>
-  (aggregation?.buckets ?? []).map(bucket => ({
-    key: String(bucket.key),
-    count: bucket.doc_count ?? 0,
-  }));
+  Array.isArray(aggregation?.buckets)
+    ? aggregation.buckets.map(bucket => ({
+        key: String(bucket.key),
+        count: bucket.doc_count ?? 0,
+      }))
+    : [];
+
+/** The buckets of a `filters` aggregation, in the order of `keys`. */
+const toKeyedBuckets = (
+  aggregation: Aggregation | undefined,
+  keys: string[],
+): CtiBucket[] => {
+  const buckets = Array.isArray(aggregation?.buckets)
+    ? {}
+    : aggregation?.buckets ?? {};
+  return keys.map(key => ({ key, count: buckets[key]?.doc_count ?? 0 }));
+};
 
 const hitsOf = (response: SearchResponse): SearchHit[] =>
   response.hits?.hits ?? [];
@@ -315,7 +332,13 @@ export async function getVulnerabilitySummary(
     CTI_VULNERABILITIES_PATTERN,
     buildVulnerabilitySummaryBody(),
   );
-  return { byType: toBuckets(response.aggregations?.byType) };
+  return {
+    byType: toBuckets(response.aggregations?.byType),
+    byHighestSeverity: toKeyedBuckets(
+      response.aggregations?.byHighestSeverity,
+      CVE_SEVERITY_FILTERS,
+    ),
+  };
 }
 
 export async function searchVulnerabilities(

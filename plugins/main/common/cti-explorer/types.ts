@@ -103,12 +103,19 @@ export type IocLookupCategory =
 
 export interface VulnerabilitySummaryResponse {
   byType: CtiBucket[];
+  /**
+   * CVE records by the severity band of their highest CNA base score, a bucket
+   * per `CVE_SEVERITY_FILTERS` key. Records without a CNA score are in none.
+   */
+  byHighestSeverity: CtiBucket[];
 }
 
 export interface VulnerabilitySearchRequest {
   type?: VulnerabilityRecordType;
   /** CVE records with a CNA base score in any of these bands. */
   severities?: CveSeverityFilter[];
+  /** Only the record with this full id (`_id`, case-sensitive). */
+  id?: string;
   /** Newest delivered first (`offset`, descending) when omitted. */
   sortField?: VulnerabilitySortField;
   sortDirection?: 'asc' | 'desc';

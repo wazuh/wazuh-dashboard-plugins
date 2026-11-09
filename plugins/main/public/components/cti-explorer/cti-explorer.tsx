@@ -18,7 +18,10 @@ import {
   EuiPageHeader,
   EuiSpacer,
 } from '@elastic/eui';
-import type { VulnerabilityRecordType } from '../../../common/cti-explorer/constants';
+import type {
+  CveSeverityFilter,
+  VulnerabilityRecordType,
+} from '../../../common/cti-explorer/constants';
 import type { IocFilters } from '../../../common/cti-explorer/types';
 import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
 import NavigationService from '../../react-services/navigation-service';
@@ -75,6 +78,7 @@ export const CtiExplorer = () => {
   const [iocFilters, setIocFilters] = useState<IocFilters>({});
   const [vulnerabilityType, setVulnerabilityType] =
     useState<VulnerabilityRecordType>();
+  const [severities, setSeverities] = useState<CveSeverityFilter[]>([]);
 
   const setParams = useCallback(
     (params: Record<string, string | null>) =>
@@ -89,8 +93,13 @@ export const CtiExplorer = () => {
     setIocFilters(filters);
     setParams({ tab: 'iocs', ioc: null, record: null });
   };
-  const browseVulnerabilities = (type?: VulnerabilityRecordType) => {
+  /** Opens the list with these filters only: none kept from a previous visit. */
+  const browseVulnerabilities = (
+    type?: VulnerabilityRecordType,
+    selectedSeverities: CveSeverityFilter[] = [],
+  ) => {
     setVulnerabilityType(type);
+    setSeverities(selectedSeverities);
     setParams({ tab: 'vulnerabilities', ioc: null, record: null });
   };
 
@@ -155,6 +164,8 @@ export const CtiExplorer = () => {
           summary={vulnerabilitySummary}
           type={vulnerabilityType}
           onTypeChange={setVulnerabilityType}
+          severities={severities}
+          onSeveritiesChange={setSeverities}
           onOpenVulnerability={openVulnerability}
         />
       ) : null}

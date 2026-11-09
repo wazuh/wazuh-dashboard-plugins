@@ -1,6 +1,7 @@
 /* eslint-disable camelcase -- the keys are catalog values: document.type and document.software.type */
 import { i18n } from '@osd/i18n';
-import type { IocLookupCategory } from '../../../../common/cti-explorer/types';
+import moment from 'moment-timezone';
+import { formatUIDate } from '../../../react-services/time-service';
 
 /** `document.type` → label. An unknown type shows as stored. */
 const IOC_TYPE_LABELS: Record<string, string> = {
@@ -88,49 +89,27 @@ const CONFIDENCE_LABELS: Record<string, string> = {
 export const getConfidenceBandLabel = (band: string): string =>
   CONFIDENCE_LABELS[band] ?? band;
 
-const LOOKUP_CATEGORY_LABELS: Record<IocLookupCategory, string> = {
-  hash_md5: IOC_TYPE_LABELS.hash_md5,
-  hash_sha1: IOC_TYPE_LABELS.hash_sha1,
-  hash_sha256: IOC_TYPE_LABELS.hash_sha256,
-  ip: i18n.translate('wazuh.ctiExplorer.lookupCategory.ip', {
-    defaultMessage: 'IP address',
-  }),
-  host_port: IOC_TYPE_LABELS.connection,
-  url: IOC_TYPE_LABELS.url_full,
-  domain: IOC_TYPE_LABELS.url_domain,
-  other: i18n.translate('wazuh.ctiExplorer.lookupCategory.other', {
-    defaultMessage: 'Value',
-  }),
-};
-
-export const getLookupCategoryLabel = (category: IocLookupCategory): string =>
-  LOOKUP_CATEGORY_LABELS[category];
-
 const numberFormat = new Intl.NumberFormat();
 export const formatNumber = (value: number): string =>
   numberFormat.format(value);
 
-/** Dates of the catalog are UTC; shown with the browser's locale, in UTC. */
-const dateFormat = new Intl.DateTimeFormat(undefined, {
-  year: 'numeric',
-  month: 'short',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  timeZone: 'UTC',
-  timeZoneName: 'short',
-});
+/**
+ * A date of the catalog with the `dateFormat` and `dateFormat:tz` advanced
+ * settings, as every other date of the app. The catalog stores them in UTC,
+ * so a value without an offset is read as UTC, not as the browser's time.
+ */
+export const formatDateTime = (value: string | null): string => {
+  const time = value ? moment.utc(value, moment.ISO_8601, true) : null;
+  return time?.isValid() ? formatUIDate(time.valueOf()) : '-';
+};
+
+/** Only the day, where there is no room for the time: in the browser's locale, in UTC. */
 const dayFormat = new Intl.DateTimeFormat(undefined, {
   year: 'numeric',
   month: 'short',
   day: '2-digit',
   timeZone: 'UTC',
 });
-
-export const formatDateTime = (value: string | null): string => {
-  const time = value ? Date.parse(value) : NaN;
-  return Number.isNaN(time) ? '-' : dateFormat.format(time);
-};
 
 export const formatDate = (value: string | null): string => {
   const time = value ? Date.parse(value) : NaN;

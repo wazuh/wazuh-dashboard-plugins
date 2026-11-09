@@ -130,8 +130,9 @@ describe('LookupPanel', () => {
 
     check('cve-2024-6387');
     const found = await screen.findByTestId('ctiExplorerLookupRecordFound');
-    expect(found).toHaveTextContent('Highest CVSS');
-    expect(found).toHaveTextContent('Assigner: redhat');
+    expect(found).toHaveTextContent('CVSS');
+    expect(found).toHaveTextContent('Assigner');
+    expect(found).toHaveTextContent('redhat');
     expect(found).not.toHaveTextContent('Vendor pattern');
     expect(found.closest('.euiCallOut')).toBeNull();
 

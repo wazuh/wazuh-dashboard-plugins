@@ -5,6 +5,7 @@ import {
   CTI_RECENT_DAYS,
   CTI_RELATED_MAX_RECORDS,
   CVE_CNA_BASE_SCORE_FIELDS,
+  CVE_SEVERITY_FILTERS,
   CVE_SEVERITY_RANGES,
   IOC_CONFIDENCE_BANDS,
   IOC_UNKNOWN_FAMILY,
@@ -189,6 +190,38 @@ export const buildIocRelatedBody = (name: string, excludeId: string) => ({
   _source: ['document', 'offset'],
 });
 
+/** Records with a CNA base score in a `query_string` range; fixed strings. */
+const cnaScoreIn = (range: string) => ({
+  query_string: { query: range, fields: [CVE_CNA_BASE_SCORE_FIELDS] },
+});
+
+/**
+ * A record is in the severity of its highest CNA base score: it has a score in
+ * that band and none in a higher one. The scores of a record are separate
+ * fields, so their maximum is found by exclusion instead of a script.
+ * `CVE_SEVERITY_FILTERS` goes from the lowest band to the highest.
+ */
+const buildHighestSeverityFilters = () =>
+  Object.fromEntries(
+    CVE_SEVERITY_FILTERS.map((severity, position) => {
+      const higher = CVE_SEVERITY_FILTERS.slice(position + 1);
+      const inBand = cnaScoreIn(CVE_SEVERITY_RANGES[severity]);
+      return [
+        severity,
+        higher.length
+          ? {
+              bool: {
+                filter: [inBand],
+                must_not: higher.map(band =>
+                  cnaScoreIn(CVE_SEVERITY_RANGES[band]),
+                ),
+              },
+            }
+          : inBand,
+      ];
+    }),
+  );
+
 export const buildVulnerabilitySummaryBody = () => ({
   size: 0,
   query: { bool: { filter: [LISTED_RECORD_TYPES] } },
@@ -196,6 +229,7 @@ export const buildVulnerabilitySummaryBody = () => ({
     byType: {
       terms: { field: 'type', size: VULNERABILITY_RECORD_TYPES.length },
     },
+    byHighestSeverity: { filters: { filters: buildHighestSeverityFilters() } },
   },
 });
 
@@ -277,6 +311,7 @@ const buildVulnerabilitySort = ({
 export const buildVulnerabilitySearchBody = ({
   type,
   severities,
+  id,
   sortField,
   sortDirection,
   page,
@@ -290,6 +325,8 @@ export const buildVulnerabilitySearchBody = ({
       filter: [
         type ? { term: { type } } : LISTED_RECORD_TYPES,
         ...buildSeverityFilter(severities),
+        // The index matches whole ids only: `_id` supports no prefix.
+        ...(id ? [{ ids: { values: [id] } }] : []),
       ],
     },
   },
