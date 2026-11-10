@@ -91,7 +91,8 @@ export const NoProviderPrompt = ({
         </p>
       }
     />
-    <div className='wzExampleCardsGrid wzNoProviderPrompt__examples'>
+    <EuiSpacer size='m' />
+    <div className='wzExampleCardsGrid'>
       {EXAMPLE_CARDS.map(card => (
         <EuiCard
           key={card.id}
@@ -100,7 +101,6 @@ export const NoProviderPrompt = ({
           display='plain'
           hasBorder
           isDisabled
-          paddingSize='s'
           titleSize='xs'
           icon={<EuiIcon type={card.icon} size='l' />}
           title={card.title}
@@ -108,7 +108,7 @@ export const NoProviderPrompt = ({
         />
       ))}
     </div>
-    <EuiSpacer size='l' />
+    <EuiSpacer size='m' />
     <EuiText
       size='s'
       color='subdued'
@@ -143,7 +143,7 @@ export const NoProviderPrompt = ({
         />
       </p>
     </EuiText>
-    <EuiSpacer size='l' />
+    <EuiSpacer size='m' />
     <EuiButton
       color='primary'
       fill
