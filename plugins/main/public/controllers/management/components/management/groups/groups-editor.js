@@ -48,6 +48,10 @@ import {
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 import { WzOverlayMask } from '../../../../../components/common/util';
 import { ButtonAboutCentralizedConfiguration } from './button-about-centralized-configuration';
+import {
+  RemoteCommandsWarning,
+  REMOTE_COMMANDS_WARNING_HEIGHT,
+} from './remote-commands-warning';
 import 'brace/theme/textmate';
 import 'brace/mode/xml';
 import 'brace/snippets/xml';
@@ -330,6 +334,7 @@ class WzGroupsEditor extends Component {
                   )}
                 </EuiFlexGroup>
                 <EuiSpacer size='m' />
+                {isEditable && <RemoteCommandsWarning />}
                 {xmlError && (
                   <Fragment>
                     <span style={{ color: 'red' }}> {xmlError}</span>
@@ -344,7 +349,10 @@ class WzGroupsEditor extends Component {
                           <EuiCodeEditor
                             theme='textmate'
                             width='100%'
-                            height={`calc(100vh - ${xmlError ? 250 : 230}px)`}
+                            height={`calc(100vh - ${
+                              (xmlError ? 250 : 230) +
+                              REMOTE_COMMANDS_WARNING_HEIGHT
+                            }px)`}
                             value={content}
                             onChange={this.onContentChange}
                             mode='xml'

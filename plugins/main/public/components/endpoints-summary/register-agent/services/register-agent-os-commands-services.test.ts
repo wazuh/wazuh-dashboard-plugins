@@ -15,6 +15,11 @@ import {
 
 let test: any;
 
+/* The Windows install command waits for msiexec and reports a failed exit code, so the
+start command that follows finds the service. */
+const windowsInstallerWait =
+  '| Out-Null; if ($LASTEXITCODE -ne 0) { Write-Error "The installation failed with exit code $LASTEXITCODE." }';
+
 beforeEach(() => {
   test = {
     optionals: {
@@ -155,7 +160,7 @@ describe('getLinuxStartCommand', () => {
 describe('getWindowsInstallCommand', () => {
   it('should return the correct install command', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.msi`;
-    let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} `;
+    let expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} ${windowsInstallerWait}`;
 
     const withAllOptionals = getWindowsInstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
@@ -164,7 +169,7 @@ describe('getWindowsInstallCommand', () => {
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
 
-    expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.agentGroups} `;
+    expected = `Invoke-WebRequest -Uri ${test.urlPackage} -OutFile \$env:tmp\\${test.packageName}; msiexec.exe /i \$env:tmp\\${test.packageName} /q ${test.optionals.serverAddress} ${test.optionals.agentGroups} ${windowsInstallerWait}`;
     const withServerAddresAndAgentGroupsOptions =
       getWindowsInstallCommand(test);
 
@@ -314,7 +319,7 @@ describe('SSL verification states', () => {
       name: 'windows',
     });
     expect(result).toEqual(
-      `Invoke-WebRequest -Uri https://example.com/package.msi -OutFile $env:tmp\\wazuh-agent-5.0.0.msi; msiexec.exe /i $env:tmp\\wazuh-agent-5.0.0.msi /q ${serverAddress} ${expectedTail[state]}`,
+      `Invoke-WebRequest -Uri https://example.com/package.msi -OutFile $env:tmp\\wazuh-agent-5.0.0.msi; msiexec.exe /i $env:tmp\\wazuh-agent-5.0.0.msi /q ${serverAddress} ${expectedTail[state]}${windowsInstallerWait}`,
     );
   });
 
