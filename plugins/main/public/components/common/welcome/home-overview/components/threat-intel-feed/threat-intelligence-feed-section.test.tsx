@@ -88,8 +88,10 @@ describe('ThreatIntelligenceFeedSection', () => {
     render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
-    expect(screen.getByText(/from the CTI feed/)).toBeInTheDocument();
-    expect(screen.getByText('Open CTI feed').closest('a')).toHaveAttribute(
+    expect(
+      screen.getByText(/Detection content and IOCs from the/),
+    ).toBeInTheDocument();
+    expect(screen.getByText('CTI feed').closest('a')).toHaveAttribute(
       'href',
       '/cti-feed',
     );

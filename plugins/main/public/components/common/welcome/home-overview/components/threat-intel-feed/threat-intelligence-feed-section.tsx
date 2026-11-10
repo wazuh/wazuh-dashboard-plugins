@@ -1,5 +1,6 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -63,29 +64,28 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
           { defaultMessage: 'Threat intelligence feed' },
         )}
         description={
-          <>
-            {i18n.translate(
-              'wazuh.common.homeOverviewThreatIntelFeed.description',
-              {
-                defaultMessage:
-                  'Detection content and IOCs from the CTI feed, synced by the indexer every hour by default.',
-              },
-            )}{' '}
-            <RedirectAppLinks
-              application={getCore().application}
-              className='eui-displayInline'
-            >
-              <EuiLink
-                href={getCtiFeedUrl()}
-                data-test-subj='home-overview-threat-intel-feed-cti-feed-link'
-              >
-                {i18n.translate(
-                  'wazuh.common.homeOverviewThreatIntelFeed.ctiFeedLink',
-                  { defaultMessage: 'Open CTI feed' },
-                )}
-              </EuiLink>
-            </RedirectAppLinks>
-          </>
+          <FormattedMessage
+            id='wazuh.common.homeOverviewThreatIntelFeed.description'
+            defaultMessage='Detection content and IOCs from the {ctiFeed}, synced by the indexer every hour by default.'
+            values={{
+              ctiFeed: (
+                <RedirectAppLinks
+                  application={getCore().application}
+                  className='eui-displayInline'
+                >
+                  <EuiLink
+                    href={getCtiFeedUrl()}
+                    data-test-subj='home-overview-threat-intel-feed-cti-feed-link'
+                  >
+                    {i18n.translate(
+                      'wazuh.common.homeOverviewThreatIntelFeed.ctiFeedLink',
+                      { defaultMessage: 'CTI feed' },
+                    )}
+                  </EuiLink>
+                </RedirectAppLinks>
+              ),
+            }}
+          />
         }
       />
       <EuiFlexGroup wrap responsive={false}>
