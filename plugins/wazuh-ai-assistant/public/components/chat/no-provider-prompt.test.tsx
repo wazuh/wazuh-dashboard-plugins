@@ -58,10 +58,19 @@ describe('NoProviderPrompt', () => {
     expect(onOpenPrivacySettings).toHaveBeenCalledTimes(1);
   });
 
-  it('explains provider types in a tooltip', () => {
+  it('explains provider types in a click-to-open popover', async () => {
     renderPrompt();
 
-    expect(screen.getByLabelText('What is a provider?')).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: 'What is a provider?' });
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    fireEvent.click(button);
+
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      await screen.findByText(
+        /A provider is the AI service that writes the answers/,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('adds a provider', () => {

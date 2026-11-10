@@ -1,12 +1,13 @@
 import './chat-page.scss';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   EuiButton,
+  EuiButtonIcon,
   EuiCard,
   EuiEmptyPrompt,
   EuiIcon,
-  EuiIconTip,
   EuiLink,
+  EuiPopover,
   EuiSpacer,
   EuiText,
 } from '@elastic/eui';
@@ -21,6 +22,46 @@ interface NoProviderPromptProps {
   onOpenPrivacySettings: () => void;
   isAddProviderDisabled?: boolean;
 }
+
+/** Same click-to-open help as the composer's privacy ⓘ (chat-page.tsx), not a hover tooltip. */
+const ProviderHelp = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <EuiPopover
+      isOpen={isOpen}
+      closePopover={() => setIsOpen(false)}
+      anchorPosition='upCenter'
+      panelPaddingSize='s'
+      button={
+        <EuiButtonIcon
+          iconSize='m'
+          iconType='iInCircle'
+          color='text'
+          display='empty'
+          data-test-subj='wzAiNoProviderHelpButton'
+          aria-expanded={isOpen}
+          aria-label={i18n.translate(
+            'wazuhAiAssistant.noProvider.providerHelpLabel',
+            { defaultMessage: 'What is a provider?' },
+          )}
+          onClick={() => setIsOpen(current => !current)}
+        />
+      }
+    >
+      <EuiText size='xs' className='wzHelpPanel'>
+        <p style={{ margin: 0 }}>
+          {i18n.translate('wazuhAiAssistant.noProvider.providerHelp', {
+            defaultMessage:
+              'A provider is the AI service that writes the answers. OpenAI-compatible: ' +
+              'any service with an OpenAI-style chat API, such as OpenAI, Gemini, ' +
+              'Ollama, LM Studio or vLLM. Anthropic: Claude models through the ' +
+              'Anthropic API.',
+          })}
+        </p>
+      </EuiText>
+    </EuiPopover>
+  );
+};
 
 /** Empty state shown while no AI provider is configured: what the assistant answers, what it
  * sends to the provider, and how to add one. Shared by the chat (page and header panel) and the
@@ -79,26 +120,7 @@ export const NoProviderPrompt = ({
           id='wazuhAiAssistant.noProvider.needsProvider'
           defaultMessage='The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) {providerHelp} before it can answer questions. Add one to get started.'
           values={{
-            providerHelp: (
-              <EuiIconTip
-                type='questionInCircle'
-                color='subdued'
-                aria-label={i18n.translate(
-                  'wazuhAiAssistant.noProvider.providerHelpLabel',
-                  { defaultMessage: 'What is a provider?' },
-                )}
-                content={i18n.translate(
-                  'wazuhAiAssistant.noProvider.providerHelp',
-                  {
-                    defaultMessage:
-                      'A provider is the AI service that writes the answers. OpenAI-compatible: ' +
-                      'any service with an OpenAI-style chat API, such as OpenAI, Gemini, ' +
-                      'Ollama, LM Studio or vLLM. Anthropic: Claude models through the ' +
-                      'Anthropic API.',
-                  },
-                )}
-              />
-            ),
+            providerHelp: <ProviderHelp />,
           }}
         />
       </p>
