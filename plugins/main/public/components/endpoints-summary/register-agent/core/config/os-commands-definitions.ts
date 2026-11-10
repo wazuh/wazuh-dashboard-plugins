@@ -103,6 +103,15 @@ const getPackagesBaseUrl = () =>
     ? `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x`
     : `https://packages.wazuh.com/production/${PLUGIN_MAJOR_VERSION}.x`;
 
+/**
+ * GPG key that signs the packages of the repository above.
+ * Evaluated lazily so the value from injectedMetadata is available.
+ */
+const getGpgKeyUrl = () =>
+  isWazuhPreRelease()
+    ? 'https://packages-staging.xdrsiem.wazuh.info/key/GPG-KEY-WAZUH'
+    : 'https://packages.wazuh.com/key/GPG-KEY-WAZUH';
+
 ///////////////////////////////////////////////////////////////////
 /// Operating system commands definitions
 ///////////////////////////////////////////////////////////////////
@@ -120,7 +129,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
         `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${
           props.packageName
         }`,
-      installCommand: props => getDEBAMD64InstallCommand(props),
+      installCommand: props =>
+        getDEBAMD64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -130,7 +140,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
           props.wazuhVersion
         }${getPackageBuildQualifier()}.x86_64.rpm`,
       urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
-      installCommand: props => getRPMAMD64InstallCommand(props),
+      installCommand: props =>
+        getRPMAMD64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -143,7 +154,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
         `${getPackagesBaseUrl()}/apt/pool/main/w/wazuh-agent/${
           props.packageName
         }`,
-      installCommand: props => getDEBARM64InstallCommand(props),
+      installCommand: props =>
+        getDEBARM64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -153,7 +165,8 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
           props.wazuhVersion
         }${getPackageBuildQualifier()}.aarch64.rpm`,
       urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
-      installCommand: props => getRPMARM64InstallCommand(props),
+      installCommand: props =>
+        getRPMARM64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
       startCommand: props => getLinuxStartCommand(props),
     },
   ],

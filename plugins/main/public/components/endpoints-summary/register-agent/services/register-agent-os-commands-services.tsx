@@ -68,43 +68,41 @@ export const getAllOptionalsMacos = (
 
 /******* DEB *******/
 
-export const getDEBAMD64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `wget ${urlPackage} && sudo ${
+type tLinuxInstallCommand = tOSEntryInstallCommand<tOptionalParameters> & {
+  gpgKeyUrl: string;
+};
+
+// dpkg doesn't check signatures; this leaves the keyring the APT repository method uses.
+const getDEBImportKeyCommand = (gpgKeyUrl: string) =>
+  `wget -qO - ${gpgKeyUrl} | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && sudo chmod 644 /usr/share/keyrings/wazuh.gpg`;
+
+const getDEBInstallCommand = (props: tLinuxInstallCommand) => {
+  const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
+  return `${getDEBImportKeyCommand(gpgKeyUrl)} && wget ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
 };
 
-export const getDEBARM64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `wget ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }dpkg -i ./${packageName}`;
-};
+export const getDEBAMD64InstallCommand = (props: tLinuxInstallCommand) =>
+  getDEBInstallCommand(props);
+
+export const getDEBARM64InstallCommand = (props: tLinuxInstallCommand) =>
+  getDEBInstallCommand(props);
 
 /******* RPM *******/
 
-export const getRPMAMD64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
+const getRPMInstallCommand = (props: tLinuxInstallCommand) => {
+  const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
+  return `sudo rpm --import ${gpgKeyUrl} && curl -o ${packageName} ${urlPackage} && sudo ${
     optionals && getAllOptionals(optionals)
   }rpm -ihv ${packageName}`;
 };
 
-export const getRPMARM64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }rpm -ihv ${packageName}`;
-};
+export const getRPMAMD64InstallCommand = (props: tLinuxInstallCommand) =>
+  getRPMInstallCommand(props);
+
+export const getRPMARM64InstallCommand = (props: tLinuxInstallCommand) =>
+  getRPMInstallCommand(props);
 
 /******* Linux *******/
 
