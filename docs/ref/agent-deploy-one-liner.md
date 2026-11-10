@@ -18,9 +18,11 @@ interface, for example in end-to-end testing scenarios.
 ![Select platform](../img/agent-deploy-oneliner/agent-wizard-platform.webp)
 
 4. In **Server address**, enter the hostname or IP address of the Wazuh manager
-   the agent will register against. The port and the path prefix sit behind
-   **View advanced options** and are only needed when the manager does not
-   listen on the defaults.
+   the agent will register against. The field suggests the names in the
+   manager listener certificate, as the **Create enrollment token** flyout
+   does, and still takes any other address. The port and the path prefix sit
+   behind **View advanced options** and are only needed when the manager does
+   not listen on the defaults.
 
 ![Set manager address](../img/agent-deploy-oneliner/set-server-address.webp)
 

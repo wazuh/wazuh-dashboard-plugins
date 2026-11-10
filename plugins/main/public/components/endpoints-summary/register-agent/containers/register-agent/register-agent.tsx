@@ -45,6 +45,7 @@ import {
   validateEnrollmentTokenTtl,
 } from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
+import { AddressComboBox } from '../../../../enrollment-tokens/components/address-combo-box';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -135,10 +136,19 @@ export const RegisterAgent = compose(
         groups,
       },
     },
+    /* The same input as the token flyout's: the token minted here carries
+    this address, and the manager refuses one outside its listener
+    certificate, so the names in it are offered. */
     serverAddress: {
-      type: 'text',
+      type: 'custom',
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
+      component: props => (
+        <AddressComboBox
+          {...props}
+          data-test-subj='registerAgentServerAddress'
+        />
+      ),
     },
     /* The port and the path prefix complete the endpoint the agent is
     installed with. Both are optional: left empty, they are omitted from the
