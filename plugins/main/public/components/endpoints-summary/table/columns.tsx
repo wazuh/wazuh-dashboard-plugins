@@ -162,34 +162,6 @@ export const agentsTableColumns = (
     searchable: false,
   },
   {
-    field: 'lastKeepAlive',
-    name: (
-      <span>
-        {i18n.translate(
-          'wazuh.endpointsSummary.agentsTableColumns.lastKeepAlive',
-          {
-            defaultMessage: 'Last keep alive',
-          },
-        )}{' '}
-        <EuiIconTip
-          content={i18n.translate(
-            'wazuh.endpointsSummary.agentsTableColumns.lastKeepAliveNotSearchableTooltip',
-            {
-              defaultMessage: 'This is not searchable through a search term.',
-            },
-          )}
-          size='s'
-          color='subdued'
-          type='iInCircle'
-        />
-      </span>
-    ),
-    render: lastKeepAlive => formatUIDate(lastKeepAlive),
-    sortable: true,
-    show: true,
-    searchable: false,
-  },
-  {
     field: 'status',
     name: i18n.translate('wazuh.endpointsSummary.agentsTableColumns.status', {
       defaultMessage: 'Status',
@@ -235,6 +207,34 @@ export const agentsTableColumns = (
         ) : null}
       </EuiFlexGroup>
     ),
+  },
+  {
+    field: 'lastKeepAlive',
+    name: (
+      <span>
+        {i18n.translate(
+          'wazuh.endpointsSummary.agentsTableColumns.lastKeepAlive',
+          {
+            defaultMessage: 'Last keep alive',
+          },
+        )}{' '}
+        <EuiIconTip
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentsTableColumns.lastKeepAliveNotSearchableTooltip',
+            {
+              defaultMessage: 'This is not searchable through a search term.',
+            },
+          )}
+          size='s'
+          color='subdued'
+          type='iInCircle'
+        />
+      </span>
+    ),
+    render: lastKeepAlive => formatUIDate(lastKeepAlive),
+    sortable: true,
+    show: true,
+    searchable: false,
   },
   {
     field: 'actions',

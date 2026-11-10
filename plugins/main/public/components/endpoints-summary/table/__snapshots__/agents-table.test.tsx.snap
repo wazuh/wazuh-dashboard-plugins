@@ -509,7 +509,31 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_lastKeepAlive_6"
+                        data-test-subj="tableHeaderCell_status_6"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Status
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_lastKeepAlive_7"
                         role="columnheader"
                         scope="col"
                       >
@@ -537,30 +561,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                                   />
                                 </span>
                               </span>
-                            </span>
-                          </span>
-                        </button>
-                      </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_status_7"
-                        role="columnheader"
-                        scope="col"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              Status
                             </span>
                           </span>
                         </button>
@@ -1122,7 +1122,31 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_lastKeepAlive_6"
+                        data-test-subj="tableHeaderCell_status_6"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Status
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_lastKeepAlive_7"
                         role="columnheader"
                         scope="col"
                       >
@@ -1150,30 +1174,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                                   />
                                 </span>
                               </span>
-                            </span>
-                          </span>
-                        </button>
-                      </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_status_7"
-                        role="columnheader"
-                        scope="col"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              Status
                             </span>
                           </span>
                         </button>
@@ -1735,7 +1735,31 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         aria-live="polite"
                         aria-sort="none"
                         class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_lastKeepAlive_6"
+                        data-test-subj="tableHeaderCell_status_6"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              Status
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_lastKeepAlive_7"
                         role="columnheader"
                         scope="col"
                       >
@@ -1763,30 +1787,6 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                                   />
                                 </span>
                               </span>
-                            </span>
-                          </span>
-                        </button>
-                      </th>
-                      <th
-                        aria-live="polite"
-                        aria-sort="none"
-                        class="euiTableHeaderCell"
-                        data-test-subj="tableHeaderCell_status_7"
-                        role="columnheader"
-                        scope="col"
-                      >
-                        <button
-                          class="euiTableHeaderButton"
-                          data-test-subj="tableHeaderSortButton"
-                          type="button"
-                        >
-                          <span
-                            class="euiTableCellContent"
-                          >
-                            <span
-                              class="euiTableCellContent__text"
-                            >
-                              Status
                             </span>
                           </span>
                         </button>
