@@ -60,3 +60,25 @@ describe('agentsTableColumns status column', () => {
     expect(getByText('Upgrading')).toBeInTheDocument();
   });
 });
+
+describe('agentsTableColumns date columns', () => {
+  it('shows the last keep alive column by default', () => {
+    expect(getColumn('lastKeepAlive').show).toBe(true);
+  });
+
+  it('keeps the registration date column hidden by default', () => {
+    expect(getColumn('dateAdd').show).toBe(false);
+  });
+
+  it.each(['lastKeepAlive', 'dateAdd'])(
+    'uses an info icon for the not searchable note of %s',
+    field => {
+      const { container } = render(getColumn(field).name);
+
+      expect(
+        container.querySelector('[data-euiicon-type="iInCircle"]'),
+      ).not.toBeNull();
+      expect(container.querySelector('[data-euiicon-type="alert"]')).toBeNull();
+    },
+  );
+});

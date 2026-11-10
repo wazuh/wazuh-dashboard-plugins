@@ -152,7 +152,7 @@ export const agentsTableColumns = (
           )}
           size='s'
           color='subdued'
-          type='alert'
+          type='iInCircle'
         />
       </span>
     ),
@@ -180,13 +180,13 @@ export const agentsTableColumns = (
           )}
           size='s'
           color='subdued'
-          type='alert'
+          type='iInCircle'
         />
       </span>
     ),
     render: lastKeepAlive => formatUIDate(lastKeepAlive),
     sortable: true,
-    show: false,
+    show: true,
     searchable: false,
   },
   {
