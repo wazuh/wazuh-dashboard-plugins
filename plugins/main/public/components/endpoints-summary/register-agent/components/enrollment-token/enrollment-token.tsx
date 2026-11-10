@@ -47,6 +47,8 @@ interface EnrollmentTokenInputProps {
   formFields: UseFormReturn['fields'];
   enrollmentToken: EnrollmentToken | null;
   onEnrollmentTokenChange: (enrollmentToken: EnrollmentToken | null) => void;
+  /* Without `enrollment_token:create` only a stored token can be used. */
+  canCreateEnrollmentToken?: boolean;
 }
 
 const ENDPOINT_FIELDS = ['serverAddress', 'serverPort', 'serverPath'] as const;
@@ -134,6 +136,7 @@ const EnrollmentTokenInput = ({
   formFields,
   enrollmentToken,
   onEnrollmentTokenChange,
+  canCreateEnrollmentToken = true,
 }: EnrollmentTokenInputProps) => {
   const { serverAddress, serverPort, serverPath } = formFields;
   const existingTokenField = formFields.existingEnrollmentToken;
@@ -169,12 +172,22 @@ const EnrollmentTokenInput = ({
   );
   /* A token already in the field -- a form restored from an earlier visit, or
   an operator who arrived with one -- is what the step is about, so it opens on
-  that tab rather than hiding what is in effect. */
+  that tab rather than hiding what is in effect. An operator who cannot mint
+  has only that tab to use. */
   const [tokenSource, setTokenSource] = useState<TokenSource>(() =>
-    existingTokenValue.length > 0 || existingTokenField?.error
+    !canCreateEnrollmentToken ||
+    existingTokenValue.length > 0 ||
+    existingTokenField?.error
       ? 'existing'
       : 'generate',
   );
+
+  /* The permissions can settle after the step is mounted. */
+  useEffect(() => {
+    if (!canCreateEnrollmentToken && tokenSource === 'generate') {
+      setTokenSource('existing');
+    }
+  }, [canCreateEnrollmentToken, tokenSource]);
 
   const endpoint = ENDPOINT_FIELDS.map(field => formFields[field]?.value ?? '');
   const endpointKey = endpoint.join('|');
@@ -229,7 +242,10 @@ const EnrollmentTokenInput = ({
   commands and withholds the commands until they are gone, and an error on an
   input that is no longer rendered cannot be corrected. */
   const selectTokenSource = (nextSource: TokenSource) => {
-    if (nextSource === tokenSource) {
+    if (
+      nextSource === tokenSource ||
+      (nextSource === 'generate' && !canCreateEnrollmentToken)
+    ) {
       return;
     }
     const fieldsBeingLeft =
@@ -409,7 +425,10 @@ const EnrollmentTokenInput = ({
       </EuiFlexGroup>
       <EuiSpacer size='s' />
       <EuiTabs size='s'>
-        {TOKEN_SOURCE_TABS.map(tab => (
+        {/* An operator who cannot mint is offered only the stored token. */}
+        {TOKEN_SOURCE_TABS.filter(
+          tab => tab.id !== 'generate' || canCreateEnrollmentToken,
+        ).map(tab => (
           <EuiTab
             key={tab.id}
             isSelected={tokenSource === tab.id}

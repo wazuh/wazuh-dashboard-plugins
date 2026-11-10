@@ -162,14 +162,15 @@ until it is.
 
 Minting requires the `enrollment_token:create` permission. Where it is missing --
 including against a server whose RBAC policy predates the action -- the
-**Enrollment token** step is not shown and the wizard falls back to the 4.x
-variables, `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD`. A 5.0
-agent installer ignores both, so the command installs the agent but does not
-register it: the agent is left with no manager to connect to. Grant the
-permission and generate the command again, or register the installed agent
-afterwards with a token minted on the manager, as described in the manager
-documentation, _Wazuh Manager > Getting Started > Installation > Installing
-without a token_.
+**Enrollment token** step still shows, with only the **Use an existing token**
+tab. A pasted token is deployed as usual. Until one is pasted, the wizard falls
+back to the 4.x variables, `WAZUH_MANAGER_ENDPOINT` and
+`WAZUH_REGISTRATION_PASSWORD`. A 5.0 agent installer ignores both, so the command installs the agent but does not
+register it: the agent is left with no manager to connect to. Paste a stored
+token, grant the permission and generate the command again, or register the
+installed agent afterwards with a token minted on the manager, as described in
+the manager documentation, _Wazuh Manager > Getting Started > Installation >
+Installing without a token_.
 
 The tokens the server has minted are listed, revoked and purged in the
 [Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from

@@ -140,10 +140,13 @@ export const Steps = ({
   onEnrollmentTokenChange,
 }: IStepsProps) => {
   /* The enrollment token replaces the password: the agent enrolls with the
-  credential the token carries, so the password steps are only reached when the
-  server cannot mint one for this user. */
+  credential the token carries. An operator who cannot mint one can still paste
+  a stored token, so the password steps are only reached while neither path
+  has given the deployment a token. */
+  const usesEnrollmentToken =
+    canCreateEnrollmentToken || Boolean(enrollmentToken);
   const passwordPermissionMissing =
-    !canCreateEnrollmentToken && needsPassword && !canReadAuthdPassword;
+    !usesEnrollmentToken && needsPassword && !canReadAuthdPassword;
   /* Blocks the command steps while the token path is in use and no token has
   been generated yet. */
   const enrollmentTokenIsMissing = canCreateEnrollmentToken && !enrollmentToken;
@@ -314,30 +317,28 @@ export const Steps = ({
       ),
       status: getServerAddressStepStatus(form.fields),
     },
-    ...(canCreateEnrollmentToken
-      ? [
-          {
-            title: i18n.translate(
-              'wazuh.endpointsSummary.registerAgentSteps.enrollmentTokenTitle',
-              {
-                defaultMessage: 'Enrollment token:',
-              },
-            ),
-            children: (
-              <EnrollmentTokenInput
-                formFields={form.fields}
-                enrollmentToken={enrollmentToken}
-                onEnrollmentTokenChange={onEnrollmentTokenChange}
-              />
-            ),
-            status: getEnrollmentTokenStepStatus(
-              form.fields,
-              Boolean(enrollmentToken),
-            ),
-          },
-        ]
-      : []),
-    ...(!canCreateEnrollmentToken && needsPassword && !wazuhPassword
+    /* Shown even without the permission to mint: a stored token needs none. */
+    {
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.enrollmentTokenTitle',
+        {
+          defaultMessage: 'Enrollment token:',
+        },
+      ),
+      children: (
+        <EnrollmentTokenInput
+          formFields={form.fields}
+          enrollmentToken={enrollmentToken}
+          onEnrollmentTokenChange={onEnrollmentTokenChange}
+          canCreateEnrollmentToken={canCreateEnrollmentToken}
+        />
+      ),
+      status: getEnrollmentTokenStepStatus(
+        form.fields,
+        Boolean(enrollmentToken),
+      ),
+    },
+    ...(!usesEnrollmentToken && needsPassword && !wazuhPassword
       ? [
           {
             title: passwordStepTitle,
@@ -418,7 +419,7 @@ export const Steps = ({
       children: (
         <OptionalsInputs
           formFields={form.fields}
-          usesEnrollmentToken={canCreateEnrollmentToken}
+          usesEnrollmentToken={usesEnrollmentToken}
         />
       ),
       status: getOptionalParameterStepStatus(

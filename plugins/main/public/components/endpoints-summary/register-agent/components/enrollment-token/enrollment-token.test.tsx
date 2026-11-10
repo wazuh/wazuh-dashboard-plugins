@@ -158,10 +158,12 @@ const Harness = ({
   formFields,
   initialToken,
   onTokenChange,
+  canCreateEnrollmentToken,
 }: {
   formFields: UseFormReturn['fields'];
   initialToken: EnrollmentToken | null;
   onTokenChange: (token: EnrollmentToken | null) => void;
+  canCreateEnrollmentToken?: boolean;
 }) => {
   const [token, setToken] = useState<EnrollmentToken | null>(initialToken);
   return (
@@ -172,6 +174,7 @@ const Harness = ({
         setToken(next);
         onTokenChange(next);
       }}
+      canCreateEnrollmentToken={canCreateEnrollmentToken}
     />
   );
 };
@@ -183,6 +186,7 @@ interface RenderOptions {
   formFields?: Partial<UseFormReturn['fields']>;
   enrollmentToken?: EnrollmentToken | null;
   collapsed?: boolean;
+  canCreateEnrollmentToken?: boolean;
 }
 
 const renderInput = (props: RenderOptions = {}) => {
@@ -192,6 +196,7 @@ const renderInput = (props: RenderOptions = {}) => {
       formFields={buildFormFields(props.formFields)}
       initialToken={props.enrollmentToken ?? null}
       onTokenChange={onEnrollmentTokenChange}
+      canCreateEnrollmentToken={props.canCreateEnrollmentToken}
     />,
   );
   if (!props.collapsed && screen.queryByText('View advanced options')) {
@@ -228,6 +233,48 @@ beforeEach(() => {
   lookupToken.mockReset();
   lookupToken.mockResolvedValue(undefined);
   revokeToken.mockReset();
+});
+
+/* Pasting a stored token needs no permission, so an operator who cannot mint
+keeps the step with only that tab. */
+describe('EnrollmentTokenInput without the permission to mint', () => {
+  it('offers only the reuse tab', () => {
+    renderInput({ canCreateEnrollmentToken: false });
+
+    expect(existingTab()).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.queryByRole('tab', { name: 'Generate a new token' }),
+    ).not.toBeInTheDocument();
+    expect(existingTokenInput()).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Generate/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows no warning about the permission', () => {
+    renderInput({ canCreateEnrollmentToken: false });
+
+    expect(document.querySelector('.euiCallOut')).toBeNull();
+  });
+
+  it('deploys with a pasted token', () => {
+    const { onEnrollmentTokenChange } = renderInput({
+      canCreateEnrollmentToken: false,
+      formFields: { existingEnrollmentToken: field('eyJ2ZXIiOjEs') },
+    });
+
+    expect(onEnrollmentTokenChange).toHaveBeenCalledWith({
+      source: 'existing',
+      token: 'eyJ2ZXIiOjEs',
+    });
+  });
+
+  it('offers both tabs when the permission is there', () => {
+    renderInput();
+
+    expect(generateTab()).toBeInTheDocument();
+    expect(existingTab()).toBeInTheDocument();
+  });
 });
 
 /* A token is either minted here or reused from an earlier deployment. Reading

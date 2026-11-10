@@ -90,7 +90,8 @@ export const RegisterAgent = compose(
   /* Minting a token is how the wizard deploys an agent. A server that does not
   know the action -- one older than the mint endpoint, or whose RBAC policy
   predates it -- reports it as missing here, which is also what a user without
-  the permission gets, and both fall back to the enrollment password path. */
+  the permission gets. Both can still paste a stored token, and fall back to
+  the enrollment password path until they do. */
   const [missingEnrollmentTokenPermissions] = useUserPermissionsRequirements([
     [{ action: 'enrollment_token:create', resource: '*:*:*' }],
   ]);
