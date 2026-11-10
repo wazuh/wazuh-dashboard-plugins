@@ -196,6 +196,17 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                 </EuiFlexGroup>
               </>
             }
+            footer={
+              <EndpointDefaultHint>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.serverAddress.addressHint',
+                  {
+                    defaultMessage:
+                      'Pick one of the names in the manager listener certificate, or type another.',
+                  },
+                )}
+              </EndpointDefaultHint>
+            }
             fullWidth={false}
             placeholder={i18n.translate(
               'wazuh.endpointsSummary.serverAddress.addressPlaceholder',
