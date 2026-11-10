@@ -30,6 +30,7 @@ jest.mock('../../utils/navigation', () => ({
   getKvdbsUrl: jest.fn(),
   getFiltersUrl: jest.fn(),
   getCtiExplorerIocsUrl: jest.fn(() => '/cti-explorer-iocs'),
+  getCtiFeedUrl: jest.fn(() => '/cti-feed'),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -82,14 +83,16 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(navigation.getIntegrationsUrl).toHaveBeenCalled();
   });
 
-  it('says the content comes from the CTI feed and shows its sync status', () => {
-    const { container } = render(
+  it('says the content comes from the CTI feed and links to it', () => {
+    asMock(navigation.getCtiFeedUrl).mockReturnValue('/cti-feed');
+    render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
     expect(screen.getByText(/from the CTI feed/)).toBeInTheDocument();
-    expect(
-      container.querySelector('[data-test-subj="ctiFeedSyncStatus"]'),
-    ).toBeTruthy();
+    expect(screen.getByText('Open CTI feed').closest('a')).toHaveAttribute(
+      'href',
+      '/cti-feed',
+    );
   });
 
   it('links the Threat catalog title to the CTI Explorer IOCs tab', () => {

@@ -1,6 +1,11 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHorizontalRule,
+  EuiLink,
+} from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { SectionHeader, WidgetGroup } from '../common';
 import { SecurityAnalyticsTiles } from '../security-analytics';
@@ -18,9 +23,11 @@ import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
 import {
   getCtiExplorerIocsUrl,
+  getCtiFeedUrl,
   getIntegrationsUrl,
 } from '../../utils/navigation';
-import { getWazuhCheckUpdatesPlugin } from '../../../../../../kibana-services';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared enrichments catalog: the IOCs tile and the threat-type bar. */
@@ -31,7 +38,6 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   ThreatIntelligenceFeedSectionProps
 > = ({ threatIntel }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
-  const { CtiFeedSyncStatus } = getWazuhCheckUpdatesPlugin();
   const rules = useRulesCount(visible);
   const decoders = useDecodersCount(visible);
   const detectors = useDetectorsCount(visible);
@@ -56,14 +62,31 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
           'wazuh.common.homeOverviewThreatIntelFeed.title',
           { defaultMessage: 'Threat intelligence feed' },
         )}
-        description={i18n.translate(
-          'wazuh.common.homeOverviewThreatIntelFeed.description',
-          {
-            defaultMessage:
-              'Detection content and IOCs from the CTI feed, synced by the indexer every hour by default.',
-          },
-        )}
-        actions={<CtiFeedSyncStatus feeds={['ruleset', 'iocs']} />}
+        description={
+          <>
+            {i18n.translate(
+              'wazuh.common.homeOverviewThreatIntelFeed.description',
+              {
+                defaultMessage:
+                  'Detection content and IOCs from the CTI feed, synced by the indexer every hour by default.',
+              },
+            )}{' '}
+            <RedirectAppLinks
+              application={getCore().application}
+              className='eui-displayInline'
+            >
+              <EuiLink
+                href={getCtiFeedUrl()}
+                data-test-subj='home-overview-threat-intel-feed-cti-feed-link'
+              >
+                {i18n.translate(
+                  'wazuh.common.homeOverviewThreatIntelFeed.ctiFeedLink',
+                  { defaultMessage: 'Open CTI feed' },
+                )}
+              </EuiLink>
+            </RedirectAppLinks>
+          </>
+        }
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem grow={3}>
