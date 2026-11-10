@@ -17,6 +17,10 @@ import {
   CTI_OAUTH_DEVICE_GRANT_TYPE,
   CTI_REGISTRATION_COMPLETED_BODY,
 } from '../../../common/constants';
+import {
+  ctiRegistrationAccessError,
+  getCtiRegistrationAccess,
+} from './registration-access';
 
 function isSuccessfulUpstreamDevicePoll(
   body: Record<string, unknown>,
@@ -105,7 +109,6 @@ export const getCtiTokenRoute = (router: IRouter) => {
       path: routes.token,
       validate: {
         body: schema.object({
-          client_id: schema.maybe(schema.string()),
           grant_type: schema.maybe(schema.string()),
           device_code: schema.maybe(schema.string()),
         }),
@@ -113,7 +116,12 @@ export const getCtiTokenRoute = (router: IRouter) => {
     },
     async (context, request, response) => {
       try {
-        const { client_id, grant_type, device_code } = request.body;
+        const access = await getCtiRegistrationAccess(context);
+        if (access !== 'allowed') {
+          return ctiRegistrationAccessError(response, access);
+        }
+
+        const { grant_type, device_code } = request.body;
 
         const hasPoll = Boolean(grant_type && device_code);
         if ((grant_type && !device_code) || (!grant_type && device_code)) {
@@ -130,7 +138,7 @@ export const getCtiTokenRoute = (router: IRouter) => {
           });
         }
 
-        const clientId = await resolveCtiOAuthClientId(client_id);
+        const clientId = await resolveCtiOAuthClientId();
 
         if (hasPoll) {
           const outcome = await exchangeDeviceCodeOnce(
@@ -204,9 +212,14 @@ export const getCtiTokenRoute = (router: IRouter) => {
       path: routes.token,
       validate: {},
     },
-    async (_context, _request, response) => {
+    async (context, _request, response) => {
       try {
-        const clientId = await resolveCtiOAuthClientId(undefined);
+        const access = await getCtiRegistrationAccess(context);
+        if (access !== 'allowed') {
+          return ctiRegistrationAccessError(response, access);
+        }
+
+        const clientId = await resolveCtiOAuthClientId();
         const store = CtiRegistrationStore.getInstance();
         const rec = store.getStatus(clientId);
         if (rec && !rec.registrationComplete) {

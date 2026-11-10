@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- OAuth and CTI fields keep their API names */
 import { Router } from '../../../../../src/core/server/http/router/router';
 import { HttpServer } from '../../../../../src/core/server/http/http_server';
 import { loggingSystemMock } from '../../../../../src/core/server/logging/logging_system.mock';
@@ -7,6 +8,7 @@ import { getCtiRegistrationStatusRoute } from './status';
 import {
   getCtiSubscriptionStatus,
   resolveCtiOAuthClientId,
+  evaluateCtiRegistrationPermission,
 } from '../../services/cti-registration';
 import {
   CtiRegistrationStore,
@@ -20,6 +22,7 @@ const port = 11007;
 
 const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
 const mockedGetCtiSubscriptionStatus = getCtiSubscriptionStatus as jest.Mock;
+const mockedEvaluatePermission = evaluateCtiRegistrationPermission as jest.Mock;
 const mockedTriggerContentUpdateOnChange =
   triggerContentUpdateOnChange as jest.Mock;
 
@@ -29,6 +32,7 @@ jest.mock('../../services/cti-registration', () => ({
     message: null,
     status: null,
   }),
+  evaluateCtiRegistrationPermission: jest.fn(),
 }));
 
 jest.mock(
@@ -118,6 +122,11 @@ describe('CTI registration status route', () => {
       failed: false,
     });
     mockedLoggerError.mockClear();
+    mockedEvaluatePermission.mockReset();
+    mockedEvaluatePermission.mockResolvedValue({
+      accessAllowed: true,
+      missingPrivileges: [],
+    });
   });
 
   test(`GET ${routes.ctiRegistrationStatus} when store is empty`, async () => {
@@ -327,6 +336,107 @@ describe('CTI registration status route', () => {
       await new Promise(resolve => setImmediate(resolve));
       expect(mockedLoggerError).toHaveBeenCalledTimes(1);
       expect(mockedLoggerError.mock.calls[0][0]).toContain('env-uuid-1');
+    });
+  });
+  describe('pending activation and the permission check', () => {
+    const pending = () =>
+      CtiRegistrationStore.getInstance().setInProgress(
+        'env-uuid-1',
+        parseDeviceAuthorizationForStore({
+          device_code: 'dc-admin',
+          user_code: 'WZH-9',
+          verification_uri: 'https://example.test/register',
+          verification_uri_complete:
+            'https://example.test/register?user_code=WZH-9',
+          expires_in: 600,
+          interval: 8,
+        }),
+      );
+
+    test('probes the permission as the requesting user', async () => {
+      pending();
+
+      await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(mockedEvaluatePermission).toHaveBeenCalledWith(mockWazuhClient);
+    });
+
+    test('hides the pending codes from a user without the privilege', async () => {
+      pending();
+      mockedEvaluatePermission.mockResolvedValue({
+        accessAllowed: false,
+        missingPrivileges: [
+          'cluster:admin/content_manager/subscription/create',
+        ],
+      });
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(response.body).toEqual({
+        registrationComplete: false,
+        inProgress: true,
+        subscription: { message: null, status: null },
+      });
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('env-uuid-1')?.device_code,
+      ).toBe('dc-admin');
+    });
+
+    test('answers 503 and keeps the activation when the probe cannot be evaluated', async () => {
+      pending();
+      mockedEvaluatePermission.mockResolvedValue(null);
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(503);
+
+      expect(response.body).not.toHaveProperty('device_code');
+      expect(
+        CtiRegistrationStore.getInstance().getStatus('env-uuid-1')?.device_code,
+      ).toBe('dc-admin');
+    });
+
+    test('does not probe when nothing is pending', async () => {
+      await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(mockedEvaluatePermission).not.toHaveBeenCalled();
+    });
+
+    test('does not probe for a completed registration', async () => {
+      pending();
+      CtiRegistrationStore.getInstance().setRegistrationComplete('env-uuid-1');
+
+      await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(mockedEvaluatePermission).not.toHaveBeenCalled();
+    });
+
+    test('does not probe for an expired activation', async () => {
+      CtiRegistrationStore.getInstance().setInProgress('env-uuid-1', {
+        ...parseDeviceAuthorizationForStore({
+          device_code: 'dc-old',
+          user_code: 'WZH-0',
+          verification_uri: 'https://example.test/register',
+          expires_in: 600,
+          interval: 5,
+        }),
+        deviceAuthExpiresAtMs: Date.now() - 1000,
+      });
+
+      const response = await supertest(innerServer.listener)
+        .get(routes.ctiRegistrationStatus)
+        .expect(200);
+
+      expect(response.body.inProgress).toBe(false);
+      expect(mockedEvaluatePermission).not.toHaveBeenCalled();
     });
   });
 });
