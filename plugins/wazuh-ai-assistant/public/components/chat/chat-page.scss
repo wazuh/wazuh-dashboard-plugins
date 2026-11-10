@@ -1059,3 +1059,25 @@ $wzMsgAvatarColumn: 40px;
   overflow: hidden;
   min-width: 0;
 }
+
+/* No-provider prompt (no-provider-prompt.tsx): one centred column; the text keeps
+   EuiEmptyPrompt's own 36em measure, the example cards may use more. */
+.wzNoProviderPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 16px;
+
+  .euiEmptyPrompt {
+    padding-bottom: 8px;
+  }
+}
+
+.wzNoProviderPrompt__examples {
+  max-width: 820px;
+  gap: 8px;
+}
+
+.wzNoProviderPrompt__text {
+  max-width: 36em;
+}

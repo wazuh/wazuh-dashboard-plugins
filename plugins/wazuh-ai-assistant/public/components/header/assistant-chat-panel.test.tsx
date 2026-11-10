@@ -37,6 +37,7 @@ jest.mock('../chat/chat-page', () => {
       props: {
         onGeneratingChange?: (generating: boolean) => void;
         onNavigateToSettings: () => void;
+        onOpenPrivacySettings: () => void;
         onConversationsChange?: (state: ConversationsSnapshot) => void;
         showConversationSidebar?: boolean;
         allowRailFlyout?: boolean;
@@ -73,6 +74,11 @@ jest.mock('../chat/chat-page', () => {
           'button',
           { type: 'button', onClick: () => props.onNavigateToSettings() },
           'chat settings CTA',
+        ),
+        mockReact.createElement(
+          'button',
+          { type: 'button', onClick: () => props.onOpenPrivacySettings() },
+          'chat privacy link',
         ),
         mockReact.createElement(
           'button',
@@ -238,6 +244,17 @@ describe('AssistantChatPanel', () => {
     expect(props.onClose).toHaveBeenCalled();
     expect(mockNavigateToApp).toHaveBeenCalledWith('wazuhAiAssistant', {
       path: '#/settings?addProvider=true',
+    });
+  });
+
+  it("routes ChatPage's privacy link to the settings privacy tab", () => {
+    const { props } = renderPanel();
+
+    fireEvent.click(screen.getByText('chat privacy link'));
+
+    expect(props.onClose).toHaveBeenCalled();
+    expect(mockNavigateToApp).toHaveBeenCalledWith('wazuhAiAssistant', {
+      path: '#/settings?tab=privacy',
     });
   });
 

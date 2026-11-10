@@ -32,6 +32,8 @@ import {
 import { i18n } from '@osd/i18n';
 import { AppMountParameters, CoreStart } from '../../../../../src/core/public';
 import { ChatService } from '../../services/chat-service';
+import { EXAMPLE_CARDS } from './example-questions';
+import { NoProviderPrompt } from './no-provider-prompt';
 import {
   ASSISTANT_SETTINGS_CHANGED_EVENT,
   AssistantSettings,
@@ -100,6 +102,9 @@ interface ChatPageProps {
   /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
    * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
+  /** The no-provider empty state's link to Settings > Privacy & data protection
+   * (`#/settings?tab=privacy`). */
+  onOpenPrivacySettings: () => void;
   /** The provider picker's (chat-page.tsx, `ProviderPicker`) "Manage providers" footer item — a
    * plain visit to the Settings app, deliberately a SEPARATE callback from `onNavigateToSettings`
    * above rather than a reuse of it: that one always opens the create-provider flyout
@@ -341,58 +346,6 @@ function resolvePrivacyDefault(
 }
 
 /**
- * Welcome-state example questions, now rendered as EuiCards (not plain badge chips) so the empty
- * state reads as a real product surface: one short title + icon per card, the full question as
- * the card description. Clicking a card only fills the input (existing `setInputText` behavior),
- * it does not auto-send, matching how the previous badge chips behaved.
- */
-const EXAMPLE_CARDS = [
-  {
-    id: 'criticalAlerts',
-    icon: 'alert',
-    title: i18n.translate(
-      'wazuhAiAssistant.chat.example.criticalAlerts.title',
-      {
-        defaultMessage: 'Critical findings',
-      },
-    ),
-    // Deliberately the shortest of the three questions rather than the longest: rendered as a card
-    // description in a 3-up grid, a longer phrasing like "Show me the critical findings of the
-    // last 24 hours" would wrap to two lines while its two neighbours took one, so the row's cards
-    // would have visibly different amounts of empty space in them.
-    question: i18n.translate('wazuhAiAssistant.chat.example.criticalAlerts', {
-      defaultMessage: 'Critical findings in the last 24 hours',
-    }),
-  },
-  {
-    id: 'disconnectedAgents',
-    icon: 'user',
-    title: i18n.translate(
-      'wazuhAiAssistant.chat.example.disconnectedAgents.title',
-      {
-        defaultMessage: 'Disconnected agents',
-      },
-    ),
-    question: i18n.translate(
-      'wazuhAiAssistant.chat.example.disconnectedAgents',
-      {
-        defaultMessage: 'Which agents are disconnected?',
-      },
-    ),
-  },
-  {
-    id: 'bruteForce',
-    icon: 'lock',
-    title: i18n.translate('wazuhAiAssistant.chat.example.bruteForce.title', {
-      defaultMessage: 'Brute force attempts',
-    }),
-    question: i18n.translate('wazuhAiAssistant.chat.example.bruteForce', {
-      defaultMessage: 'Any brute force attempts today?',
-    }),
-  },
-];
-
-/**
  * Rewrites the route to address `conversationId` (a `/conversation/:id` path, or `/` for none),
  * without touching the query string. Goes through the app shell's own router `history` (rather than
  * a raw `window.history.replaceState` call) so this and the shell's tab routing share one writer of
@@ -429,6 +382,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
       selectedProviderId,
       onProviderChange,
       onNavigateToSettings,
+      onOpenPrivacySettings,
       onManageProviders,
       history,
       onGeneratingChange,
@@ -3472,44 +3426,11 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                   )}
 
                   {showNoProviderState && (
-                    <EuiEmptyPrompt
-                      iconType='machineLearningApp'
-                      title={
-                        // The view's h1 while no provider is set
-                        <h1>
-                          {i18n.translate(
-                            'wazuhAiAssistant.chat.noProvider.title',
-                            {
-                              defaultMessage: 'No AI provider configured',
-                            },
-                          )}
-                        </h1>
-                      }
-                      body={
-                        <p>
-                          {i18n.translate(
-                            'wazuhAiAssistant.chat.noProvider.body',
-                            {
-                              defaultMessage:
-                                'The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) before it can answer questions. Add one to get started.',
-                            },
-                          )}
-                        </p>
-                      }
-                      actions={
-                        <EuiButton
-                          color='primary'
-                          fill
-                          onClick={onNavigateToSettings}
-                        >
-                          {i18n.translate(
-                            'wazuhAiAssistant.chat.noProvider.action',
-                            {
-                              defaultMessage: 'Add a provider',
-                            },
-                          )}
-                        </EuiButton>
-                      }
+                    <NoProviderPrompt
+                      // The view's h1 while no provider is set
+                      headingLevel='h1'
+                      onAddProvider={onNavigateToSettings}
+                      onOpenPrivacySettings={onOpenPrivacySettings}
                     />
                   )}
 
