@@ -79,6 +79,17 @@ describe('NoProviderPrompt', () => {
     expect(onAddProvider).toHaveBeenCalledTimes(1);
   });
 
+  it('hides the example questions when asked', () => {
+    renderPrompt({ showExamples: false });
+
+    expect(
+      screen.queryByText('Which agents are disconnected?'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(/agents, findings and vulnerabilities/),
+    ).toBeInTheDocument();
+  });
+
   it('disables the add button when settings are locked', () => {
     renderPrompt({ headingLevel: 'h2', isAddProviderDisabled: true });
     expect(

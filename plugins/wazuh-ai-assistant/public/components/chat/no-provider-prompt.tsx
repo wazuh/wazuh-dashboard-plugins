@@ -21,6 +21,8 @@ interface NoProviderPromptProps {
   onAddProvider: () => void;
   onOpenPrivacySettings: () => void;
   isAddProviderDisabled?: boolean;
+  /** Example question cards; off on Settings, where they read as chat content. */
+  showExamples?: boolean;
 }
 
 /** Same click-to-open help as the composer's privacy ⓘ (chat-page.tsx), not a hover tooltip. */
@@ -71,50 +73,25 @@ export const NoProviderPrompt = ({
   onAddProvider,
   onOpenPrivacySettings,
   isAddProviderDisabled = false,
-}: NoProviderPromptProps) => (
-  <div className='wzNoProviderPrompt' data-test-subj='wzAiNoProviderPrompt'>
-    <EuiEmptyPrompt
-      iconType='machineLearningApp'
-      title={
-        <Heading>
-          {i18n.translate('wazuhAiAssistant.noProvider.title', {
-            defaultMessage: 'No AI provider configured',
-          })}
-        </Heading>
-      }
-      body={
-        <p>
-          {i18n.translate('wazuhAiAssistant.noProvider.purpose', {
-            defaultMessage:
-              'Ask questions about your agents, findings and vulnerabilities in plain language.',
-          })}
-        </p>
-      }
-    />
-    <EuiSpacer size='m' />
-    <div className='wzExampleCardsGrid'>
-      {EXAMPLE_CARDS.map(card => (
-        <EuiCard
-          key={card.id}
-          className='wzWelcomeCard'
-          layout='horizontal'
-          display='plain'
-          hasBorder
-          isDisabled
-          titleSize='xs'
-          icon={<EuiIcon type={card.icon} size='l' />}
-          title={card.title}
-          description={card.question}
-        />
-      ))}
-    </div>
-    <EuiSpacer size='m' />
-    <EuiText
-      size='s'
-      color='subdued'
-      textAlign='center'
-      className='wzNoProviderPrompt__text'
-    >
+  showExamples = true,
+}: NoProviderPromptProps) => {
+  const title = (
+    <Heading>
+      {i18n.translate('wazuhAiAssistant.noProvider.title', {
+        defaultMessage: 'No AI provider configured',
+      })}
+    </Heading>
+  );
+  const purpose = (
+    <p>
+      {i18n.translate('wazuhAiAssistant.noProvider.purpose', {
+        defaultMessage:
+          'Ask questions about your agents, findings and vulnerabilities in plain language.',
+      })}
+    </p>
+  );
+  const details = (
+    <>
       <p>
         <FormattedMessage
           id='wazuhAiAssistant.noProvider.needsProvider'
@@ -142,8 +119,9 @@ export const NoProviderPrompt = ({
           }}
         />
       </p>
-    </EuiText>
-    <EuiSpacer size='m' />
+    </>
+  );
+  const action = (
     <EuiButton
       color='primary'
       fill
@@ -154,5 +132,62 @@ export const NoProviderPrompt = ({
         defaultMessage: 'Add a provider',
       })}
     </EuiButton>
-  </div>
-);
+  );
+
+  // Without examples (Settings) it is a plain empty prompt, like the page's other empty states.
+  if (!showExamples) {
+    return (
+      <div data-test-subj='wzAiNoProviderPrompt'>
+        <EuiEmptyPrompt
+          iconType='machineLearningApp'
+          title={title}
+          body={
+            <>
+              {purpose}
+              {details}
+            </>
+          }
+          actions={action}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className='wzNoProviderPrompt' data-test-subj='wzAiNoProviderPrompt'>
+      <EuiEmptyPrompt
+        iconType='machineLearningApp'
+        title={title}
+        body={purpose}
+      />
+      <EuiSpacer size='m' />
+      <div className='wzExampleCardsGrid'>
+        {EXAMPLE_CARDS.map(card => (
+          <EuiCard
+            key={card.id}
+            className='wzWelcomeCard'
+            layout='horizontal'
+            display='plain'
+            hasBorder
+            isDisabled
+            titleSize='xs'
+            icon={<EuiIcon type={card.icon} size='l' />}
+            title={card.title}
+            description={card.question}
+          />
+        ))}
+      </div>
+      <EuiSpacer size='m' />
+      <EuiText
+        size='s'
+        color='subdued'
+        textAlign='center'
+        className='wzNoProviderPrompt__text'
+      >
+        {details}
+      </EuiText>
+      <EuiSpacer size='m' />
+      {action}
+    </div>
+  );
+};

@@ -1855,6 +1855,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 onAddProvider={openCreateForm}
                 onOpenPrivacySettings={() => switchTab('privacy')}
                 isAddProviderDisabled={settingsLocked}
+                showExamples={false}
               />
             ) : (
               <EuiInMemoryTable
