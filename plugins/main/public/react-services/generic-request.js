@@ -107,18 +107,22 @@ export class GenericRequest {
         try {
           await ApiCheck.checkStored(currentApi.id);
         } catch (err) {
-          const wzMisc = new WzMisc();
-          wzMisc.setApiIsDown(true);
+          // A check that timed out means the API is slow, not down (e.g. it
+          // is hashing a large merged.mg): keep the user on the page.
+          if (err?.code !== 'ECONNABORTED') {
+            const wzMisc = new WzMisc();
+            wzMisc.setApiIsDown(true);
 
-          if (
-            ['/settings', '/health-check', '/blank-screen'].every(
-              pathname =>
-                !NavigationService.getInstance()
-                  .getPathname()
-                  .startsWith(pathname),
-            )
-          ) {
-            NavigationService.getInstance().navigate('/health-check');
+            if (
+              ['/settings', '/health-check', '/blank-screen'].every(
+                pathname =>
+                  !NavigationService.getInstance()
+                    .getPathname()
+                    .startsWith(pathname),
+              )
+            ) {
+              NavigationService.getInstance().navigate('/health-check');
+            }
           }
         }
       }
