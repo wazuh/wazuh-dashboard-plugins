@@ -16,7 +16,11 @@ import {
 } from '../../hooks/use-overview-data';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
-import { getIntegrationsUrl } from '../../utils/navigation';
+import {
+  getCtiExplorerIocsUrl,
+  getIntegrationsUrl,
+} from '../../utils/navigation';
+import { getWazuhCheckUpdatesPlugin } from '../../../../../../kibana-services';
 
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared enrichments catalog: the IOCs tile and the threat-type bar. */
@@ -27,6 +31,7 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
   ThreatIntelligenceFeedSectionProps
 > = ({ threatIntel }) => {
   const [sectionRef, visible] = useInViewport<HTMLDivElement>();
+  const { CtiFeedSyncStatus } = getWazuhCheckUpdatesPlugin();
   const rules = useRulesCount(visible);
   const decoders = useDecodersCount(visible);
   const detectors = useDetectorsCount(visible);
@@ -55,9 +60,10 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
           'wazuh.common.homeOverviewThreatIntelFeed.description',
           {
             defaultMessage:
-              'What the platform is detecting with — detection content and knowledge base.',
+              'Detection content and IOCs from the CTI feed, synced by the indexer every hour by default.',
           },
         )}
+        actions={<CtiFeedSyncStatus feeds={['ruleset', 'iocs']} />}
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem grow={3}>
@@ -102,6 +108,13 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
               'wazuh.common.homeOverviewWidget.captionCurrentState',
               { defaultMessage: 'Current state' },
             )}
+            titleLink={{
+              href: getCtiExplorerIocsUrl(),
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewThreatIntelFeed.threatCatalogDestination',
+                { defaultMessage: 'CTI Explorer' },
+              ),
+            }}
             data-test-subj='home-overview-threat-catalog'
           >
             <ThreatCatalogTiles iocs={iocs} />

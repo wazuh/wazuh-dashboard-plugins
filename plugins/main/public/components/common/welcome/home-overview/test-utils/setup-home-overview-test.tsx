@@ -12,6 +12,9 @@ jest.mock('../../../../../kibana-services', () => ({
       getUrlForApp: jest.fn(() => '/mock-url'),
     },
   })),
+  getWazuhCheckUpdatesPlugin: jest.fn(() => ({
+    CtiFeedSyncStatus: () => <span data-test-subj='ctiFeedSyncStatus' />,
+  })),
 }));
 
 jest.mock(
