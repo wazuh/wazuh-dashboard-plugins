@@ -475,6 +475,9 @@ export const Steps = ({
           ) : null}
           {!missingStepsName?.length && !invalidFieldsName?.length ? (
             <>
+              <OsCommandWarning
+                os={registerAgentFormValues.operatingSystem.name}
+              />
               <CommandOutput
                 commandText={installCommand}
                 showCommand={showCommandsSections(
@@ -487,9 +490,6 @@ export const Steps = ({
                 enrollmentToken={
                   registerAgentFormValues.optionalParams.enrollmentToken
                 }
-              />
-              <OsCommandWarning
-                os={registerAgentFormValues.operatingSystem.name}
               />
             </>
           ) : null}
