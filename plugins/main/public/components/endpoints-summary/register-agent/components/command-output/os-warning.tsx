@@ -5,6 +5,7 @@ import { tOperatingSystem } from '../../core/config/os-commands-definitions';
 
 interface OsWarningProps {
   os?: tOperatingSystem['name'];
+  architecture?: string;
 }
 
 export default function OsCommandWarning(props: OsWarningProps) {
@@ -29,6 +30,7 @@ export default function OsCommandWarning(props: OsWarningProps) {
         'Keep in mind you need to run this command in a Shell Bash terminal.',
     },
   );
+  const isDEB = props?.architecture?.startsWith('DEB');
   const osSelector = {
     WINDOWS: (
       <EuiCallOut title={title} iconType='iInCircle'>
@@ -65,6 +67,19 @@ export default function OsCommandWarning(props: OsWarningProps) {
           <li>
             <span>{shellBashRequired}</span>
           </li>
+          {isDEB && (
+            <li>
+              <span>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.osWarning.debSignatureTools',
+                  {
+                    defaultMessage:
+                      'The gnupg and binutils packages are required to check the package signature.',
+                  },
+                )}
+              </span>
+            </li>
+          )}
         </ul>
         <p>{shellBashTerminal}</p>
       </EuiCallOut>

@@ -37,6 +37,9 @@ beforeEach(() => {
 
 const debImportKey =
   'wget -qO - https://test.com/GPG-KEY | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && sudo chmod 644 /usr/share/keyrings/wazuh.gpg';
+// The package is installed only when its embedded signature checks out.
+const debVerify = (pkg: string) =>
+  `(f=$PWD/${pkg} && cd "$(mktemp -d)" && ar x "$f" && gpgv --keyring /usr/share/keyrings/wazuh.gpg -o signed _gpgbuilder && awk '/^\\t/{print $2"  "$4}' signed > sums && [ "$(ar t "$f" | grep -v '^_')" = "$(cut -d' ' -f3 sums)" ] && sha1sum -c --quiet sums && rm -rf "$PWD")`;
 const rpmImportKey = 'sudo rpm --import https://test.com/GPG-KEY';
 
 describe('getAllOptionals', () => {
@@ -74,7 +77,9 @@ describe('getDEBAMD64InstallCommand', () => {
     };
     const result = getDEBAMD64InstallCommand(props);
     expect(result).toBe(
-      `${debImportKey} && wget https://example.com/package.deb && sudo localhost password group1 agent1 dpkg -i ./wazuh-agent_4.0.0-beta2_amd64.deb`,
+      `${debImportKey} && wget https://example.com/package.deb && ${debVerify(
+        'wazuh-agent_4.0.0-beta2_amd64.deb',
+      )} && sudo localhost password group1 agent1 dpkg -i ./wazuh-agent_4.0.0-beta2_amd64.deb`,
     );
   });
 });
@@ -82,7 +87,13 @@ describe('getDEBAMD64InstallCommand', () => {
 describe('getDEBAMD64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent_${test.wazuhVersion}-beta2_amd64.deb`;
-    let expected = `${debImportKey} && wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} dpkg -i ./${test.packageName}`;
+    let expected = `${debImportKey} && wget ${test.urlPackage} && ${debVerify(
+      test.packageName,
+    )} && sudo ${test.optionals.serverAddress} ${
+      test.optionals.wazuhPassword
+    } ${test.optionals.agentGroups} ${test.optionals.agentName} ${
+      test.optionals.sslVerification
+    } dpkg -i ./${test.packageName}`;
     const withAllOptionals = getDEBAMD64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
@@ -90,7 +101,11 @@ describe('getDEBAMD64InstallCommand', () => {
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
 
-    expected = `${debImportKey} && wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} dpkg -i ./${test.packageName}`;
+    expected = `${debImportKey} && wget ${test.urlPackage} && ${debVerify(
+      test.packageName,
+    )} && sudo ${test.optionals.serverAddress} ${
+      test.optionals.agentGroups
+    } dpkg -i ./${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
       getDEBAMD64InstallCommand(test);
     expect(withServerAddresAndAgentGroupsOptions).toEqual(expected);
@@ -100,7 +115,13 @@ describe('getDEBAMD64InstallCommand', () => {
 describe('getDEBARM64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent_${test.wazuhVersion}-beta2_arm64.deb`;
-    let expected = `${debImportKey} && wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} dpkg -i ./${test.packageName}`;
+    let expected = `${debImportKey} && wget ${test.urlPackage} && ${debVerify(
+      test.packageName,
+    )} && sudo ${test.optionals.serverAddress} ${
+      test.optionals.wazuhPassword
+    } ${test.optionals.agentGroups} ${test.optionals.agentName} ${
+      test.optionals.sslVerification
+    } dpkg -i ./${test.packageName}`;
     const withAllOptionals = getDEBARM64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
@@ -108,7 +129,11 @@ describe('getDEBARM64InstallCommand', () => {
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
 
-    expected = `${debImportKey} && wget ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} dpkg -i ./${test.packageName}`;
+    expected = `${debImportKey} && wget ${test.urlPackage} && ${debVerify(
+      test.packageName,
+    )} && sudo ${test.optionals.serverAddress} ${
+      test.optionals.agentGroups
+    } dpkg -i ./${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
       getDEBARM64InstallCommand(test);
     expect(withServerAddresAndAgentGroupsOptions).toEqual(expected);
@@ -281,7 +306,11 @@ describe('SSL verification states', () => {
       packageName: 'wazuh-agent_5.0.0_amd64.deb',
     });
     expect(result).toEqual(
-      `${debImportKey} && wget https://example.com/package.deb && sudo ${serverAddress} ${expectedTail[state]}dpkg -i ./wazuh-agent_5.0.0_amd64.deb`,
+      `${debImportKey} && wget https://example.com/package.deb && ${debVerify(
+        'wazuh-agent_5.0.0_amd64.deb',
+      )} && sudo ${serverAddress} ${
+        expectedTail[state]
+      }dpkg -i ./wazuh-agent_5.0.0_amd64.deb`,
     );
   });
 
@@ -293,7 +322,11 @@ describe('SSL verification states', () => {
       packageName: 'wazuh-agent_5.0.0_arm64.deb',
     });
     expect(result).toEqual(
-      `${debImportKey} && wget https://example.com/package.deb && sudo ${serverAddress} ${expectedTail[state]}dpkg -i ./wazuh-agent_5.0.0_arm64.deb`,
+      `${debImportKey} && wget https://example.com/package.deb && ${debVerify(
+        'wazuh-agent_5.0.0_arm64.deb',
+      )} && sudo ${serverAddress} ${
+        expectedTail[state]
+      }dpkg -i ./wazuh-agent_5.0.0_arm64.deb`,
     );
   });
 

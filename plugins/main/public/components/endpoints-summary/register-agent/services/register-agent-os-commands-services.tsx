@@ -72,13 +72,20 @@ type tLinuxInstallCommand = tOSEntryInstallCommand<tOptionalParameters> & {
   gpgKeyUrl: string;
 };
 
-// dpkg doesn't check signatures; this leaves the keyring the APT repository method uses.
+const DEB_KEYRING = '/usr/share/keyrings/wazuh.gpg';
+
 const getDEBImportKeyCommand = (gpgKeyUrl: string) =>
-  `wget -qO - ${gpgKeyUrl} | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && sudo chmod 644 /usr/share/keyrings/wazuh.gpg`;
+  `wget -qO - ${gpgKeyUrl} | sudo gpg --no-default-keyring --keyring gnupg-ring:${DEB_KEYRING} --import && sudo chmod 644 ${DEB_KEYRING}`;
+
+// dpkg checks no signature: check the embedded dpkg-sig one (signed member list, SHA-1 sums).
+const getDEBVerifyCommand = (packageName: string) =>
+  `(f=$PWD/${packageName} && cd "$(mktemp -d)" && ar x "$f" && gpgv --keyring ${DEB_KEYRING} -o signed _gpgbuilder && awk '/^\\t/{print $2"  "$4}' signed > sums && [ "$(ar t "$f" | grep -v '^_')" = "$(cut -d' ' -f3 sums)" ] && sha1sum -c --quiet sums && rm -rf "$PWD")`;
 
 const getDEBInstallCommand = (props: tLinuxInstallCommand) => {
   const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
-  return `${getDEBImportKeyCommand(gpgKeyUrl)} && wget ${urlPackage} && sudo ${
+  return `${getDEBImportKeyCommand(
+    gpgKeyUrl,
+  )} && wget ${urlPackage} && ${getDEBVerifyCommand(packageName)} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
 };

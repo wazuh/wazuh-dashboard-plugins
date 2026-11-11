@@ -490,6 +490,9 @@ export const Steps = ({
               />
               <OsCommandWarning
                 os={registerAgentFormValues.operatingSystem.name}
+                architecture={
+                  registerAgentFormValues.operatingSystem.architecture
+                }
               />
             </>
           ) : null}

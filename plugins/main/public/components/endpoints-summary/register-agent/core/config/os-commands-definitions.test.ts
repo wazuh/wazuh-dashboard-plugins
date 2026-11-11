@@ -67,6 +67,7 @@ describe('Linux install commands - GPG key', () => {
         wazuhVersion: '5.0.0',
         urlPackage: 'https://example.com/package',
         packageName: 'package',
+        optionals: {},
       }),
     );
 
@@ -93,6 +94,10 @@ describe('Linux install commands - GPG key', () => {
         );
         expect(command).toContain(
           'sudo chmod 644 /usr/share/keyrings/wazuh.gpg && wget https://example.com/package',
+        );
+        // dpkg runs only after the embedded signature is checked.
+        expect(command).toMatch(
+          /&& \(f=\$PWD\/package && .* && gpgv --keyring \/usr\/share\/keyrings\/wazuh\.gpg -o signed _gpgbuilder && .* && sha1sum -c --quiet sums && rm -rf "\$PWD"\) && sudo dpkg -i \.\/package$/,
         );
       }
     },
