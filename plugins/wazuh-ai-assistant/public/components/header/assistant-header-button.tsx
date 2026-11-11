@@ -9,6 +9,7 @@ import React, {
 import { createRoot } from 'react-dom/client';
 import { EuiHeaderSectionItemButton, EuiIcon, EuiToolTip } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { I18nProvider } from '@osd/i18n/react';
 import type {
   CoreStart,
   ISidecarConfig,
@@ -87,14 +88,16 @@ export const AssistantHeaderButton: React.FC<{ core: CoreStart }> = ({
         element.setAttribute('data-no-focus-lock', 'true');
         const root = createRoot(element);
         root.render(
-          <Suspense fallback={null}>
-            <AssistantChatPanel
-              core={core}
-              onClose={closeSidecar}
-              runGuarded={runGuarded}
-              isGeneratingRef={isGeneratingRef}
-            />
-          </Suspense>,
+          <I18nProvider>
+            <Suspense fallback={null}>
+              <AssistantChatPanel
+                core={core}
+                onClose={closeSidecar}
+                runGuarded={runGuarded}
+                isGeneratingRef={isGeneratingRef}
+              />
+            </Suspense>
+          </I18nProvider>,
         );
         return () => setTimeout(() => root.unmount());
       },
