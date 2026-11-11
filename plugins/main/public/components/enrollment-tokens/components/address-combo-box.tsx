@@ -20,6 +20,8 @@ interface AddressComboBoxProps {
   onChange: (event: { target: { value: string } }) => void;
   isInvalid?: boolean;
   placeholder?: string;
+  fullWidth?: boolean;
+  'data-test-subj'?: string;
 }
 
 /* Without suggestions the input still takes any typed address. */
@@ -48,6 +50,8 @@ export const AddressComboBox = ({
   onChange,
   isInvalid,
   placeholder,
+  fullWidth = true,
+  'data-test-subj': dataTestSubj = 'enrollmentTokenAddress',
 }: AddressComboBoxProps) => {
   const { names, isLoading } = useListenerCertificateNames();
   const setValue = (address: string) =>
@@ -55,7 +59,7 @@ export const AddressComboBox = ({
 
   return (
     <EuiComboBox
-      fullWidth
+      fullWidth={fullWidth}
       placeholder={placeholder}
       singleSelection={{ asPlainText: true }}
       options={names.map(name => ({ label: name }))}
@@ -66,7 +70,7 @@ export const AddressComboBox = ({
       onCreateOption={(searchValue: string) => setValue(searchValue.trim())}
       isLoading={isLoading}
       isInvalid={isInvalid}
-      data-test-subj='enrollmentTokenAddress'
+      data-test-subj={dataTestSubj}
     />
   );
 };

@@ -1,6 +1,12 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiFlexGroup, EuiFlexItem, EuiHorizontalRule } from '@elastic/eui';
+import { FormattedMessage } from '@osd/i18n/react';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHorizontalRule,
+  EuiLink,
+} from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import { SectionHeader, WidgetGroup } from '../common';
 import { SecurityAnalyticsTiles } from '../security-analytics';
@@ -16,7 +22,13 @@ import {
 } from '../../hooks/use-overview-data';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { ThreatIntelEnrichments, TopItem } from '../../interfaces/types';
-import { getIntegrationsUrl } from '../../utils/navigation';
+import {
+  getCtiExplorerIocsUrl,
+  getCtiFeedUrl,
+  getIntegrationsUrl,
+} from '../../utils/navigation';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 
 export interface ThreatIntelligenceFeedSectionProps {
   /** Shared enrichments catalog: the IOCs tile and the threat-type bar. */
@@ -51,13 +63,30 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
           'wazuh.common.homeOverviewThreatIntelFeed.title',
           { defaultMessage: 'Threat intelligence feed' },
         )}
-        description={i18n.translate(
-          'wazuh.common.homeOverviewThreatIntelFeed.description',
-          {
-            defaultMessage:
-              'What the platform is detecting with — detection content and knowledge base.',
-          },
-        )}
+        description={
+          <FormattedMessage
+            id='wazuh.common.homeOverviewThreatIntelFeed.description'
+            defaultMessage='Detection content and IOCs from the {ctiFeed}, synced by the indexer every hour by default.'
+            values={{
+              ctiFeed: (
+                <RedirectAppLinks
+                  application={getCore().application}
+                  className='eui-displayInline'
+                >
+                  <EuiLink
+                    href={getCtiFeedUrl()}
+                    data-test-subj='home-overview-threat-intel-feed-cti-feed-link'
+                  >
+                    {i18n.translate(
+                      'wazuh.common.homeOverviewThreatIntelFeed.ctiFeedLink',
+                      { defaultMessage: 'CTI feed' },
+                    )}
+                  </EuiLink>
+                </RedirectAppLinks>
+              ),
+            }}
+          />
+        }
       />
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem grow={3}>
@@ -102,6 +131,13 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
               'wazuh.common.homeOverviewWidget.captionCurrentState',
               { defaultMessage: 'Current state' },
             )}
+            titleLink={{
+              href: getCtiExplorerIocsUrl(),
+              destination: i18n.translate(
+                'wazuh.common.homeOverviewThreatIntelFeed.threatCatalogDestination',
+                { defaultMessage: 'CTI Explorer' },
+              ),
+            }}
             data-test-subj='home-overview-threat-catalog'
           >
             <ThreatCatalogTiles iocs={iocs} />
