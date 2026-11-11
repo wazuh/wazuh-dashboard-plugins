@@ -25,6 +25,10 @@ jest.mock('../../common/hooks/use-app-config', () => ({
   useAppConfig: () => ({ data: {} }),
 }));
 
+jest.mock('../utils/navigation', () => ({
+  getCtiCveUrl: (id: string) => `https://cti.example/cves/${id}`,
+}));
+
 const mockSearch = searchVulnerabilities as jest.Mock;
 
 /** The tab with its severities kept as the page keeps them. */
@@ -169,5 +173,46 @@ describe('VulnerabilitiesTab', () => {
     await waitFor(() => expect(lastRequest()).toMatchObject({ type: 'CVE' }));
     await screen.findByText('CVE-2024-6387');
     expect(header()).not.toContain('Type');
+  });
+
+  it('links the full advisory on the CTI site only while CVE records are listed', async () => {
+    mockSearch.mockResolvedValue({
+      total: 1,
+      items: [{ id: 'CVE-2024-6387', type: 'CVE', offset: 1, document: {} }],
+    });
+    const onOpenVulnerability = jest.fn();
+
+    const { rerender } = render(
+      <Tab type={undefined} onOpenVulnerability={onOpenVulnerability} />,
+    );
+    await screen.findByText('CVE-2024-6387');
+    expect(
+      screen.queryByTestId('ctiExplorerVulnerabilityOpenInCti'),
+    ).toBeNull();
+
+    rerender(<Tab type='CVE' onOpenVulnerability={onOpenVulnerability} />);
+    const advisory = await screen.findByTestId(
+      'ctiExplorerVulnerabilityOpenInCti',
+    );
+    expect(advisory).toHaveAttribute(
+      'href',
+      'https://cti.example/cves/CVE-2024-6387',
+    );
+    expect(advisory).toHaveAttribute('target', '_blank');
+    // An icon only: its label names the record and the site.
+    expect(advisory).toHaveAttribute(
+      'aria-label',
+      'Full advisory of CVE-2024-6387 on cti.wazuh.com, in a new tab',
+    );
+
+    // Following the link does not open the record in the flyout too.
+    fireEvent.click(advisory);
+    expect(onOpenVulnerability).not.toHaveBeenCalled();
+
+    rerender(<Tab type='TID' onOpenVulnerability={onOpenVulnerability} />);
+    await waitFor(() => expect(lastRequest()).toMatchObject({ type: 'TID' }));
+    expect(
+      screen.queryByTestId('ctiExplorerVulnerabilityOpenInCti'),
+    ).toBeNull();
   });
 });
