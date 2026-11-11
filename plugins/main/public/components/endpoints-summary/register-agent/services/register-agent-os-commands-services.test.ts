@@ -32,14 +32,15 @@ beforeEach(() => {
     urlPackage: 'https://test.com/agent.deb',
     wazuhVersion: '4.8.0',
     gpgKeyUrl: 'https://test.com/GPG-KEY',
+    aptSource: 'https://test.com/apt stable',
   };
 });
 
 const debImportKey =
-  'wget -qO - https://test.com/GPG-KEY | sudo gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && sudo chmod 644 /usr/share/keyrings/wazuh.gpg';
-// The package is installed only when its embedded signature checks out.
+  'wget -qO - https://test.com/GPG-KEY | sudo tee /usr/share/keyrings/wazuh.asc > /dev/null';
+// The package is installed only when it matches the SHA-256 of the index apt verified.
 const debVerify = (pkg: string) =>
-  `(f=$PWD/${pkg} && cd "$(mktemp -d)" && ar x "$f" && gpgv --keyring /usr/share/keyrings/wazuh.gpg -o signed _gpgbuilder && awk '/^\\t/{print $2"  "$4}' signed > sums && [ "$(ar t "$f" | grep -v '^_')" = "$(cut -d' ' -f3 sums)" ] && sha1sum -c --quiet sums && rm -rf "$PWD")`;
+  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=/usr/share/keyrings/wazuh.asc] https://test.com/apt stable main" > $d/wazuh.list && o="-o Dir::Etc::SourceList=$d/wazuh.list -o Dir::Etc::SourceParts=$d/lists -o Dir::State::Lists=$d/lists -o Dir::Cache=$d" && sudo mkdir -p $d/lists/partial && sudo apt-get update -qq $o && echo "$(apt-cache $o show wazuh-agent | awk -v f=/${pkg} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${pkg}" | sha256sum -c --quiet && sudo rm -rf $d`;
 const rpmImportKey = 'sudo rpm --import https://test.com/GPG-KEY';
 
 describe('getAllOptionals', () => {
@@ -74,6 +75,7 @@ describe('getDEBAMD64InstallCommand', () => {
       packageName: 'wazuh-agent_4.0.0-beta2_amd64.deb',
       wazuhVersion: '4.0.0',
       gpgKeyUrl: 'https://test.com/GPG-KEY',
+      aptSource: 'https://test.com/apt stable',
     };
     const result = getDEBAMD64InstallCommand(props);
     expect(result).toBe(
@@ -303,6 +305,7 @@ describe('SSL verification states', () => {
       optionals: states[state],
       urlPackage: 'https://example.com/package.deb',
       gpgKeyUrl: 'https://test.com/GPG-KEY',
+      aptSource: 'https://test.com/apt stable',
       packageName: 'wazuh-agent_5.0.0_amd64.deb',
     });
     expect(result).toEqual(
@@ -319,6 +322,7 @@ describe('SSL verification states', () => {
       optionals: states[state],
       urlPackage: 'https://example.com/package.deb',
       gpgKeyUrl: 'https://test.com/GPG-KEY',
+      aptSource: 'https://test.com/apt stable',
       packageName: 'wazuh-agent_5.0.0_arm64.deb',
     });
     expect(result).toEqual(

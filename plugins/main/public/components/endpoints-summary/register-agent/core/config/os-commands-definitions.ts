@@ -112,6 +112,13 @@ const getGpgKeyUrl = () =>
     ? 'https://packages-staging.xdrsiem.wazuh.info/key/GPG-KEY-WAZUH'
     : 'https://packages.wazuh.com/key/GPG-KEY-WAZUH';
 
+/**
+ * APT repository and suite that list the DEB packages above, for the signature check.
+ * Evaluated lazily so the value from injectedMetadata is available.
+ */
+const getAptSource = () =>
+  `${getPackagesBaseUrl()}/apt ${isWazuhPreRelease() ? 'unstable' : 'stable'}`;
+
 ///////////////////////////////////////////////////////////////////
 /// Operating system commands definitions
 ///////////////////////////////////////////////////////////////////
@@ -130,7 +137,11 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
           props.packageName
         }`,
       installCommand: props =>
-        getDEBAMD64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
+        getDEBAMD64InstallCommand({
+          ...props,
+          gpgKeyUrl: getGpgKeyUrl(),
+          aptSource: getAptSource(),
+        }),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -155,7 +166,11 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
           props.packageName
         }`,
       installCommand: props =>
-        getDEBARM64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
+        getDEBARM64InstallCommand({
+          ...props,
+          gpgKeyUrl: getGpgKeyUrl(),
+          aptSource: getAptSource(),
+        }),
       startCommand: props => getLinuxStartCommand(props),
     },
     {

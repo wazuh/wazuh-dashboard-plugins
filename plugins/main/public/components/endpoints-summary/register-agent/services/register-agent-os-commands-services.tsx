@@ -72,28 +72,30 @@ type tLinuxInstallCommand = tOSEntryInstallCommand<tOptionalParameters> & {
   gpgKeyUrl: string;
 };
 
-const DEB_KEYRING = '/usr/share/keyrings/wazuh.gpg';
+type tDEBInstallCommand = tLinuxInstallCommand & {
+  aptSource: string;
+};
 
-const getDEBImportKeyCommand = (gpgKeyUrl: string) =>
-  `wget -qO - ${gpgKeyUrl} | sudo gpg --no-default-keyring --keyring gnupg-ring:${DEB_KEYRING} --import && sudo chmod 644 ${DEB_KEYRING}`;
+const DEB_KEYRING = '/usr/share/keyrings/wazuh.asc';
 
-// dpkg checks no signature: check the embedded dpkg-sig one (signed member list, SHA-1 sums).
-const getDEBVerifyCommand = (packageName: string) =>
-  `(f=$PWD/${packageName} && cd "$(mktemp -d)" && ar x "$f" && gpgv --keyring ${DEB_KEYRING} -o signed _gpgbuilder && awk '/^\\t/{print $2"  "$4}' signed > sums && [ "$(ar t "$f" | grep -v '^_')" = "$(cut -d' ' -f3 sums)" ] && sha1sum -c --quiet sums && rm -rf "$PWD")`;
+// dpkg checks no signature: apt verifies the signed index; the package must match its SHA-256.
+const getDEBVerifyCommand = (packageName: string, aptSource: string) =>
+  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=${DEB_KEYRING}] ${aptSource} main" > $d/wazuh.list && o="-o Dir::Etc::SourceList=$d/wazuh.list -o Dir::Etc::SourceParts=$d/lists -o Dir::State::Lists=$d/lists -o Dir::Cache=$d" && sudo mkdir -p $d/lists/partial && sudo apt-get update -qq $o && echo "$(apt-cache $o show wazuh-agent | awk -v f=/${packageName} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${packageName}" | sha256sum -c --quiet && sudo rm -rf $d`;
 
-const getDEBInstallCommand = (props: tLinuxInstallCommand) => {
-  const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
-  return `${getDEBImportKeyCommand(
-    gpgKeyUrl,
-  )} && wget ${urlPackage} && ${getDEBVerifyCommand(packageName)} && sudo ${
+const getDEBInstallCommand = (props: tDEBInstallCommand) => {
+  const { optionals, urlPackage, packageName, gpgKeyUrl, aptSource } = props;
+  return `wget -qO - ${gpgKeyUrl} | sudo tee ${DEB_KEYRING} > /dev/null && wget ${urlPackage} && ${getDEBVerifyCommand(
+    packageName,
+    aptSource,
+  )} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
 };
 
-export const getDEBAMD64InstallCommand = (props: tLinuxInstallCommand) =>
+export const getDEBAMD64InstallCommand = (props: tDEBInstallCommand) =>
   getDEBInstallCommand(props);
 
-export const getDEBARM64InstallCommand = (props: tLinuxInstallCommand) =>
+export const getDEBARM64InstallCommand = (props: tDEBInstallCommand) =>
   getDEBInstallCommand(props);
 
 /******* RPM *******/

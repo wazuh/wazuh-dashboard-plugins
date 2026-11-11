@@ -2,6 +2,7 @@ import {
   optionalParamsDefinitions,
   osCommandsDefinitions,
 } from './os-commands-definitions';
+import { PLUGIN_MAJOR_VERSION } from '../../../../../../common/constants';
 
 let mockPreRelease = false;
 jest.mock('../../../../../kibana-services', () => ({
@@ -88,16 +89,21 @@ describe('Linux install commands - GPG key', () => {
           true,
         );
       }
+      const aptSource = preRelease
+        ? `https://packages-staging.xdrsiem.wazuh.info/pre-release/${PLUGIN_MAJOR_VERSION}.x/apt unstable`
+        : `https://packages.wazuh.com/production/${PLUGIN_MAJOR_VERSION}.x/apt stable`;
       for (const command of [debAmd, debArm]) {
-        expect(command.startsWith(`wget -qO - ${keyUrl} | sudo gpg`)).toBe(
-          true,
-        );
+        expect(
+          command.startsWith(
+            `wget -qO - ${keyUrl} | sudo tee /usr/share/keyrings/wazuh.asc > /dev/null && wget https://example.com/package && `,
+          ),
+        ).toBe(true);
         expect(command).toContain(
-          'sudo chmod 644 /usr/share/keyrings/wazuh.gpg && wget https://example.com/package',
+          `echo "deb [signed-by=/usr/share/keyrings/wazuh.asc] ${aptSource} main"`,
         );
-        // dpkg runs only after the embedded signature is checked.
+        // dpkg runs only after the package matches the SHA-256 of the verified index.
         expect(command).toMatch(
-          /&& \(f=\$PWD\/package && .* && gpgv --keyring \/usr\/share\/keyrings\/wazuh\.gpg -o signed _gpgbuilder && .* && sha1sum -c --quiet sums && rm -rf "\$PWD"\) && sudo dpkg -i \.\/package$/,
+          /&& sudo apt-get update -qq \$o && .* \| sha256sum -c --quiet && sudo rm -rf \$d && sudo dpkg -i \.\/package$/,
         );
       }
     },
