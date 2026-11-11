@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { agentsTableActions } from './actions/actions';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
@@ -231,7 +232,14 @@ export const agentsTableColumns = (
         />
       </span>
     ),
-    render: lastKeepAlive => formatUIDate(lastKeepAlive),
+    render: lastKeepAlive =>
+      lastKeepAlive ? (
+        <EuiToolTip content={formatUIDate(lastKeepAlive)}>
+          <span>{moment(lastKeepAlive).fromNow()}</span>
+        </EuiToolTip>
+      ) : (
+        '-'
+      ),
     sortable: true,
     show: true,
     searchable: false,
