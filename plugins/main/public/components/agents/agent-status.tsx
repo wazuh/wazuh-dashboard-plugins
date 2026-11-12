@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
 import {
   agentStatusColorByAgentStatus,
@@ -75,6 +76,20 @@ export const AgentStatus = ({
                 )}
               </p>
             )}
+            {status === API_NAME_AGENT_STATUS.DISCONNECTED &&
+              agent?.lastKeepAlive && (
+                <p>
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.agentStatus.lastSeen',
+                    {
+                      defaultMessage: 'Last seen: {relativeTime}',
+                      values: {
+                        relativeTime: moment(agent.lastKeepAlive).fromNow(),
+                      },
+                    },
+                  )}
+                </p>
+              )}
           </>
         }
       />
