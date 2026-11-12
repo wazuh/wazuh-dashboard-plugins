@@ -38,3 +38,30 @@ describe('DashboardSecurity.fetchCurrentPlatform', () => {
     expect(http.get).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('DashboardSecurity.fetchAuthContextFields', () => {
+  it('shares the request with the platform', async () => {
+    const http = {
+      get: jest.fn().mockResolvedValue({
+        platform: 'opensearchSecurity',
+        authContextFields: ['user_name', 'backend_roles'],
+      }),
+    };
+    const security = new DashboardSecurity(logger, http);
+
+    await security.setup();
+    const platform = await fetchCurrentPlatform(security);
+    const fields = await security.fetchAuthContextFields();
+
+    expect(platform).toBe('opensearchSecurity');
+    expect(fields).toEqual(['user_name', 'backend_roles']);
+    expect(http.get).toHaveBeenCalledTimes(1);
+  });
+
+  it('returns no fields when the response has none', async () => {
+    const http = { get: jest.fn().mockResolvedValue({ platform: '' }) };
+    const security = new DashboardSecurity(logger, http);
+
+    expect(await security.fetchAuthContextFields()).toEqual([]);
+  });
+});

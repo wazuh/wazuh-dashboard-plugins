@@ -24,7 +24,7 @@ Backlog ──claim──▶ In progress ──analyze + implement──▶ Draf
 | `--auto`                               | No confirmations. Stop only for genuinely unclear issues or decisions only the user can make (including the step 4 sanity-check findings).                                                                                                                                                |
 | `--confirm-each`                       | Ask before **every** comment, status change, assignment, push, PR create/ready.                                                                                                                                                                                                           |
 | `--dry-run`                            | Write nothing to GitHub (no assign, comment, status, push, PR). Local analysis is fine; print every action that would run with its full text.                                                                                                                                             |
-| `--finish <pr>`                        | Resume a PR left as Draft for UI evidence: jump to step 9 for that PR (then 9b CI watch).                                                                                                                                                                                                 |
+| `--finish <pr>`                        | Resume a PR left as Draft for UI evidence: jump to step 9 for that PR (then 9b CI watch). Never touches the issue link (created with the PR in step 8).                                                                                                                                   |
 
 "Outward action" = anything visible to others: issue assignment/comments, project
 status, `git push`, `gh pr create/ready/edit`. State the active mode to the user at
@@ -78,7 +78,7 @@ Copy this checklist and track progress:
 - [ ] 5. Analyze; comment findings + approach on the issue
 - [ ] 6. Implement, with colocated tests
 - [ ] 7. Validate with check-standards; add the CHANGELOG entry
-- [ ] 8. Push + open the Draft PR linked to the issue
+- [ ] 8. Push + open the Draft PR and link it to the issue (`addCloseIssueReferences`, only here)
 - [ ] 9. Finish: PR ready + Status → Pending review + implementation comment
 - [ ] 9b. PR ready → watch its GHA jobs until done → report the result
 - [ ] B. (any step) Blocked path: comment + Status → Blocked
@@ -289,10 +289,10 @@ explicit ask that lets it run `gh pr create`). Then:
 
 ```bash
 git push -u origin <branch>
-gh pr create --draft --base <base> --assignee @me \
+PR_URL=$(gh pr create --draft --base <base> --assignee @me \
   --title "<Imperative, capitalized subject ≤ 50 chars>" \
-  --body-file <temp-dir>/pr-body.md
-PR_NODE_ID=$(gh pr view <pr> --json id -q .id)
+  --body-file <temp-dir>/pr-body.md)
+PR_NODE_ID=$(gh pr view "$PR_URL" --json id -q .id)
 gh api graphql -f query="mutation { addCloseIssueReferences(input: {issueId: \"$ISSUE_NODE_ID\", pullRequestIds: [\"$PR_NODE_ID\"]}) { clientMutationId } }"
 ```
 
@@ -301,7 +301,13 @@ gh api graphql -f query="mutation { addCloseIssueReferences(input: {issueId: \"$
   empty for the developer.
 - Always run the `addCloseIssueReferences` call right after creating the PR: it
   links the PR in the issue's Development section via node ids, independent of any
-  closing keyword, so internal-issue PRs show up there too.
+  closing keyword, so internal-issue PRs show up there too. Check it worked
+  (`gh pr view "$PR_URL" --json closingIssuesReferences` for a public issue; for an
+  internal one the mutation succeeding is the check). On failure, report it — don't
+  loop.
+- **The PR↔issue link is created here, when the PR is created**, in every mode and
+  path (checkpoint, `--auto`, `--confirm-each`), including a Draft PR opened from the
+  Blocked path (B). It is never created, repaired or re-run in step 9 or `--finish`.
 - Add `--label no-changelog` when no CHANGELOG entry is needed.
 - Decide if the change is **UI-visible** (anything under `public/` that changes
   what users see).
@@ -319,7 +325,8 @@ gh project item-edit --project-id <PROJECT_ID> --id <ITEM_ID> \
 **UI change:** keep the PR in Draft and the card in "In progress". Tell the user to
 attach the screenshot/video to `### Results and Evidence` and then run
 `/develop-issue --finish <pr>`, which only does: verify evidence is present in the
-PR body → `gh pr ready` → Pending review → implementation comment.
+PR body → `gh pr ready` → Pending review → implementation comment. It does not link the PR to the
+issue: that link already exists since step 8.
 
 **check-standards FAIL** that you could not fix → Blocked path (keep PR Draft).
 
@@ -401,7 +408,8 @@ change that you cannot fix; missing permissions; target repo cannot be determine
 
 2. Status → **Blocked** (its option id from the project resolution).
 3. If there are useful commits, push the branch (and keep/open the PR as Draft) and
-   say so; otherwise leave the work local and report where it is.
+   say so (when opening that PR, run step 8's `addCloseIssueReferences` right after
+   creating it); otherwise leave the work local and report where it is.
 4. Report to the user and stop.
 
 In checkpoint mode, a blocker discovered **after** the "go" still needs a quick
@@ -428,6 +436,7 @@ changes, to add the screenshot before marking the PR ready.
 
 - Every outward action respects the chosen mode; `--dry-run` writes nothing.
 - Never force-push, close issues, merge PRs, or move a card to "Done".
+- The PR is linked to the issue when it is created (step 8), never in `--finish`.
 - The CI watch is read-only: never re-run jobs, push fixes, or change the status
   based on CI results without the active mode's confirmation.
 - Never expose an internal issue link, or the internal repository's name, in a public
