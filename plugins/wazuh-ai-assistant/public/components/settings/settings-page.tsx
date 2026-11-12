@@ -35,7 +35,6 @@ import {
   EuiFieldNumber,
   EuiHorizontalRule,
   EuiFieldSearch,
-  EuiEmptyPrompt,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { CoreStart } from '../../../../../src/core/public';
@@ -51,6 +50,7 @@ import { ProviderInput, ProviderSummary } from '../../../common/types';
 import { useDirtyFormState } from '../../hooks/use-dirty-form-state';
 import { getWazuhCore } from '../../plugin-services';
 import { ProviderFormFlyout } from './provider-form-flyout';
+import { NoProviderPrompt } from '../chat/no-provider-prompt';
 import {
   ProviderTestOutcome,
   describeHttpError,
@@ -1693,6 +1693,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
       </EuiBottomBar>
     ) : null;
 
+  const documentationLabel = i18n.translate(
+    'wazuhAiAssistant.settings.documentationLink',
+    { defaultMessage: 'Documentation' },
+  );
+
   return (
     <EuiPage className='wzSettingsPage'>
       <EuiPageBody>
@@ -1712,18 +1717,17 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 defaultMessage:
                   'Manage AI providers, privacy and conversation history.',
               })}{' '}
-              <EuiButtonIcon
-                href={getWazuhCore().utils.webDocumentationLink(
-                  'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
-                )}
-                iconType='iInCircle'
-                target='_blank'
-                rel='noopener noreferrer'
-                aria-label={i18n.translate(
-                  'wazuhAiAssistant.settings.documentationLink',
-                  { defaultMessage: 'Documentation' },
-                )}
-              />
+              <EuiToolTip content={documentationLabel}>
+                <EuiButtonIcon
+                  href={getWazuhCore().utils.webDocumentationLink(
+                    'user-manual/wazuh-dashboard/wazuh-dashboard-configurations.html#ai-assistant',
+                  )}
+                  iconType='iInCircle'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  aria-label={documentationLabel}
+                />
+              </EuiToolTip>
             </>
           }
           rightSideItems={[
@@ -1846,46 +1850,12 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             )}
 
             {providersLoaded && providers.length === 0 ? (
-              <EuiEmptyPrompt
-                iconType='machineLearningApp'
-                title={
-                  <h2>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.providers.emptyTitle',
-                      {
-                        defaultMessage: 'No AI provider configured',
-                      },
-                    )}
-                  </h2>
-                }
-                body={
-                  <p>
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.providers.emptyBody',
-                      {
-                        defaultMessage:
-                          'The AI Assistant needs at least one connected provider ' +
-                          '(OpenAI-compatible or Anthropic) before it can answer questions. ' +
-                          'Add one to get started.',
-                      },
-                    )}
-                  </p>
-                }
-                actions={
-                  <EuiButton
-                    color='primary'
-                    fill
-                    isDisabled={settingsLocked}
-                    onClick={openCreateForm}
-                  >
-                    {i18n.translate(
-                      'wazuhAiAssistant.settings.providers.emptyAction',
-                      {
-                        defaultMessage: 'Add a provider',
-                      },
-                    )}
-                  </EuiButton>
-                }
+              <NoProviderPrompt
+                headingLevel='h2'
+                onAddProvider={openCreateForm}
+                onOpenPrivacySettings={() => switchTab('privacy')}
+                isAddProviderDisabled={settingsLocked}
+                showExamples={false}
               />
             ) : (
               <EuiInMemoryTable

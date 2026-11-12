@@ -37,7 +37,6 @@ import { CtiRequestState, useCtiRequest } from '../hooks/use-cti-request';
 import { searchIocs } from '../services/cti-explorer-api';
 import type { CsvColumn } from '../services/export-csv';
 import {
-  formatDateTime,
   formatNumber,
   getConfidenceBandLabel,
   getIocTypeLabel,
@@ -47,6 +46,7 @@ import {
 } from '../utils/labels';
 import { NORMAL_FONT_WEIGHT, VISUALIZATION_TITLE_STYLE } from '../utils/styles';
 import { BreakdownList } from './breakdown-list';
+import { CatalogDate } from './catalog-date';
 import { ExportCsvButton } from './export-csv-button';
 import { RequestErrorCallout } from './request-error-callout';
 
@@ -467,7 +467,7 @@ const IocList = ({
         defaultMessage: 'First seen',
       }),
       sortable: true,
-      render: (value: string | null) => formatDateTime(value),
+      render: (value: string | null) => <CatalogDate value={value} />,
     },
     {
       field: 'lastSeen',
@@ -475,7 +475,7 @@ const IocList = ({
         defaultMessage: 'Last seen',
       }),
       sortable: true,
-      render: (value: string | null) => formatDateTime(value),
+      render: (value: string | null) => <CatalogDate value={value} />,
     },
   ];
 

@@ -53,6 +53,14 @@ characters, record ids in the `CVE-YYYY-NNNN` or `TID-NNNN` form, severities amo
 `medium`, `high` and `critical`, and vulnerability sort fields among `offset` and
 `document.cveMetadata.datePublished`.
 
+## Dates
+
+The dates of the catalog (published, updated, first seen, last seen) are those of public records,
+stored in UTC. They show as stored, in UTC, so a day never differs from the one the public source
+shows: only the day, written in the browser's locale. Hover a date to see the full timestamp,
+such as `2026-08-19 22:17:14 UTC`. The lists sort on the full timestamp, and **Export CSV** writes
+it as stored.
+
 ## Overview
 
 ### Checking a value
@@ -67,7 +75,9 @@ Type a domain, URL, IP address, host:port pair, file hash or CVE id and click **
     record** and **Hunt in Threat Hunting**.
   - A `CVE-…` id shows the CVE record with the columns of the Vulnerabilities tab (highest CVSS,
     publication date, assigner), and a `TID-…` id the translation rule with its patterns,
-    translations, rule actions and targets. Both offer **Open the record**.
+    translations, rule actions and targets. Both offer **Open the record**; a CVE record also
+    offers **Full advisory on cti.wazuh.com**, which opens its page on the CTI site in a new tab.
+    Translation rules have no page there.
 - A value that is not found is only absent from the catalog: it is not a verdict that the value is
   safe.
 
@@ -122,14 +132,23 @@ type and offset are searchable. The tab therefore:
   package, the `vendor:product` names it translates the package to, its actions and its target
   operating systems. **Export CSV** exports the same columns.
 - Opens any record by its full id, such as `CVE-2024-6387`. Free text cannot be searched.
+- Links the full advisory of each CVE record on the CTI site, with an icon in the **Actions**
+  column, while **CVE** is selected. Selecting a row opens the record in the flyout; the icon opens
+  only the CTI site, in a new tab.
 - Exports the listed records, of the selected type, with **Export CSV**: id, type, highest CVSS
   score, severity and version, dates, assigner and state of the CVE records, and the actions and
   targets of the translation rules. The same limit as the IOC export applies.
 
 A CVE record shows its state, dates, assigner, highest CVSS score, vendor ratings, weaknesses and
 affected products, with tabs for every affected product and version range, every score and its
-source, the references and the stored JSON. **Open in Vulnerability Detection** opens the
-inventory of the agents affected by the CVE.
+source, the references and the stored JSON.
+
+- **Full advisory on cti.wazuh.com**, the main action of the flyout, opens the page of the CVE on
+  the CTI site in a new tab.
+- The **Overview** tab links the **Vulnerability Detection** inventory of the agents affected by
+  the CVE, and shows the description of the record when it has one: English first, from the CNA
+  container, then from the ADP containers. The newest records of the feed come without a
+  description or references; nothing is shown in their place.
 
 A translation rule shows its actions, the operating systems it applies to, the vendor and product
 it matches, and what it translates them to.

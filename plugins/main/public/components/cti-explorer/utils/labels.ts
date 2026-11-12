@@ -1,7 +1,6 @@
 /* eslint-disable camelcase -- the keys are catalog values: document.type and document.software.type */
 import { i18n } from '@osd/i18n';
 import moment from 'moment-timezone';
-import { formatUIDate } from '../../../react-services/time-service';
 
 /** `document.type` → label. An unknown type shows as stored. */
 const IOC_TYPE_LABELS: Record<string, string> = {
@@ -94,27 +93,35 @@ export const formatNumber = (value: number): string =>
   numberFormat.format(value);
 
 /**
- * A date of the catalog with the `dateFormat` and `dateFormat:tz` advanced
- * settings, as every other date of the app. The catalog stores them in UTC,
- * so a value without an offset is read as UTC, not as the browser's time.
+ * A date of the catalog, stored in UTC: a value without an offset is read as
+ * UTC, not as the browser's time. `null` when missing or invalid.
  */
-export const formatDateTime = (value: string | null): string => {
+const parseCatalogDate = (value: string | null): moment.Moment | null => {
   const time = value ? moment.utc(value, moment.ISO_8601, true) : null;
-  return time?.isValid() ? formatUIDate(time.valueOf()) : '-';
+  return time?.isValid() ? time : null;
 };
 
-/** Only the day, where there is no room for the time: in the browser's locale, in UTC. */
+/**
+ * The dates of the catalog are those of public records (a CVE, an IOC
+ * report): they show as the record has them, in UTC, so a day never differs
+ * from the one the public source shows. Only the day, in the browser's locale:
+ * a time of day without its time zone would read as local time.
+ */
 const dayFormat = new Intl.DateTimeFormat(undefined, {
   year: 'numeric',
   month: 'short',
-  day: '2-digit',
+  day: 'numeric',
   timeZone: 'UTC',
 });
 
 export const formatDate = (value: string | null): string => {
-  const time = value ? Date.parse(value) : NaN;
-  return Number.isNaN(time) ? '-' : dayFormat.format(time);
+  const time = parseCatalogDate(value);
+  return time ? dayFormat.format(time.valueOf()) : '-';
 };
+
+/** The full date, unambiguous whatever the locale: `2026-08-19 22:17:14 UTC`. */
+export const formatUtcTimestamp = (value: string | null): string | null =>
+  parseCatalogDate(value)?.format('YYYY-MM-DD HH:mm:ss [UTC]') ?? null;
 
 /** Long hashes are cut in the middle in lists; the full value is in the tooltip. */
 export const shortenValue = (value: string, type: string): string =>
