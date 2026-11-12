@@ -12,23 +12,27 @@ jest.mock('@elastic/eui', () => ({
 }));
 
 jest.mock('../../../common/permissions/button', () => ({
-  WzButtonPermissions: ({ children }: { children?: React.ReactNode }) => (
-    <button>{children}</button>
-  ),
+  WzButtonPermissions: ({
+    children,
+    onClick,
+  }: {
+    children?: React.ReactNode;
+    onClick?: () => void;
+  }) => <button onClick={onClick}>{children}</button>,
 }));
 jest.mock('../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({ handleError: jest.fn() }),
 }));
 
-const renderEditor = (initialRule: object) =>
+const renderEditor = (initialRule: object, save = jest.fn()) =>
   render(
     <RuleEditor
-      save={jest.fn()}
+      save={save}
       initialRule={initialRule}
       isLoading={false}
       isReserved={false}
       internalUsers={[]}
-      currentPlatform=''
+      currentPlatform='OpenSearch Dashboards Security'
       onFormChange={jest.fn()}
     />,
   );
@@ -65,5 +69,57 @@ describe('RuleEditor JSON editor', () => {
 
     const props = mockCodeEditorProps.mock.lastCall[0];
     expect(props.setOptions.useWorker).toBe(false);
+  });
+});
+
+describe('RuleEditor new rules', () => {
+  const addRule = () =>
+    fireEvent.click(screen.getByRole('button', { name: 'Add new rule' }));
+
+  it('starts a new rule empty', () => {
+    renderEditor({});
+    addRule();
+
+    expect(screen.queryByText('user_name')).toBeNull();
+    expect(screen.queryByDisplayValue('wazuh')).toBeNull();
+    expect(
+      (screen.getByPlaceholderText('Value to match') as HTMLInputElement).value,
+    ).toBe('');
+  });
+
+  it('does not save a rule without user field', () => {
+    const save = jest.fn();
+    renderEditor({}, save);
+    addRule();
+    fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
+
+    expect(save).not.toHaveBeenCalled();
+    expect(screen.getByText('Select or type a user field.')).toBeTruthy();
+  });
+
+  it('asks for confirmation before saving an unknown user field', () => {
+    const save = jest.fn();
+    renderEditor({ FIND: { user_namebackend_roles: 'x' } }, save);
+    fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
+
+    expect(save).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(
+        /These fields are not known user fields.*user_namebackend_roles/,
+      ),
+    ).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save anyway' }));
+    expect(save).toHaveBeenCalledWith({
+      FIND: { user_namebackend_roles: 'x' },
+    });
+  });
+
+  it('saves a known user field without confirmation', () => {
+    const save = jest.fn();
+    renderEditor({ FIND: { backend_roles: 'x' } }, save);
+    fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
+
+    expect(save).toHaveBeenCalledWith({ FIND: { backend_roles: 'x' } });
   });
 });

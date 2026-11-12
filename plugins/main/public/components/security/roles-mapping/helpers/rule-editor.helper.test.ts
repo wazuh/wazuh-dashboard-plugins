@@ -1,4 +1,10 @@
-import { decodeJsonRule, getJsonFromRule, getSelectedUsersFromRules } from './rule-editor.helper';
+import {
+  decodeJsonRule,
+  getJsonFromRule,
+  getSelectedUsersFromRules,
+  getUnknownUserFields,
+  getUserFieldsFromRuleObject,
+} from './rule-editor.helper';
 const internalUsers = [{ user: 'admin' }, { user: 'test' }, { user: 'test2' }];
 
 const internalUsersRules = [
@@ -126,7 +132,10 @@ describe('Rule Editor Helper', () => {
         const json = JSON.stringify({
           OR: [
             {
-              AND: [{ find: { user_name: 'wazuh' } }, { find: { user_email: 'wazuh@wauzh' } }],
+              AND: [
+                { find: { user_name: 'wazuh' } },
+                { find: { user_email: 'wazuh@wauzh' } },
+              ],
             },
           ],
         });
@@ -143,7 +152,10 @@ describe('Rule Editor Helper', () => {
               OR: [{ foo: { bar: 10 } }],
             },
             {
-              AND: [{ find: { user_name: 'wazuh' } }, { find: { user_email: 'wazuh@wauzh' } }],
+              AND: [
+                { find: { user_name: 'wazuh' } },
+                { find: { user_email: 'wazuh@wauzh' } },
+              ],
             },
           ],
         });
@@ -172,7 +184,11 @@ describe('Rule Editor Helper', () => {
 
     describe('Given an array of custom rules and an array of internal users rules', () => {
       it('Should retuns the correct Json object', () => {
-        const JsonObject = getJsonFromRule(internalUsersRules, customRules, 'AND');
+        const JsonObject = getJsonFromRule(
+          internalUsersRules,
+          customRules,
+          'AND',
+        );
 
         expect(JsonObject).toEqual(bothRulesJsonObject);
       });
@@ -205,45 +221,51 @@ describe('Rule Editor Helper', () => {
   describe('Test role-mapping behavior', () => {
     describe('Given a non null rules array and non null internal users array ', () => {
       it('Should return OR array', () => {
-        const internalUsers = [{
-          searchOperation: "FIND",
-          user_field: "user_field",
-          value: "Test_User",
-        }];
-        const rules = [{
-          searchOperation: "FIND",
-          user_field: "user_field",
-          value: "wazuh",
-        }];
+        const internalUsers = [
+          {
+            searchOperation: 'FIND',
+            user_field: 'user_field',
+            value: 'Test_User',
+          },
+        ];
+        const rules = [
+          {
+            searchOperation: 'FIND',
+            user_field: 'user_field',
+            value: 'wazuh',
+          },
+        ];
 
         const expectedValues = {
-          "OR": [
-            {"OR": [{"FIND": {"user_field": "Test_User"}}]},
-            {"AND": [{"FIND": {"user_field": "wazuh"}}]}
-          ]
+          OR: [
+            { OR: [{ FIND: { user_field: 'Test_User' } }] },
+            { AND: [{ FIND: { user_field: 'wazuh' } }] },
+          ],
         };
 
-        const currentData = getJsonFromRule(internalUsers, rules, "AND");
+        const currentData = getJsonFromRule(internalUsers, rules, 'AND');
 
         expect(currentData).toEqual(expectedValues);
       });
     });
     describe('Given a null rules array and internal users array with one element', () => {
       it('Should return an object', () => {
-        const internalUsers = [{
-          searchOperation: "FIND",
-          user_field: "user_field",
-          value: "Test_User",
-        }];
+        const internalUsers = [
+          {
+            searchOperation: 'FIND',
+            user_field: 'user_field',
+            value: 'Test_User',
+          },
+        ];
         const rules = [];
 
         const expectedValues = {
-          "FIND": {
-            "user_field": "Test_User"
-          }
-        }
+          FIND: {
+            user_field: 'Test_User',
+          },
+        };
 
-        const currentData = getJsonFromRule(internalUsers, rules, "AND");
+        const currentData = getJsonFromRule(internalUsers, rules, 'AND');
 
         expect(currentData).toEqual(expectedValues);
       });
@@ -251,19 +273,21 @@ describe('Rule Editor Helper', () => {
     describe('Given a rules array with one element and null internal users array', () => {
       it('Should return an object', () => {
         const internalUsers = [];
-        const rules = [{
-          searchOperation: "FIND",
-          user_field: "user_field",
-          value: "wazuh",
-        }];
+        const rules = [
+          {
+            searchOperation: 'FIND',
+            user_field: 'user_field',
+            value: 'wazuh',
+          },
+        ];
 
         const expectedValues = {
-          "FIND": {
-            "user_field": "wazuh"
-          }
-        }
+          FIND: {
+            user_field: 'wazuh',
+          },
+        };
 
-        const currentData = getJsonFromRule(internalUsers, rules, "AND");
+        const currentData = getJsonFromRule(internalUsers, rules, 'AND');
 
         expect(currentData).toEqual(expectedValues);
       });
@@ -273,25 +297,25 @@ describe('Rule Editor Helper', () => {
         const internalUsers = [];
         const rules = [
           {
-            searchOperation: "FIND",
-            user_field: "user_name",
-            value: "wazuh",
+            searchOperation: 'FIND',
+            user_field: 'user_name',
+            value: 'wazuh',
           },
           {
-            searchOperation: "FIND",
-            user_field: "user_name2",
-            value: "wazuh",
+            searchOperation: 'FIND',
+            user_field: 'user_name2',
+            value: 'wazuh',
           },
         ];
 
         const expectedValues = {
-          "AND": [
-            {"FIND": {"user_name": "wazuh"}},
-            {"FIND": {"user_name2": "wazuh"}}
-          ]
-        }
+          AND: [
+            { FIND: { user_name: 'wazuh' } },
+            { FIND: { user_name2: 'wazuh' } },
+          ],
+        };
 
-        const currentData = getJsonFromRule(internalUsers, rules, "AND");
+        const currentData = getJsonFromRule(internalUsers, rules, 'AND');
 
         expect(currentData).toEqual(expectedValues);
       });
@@ -301,59 +325,97 @@ describe('Rule Editor Helper', () => {
         const internalUsers = [];
         const rules = [
           {
-            searchOperation: "FIND",
-            user_field: "user_name",
-            value: "wazuh",
+            searchOperation: 'FIND',
+            user_field: 'user_name',
+            value: 'wazuh',
           },
           {
-            searchOperation: "FIND",
-            user_field: "user_name2",
-            value: "wazuh",
+            searchOperation: 'FIND',
+            user_field: 'user_name2',
+            value: 'wazuh',
           },
         ];
 
         const expectedValues = {
-          "OR": [
-            {"FIND": {"user_name": "wazuh"}},
-            {"FIND": {"user_name2": "wazuh"}}
-          ]
-        }
+          OR: [
+            { FIND: { user_name: 'wazuh' } },
+            { FIND: { user_name2: 'wazuh' } },
+          ],
+        };
 
-        const currentData = getJsonFromRule(internalUsers, rules, "OR");
+        const currentData = getJsonFromRule(internalUsers, rules, 'OR');
 
         expect(currentData).toEqual(expectedValues);
       });
     });
     describe('Given a user rules array with two or more elements and null rules array', () => {
-      it('should return an object with one \'OR\' array with all items', () => {
+      it("should return an object with one 'OR' array with all items", () => {
         const internalUsers = [
           {
-            searchOperation: "FIND",
-            user_field: "user_name",
-            value: "Test_User",
+            searchOperation: 'FIND',
+            user_field: 'user_name',
+            value: 'Test_User',
           },
           {
-            searchOperation: "FIND",
-            user_field: "user_name",
-            value: "admin",
-          }];
-        
+            searchOperation: 'FIND',
+            user_field: 'user_name',
+            value: 'admin',
+          },
+        ];
+
         const rules = [];
 
-        const expectedValues = 
-        {
-          "OR": [
-            {"FIND": {"user_name": "Test_User"}},
-            {"FIND": {"user_name": "admin"}}
-          ]
-        }
+        const expectedValues = {
+          OR: [
+            { FIND: { user_name: 'Test_User' } },
+            { FIND: { user_name: 'admin' } },
+          ],
+        };
 
-        const currentData = getJsonFromRule(internalUsers, rules, "AND");
+        const currentData = getJsonFromRule(internalUsers, rules, 'AND');
 
         expect(currentData).toEqual(expectedValues);
       });
     });
+  });
+});
+describe('getUnknownUserFields', () => {
+  const known = ['user_name', 'backend_roles'];
 
+  it('returns nothing when every field is known', () => {
+    expect(getUnknownUserFields([{ user_field: 'user_name' }], known)).toEqual(
+      [],
+    );
   });
 
+  it('returns the distinct unknown and empty fields', () => {
+    expect(
+      getUnknownUserFields(
+        [
+          { user_field: 'user_namebackend_roles' },
+          { user_field: 'user_namebackend_roles' },
+          { user_field: '' },
+          { user_field: 'backend_roles' },
+        ],
+        known,
+      ),
+    ).toEqual(['user_namebackend_roles', '']);
+  });
+});
+
+describe('getUserFieldsFromRuleObject', () => {
+  it('collects the fields of nested rules', () => {
+    expect(
+      getUserFieldsFromRuleObject({
+        OR: [
+          { FIND: { user_name: 'admin' } },
+          { AND: [{ MATCH: { backend_roles: 'x' } }] },
+        ],
+      }),
+    ).toEqual([{ user_field: 'user_name' }, { user_field: 'backend_roles' }]);
+  });
+
+  it.each([null, 'text', {}, []])('ignores %p', rule => {
+    expect(getUserFieldsFromRuleObject(rule)).toEqual([]);
+  });
 });

@@ -19,13 +19,17 @@ import {
   EuiComboBox,
   EuiComboBoxOptionOption,
   EuiSpacer,
+  EuiConfirmModal,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import {
   getJsonFromRule,
   decodeJsonRule,
   getSelectedUsersFromRules,
+  getUnknownUserFields,
+  getUserFieldsFromRuleObject,
 } from '../helpers/rule-editor.helper';
+import { getRoleMappingUserFields } from '../../../../../common/services/role-mapping-fields';
 import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../../../common/constants';
 import 'brace/mode/json';
 import 'brace/snippets/json';
@@ -66,6 +70,9 @@ export const RuleEditor = ({
     EuiComboBoxOptionOption<any>[]
   >([]);
   const [initialLogicalOperator, setInitialLogicalOperator] = useState('OR');
+  const [showFieldErrors, setShowFieldErrors] = useState(false);
+  const [pendingRule, setPendingRule] = useState<object | null>(null);
+  const [unknownFields, setUnknownFields] = useState<string[]>([]);
 
   const searchOperationOptions = [
     { value: 'FIND', text: 'FIND' },
@@ -77,11 +84,15 @@ export const RuleEditor = ({
     currentPlatform === WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
       ? 'user_name'
       : 'username';
-  const default_rule = {
-    user_field: default_user_field,
+  const knownUserFields = getRoleMappingUserFields(
+    currentPlatform !== WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY,
+  );
+  const userFieldOptions = knownUserFields.map(label => ({ label }));
+  const getDefaultRule = () => ({
+    user_field: '',
     searchOperation: 'FIND',
-    value: 'wazuh',
-  };
+    value: '',
+  });
 
   useEffect(() => {
     if (initialRule) {
@@ -138,9 +149,9 @@ export const RuleEditor = ({
     setRules(rulesTmp);
   };
 
-  const updateUserField = (e, idx) => {
+  const updateUserField = (userField: string, idx) => {
     const rulesTmp = [...rules];
-    rulesTmp[idx].user_field = e.target.value;
+    rulesTmp[idx] = { ...rulesTmp[idx], user_field: userField.trim() };
     setRules(rulesTmp);
   };
 
@@ -178,6 +189,9 @@ export const RuleEditor = ({
       };
     }
   };
+  const isUnknownField = (field: string) =>
+    field ? !knownUserFields.includes(field) : showFieldErrors;
+
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
       return (
@@ -187,15 +201,51 @@ export const RuleEditor = ({
               <EuiFormRow
                 label={i18n.translate(
                   'wazuh.security.ruleEditor.userFieldLabel',
-                  { defaultMessage: 'User field' },
+                  {
+                    defaultMessage: 'User field',
+                  },
                 )}
+                isInvalid={isUnknownField(item.user_field)}
+                error={
+                  item.user_field
+                    ? i18n.translate(
+                        'wazuh.security.ruleEditor.unknownUserFieldWarning',
+                        {
+                          defaultMessage:
+                            'This is not a known user field, so the rule may never match.',
+                        },
+                      )
+                    : i18n.translate(
+                        'wazuh.security.ruleEditor.emptyUserFieldError',
+                        {
+                          defaultMessage: 'Select or type a user field.',
+                        },
+                      )
+                }
               >
-                <EuiFieldText
-                  disabled={isLoading || isReserved}
-                  placeholder=''
-                  value={item.user_field}
-                  onChange={e => updateUserField(e, idx)}
-                  aria-label=''
+                <EuiComboBox
+                  isDisabled={isLoading || isReserved}
+                  singleSelection={{ asPlainText: true }}
+                  placeholder={i18n.translate(
+                    'wazuh.security.ruleEditor.userFieldPlaceholder',
+                    {
+                      defaultMessage: 'Select or type a field',
+                    },
+                  )}
+                  options={userFieldOptions}
+                  selectedOptions={
+                    item.user_field ? [{ label: item.user_field }] : []
+                  }
+                  onChange={selected =>
+                    updateUserField(selected[0]?.label ?? '', idx)
+                  }
+                  onCreateOption={value => updateUserField(value, idx)}
+                  aria-label={i18n.translate(
+                    'wazuh.security.ruleEditor.userFieldLabel',
+                    {
+                      defaultMessage: 'User field',
+                    },
+                  )}
                 />
               </EuiFormRow>
             </EuiFlexItem>
@@ -203,7 +253,9 @@ export const RuleEditor = ({
               <EuiFormRow
                 label={i18n.translate(
                   'wazuh.security.ruleEditor.searchOperationLabel',
-                  { defaultMessage: 'Search operation' },
+                  {
+                    defaultMessage: 'Search operation',
+                  },
                 )}
               >
                 <EuiSelect
@@ -230,7 +282,12 @@ export const RuleEditor = ({
               >
                 <EuiFieldText
                   disabled={isLoading || isReserved}
-                  placeholder=''
+                  placeholder={i18n.translate(
+                    'wazuh.security.ruleEditor.valuePlaceholder',
+                    {
+                      defaultMessage: 'Value to match',
+                    },
+                  )}
                   value={item.value}
                   onChange={e => updateValueField(e, idx)}
                   aria-label=''
@@ -245,7 +302,9 @@ export const RuleEditor = ({
                 color='danger'
                 aria-label={i18n.translate(
                   'wazuh.security.ruleEditor.removeRuleAriaLabel',
-                  { defaultMessage: 'Remove rule' },
+                  {
+                    defaultMessage: 'Remove rule',
+                  },
                 )}
               />
             </EuiFlexItem>
@@ -264,7 +323,7 @@ export const RuleEditor = ({
 
   const addNewRule = () => {
     const rulesTmp = [...rules];
-    rulesTmp.push(default_rule);
+    rulesTmp.push(getDefaultRule());
     setRules(rulesTmp);
   };
 
@@ -324,15 +383,40 @@ export const RuleEditor = ({
   };
 
   const saveRule = () => {
+    let ruleToSave;
+    let customFields: { user_field: string }[];
     if (isJsonEditor) {
       // if json editor is empty
       if (ruleJson === '') {
         setRuleJson('{}');
       }
-      save(JSON.parse(ruleJson));
+      ruleToSave = JSON.parse(ruleJson);
+      customFields = getUserFieldsFromRuleObject(ruleToSave);
     } else {
-      save(getJsonFromRule(internalUserRules, rules, logicalOperator));
+      ruleToSave = getJsonFromRule(internalUserRules, rules, logicalOperator);
+      customFields = rules;
     }
+
+    const unknown = getUnknownUserFields(customFields, knownUserFields);
+    if (!isJsonEditor && unknown.includes('')) {
+      // A rule without user field can never be saved
+      setShowFieldErrors(true);
+      return;
+    }
+    if (unknown.length) {
+      setUnknownFields(unknown);
+      setPendingRule(ruleToSave);
+      return;
+    }
+    save(ruleToSave);
+  };
+
+  const closeUnknownFieldsModal = () => setPendingRule(null);
+
+  const confirmUnknownFieldsModal = () => {
+    const ruleToSave = pendingRule;
+    setPendingRule(null);
+    save(ruleToSave);
   };
 
   const onChangeSelectedUsers = selectedUsers => {
@@ -412,7 +496,9 @@ export const RuleEditor = ({
                   setOptions={{ useWorker: false }}
                   aria-label={i18n.translate(
                     'wazuh.security.ruleEditor.codeEditorAriaLabel',
-                    { defaultMessage: 'Code Editor' },
+                    {
+                      defaultMessage: 'Code Editor',
+                    },
                   )}
                 />
               )) || (
@@ -421,14 +507,18 @@ export const RuleEditor = ({
                     <h2>
                       {i18n.translate(
                         'wazuh.security.ruleEditor.internalUsersTitle',
-                        { defaultMessage: 'Map internal users' },
+                        {
+                          defaultMessage: 'Map internal users',
+                        },
                       )}
                     </h2>
                   </EuiTitle>
                   <EuiFormRow
                     label={i18n.translate(
                       'wazuh.security.ruleEditor.internalUsersLabel',
-                      { defaultMessage: 'Internal users' },
+                      {
+                        defaultMessage: 'Internal users',
+                      },
                     )}
                     helpText={i18n.translate(
                       'wazuh.security.ruleEditor.internalUsersHelpText',
@@ -456,7 +546,9 @@ export const RuleEditor = ({
                     <h2>
                       {i18n.translate(
                         'wazuh.security.ruleEditor.customRulesTitle',
-                        { defaultMessage: 'Custom rules' },
+                        {
+                          defaultMessage: 'Custom rules',
+                        },
                       )}
                     </h2>
                   </EuiTitle>
@@ -472,11 +564,15 @@ export const RuleEditor = ({
                         {logicalOperator === 'AND'
                           ? i18n.translate(
                               'wazuh.security.ruleEditor.logicalOperatorAnd',
-                              { defaultMessage: 'All are true' },
+                              {
+                                defaultMessage: 'All are true',
+                              },
                             )
                           : i18n.translate(
                               'wazuh.security.ruleEditor.logicalOperatorOr',
-                              { defaultMessage: 'Any are true' },
+                              {
+                                defaultMessage: 'Any are true',
+                              },
                             )}
                       </EuiButtonEmpty>
                     }
@@ -497,7 +593,9 @@ export const RuleEditor = ({
                             )}
                             {i18n.translate(
                               'wazuh.security.ruleEditor.logicalOperatorAnd',
-                              { defaultMessage: 'All are true' },
+                              {
+                                defaultMessage: 'All are true',
+                              },
                             )}
                           </EuiButtonEmpty>
                         </EuiFlexItem>
@@ -514,7 +612,9 @@ export const RuleEditor = ({
                             )}
                             {i18n.translate(
                               'wazuh.security.ruleEditor.logicalOperatorOr',
-                              { defaultMessage: 'Any are true' },
+                              {
+                                defaultMessage: 'Any are true',
+                              },
                             )}
                           </EuiButtonEmpty>
                         </EuiFlexItem>
@@ -543,13 +643,47 @@ export const RuleEditor = ({
               <EuiButtonEmpty color='primary' onClick={() => openJsonEditor()}>
                 {i18n.translate(
                   'wazuh.security.ruleEditor.switchToJsonEditor',
-                  { defaultMessage: 'Switch to JSON editor' },
+                  {
+                    defaultMessage: 'Switch to JSON editor',
+                  },
                 )}
               </EuiButtonEmpty>
             )}
           </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
+      {pendingRule && (
+        <EuiConfirmModal
+          title={i18n.translate(
+            'wazuh.security.ruleEditor.unknownFieldsModal.title',
+            {
+              defaultMessage: 'Unknown user fields',
+            },
+          )}
+          onCancel={closeUnknownFieldsModal}
+          onConfirm={confirmUnknownFieldsModal}
+          cancelButtonText={i18n.translate(
+            'wazuh.security.ruleEditor.unknownFieldsModal.cancelButton',
+            { defaultMessage: 'Cancel' },
+          )}
+          confirmButtonText={i18n.translate(
+            'wazuh.security.ruleEditor.unknownFieldsModal.confirmButton',
+            { defaultMessage: 'Save anyway' },
+          )}
+          defaultFocusedButton='cancel'
+        >
+          <p>
+            {i18n.translate(
+              'wazuh.security.ruleEditor.unknownFieldsModal.body',
+              {
+                defaultMessage:
+                  'These fields are not known user fields, so the rules using them may never match any user: {fields}',
+                values: { fields: unknownFields.join(', ') },
+              },
+            )}
+          </p>
+        </EuiConfirmModal>
+      )}
       <EuiFlexGroup style={{ marginTop: 6 }}>
         <EuiFlexItem></EuiFlexItem>
         <EuiFlexItem grow={false}>
