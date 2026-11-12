@@ -137,16 +137,12 @@ evidence under `### Results and Evidence`.
 > no link this way, since no issue reference is exposed in their PR body at
 > all — that is the expected privacy trade-off, not a gap to fix.
 >
-> There is **no REST or GraphQL API to create or manage this link directly**
-> — a documented, still-open gap in GitHub's public API. The closing keyword
-> above is the supported mechanism this skill uses. The only other way to
-> populate the Development section is to link a branch to the issue _before_
-> opening the PR (via the GitHub UI, or `gh issue develop <issue-number>`) —
-> any PR later opened from that branch is auto-linked regardless of its
-> description text. That's a heavier workflow change (branch creation, not
-> just PR body text) and isn't what this skill does today; it's noted here
-> only as the alternative to reach for if a closing keyword alone is ever
-> insufficient (e.g. it gets edited out of the PR description later).
+> The link can also be created with the GraphQL mutation `addCloseIssueReferences`
+> (issue and PR node ids), which does not depend on the PR description. The
+> `develop-issue` skill runs it right after creating the PR, so it links any issue,
+> internal ones included, without exposing a reference in the PR body. Only when
+> this skill is used on its own does the closing keyword remain the mechanism, and
+> then only for public issues. The link is created at PR creation, never later.
 
 **Default deliverable — pre-flight report.** Unless the user asked you to create the
 PR, stop here and output the filled body plus this report for the human to act on:
