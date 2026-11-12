@@ -76,7 +76,12 @@ describe('WzIndexerSettings', () => {
     fireEvent.click(toggle);
     expect(toggle).toBeChecked();
 
-    mockRequest.mockRejectedValueOnce({ response: { status: 403 } });
+    mockRequest.mockRejectedValueOnce({
+      response: {
+        status: 403,
+        data: { message: 'security_exception: no permissions' },
+      },
+    });
     fireEvent.click(screen.getByText('Save changes'));
 
     const noPermission =
@@ -112,5 +117,38 @@ describe('WzIndexerSettings', () => {
       expect(mockAddDanger).toHaveBeenCalledWith('Indexer unavailable'),
     );
     expect(toggle).not.toBeDisabled();
+  });
+
+  test('shows the reason of a 403 that is not a missing permission', async () => {
+    mockIsDisabled.mockReturnValue(false);
+    render(<WzIndexerSettings />);
+
+    const toggle = await screen.findByRole('switch');
+    fireEvent.click(toggle);
+
+    const blocked = 'cluster_block_exception: index read-only';
+    mockRequest.mockRejectedValueOnce({
+      response: { status: 403, data: { message: blocked } },
+    });
+    fireEvent.click(screen.getByText('Save changes'));
+
+    await waitFor(() => expect(mockAddDanger).toHaveBeenCalledWith(blocked));
+    expect(toggle).toBeChecked();
+    expect(toggle).not.toBeDisabled();
+  });
+
+  test('says the user cannot read the settings instead of the raw exception', async () => {
+    mockIsDisabled.mockReturnValue(false);
+    mockRequest.mockRejectedValueOnce(
+      new Error('security_exception: no permissions for [indices:data/read]'),
+    );
+    render(<WzIndexerSettings />);
+
+    expect(
+      await screen.findByText(
+        "You don't have permission to read indexer settings.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/security_exception/)).not.toBeInTheDocument();
   });
 });
