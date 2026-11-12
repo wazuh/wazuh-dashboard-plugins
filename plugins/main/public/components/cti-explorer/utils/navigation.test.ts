@@ -1,5 +1,6 @@
 import rison from 'rison-node';
 import {
+  getCtiCveUrl,
   getRulesetPageUrl,
   getThreatHuntingIocUrl,
   getVulnerabilityDetectionCveUrl,
@@ -60,6 +61,12 @@ describe('CTI Explorer navigation', () => {
       params: { query: 'CVE-2024-6387' },
       index: 'wazuh-states-vulnerabilities*',
     });
+  });
+
+  it('opens the full advisory of one CVE on the CTI site', () => {
+    expect(getCtiCveUrl('CVE-2026-76312')).toBe(
+      'https://cti.wazuh.com/vulnerabilities/cves/CVE-2026-76312',
+    );
   });
 
   it('opens Ruleset Management with the links of the Home page', () => {
