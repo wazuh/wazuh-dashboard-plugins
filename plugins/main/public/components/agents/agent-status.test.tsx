@@ -55,4 +55,33 @@ describe('AgentStatus component', () => {
       }
     },
   );
+
+  describe('Last seen in the info tip', () => {
+    const lastKeepAlive = new Date(Date.now() - 12 * 60 * 1000).toISOString();
+
+    test.each([
+      ['disconnected', lastKeepAlive, true],
+      ['disconnected', undefined, false],
+      ['active', lastKeepAlive, false],
+    ])(
+      '%s with lastKeepAlive %s shows last seen: %s',
+      async (status, date, shown) => {
+        rtlRender(
+          <AgentStatus
+            status={status as any}
+            agent={{ status_code: 3, lastKeepAlive: date } as any}
+          />,
+        );
+
+        fireEvent.focus(screen.getByLabelText('Description'));
+        await screen.findByText('Last change: Shutdown message received');
+        const lastSeen = screen.queryByText('Last seen: 12 minutes ago');
+        if (shown) {
+          expect(lastSeen).toBeInTheDocument();
+        } else {
+          expect(lastSeen).toBeNull();
+        }
+      },
+    );
+  });
 });
