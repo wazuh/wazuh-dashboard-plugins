@@ -10,15 +10,15 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
   platform: string = WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY;
   // Keys of the response of the security plugin account API
   authContextFields: string[] = [
-    'user_name',
-    'is_reserved',
-    'is_hidden',
-    'is_internal_user',
-    'user_requested_tenant',
     'backend_roles',
     'custom_attribute_names',
-    'tenants',
+    'is_hidden',
+    'is_internal_user',
+    'is_reserved',
     'roles',
+    'tenants',
+    'user_name',
+    'user_requested_tenant',
   ];
   constructor() {}
 

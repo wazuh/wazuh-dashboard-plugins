@@ -21,4 +21,13 @@ describe('security factories authContextFields', () => {
       ]),
     );
   });
+
+  it.each([
+    ['default', () => new DefaultFactory()],
+    ['security plugin', () => new OpenSearchDashboardsSecurityFactory()],
+  ])('sorts alphabetically the fields of the %s factory', (_name, create) => {
+    const { authContextFields } = create();
+
+    expect(authContextFields).toEqual([...authContextFields].sort());
+  });
 });
