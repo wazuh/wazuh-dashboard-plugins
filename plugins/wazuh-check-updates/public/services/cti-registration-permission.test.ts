@@ -22,7 +22,10 @@ describe('fetchCtiRegistrationPermission', () => {
 
     await fetchCtiRegistrationPermission();
 
-    expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationPermission);
+    expect(mockHttpGet).toHaveBeenCalledWith(
+      routes.ctiRegistrationPermission,
+      undefined,
+    );
   });
 
   test('passes a denial through with its missing privileges', async () => {
@@ -66,6 +69,46 @@ describe('fetchCtiRegistrationPermission', () => {
 
     await expect(fetchCtiRegistrationPermission()).resolves.toEqual({
       accessAllowed: true,
+      missingPrivileges: [],
+    });
+  });
+});
+
+describe('fetchCtiRegistrationPermission for clear', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getCore as jest.Mock).mockReturnValue({ http: { get: mockHttpGet } });
+  });
+
+  test('asks for the clear action', async () => {
+    mockHttpGet.mockResolvedValue({
+      accessAllowed: true,
+      missingPrivileges: [],
+    });
+
+    await expect(fetchCtiRegistrationPermission('clear')).resolves.toEqual({
+      accessAllowed: true,
+      missingPrivileges: [],
+    });
+    expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationPermission, {
+      query: { action: 'clear' },
+    });
+  });
+
+  test('fails closed on an unreadable body', async () => {
+    mockHttpGet.mockResolvedValue({});
+
+    await expect(fetchCtiRegistrationPermission('clear')).resolves.toEqual({
+      accessAllowed: false,
+      missingPrivileges: [],
+    });
+  });
+
+  test('fails closed when the request rejects', async () => {
+    mockHttpGet.mockRejectedValue(new Error('network down'));
+
+    await expect(fetchCtiRegistrationPermission('clear')).resolves.toEqual({
+      accessAllowed: false,
       missingPrivileges: [],
     });
   });

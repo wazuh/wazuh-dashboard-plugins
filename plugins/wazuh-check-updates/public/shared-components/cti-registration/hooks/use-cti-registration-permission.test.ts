@@ -115,4 +115,44 @@ describe('useCtiRegistrationPermission', () => {
     expect(consoleError).not.toHaveBeenCalled();
     consoleError.mockRestore();
   });
+
+  describe('clear action', () => {
+    test('probes the clear action', async () => {
+      const { result } = renderHook(() =>
+        useCtiRegistrationPermission(true, 'clear'),
+      );
+
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(mockedFetchCtiRegistrationPermission).toHaveBeenCalledWith(
+        'clear',
+      );
+      expect(result.current.accessAllowed).toBe(true);
+    });
+
+    test('reads as denied until the probe answers', () => {
+      mockedFetchCtiRegistrationPermission.mockReturnValue(
+        new Promise(() => undefined),
+      );
+
+      const { result } = renderHook(() =>
+        useCtiRegistrationPermission(true, 'clear'),
+      );
+
+      expect(result.current).toEqual({
+        loading: true,
+        accessAllowed: false,
+        missingPrivileges: [],
+      });
+    });
+
+    test('reads as denied when disabled', async () => {
+      const { result } = renderHook(() =>
+        useCtiRegistrationPermission(false, 'clear'),
+      );
+
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.accessAllowed).toBe(false);
+      expect(mockedFetchCtiRegistrationPermission).not.toHaveBeenCalled();
+    });
+  });
 });

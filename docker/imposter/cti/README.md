@@ -22,6 +22,56 @@ The response depends on the request body:
 Both `application/x-www-form-urlencoded` and `application/json` request
 bodies are accepted.
 
+### CTI Console (plan of the registered environment)
+
+The indexer Content Manager calls these with the stored access token to read
+the plan. Point the indexer at the mock to use them (see
+[Pointing the indexer at this mock](#pointing-the-indexer-at-this-mock)).
+
+```
+GET /api/v1/platform/environments/me
+GET /api/v1/catalog/plans
+```
+
+`environments/me` returns the environment name, its organization, its
+registration date, the active plan and the subscriptions paying for it:
+
+```json
+{
+  "name": "environment-01",
+  "organization": { "name": "Acme Corp" },
+  "registered_at": "2026-03-01T10:00:00Z",
+  "plans": [{ "name": "Professional", "is_public": false, "features": [] }],
+  "subscriptions": [
+    {
+      "plan": "Professional",
+      "interval": "year",
+      "started_at": "2026-03-01T10:00:00Z",
+      "renews_at": "2027-03-01T10:00:00Z",
+      "expires_at": null
+    }
+  ]
+}
+```
+
+The indexer does not forward any mock header, so store the scenario in the
+mock:
+
+```bash
+curl -X POST http://imposter:8080/mock/cti/environment/scenario -d 'scenario=canceling'
+```
+
+| Scenario                 | Answer                                                                       |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| `professional` (default) | The Professional plan and its yearly subscription, which renews.             |
+| `canceling`              | The same subscription set to end: `renews_at: null`, `expires_at` set.       |
+| `open`                   | The public plan and no subscription.                                         |
+| `token_rejected`         | `401`: the indexer clears its credentials and falls back to the public plan. |
+| `unavailable`            | `503`: the indexer keeps the registration and answers its GET with `502`.    |
+
+`default` restores `professional`. `catalog/plans` always returns the Open
+(public) and Professional plans.
+
 ### Content Manager (`/_plugins/_content_manager/subscription`)
 
 **Not mocked here.** The dashboard calls those paths on the **OpenSearch
@@ -64,10 +114,13 @@ completes on the next polls.
 - `cti-config.yml` — Imposter resource configuration.
 - `token.js` — Dispatch logic (body parsing, scenario selection, poll counter).
 - `scenario.js` — Stores the scenario used when no `X-Mock-Scenario` header is sent.
+- `environment.js` — Answers `GET /api/v1/platform/environments/me` for the stored scenario.
+- `environment-scenario.js` — Stores the `environments/me` scenario.
+- `responses/catalog_plans.json` — Answer of `GET /api/v1/catalog/plans`.
 
 > **Note:** Imposter scripts run on **Nashorn (ES5 only)**. Avoid trailing
 > commas in function calls, `const`/`let`, arrow functions, template literals,
-> destructuring and any other ES2015+ syntax in `token.js` and `scenario.js`.
+> destructuring and any other ES2015+ syntax in the `*.js` scripts.
 
 ## Topology
 
@@ -111,3 +164,23 @@ The setting is absent from the shipped configuration file, so without it the
 device flow keeps going to the default CTI environment. Only the `http` and
 `https` schemes are accepted; an invalid value stops the dashboard at startup.
 A restart is required for a change to take effect.
+
+## Pointing the indexer at this mock
+
+The indexer Content Manager reads the CTI API base from the
+`plugins.content_manager.cti.api` setting in `opensearch.yml` (default: the
+`pre` CTI environment). To read the plan from this mock:
+
+```yml
+plugins.content_manager.cti.api: 'http://imposter:8080/api/v1'
+```
+
+Restart the indexer afterwards. Then `GET /_plugins/_content_manager/subscription`
+reports the plan of the stored `environments/me` scenario once a token is
+registered, and the dashboard status route
+(`GET /api/wazuh-check-updates/cti-registration/status`) passes the identity and
+the dates through when the indexer returns them.
+
+The catalog content endpoints (consumers, changes, snapshots) are **not**
+mocked: content sync fails while the indexer points at the mock. Point it back
+at the real CTI API to sync content.

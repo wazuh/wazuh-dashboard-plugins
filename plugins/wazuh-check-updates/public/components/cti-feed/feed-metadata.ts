@@ -72,3 +72,21 @@ export function sortFeeds(consumers: CtiConsumer[]): CtiConsumer[] {
       a.name.localeCompare(b.name),
   );
 }
+
+const OPEN_CATALOG = i18n.translate(
+  'wazuhCheckUpdates.ctiFeed.feeds.catalog.open',
+  { defaultMessage: 'Open catalog' },
+);
+
+const PROFESSIONAL_CATALOG = i18n.translate(
+  'wazuhCheckUpdates.ctiFeed.feeds.catalog.professional',
+  { defaultMessage: 'Professional catalog' },
+);
+
+/**
+ * Which catalog the indexer installed for the feed: the public consumers come with the
+ * Open feed, the private ones with the Professional feed.
+ */
+export function getFeedCatalogLabel(consumer: CtiConsumer): string {
+  return consumer.is_public ? OPEN_CATALOG : PROFESSIONAL_CATALOG;
+}

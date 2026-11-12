@@ -17,3 +17,12 @@ export interface CtiRegistrationPermissionApiBody {
   /** Privileges the current user is missing, as reported by the indexer. */
   missingPrivileges: string[];
 }
+
+/**
+ * Subscription action the probe evaluates, sent as the `action` query parameter:
+ * `register` (default) probes `POST …/subscription`, `clear` probes `DELETE …/subscription`.
+ */
+export type CtiRegistrationPermissionAction = 'register' | 'clear';
+
+export const CTI_REGISTRATION_PERMISSION_ACTIONS: readonly CtiRegistrationPermissionAction[] =
+  ['register', 'clear'];

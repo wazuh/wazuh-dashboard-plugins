@@ -1,0 +1,14 @@
+{
+  "plans": [
+    {
+      "name": "Open",
+      "is_public": true,
+      "features": []
+    },
+    {
+      "name": "Professional",
+      "is_public": false,
+      "features": []
+    }
+  ]
+}

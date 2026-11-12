@@ -70,3 +70,14 @@
     overflow-wrap: break-word;
   }
 }
+
+// Subscription details: short labels, the environment ID keeps one line or wraps
+// anywhere on a narrow card.
+.ctiFeed__subscriptionDetails .euiDescriptionList__description {
+  overflow-wrap: anywhere;
+}
+
+.ctiFeed__environmentId {
+  font-family: $euiCodeFontFamily;
+  font-size: $euiFontSizeS;
+}

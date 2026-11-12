@@ -23,3 +23,26 @@ resources:
     path: /mock/cti/scenario
     response:
       scriptFile: scenario.js
+
+  # Plan of the registered environment, read by the indexer Content Manager
+  # with the stored access token (see environment.js).
+  - method: GET
+    path: /api/v1/platform/environments/me
+    response:
+      scriptFile: environment.js
+
+  # Mock-only control endpoint: stores the `environments/me` scenario (see
+  # environment-scenario.js).
+  - method: POST
+    path: /mock/cti/environment/scenario
+    response:
+      scriptFile: environment-scenario.js
+
+  # Public plans, read by the indexer while it is not registered.
+  - method: GET
+    path: /api/v1/catalog/plans
+    response:
+      statusCode: 200
+      file: responses/catalog_plans.json
+      headers:
+        Content-Type: application/json
