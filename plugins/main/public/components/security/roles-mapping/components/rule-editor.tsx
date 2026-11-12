@@ -21,6 +21,7 @@ import {
   EuiSpacer,
   EuiConfirmModal,
   EuiCallOut,
+  EuiCode,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import {
@@ -704,11 +705,19 @@ export const RuleEditor = ({
               'wazuh.security.ruleEditor.unknownFieldsModal.body',
               {
                 defaultMessage:
-                  'These fields are not known auth context fields, so the rules using them may never match any user: {fields}',
-                values: { fields: unknownFields.join(', ') },
+                  '{count, plural, one {This field is not a known auth context field, so the rules using it may never match any user:} other {These fields are not known auth context fields, so the rules using them may never match any user:}}',
+                values: { count: unknownFields.length },
               },
             )}
           </p>
+          <EuiSpacer size='s' />
+          <ul>
+            {unknownFields.map(field => (
+              <li key={field}>
+                <EuiCode>{field}</EuiCode>
+              </li>
+            ))}
+          </ul>
         </EuiConfirmModal>
       )}
       <EuiFlexGroup style={{ marginTop: 6 }}>

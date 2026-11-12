@@ -113,15 +113,31 @@ describe('RuleEditor new rules', () => {
 
     expect(save).not.toHaveBeenCalled();
     expect(
-      screen.getByText(
-        /These fields are not known auth context fields.*user_namebackend_roles/,
-      ),
+      screen.getByText(/This field is not a known auth context field/),
     ).toBeTruthy();
+    expect(screen.getByRole('listitem').textContent).toBe(
+      'user_namebackend_roles',
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Save anyway' }));
     expect(save).toHaveBeenCalledWith({
       FIND: { user_namebackend_roles: 'x' },
     });
+  });
+
+  it('lists every unknown auth context field in the confirmation', () => {
+    renderEditor({
+      AND: [{ FIND: { usr_name: 'x' } }, { MATCH: { foo: 'y' } }],
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
+
+    expect(
+      screen.getByText(/These fields are not known auth context fields/),
+    ).toBeTruthy();
+    expect(screen.getAllByRole('listitem').map(li => li.textContent)).toEqual([
+      'usr_name',
+      'foo',
+    ]);
   });
 
   it('saves a known auth context field without confirmation', () => {
