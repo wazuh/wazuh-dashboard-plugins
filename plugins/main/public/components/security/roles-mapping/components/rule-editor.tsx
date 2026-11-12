@@ -29,7 +29,6 @@ import {
   getUnknownUserFields,
   getUserFieldsFromRuleObject,
 } from '../helpers/rule-editor.helper';
-import { getRoleMappingUserFields } from '../../../../../common/services/role-mapping-fields';
 import { WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY } from '../../../../../common/constants';
 import 'brace/mode/json';
 import 'brace/snippets/json';
@@ -46,6 +45,7 @@ export const RuleEditor = ({
   isReserved,
   internalUsers,
   currentPlatform,
+  userFields = [],
   onFormChange,
   saveButtonPermissions = [],
 }) => {
@@ -84,9 +84,9 @@ export const RuleEditor = ({
     currentPlatform === WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY
       ? 'user_name'
       : 'username';
-  const knownUserFields = getRoleMappingUserFields(
-    currentPlatform !== WAZUH_SECURITY_PLUGIN_OPENSEARCH_DASHBOARDS_SECURITY,
-  );
+  // Without the list of known fields (not loaded yet) no field can be judged
+  const knownUserFields: string[] = userFields;
+  const hasKnownUserFields = knownUserFields.length > 0;
   const userFieldOptions = knownUserFields.map(label => ({ label }));
   const getDefaultRule = () => ({
     user_field: '',
@@ -190,7 +190,9 @@ export const RuleEditor = ({
     }
   };
   const isUnknownField = (field: string) =>
-    field ? !knownUserFields.includes(field) : showFieldErrors;
+    field
+      ? hasKnownUserFields && !knownUserFields.includes(field)
+      : showFieldErrors;
 
   const printRules = () => {
     const rulesList = rules.map((item, idx) => {
@@ -397,7 +399,9 @@ export const RuleEditor = ({
       customFields = rules;
     }
 
-    const unknown = getUnknownUserFields(customFields, knownUserFields);
+    const unknown = getUnknownUserFields(customFields, knownUserFields).filter(
+      field => field === '' || hasKnownUserFields,
+    );
     if (!isJsonEditor && unknown.includes('')) {
       // A rule without user field can never be saved
       setShowFieldErrors(true);

@@ -19,6 +19,7 @@ import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
 import { useSelector } from 'react-redux';
+import { getWazuhCorePlugin } from '../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
@@ -38,6 +39,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
     {},
   );
   const [internalUsers, setInternalUsers] = useState([]);
+  const [userFields, setUserFields] = useState<string[]>([]);
   const currentPlatform = useSelector(
     (state: any) => state.appStateReducers.currentPlatform,
   );
@@ -125,6 +127,13 @@ export const RolesMapping = withUserAuthorizationPrompt([
     }
   };
 
+  useEffect(() => {
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchAuthContextFields()
+      .then(setUserFields)
+      .catch(() => {});
+  }, []);
+
   const initData = async () => {
     await getData();
     if (currentPlatform) {
@@ -157,6 +166,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         internalUsers={internalUsers}
         onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
+        userFields={userFields}
       />
     );
   }
@@ -170,6 +180,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         internalUsers={internalUsers}
         onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
+        userFields={userFields}
       />
     );
   }

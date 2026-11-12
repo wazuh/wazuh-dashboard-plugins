@@ -18,6 +18,11 @@ type CurrentUser = {
 
 export interface ISecurityFactory {
   platform?: string;
+  /**
+   * Keys of the `authContext` returned by `getCurrentUser`, which are the
+   * user fields that the role mapping rules can match.
+   */
+  authContextFields: string[];
   getCurrentUser(
     request: OpenSearchDashboardsRequest,
     context?: RequestHandlerContext,

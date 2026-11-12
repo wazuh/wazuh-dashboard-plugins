@@ -24,7 +24,13 @@ jest.mock('../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({ handleError: jest.fn() }),
 }));
 
-const renderEditor = (initialRule: object, save = jest.fn()) =>
+const userFields = ['user_name', 'backend_roles'];
+
+const renderEditor = (
+  initialRule: object,
+  save = jest.fn(),
+  fields: string[] = userFields,
+) =>
   render(
     <RuleEditor
       save={save}
@@ -33,6 +39,7 @@ const renderEditor = (initialRule: object, save = jest.fn()) =>
       isReserved={false}
       internalUsers={[]}
       currentPlatform='OpenSearch Dashboards Security'
+      userFields={fields}
       onFormChange={jest.fn()}
     />,
   );
@@ -121,5 +128,13 @@ describe('RuleEditor new rules', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
 
     expect(save).toHaveBeenCalledWith({ FIND: { backend_roles: 'x' } });
+  });
+
+  it('does not judge the fields while the known fields are not available', () => {
+    const save = jest.fn();
+    renderEditor({ FIND: { anything: 'x' } }, save, []);
+    fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
+
+    expect(save).toHaveBeenCalledWith({ FIND: { anything: 'x' } });
   });
 });
