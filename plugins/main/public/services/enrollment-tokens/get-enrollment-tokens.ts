@@ -52,3 +52,22 @@ export const getEnrollmentTokens = async (
 
   return { tokens, total };
 };
+
+/**
+ * Find one token by its id, or `undefined` when the manager does not list it.
+ *
+ * The id is matched with `q`, which compares whole values, rather than with
+ * `search`: a search term that starts with `-` is read as an exclusion, and a
+ * base64url id can start with one. The answer is checked again here so that
+ * only an exact match is reported.
+ */
+export const getEnrollmentToken = async (
+  id: string,
+): Promise<EnrollmentTokenSummary | undefined> => {
+  const response = (await WzRequest.apiReq('GET', ENROLLMENT_TOKENS_ENDPOINT, {
+    params: { q: `id=${id}`, limit: 1 },
+  })) as IApiResponse<EnrollmentTokenSummary>;
+  return (response?.data?.data?.affected_items ?? []).find(
+    token => token.id === id,
+  );
+};

@@ -1004,7 +1004,8 @@ $wzMsgAvatarColumn: 40px;
 // The privacy explainer is two or three sentences. Inside a popover with no measure of its own it
 // would either run the full width EUI allows or wrap to a sliver, depending on the anchor's room —
 // so it gets an explicit reading measure, capped to the viewport for the narrow docked sidecar.
-.wzPrivacyHelpPanel {
+.wzPrivacyHelpPanel,
+.wzHelpPanel {
   max-inline-size: min(360px, 80vw);
 }
 
@@ -1058,4 +1059,18 @@ $wzMsgAvatarColumn: 40px;
 .wzAiAssistantTitleTooltipAnchor {
   overflow: hidden;
   min-width: 0;
+}
+
+/* No-provider prompt (no-provider-prompt.tsx): the welcome cluster's own measure and 16px
+   rhythm; the text keeps EuiEmptyPrompt's 36em measure. */
+.wzNoProviderPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: $wzWelcomeGroupMaxWidth;
+  margin-inline: auto;
+}
+
+.wzNoProviderPrompt__text {
+  max-width: 36em;
 }
