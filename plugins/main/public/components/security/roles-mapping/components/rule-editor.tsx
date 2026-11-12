@@ -204,7 +204,7 @@ export const RuleEditor = ({
                 label={i18n.translate(
                   'wazuh.security.ruleEditor.userFieldLabel',
                   {
-                    defaultMessage: 'User field',
+                    defaultMessage: 'Auth context field',
                   },
                 )}
                 isInvalid={isUnknownField(item.user_field)}
@@ -214,13 +214,14 @@ export const RuleEditor = ({
                         'wazuh.security.ruleEditor.unknownUserFieldWarning',
                         {
                           defaultMessage:
-                            'This is not a known user field, so the rule may never match.',
+                            'This is not a known auth context field, so the rule may never match.',
                         },
                       )
                     : i18n.translate(
                         'wazuh.security.ruleEditor.emptyUserFieldError',
                         {
-                          defaultMessage: 'Select or type a user field.',
+                          defaultMessage:
+                            'Select or type an auth context field.',
                         },
                       )
                 }
@@ -231,7 +232,7 @@ export const RuleEditor = ({
                   placeholder={i18n.translate(
                     'wazuh.security.ruleEditor.userFieldPlaceholder',
                     {
-                      defaultMessage: 'Select or type a field',
+                      defaultMessage: 'Select or type an auth context field',
                     },
                   )}
                   options={userFieldOptions}
@@ -245,7 +246,7 @@ export const RuleEditor = ({
                   aria-label={i18n.translate(
                     'wazuh.security.ruleEditor.userFieldLabel',
                     {
-                      defaultMessage: 'User field',
+                      defaultMessage: 'Auth context field',
                     },
                   )}
                 />
@@ -661,7 +662,7 @@ export const RuleEditor = ({
           title={i18n.translate(
             'wazuh.security.ruleEditor.unknownFieldsModal.title',
             {
-              defaultMessage: 'Unknown user fields',
+              defaultMessage: 'Unknown auth context fields',
             },
           )}
           onCancel={closeUnknownFieldsModal}
@@ -681,7 +682,7 @@ export const RuleEditor = ({
               'wazuh.security.ruleEditor.unknownFieldsModal.body',
               {
                 defaultMessage:
-                  'These fields are not known user fields, so the rules using them may never match any user: {fields}',
+                  'These fields are not known auth context fields, so the rules using them may never match any user: {fields}',
                 values: { fields: unknownFields.join(', ') },
               },
             )}

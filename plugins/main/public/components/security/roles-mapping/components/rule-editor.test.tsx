@@ -94,17 +94,19 @@ describe('RuleEditor new rules', () => {
     ).toBe('');
   });
 
-  it('does not save a rule without user field', () => {
+  it('does not save a rule without auth context field', () => {
     const save = jest.fn();
     renderEditor({}, save);
     addRule();
     fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
 
     expect(save).not.toHaveBeenCalled();
-    expect(screen.getByText('Select or type a user field.')).toBeTruthy();
+    expect(
+      screen.getByText('Select or type an auth context field.'),
+    ).toBeTruthy();
   });
 
-  it('asks for confirmation before saving an unknown user field', () => {
+  it('asks for confirmation before saving an unknown auth context field', () => {
     const save = jest.fn();
     renderEditor({ FIND: { user_namebackend_roles: 'x' } }, save);
     fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
@@ -112,7 +114,7 @@ describe('RuleEditor new rules', () => {
     expect(save).not.toHaveBeenCalled();
     expect(
       screen.getByText(
-        /These fields are not known user fields.*user_namebackend_roles/,
+        /These fields are not known auth context fields.*user_namebackend_roles/,
       ),
     ).toBeTruthy();
 
@@ -122,7 +124,7 @@ describe('RuleEditor new rules', () => {
     });
   });
 
-  it('saves a known user field without confirmation', () => {
+  it('saves a known auth context field without confirmation', () => {
     const save = jest.fn();
     renderEditor({ FIND: { backend_roles: 'x' } }, save);
     fireEvent.click(screen.getByRole('button', { name: 'Save role mapping' }));
