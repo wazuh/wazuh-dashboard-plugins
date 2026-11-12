@@ -94,6 +94,17 @@ describe('FeedSyncPanel', () => {
       .forEach(badge => expect(badge).toHaveTextContent('Up to date'));
   });
 
+  test('names the catalog each feed comes from', () => {
+    renderPanel([
+      consumer({ name: 'private-ruleset-5', is_public: false }),
+      consumer({ name: 'public-iocs-5', type: 'cti:catalog:consumer:iocs' }),
+    ]);
+
+    expect(
+      screen.getAllByTestId('ctiFeedCatalog').map(label => label.textContent),
+    ).toEqual(['Professional catalog', 'Open catalog']);
+  });
+
   test('shows the progress of a feed that is syncing', () => {
     renderPanel([
       consumer({ status: 'running', local_offset: 40, remote_offset: 80 }),

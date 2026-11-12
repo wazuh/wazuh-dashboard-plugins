@@ -20,7 +20,11 @@ import {
   FeedSyncSummary,
   getConsumerSyncState,
 } from '../../services/cti-consumer-sync-state';
-import { getFeedMetadata, sortFeeds } from './feed-metadata';
+import {
+  getFeedCatalogLabel,
+  getFeedMetadata,
+  sortFeeds,
+} from './feed-metadata';
 import { FeedSyncBadge } from './feed-sync-badge';
 import { FeedDetailsFlyout } from './feed-details-flyout';
 import { CtiTimestamp } from './cti-timestamp';
@@ -161,6 +165,9 @@ const FeedRow: React.FC<{ consumer: CtiConsumer; onOpen: () => void }> = ({
           </EuiText>
           <EuiText size='xs' color='subdued'>
             {metadata.description}
+          </EuiText>
+          <EuiText size='xs' color='subdued' data-test-subj='ctiFeedCatalog'>
+            {getFeedCatalogLabel(consumer)}
           </EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>

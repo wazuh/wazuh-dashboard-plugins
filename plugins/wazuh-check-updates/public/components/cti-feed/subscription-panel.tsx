@@ -12,10 +12,13 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { statusCodes } from '../../../common/constants';
+import { statusCodes, WAZUH_CTI_CONSOLE_HREF } from '../../../common/constants';
 import type { CtiSubscriptionPlan } from '../../../common/cti-registration-status-api';
 import { ctiFlowState } from '../../services/cti-flow-state';
 import { ISubscriptionResponse } from '../../services/types';
+import { useCtiRegistrationPermission } from '../../shared-components/cti-registration/hooks/use-cti-registration-permission';
+import { SubscriptionDetails } from './subscription-details';
+import { RegistrationOptions } from './registration-options';
 
 type SubscriptionState = 'registered' | 'pending' | 'failed' | 'notRegistered';
 
@@ -86,11 +89,19 @@ function getSubscriptionView(
                   'This environment is registered with Wazuh Cyber Threat Intelligence and receives the Open feed. Upgrade it to the Professional feed from the Wazuh Console to get vulnerabilities, IOCs and rules with no delay.',
               },
             )
-          : i18n.translate(
+          : plan?.name
+          ? i18n.translate(
               'wazuhCheckUpdates.ctiFeed.subscription.registeredDescription',
               {
+                defaultMessage: 'This environment is on the {planName} feed.',
+                values: { planName: plan.name },
+              },
+            )
+          : i18n.translate(
+              'wazuhCheckUpdates.ctiFeed.subscription.registeredNoPlanDescription',
+              {
                 defaultMessage:
-                  'This environment is registered with Wazuh Cyber Threat Intelligence. Manage the subscription and upgrade the plan from the Wazuh Console.',
+                  'This environment is registered with Wazuh Cyber Threat Intelligence.',
               },
             ),
         fillAction: false,
@@ -247,6 +258,8 @@ export interface SubscriptionPanelProps {
   loading: boolean;
   deviceFlowActive: boolean;
   onOpenRegistration: () => void;
+  /** Called once the local registration was cleared, to refresh the page. */
+  onRegistrationCleared: () => void;
 }
 
 export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
@@ -254,12 +267,17 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
   loading,
   deviceFlowActive,
   onOpenRegistration,
+  onRegistrationCleared,
 }) => {
   const state = getSubscriptionState(statusCTI, deviceFlowActive);
-  const view = getSubscriptionView(
-    state,
-    ctiFlowState.getSubscription()?.message?.plan,
-  );
+  const subscriptionMessage = ctiFlowState.getSubscription()?.message;
+  const view = getSubscriptionView(state, subscriptionMessage?.plan);
+  const registered = state === 'registered';
+  // Only a registration the indexer holds can be cleared.
+  const clearable = registered && Boolean(subscriptionMessage?.is_registered);
+  const clearPermission = useCtiRegistrationPermission(clearable, 'clear');
+  const showOptions =
+    clearable && !clearPermission.loading && clearPermission.accessAllowed;
 
   return (
     <EuiPanel
@@ -268,13 +286,27 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
       className='ctiFeed__panel'
       data-test-subj='ctiFeedSubscriptionPanel'
     >
-      <EuiTitle size='xs'>
-        <h2>
-          {i18n.translate('wazuhCheckUpdates.ctiFeed.subscription.title', {
-            defaultMessage: 'Subscription',
-          })}
-        </h2>
-      </EuiTitle>
+      <EuiFlexGroup
+        justifyContent='spaceBetween'
+        alignItems='center'
+        gutterSize='s'
+        responsive={false}
+      >
+        <EuiFlexItem>
+          <EuiTitle size='xs'>
+            <h2>
+              {i18n.translate('wazuhCheckUpdates.ctiFeed.subscription.title', {
+                defaultMessage: 'Subscription',
+              })}
+            </h2>
+          </EuiTitle>
+        </EuiFlexItem>
+        {showOptions && !loading ? (
+          <EuiFlexItem grow={false}>
+            <RegistrationOptions onCleared={onRegistrationCleared} />
+          </EuiFlexItem>
+        ) : null}
+      </EuiFlexGroup>
       <EuiSpacer size='m' />
       {loading ? (
         <EuiLoadingContent
@@ -307,10 +339,38 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
           <EuiText size='s' color='subdued'>
             <p>{view.description}</p>
           </EuiText>
+          {registered ? (
+            <>
+              <EuiSpacer size='m' />
+              <SubscriptionDetails
+                message={subscriptionMessage}
+                environmentUid={ctiFlowState.getEnvironmentUid()}
+              />
+            </>
+          ) : null}
           {view.showFeedTiers ? (
             <>
               <EuiSpacer size='m' />
               <FeedTiers />
+            </>
+          ) : null}
+          {registered ? (
+            <>
+              <EuiSpacer size='l' />
+              <EuiButton
+                fill
+                href={WAZUH_CTI_CONSOLE_HREF}
+                target='_blank'
+                rel='noopener noreferrer'
+                iconType='popout'
+                iconSide='right'
+                data-test-subj='ctiFeedSubscriptionConsoleLink'
+              >
+                {i18n.translate(
+                  'wazuhCheckUpdates.ctiFeed.subscription.openConsole',
+                  { defaultMessage: 'Open in Wazuh Console' },
+                )}
+              </EuiButton>
             </>
           ) : null}
           {view.action ? (

@@ -1,19 +1,23 @@
+/* eslint-disable camelcase -- CTI fields keep their API names */
 import {
+  clearCtiRegistration,
   fetchCtiRegistrationStatus,
   hydrateCtiFlowFromServer,
 } from './cti-registration-status';
+import { routes } from '../../common/constants';
 import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
 const mockHttpGet = jest.fn();
 const mockHttpPost = jest.fn();
+const mockHttpDelete = jest.fn();
 
 jest.mock('../plugin-services', () => ({
   getCore: jest.fn(),
 }));
 
 (getCore as jest.Mock).mockReturnValue({
-  http: { get: mockHttpGet, post: mockHttpPost },
+  http: { get: mockHttpGet, post: mockHttpPost, delete: mockHttpDelete },
 });
 
 describe('hydrateCtiFlowFromServer', () => {
@@ -72,6 +76,27 @@ describe('hydrateCtiFlowFromServer', () => {
 
     expect(ctiFlowState.isRegistrationComplete()).toBe(false);
     expect(ctiFlowState.isRegistered()).toBe(false);
+  });
+
+  it('keeps the environment UID in every state, also after a reset', async () => {
+    ctiFlowState.setRegistrationComplete(true);
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: false,
+      environment_uid: 'env-uuid-1',
+      subscription: {
+        message: {
+          plan: { name: 'Open', is_public: true },
+          is_registered: false,
+        },
+        status: 200,
+      },
+    });
+
+    await hydrateCtiFlowFromServer();
+
+    expect(ctiFlowState.isRegistrationComplete()).toBe(false);
+    expect(ctiFlowState.getEnvironmentUid()).toBe('env-uuid-1');
   });
 
   it('restores how long an in-progress device code has been pending', async () => {
@@ -183,5 +208,22 @@ describe('fetchCtiRegistrationStatus', () => {
     await expect(fetchCtiRegistrationStatus()).rejects.toMatchObject({
       message: 'The CTI console is unreachable',
     });
+  });
+});
+
+describe('clearCtiRegistration', () => {
+  it('asks the server to clear the local registration', async () => {
+    mockHttpDelete.mockResolvedValue({ cleared: true });
+
+    await clearCtiRegistration();
+
+    expect(mockHttpDelete).toHaveBeenCalledWith(routes.ctiRegistration);
+  });
+
+  it('rejects with the server error', async () => {
+    const error = { body: { message: 'Forbidden' } };
+    mockHttpDelete.mockRejectedValue(error);
+
+    await expect(clearCtiRegistration()).rejects.toBe(error);
   });
 });

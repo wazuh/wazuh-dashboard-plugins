@@ -20,6 +20,10 @@ info:
     for clients that cannot send the header. When neither is set, the mock
     returns `authorization_pending` for the first 2 polls and `success`
     afterwards.
+
+    It also mocks the endpoints the indexer Content Manager calls for the
+    plan: `GET /api/v1/platform/environments/me` (scenario stored with
+    `POST /mock/cti/environment/scenario`) and `GET /api/v1/catalog/plans`.
   version: 1.0.0
   license:
     name: Apache 2.0
@@ -173,8 +177,165 @@ paths:
         '400':
           description: Bad Request - Unknown scenario.
 
+  /api/v1/platform/environments/me:
+    get:
+      summary: Plan of the registered environment
+      description: |
+        Called by the indexer Content Manager with the stored access token.
+        Returns the environment, its organization, its registration date, the
+        active plan and the subscriptions paying for it. The answer is chosen
+        by the scenario stored with `POST /mock/cti/environment/scenario`.
+      operationId: getEnvironmentMe
+      tags:
+        - CTI Console
+      responses:
+        '200':
+          description: OK - The registered environment.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnvironmentMe'
+        '401':
+          description: Unauthorized - The access token was rejected.
+        '503':
+          description: Service Unavailable - The CTI Console cannot answer.
+
+  /mock/cti/environment/scenario:
+    post:
+      summary: Store the environments/me scenario (mock only)
+      description: |
+        Stores the scenario answered by `GET /api/v1/platform/environments/me`.
+        An empty or `default` scenario restores `professional`.
+      operationId: mockCtiEnvironmentScenario
+      tags:
+        - CTI Console
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MockEnvironmentScenarioRequest'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MockEnvironmentScenarioRequest'
+      responses:
+        '200':
+          description: OK - The scenario now in use.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MockEnvironmentScenarioRequest'
+        '400':
+          description: Bad Request - Unknown scenario.
+
+  /api/v1/catalog/plans:
+    get:
+      summary: Public catalog of plans
+      description: |
+        Called by the indexer Content Manager while it is not registered, to
+        find the public plan.
+      operationId: getCatalogPlans
+      tags:
+        - CTI Console
+      responses:
+        '200':
+          description: OK - The plans of the catalog.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plans:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Plan'
+
 components:
   schemas:
+    MockEnvironmentScenarioRequest:
+      type: object
+      properties:
+        scenario:
+          type: string
+          enum:
+            - default
+            - professional
+            - canceling
+            - open
+            - token_rejected
+            - unavailable
+          example: canceling
+      required:
+        - scenario
+
+    Plan:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Professional
+        is_public:
+          type: boolean
+          example: false
+        features:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              resource:
+                type: string
+              type:
+                type: string
+
+    EnvironmentMe:
+      type: object
+      properties:
+        name:
+          type: string
+          example: environment-01
+        organization:
+          type: object
+          properties:
+            name:
+              type: string
+              example: Acme Corp
+        registered_at:
+          type: string
+          format: date-time
+          example: '2026-03-01T10:00:00Z'
+        plans:
+          type: array
+          items:
+            $ref: '#/components/schemas/Plan'
+        subscriptions:
+          type: array
+          items:
+            type: object
+            properties:
+              plan:
+                type: string
+                example: Professional
+              interval:
+                type: string
+                enum:
+                  - month
+                  - year
+              started_at:
+                type: string
+                format: date-time
+              renews_at:
+                type: string
+                format: date-time
+                nullable: true
+              expires_at:
+                type: string
+                format: date-time
+                nullable: true
+
     MockScenarioRequest:
       type: object
       properties:

@@ -1,6 +1,10 @@
 /* eslint-disable camelcase -- CTI consumer and query fields keep their API names */
 import type { CtiConsumer } from '../../../common/cti-consumers';
-import { getFeedMetadata, sortFeeds } from './feed-metadata';
+import {
+  getFeedCatalogLabel,
+  getFeedMetadata,
+  sortFeeds,
+} from './feed-metadata';
 
 const consumer = (type: string, name = type): CtiConsumer => ({
   name,
@@ -44,5 +48,24 @@ describe('feed metadata', () => {
       'a-unknown',
       'z-unknown',
     ]);
+  });
+});
+
+describe('getFeedCatalogLabel', () => {
+  test('names the catalog the Open feed installs', () => {
+    expect(
+      getFeedCatalogLabel(
+        consumer('cti:catalog:consumer:iocs', 'public-iocs-5'),
+      ),
+    ).toBe('Open catalog');
+  });
+
+  test('names the catalog the Professional feed installs', () => {
+    expect(
+      getFeedCatalogLabel({
+        ...consumer('cti:catalog:consumer:iocs', 'private-iocs-5'),
+        is_public: false,
+      }),
+    ).toBe('Professional catalog');
   });
 });

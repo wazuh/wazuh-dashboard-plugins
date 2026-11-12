@@ -276,11 +276,11 @@ function getDetailItems(consumer: CtiConsumer) {
       description: consumer.is_public
         ? i18n.translate(
             'wazuhCheckUpdates.ctiFeed.details.fields.accessPublic',
-            { defaultMessage: 'Public' },
+            { defaultMessage: 'Open' },
           )
         : i18n.translate(
             'wazuhCheckUpdates.ctiFeed.details.fields.accessPrivate',
-            { defaultMessage: 'Private' },
+            { defaultMessage: 'Professional' },
           ),
     },
     {

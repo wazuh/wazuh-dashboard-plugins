@@ -10,6 +10,8 @@ export const SAVED_OBJECT_USER_PREFERENCES =
 const ctiBasePath = '/api/wazuh-check-updates/cti-registration';
 const ctiFeedBasePath = '/api/wazuh-check-updates/cti-feed';
 export enum routes {
+  /** DELETE clears the registration stored in the indexer. */
+  ctiRegistration = `${ctiBasePath}`,
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
   token = `${ctiBasePath}/token`,
@@ -63,8 +65,11 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
   },
 );
 
-/** Wazuh Cyber Threat Intelligence console URL. Uses `#` in the UI until set. */
-export const WAZUH_CTI_CONSOLE_HREF = '';
+/**
+ * Wazuh Cyber Threat Intelligence console, opened in the browser. It belongs to the same CTI
+ * environment as {@link WAZUH_CTI_CONSOLE_BASE_URL}: change both together.
+ */
+export const WAZUH_CTI_CONSOLE_HREF = 'https://console.pre.cloud.wazuh.com';
 
 /**
  * Default base URL of the Wazuh Cyber Threat Intelligence Console API (server-side OAuth device

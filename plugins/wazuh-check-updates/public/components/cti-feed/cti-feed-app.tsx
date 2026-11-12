@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
@@ -43,6 +43,15 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
     }
     previousSummary.current = sync.summary;
   }, [sync.summary, refetchContent]);
+
+  // The status turns to Open feed, and the content update the server starts shows
+  // up in the feed sync state.
+  const refetchStatus = registration.refetchStatus;
+  const refetchSync = sync.refetchAfterCheck;
+  const onRegistrationCleared = useCallback(() => {
+    void refetchStatus();
+    void refetchSync();
+  }, [refetchStatus, refetchSync]);
 
   return (
     <EuiPage paddingSize='l' className='ctiFeed' data-test-subj='ctiFeedApp'>
@@ -109,6 +118,7 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
               loading={registration.loading}
               deviceFlowActive={registration.deviceFlowActive}
               onOpenRegistration={registration.openModal}
+              onRegistrationCleared={onRegistrationCleared}
             />
           </EuiFlexItem>
           <EuiFlexItem grow={3}>

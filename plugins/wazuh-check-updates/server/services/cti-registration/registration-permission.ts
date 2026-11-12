@@ -3,12 +3,15 @@ import {
   CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM,
   contentManagerRoutes,
 } from '../../../common/constants';
-import type { CtiRegistrationPermissionApiBody } from '../../../common/cti-registration-permission-api';
+import type {
+  CtiRegistrationPermissionAction,
+  CtiRegistrationPermissionApiBody,
+} from '../../../common/cti-registration-permission-api';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 
 /**
- * Answer used whenever the probe cannot be evaluated (older indexer without the
- * parameter, transport failure, unreadable body). The indexer still enforces the
+ * Answer used whenever the registration probe cannot be evaluated (older indexer without
+ * the parameter, transport failure, unreadable body). The indexer still enforces the
  * privilege when registration is applied, so failing open only means the user sees
  * the same error they saw before this check existed — failing closed would hide the
  * action from users who are allowed to register.
@@ -17,6 +20,22 @@ const PERMISSION_NOT_EVALUATED: CtiRegistrationPermissionApiBody = {
   accessAllowed: true,
   missingPrivileges: [],
 };
+
+/**
+ * Clearing the local registration is only offered to users the indexer confirms, so an
+ * unusable answer to that probe denies it.
+ */
+const CLEAR_PERMISSION_NOT_EVALUATED: CtiRegistrationPermissionApiBody = {
+  accessAllowed: false,
+  missingPrivileges: [],
+};
+
+/** HTTP method of the Content Manager subscription action each probe evaluates. */
+const PROBE_METHOD: Record<CtiRegistrationPermissionAction, 'POST' | 'DELETE'> =
+  {
+    register: 'POST',
+    clear: 'DELETE',
+  };
 
 /** The plugin services are unavailable in some contexts; never fail on the logger. */
 function logWarning(message: string): void {
@@ -36,18 +55,19 @@ function normalizeMissingPrivileges(value: unknown): string[] {
 
 /**
  * Asks Content Manager whether the current user holds the privilege required to
- * register a CTI subscription, without starting anything: the probe reads no body and
- * has no side effects.
+ * register a CTI subscription (`register`) or to remove it (`clear`), without running
+ * the action: the security plugin answers the probe instead of executing it.
  *
  * Never rejects: resolves to `null` when the answer cannot be evaluated, so routes that
  * change the registration can deny instead of allowing.
  */
 export async function evaluateCtiRegistrationPermission(
   wazuhClient: IScopedClusterClient,
+  action: CtiRegistrationPermissionAction = 'register',
 ): Promise<CtiRegistrationPermissionApiBody | null> {
   try {
     const response = await wazuhClient.asCurrentUser.transport.request({
-      method: 'POST',
+      method: PROBE_METHOD[action],
       path: contentManagerRoutes.subscription,
       querystring: { [CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM]: 'true' },
     });
@@ -59,7 +79,7 @@ export async function evaluateCtiRegistrationPermission(
 
     if (typeof body?.accessAllowed !== 'boolean') {
       logWarning(
-        'CTI registration permission check answered without an accessAllowed flag.',
+        `CTI registration permission check (${action}) answered without an accessAllowed flag.`,
       );
       return null;
     }
@@ -77,21 +97,25 @@ export async function evaluateCtiRegistrationPermission(
         : 'unknown error';
 
     logWarning(
-      `CTI registration permission check could not be evaluated (${message}).`,
+      `CTI registration permission check (${action}) could not be evaluated (${message}).`,
     );
     return null;
   }
 }
 
 /**
- * Same probe for the registration modal: an unusable answer resolves to
- * {@link PERMISSION_NOT_EVALUATED}.
+ * Same probe for the browser. An unusable answer resolves to
+ * {@link PERMISSION_NOT_EVALUATED} for `register` and to
+ * {@link CLEAR_PERMISSION_NOT_EVALUATED} for `clear`.
  */
 export async function checkCtiRegistrationPermission(
   wazuhClient: IScopedClusterClient,
+  action: CtiRegistrationPermissionAction = 'register',
 ): Promise<CtiRegistrationPermissionApiBody> {
   return (
-    (await evaluateCtiRegistrationPermission(wazuhClient)) ??
-    PERMISSION_NOT_EVALUATED
+    (await evaluateCtiRegistrationPermission(wazuhClient, action)) ??
+    (action === 'clear'
+      ? CLEAR_PERMISSION_NOT_EVALUATED
+      : PERMISSION_NOT_EVALUATED)
   );
 }

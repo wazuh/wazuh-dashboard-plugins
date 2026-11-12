@@ -43,6 +43,9 @@ async function withSubscriptionFields(
 
   return {
     ...base,
+    // The Subscription card shows it as the environment ID in every state.
+    // eslint-disable-next-line camelcase -- status API body uses snake_case
+    environment_uid: environmentUuid,
     subscription,
   };
 }
@@ -137,7 +140,6 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             expires_in_remaining_sec,
             /* eslint-disable camelcase -- status API body uses snake_case */
             pending_for_sec: pendingForSec,
-            environment_uid: environmentUuid,
             /* eslint-enable camelcase */
           }),
         });

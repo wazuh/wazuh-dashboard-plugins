@@ -40,3 +40,12 @@ export function getCtiTimestampFromNow(
 ): string {
   return moment.min(timestamp, now).from(now);
 }
+
+/**
+ * The calendar date only ("Nov 11, 2026"), for dates where the time adds nothing
+ * (registration, renewal). `null` when there is no valid date to show.
+ */
+export function formatCtiDate(timestamp: string | undefined): string | null {
+  const parsed = parseCtiTimestamp(timestamp);
+  return parsed ? parsed.format('ll') : null;
+}

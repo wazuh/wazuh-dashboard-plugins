@@ -76,7 +76,7 @@ describe('FeedDetailsFlyout', () => {
       'public-iocs-5',
       't1-iocs-5',
       'cti:catalog:consumer:iocs',
-      'Public',
+      'Open',
       'ready',
       numberFormat.format(989386),
     ].forEach(value => expect(fields).toHaveTextContent(value));

@@ -47,6 +47,14 @@ function buildDeviceAuthLinksFromStatusBody(
   };
 }
 
+/**
+ * Clears the registration stored in the indexer. The CTI console still lists the
+ * environment as registered.
+ */
+export async function clearCtiRegistration(): Promise<void> {
+  await getCore().http.delete(routes.ctiRegistration);
+}
+
 /** Cancels the pending device-flow activation on the server. */
 export async function cancelCtiRegistration(): Promise<void> {
   await getCore().http.delete(routes.token);
@@ -67,11 +75,7 @@ export function cancelCtiRegistrationOnUnload(): void {
   });
 }
 
-export async function hydrateCtiFlowFromServer(): Promise<void> {
-  const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
-    routes.ctiRegistrationStatus,
-  );
-
+function applyStatusBody(body: CtiRegistrationStatusApiBody): void {
   ctiFlowState.setSubscription(body.subscription ?? null);
 
   if (body.registrationComplete) {
@@ -104,7 +108,6 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
     if (typeof body.pending_for_sec === 'number') {
       ctiFlowState.setDeviceAuthPendingFor(body.pending_for_sec);
     }
-    ctiFlowState.setEnvironmentUid(body.environment_uid);
     const links = buildDeviceAuthLinksFromStatusBody(body);
     ctiFlowState.setDeviceAuthLinks(links);
     return;
@@ -113,6 +116,16 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
   if (ctiFlowState.getDeviceCode() || ctiFlowState.isRegistrationComplete()) {
     ctiFlowState.reset();
   }
+}
+
+export async function hydrateCtiFlowFromServer(): Promise<void> {
+  const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
+    routes.ctiRegistrationStatus,
+  );
+
+  applyStatusBody(body);
+  // After `applyStatusBody`, whose reset would drop it: the card shows it in every state.
+  ctiFlowState.setEnvironmentUid(body.environment_uid);
 }
 
 type CtiRegistrationStatusResult = { statusCode: number; message: string };

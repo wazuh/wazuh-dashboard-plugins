@@ -1,5 +1,8 @@
 import { routes } from '../../common/constants';
-import type { CtiRegistrationPermissionApiBody } from '../../common/cti-registration-permission-api';
+import type {
+  CtiRegistrationPermissionAction,
+  CtiRegistrationPermissionApiBody,
+} from '../../common/cti-registration-permission-api';
 import { getCore } from '../plugin-services';
 
 /**
@@ -12,19 +15,36 @@ const PERMISSION_NOT_EVALUATED: CtiRegistrationPermissionApiBody = {
 };
 
 /**
- * Asks the server whether the current user may start CTI registration.
- *
- * Never rejects: any failure resolves to "allowed", so the caller only has to handle
- * an explicit denial.
+ * Fail-closed answer for `clear`: clearing the local registration is only offered to
+ * users the indexer confirms.
  */
-export async function fetchCtiRegistrationPermission(): Promise<CtiRegistrationPermissionApiBody> {
+const CLEAR_PERMISSION_NOT_EVALUATED: CtiRegistrationPermissionApiBody = {
+  accessAllowed: false,
+  missingPrivileges: [],
+};
+
+/**
+ * Asks the server whether the current user may start CTI registration (`register`) or
+ * clear the local registration (`clear`).
+ *
+ * Never rejects: a failure resolves to "allowed" for `register`, so the caller only has
+ * to handle an explicit denial, and to "denied" for `clear`.
+ */
+export async function fetchCtiRegistrationPermission(
+  action: CtiRegistrationPermissionAction = 'register',
+): Promise<CtiRegistrationPermissionApiBody> {
+  const notEvaluated =
+    action === 'clear'
+      ? CLEAR_PERMISSION_NOT_EVALUATED
+      : PERMISSION_NOT_EVALUATED;
   try {
     const body = await getCore().http.get<CtiRegistrationPermissionApiBody>(
       routes.ctiRegistrationPermission,
+      action === 'register' ? undefined : { query: { action } },
     );
 
     if (typeof body?.accessAllowed !== 'boolean') {
-      return PERMISSION_NOT_EVALUATED;
+      return notEvaluated;
     }
 
     return {
@@ -36,6 +56,6 @@ export async function fetchCtiRegistrationPermission(): Promise<CtiRegistrationP
         : [],
     };
   } catch {
-    return PERMISSION_NOT_EVALUATED;
+    return notEvaluated;
   }
 }

@@ -122,4 +122,56 @@ describe(`GET ${routes.ctiRegistrationPermission}`, () => {
       missingPrivileges: [],
     });
   });
+
+  test('probes the register action with POST by default', async () => {
+    mockTransportRequest.mockResolvedValue({
+      body: { accessAllowed: true, missingPrivileges: [] },
+    });
+
+    await supertest(innerServer.listener)
+      .get(routes.ctiRegistrationPermission)
+      .expect(200);
+
+    expect(mockTransportRequest.mock.calls[0][0].method).toBe('POST');
+  });
+
+  test('probes the clear action with DELETE', async () => {
+    mockTransportRequest.mockResolvedValue({
+      body: { accessAllowed: true, missingPrivileges: [] },
+    });
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiRegistrationPermission)
+      .query({ action: 'clear' })
+      .expect(200);
+
+    expect(mockTransportRequest.mock.calls[0][0].method).toBe('DELETE');
+    expect(response.body).toEqual({
+      accessAllowed: true,
+      missingPrivileges: [],
+    });
+  });
+
+  test('answers accessAllowed false for clear when the probe fails', async () => {
+    mockTransportRequest.mockRejectedValue(new Error('class_cast_exception'));
+
+    const response = await supertest(innerServer.listener)
+      .get(routes.ctiRegistrationPermission)
+      .query({ action: 'clear' })
+      .expect(200);
+
+    expect(response.body).toEqual({
+      accessAllowed: false,
+      missingPrivileges: [],
+    });
+  });
+
+  test('rejects an unknown action', async () => {
+    await supertest(innerServer.listener)
+      .get(routes.ctiRegistrationPermission)
+      .query({ action: 'delete-everything' })
+      .expect(400);
+
+    expect(mockTransportRequest).not.toHaveBeenCalled();
+  });
 });
