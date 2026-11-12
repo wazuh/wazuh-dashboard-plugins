@@ -72,7 +72,7 @@ const renderMitreList = (
         }}
       >
         {items.map((item, index) => (
-          <span key={`${item}-${index}`} style={{ whiteSpace: 'nowrap' }}>
+          <span key={`${item}-${index}`}>
             {renderItem ? renderItem(item, true) : item}
             {index < items.length - 1 ? ',' : ''}
           </span>
@@ -130,6 +130,11 @@ const renderMitreTechnique = (technique: string, showLinkTooltip = true) => (
   </WzLink>
 );
 
+const renderMitreColumn =
+  (renderItem?: (item: string, isOnly: boolean) => React.ReactNode) =>
+  (value: string | string[], _row: object, options?: RenderColumnOptions) =>
+    renderMitreList(value, renderItem, options);
+
 export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   {
     id: 'wazuh.agent.id',
@@ -179,32 +184,27 @@ export const wzDiscoverRenderColumns: tDataGridRenderColumn[] = [
   },
   {
     id: 'wazuh.rule.mitre.technique.id',
-    render: (
-      value: string | string[],
-      _row: object,
-      options?: RenderColumnOptions,
-    ) => renderMitreList(value, renderMitreTechnique, options),
+    render: renderMitreColumn(renderMitreTechnique),
   },
   {
     id: 'wazuh.rule.mitre.technique.name',
-    render: (value: string | string[]) => renderMitreList(value),
+    render: renderMitreColumn(),
   },
   {
     id: 'wazuh.rule.mitre.tactic.id',
-    render: (value: string | string[]) => renderMitreList(value),
+    render: renderMitreColumn(),
   },
   {
     id: 'wazuh.rule.mitre.tactic.name',
-    render: (value: string | string[]) => renderMitreList(value),
+    render: renderMitreColumn(),
   },
   {
     id: 'wazuh.rule.mitre.subtechnique.id',
-    render: (value: string | string[]) =>
-      renderMitreList(value, renderMitreTechnique),
+    render: renderMitreColumn(renderMitreTechnique),
   },
   {
     id: 'wazuh.rule.mitre.subtechnique.name',
-    render: (value: string | string[]) => renderMitreList(value),
+    render: renderMitreColumn(),
   },
   {
     id: 'wazuh.rule.compliance.pci_dss',

@@ -5,23 +5,39 @@ import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_da
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
 
+interface DocDetailsHeaderProps {
+  doc?: { _id?: string; _index?: string };
+  indexPattern?: { id?: string };
+  title?: string;
+}
+
 const DocDetailsHeader = ({
   doc,
   indexPattern,
   title = i18n.translate('wazuh.common.wazuhDiscover.documentDetailsTitle', {
     defaultMessage: 'Document Details',
   }),
-}) => {
+}: DocDetailsHeaderProps) => {
   return (
-    <EuiFlexGroup>
-      <EuiFlexItem>
+    // Right padding keeps the links clear of the flyout close button.
+    <EuiFlexGroup
+      alignItems='center'
+      responsive={false}
+      style={{ paddingRight: '24px' }}
+    >
+      <EuiFlexItem grow={false}>
         <EuiTitle>
           <h2>{title}</h2>
         </EuiTitle>
       </EuiFlexItem>
       <EuiFlexItem>
-        <EuiFlexGroup>
-          <EuiFlexItem>
+        <EuiFlexGroup
+          gutterSize='s'
+          justifyContent='flexEnd'
+          wrap
+          responsive={false}
+        >
+          <EuiFlexItem grow={false}>
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
                 href={NavigationService.getInstance().getUrlForApp('discover', {
@@ -38,7 +54,7 @@ const DocDetailsHeader = ({
               </EuiLink>
             </RedirectAppLinks>
           </EuiFlexItem>
-          <EuiFlexItem>
+          <EuiFlexItem grow={false}>
             <RedirectAppLinks application={getCore().application}>
               <EuiLink
                 href={NavigationService.getInstance().getUrlForApp('discover', {
