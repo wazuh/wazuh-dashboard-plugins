@@ -20,6 +20,7 @@ import {
   EuiComboBoxOptionOption,
   EuiSpacer,
   EuiConfirmModal,
+  EuiCallOut,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import {
@@ -71,6 +72,7 @@ export const RuleEditor = ({
   >([]);
   const [initialLogicalOperator, setInitialLogicalOperator] = useState('OR');
   const [showFieldErrors, setShowFieldErrors] = useState(false);
+  const [jsonEmptyKey, setJsonEmptyKey] = useState(false);
   const [pendingRule, setPendingRule] = useState<object | null>(null);
   const [unknownFields, setUnknownFields] = useState<string[]>([]);
 
@@ -347,6 +349,7 @@ export const RuleEditor = ({
 
   const onChangeRuleJson = e => {
     setRuleJson(e);
+    setJsonEmptyKey(false);
     getRulesFromJson(e); // we test format to disable button if it's incorrect
   };
 
@@ -403,9 +406,10 @@ export const RuleEditor = ({
     const unknown = getUnknownUserFields(customFields, knownUserFields).filter(
       field => field === '' || hasKnownUserFields,
     );
-    if (!isJsonEditor && unknown.includes('')) {
+    if (unknown.includes('')) {
       // A rule without user field can never be saved
       setShowFieldErrors(true);
+      setJsonEmptyKey(isJsonEditor);
       return;
     }
     if (unknown.length) {
@@ -487,25 +491,43 @@ export const RuleEditor = ({
           <EuiFlexItem>
             <EuiPanel>
               {(isJsonEditor && (
-                <EuiCodeEditor
-                  // theme="textmate"
-                  readOnly={isLoading || isReserved}
-                  width='100%'
-                  height='250px'
-                  value={ruleJson}
-                  mode='json'
-                  onChange={onChangeRuleJson}
-                  wrapEnabled
-                  // The JSON is validated when saving: the editor worker is
-                  // not needed and cannot be loaded on every platform.
-                  setOptions={{ useWorker: false }}
-                  aria-label={i18n.translate(
-                    'wazuh.security.ruleEditor.codeEditorAriaLabel',
-                    {
-                      defaultMessage: 'Code Editor',
-                    },
+                <Fragment>
+                  {jsonEmptyKey && (
+                    <Fragment>
+                      <EuiCallOut
+                        color='danger'
+                        size='s'
+                        title={i18n.translate(
+                          'wazuh.security.ruleEditor.emptyAuthContextField',
+                          {
+                            defaultMessage:
+                              'A rule cannot have an empty auth context field.',
+                          },
+                        )}
+                      />
+                      <EuiSpacer size='s' />
+                    </Fragment>
                   )}
-                />
+                  <EuiCodeEditor
+                    // theme="textmate"
+                    readOnly={isLoading || isReserved}
+                    width='100%'
+                    height='250px'
+                    value={ruleJson}
+                    mode='json'
+                    onChange={onChangeRuleJson}
+                    wrapEnabled
+                    // The JSON is validated when saving: the editor worker is
+                    // not needed and cannot be loaded on every platform.
+                    setOptions={{ useWorker: false }}
+                    aria-label={i18n.translate(
+                      'wazuh.security.ruleEditor.codeEditorAriaLabel',
+                      {
+                        defaultMessage: 'Code Editor',
+                      },
+                    )}
+                  />
+                </Fragment>
               )) || (
                 <Fragment>
                   <EuiTitle size='s'>
