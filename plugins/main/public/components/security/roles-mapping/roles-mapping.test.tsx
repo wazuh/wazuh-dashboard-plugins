@@ -52,6 +52,13 @@ jest.mock('../rules/services', () => ({
   __esModule: true,
   default: { GetRules: jest.fn() },
 }));
+jest.mock('../../../kibana-services', () => ({
+  getWazuhCorePlugin: () => ({
+    dashboardSecurity: {
+      fetchAuthContextFields: jest.fn().mockResolvedValue(['user_name']),
+    },
+  }),
+}));
 jest.mock('react-redux', () => ({ useSelector: () => undefined }));
 jest.mock('../../common/hocs', () => ({
   withUserAuthorizationPrompt: () => (Component: unknown) => Component,
@@ -61,9 +68,13 @@ jest.mock('../../common/permissions/button', () => ({
 }));
 
 describe('RolesMapping', () => {
-  it('shows a description clarifying these mappings belong to the Wazuh manager API', () => {
+  it('shows a description saying role mappings give Wazuh roles to the users who sign in', () => {
     render(<RolesMapping />);
 
-    expect(screen.getByText(/Map roles of the manager API/)).toBeTruthy();
+    expect(
+      screen.getByText(
+        /Give Wazuh roles to the users who sign in to the dashboard/,
+      ),
+    ).toBeTruthy();
   });
 });

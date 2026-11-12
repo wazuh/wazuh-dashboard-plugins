@@ -140,6 +140,17 @@ const PROVIDER_API_KEY_GUIDANCE: Record<
   },
 };
 
+/** Replaces the openai_compatible "Optional" line when the endpoint is a hosted service that needs a
+ * key (see `keyRequiredHost` in VENDOR_MODEL_SUGGESTIONS). */
+const HOSTED_API_KEY_REQUIREMENT = i18n.translate(
+  'wazuhAiAssistant.settings.form.apiKeyRequirementHosted',
+  {
+    defaultMessage:
+      'Required for this hosted endpoint. Stored encrypted at rest if an encryption key is ' +
+      'configured.',
+  },
+);
+
 interface ProviderUrlDoc {
   label: string;
   url: string;
@@ -385,21 +396,32 @@ const PROVIDER_MODEL_GUIDANCE: Record<
  * makes sense for the `anthropic` type (an `openai_compatible` provider pointed at that URL would
  * be a guaranteed-broken config), and every other entry is an OpenAI-compatible-only
  * gateway/service, so it is gated to `openai_compatible`.
+ *
+ * `keyRequiredHost` marks a hosted service that refuses every request without a key, so the form
+ * blocks Save without one there. Only these hosts: an openai_compatible key is "Optional" for local
+ * runtimes such as Ollama, and an Anthropic-compatible proxy may have no auth. It is anchored on the
+ * whole hostname (exact host or a subdomain of it), unlike `match`: a self-hosted proxy whose name
+ * merely CONTAINS a vendor's (`generativelanguage-proxy.corp`, `my-bedrock-mantle.internal`) is not
+ * that service and may need no key. Groq has an entry for this field alone: it gets no model
+ * suggestions (see PROVIDER_URL_GUIDANCE).
  */
 const VENDOR_MODEL_SUGGESTIONS: Array<{
   match: string;
   forType: ProviderInput['type'];
   models: string[];
+  keyRequiredHost?: RegExp;
 }> = [
   {
     match: 'api.anthropic.com',
     forType: 'anthropic',
     models: ['claude-sonnet-5', 'claude-haiku-4-5', 'claude-opus-5'],
+    keyRequiredHost: /(^|\.)api\.anthropic\.com$/,
   },
   {
     match: 'api.openai.com',
     forType: 'openai_compatible',
     models: ['gpt-4o', 'gpt-4o-mini'],
+    keyRequiredHost: /(^|\.)api\.openai\.com$/,
   },
   {
     match: 'bedrock-mantle',
@@ -410,16 +432,25 @@ const VENDOR_MODEL_SUGGESTIONS: Array<{
       'qwen.qwen3-32b',
       'deepseek.v3.2',
     ],
+    keyRequiredHost: /^bedrock-mantle\..+\.api\.aws$/,
   },
   {
     match: 'openrouter.ai',
     forType: 'openai_compatible',
     models: ['openai/gpt-oss-20b:free'],
+    keyRequiredHost: /(^|\.)openrouter\.ai$/,
   },
   {
     match: 'generativelanguage',
     forType: 'openai_compatible',
     models: ['gemini-flash-latest', 'gemini-3-flash-preview'],
+    keyRequiredHost: /(^|\.)generativelanguage\.googleapis\.com$/,
+  },
+  {
+    match: 'api.groq.com',
+    forType: 'openai_compatible',
+    models: [],
+    keyRequiredHost: /(^|\.)api\.groq\.com$/,
   },
   {
     match: 'localhost:11434',
@@ -445,6 +476,25 @@ function getVendorModelSuggestions(
     ({ match, forType }) => forType === type && normalized.includes(match),
   );
   return vendor?.models ?? [];
+}
+
+/** Matched against the HOSTNAME only (no port, path or query), unlike the suggestions above: a
+ * gateway that names its upstream in its path or query (`…/proxy?upstream=https://api.openai.com`)
+ * is not that hosted service and may hold the key itself. */
+function isHostedEndpointRequiringKey(
+  baseUrl: string,
+  type: ProviderInput['type'],
+): boolean {
+  let hostname: string;
+  try {
+    hostname = new URL(baseUrl.trim()).hostname.toLowerCase();
+  } catch {
+    return false;
+  }
+  return VENDOR_MODEL_SUGGESTIONS.some(
+    ({ forType, keyRequiredHost }) =>
+      forType === type && Boolean(keyRequiredHost?.test(hostname)),
+  );
 }
 
 /**
@@ -759,6 +809,7 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [baseUrlError, setBaseUrlError] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
   const [modelError, setModelError] = useState<string | null>(null);
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   // What the Model combo box's search input currently holds, i.e. text the admin has typed but not
   // committed (by picking a suggestion or pressing Enter on the custom-option row). EuiComboBox
   // keeps that text purely internally, which is how a form could be submitted with the model field
@@ -766,14 +817,16 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
   const [modelSearchText, setModelSearchText] = useState('');
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   // Submit moves focus to the FIRST field it rejected (in the form's own reading order: Name,
-  // Endpoint URL, Model), so a rejected save does not leave a keyboard/screen-reader user at the
+  // API key, Endpoint URL, Model), so a rejected save does not leave a keyboard/screen-reader user at the
   // footer button hunting for which of the errors above it appeared.
   const nameInputRef = useRef<HTMLInputElement | null>(null);
   const baseUrlInputRef = useRef<HTMLInputElement | null>(null);
+  const apiKeyInputRef = useRef<HTMLInputElement | null>(null);
   // Whatever the model combo box's search input had in `aria-describedby` before this form added
   // its own error to it — `''` for "nothing", `null` for "no error has been shown yet". See the
   // effect that maintains those attributes below.
   const describedByBeforeErrorRef = useRef<string | null>(null);
+  const testResultRef = useRef<HTMLDivElement | null>(null);
   // Tracks whether the admin has typed into the endpoint URL field themselves (see the field's own
   // `onChange` below), so a provider-type switch (`handleTypeChange` above) only ever resets the
   // base URL while the field is still empty or holds one of the OLD type's own known defaults —
@@ -812,6 +865,18 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
     form.baseUrl,
     form.type,
   );
+  // A hosted endpoint needs a key, unless an edited provider already stores one: an empty field
+  // then means "keep the current key".
+  const apiKeyRequired =
+    isHostedEndpointRequiringKey(form.baseUrl, form.type) &&
+    !editingProvider?.hasApiKey;
+  // Only while the key is still required: switching the endpoint to a local one drops the error.
+  const visibleApiKeyError = apiKeyRequired ? apiKeyError : null;
+  // The hosted line replaces only openai_compatible's "Optional": Anthropic's says "Required" already.
+  const apiKeyRequirement =
+    apiKeyRequired && form.type === 'openai_compatible'
+      ? HOSTED_API_KEY_REQUIREMENT
+      : apiKeyGuidance.requirement;
   // Feeds both the "Suggested models:" chips and the Model EuiComboBox's dropdown `options`.
   //
   // No deduplication against `modelGuidance.examples`: an id curated in BOTH tables (Anthropic's
@@ -867,6 +932,18 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
       describedByBeforeErrorRef.current = null;
     }
   }, [modelError]);
+
+  // Each "Save & test" hands over a new outcome object, so a retry that fails again brings the
+  // result back into view too. A passing test closes the flyout (settings-page.tsx), so only a
+  // failure needs this.
+  useEffect(() => {
+    if (!testOutcome || testOutcome.status === 'ok') {
+      return;
+    }
+    const node = testResultRef.current;
+    node?.scrollIntoView?.({ block: 'start' });
+    node?.focus();
+  }, [testOutcome]);
 
   // Deliberately does NOT set `baseUrlTouched` — this fills the field from one of the type's own
   // "Examples:" chips, which is still just a suggested value (see `handleTypeChange` above), not
@@ -1005,13 +1082,28 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
             'Pick a suggestion, or type a model id and press Enter.',
         });
 
+    const nextApiKeyError =
+      apiKeyRequired && !trimmedForm.apiKey
+        ? i18n.translate('wazuhAiAssistant.settings.form.apiKeyRequired', {
+            defaultMessage: 'Enter the API key for this hosted endpoint.',
+          })
+        : null;
+
     setNameError(nextNameError);
+    setApiKeyError(nextApiKeyError);
     setBaseUrlError(nextBaseUrlError);
     setModelError(nextModelError);
-    if (nextNameError || nextBaseUrlError || nextModelError) {
+    if (
+      nextNameError ||
+      nextApiKeyError ||
+      nextBaseUrlError ||
+      nextModelError
+    ) {
       // Form reading order, so focus lands on the topmost problem rather than the last one checked.
       if (nextNameError) {
         nameInputRef.current?.focus();
+      } else if (nextApiKeyError) {
+        apiKeyInputRef.current?.focus();
       } else if (nextBaseUrlError) {
         baseUrlInputRef.current?.focus();
       } else {
@@ -1076,6 +1168,57 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
           </EuiTitle>
         </EuiFlyoutHeader>
         <EuiFlyoutBody>
+          {/* First in the body, not after the form: at the bottom it sat below the tool-calling
+              warning, behind the sticky footer and the toasts, so a failed "Save & test" looked
+              like a success. The wrapper is focusable and an alert, so it is also announced. */}
+          {testOutcome && (
+            <>
+              <div
+                ref={testResultRef}
+                tabIndex={-1}
+                role={testOutcome.status === 'ok' ? 'status' : 'alert'}
+              >
+                <EuiCallOut
+                  size='s'
+                  color={
+                    testOutcome.status === 'ok'
+                      ? 'success'
+                      : testOutcome.status === 'failed'
+                      ? 'danger'
+                      : 'warning'
+                  }
+                  iconType={testOutcome.status === 'ok' ? 'check' : 'alert'}
+                  title={
+                    testOutcome.status === 'ok'
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultSuccessTitle',
+                          {
+                            defaultMessage:
+                              'Connection test succeeded ({latencyMs} ms)',
+                            values: { latencyMs: testOutcome.latencyMs },
+                          },
+                        )
+                      : testOutcome.status === 'failed'
+                      ? i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultFailureTitle',
+                          { defaultMessage: 'Connection test failed' },
+                        )
+                      : i18n.translate(
+                          'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
+                          {
+                            defaultMessage: 'Could not verify the connection',
+                          },
+                        )
+                  }
+                >
+                  {/* Success needs no body: the title already carries the latency, which is the
+                      whole result. Only a failure has something more to say. */}
+                  {testOutcome.status !== 'ok' && <p>{testOutcome.message}</p>}
+                </EuiCallOut>
+              </div>
+              <EuiSpacer size='m' />
+            </>
+          )}
           {apiKeyEncryptionEnabled === false && (
             <>
               <EuiCallOut
@@ -1312,10 +1455,25 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 <EuiFlexItem>
                   <EuiFormRow
                     id='wz-ai-provider-api-key'
-                    label={i18n.translate(
-                      'wazuhAiAssistant.settings.form.apiKey',
-                      { defaultMessage: 'API key' },
-                    )}
+                    label={
+                      apiKeyRequired ? (
+                        <RequiredLabel
+                          label={i18n.translate(
+                            'wazuhAiAssistant.settings.form.apiKey',
+                            { defaultMessage: 'API key' },
+                          )}
+                        />
+                      ) : (
+                        i18n.translate(
+                          'wazuhAiAssistant.settings.form.apiKey',
+                          {
+                            defaultMessage: 'API key',
+                          },
+                        )
+                      )
+                    }
+                    isInvalid={Boolean(visibleApiKeyError)}
+                    error={visibleApiKeyError}
                     labelAppend={
                       editingProvider?.hasApiKey ? (
                         <EuiBadge color='hollow'>
@@ -1343,21 +1501,29 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                                     'rest if an encryption key is configured.',
                                 },
                               )
-                            : apiKeyGuidance.requirement}
+                            : apiKeyRequirement}
                         </p>
                         <p>{apiKeyGuidance.help}</p>
                       </>
                     }
                   >
-                    {/* Deliberately no `isInvalid` here: a shape mismatch is a non-blocking
-                        warning (below), not a form error — a red-invalid field would read as
-                        blocking even though Save stays enabled. */}
+                    {/* `isInvalid` only for a missing required key: a shape mismatch is a
+                        non-blocking warning (below), not a form error — a red-invalid field would
+                        read as blocking even though Save stays enabled. */}
                     <EuiFieldPassword
                       type='dual'
                       value={form.apiKey}
-                      onChange={event =>
-                        setForm({ ...form, apiKey: event.target.value })
-                      }
+                      aria-required={apiKeyRequired ? 'true' : undefined}
+                      inputRef={node => {
+                        apiKeyInputRef.current = node;
+                      }}
+                      isInvalid={Boolean(visibleApiKeyError)}
+                      onChange={event => {
+                        setForm({ ...form, apiKey: event.target.value });
+                        if (apiKeyError) {
+                          setApiKeyError(null);
+                        }
+                      }}
                     />
                   </EuiFormRow>
                 </EuiFlexItem>
@@ -1695,49 +1861,6 @@ export const ProviderFormFlyout: React.FC<ProviderFormFlyoutProps> = ({
                 />
               </p>
             </EuiCallOut>
-
-            {testOutcome && (
-              <>
-                <EuiSpacer size='m' />
-                <EuiCallOut
-                  size='s'
-                  color={
-                    testOutcome.status === 'ok'
-                      ? 'success'
-                      : testOutcome.status === 'failed'
-                      ? 'danger'
-                      : 'warning'
-                  }
-                  iconType={testOutcome.status === 'ok' ? 'check' : 'alert'}
-                  title={
-                    testOutcome.status === 'ok'
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.testResultSuccessTitle',
-                          {
-                            defaultMessage:
-                              'Connection test succeeded ({latencyMs} ms)',
-                            values: { latencyMs: testOutcome.latencyMs },
-                          },
-                        )
-                      : testOutcome.status === 'failed'
-                      ? i18n.translate(
-                          'wazuhAiAssistant.settings.form.testResultFailureTitle',
-                          { defaultMessage: 'Connection test failed' },
-                        )
-                      : i18n.translate(
-                          'wazuhAiAssistant.settings.form.testResultCouldNotVerifyTitle',
-                          {
-                            defaultMessage: 'Could not verify the connection',
-                          },
-                        )
-                  }
-                >
-                  {/* Success needs no body: the title already carries the latency, which is the
-                      whole result. Only a failure has something more to say. */}
-                  {testOutcome.status !== 'ok' && <p>{testOutcome.message}</p>}
-                </EuiCallOut>
-              </>
-            )}
           </EuiForm>
         </EuiFlyoutBody>
         <EuiFlyoutFooter>

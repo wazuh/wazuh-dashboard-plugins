@@ -18,12 +18,12 @@ import { WzCtiUpsellNotification } from './components/wz-cti-upsell-notification
 import { RegisterAgent } from './components/endpoints-summary/register-agent';
 import { MainEndpointsSummary } from './components/endpoints-summary';
 import { MainEnrollmentTokens } from './components/enrollment-tokens';
+import { MainCtiExplorer } from './components/cti-explorer';
 import { AgentView } from './components/endpoints-summary/agent';
 import WzManagement from './controllers/management/components/management/management-provider';
 import { Overview } from './components/overview/overview';
 import { Settings } from './components/settings';
 import { WzSecurity } from './components/security';
-import $ from 'jquery';
 import NavigationService from './react-services/navigation-service';
 import { SECTIONS } from './sections';
 import { withGuardAsync } from './components/common/hocs';
@@ -91,18 +91,6 @@ export const Application = withGuardAsync(
     checkPluginVersion().finally(() => {
       WzAuthentication.refresh();
     });
-
-    // TODO: Replace this with document insteat
-    // Bind deleteExistentToken on Log out component.
-    $('.euiHeaderSectionItem__button, .euiHeaderSectionItemButton').on(
-      'mouseleave',
-      function () {
-        // opendistro
-        $('button:contains(Log out)').on('click', function () {
-          WzAuthentication.deleteExistentToken();
-        });
-      },
-    );
   }, []);
 
   return (
@@ -133,6 +121,11 @@ export const Application = withGuardAsync(
             path={`/${SECTIONS.ENROLLMENT_TOKENS}/`}
             exact
             render={MainEnrollmentTokens}
+          ></Route>
+          <Route
+            path={`/${SECTIONS.CTI_EXPLORER}/`}
+            exact
+            render={MainCtiExplorer}
           ></Route>
           <Route
             path={`/${SECTIONS.MANAGER}`}

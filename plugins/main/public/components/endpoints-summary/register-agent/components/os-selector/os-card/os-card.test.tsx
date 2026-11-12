@@ -44,4 +44,20 @@ describe('OsCard', () => {
     expect(cardTitles[1]).toHaveTextContent('WINDOWS');
     expect(cardTitles[2]).toHaveTextContent('macOS');
   });
+
+  test('links the supported operating systems instead of other packages', () => {
+    render(<OsCard />);
+
+    expect(
+      screen.queryByText(/For additional systems and architectures/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Supported operating systems/ }),
+    ).toHaveAttribute(
+      'href',
+      expect.stringMatching(
+        /\/user-manual\/agent\/agent-enrollment\/requirements\.html#supported-operating-systems$/,
+      ),
+    );
+  });
 });

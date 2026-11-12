@@ -18,35 +18,22 @@ import { connect } from 'react-redux';
 
 import { updateFileContent } from '../../../../../redux/actions/groupsActions';
 
-import GroupsHandler from './utils/groups-handler';
+import { getGroupConfigurationFile } from './utils/group-configuration';
 import { WzButtonPermissions } from '../../../../../components/common/permissions/button';
 
 class WzGroupsActionButtonsFiles extends Component {
   constructor(props) {
     super(props);
-    this.groupsHandler = GroupsHandler;
     this.refreshTimeoutId = null;
   }
 
   async showGroupConfiguration() {
-    const { itemDetail } = this.props.state;
-    let result = await this.groupsHandler.getFileContent(
-      `/groups/${itemDetail.name}/files/agent.conf?raw=true`,
+    const file = await getGroupConfigurationFile(
+      this.props.state.itemDetail.name,
     );
-
-    if (Object.keys(result).length == 0) {
-      result = '';
+    if (file) {
+      this.props.updateFileContent(file);
     }
-
-    const data = result?.toString();
-
-    const file = {
-      name: 'agent.conf',
-      content: data,
-      isEditable: true,
-      groupName: itemDetail.name,
-    };
-    this.props.updateFileContent(file);
   }
 
   render() {

@@ -17,6 +17,7 @@
 - [Repository bumper](dev/bumper-repository.md)
 - [Documentation installation and setup](INSTALLATION.md)
 - [Modules](dev/modules/README.md)
+  - [About flyout and documentation links](dev/modules/about-flyout.md)
   - [Active responses](dev/modules/active-responses.md)
   - [Ruleset management](dev/modules/ruleset-management.md)
 
@@ -41,6 +42,7 @@
   - [Indexer management settings](ref/modules/indexer-settings.md)
   - [Available updates](ref/modules/available-updates.md)
   - [CTI feed](ref/modules/cti-feed.md)
+  - [CTI Explorer](ref/modules/cti-explorer.md)
   - [Enrollment tokens](ref/modules/enrollment-tokens/README.md)
   - [Saved objects for dashboards and visualizations](ref/modules/saved-objects-dashboards.md)
   - [Active Response](ref/modules/active-response/README.md)

@@ -18,16 +18,20 @@ interface, for example in end-to-end testing scenarios.
 ![Select platform](../img/agent-deploy-oneliner/agent-wizard-platform.webp)
 
 4. In **Server address**, enter the hostname or IP address of the Wazuh manager
-   the agent will register against. The port and the path prefix sit behind
-   **View advanced options** and are only needed when the manager does not
-   listen on the defaults.
+   the agent will register against. The field suggests the names in the
+   manager listener certificate, as the **Create enrollment token** flyout
+   does, and still takes any other address. The port and the path prefix sit
+   behind **View advanced options** and are only needed when the manager does
+   not listen on the defaults.
 
 ![Set manager address](../img/agent-deploy-oneliner/set-server-address.webp)
 
 5. In **Enrollment token**, select **Generate token**. The server mints one for
-   the address typed in the previous step, with its own defaults -- a 30 day
-   lifetime and unlimited enrollments -- and answers with its identifier and
-   expiry.
+   the address typed in the previous step, with a 1 day lifetime unless
+   **Lifetime** is set, and unlimited enrollments unless **Enrollments allowed**
+   is set, and answers with its identifier and expiry. After minting, the step
+   lists how many earlier tokens are still active and have enrolled no agent,
+   and offers to revoke them or to review them in **Enrollment tokens**.
 
    The step offers the two ways of obtaining a token as tabs, since they
    exclude each other and only the open one is in effect. **Generate a new
@@ -44,8 +48,8 @@ interface, for example in end-to-end testing scenarios.
 
 6. **Optional configuration** (when required):
    - **Verify the manager certificate**: leave it enabled unless the endpoint
-     cannot verify the manager listener. A token install needs no certificate
-     authority path: the agent obtains its trust anchor through the token. See
+     cannot verify the manager listener. A token install gets its trust anchor
+     through the token. See
      [Manager certificate verification](#manager-certificate-verification).
    - **Agent name**: define how the agent is identified.
    - **Agent group**: assign the agent to an existing group (for example, `default`).
@@ -111,13 +115,23 @@ and is never listed again, so the deployment command has to be copied before
 leaving the page.
 
 An operator who kept a token from an earlier deployment can reuse it on the
-**Use an existing token** tab instead of minting a new one. Only the token text is
-known in that case -- the manager returns the metadata once, at mint time -- so
-the wizard shows neither the address it names nor its expiry, and it is the
-manager that refuses an expired or exhausted token at enrollment time. The field
-is checked only for what would break the generated command apart, a space or a
-single quote, since the manager is what decides whether the text is a token it
-issued.
+**Use an existing token** tab instead of minting a new one. The field rejects only
+what would break the generated command apart, a space or a single quote. The
+wizard then reads the token itself: it carries the manager address, and the first
+16 bytes of its key are the id the token list names it by
+(`GET /agents/enrollment-tokens?q=id=<id>`). From these the wizard shows the
+token's id, address, expiry and enrollments used, and warns, without blocking the
+command, when the token:
+
+- cannot be read as an enrollment token,
+- is not in the token list (minted by another manager, or purged),
+- is revoked, expired or exhausted,
+- names a different address than the server address step (the port and the path
+  are compared only when they were entered),
+- carries no credential, so it has no id and its status cannot be checked,
+- cannot be looked up, for example without the `enrollment_token:read` permission.
+
+The manager still decides at enrollment time whether it accepts the token.
 
 `WAZUH_ENROLLMENT_TOKEN` is the only way the 5.0 agent installer registers an
 agent. The token names the manager, pins the certificate authority of the
@@ -148,14 +162,15 @@ until it is.
 
 Minting requires the `enrollment_token:create` permission. Where it is missing --
 including against a server whose RBAC policy predates the action -- the
-**Enrollment token** step is not shown and the wizard falls back to the 4.x
-variables, `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD`. A 5.0
-agent installer ignores both, so the command installs the agent but does not
-register it: the agent is left with no manager to connect to. Grant the
-permission and generate the command again, or register the installed agent
-afterwards with a token minted on the manager, as described in the manager
-documentation, _Wazuh Manager > Getting Started > Installation > Installing
-without a token_.
+**Enrollment token** step still shows, with only the **Use an existing token**
+tab. A pasted token is deployed as usual. Until one is pasted, the wizard falls
+back to the 4.x variables, `WAZUH_MANAGER_ENDPOINT` and
+`WAZUH_REGISTRATION_PASSWORD`. A 5.0 agent installer ignores both, so the command installs the agent but does not
+register it: the agent is left with no manager to connect to. Paste a stored
+token, grant the permission and generate the command again, or register the
+installed agent afterwards with a token minted on the manager, as described in
+the manager documentation, _Wazuh Manager > Getting Started > Installation >
+Installing without a token_.
 
 The tokens the server has minted are listed, revoked and purged in the
 [Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from
@@ -166,15 +181,10 @@ The tokens the server has minted are listed, revoked and purged in the
 Enrollment authenticates the agent to the manager, not the manager to the
 agent. What establishes that the endpoint is talking to the real manager is the
 TLS certificate its listener presents, and the **Optional settings** step
-decides how that certificate is verified through two controls, both shown
-whether or not the deployment uses an enrollment token:
+decides how that certificate is verified through one control, **Verify the
+manager certificate**, enabled by default.
 
-- **Verify the manager certificate**, enabled by default.
-- **Manager CA file path on the endpoint**, shown while verification is
-  enabled. It takes the path of a certificate authority already present on the
-  endpoint.
-
-A token install needs neither. The token carries a **pin**, the SHA-256 digest
+The token carries a **pin**, the SHA-256 digest
 of the public key of the certificate authority that signs the manager's
 agent-facing certificate. On its first start the agent fetches that authority
 from the manager, checks it against the pin, installs it as its trust anchor at
@@ -185,13 +195,16 @@ anchor `etc/certs/root-ca.pem` is present, and to `none` otherwise; it never
 falls back to the system CA store. After a token install the mode is therefore
 `full`, and `WAZUH_SSL_VERIFICATION` only overrides it.
 
-Three combinations are possible, and each generates a different command:
+Each state of the switch generates a different command:
 
-| Wizard state                           | What the generated command carries                                                                                                                                                                                                                                                                                          |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Verification enabled, no CA path       | Nothing. After a token install the agent verifies the manager against the trust anchor the token delivered.                                                                                                                                                                                                                 |
-| Verification enabled, CA path supplied | `WAZUH_REGISTRATION_CA='<path>'`. This variable was removed in 5.0 and the installer ignores it, so the path has no effect. A token install does not need it; on an agent configured by hand, place the authority at `etc/certs/root-ca.pem` or name it in `<agent><ssl><certificate_authorities>` in `ossec.conf` instead. |
-| Verification disabled                  | `WAZUH_SSL_VERIFICATION='none'`, and the CA path input is hidden, since an authority to verify against means nothing once nothing is verified. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only.                              |
+| Wizard state          | What the generated command carries                                                                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verification enabled  | Nothing. After a token install the agent verifies the manager against the trust anchor the token delivered.                                                                      |
+| Verification disabled | `WAZUH_SSL_VERIFICATION='none'`. The agent accepts any certificate the manager presents and the connection can be intercepted, so disable verification in trusted networks only. |
+
+The wizard offers no CA path: the 5.0 installer has no variable for it. To use
+another authority, place it at `etc/certs/root-ca.pem` on the endpoint or name
+it in `<agent><ssl><certificate_authorities>` in `ossec.conf`.
 
 `WAZUH_SSL_VERIFICATION` also accepts `full`, `certificate` and `system`, which
 the wizard does not generate. `system` suits a manager fronted by a publicly

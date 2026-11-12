@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- consumer fields keep the index's snake_case names */
 import { IRouter } from 'opensearch-dashboards/server';
 import { routes } from '../../../common/constants';
 import type {
@@ -6,8 +7,32 @@ import type {
 } from '../../../common/cti-consumers';
 
 const CTI_CONSUMERS_INDEX = '.wazuh-cti-consumers';
+/**
+ * Id of the index's one non-consumer document, which holds `last_checked_at`
+ * for the whole catalog instead of a feed.
+ */
+const CTI_GLOBAL_DOCUMENT_ID = 'cti:catalog:global';
+
+interface ConsumerHit {
+  _id?: string;
+  _source?: Record<string, unknown>;
+}
+
+/** The value when it is a non-empty string, so it can be spread in or left out. */
+function optionalString(value: unknown): string | undefined {
+  return typeof value === 'string' && value ? value : undefined;
+}
+
+/** The string entries of a list, or `undefined` when the value is not a list. */
+function optionalStringList(value: unknown): string[] | undefined {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string' && !!item)
+    : undefined;
+}
 
 function mapHitToConsumer(source: Record<string, unknown>): CtiConsumer {
+  const updatedAt = optionalString(source.updated_at);
+  const pendingSyncPhases = optionalStringList(source.pending_sync_phases);
   return {
     name: (source.name as string) ?? '',
     context: (source.context as string) ?? '',
@@ -17,6 +42,8 @@ function mapHitToConsumer(source: Record<string, unknown>): CtiConsumer {
     status: (source.status as string) ?? '',
     local_offset: Number(source.local_offset) || 0,
     remote_offset: Number(source.remote_offset) || 0,
+    ...(updatedAt ? { updated_at: updatedAt } : {}),
+    ...(pendingSyncPhases ? { pending_sync_phases: pendingSyncPhases } : {}),
   };
 }
 
@@ -34,12 +61,21 @@ export const getCtiConsumersRoute = (router: IRouter) => {
             body: { query: { match_all: {} }, size: 1000 },
           });
 
-        const hits = result.body?.hits?.hits ?? [];
-        const data = hits.map((hit: { _source: Record<string, unknown> }) =>
-          mapHitToConsumer(hit._source ?? {}),
+        const hits: ConsumerHit[] = result.body?.hits?.hits ?? [];
+        const globalHit = hits.find(hit => hit._id === CTI_GLOBAL_DOCUMENT_ID);
+        const data = hits
+          .filter(hit => hit !== globalHit)
+          .map(hit => mapHitToConsumer(hit._source ?? {}));
+        const lastCheckedAt = optionalString(
+          globalHit?._source?.last_checked_at,
         );
 
-        return response.ok<CtiConsumersResponse>({ body: { data } });
+        return response.ok<CtiConsumersResponse>({
+          body: {
+            data,
+            ...(lastCheckedAt ? { last_checked_at: lastCheckedAt } : {}),
+          },
+        });
       } catch (error) {
         const statusCode = (error as { statusCode?: number })?.statusCode;
 

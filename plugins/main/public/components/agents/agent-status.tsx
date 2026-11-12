@@ -1,13 +1,18 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
 import {
   agentStatusColorByAgentStatus,
+  agentStatusDescriptionByAgentStatus,
   agentStatusLabelByAgentStatus,
   TAgentStatus,
 } from '../../../common/services/wz_agent_status';
 import { ColumnWithStatusIcon } from './column-with-status-icon';
 import { EuiIconTip } from '@elastic/eui';
-import { AGENT_STATUS_CODE } from '../../../common/constants';
+import {
+  AGENT_STATUS_CODE,
+  API_NAME_AGENT_STATUS,
+} from '../../../common/constants';
 import '../../styles/common.scss';
 import { Agent } from '../endpoints-summary/types';
 import './agent-status.scss';
@@ -28,15 +33,17 @@ export const AgentStatus = ({
   const statusCodeAgent = AGENT_STATUS_CODE.find(
     status => status.STATUS_CODE === agent?.status_code,
   );
+  const label = agentStatusLabelByAgentStatus(status);
+  const description = agentStatusDescriptionByAgentStatus(status);
   return (
     <div
       className='euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow'
       style={style}
     >
       <ColumnWithStatusIcon
-        text={children || agentStatusLabelByAgentStatus(status).toLowerCase()}
+        text={children || label.toLowerCase()}
         color={agentStatusColorByAgentStatus(status)}
-        tooltip={agentStatusLabelByAgentStatus(status).toLowerCase()}
+        tooltip={label.toLowerCase()}
       />
       <EuiIconTip
         anchorClassName='wz-agent-icon-tip'
@@ -48,13 +55,42 @@ export const AgentStatus = ({
         type='iInCircle'
         color='primary'
         content={
-          statusCodeAgent?.STATUS_DESCRIPTION ??
-          i18n.translate(
-            'wazuh.endpointsSummary.agentStatus.withoutInformation',
-            {
-              defaultMessage: 'Without information',
-            },
-          )
+          <>
+            {description && <p>{description}</p>}
+            {/* The manager reports code 0 for agents that never connected */}
+            {status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED && (
+              <p>
+                {i18n.translate(
+                  'wazuh.endpointsSummary.agentStatus.lastChange',
+                  {
+                    defaultMessage: 'Last change: {reason}',
+                    values: {
+                      reason:
+                        statusCodeAgent?.STATUS_DESCRIPTION ??
+                        i18n.translate(
+                          'wazuh.endpointsSummary.agentStatus.withoutInformation',
+                          { defaultMessage: 'Without information' },
+                        ),
+                    },
+                  },
+                )}
+              </p>
+            )}
+            {status === API_NAME_AGENT_STATUS.DISCONNECTED &&
+              agent?.lastKeepAlive && (
+                <p>
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.agentStatus.lastSeen',
+                    {
+                      defaultMessage: 'Last seen: {relativeTime}',
+                      values: {
+                        relativeTime: moment(agent.lastKeepAlive).fromNow(),
+                      },
+                    },
+                  )}
+                </p>
+              )}
+          </>
         }
       />
     </div>

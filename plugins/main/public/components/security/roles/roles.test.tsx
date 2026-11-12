@@ -72,12 +72,10 @@ describe('Roles', () => {
     }
   });
 
-  it('shows a description clarifying these roles belong to the Wazuh manager API', () => {
+  it('shows a description clarifying these roles belong to the Wazuh API', () => {
     render(<Roles />);
 
-    expect(
-      screen.getByText(/Manage the roles of the manager API/),
-    ).toBeTruthy();
+    expect(screen.getByText(/Manage the roles of the Wazuh API/)).toBeTruthy();
   });
 
   it('requests the first page sorted by id ascending by default', async () => {

@@ -12,6 +12,41 @@
   }
 }
 
+/* Configuration Assessment: fit table columns to narrow panels; OSD sets them only on load */
+.wz-sca-dashboard {
+  .visTable {
+    container-type: inline-size;
+  }
+
+  @container (max-width: 600px) {
+    .tableVisContainer {
+      table {
+        width: 100% !important;
+        table-layout: auto;
+      }
+      th,
+      td {
+        width: auto !important;
+        max-width: none !important;
+      }
+      .header-text {
+        max-width: none !important;
+        white-space: normal !important;
+      }
+      /* Keep rows short so the page of rows fits the panel */
+      .tableVisCell__dataField {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        overflow: hidden;
+      }
+      .tableVisPagination {
+        flex-wrap: wrap;
+      }
+    }
+  }
+}
+
 /* Hide the export CSV controls of table visualizations*/
 .wz-dashboard-hide-tables-pagination-export-csv-controls {
   .euiDataGrid__controls,

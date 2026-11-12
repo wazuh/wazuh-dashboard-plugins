@@ -14,6 +14,7 @@ import {
   pollCtiToken,
   postContentManagerSubscription,
   resolveCtiOAuthClientId,
+  evaluateCtiRegistrationPermission,
 } from '../../services/cti-registration';
 import {
   CtiRegistrationStore,
@@ -35,6 +36,7 @@ const mockedPollCtiToken = pollCtiToken as jest.Mock;
 const mockedResolve = resolveCtiOAuthClientId as jest.Mock;
 const mockedPostContentManagerSubscription =
   postContentManagerSubscription as jest.Mock;
+const mockedEvaluatePermission = evaluateCtiRegistrationPermission as jest.Mock;
 
 jest.mock('../../services/cti-registration', () => ({
   CtiConfigurationError: class CtiConfigurationError extends Error {},
@@ -44,6 +46,7 @@ jest.mock('../../services/cti-registration', () => ({
   getCtiConsoleBaseUrl: jest.fn(),
   fetchClusterUuid: jest.fn(),
   postContentManagerSubscription: jest.fn(() => Promise.resolve()),
+  evaluateCtiRegistrationPermission: jest.fn(),
 }));
 
 const loggingService = loggingSystemMock.create();
@@ -102,6 +105,10 @@ describe('CTI token route', () => {
   beforeEach(() => {
     CtiRegistrationStore.resetForTests();
     mockedResolve.mockResolvedValue('resolved-client-id');
+    mockedEvaluatePermission.mockResolvedValue({
+      accessAllowed: true,
+      missingPrivileges: [],
+    });
   });
 
   afterEach(() => {
@@ -123,7 +130,8 @@ describe('CTI token route', () => {
       device_code: 'dc1',
       user_code: 'WZH-1',
     });
-    expect(mockedResolve).toHaveBeenCalledWith(undefined);
+    expect(mockedResolve).toHaveBeenCalledWith();
+    expect(mockedEvaluatePermission).toHaveBeenCalledWith(mockWazuhClient);
     expect(mockedGetCtiToken).toHaveBeenCalledWith('resolved-client-id');
     expect(mockedPollCtiToken).not.toHaveBeenCalled();
   });
@@ -373,6 +381,119 @@ describe('CTI token route', () => {
       expect(
         CtiRegistrationStore.getInstance().getStatus('resolved-client-id'),
       ).toBeUndefined();
+    });
+  });
+  describe('server-side permission check', () => {
+    const pending = () =>
+      CtiRegistrationStore.getInstance().setInProgress(
+        'resolved-client-id',
+        parseDeviceAuthorizationForStore({
+          device_code: 'dc-admin',
+          user_code: 'WZH-1',
+          verification_uri: 'https://example.test/register',
+          expires_in: 600,
+          interval: 5,
+        }),
+      );
+    const deny = () =>
+      mockedEvaluatePermission.mockResolvedValue({
+        accessAllowed: false,
+        missingPrivileges: [
+          'cluster:admin/content_manager/subscription/create',
+        ],
+      });
+    const notEvaluated = () => mockedEvaluatePermission.mockResolvedValue(null);
+    const storedDeviceCode = () =>
+      CtiRegistrationStore.getInstance().getStatus('resolved-client-id')
+        ?.device_code;
+    const poll = () =>
+      supertest(innerServer.listener).post(routes.token).send({
+        grant_type: CTI_OAUTH_DEVICE_GRANT_TYPE,
+        device_code: 'dc-admin',
+      });
+
+    test.each([
+      ['denied', deny, 403],
+      ['not evaluated', notEvaluated, 503],
+    ])(
+      'POST start is refused when the permission is %s and keeps the pending activation',
+      async (_label, setPermission, status) => {
+        pending();
+        setPermission();
+
+        await supertest(innerServer.listener)
+          .post(routes.token)
+          .send({})
+          .expect(status);
+
+        expect(mockedGetCtiToken).not.toHaveBeenCalled();
+        expect(mockedResolve).not.toHaveBeenCalled();
+        expect(storedDeviceCode()).toBe('dc-admin');
+      },
+    );
+
+    test.each([
+      ['denied', deny, 403],
+      ['not evaluated', notEvaluated, 503],
+    ])(
+      'POST poll is refused when the permission is %s, before reaching the CTI console',
+      async (_label, setPermission, status) => {
+        pending();
+        setPermission();
+
+        await poll().expect(status);
+
+        expect(mockedPollCtiToken).not.toHaveBeenCalled();
+        expect(mockedPostContentManagerSubscription).not.toHaveBeenCalled();
+        expect(storedDeviceCode()).toBe('dc-admin');
+      },
+    );
+
+    test.each([
+      ['denied', deny, 403],
+      ['not evaluated', notEvaluated, 503],
+    ])(
+      'DELETE is refused when the permission is %s and keeps the pending activation',
+      async (_label, setPermission, status) => {
+        pending();
+        setPermission();
+
+        await supertest(innerServer.listener)
+          .delete(routes.token)
+          .expect(status);
+
+        expect(storedDeviceCode()).toBe('dc-admin');
+      },
+    );
+
+    test('a denied user does not join a poll already in flight', async () => {
+      pending();
+      let finishPoll: (body: Record<string, unknown>) => void = () => {};
+      mockedPollCtiToken.mockReturnValueOnce(
+        new Promise(resolve => {
+          finishPoll = resolve;
+        }),
+      );
+      const allowedPoll = poll().then(res => res);
+      await new Promise(resolve => setTimeout(resolve, 50));
+
+      deny();
+      const deniedPoll = poll().then(res => res);
+      await new Promise(resolve => setTimeout(resolve, 50));
+      finishPoll({ error: 'authorization_pending' });
+
+      expect((await deniedPoll).status).toBe(403);
+      expect((await allowedPoll).status).toBe(200);
+      expect(mockedPollCtiToken).toHaveBeenCalledTimes(1);
+    });
+
+    test('POST rejects a client_id in the body', async () => {
+      await supertest(innerServer.listener)
+        .post(routes.token)
+        .send({ client_id: 'attacker-env' })
+        .expect(400);
+
+      expect(mockedGetCtiToken).not.toHaveBeenCalled();
     });
   });
 });

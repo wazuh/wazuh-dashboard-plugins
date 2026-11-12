@@ -19,7 +19,6 @@ export const getAllOptionals = (
       'agentGroups',
       'agentName',
       'sslVerification',
-      'managerCa',
     ];
 
   if (!optionals) return '';
@@ -48,7 +47,6 @@ export const getAllOptionalsMacos = (
       'agentName',
       'wazuhPassword',
       'sslVerification',
-      'managerCa',
     ];
 
   if (!optionals) return '';
@@ -119,13 +117,21 @@ export const getLinuxStartCommand = (
 
 /******** Windows ********/
 
+/* PowerShell does not wait for msiexec.exe, a GUI-subsystem executable, unless its output
+is piped. Waiting lets the start command find the service, and the exit code shows an
+install that failed silently because of /q. Start-Process is not used because it passes
+the arguments as a single string, so the quotes of the PROP='value' options would reach
+msiexec. */
+const WINDOWS_INSTALLER_WAIT =
+  '| Out-Null; if ($LASTEXITCODE -ne 0) { Write-Error "The installation failed with exit code $LASTEXITCODE." }';
+
 export const getWindowsInstallCommand = (
   props: tOSEntryInstallCommand<tOptionalParameters>,
 ) => {
   const { optionals, urlPackage, packageName, name } = props;
   return `Invoke-WebRequest -Uri ${urlPackage} -OutFile \$env:tmp\\${packageName}; msiexec.exe /i \$env:tmp\\${packageName} /q ${
     optionals && getAllOptionals(optionals, name)
-  }`;
+  }${WINDOWS_INSTALLER_WAIT}`;
 };
 
 export const getWindowsStartCommand = (

@@ -10,15 +10,34 @@
  * Find more information about this on the LICENSE file.
  */
 /* eslint-disable camelcase */
+import '@testing-library/jest-dom';
+import React from 'react';
+import { render, waitFor } from '@testing-library/react';
+import { queryDataTestAttr } from '../../../../test/public/query-attr';
 import {
+  ComplianceTable,
   computeOthersCount,
   buildComplianceObject,
   buildRequirementFilter,
-  getFrameworkDefinition,
 } from './compliance-table';
 import { WAZUH_MODULES_ID } from '../../../../common/constants';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
 import { hipaaRequirementsFile } from '../../../../common/compliance-requirements/hipaa-requirements';
+
+// The data source wrappers are replaced so the view gets its data source as a prop.
+jest.mock('../../common/hocs', () => ({
+  withAgentSupportModule: Component => Component,
+  withDataSourceSearchBar: () => Component => Component,
+  withDataSourceLoading: () => Component => Component,
+  withDataSourceInitiated: () => Component => Component,
+}));
+jest.mock('../../common/search-bar', () => ({ WzSearchBar: () => null }));
+jest.mock('../../../react-services/common-services', () => ({
+  getErrorOrchestrator: () => ({ handleError: jest.fn() }),
+}));
+jest.mock('./components', () => ({
+  ComplianceSubrequirements: () => <div data-test-subj='subrequirements' />,
+}));
 
 describe('computeOthersCount', () => {
   it('totals the findings of the codes no requirement claims', () => {
@@ -32,31 +51,6 @@ describe('computeOthersCount', () => {
 
   it('returns 0 when every code is known', () => {
     expect(computeOthersCount([])).toBe(0);
-  });
-});
-
-describe('getFrameworkDefinition', () => {
-  // A FedRAMP identifier is a NIST 800-53 one (AC-2(1)) and holds no dot, so
-  // splitting it on dots gave one group per control.
-  it('groups FedRAMP by control family, like NIST 800-53', () => {
-    const fedramp = getFrameworkDefinition(WAZUH_MODULES_ID.FEDRAMP);
-    const nist = getFrameworkDefinition(WAZUH_MODULES_ID.NIST_800_53);
-
-    expect([fedramp.entriesBySeparator, fedramp.separator]).toEqual([1, '-']);
-    expect([nist.entriesBySeparator, nist.separator]).toEqual([1, '-']);
-  });
-
-  it('resolves the ruleset notation of every framework that has one', () => {
-    for (const section of [
-      WAZUH_MODULES_ID.GDPR,
-      WAZUH_MODULES_ID.HIPAA,
-      WAZUH_MODULES_ID.CMMC,
-      WAZUH_MODULES_ID.NIS2,
-    ]) {
-      const { resolver } = getFrameworkDefinition(section);
-
-      expect(resolver.aliases || resolver.derive).toBeDefined();
-    }
   });
 });
 
@@ -149,5 +143,63 @@ describe('buildRequirementFilter', () => {
 
   it('returns no filter when the requirement has no code', () => {
     expect(buildRequirementFilter(field, [], 'index-pattern')).toEqual([]);
+  });
+});
+
+describe('ComplianceTable', () => {
+  const renderTable = (fetchData: jest.Mock) =>
+    render(
+      <ComplianceTable
+        section={WAZUH_MODULES_ID.PCI_DSS}
+        dataSource={{
+          dataSource: {
+            indexPattern: { id: 'id', title: 'wazuh-findings-v5*' },
+          },
+          fetchData,
+          fetchFilters: [],
+          filters: [],
+          fixedFilters: [],
+          setFilters: jest.fn(),
+          searchBarProps: {
+            query: { query: '' },
+            dateRangeFrom: '',
+            dateRangeTo: '',
+          },
+        }}
+      />,
+    ).container;
+
+  it('renders the permission prompt instead of the requirements on a 403', async () => {
+    const container = renderTable(
+      jest.fn().mockRejectedValue({ status: 403, message: 'Forbidden' }),
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector(
+          queryDataTestAttr('query-error-prompt-permission-denied'),
+        ),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      container.querySelector(queryDataTestAttr('subrequirements')),
+    ).toBeNull();
+  });
+
+  it('renders the requirements when the search succeeds', async () => {
+    const container = renderTable(
+      jest
+        .fn()
+        .mockResolvedValue({ aggregations: { tactics: { buckets: [] } } }),
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector(queryDataTestAttr('subrequirements')),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      container.querySelector('[data-test-subj^="query-error-prompt"]'),
+    ).toBeNull();
   });
 });

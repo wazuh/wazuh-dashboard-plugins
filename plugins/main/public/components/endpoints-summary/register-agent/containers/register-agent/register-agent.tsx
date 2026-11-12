@@ -38,7 +38,6 @@ import { OsCard } from '../../components/os-selector/os-card/os-card';
 import {
   validateAgentName,
   validateExistingEnrollmentToken,
-  validateManagerCaPath,
 } from '../../utils/validations';
 import {
   validateEnrollmentTokenDescription,
@@ -46,6 +45,7 @@ import {
   validateEnrollmentTokenTtl,
 } from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
+import { AddressComboBox } from '../../../../enrollment-tokens/components/address-combo-box';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -90,7 +90,8 @@ export const RegisterAgent = compose(
   /* Minting a token is how the wizard deploys an agent. A server that does not
   know the action -- one older than the mint endpoint, or whose RBAC policy
   predates it -- reports it as missing here, which is also what a user without
-  the permission gets, and both fall back to the enrollment password path. */
+  the permission gets. Both can still paste a stored token, and fall back to
+  the enrollment password path until they do. */
   const [missingEnrollmentTokenPermissions] = useUserPermissionsRequirements([
     [{ action: 'enrollment_token:create', resource: '*:*:*' }],
   ]);
@@ -136,10 +137,19 @@ export const RegisterAgent = compose(
         groups,
       },
     },
+    /* The same input as the token flyout's: the token minted here carries
+    this address, and the manager refuses one outside its listener
+    certificate, so the names in it are offered. */
     serverAddress: {
-      type: 'text',
+      type: 'custom',
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
+      component: props => (
+        <AddressComboBox
+          {...props}
+          data-test-subj='registerAgentServerAddress'
+        />
+      ),
     },
     /* The port and the path prefix complete the endpoint the agent is
     installed with. Both are optional: left empty, they are omitted from the
@@ -163,8 +173,8 @@ export const RegisterAgent = compose(
       validate: validateExistingEnrollmentToken,
     },
     /* These three parameterize the token the server mints, not the agent
-    install, and all are optional: left empty the server applies its own
-    defaults, a 30 day lifetime and unlimited enrollments. */
+    install, and all are optional: left empty the wizard asks for a 1 day
+    lifetime and the server allows unlimited enrollments. */
     enrollmentTokenTtl: {
       type: 'text',
       initialValue: '',
@@ -188,11 +198,9 @@ export const RegisterAgent = compose(
       validate: validateAgentName,
     },
     /* Enrollment authenticates one way, agent to manager, so the manager is
-    authenticated solely by TLS. The agent verifies by default -- against the
-    CA bootstrapped from the enrollment token, the endpoint's system CA store
-    without a token, or the CA below when one is given -- and
-    turning this off generates an explicit WAZUH_SSL_VERIFICATION=none
-    opt-out. */
+    authenticated solely by TLS. The agent verifies by default against the CA
+    the enrollment token delivers, and turning this off generates an explicit
+    WAZUH_SSL_VERIFICATION=none opt-out. */
     sslVerification: {
       type: 'switch',
       initialValue: true,
@@ -210,11 +218,6 @@ export const RegisterAgent = compose(
           },
         },
       },
-    },
-    managerCa: {
-      type: 'text',
-      initialValue: '',
-      validate: validateManagerCaPath,
     },
 
     agentGroups: {

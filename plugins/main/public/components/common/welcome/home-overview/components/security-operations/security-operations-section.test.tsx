@@ -5,7 +5,7 @@ import '../../test-utils/setup-home-overview-test';
 import { SecurityOperationsSection } from './security-operations-section';
 import {
   useActiveResponseOverview,
-  useItHygieneOperatingSystemsCount,
+  useItHygienePlatformsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
   useItHygieneUsersCount,
@@ -16,7 +16,7 @@ import { useInViewport } from '../../../../hooks';
 import * as navigation from '../../utils/navigation';
 
 jest.mock('../../hooks/use-overview-data', () => ({
-  useItHygieneOperatingSystemsCount: jest.fn(),
+  useItHygienePlatformsCount: jest.fn(),
   useItHygienePackagesCount: jest.fn(),
   useItHygieneUsersCount: jest.fn(),
   useItHygieneServicesCount: jest.fn(),
@@ -40,9 +40,9 @@ const complianceControls = { status: 'loading' } as const;
 
 beforeEach(() => {
   jest.clearAllMocks();
-  asMock(useItHygieneOperatingSystemsCount).mockReturnValue({
+  asMock(useItHygienePlatformsCount).mockReturnValue({
     status: 'available',
-    data: 12,
+    data: 3,
   });
   asMock(useItHygienePackagesCount).mockReturnValue({
     status: 'available',
@@ -83,7 +83,7 @@ describe('SecurityOperationsSection', () => {
     expect(within(itHygienePanel).getByText('IT Hygiene')).toBeInTheDocument();
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
     expect(screen.getByText('Regulatory Compliance')).toBeInTheDocument();
-    expect(screen.getByText('Operating systems')).toBeInTheDocument();
+    expect(screen.getByText('Platforms')).toBeInTheDocument();
     expect(screen.getByText('35,682')).toBeInTheDocument();
     expect(
       screen.getByText('Actions triggered, last 24 hours'),
@@ -124,7 +124,7 @@ describe('SecurityOperationsSection', () => {
   });
 
   it('keeps the IT Hygiene panel (never hidden) even when every tile is unavailable', () => {
-    asMock(useItHygieneOperatingSystemsCount).mockReturnValue({
+    asMock(useItHygienePlatformsCount).mockReturnValue({
       status: 'unavailable',
     });
     asMock(useItHygienePackagesCount).mockReturnValue({
@@ -141,6 +141,32 @@ describe('SecurityOperationsSection', () => {
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
     ).toBeInTheDocument();
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
+  });
+
+  it('shows the permission message on the IT Hygiene card when every tile is denied', () => {
+    const denied = {
+      status: 'error',
+      error: {
+        kind: 'permission-denied',
+        message: "You don't have permission to view this data.",
+      },
+    };
+    asMock(useItHygienePlatformsCount).mockReturnValue(denied);
+    asMock(useItHygienePackagesCount).mockReturnValue(denied);
+    asMock(useItHygieneUsersCount).mockReturnValue(denied);
+    asMock(useItHygieneServicesCount).mockReturnValue(denied);
+    const { container } = render(
+      <SecurityOperationsSection complianceControls={complianceControls} />,
+    );
+    const card = container.querySelector(
+      '[data-test-subj="home-overview-it-hygiene"]',
+    ) as HTMLElement;
+    expect(
+      within(card).getByText("You don't have permission to view this data."),
+    ).toBeInTheDocument();
+    expect(
+      card.querySelector('[data-test-subj="it-hygiene-tile-packages"]'),
+    ).not.toBeInTheDocument();
   });
 
   it('keeps every IT Hygiene tile; an unavailable one shows "-"', () => {
@@ -185,14 +211,31 @@ describe('SecurityOperationsSection', () => {
     expect(navigation.getItHygieneUrl).toHaveBeenCalled();
   });
 
+  it('gives Incident Response half the width of the other two cards', () => {
+    const { container } = render(
+      <SecurityOperationsSection complianceControls={complianceControls} />,
+    );
+    const growOf = (testSubj: string) =>
+      container
+        .querySelector(`[data-test-subj="${testSubj}"]`)
+        ?.closest('.euiFlexItem')?.className;
+    expect(growOf('home-overview-it-hygiene')).toContain(
+      'euiFlexItem--flexGrow2',
+    );
+    expect(growOf('home-overview-active-response')).toContain(
+      'euiFlexItem--flexGrow1',
+    );
+    expect(growOf('home-overview-regulatory-compliance')).toContain(
+      'euiFlexItem--flexGrow2',
+    );
+  });
+
   it('fetches lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(
       <SecurityOperationsSection complianceControls={complianceControls} />,
     );
-    expect(asMock(useItHygieneOperatingSystemsCount)).toHaveBeenCalledWith(
-      false,
-    );
+    expect(asMock(useItHygienePlatformsCount)).toHaveBeenCalledWith(false);
     expect(asMock(useActiveResponseOverview)).toHaveBeenCalledWith(false);
     expect(asMock(useTopOperatingSystems)).toHaveBeenCalledWith(false);
     expect(asMock(useTopNetworkServices)).toHaveBeenCalledWith(false);

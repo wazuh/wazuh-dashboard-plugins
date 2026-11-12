@@ -31,19 +31,23 @@ you to create/open/submit it.
 
 Detect the source repo from the issue URL:
 
-- **Internal** — the URL/repo contains `internal-devel-request` (e.g.
-  `https://github.com/wazuh/internal-devel-requests/issues/5526`):
+- **Internal** — the URL is under `github.com/$WZSS_INTERNAL_ISSUES_REPO/`, the
+  internal requests repository:
   - PR `## Description`: **do not reference the issue** — never expose the
     internal link.
-  - CHANGELOG: **no entry** for internal-devel-requests issues.
+  - CHANGELOG: **no entry** for internal issues.
 - **Public** — any other repo (e.g.
   `https://github.com/wazuh/wazuh-dashboard-plugins/issues/8760`):
   - PR `## Description`: `Closes #<n>` (same repo) or `Closes <issue-url>`
     (another public repo).
   - CHANGELOG: add an entry linking to the **issue** (see step 4).
 
-> **repo-specific:** the internal repo is `wazuh/internal-devel-requests`; match
-> it by the substring `internal-devel-request` in the URL.
+> The internal repository is never named in this repo. Read
+> `WZSS_INTERNAL_ISSUES_REPO` from the local env file (see the `setup-local-secrets`
+> skill, section 5) in the same command that checks the URL. If it is not set, or the
+> issue lives in a repo that is neither this one nor clearly public, **ask the user
+> whether the issue is internal** and offer to run `setup-local-secrets`. Never expose
+> an issue link on a guess.
 
 ## Workflow
 
@@ -103,7 +107,7 @@ the PR.**
 
 **Skip the entry entirely when:**
 
-- The issue is from **internal-devel-requests** (internal request → no changelog).
+- The issue is **internal** (internal request → no changelog).
 - The PR is internal-tooling / docs-only / test-only / dependency-bump with no
   user-facing impact — add the **`no-changelog`** label to the PR instead.
 
@@ -117,8 +121,8 @@ sections here.
 
 Fill each section with real content; check the boxes that genuinely apply. In
 `## Description`: public issue → closing keyword (`Closes`, `Fixes`, `Fix`)
-with `#<n>` or the full issue URL; **internal-devel-requests issue → do not
-reference the issue at all** (see "Issue source" above). UI changes require
+with `#<n>` or the full issue URL; **internal issue → do not reference the
+issue at all** (see "Issue source" above). UI changes require
 evidence under `### Results and Evidence`.
 
 > That closing keyword is not just prose — it is what creates the actual
@@ -129,20 +133,16 @@ evidence under `### Results and Evidence`.
 > `ConnectedEvent`, and the PR's `closingIssuesReferences` listed the issue —
 > both immediately on open, and independent of the PR's base branch (this
 > repo's PRs target version branches like `5.0.0`, not the default branch,
-> and the link still forms). Internal-devel-requests issues intentionally get
+> and the link still forms). Internal issues intentionally get
 > no link this way, since no issue reference is exposed in their PR body at
 > all — that is the expected privacy trade-off, not a gap to fix.
 >
-> There is **no REST or GraphQL API to create or manage this link directly**
-> — a documented, still-open gap in GitHub's public API. The closing keyword
-> above is the supported mechanism this skill uses. The only other way to
-> populate the Development section is to link a branch to the issue _before_
-> opening the PR (via the GitHub UI, or `gh issue develop <issue-number>`) —
-> any PR later opened from that branch is auto-linked regardless of its
-> description text. That's a heavier workflow change (branch creation, not
-> just PR body text) and isn't what this skill does today; it's noted here
-> only as the alternative to reach for if a closing keyword alone is ever
-> insufficient (e.g. it gets edited out of the PR description later).
+> The link can also be created with the GraphQL mutation `addCloseIssueReferences`
+> (issue and PR node ids), which does not depend on the PR description. The
+> `develop-issue` skill runs it right after creating the PR, so it links any issue,
+> internal ones included, without exposing a reference in the PR body. Only when
+> this skill is used on its own does the closing keyword remain the mechanism, and
+> then only for public issues. The link is created at PR creation, never later.
 
 **Default deliverable — pre-flight report.** Unless the user asked you to create the
 PR, stop here and output the filled body plus this report for the human to act on:
@@ -153,7 +153,7 @@ PR pre-flight
 - Suggested base: <version-branch>   (confirm before creating)
 - Commits DCO-signed: yes / no (missing: <hashes>)
 - check-standards: PASS / FAIL (<summary>)
-- Issue source: public (<url>) / internal-devel-requests (link withheld)
+- Issue source: public (<url>) / internal (link withheld)
 - CHANGELOG: entry added (links to issue) / not needed (internal / `no-changelog`)
 - UI change: yes → evidence attached? / no
 - Assignee: <user> (via --assignee @me)

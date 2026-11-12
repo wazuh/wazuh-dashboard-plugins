@@ -14,9 +14,16 @@ import { CustomSearchBarProps } from '../custom-search-bar/custom-search-bar';
 import { withDataSourceInitiated, withDataSourceLoading } from '../hocs';
 import { LoadingSearchbarProgress } from '../loading-searchbar-progress/loading-searchbar-progress';
 import { DiscoverNoResults } from '../no-results/no-results';
+import { QueryErrorPrompt } from '../query-error';
 import { SampleDataWarning } from '../../visualize/components';
 import classnames from 'classnames';
 import { compose } from 'redux';
+import { exportSearchToCSV } from '../data-grid';
+import { useReportingCommunicateTableContext } from '../hooks/use-reporting-communicate-table-context';
+import {
+  getInventoryExportFileName,
+  getInventoryReportFields,
+} from './inventory-report';
 
 const InventoryDashboard = compose(
   withDataSourceLoading({
@@ -48,9 +55,12 @@ const InventoryDashboard = compose(
     categoriesSampleData,
     classNameDashboardWrapper,
     additionalDocumentDetailsTabs,
+    exportFileName = getInventoryExportFileName(tableId),
+    emptyState,
   }: InventoryDashboardTableProps) => {
     const {
       results,
+      error: fetchError,
       dataGridProps,
       inspectedHit,
       removeInspectedHit,
@@ -72,7 +82,27 @@ const InventoryDashboard = compose(
 
     const dashboardFingerprint = (fingerprint ?? 0) + caseRefreshKey;
 
-    const shouldHideDashboard = !Boolean(results?.hits?.total > 0);
+    useReportingCommunicateTableContext({
+      totalResults: fetchError ? 0 : results?.hits?.total,
+      generateReport: () =>
+        exportSearchToCSV(
+          {
+            indexPattern: dataSource.indexPattern,
+            filters: fetchFilters,
+            query: searchBarProps.query,
+            fields: getInventoryReportFields(
+              dataGridProps.columnVisibility.visibleColumns,
+              dataSource.indexPattern,
+            ),
+            pagination: { pageIndex: 0, pageSize: results.hits.total },
+            sorting: dataGridProps.sorting,
+          },
+          { fileName: exportFileName },
+        ),
+    });
+
+    const shouldHideDashboard =
+      Boolean(fetchError) || !Boolean(results?.hits?.total > 0);
 
     return (
       <>
@@ -85,12 +115,20 @@ const InventoryDashboard = compose(
           filterInputsProps={managedFiltersProps}
         />
 
-        {results?.hits?.total === 0 ? <DiscoverNoResults /> : null}
+        {fetchError ? (
+          <QueryErrorPrompt
+            error={fetchError}
+            indexPatternTitle={dataSource?.indexPattern?.title}
+          />
+        ) : null}
+        {!fetchError && results?.hits?.total === 0
+          ? emptyState ?? <DiscoverNoResults />
+          : null}
 
         {categoriesSampleData && (
           <div
             className={classnames(classNameDashboardWrapper, {
-              'wz-no-display': !shouldHideDashboard,
+              'wz-no-display': Boolean(fetchError) || !shouldHideDashboard,
             })}
           >
             <SampleDataWarning categoriesSampleData={categoriesSampleData} />
@@ -136,7 +174,7 @@ const InventoryDashboard = compose(
             </>
           )}
         </div>
-        {results?.hits?.total > 0 && (
+        {!fetchError && results?.hits?.total > 0 && (
           <IntlProvider locale='en'>
             <>
               <EuiPageTemplate
@@ -156,6 +194,7 @@ const InventoryDashboard = compose(
                   isDataSourceLoading={isDataSourceLoading}
                   setFilters={setFilters}
                   searchBarProps={searchBarProps}
+                  exportFileName={exportFileName}
                   displayOnlyNoResultsCalloutOnNoResults={true}
                   showSearchBar={false}
                   dataGridProps={dataGridProps}
@@ -190,6 +229,10 @@ export interface InventoryDashboardTableProps {
   categoriesSampleData?: string[];
   classNameDashboardWrapper?: string;
   additionalDocumentDetailsTabs?: TableDataGridWithSearchBarInspectedHitProps<K>['additionalDocumentDetailsTabs'];
+  // Name of the exported files when the table id does not match the tab name
+  exportFileName?: string;
+  /** Rendered instead of the default no results prompt when the search has no hits. */
+  emptyState?: React.ReactNode;
 }
 
 export const InventoryDashboardTable = ({
@@ -203,6 +246,8 @@ export const InventoryDashboardTable = ({
   tableId,
   additionalDocumentDetailsTabs,
   categoriesSampleData,
+  exportFileName,
+  emptyState,
 }: InventoryDashboardTableProps) => {
   const {
     dataSource,
@@ -250,6 +295,8 @@ export const InventoryDashboardTable = ({
       classNameDashboardWrapper={classNameDashboardWrapper}
       additionalDocumentDetailsTabs={additionalDocumentDetailsTabs}
       categoriesSampleData={categoriesSampleData}
+      exportFileName={exportFileName}
+      emptyState={emptyState}
     />
   );
 };

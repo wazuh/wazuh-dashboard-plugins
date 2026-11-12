@@ -1,3 +1,6 @@
+import React from 'react';
+import { EuiToolTip } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { SearchParams, search } from '../search-bar/search-bar-service';
@@ -11,8 +14,8 @@ import { tDataGridColumn } from './use-data-grid';
 import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
-import { formatUIDate } from '../../../react-services';
 import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
+import { getToasts } from '../../../kibana-services';
 
 type ParseData<T> =
   | {
@@ -81,6 +84,7 @@ export const getFieldFormatted = (
 // receive search params
 export const exportSearchToCSV = async (
   params: SearchParams,
+  { fileName = 'events' }: { fileName?: string } = {},
 ): Promise<void> => {
   const DEFAULT_MAX_SIZE_PER_CALL = 1000;
   const {
@@ -130,15 +134,15 @@ export const exportSearchToCSV = async (
   }
 
   const resultsFields = fields;
+  const dateFields = indexPattern.fields.getByType('date');
   const data = allHits.map(hit => {
-    // check if the field type is a date
-    const dateFields = indexPattern.fields.getByType('date');
-    const dateFieldsNames = dateFields.map(field => field.name);
     const flattenHit = indexPattern.flattenHit(hit);
-    // replace the date fields with the formatted date
-    dateFieldsNames.forEach(field => {
-      if (flattenHit[field]) {
-        flattenHit[field] = formatUIDate(flattenHit[field]);
+    // The field formatter keeps the nanoseconds of date_nanos fields
+    dateFields.forEach(field => {
+      if (flattenHit[field.name]) {
+        flattenHit[field.name] = indexPattern
+          .getFormatterForField(field)
+          .convert(flattenHit[field.name]);
       }
     });
     return flattenHit;
@@ -164,8 +168,19 @@ export const exportSearchToCSV = async (
   });
 
   if (blobData) {
+    const fullFileName = `${fileName}-${new Date().toISOString()}.csv`;
     // @ts-ignore
-    FileSaver?.saveAs(blobData, `events-${new Date().toISOString()}.csv`);
+    FileSaver?.saveAs(blobData, fullFileName);
+    getToasts().addSuccess({
+      title: i18n.translate('wazuh.common.dataGrid.exportCsvDownloadedTitle', {
+        defaultMessage: 'Downloaded {fileName}',
+        values: { fileName: fullFileName },
+      }),
+      text: i18n.translate('wazuh.common.dataGrid.exportCsvDownloadedRows', {
+        defaultMessage: '{count, plural, one {# row} other {# rows}}',
+        values: { count: data.length },
+      }),
+    });
   }
 };
 
@@ -183,6 +198,17 @@ const mapToDataGridColumn = (
     ...field,
     id: field.name,
     name: field.name,
+    display: React.createElement(
+      EuiToolTip,
+      // A block anchor that truncates itself: the default inline-block anchor
+      // cannot be shortened with an ellipsis by the header cell.
+      {
+        content: field.name,
+        display: 'inlineBlock',
+        anchorClassName: 'oui-textTruncate wz-display-inline',
+      },
+      React.createElement('span', null, field.name),
+    ),
     schema: field.type,
     actions: { showHide: true },
     // Non-aggregatable fields (e.g. ECS match_only_text) have no doc_values

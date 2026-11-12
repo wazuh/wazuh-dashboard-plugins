@@ -13,14 +13,13 @@ export const HOME_OVERVIEW_COLOR = {
   info: 'var(--wz-ho-info)',
   disabled: 'var(--wz-ho-disabled)',
   failed: 'var(--wz-ho-failed)',
+  /** Light gray (3:1 against the panel) for low-priority values, such as Informational. */
+  subdued: 'var(--wz-ho-subdued)',
 } as const;
 
 /** AA-contrast-boosted variants (OUI's `makeHighContrastColor` tokens) for status colors rendered
  * as text rather than a bar/tile fill. */
 export const HOME_OVERVIEW_TEXT_COLOR = {
-  /** Same value as EuiLink's `color="text"` — the default for EuiStat tiles with no
-   * status color, so they match the linked KPI numbers rendered next to them. */
-  text: 'var(--wz-ho-text)',
   success: 'var(--wz-ho-success-text)',
   danger: 'var(--wz-ho-danger-text)',
   warning: 'var(--wz-ho-warning-text)',

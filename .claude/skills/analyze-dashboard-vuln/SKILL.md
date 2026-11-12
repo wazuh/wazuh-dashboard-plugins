@@ -46,7 +46,7 @@ Group rows by **CVE** — one CVE produces **one** consolidated issue covering e
 
 ## Beat 2 — Produce artifacts (on confirmation)
 
-7. **Draft the issue body.** First dedup: `gh issue list --repo wazuh/internal-devel-requests --search "<CVE> in:title" --state all`. If one already exists, reuse its URL and skip drafting. Otherwise write the [full template](#issue-template) to a git-ignored scratch file `tmp/vuln-issues/<CVE>.md`, reasoning each impact section for this CVE in Wazuh's context and enumerating all affected repos in the Description.
+7. **Draft the issue body.** First dedup in the internal requests repository: load `WZSS_INTERNAL_ISSUES_REPO` from the local env file (see the `setup-local-secrets` skill, section 5) and, in the same command, run `gh issue list --repo "$WZSS_INTERNAL_ISSUES_REPO" --search "<CVE> in:title" --state all`. If the variable is not set, ask the user for the repository or offer to run `setup-local-secrets`; never write its name in this repo. If one already exists, reuse its URL and skip drafting. Otherwise write the [full template](#issue-template) to a git-ignored scratch file `tmp/vuln-issues/<CVE>.md`, reasoning each impact section for this CVE in Wazuh's context and enumerating all affected repos in the Description.
 
 8. **Print the issue title + labels** for manual creation: title per [convention](#title-convention); labels `level/task`, `type/vulnerability`.
 

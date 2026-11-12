@@ -22,8 +22,10 @@ jest.mock('json-2-csv', () => ({
 jest.mock('../../../services/file-saver', () => ({
   saveAs: jest.fn(),
 }));
-jest.mock('../../../react-services', () => ({
-  formatUIDate: (date: string) => date,
+const mockAddSuccess = jest.fn();
+jest.mock('../../../kibana-services', () => ({
+  ...jest.requireActual('../../../kibana-services'),
+  getToasts: () => ({ addSuccess: mockAddSuccess }),
 }));
 
 describe('describe-grid-test', () => {
@@ -121,6 +123,51 @@ describe('describe-grid-test', () => {
         },
       ]);
       expect(FileSaver.saveAs).toHaveBeenCalled();
+    });
+
+    it('formats date fields with the index pattern formatter', async () => {
+      const timestamp = '2026-10-27T12:00:00.123456789Z';
+      const convert = jest.fn(() => 'formatted-date');
+      (search as jest.Mock).mockResolvedValue({
+        hits: { hits: [{ _id: 'id-1', _source: { '@timestamp': timestamp } }] },
+      });
+
+      await exportSearchToCSV({
+        ...buildParams(),
+        indexPattern: {
+          ...indexPattern,
+          fields: { getByType: () => [{ name: '@timestamp' }] },
+          getFormatterForField: () => ({ convert }),
+        },
+      } as unknown as SearchParams);
+
+      expect(convert).toHaveBeenCalledWith(timestamp);
+      const [data] = (converter.json2csvAsync as jest.Mock).mock.calls[0];
+      expect(data).toEqual([{ '@timestamp': 'formatted-date' }]);
+    });
+
+    it('names the file after its content and confirms the download', async () => {
+      (search as jest.Mock).mockResolvedValue({
+        hits: { hits: [HIT_WITH_FORMULA] },
+      });
+
+      await exportSearchToCSV(buildParams() as unknown as SearchParams, {
+        fileName: 'packages',
+      });
+
+      const [, fileName] = (FileSaver.saveAs as jest.Mock).mock.calls[0];
+      expect(fileName).toMatch(/^packages-\d{4}-\d{2}-\d{2}T.*\.csv$/);
+      expect(mockAddSuccess).toHaveBeenCalledWith({
+        title: `Downloaded ${fileName}`,
+        text: '1 row',
+      });
+    });
+
+    it('keeps the events file name when none is given', async () => {
+      await runExport();
+
+      const [, fileName] = (FileSaver.saveAs as jest.Mock).mock.calls[0];
+      expect(fileName).toMatch(/^events-.*\.csv$/);
     });
 
     it('keeps the writer options and column selectors untouched', async () => {

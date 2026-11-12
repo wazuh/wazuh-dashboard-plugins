@@ -3,7 +3,7 @@ import type { CtiConsumer } from '../../common/cti-consumers';
 import {
   getConsumerSyncState,
   getFeedSyncSummary,
-  isFeedSyncInProgress,
+  getSyncProgress,
 } from './cti-consumer-sync-state';
 
 const consumer = (overrides: Partial<CtiConsumer> = {}): CtiConsumer => ({
@@ -59,6 +59,24 @@ describe('getConsumerSyncState', () => {
   });
 });
 
+describe('getSyncProgress', () => {
+  test('is the share of the remote content already synced', () => {
+    expect(
+      getSyncProgress(consumer({ local_offset: 30, remote_offset: 120 })),
+    ).toBe(0.25);
+  });
+
+  test('stays within [0, 1] when the offsets are out of step', () => {
+    expect(
+      getSyncProgress(consumer({ local_offset: 15, remote_offset: 10 })),
+    ).toBe(1);
+  });
+
+  test('is null when the remote offset is unknown', () => {
+    expect(getSyncProgress(consumer({ remote_offset: 0 }))).toBeNull();
+  });
+});
+
 describe('getFeedSyncSummary', () => {
   test('is empty without consumers', () => {
     expect(getFeedSyncSummary([])).toBe('empty');
@@ -78,15 +96,5 @@ describe('getFeedSyncSummary', () => {
     expect(getFeedSyncSummary([pending, syncing, consumer()])).toBe('syncing');
     expect(getFeedSyncSummary([unknown, pending])).toBe('pending');
     expect(getFeedSyncSummary([consumer(), unknown])).toBe('unknown');
-  });
-});
-
-describe('isFeedSyncInProgress', () => {
-  test('only while syncing or pending', () => {
-    expect(isFeedSyncInProgress('syncing')).toBe(true);
-    expect(isFeedSyncInProgress('pending')).toBe(true);
-    expect(isFeedSyncInProgress('upToDate')).toBe(false);
-    expect(isFeedSyncInProgress('failed')).toBe(false);
-    expect(isFeedSyncInProgress('empty')).toBe(false);
   });
 });

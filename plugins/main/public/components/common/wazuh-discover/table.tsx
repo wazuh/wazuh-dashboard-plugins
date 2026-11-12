@@ -77,6 +77,9 @@ export interface TableDataGridBasicProps<K> {
   query: { query: string; language: string };
   isDataSourceLoading: boolean;
   displayOnlyNoResultsCalloutOnNoResults?: boolean;
+  exportFileName?: string;
+  /** Rendered instead of the default no results prompt when there are no hits. */
+  emptyState?: React.ReactNode;
 }
 
 const Padding = ({ children, style }: { children; style?: object }) => (
@@ -109,7 +112,9 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
         displayOnlyNoResultsCalloutOnNoResults &&
         !isDataSourceLoading &&
         results?.hits?.total === 0,
-      DiscoverNoResults,
+      ({ emptyState }: TableDataGridBasicProps) => (
+        <>{emptyState ?? <DiscoverNoResults />}</>
+      ),
     ),
   )(
     ({
@@ -118,6 +123,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
       dataSource,
       fetchFilters,
       query,
+      exportFileName,
     }: TableDataGridBasicProps) => {
       const sideNavDocked = getWazuhCorePlugin().hooks.useDockedSideNav();
       const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -136,7 +142,7 @@ export const TableDataGridBasic: React.FunctionComponent<TableDataGridBasicProps
         };
         try {
           setIsExporting(true);
-          await exportSearchToCSV(params);
+          await exportSearchToCSV(params, { fileName: exportFileName });
         } catch (error) {
           const searchError = ErrorFactory.create(HttpError, {
             error,
@@ -258,6 +264,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
     query,
     displayOnlyNoResultsCalloutOnNoResults,
     isDataSourceLoading,
+    exportFileName,
   }: TableDataGridWithSearchBarProps<K>) => (
     <>
       {title && (
@@ -293,6 +300,7 @@ const TableDataGridWithSearchBar: React.FunctionComponent<
             displayOnlyNoResultsCalloutOnNoResults
           }
           isDataSourceLoading={isDataSourceLoading}
+          exportFileName={exportFileName}
         />
       </Padding>
     </>
@@ -323,6 +331,7 @@ export const useTableDataGridFetch = ({
   const { query, dateRangeFrom, dateRangeTo } = searchBarProps;
 
   const [results, setResults] = useState<SearchResponse>({} as SearchResponse);
+  const [error, setError] = useState<unknown>(undefined);
   const [inspectedHit, setInspectedHit] = useState<any>(undefined);
   const { onDocumentMutated, caseRefreshKey } = useDocumentMutationSync({
     inspectedHit,
@@ -376,6 +385,8 @@ export const useTableDataGridFetch = ({
     if (isDataSourceLoading) {
       return;
     }
+    // Ignore the response of a request that a newer one replaced.
+    let ignore = false;
     fetchData({
       query: searchBarProps.query,
       pagination,
@@ -387,9 +398,19 @@ export const useTableDataGridFetch = ({
         : {}),
     })
       .then(results => {
+        if (ignore) {
+          return;
+        }
+        setError(undefined);
         setResults(results);
       })
       .catch(error => {
+        if (ignore) {
+          return;
+        }
+        // Drop stale hits so only the error prompt is shown
+        setResults({} as SearchResponse);
+        setError(error);
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
@@ -398,6 +419,9 @@ export const useTableDataGridFetch = ({
         });
         ErrorHandler.handleError(searchError);
       });
+    return () => {
+      ignore = true;
+    };
   }, [
     isDataSourceLoading,
     reloadFetch,
@@ -433,6 +457,7 @@ export const useTableDataGridFetch = ({
 
   return {
     results,
+    error,
     dataGridProps,
     inspectedHit,
     removeInspectedHit,
@@ -492,11 +517,12 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
     title,
     showSearchBar,
     results,
-    query,
+    query = searchBarProps?.query,
     inspectedHit,
     removeInspectedHit,
     onDocumentMutated,
     dataGridProps,
+    exportFileName,
   }: TableDataGridWithSearchBarInspectedHitProps) => {
     return (
       <>
@@ -515,6 +541,7 @@ export const TableDataGridWithSearchBarInspectedHit: React.FunctionComponent<
             displayOnlyNoResultsCalloutOnNoResults
           }
           isDataSourceLoading={isDataSourceLoading}
+          exportFileName={exportFileName}
         />
         {inspectedHit && (
           <DocumentDetailsOnFlyout

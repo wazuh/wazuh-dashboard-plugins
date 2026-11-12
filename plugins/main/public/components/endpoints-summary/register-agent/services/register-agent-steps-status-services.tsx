@@ -77,9 +77,9 @@ const serverEndpointIsIncomplete = (
 
 /* The wizard mints an enrollment token and installs the agent with it, so
 until the operator generates one there is no command to show. The flag is false
-whenever the token path is not in use -- the operator lacks
-`enrollment_token:create`, or the manager does not know the action -- and the
-wizard falls back to the enrollment password. */
+when the operator cannot mint -- no `enrollment_token:create`, or a manager
+that does not know the action -- and the wizard falls back to the enrollment
+password until a stored token is pasted. */
 export const showCommandsSections = (
   formFields: UseFormReturn['fields'],
   enrollmentTokenIsMissing: boolean = false,
@@ -227,7 +227,6 @@ export enum tFormFieldsLabel {
   serverAddress = 'server address',
   serverPort = 'server port',
   serverPath = 'server path prefix',
-  managerCa = 'manager CA file path',
 }
 
 /* The three fields that parameterize a mint request, none of which is sent when
@@ -246,9 +245,6 @@ const fieldIsNotApplicable = (
   fieldName: string,
   formFields: UseFormReturn['fields'],
 ): boolean => {
-  if (fieldName === 'managerCa' && !formFields.sslVerification?.value) {
-    return true;
-  }
   /* A token the operator already had is being reused, so no mint request is
   made and the fields that would parameterize it are disabled. */
   return (

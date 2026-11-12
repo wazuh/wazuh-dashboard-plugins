@@ -6,6 +6,7 @@ import { useChartDimensions } from '../hooks/use_chart_dimensions';
 export type ChartDonutDataEntry = {
   color: string;
   value: number;
+  description?: string;
 };
 
 export type ChartDonutProps = {
@@ -48,6 +49,13 @@ export const ChartDonut = (props: ChartDonutProps) => {
         <p style={{ marginLeft: '5px', fontSize: '0.8rem' }}>
           {data.label}: {data.value}
         </p>
+        {data.description && (
+          <p
+            style={{ marginLeft: '5px', fontSize: '0.8rem', maxWidth: '250px' }}
+          >
+            {data.description}
+          </p>
+        )}
       </div>
     );
   };

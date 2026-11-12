@@ -18,13 +18,15 @@ import {
   EuiTitle,
   EuiFieldSearch,
   EuiSpacer,
-  EuiCallOut,
   EuiToolTip,
   EuiSwitch,
   EuiPopover,
   EuiText,
   EuiIcon,
+  EuiIconTip,
   EuiLoadingSpinner,
+  EuiCallOut,
+  EuiLink,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { RequirementFlyout } from '../requirement-flyout';
@@ -46,6 +48,10 @@ import {
   getRequirementLabel,
   getRequirementName,
 } from '../../../../../../common/compliance-requirements/requirement-text';
+import { DiscoverNoResults } from '../../../../common/no-results/no-results';
+import { getModuleEmptyStateTexts } from '../../../../common/no-results/module-empty-state-texts';
+import { webDocumentationLink } from '../../../../../../common/services/web_documentation';
+import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 
 // Sentinel id for the synthetic "Others" tile. Only used for this
 // component's own bookkeeping (showFlyout/state) - never compared against
@@ -58,6 +64,30 @@ const OTHERS_REQUIREMENT_LABEL = i18n.translate(
   },
 );
 
+/**
+ * Tooltip of a requirement tile: what its count is. A requirement without
+ * findings is not a requirement that is met, so the tooltip says so.
+ */
+export function getRequirementTooltip(requirement: string, quantity: number) {
+  return quantity > 0
+    ? i18n.translate(
+        'wazuh.complianceTable.subrequirements.requirementFindingsTooltip',
+        {
+          defaultMessage:
+            '{quantity, plural, one {# finding} other {# findings}} mapped to {requirement} in the selected time range. Select it to see its description and findings.',
+          values: { requirement, quantity },
+        },
+      )
+    : i18n.translate(
+        'wazuh.complianceTable.subrequirements.requirementNoFindingsTooltip',
+        {
+          defaultMessage:
+            'No findings mapped to {requirement} in the selected time range. This does not mean that the requirement is met. Select it to see its description.',
+          values: { requirement },
+        },
+      );
+}
+
 export class ComplianceSubrequirements extends Component {
   _isMount = false;
   state: {};
@@ -65,6 +95,8 @@ export class ComplianceSubrequirements extends Component {
   props!: {
     requirementCounts?: Record<string, number>;
     requirementCodes?: Record<string, string[]>;
+    othersCount?: number;
+    loadingAlerts?: boolean;
   };
 
   constructor(props) {
@@ -234,13 +266,7 @@ export class ComplianceSubrequirements extends Component {
                   'View details of Others. This count sums occurrences of unknown requirement values — a finding tagged with more than one unknown value is counted once per value, so the total can exceed the number of distinct findings.',
               },
             )
-          : i18n.translate(
-              'wazuh.complianceTable.subrequirements.viewDetailsTooltip',
-              {
-                defaultMessage: 'View details of {requirement}',
-                values: { requirement: item.id },
-              },
-            );
+          : getRequirementTooltip(item.id, item.quantity);
         const tooltipNoOthersContent = i18n.translate(
           'wazuh.complianceTable.subrequirements.noFindingsTooltip',
           {
@@ -384,18 +410,71 @@ export class ComplianceSubrequirements extends Component {
       );
     } else {
       return (
-        <EuiCallOut
-          title={i18n.translate(
+        <DiscoverNoResults
+          message={i18n.translate(
             'wazuh.complianceTable.subrequirements.noResultsTitle',
             {
-              defaultMessage: 'There are no results.',
+              defaultMessage: 'No requirements found',
             },
           )}
-          iconType='help'
-          color='warning'
-        ></EuiCallOut>
+          description={i18n.translate(
+            'wazuh.complianceTable.subrequirements.noResultsDescription',
+            {
+              defaultMessage:
+                'No requirement of this standard matches the current search. Try changing it.',
+            },
+          )}
+        />
       );
     }
+  }
+
+  /**
+   * Notice shown while no requirement has findings: the tiles then show only
+   * zeros, so it says what produces the findings and links to the guide.
+   */
+  renderNoFindingsCallOut() {
+    const total =
+      Object.values(this.props.requirementCounts || {}).reduce(
+        (sum: number, count) => sum + (count || 0),
+        0,
+      ) + (this.props.othersCount || 0);
+
+    if (this.props.loadingAlerts || total > 0) {
+      return null;
+    }
+
+    const texts = getModuleEmptyStateTexts('regulatory-compliance');
+
+    return (
+      <>
+        <EuiCallOut
+          size='s'
+          iconType='iInCircle'
+          title={texts?.title}
+          data-test-subj='wzComplianceRequirementsNoFindings'
+        >
+          <p>{texts?.description}</p>
+          <p>
+            <EuiLink
+              href={webDocumentationLink(DOCS_PATHS.regulatoryCompliance)}
+              target='_blank'
+              rel='noopener noreferrer'
+              external
+            >
+              {i18n.translate(
+                'wazuh.complianceTable.subrequirements.noFindingsDocsLink',
+                {
+                  defaultMessage:
+                    'Learn how findings are mapped to requirements',
+                },
+              )}
+            </EuiLink>
+          </p>
+        </EuiCallOut>
+        <EuiSpacer size='s' />
+      </>
+    );
   }
 
   onChangeFlyout = flyoutOn => {
@@ -473,7 +552,36 @@ export class ComplianceSubrequirements extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size='xs' />
+        <EuiText size='s' color='subdued'>
+          <p>
+            {i18n.translate(
+              'wazuh.complianceTable.subrequirements.countDescription',
+              {
+                defaultMessage:
+                  'Findings: the number on each requirement counts the findings mapped to it in the selected time range.',
+              },
+            )}{' '}
+            <EuiIconTip
+              type='questionInCircle'
+              color='subdued'
+              aria-label={i18n.translate(
+                'wazuh.complianceTable.subrequirements.countTooltipAriaLabel',
+                { defaultMessage: 'About the findings count' },
+              )}
+              content={i18n.translate(
+                'wazuh.complianceTable.subrequirements.countTooltip',
+                {
+                  defaultMessage:
+                    'A finding is an event that matched a rule mapped to the requirement. Findings are evidence that supports compliance, but they do not establish it: 0 means that no finding was mapped to the requirement, not that the requirement is met.',
+                },
+              )}
+              iconProps={{
+                'data-test-subj': 'wzComplianceRequirementsCountTooltip',
+              }}
+            />
+          </p>
+        </EuiText>
+        <EuiSpacer size='s' />
 
         <EuiFieldSearch
           fullWidth={true}
@@ -494,6 +602,8 @@ export class ComplianceSubrequirements extends Component {
           )}
         />
         <EuiSpacer size='s' />
+
+        {this.renderNoFindingsCallOut()}
 
         <div>
           {this.props.loadingAlerts ? (

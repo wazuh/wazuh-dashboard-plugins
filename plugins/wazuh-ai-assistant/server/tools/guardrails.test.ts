@@ -1269,6 +1269,82 @@ test('checkIndexAllowlist: rejects a path-traversal-shaped value even though the
 
 // --- applySafetyValves ------------------------------------------------------------------------
 
+test('applySafetyValves: sorts @timestamp as date_nanos in every sort shape', () => {
+  const result = applySafetyValves({
+    query: timeBoundedFilter(),
+    sort: [
+      '@timestamp',
+      { '@timestamp': 'asc' },
+      { '@timestamp': { order: 'desc' } },
+      { 'wazuh.rule.level': { order: 'desc' } },
+    ],
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.deepEqual(result.body.sort, [
+      { '@timestamp': { numeric_type: 'date_nanos' } },
+      { '@timestamp': { order: 'asc', numeric_type: 'date_nanos' } },
+      { '@timestamp': { order: 'desc', numeric_type: 'date_nanos' } },
+      { 'wazuh.rule.level': { order: 'desc' } },
+    ]);
+  }
+});
+
+test('applySafetyValves: keeps an explicit numeric_type and does not mutate the input sort', () => {
+  const sort = [{ '@timestamp': { order: 'desc', numeric_type: 'date' } }];
+  const input = [{ '@timestamp': { order: 'desc' } }];
+  const explicit = applySafetyValves({ query: timeBoundedFilter(), sort });
+  const added = applySafetyValves({ query: timeBoundedFilter(), sort: input });
+  assert.equal(explicit.ok && added.ok, true);
+  if (explicit.ok) {
+    assert.deepEqual(explicit.body.sort, sort);
+  }
+  assert.deepEqual(input, [{ '@timestamp': { order: 'desc' } }]);
+});
+
+test('applySafetyValves: sorts @timestamp as date_nanos in top_hits and inner_hits', () => {
+  const nanos = { order: 'desc', numeric_type: 'date_nanos' };
+  const result = applySafetyValves({
+    query: timeBoundedFilter(),
+    aggs: {
+      by_agent: {
+        terms: { field: 'wazuh.agent.id' },
+        aggs: {
+          latest: {
+            top_hits: { size: 1, sort: [{ '@timestamp': 'desc' }] },
+          },
+        },
+      },
+    },
+    collapse: {
+      field: 'wazuh.agent.id',
+      inner_hits: [{ name: 'latest', sort: [{ '@timestamp': 'desc' }] }],
+    },
+  });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    const aggs = result.body.aggs as {
+      by_agent: { aggs: { latest: { top_hits: { sort: unknown } } } };
+    };
+    const collapse = result.body.collapse as {
+      inner_hits: Array<{ sort: unknown }>;
+    };
+    assert.deepEqual(aggs.by_agent.aggs.latest.top_hits.sort, [
+      { '@timestamp': nanos },
+    ]);
+    assert.deepEqual(collapse.inner_hits[0].sort, [{ '@timestamp': nanos }]);
+  }
+});
+
+test('applySafetyValves: keeps an @timestamp sort with a non-date unmapped_type', () => {
+  const sort = [{ '@timestamp': { order: 'desc', unmapped_type: 'long' } }];
+  const result = applySafetyValves({ query: timeBoundedFilter(), sort });
+  assert.equal(result.ok, true);
+  if (result.ok) {
+    assert.deepEqual(result.body.sort, sort);
+  }
+});
+
 test('applySafetyValves: clamps size to <= 500', () => {
   const result = applySafetyValves({ query: timeBoundedFilter(), size: 5000 });
   assert.equal(result.ok, true);

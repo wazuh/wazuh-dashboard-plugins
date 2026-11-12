@@ -48,21 +48,26 @@ const ButtonPinnedAgent = ({
       alignItems='center'
       responsive={false}
     >
-      <EuiFlexItem grow={false} style={{ paddingLeft: 5, paddingRight: 5 }}>
-        <IconTip
-          iconType='alert'
-          color='warning'
-          size='l'
-          isDisabled={!outdatedAgentPinned}
-          message={i18n.translate(
-            'wazuh.core.agentSelector.outdatedAgentWarning',
-            {
-              defaultMessage:
-                'Agent version is below 5.0.0. Some features may not be available.',
-            },
-          )}
-        />
-      </EuiFlexItem>
+      {outdatedAgentPinned ? (
+        <EuiFlexItem
+          grow={false}
+          style={{ paddingLeft: 5, paddingRight: 5 }}
+          data-test-subj='wzOutdatedAgentWarning'
+        >
+          <IconTip
+            iconType='alert'
+            color='warning'
+            size='l'
+            message={i18n.translate(
+              'wazuh.core.agentSelector.outdatedAgentWarning',
+              {
+                defaultMessage:
+                  'Agent version is below 5.0.0. Some features may not be available.',
+              },
+            )}
+          />
+        </EuiFlexItem>
+      ) : null}
       <EuiFlexItem grow={false}>
         <WzButton
           buttonType={WzButtonType.empty}

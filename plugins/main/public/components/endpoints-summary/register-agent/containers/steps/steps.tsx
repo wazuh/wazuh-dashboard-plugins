@@ -103,10 +103,6 @@ const FIELD_LABELS: Record<tFormFieldsLabel, string> = {
     'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.serverPath',
     { defaultMessage: 'server path prefix' },
   ),
-  [tFormFieldsLabel.managerCa]: i18n.translate(
-    'wazuh.endpointsSummary.registerAgentSteps.fieldLabels.managerCa',
-    { defaultMessage: 'manager CA file path' },
-  ),
 };
 
 /* Joins the labels into one list, leaving the conjunction and the word order to
@@ -144,10 +140,13 @@ export const Steps = ({
   onEnrollmentTokenChange,
 }: IStepsProps) => {
   /* The enrollment token replaces the password: the agent enrolls with the
-  credential the token carries, so the password steps are only reached when the
-  server cannot mint one for this user. */
+  credential the token carries. An operator who cannot mint one can still paste
+  a stored token, so the password steps are only reached while neither path
+  has given the deployment a token. */
+  const usesEnrollmentToken =
+    canCreateEnrollmentToken || Boolean(enrollmentToken);
   const passwordPermissionMissing =
-    !canCreateEnrollmentToken && needsPassword && !canReadAuthdPassword;
+    !usesEnrollmentToken && needsPassword && !canReadAuthdPassword;
   /* Blocks the command steps while the token path is in use and no token has
   been generated yet. */
   const enrollmentTokenIsMissing = canCreateEnrollmentToken && !enrollmentToken;
@@ -163,7 +162,6 @@ export const Steps = ({
       wazuhPassword: canCreateEnrollmentToken ? '' : wazuhPassword,
       enrollmentToken: enrollmentToken?.token || '',
       sslVerification: true,
-      managerCa: '',
     },
   } as IParseRegisterFormValues;
   const [missingStepsName, setMissingStepsName] = useState<tFormStepsLabel[]>(
@@ -319,30 +317,28 @@ export const Steps = ({
       ),
       status: getServerAddressStepStatus(form.fields),
     },
-    ...(canCreateEnrollmentToken
-      ? [
-          {
-            title: i18n.translate(
-              'wazuh.endpointsSummary.registerAgentSteps.enrollmentTokenTitle',
-              {
-                defaultMessage: 'Enrollment token:',
-              },
-            ),
-            children: (
-              <EnrollmentTokenInput
-                formFields={form.fields}
-                enrollmentToken={enrollmentToken}
-                onEnrollmentTokenChange={onEnrollmentTokenChange}
-              />
-            ),
-            status: getEnrollmentTokenStepStatus(
-              form.fields,
-              Boolean(enrollmentToken),
-            ),
-          },
-        ]
-      : []),
-    ...(!canCreateEnrollmentToken && needsPassword && !wazuhPassword
+    /* Shown even without the permission to mint: a stored token needs none. */
+    {
+      title: i18n.translate(
+        'wazuh.endpointsSummary.registerAgentSteps.enrollmentTokenTitle',
+        {
+          defaultMessage: 'Enrollment token:',
+        },
+      ),
+      children: (
+        <EnrollmentTokenInput
+          formFields={form.fields}
+          enrollmentToken={enrollmentToken}
+          onEnrollmentTokenChange={onEnrollmentTokenChange}
+          canCreateEnrollmentToken={canCreateEnrollmentToken}
+        />
+      ),
+      status: getEnrollmentTokenStepStatus(
+        form.fields,
+        Boolean(enrollmentToken),
+      ),
+    },
+    ...(!usesEnrollmentToken && needsPassword && !wazuhPassword
       ? [
           {
             title: passwordStepTitle,
@@ -423,7 +419,7 @@ export const Steps = ({
       children: (
         <OptionalsInputs
           formFields={form.fields}
-          usesEnrollmentToken={canCreateEnrollmentToken}
+          usesEnrollmentToken={usesEnrollmentToken}
         />
       ),
       status: getOptionalParameterStepStatus(
@@ -479,6 +475,9 @@ export const Steps = ({
           ) : null}
           {!missingStepsName?.length && !invalidFieldsName?.length ? (
             <>
+              <OsCommandWarning
+                os={registerAgentFormValues.operatingSystem.name}
+              />
               <CommandOutput
                 commandText={installCommand}
                 showCommand={showCommandsSections(
@@ -491,9 +490,6 @@ export const Steps = ({
                 enrollmentToken={
                   registerAgentFormValues.optionalParams.enrollmentToken
                 }
-              />
-              <OsCommandWarning
-                os={registerAgentFormValues.operatingSystem.name}
               />
             </>
           ) : null}

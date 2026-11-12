@@ -14,38 +14,16 @@ import { EuiPanel, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 //@ts-ignore
 import { ComplianceRequirements } from './components/requirements';
 import { ComplianceSubrequirements } from './components';
-import { pciRequirementsFile } from '../../../../common/compliance-requirements/pci-requirements';
-import {
-  gdprRequirementsAliases,
-  gdprRequirementsFile,
-} from '../../../../common/compliance-requirements/gdpr-requirements';
-import {
-  hipaaRequirementsAliases,
-  hipaaRequirementsFile,
-} from '../../../../common/compliance-requirements/hipaa-requirements';
-import { nistRequirementsFile } from '../../../../common/compliance-requirements/nist-requirements';
-import { nist171RequirementsFile } from '../../../../common/compliance-requirements/nist-171-requirements';
-import { tscRequirementsFile } from '../../../../common/compliance-requirements/tsc-requirements';
-import { iso27001RequirementsFile } from '../../../../common/compliance-requirements/iso27001-requirements';
-import {
-  cmmcRequirementsAliases,
-  cmmcRequirementsFile,
-} from '../../../../common/compliance-requirements/cmmc-requirements';
-import { fedrampRequirementsFile } from '../../../../common/compliance-requirements/fedramp-requirements';
-import { nis2RequirementsFile } from '../../../../common/compliance-requirements/nis2-requirements';
 import { ComplianceRequirement } from '../../../../common/compliance-requirements/types';
 import {
-  deriveDottedParent,
-  deriveGdprArticle,
-  deriveHipaaCitation,
   indexRequirementCodes,
   RequirementResolver,
 } from '../../../../common/compliance-requirements/requirement-codes';
+import { getFrameworkDefinition } from '../../../../common/compliance-requirements/frameworks';
 import {
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_REQUIREMENT,
   DATA_SOURCE_FILTER_CONTROLLED_REGULATORY_COMPLIANCE_OTHER_REQUIREMENT,
   UI_LOGGER_LEVELS,
-  WAZUH_MODULES_ID,
 } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
@@ -66,54 +44,13 @@ import { i18n } from '@osd/i18n';
 import { I18nProvider } from '@osd/i18n/react';
 import { useAsyncAction } from '../../common/hooks';
 import { WzSearchBar } from '../../common/search-bar';
+import { QueryErrorPrompt } from '../../common/query-error';
 import { compose } from 'redux';
 
 // Generous headroom above every framework's known-catalog size, so the
 // terms aggregation realistically returns every distinct value (known and
 // unknown) instead of silently truncating at the top N by count.
 const COMPLIANCE_REQUIREMENTS_AGGREGATION_SIZE = 1000;
-
-// HIPAA identifiers name a standard and, under it, its implementation
-// specifications: 164.312(a)(1) is the "Access control" standard and
-// 164.312(a)(2)(i-iv) are its specifications. The standard is the unit a
-// compliance state is assessed against, so every specification groups under it.
-const HIPAA_STANDARD = /^(\d+\.\d+\([a-z]\))/;
-
-function getHipaaStandard(requirement: string) {
-  return HIPAA_STANDARD.exec(requirement)?.[1] || requirement;
-}
-
-// GDPR is not written as a control framework: its hierarchy is chapter,
-// article, paragraph and point, and the article is the unit a compliance state
-// is cited and assessed against. The chapter is the only grouping the
-// Regulation itself defines, and the article number determines it.
-const GDPR_CHAPTERS: Array<{ chapter: string; upTo: number }> = [
-  { chapter: 'I', upTo: 4 },
-  { chapter: 'II', upTo: 11 },
-  { chapter: 'III', upTo: 23 },
-  { chapter: 'IV', upTo: 43 },
-  { chapter: 'V', upTo: 50 },
-  { chapter: 'VI', upTo: 59 },
-  { chapter: 'VII', upTo: 76 },
-  { chapter: 'VIII', upTo: 84 },
-  { chapter: 'IX', upTo: 91 },
-  { chapter: 'X', upTo: 93 },
-  { chapter: 'XI', upTo: 99 },
-];
-
-function getGdprChapter(requirement: string) {
-  const article = Number(requirement.replace(/\D/g, ''));
-  const chapter = GDPR_CHAPTERS.find(({ upTo }) => article <= upTo);
-
-  return chapter && article ? chapter.chapter : requirement;
-}
-
-// A NIS2 requirement is an article of the Directive, or one of the points of
-// Article 21(2), which is the article the cybersecurity risk-management
-// measures live in. A point is assessed as part of its article.
-function getNis2Group(requirement: string) {
-  return requirement.split('.')[0];
-}
 
 function buildComplianceRequirements(
   requirements: Record<string, ComplianceRequirement>,
@@ -172,91 +109,6 @@ const EMPTY_REQUIREMENTS_DATA: RequirementsData = {
   codesByRequirement: {},
   counts: {},
 };
-
-interface FrameworkDefinition {
-  requirements: Record<string, ComplianceRequirement>;
-  // Grouping of the left panel: the number of segments of the identifier that
-  // name the group and their separator, or the rule that derives it.
-  entriesBySeparator?: number;
-  separator?: string;
-  getGroup?: (requirement: string) => string;
-  resolver: RequirementResolver;
-}
-
-// How each framework names its requirements, groups them, and resolves the
-// compliance tag values the Wazuh ruleset writes for them.
-const FRAMEWORKS: Record<string, FrameworkDefinition> = {
-  [WAZUH_MODULES_ID.PCI_DSS]: {
-    requirements: pciRequirementsFile,
-    entriesBySeparator: 1,
-    separator: '.',
-    resolver: {},
-  },
-  [WAZUH_MODULES_ID.GDPR]: {
-    requirements: gdprRequirementsFile,
-    getGroup: getGdprChapter,
-    resolver: {
-      aliases: gdprRequirementsAliases,
-      derive: deriveGdprArticle,
-    },
-  },
-  [WAZUH_MODULES_ID.HIPAA]: {
-    requirements: hipaaRequirementsFile,
-    getGroup: getHipaaStandard,
-    resolver: {
-      aliases: hipaaRequirementsAliases,
-      derive: deriveHipaaCitation(hipaaRequirementsFile),
-    },
-  },
-  [WAZUH_MODULES_ID.NIST_800_53]: {
-    requirements: nistRequirementsFile,
-    entriesBySeparator: 1,
-    separator: '-',
-    resolver: {},
-  },
-  [WAZUH_MODULES_ID.NIST_800_171]: {
-    requirements: nist171RequirementsFile,
-    entriesBySeparator: 2,
-    separator: '.',
-    resolver: {},
-  },
-  [WAZUH_MODULES_ID.TSC]: {
-    requirements: tscRequirementsFile,
-    entriesBySeparator: 1,
-    separator: '.',
-    resolver: {},
-  },
-  [WAZUH_MODULES_ID.ISO_27001]: {
-    requirements: iso27001RequirementsFile,
-    entriesBySeparator: 2,
-    separator: '.',
-    resolver: {},
-  },
-  [WAZUH_MODULES_ID.CMMC]: {
-    requirements: cmmcRequirementsFile,
-    entriesBySeparator: 1,
-    separator: '.',
-    resolver: { aliases: cmmcRequirementsAliases },
-  },
-  [WAZUH_MODULES_ID.NIS2]: {
-    requirements: nis2RequirementsFile,
-    getGroup: getNis2Group,
-    // The ruleset cites paragraphs and points of an article the Directive
-    // does not number as requirements of their own.
-    resolver: { derive: deriveDottedParent(nis2RequirementsFile) },
-  },
-  [WAZUH_MODULES_ID.FEDRAMP]: {
-    requirements: fedrampRequirementsFile,
-    // A FedRAMP identifier is a NIST 800-53 one, so it groups by family.
-    entriesBySeparator: 1,
-    separator: '-',
-    resolver: {},
-  },
-};
-
-export function getFrameworkDefinition(section: string) {
-  return FRAMEWORKS[section];
-}
 
 /**
  * Filter that selects the findings of one requirement.
@@ -417,23 +269,13 @@ export const ComplianceTable = compose(
     dateRange,
   }) => {
     try {
-      const mapFieldAgg = {
-        [WAZUH_MODULES_ID.CMMC]: 'wazuh.rule.compliance.cmmc',
-        [WAZUH_MODULES_ID.FEDRAMP]: 'wazuh.rule.compliance.fedramp',
-        [WAZUH_MODULES_ID.GDPR]: 'wazuh.rule.compliance.gdpr',
-        [WAZUH_MODULES_ID.HIPAA]: 'wazuh.rule.compliance.hipaa',
-        [WAZUH_MODULES_ID.ISO_27001]: 'wazuh.rule.compliance.iso_27001',
-        [WAZUH_MODULES_ID.NIS2]: 'wazuh.rule.compliance.nis2',
-        [WAZUH_MODULES_ID.NIST_800_53]: 'wazuh.rule.compliance.nist_800_53',
-        [WAZUH_MODULES_ID.NIST_800_171]: 'wazuh.rule.compliance.nist_800_171',
-        [WAZUH_MODULES_ID.PCI_DSS]: 'wazuh.rule.compliance.pci_dss',
-        [WAZUH_MODULES_ID.TSC]: 'wazuh.rule.compliance.tsc',
-      };
-      const field = mapFieldAgg[section];
-      const { requirements, resolver } = {
-        requirements: getFrameworkDefinition(section)?.requirements || {},
-        resolver: getFrameworkDefinition(section)?.resolver || {},
-      };
+      const definition = getFrameworkDefinition(section);
+
+      if (!definition) {
+        return EMPTY_REQUIREMENTS_DATA;
+      }
+
+      const { field, requirements, resolver } = definition;
 
       const data = await fetchData({
         aggs: {
@@ -521,10 +363,8 @@ export const ComplianceTable = compose(
         },
       };
       getErrorOrchestrator().handleError(options);
-
-      // The result is read by the panels, so a failed search gives them an
-      // empty one instead of nothing.
-      return EMPTY_REQUIREMENTS_DATA;
+      // Rethrown so the view replaces the zero counts with the error prompt.
+      throw error;
     }
   };
 
@@ -637,68 +477,77 @@ export const ComplianceTable = compose(
             showSaveQuery={true}
           />
         </EuiPanel>
-        <EuiPanel
-          paddingSize='s'
-          hasShadow={false}
-          hasBorder={false}
-          color='transparent'
-        >
-          <EuiPanel paddingSize='none'>
-            <EuiFlexGroup paddingSize='none'>
-              <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
-                {!!Object.keys(complianceData.complianceObject).length && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem
-                      grow={false}
-                      style={{
-                        width: '15%',
-                        minWidth: 145,
-                        maxHeight: 'calc(100vh - 320px)',
-                        overflowX: 'hidden',
-                        overflowY: 'auto',
-                        backgroundColor: '#80808014',
-                      }}
-                    >
-                      <ComplianceRequirements
-                        section={props.section}
-                        onChangeSelectedRequirements={selectedRequirements =>
-                          setComplianceData(state => ({
-                            ...state,
-                            selectedRequirements,
-                          }))
-                        }
-                        requirementCounts={requirementsData.counts}
-                        loadingAlerts={action.running}
-                        {...complianceData}
-                      />
-                    </EuiFlexItem>
-                    <EuiFlexItem style={{ width: '15%' }}>
-                      <ComplianceSubrequirements
-                        section={props.section}
-                        requirementCounts={requirementsData.counts}
-                        requirementCodes={requirementsData.codesByRequirement}
-                        loadingAlerts={action.running}
-                        fetchFilters={dataSource.fetchFilters}
-                        getRegulatoryComplianceRequirementFilter={
-                          getRegulatoryComplianceRequirementFilter
-                        }
-                        othersCount={othersCount}
-                        othersBuckets={othersBuckets}
-                        indexPatternId={dataSource.dataSource?.indexPattern.id}
-                        getRegulatoryComplianceOtherRequirementsFilter={
-                          getRegulatoryComplianceOtherRequirementsFilter
-                        }
-                        {...complianceData}
-                        filters={dataSource.filters}
-                        setFilters={dataSource.setFilters}
-                      />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
-              </EuiFlexItem>
-            </EuiFlexGroup>
+        {action.error ? (
+          <QueryErrorPrompt
+            error={action.error}
+            indexPatternTitle={dataSource.dataSource?.indexPattern?.title}
+          />
+        ) : (
+          <EuiPanel
+            paddingSize='s'
+            hasShadow={false}
+            hasBorder={false}
+            color='transparent'
+          >
+            <EuiPanel paddingSize='none'>
+              <EuiFlexGroup paddingSize='none'>
+                <EuiFlexItem style={{ width: 'calc(100% - 24px)' }}>
+                  {!!Object.keys(complianceData.complianceObject).length && (
+                    <EuiFlexGroup>
+                      <EuiFlexItem
+                        grow={false}
+                        style={{
+                          width: '15%',
+                          minWidth: 145,
+                          maxHeight: 'calc(100vh - 320px)',
+                          overflowX: 'hidden',
+                          overflowY: 'auto',
+                          backgroundColor: '#80808014',
+                        }}
+                      >
+                        <ComplianceRequirements
+                          section={props.section}
+                          onChangeSelectedRequirements={selectedRequirements =>
+                            setComplianceData(state => ({
+                              ...state,
+                              selectedRequirements,
+                            }))
+                          }
+                          requirementCounts={requirementsData.counts}
+                          loadingAlerts={action.running}
+                          {...complianceData}
+                        />
+                      </EuiFlexItem>
+                      <EuiFlexItem style={{ width: '15%' }}>
+                        <ComplianceSubrequirements
+                          section={props.section}
+                          requirementCounts={requirementsData.counts}
+                          requirementCodes={requirementsData.codesByRequirement}
+                          loadingAlerts={action.running}
+                          fetchFilters={dataSource.fetchFilters}
+                          getRegulatoryComplianceRequirementFilter={
+                            getRegulatoryComplianceRequirementFilter
+                          }
+                          othersCount={othersCount}
+                          othersBuckets={othersBuckets}
+                          indexPatternId={
+                            dataSource.dataSource?.indexPattern.id
+                          }
+                          getRegulatoryComplianceOtherRequirementsFilter={
+                            getRegulatoryComplianceOtherRequirementsFilter
+                          }
+                          {...complianceData}
+                          filters={dataSource.filters}
+                          setFilters={dataSource.setFilters}
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
           </EuiPanel>
-        </EuiPanel>
+        )}
       </>
     </I18nProvider>
   );

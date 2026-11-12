@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { i18n } from '@osd/i18n';
 import {
-  EuiButton,
   EuiFlexGroup,
   EuiFlexItem,
   EuiPage,
@@ -9,8 +8,6 @@ import {
   EuiPageHeader,
   EuiSpacer,
 } from '@elastic/eui';
-import { getCore } from '../../plugin-services';
-import { requestCtiContentUpdate } from '../../services/cti-feed';
 import { ModalCti } from '../../shared-components/cti-registration/components/modal-cti';
 import { useCtiRegistrationModal } from '../../shared-components/cti-registration/hooks/use-cti-registration-modal';
 import { SubscriptionPanel } from './subscription-panel';
@@ -18,55 +15,9 @@ import { FeedSyncPanel } from './feed-sync-panel';
 import { FeedContentPanel } from './feed-content-panel';
 import { useCtiConsumers } from './hooks/use-cti-consumers';
 import { useFeedContentCounts } from './hooks/use-feed-content-counts';
-
-const UpdateCtiContentButton: React.FC<{ onRequested: () => void }> = ({
-  onRequested,
-}) => {
-  const [requesting, setRequesting] = useState(false);
-
-  const handleClick = async () => {
-    setRequesting(true);
-    const { toasts } = getCore().notifications;
-    try {
-      await requestCtiContentUpdate();
-      toasts.addSuccess({
-        title: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.updateButton.successToastTitle',
-          { defaultMessage: 'CTI update requested' },
-        ),
-        text: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.updateButton.successToastText',
-          { defaultMessage: 'The update has been requested successfully' },
-        ),
-        toastLifeTimeMs: 5000,
-      });
-      onRequested();
-    } catch (error) {
-      toasts.addError(error as Error, {
-        title: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.updateButton.errorToastTitle',
-          { defaultMessage: 'Error updating CTI feeds' },
-        ),
-      });
-    } finally {
-      setRequesting(false);
-    }
-  };
-
-  return (
-    <EuiButton
-      fill
-      iconType='refresh'
-      isLoading={requesting}
-      onClick={handleClick}
-      data-test-subj='ctiFeedUpdateButton'
-    >
-      {i18n.translate('wazuhCheckUpdates.ctiFeed.updateButton.label', {
-        defaultMessage: 'Update CTI content',
-      })}
-    </EuiButton>
-  );
-};
+import { CheckForUpdatesAbout } from './check-for-updates-about';
+import { CheckForUpdatesButton } from './check-for-updates-button';
+import { CtiTimestamp } from './cti-timestamp';
 
 export interface CtiFeedAppProps {
   /** Opens the registration modal on mount. */
@@ -80,7 +31,7 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
   const sync = useCtiConsumers();
   const content = useFeedContentCounts();
 
-  // Counts change when a sync lands, so refresh them once the feed settles.
+  // Counts change when a sync lands, so refresh them when a read finds it done.
   const previousSummary = useRef(sync.summary);
   const refetchContent = content.refetch;
   useEffect(() => {
@@ -108,7 +59,46 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
             },
           )}
           rightSideItems={[
-            <UpdateCtiContentButton key='update' onRequested={sync.watch} />,
+            <EuiFlexGroup
+              key='checkForUpdates'
+              direction='column'
+              alignItems='flexEnd'
+              gutterSize='xs'
+              responsive={false}
+            >
+              <EuiFlexItem grow={false}>
+                <EuiFlexGroup
+                  gutterSize='s'
+                  alignItems='center'
+                  responsive={false}
+                >
+                  <EuiFlexItem grow={false}>
+                    <CheckForUpdatesAbout />
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    {/* The check writes `last_checked_at`, so read it back. */}
+                    <CheckForUpdatesButton
+                      onRequested={sync.refetchAfterCheck}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <CtiTimestamp
+                  timestamp={sync.lastCheckedAt}
+                  renderText={time =>
+                    i18n.translate(
+                      'wazuhCheckUpdates.ctiFeed.page.lastChecked',
+                      {
+                        defaultMessage: 'Last checked: {time}',
+                        values: { time },
+                      },
+                    )
+                  }
+                  dataTestSubj='ctiFeedLastCheckedAt'
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>,
           ]}
         />
         <EuiSpacer size='l' />
@@ -127,7 +117,9 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
               summary={sync.summary}
               loading={sync.loading}
               error={sync.error}
-              onRetry={sync.refetch}
+              refreshing={sync.refreshing}
+              onRefresh={sync.refetch}
+              onUpdateRequested={sync.refetchAfterCheck}
             />
           </EuiFlexItem>
         </EuiFlexGroup>

@@ -4,8 +4,10 @@ import { FindingsDataSourceRepository } from '../../../../common/data-source';
 import {
   HIPAA_DASHBOARD_ID,
   HIPAA_AGENT_DASHBOARD_ID,
+  WAZUH_MODULES_ID,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
 } from '../../../../../../common/constants';
+import { getRequirementFieldFormats } from '../../shared/requirement-field-format';
 import { createDashboard } from '../../../../common/dashboards';
 
 export const DashboardHIPAA = createDashboard({
@@ -18,4 +20,5 @@ export const DashboardHIPAA = createDashboard({
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+  displayFieldFormats: getRequirementFieldFormats(WAZUH_MODULES_ID.HIPAA),
 });

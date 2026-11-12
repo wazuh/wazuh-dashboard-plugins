@@ -16,6 +16,7 @@ import {
   EuiConfirmModal,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { getAllowRunAsHelpText } from './allow-run-as-help-text';
 
 import { useApiService } from '../../../common/hooks/useApiService';
 import { Role } from '../../roles/types/role.type';
@@ -423,10 +424,7 @@ export const CreateUser = ({ closeFlyout }) => {
                   'wazuh.security.createUser.allowRunAsLabel',
                   { defaultMessage: 'Allow run as' },
                 )}
-                helpText={i18n.translate(
-                  'wazuh.security.createUser.allowRunAsHelpText',
-                  { defaultMessage: 'Set if the user is able to use run as' },
-                )}
+                helpText={getAllowRunAsHelpText()}
               >
                 <WzButtonPermissions
                   buttonType='switch'

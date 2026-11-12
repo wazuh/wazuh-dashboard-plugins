@@ -19,6 +19,7 @@ import { Role } from '../roles/types/role.type';
 import RolesServices from '../roles/services';
 import RulesServices from '../rules/services';
 import { useSelector } from 'react-redux';
+import { getWazuhCorePlugin } from '../../../kibana-services';
 import { UI_LOGGER_LEVELS } from '../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../react-services/common-services';
@@ -38,6 +39,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
     {},
   );
   const [internalUsers, setInternalUsers] = useState([]);
+  const [userFields, setUserFields] = useState<string[]>([]);
   const currentPlatform = useSelector(
     (state: any) => state.appStateReducers.currentPlatform,
   );
@@ -125,6 +127,25 @@ export const RolesMapping = withUserAuthorizationPrompt([
     }
   };
 
+  useEffect(() => {
+    getWazuhCorePlugin()
+      .dashboardSecurity.fetchAuthContextFields()
+      .then(setUserFields)
+      .catch(error => {
+        getErrorOrchestrator().handleError({
+          context: `${RolesMapping.name}.fetchAuthContextFields`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: false,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        });
+      });
+  }, []);
+
   const initData = async () => {
     await getData();
     if (currentPlatform) {
@@ -157,6 +178,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         internalUsers={internalUsers}
         onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
+        userFields={userFields}
       />
     );
   }
@@ -170,6 +192,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
         internalUsers={internalUsers}
         onSave={async () => await refreshCurrentPage()}
         currentPlatform={currentPlatform}
+        userFields={userFields}
       />
     );
   }
@@ -190,7 +213,7 @@ export const RolesMapping = withUserAuthorizationPrompt([
           <EuiText size='s' color='subdued'>
             {i18n.translate('wazuh.security.rolesMapping.description', {
               defaultMessage:
-                'Map roles of the manager API to authentication contexts.',
+                "Give Wazuh roles to the users who sign in to the dashboard. Each role mapping gives its roles to the users who match its rules. The rules check the signed-in user's authentication context: user name, backend roles and indexer roles. This only applies when run as is enabled.",
             })}
           </EuiText>
         </EuiPageContentHeaderSection>
