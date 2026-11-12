@@ -350,7 +350,7 @@ export const regulatoryCompliance = {
   ),
   description: i18n.translate('wazuh.regulatoryCompliance.app.description', {
     defaultMessage:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIST2 and NIST 800-171.',
+      'Map findings to the requirements of regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIS2 and NIST 800-171, as evidence that supports compliance.',
   }),
   docsUrl: webDocumentationLink(DOCS_PATHS.regulatoryCompliance),
   euiIconType: 'usersRolesApp',
