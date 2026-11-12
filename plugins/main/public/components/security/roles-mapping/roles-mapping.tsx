@@ -131,7 +131,19 @@ export const RolesMapping = withUserAuthorizationPrompt([
     getWazuhCorePlugin()
       .dashboardSecurity.fetchAuthContextFields()
       .then(setUserFields)
-      .catch(() => {});
+      .catch(error => {
+        getErrorOrchestrator().handleError({
+          context: `${RolesMapping.name}.fetchAuthContextFields`,
+          level: UI_LOGGER_LEVELS.ERROR,
+          severity: UI_ERROR_SEVERITIES.BUSINESS,
+          store: false,
+          error: {
+            error: error,
+            message: error.message || error,
+            title: error.name || error,
+          },
+        });
+      });
   }, []);
 
   const initData = async () => {
