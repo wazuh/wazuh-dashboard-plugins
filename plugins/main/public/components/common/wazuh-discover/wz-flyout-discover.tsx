@@ -110,7 +110,8 @@ export const toTableColumns = (
             value
               ? indexPattern.getFormatterForField(field).convert(value)
               : value
-        : value => value;
+        : // React renders array values without separators
+          value => (Array.isArray(value) ? value.join(', ') : value);
     return {
       field: column.id,
       name: column.displayAsText,
