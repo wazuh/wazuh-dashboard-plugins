@@ -415,6 +415,30 @@ describe('getUserFieldsFromRuleObject', () => {
     ).toEqual([{ user_field: 'user_name' }, { user_field: 'backend_roles' }]);
   });
 
+  it('collects the fields inside a NOT wrapping an array', () => {
+    expect(
+      getUserFieldsFromRuleObject({
+        NOT: {
+          OR: [
+            { MATCH$: { name: 'NameNotFound' } },
+            { FIND$: { auth: { name: 'x', office: ['20', '30'] } } },
+          ],
+        },
+      }),
+    ).toEqual([{ user_field: 'name' }, { user_field: 'auth' }]);
+  });
+
+  it('collects the fields inside a NOT wrapping a single clause', () => {
+    expect(
+      getUserFieldsFromRuleObject({
+        AND: [
+          { FIND: { backend_roles: 'admin' } },
+          { NOT: { MATCH: { usr_name: 'guest' } } },
+        ],
+      }),
+    ).toEqual([{ user_field: 'backend_roles' }, { user_field: 'usr_name' }]);
+  });
+
   it.each([null, 'text', {}, []])('ignores %p', rule => {
     expect(getUserFieldsFromRuleObject(rule)).toEqual([]);
   });

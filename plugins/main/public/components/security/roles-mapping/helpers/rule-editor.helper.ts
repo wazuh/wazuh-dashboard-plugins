@@ -193,7 +193,8 @@ export const getUnknownUserFields = (
   ),
 ];
 
-const LOGICAL_OPERATORS = ['AND', 'OR'];
+// AND and OR wrap an array of clauses, NOT wraps a single clause (or an array)
+const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
 /** Collects the user fields used by a rule in its JSON form. */
 export const getUserFieldsFromRuleObject = (
@@ -203,8 +204,10 @@ export const getUserFieldsFromRuleObject = (
     return [];
   }
   return Object.entries(rule).flatMap(([key, content]) => {
-    if (LOGICAL_OPERATORS.includes(key) && Array.isArray(content)) {
-      return content.flatMap(getUserFieldsFromRuleObject);
+    if (LOGICAL_OPERATORS.includes(key)) {
+      return Array.isArray(content)
+        ? content.flatMap(getUserFieldsFromRuleObject)
+        : getUserFieldsFromRuleObject(content);
     }
     return content && typeof content === 'object' && !Array.isArray(content)
       ? Object.keys(content).map(user_field => ({ user_field }))
