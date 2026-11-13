@@ -1,6 +1,6 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiProgress, EuiLink, EuiText } from '@elastic/eui';
+import { EuiProgress, EuiLink, EuiText, EuiToolTip } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
 import { formatUINumber } from '../../../../../../react-services/format-number';
 import { getCore } from '../../../../../../kibana-services';
@@ -17,6 +17,8 @@ export interface BarListProps {
   title?: React.ReactNode;
   getHref?: (item: TopItem) => string | undefined;
   onSelect?: (item: TopItem) => void;
+  /** Tooltip of a row's link, e.g. where the click lands. Only for linked rows. */
+  getTooltip?: (item: TopItem) => React.ReactNode;
   emptyMessage?: React.ReactNode;
   totalSlots?: number;
   moreItemsMessage?: React.ReactNode;
@@ -24,11 +26,26 @@ export interface BarListProps {
   ['data-test-subj']?: string;
 }
 
+/** Wraps a row label in its tooltip, keeping the label truncated. */
+const withTooltip = (label: React.ReactElement, content?: React.ReactNode) =>
+  content ? (
+    <EuiToolTip
+      position='top'
+      content={content}
+      anchorClassName='eui-textTruncate'
+    >
+      {label}
+    </EuiToolTip>
+  ) : (
+    label
+  );
+
 export const BarList: React.FC<BarListProps> = ({
   items,
   title,
   getHref,
   onSelect,
+  getTooltip,
   emptyMessage,
   totalSlots,
   moreItemsMessage = i18n.translate(
@@ -73,13 +90,16 @@ export const BarList: React.FC<BarListProps> = ({
               >
                 {isInteractive ? (
                   <RedirectAppLinks application={getCore().application}>
-                    <EuiLink
-                      style={NON_TITLE_LINK_STYLE}
-                      href={getHref?.(item)}
-                      onClick={onSelect ? () => onSelect(item) : undefined}
-                    >
-                      {item.key}
-                    </EuiLink>
+                    {withTooltip(
+                      <EuiLink
+                        style={NON_TITLE_LINK_STYLE}
+                        href={getHref?.(item)}
+                        onClick={onSelect ? () => onSelect(item) : undefined}
+                      >
+                        {item.key}
+                      </EuiLink>,
+                      getTooltip?.(item),
+                    )}
                   </RedirectAppLinks>
                 ) : (
                   <span
