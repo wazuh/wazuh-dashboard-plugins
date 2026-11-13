@@ -20,6 +20,14 @@ jest.mock('redux', () => ({
 
 jest.mock('./configuration-overview.js', () => () => <></>);
 
+jest.mock('./agent-configuration-source', () => ({
+  AgentConfigurationSource: ({ groups }: { groups?: string[] }) => (
+    <div data-test-subj='agent-configuration-source'>
+      {(groups || []).join(',')}
+    </div>
+  ),
+}));
+
 jest.mock('./utils/agent-config-service', () => ({
   getAgentReportedConfiguration: jest.fn(),
   clearAgentReportedConfigurationCache: jest.fn(),
@@ -145,6 +153,24 @@ describe('WzConfigurationSwitch', () => {
     );
 
     expect(ribbonItems.length).toBe(0);
+  });
+
+  it('tells where the settings of the agent are changed', async () => {
+    const { container } = render(
+      <WzConfigurationSwitch
+        agent={{ id: '001', group: ['default', 'linux'] }}
+        updateClusterNodes={updateClusterNodes}
+        updateClusterNodeSelected={updateClusterNodeSelected}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(
+        container.querySelector(
+          queryDataTestAttr('agent-configuration-source'),
+        ),
+      ).toHaveTextContent('default,linux'),
+    );
   });
 
   /* An agent that never reported has no configuration to page through, so the

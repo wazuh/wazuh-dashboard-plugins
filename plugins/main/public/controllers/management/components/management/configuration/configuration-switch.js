@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { i18n } from '@osd/i18n';
 
 import WzConfigurationOverview from './configuration-overview';
 import WzConfigurationEditConfiguration from './edit-configuration/edit-configuration';
 import WzLoading from './util-components/loading';
+import { AgentConfigurationSource } from './agent-configuration-source';
 import { withRenderIfOrWrapped } from './util-hocs/render-if';
 import { withUserAuthorizationPrompt } from '../../../../../components/common/hocs';
 
@@ -35,27 +35,15 @@ import {
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
-import {
-  EuiPage,
-  EuiPanel,
-  EuiSpacer,
-  EuiButtonEmpty,
-  EuiPageBody,
-  EuiProgress,
-} from '@elastic/eui';
+import { EuiPage, EuiPanel, EuiPageBody, EuiProgress } from '@elastic/eui';
 
-import { WzRequest } from '../../../../../react-services/wz-request';
 import {
   API_NAME_AGENT_STATUS,
   UI_LOGGER_LEVELS,
 } from '../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../react-services/common-services';
-import { getCore } from '../../../../../kibana-services';
 import { PromptNoActiveAgentWithoutSelect } from '../../../../../components/agents/prompts';
-import { RedirectAppLinks } from '../../../../../../../../src/plugins/opensearch_dashboards_react/public';
-import { endpointGroups } from '../../../../../utils/applications';
-import NavigationService from '../../../../../react-services/navigation-service';
 
 class WzConfigurationSwitch extends Component {
   constructor(props) {
@@ -196,31 +184,8 @@ class WzConfigurationSwitch extends Component {
       <EuiPage>
         <EuiPageBody>
           <EuiPanel>
-            {agent?.group?.length ? (
-              <Fragment>
-                <span>
-                  {i18n.translate(
-                    'wazuh.configuration.configurationSwitch.groupsLabel',
-                    {
-                      defaultMessage: 'Groups:',
-                    },
-                  )}
-                </span>
-                <RedirectAppLinks application={getCore().application}>
-                  {agent.group.map((group, key) => (
-                    <EuiButtonEmpty
-                      key={`agent-group-${key}`}
-                      href={NavigationService.getInstance().getUrlForApp(
-                        endpointGroups.id,
-                        { path: `#/manager/?tab=groups&group=${group}` },
-                      )}
-                    >
-                      {group}
-                    </EuiButtonEmpty>
-                  ))}
-                  <EuiSpacer size='s' />
-                </RedirectAppLinks>
-              </Fragment>
+            {agent?.id ? (
+              <AgentConfigurationSource groups={agent.group} />
             ) : null}
             {view === '' &&
               ((!this.state.loadingOverview && (

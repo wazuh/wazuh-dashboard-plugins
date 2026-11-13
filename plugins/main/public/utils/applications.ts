@@ -258,6 +258,29 @@ export const caseManagement = {
     }`,
 };
 
+export const ctiExplorer = {
+  category: 'wz-category-threat-intelligence',
+  id: 'cti-explorer',
+  title: i18n.translate('wazuh.ctiExplorer.app.title', {
+    defaultMessage: 'CTI Explorer',
+  }),
+  breadcrumbLabel: i18n.translate('wazuh.ctiExplorer.app.breadcrumbLabel', {
+    defaultMessage: 'CTI Explorer',
+  }),
+  description: i18n.translate('wazuh.ctiExplorer.app.description', {
+    defaultMessage:
+      'Explore the indicators of compromise and vulnerability records that the CTI feed delivers.',
+  }),
+  euiIconType: 'searchProfilerApp',
+  /* Right after the module apps of the category and before the CTI feed app
+  (305) of the wazuh-check-updates plugin, which reports the sync of the same content. */
+  order: 304,
+  showInOverviewApp: false,
+  showInAgentMenu: false,
+  redirectTo: () => '/cti-explorer/',
+  docsUrl: webDocumentationLink(DOCS_PATHS.ctiExplorer),
+};
+
 export const ITHygiene = {
   category: 'wz-category-security-operations',
   id: 'it-hygiene',
@@ -327,7 +350,7 @@ export const regulatoryCompliance = {
   ),
   description: i18n.translate('wazuh.regulatoryCompliance.app.description', {
     defaultMessage:
-      'Assess compliance with regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIST2 and NIST 800-171.',
+      'Map findings to the requirements of regulatory frameworks including PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIS2 and NIST 800-171, as evidence that supports compliance.',
   }),
   docsUrl: webDocumentationLink(DOCS_PATHS.regulatoryCompliance),
   euiIconType: 'usersRolesApp',
@@ -810,6 +833,7 @@ export const Applications = [
   vulnerabilityDetection,
   mitreAttack,
   caseManagement,
+  ctiExplorer,
   regulatoryCompliance,
   devTools,
   security,

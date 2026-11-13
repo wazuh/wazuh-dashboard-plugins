@@ -28,7 +28,6 @@ import {
   getAiAssistantUrl,
   isAiAssistantRegistered,
   getCtiFeedUrl,
-  isCtiFeedRegistered,
 } from '../../utils/navigation';
 import { NON_TITLE_LINK_STYLE } from '../../lib/constants';
 
@@ -193,24 +192,15 @@ const AiAssistantLink: React.FC = () => {
   );
 };
 
-/**
- * The groups of the opened menu. Reads the app registry only once the menu is
- * open, as `AiAssistantLink` does.
- */
+/** The groups of the opened menu. */
 const QuickAccessGroups: React.FC = () => {
-  const applications = useObservable(
-    getCore().application.applications$,
-    NO_APPLICATIONS,
+  const groups = useMemo(
+    () =>
+      [...withCtiFeed(getDataDrivenGroups()), SECURITY_ANALYTICS_GROUP].sort(
+        (a, b) => a.order - b.order,
+      ),
+    [],
   );
-  // Only when registered: the setting that gates the app can turn it off.
-  const ctiFeedRegistered = isCtiFeedRegistered(applications);
-  const groups = useMemo(() => {
-    const dataDriven = getDataDrivenGroups();
-    return [
-      ...(ctiFeedRegistered ? withCtiFeed(dataDriven) : dataDriven),
-      SECURITY_ANALYTICS_GROUP,
-    ].sort((a, b) => a.order - b.order);
-  }, [ctiFeedRegistered]);
 
   return (
     <EuiFlexGrid columns={2} style={{ width: 420 }}>

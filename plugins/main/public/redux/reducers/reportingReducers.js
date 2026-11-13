@@ -18,6 +18,7 @@ const initialState = {
   itemList: [],
   showModal: false,
   dataSourceSearchContext: null,
+  tableReportContext: null,
 };
 
 const statusReducers = (state = initialState, action) => {
@@ -47,6 +48,12 @@ const statusReducers = (state = initialState, action) => {
       isProcessing: false,
       itemList: [],
       showModal: false,
+    };
+  }
+  if (action.type === 'UPDATE_REPORTING_TABLE_CONTEXT') {
+    return {
+      ...state,
+      tableReportContext: action.tableReportContext,
     };
   }
   if (action.type === 'UPDATE_REPORTING_DATA_SEARCH_SOURCE_CONTEXT') {

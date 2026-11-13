@@ -12,7 +12,10 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { EuiFlexGrid, EuiPopover } from '@elastic/eui';
-import { ComplianceSubrequirements } from './subrequirements';
+import {
+  ComplianceSubrequirements,
+  getRequirementTooltip,
+} from './subrequirements';
 import { RequirementFlyout } from '../requirement-flyout';
 
 // EuiFacetButton is passed as the `button` prop of EuiPopover (a render
@@ -326,5 +329,74 @@ describe('ComplianceSubrequirements - hover icons on scroll', () => {
       <ComplianceSubrequirements {...propsWithOneRequirement()} />,
     );
     expect(() => wrapper.find(EuiFlexGrid).simulate('scroll')).not.toThrow();
+  });
+});
+
+describe('ComplianceSubrequirements - findings count', () => {
+  const findNotice = wrapper =>
+    wrapper.find('[data-test-subj="wzComplianceRequirementsNoFindings"]');
+
+  it('explains the count next to the requirements', () => {
+    const wrapper = shallow(<ComplianceSubrequirements {...baseProps()} />);
+
+    expect(
+      wrapper
+        .find('[iconProps]')
+        .filterWhere(
+          node =>
+            node.prop('iconProps')['data-test-subj'] ===
+            'wzComplianceRequirementsCountTooltip',
+        )
+        .prop('content'),
+    ).toContain('not that the requirement is met');
+  });
+
+  it('shows what produces findings while no requirement has any', () => {
+    const wrapper = shallow(
+      <ComplianceSubrequirements
+        {...baseProps()}
+        othersCount={0}
+        requirementCounts={{ '1.1': 0 }}
+      />,
+    );
+
+    expect(findNotice(wrapper)).toHaveLength(1);
+  });
+
+  it('hides the notice when there are findings or while they load', () => {
+    expect(
+      findNotice(
+        shallow(
+          <ComplianceSubrequirements
+            {...baseProps()}
+            othersCount={0}
+            requirementCounts={{ '1.1': 3 }}
+          />,
+        ),
+      ),
+    ).toHaveLength(0);
+    expect(
+      findNotice(
+        shallow(
+          <ComplianceSubrequirements
+            {...baseProps()}
+            othersCount={0}
+            loadingAlerts={true}
+          />,
+        ),
+      ),
+    ).toHaveLength(0);
+  });
+
+  it('says on a tile that no findings does not mean the requirement is met', () => {
+    expect(getRequirementTooltip('1.1', 0)).toContain(
+      'This does not mean that the requirement is met',
+    );
+    expect(getRequirementTooltip('1.1', 3)).toContain(
+      '3 findings mapped to 1.1',
+    );
+    expect(getRequirementTooltip('1.1', 1)).toContain(
+      '1 finding mapped to 1.1',
+    );
   });
 });

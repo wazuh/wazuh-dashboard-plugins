@@ -3,9 +3,9 @@ import {
   EuiCard,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiCallOut,
   EuiLink,
   EuiCheckbox,
+  EuiText,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
@@ -57,35 +57,31 @@ export const OsCard = ({ onChange, value }: Props) => {
           </EuiFlexItem>
         ))}
       </EuiFlexGroup>
-      <EuiCallOut
-        color='primary'
-        className='cardsCallOut'
-        iconType='iInCircle'
-        title={
-          <span>
-            <FormattedMessage
-              id='wazuh.endpointsSummary.osCard.additionalSystems'
-              defaultMessage='For additional systems and architectures, please check our {documentationLink}.'
-              values={{
-                documentationLink: (
-                  <EuiLink
-                    target='_blank'
-                    href={webDocumentationLink(
-                      'installation-guide/wazuh-agent/index.html',
-                    )}
-                    rel='noopener noreferrer'
-                  >
-                    {i18n.translate(
-                      'wazuh.endpointsSummary.osCard.documentationLink',
-                      { defaultMessage: 'documentation' },
-                    )}
-                  </EuiLink>
-                ),
-              }}
-            />
-          </span>
-        }
-      ></EuiCallOut>
+      <EuiText size='s' color='subdued' className='cardsNote'>
+        <p>
+          <FormattedMessage
+            id='wazuh.endpointsSummary.osCard.supportedSystems'
+            defaultMessage='For the operating system versions each package supports, see {supportedSystemsLink}.'
+            values={{
+              supportedSystemsLink: (
+                <EuiLink
+                  target='_blank'
+                  external
+                  href={webDocumentationLink(
+                    'user-manual/agent/agent-enrollment/requirements.html#supported-operating-systems',
+                  )}
+                  rel='noopener noreferrer'
+                >
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.osCard.supportedSystemsLink',
+                    { defaultMessage: 'Supported operating systems' },
+                  )}
+                </EuiLink>
+              ),
+            }}
+          />
+        </p>
+      </EuiText>
     </div>
   );
 };

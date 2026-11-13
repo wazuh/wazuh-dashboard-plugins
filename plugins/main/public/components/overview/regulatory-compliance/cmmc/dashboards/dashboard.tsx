@@ -3,8 +3,10 @@ import { FindingsDataSourceRepository } from '../../../../common/data-source';
 import {
   CMMC_DASHBOARD_ID,
   CMMC_AGENT_DASHBOARD_ID,
+  WAZUH_MODULES_ID,
   WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY,
 } from '../../../../../../common/constants';
+import { getRequirementFieldFormats } from '../../shared/requirement-field-format';
 import { createDashboard } from '../../../../common/dashboards';
 
 export const DashboardCMMC = createDashboard({
@@ -17,4 +19,5 @@ export const DashboardCMMC = createDashboard({
     },
   ],
   sampleDataWarningCategories: [WAZUH_SAMPLE_ALERTS_CATEGORY_SECURITY],
+  displayFieldFormats: getRequirementFieldFormats(WAZUH_MODULES_ID.CMMC),
 });

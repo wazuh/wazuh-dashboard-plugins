@@ -40,13 +40,19 @@ const createCoreSetup = (navGroupEnabled = false) => {
 };
 
 describe('WazuhCheckUpdatesPlugin public setup', () => {
-  test('does not register the CTI feed app when the CTI registration UI is disabled', () => {
+  // The setting only gates the bottom bar that invites users to register.
+  test('registers the CTI feed app when the CTI registration UI is disabled', () => {
     const { core, setup } = createCoreSetup(true);
 
     createPlugin(false).setup(setup);
 
-    expect(core.application.register).not.toHaveBeenCalled();
-    expect(core.chrome.navGroup.addNavLinksToGroup).not.toHaveBeenCalled();
+    expect(core.application.register).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'cti-feed' }),
+    );
+    expect(core.chrome.navGroup.addNavLinksToGroup).toHaveBeenCalledWith(
+      { id: 'all' },
+      [expect.objectContaining({ id: 'cti-feed' })],
+    );
   });
 
   test('registers the CTI feed app in the Threat intelligence category', () => {

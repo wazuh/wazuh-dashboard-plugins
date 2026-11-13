@@ -17,6 +17,12 @@ import WzGroups, { WzGroups as WzGroupsClass } from './groups-main';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import NavigationService from '../../../../../react-services/navigation-service';
+import { getGroupConfigurationFile } from './utils/group-configuration';
+
+jest.mock('./utils/group-configuration', () => ({
+  ...jest.requireActual('./utils/group-configuration'),
+  getGroupConfigurationFile: jest.fn(),
+}));
 
 jest.mock('../../../../../kibana-services', () => ({
   getHttp: () => ({
@@ -123,5 +129,101 @@ describe('Group main component discard confirmation', () => {
 
     expect(props.updateShowDiscardChangesModal).toHaveBeenCalledWith(false);
     expect(updateAndNavigateSearchParams).not.toHaveBeenCalled();
+  });
+});
+
+describe('Group main component editor opened from the URL', () => {
+  const file = {
+    name: 'agent.conf',
+    content: '<agent_config></agent_config>',
+    isEditable: true,
+    groupName: 'default',
+  };
+  let updateAndNavigateSearchParams: jest.Mock;
+
+  const buildInstance = (
+    search: { group?: string; editConfig?: string },
+    groupDetail: { name: string } | null = { name: 'default' },
+  ) => {
+    const props = {
+      search,
+      state: {},
+      cleanFileContent: jest.fn(),
+      updateGroupDetail: jest.fn(),
+      updateFileContent: jest.fn(),
+    };
+    const instance = new WzGroupsClass(props);
+    instance.getGroupDetail = jest.fn().mockResolvedValue(groupDetail);
+    return { instance, props };
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getGroupConfigurationFile as jest.Mock).mockResolvedValue(file);
+    updateAndNavigateSearchParams = jest.fn();
+    jest.spyOn(NavigationService, 'getInstance').mockReturnValue({
+      updateAndNavigateSearchParams,
+    } as unknown as NavigationService);
+  });
+
+  it('opens the configuration editor of the group and drops the request from the URL', async () => {
+    const { instance, props } = buildInstance({
+      group: 'default',
+      editConfig: 'true',
+    });
+
+    await instance.componentDidMount();
+
+    expect(getGroupConfigurationFile).toHaveBeenCalledWith('default');
+    expect(props.updateFileContent).toHaveBeenCalledWith(file);
+    expect(updateAndNavigateSearchParams).toHaveBeenCalledWith(
+      { editConfig: null },
+      { replace: true },
+    );
+  });
+
+  it('only shows the group when the editor is not requested', async () => {
+    const { instance, props } = buildInstance({ group: 'default' });
+
+    await instance.componentDidMount();
+
+    expect(instance.getGroupDetail).toHaveBeenCalled();
+    expect(getGroupConfigurationFile).not.toHaveBeenCalled();
+    expect(props.updateFileContent).not.toHaveBeenCalled();
+  });
+
+  it("doesn't open the editor of a group that can't be read", async () => {
+    const { instance, props } = buildInstance(
+      { group: 'missing', editConfig: 'true' },
+      null,
+    );
+
+    await instance.componentDidMount();
+
+    expect(getGroupConfigurationFile).not.toHaveBeenCalled();
+    expect(props.updateFileContent).not.toHaveBeenCalled();
+  });
+
+  it("doesn't open the editor when its file can't be read", async () => {
+    (getGroupConfigurationFile as jest.Mock).mockResolvedValue(null);
+    const { instance, props } = buildInstance({
+      group: 'default',
+      editConfig: 'true',
+    });
+
+    await instance.componentDidMount();
+
+    expect(props.updateFileContent).not.toHaveBeenCalled();
+  });
+
+  it('opens the editor when it is requested for the group already shown', async () => {
+    const { instance, props } = buildInstance({
+      group: 'default',
+      editConfig: 'true',
+    });
+
+    await instance.componentDidUpdate({ search: { group: 'default' } });
+
+    expect(props.updateFileContent).toHaveBeenCalledWith(file);
   });
 });
