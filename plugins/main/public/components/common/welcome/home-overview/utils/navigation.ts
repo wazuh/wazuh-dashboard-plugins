@@ -28,6 +28,7 @@ import {
   VULNERABILITY_SEVERITY_VALUES,
 } from '../lib/fields';
 import { SeverityBand, TopItem } from '../interfaces/types';
+import { CTI_EXPLORER_IOC_TYPE_PARAM } from '../../../../../../common/cti-explorer/constants';
 
 /** Shared `_g` query state: last 24h, no pinned filters, refresh paused. */
 const DISCOVER_G_STATE =
@@ -333,9 +334,18 @@ const CTI_FEED_APP_ID = 'cti-feed';
 /** Opens the CTI feed app from its Home overview shortcut. */
 export const getCtiFeedUrl = () => getUrlForApp(CTI_FEED_APP_ID);
 
-/** CTI Explorer > Indicators of compromise tab. */
-export const getCtiExplorerIocsUrl = () =>
-  getUrlForApp(ctiExplorer.id, { path: '#/cti-explorer/?tab=iocs' });
+/**
+ * CTI Explorer > Indicators of compromise tab. With a type, the IOC list opens
+ * filtered to it and scrolled into view.
+ */
+export const getCtiExplorerIocsUrl = (iocType?: string) =>
+  getUrlForApp(ctiExplorer.id, {
+    path: `#/cti-explorer/?tab=iocs${
+      iocType
+        ? `&${CTI_EXPLORER_IOC_TYPE_PARAM}=${encodeURIComponent(iocType)}`
+        : ''
+    }`,
+  });
 
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
 export const getDecodersUrl = () =>
