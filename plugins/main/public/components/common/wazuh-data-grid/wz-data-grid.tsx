@@ -8,7 +8,6 @@ import {
   EuiDataGrid,
   EuiFlyout,
   EuiFlyoutHeader,
-  EuiTitle,
   EuiFlyoutBody,
   EuiFlexGroup,
 } from '@elastic/eui';
@@ -198,12 +197,7 @@ const WazuhDataGrid = (props: tWazuhDataGridProps) => {
       {inspectedHit && (
         <EuiFlyout onClose={closeFlyoutHandler} size='m'>
           <EuiFlyoutHeader>
-            <EuiTitle>
-              <DocDetailsHeader
-                doc={inspectedHit}
-                indexPattern={indexPattern}
-              />
-            </EuiTitle>
+            <DocDetailsHeader doc={inspectedHit} indexPattern={indexPattern} />
           </EuiFlyoutHeader>
           <EuiFlyoutBody>
             <EuiFlexGroup direction='column'>

@@ -10,6 +10,7 @@ import {
 import { RedirectAppLinks } from '../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { getCore } from '../../../../kibana-services';
 import NavigationService from '../../../../react-services/navigation-service';
+import './doc-details-header.scss';
 
 interface DocDetailsHeaderProps {
   doc?: { _id?: string; _index?: string };
@@ -25,26 +26,26 @@ const DocDetailsHeader = ({
   }),
 }: DocDetailsHeaderProps) => {
   return (
-    // Right padding keeps the links clear of the flyout close button.
     <EuiFlexGroup
+      className='wzDocDetailsHeader'
       alignItems='center'
       gutterSize='s'
       responsive={false}
-      style={{ paddingRight: '24px' }}
+      wrap
     >
       <EuiFlexItem grow={false}>
         <EuiTitle>
           <h2>{title}</h2>
         </EuiTitle>
       </EuiFlexItem>
-      <EuiFlexItem>
+      <EuiFlexItem className='wzDocDetailsHeader__links'>
         <EuiText size='s'>
           <EuiFlexGroup
             direction='column'
             alignItems='flexEnd'
             gutterSize='xs'
             responsive={false}
-            style={{ whiteSpace: 'nowrap' }}
+            className='wzDocDetailsHeader__linkList'
           >
             <EuiFlexItem grow={false}>
               <RedirectAppLinks application={getCore().application}>

@@ -1,0 +1,13 @@
+// Right padding keeps the links clear of the flyout close button.
+.wzDocDetailsHeader {
+  padding-right: $euiSizeL;
+
+  // Grows to the right edge; moves below the title when both don't fit.
+  > .wzDocDetailsHeader__links {
+    flex: 1 0 auto;
+  }
+}
+
+.wzDocDetailsHeader__linkList {
+  white-space: nowrap;
+}

@@ -24,7 +24,7 @@
   }
 
   // Custom-rendered values (links, lists) wrap too, so no row widens the table.
-  td {
+  td:not(.wzDocViewer__field) {
     overflow-wrap: anywhere;
   }
 
