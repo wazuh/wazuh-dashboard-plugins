@@ -119,7 +119,7 @@ export const getHealthCheckDescriptions = (): Record<
       'wazuh.healthCheck.serverApiCertificateVerification.remediation',
       {
         defaultMessage:
-          'For each host the details name, set ca in the dashboard configuration to the CA certificate that signed the server API certificate, and use an https URL. Then restart the dashboard.',
+          'For each host the details name, set ca in the dashboard configuration to the CA certificate that signed the server API certificate. If the host URL uses http://, change it to https://. Then restart the dashboard.',
       },
     ),
   },
