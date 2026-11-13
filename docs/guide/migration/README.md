@@ -119,6 +119,7 @@ Navigate to **☰ Menu > Dashboard management > Health Check** and verify that t
 
 - `server-api:connection-compatibility`
 - `server-api:run-as`
+- `server-api:certificate-verification`
 - `server-api:certificate-validity`
 - `saved-objects:dashboards`
 - `saved-objects:index-patterns`

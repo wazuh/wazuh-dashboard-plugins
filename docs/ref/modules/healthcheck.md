@@ -35,6 +35,7 @@ The checks represents the unit to check and some could do some write actions suc
 | `saved-objects:index-patterns`                | Validate (create if possible) the existence of the compatible index patterns used by the different modules (events, findings, states, metrics, active responses, threat-intel enrichments, agent config, etc. — there is no "alerts" index pattern on 5.0) |
 | `server-api:connection-compatibility`         | Validate the connection and compatibility with the server API hosts                                                                                                                                                                                        |
 | `server-api:run-as`                           | Validate that the `run_as` setting is enabled in each host and is allowed to use by the configured user.                                                                                                                                                   |
+| `server-api:certificate-verification`         | Warn when the dashboard connects to a server API host without verifying its certificate: the host has no `ca` setting, or its URL uses `http://`. It checks the same hosts as `server-api:connection-compatibility` and names each one.                    |
 | `integrations:default-notifications-channels` | Validate the existence of the default Notifications channels (provisioned by `wazuh-indexer-notifications`). It does not create any Alerting monitors. See [Notifications and Alerting](./notifications-alerting.md) for details.                          |
 | `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md) for details.                         |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
@@ -186,7 +187,7 @@ By default all the checks are enabled else the enabled checks are redefined thro
 The enabled checks can be seen in the application logs:
 
 ```log
-server    log   [10:52:31.480] [info][healthcheck] Enabled checks [6]: [integrations:default-notifications-channels,server-api:connection-compatibility,server-api:run-as,server-api:certificate-validity,saved-objects:dashboards,saved-objects:index-patterns]
+server    log   [10:52:31.480] [info][healthcheck] Enabled checks [7]: [integrations:default-notifications-channels,server-api:connection-compatibility,server-api:run-as,server-api:certificate-verification,server-api:certificate-validity,saved-objects:dashboards,saved-objects:index-patterns]
 ```
 
 This setting can be a string or a list of strings. It **replaces** the default `.*` entirely
@@ -217,14 +218,15 @@ An introduction under the status says what the checks cover: the connection to t
 
 Each check shows a plain title and a one-line description, with its name below. When a check is yellow or red, its details flyout adds **What to check**. The header popover lists failing checks by title. The `main` plugin registers these texts in `public/utils/health-check-descriptions.ts`:
 
-| Name                                          | Title                         |
-| --------------------------------------------- | ----------------------------- |
-| `integrations:default-notifications-channels` | Default notification channels |
-| `saved-objects:dashboards`                    | Built-in dashboards           |
-| `saved-objects:index-patterns`                | Index patterns                |
-| `server-api:certificate-validity`             | Manager certificates          |
-| `server-api:connection-compatibility`         | Server API connection         |
-| `server-api:run-as`                           | Server API run as             |
+| Name                                          | Title                               |
+| --------------------------------------------- | ----------------------------------- |
+| `integrations:default-notifications-channels` | Default notification channels       |
+| `saved-objects:dashboards`                    | Built-in dashboards                 |
+| `saved-objects:index-patterns`                | Index patterns                      |
+| `server-api:certificate-validity`             | Manager certificates                |
+| `server-api:certificate-verification`         | Server API certificate verification |
+| `server-api:connection-compatibility`         | Server API connection               |
+| `server-api:run-as`                           | Server API run as                   |
 
 The **Wazuh dashboard is not ready yet** page and the exported JSON keep the check names.
 

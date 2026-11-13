@@ -49,6 +49,7 @@ import {
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
 import { AddApi } from './add-api';
 import { ApiTableCCS } from './api-table-ccs';
+import { VerifyCaStatus } from './verify-ca-status';
 import {
   WzButtonOpenFlyout,
   WzButtonPermissionsOpenFlyout,
@@ -568,51 +569,6 @@ export const ApiTable = compose(
       );
     }
 
-    renderVerifyCaCell(verify_ca) {
-      if (verify_ca === true) {
-        return (
-          <EuiToolTip
-            position='top'
-            content={i18n.translate(
-              'wazuh.dashboardsSettings.apiTable.verifyCa.enabledTooltip',
-              { defaultMessage: 'CA certificate verification is enabled.' },
-            )}
-          >
-            <EuiIcon type='check' />
-          </EuiToolTip>
-        );
-      }
-      if (verify_ca === false) {
-        return (
-          <EuiToolTip
-            position='top'
-            content={i18n.translate(
-              'wazuh.dashboardsSettings.apiTable.verifyCa.disabledTooltip',
-              {
-                defaultMessage:
-                  'CA certificate verification is disabled. Either certificate paths are not configured.',
-              },
-            )}
-          >
-            <p>-</p>
-          </EuiToolTip>
-        );
-      }
-      return (
-        <EuiToolTip
-          position='top'
-          content={i18n.translate(
-            'wazuh.dashboardsSettings.apiTable.verifyCa.unknownTooltip',
-            {
-              defaultMessage: 'CA certificate verification status is unknown.',
-            },
-          )}
-        >
-          <p>-</p>
-        </EuiToolTip>
-      );
-    }
-
     renderTable(items, versionData, isLoading) {
       return (
         <ApiTableCCS
@@ -728,7 +684,9 @@ export const ApiTable = compose(
               'wazuh.dashboardsSettings.apiTable.details.verifyCa',
               { defaultMessage: 'Verify CA' },
             ),
-            description: this.renderVerifyCaCell(api.verify_ca),
+            description: (
+              <VerifyCaStatus verifyCa={api.verify_ca} url={api.url} />
+            ),
           },
         );
 
