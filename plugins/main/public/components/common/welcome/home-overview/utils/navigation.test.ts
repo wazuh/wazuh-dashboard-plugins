@@ -2,6 +2,7 @@ import rison from 'rison-node';
 import {
   getAiAssistantUrl,
   getCreateActiveResponseUrl,
+  getCtiExplorerIocsUrl,
   isActiveResponsesRegistered,
   getMitreFindingsByTechniqueUrl,
   getMitreIntelligenceResourceUrl,
@@ -61,6 +62,7 @@ jest.mock('../../../../../utils/applications', () => {
     activeResponses: app('incident-response-dashboard'),
     regulatoryCompliance: app('regulatory-compliance'),
     endpointSummary: app('endpoint-summary'),
+    ctiExplorer: app('cti-explorer'),
   };
 });
 
@@ -234,5 +236,19 @@ describe('isActiveResponsesRegistered', () => {
 
   it('is false when the plugin is not installed', () => {
     expect(isActiveResponsesRegistered(new Map([['wz-home', {}]]))).toBe(false);
+  });
+});
+
+describe('getCtiExplorerIocsUrl', () => {
+  it('opens the IOCs tab of the CTI Explorer', () => {
+    expect(getCtiExplorerIocsUrl()).toBe(
+      '/app/cti-explorer#/cti-explorer/?tab=iocs',
+    );
+  });
+
+  it('filters the IOC list to one type', () => {
+    expect(getCtiExplorerIocsUrl('hash_sha256')).toBe(
+      '/app/cti-explorer#/cti-explorer/?tab=iocs&iocType=hash_sha256',
+    );
   });
 });
