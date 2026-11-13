@@ -91,16 +91,21 @@ export class WzRequest {
           try {
             await ApiCheck.checkStored(currentApi.id);
           } catch (error) {
-            const wzMisc = new WzMisc();
-            wzMisc.setApiIsDown(true);
-            if (
-              !NavigationService.getInstance()
-                .getPathname()
-                .startsWith('/settings')
-            ) {
-              NavigationService.getInstance().navigate('/health-check');
+            // A check that timed out means the API is slow, not down (e.g. it
+            // is hashing a large merged.mg): keep the user on the page and let
+            // the caller handle the original error.
+            if (error?.code !== 'ECONNABORTED') {
+              const wzMisc = new WzMisc();
+              wzMisc.setApiIsDown(true);
+              if (
+                !NavigationService.getInstance()
+                  .getPathname()
+                  .startsWith('/settings')
+              ) {
+                NavigationService.getInstance().navigate('/health-check');
+              }
+              throw new Error(error);
             }
-            throw new Error(error);
           }
         }
       }
