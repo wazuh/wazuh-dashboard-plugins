@@ -323,42 +323,47 @@ export class WzRequest {
               );
             }
           } catch (error) {
-            const recovered = await this.recoverPrimaryAPI();
-            if (recovered) {
-              return this.genericReq(
-                method,
-                path,
-                this.syncApiRequestPayloadWithSession(path, payload),
+            // A check that timed out means the API is slow, not down (e.g. it
+            // is hashing a large merged.mg): keep the user on the page and let
+            // the caller handle the original error.
+            if (error?.code !== 'ECONNABORTED') {
+              const recovered = await this.recoverPrimaryAPI();
+              if (recovered) {
+                return this.genericReq(
+                  method,
+                  path,
+                  this.syncApiRequestPayloadWithSession(path, payload),
+                  {
+                    shouldRetry,
+                    checkCurrentApiIsUp: false,
+                    overwriteHeaders,
+                  },
+                );
+              }
+
+              const wzMisc = new WzMisc();
+              wzMisc.setApiIsDown(true);
+              this.serverAPIAvailable$.next(false);
+              const title = i18n.translate(
+                'wazuh.core.request.apiNotAvailableTitle',
                 {
-                  shouldRetry,
-                  checkCurrentApiIsUp: false,
-                  overwriteHeaders,
+                  defaultMessage: 'API with ID [{apiId}] is not available.',
+                  values: { apiId: currentApi.id },
                 },
               );
+              const text = i18n.translate(
+                'wazuh.core.request.apiNotAvailableText',
+                {
+                  defaultMessage:
+                    'This could indicate a problem reaching the configured Manager API. Cause: {cause}',
+                  values: { cause: error.message },
+                },
+              );
+
+              displayAPINotAvailableToast({ title, text });
+
+              throw new Error(`${title} ${text}`);
             }
-
-            const wzMisc = new WzMisc();
-            wzMisc.setApiIsDown(true);
-            this.serverAPIAvailable$.next(false);
-            const title = i18n.translate(
-              'wazuh.core.request.apiNotAvailableTitle',
-              {
-                defaultMessage: 'API with ID [{apiId}] is not available.',
-                values: { apiId: currentApi.id },
-              },
-            );
-            const text = i18n.translate(
-              'wazuh.core.request.apiNotAvailableText',
-              {
-                defaultMessage:
-                  'This could indicate a problem reaching the configured Manager API. Cause: {cause}',
-                values: { cause: error.message },
-              },
-            );
-
-            displayAPINotAvailableToast({ title, text });
-
-            throw new Error(`${title} ${text}`);
           }
         }
       }
