@@ -183,13 +183,13 @@ class WzListEditor extends Component {
         this.showToast(
           'success',
           'Success',
-          'CBD List successfully created',
+          'CDB List successfully created',
           3000,
         );
         this.props.updateListContent(file);
       } else {
         this.setState({ showWarningRestart: true });
-        this.showToast('success', 'Success', 'CBD List updated', 3000);
+        this.showToast('success', 'Success', 'CDB List updated', 3000);
       }
     } catch (error) {
       const options = {

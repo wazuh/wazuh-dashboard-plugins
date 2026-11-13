@@ -114,7 +114,7 @@ describe('WzListEditor', () => {
         expect(mockAdd).toHaveBeenCalledWith({
           title: 'Success',
           color: 'success',
-          text: 'CBD List successfully created',
+          text: 'CDB List successfully created',
           toastLifeTimeMs: 3000,
         });
       });
@@ -260,7 +260,7 @@ describe('WzListEditor', () => {
         expect(mockAdd).toHaveBeenCalledWith({
           title: 'Success',
           color: 'success',
-          text: 'CBD List updated',
+          text: 'CDB List updated',
           toastLifeTimeMs: 3000,
         });
       });
@@ -341,7 +341,7 @@ describe('WzListEditor', () => {
           expect(mockAdd).toHaveBeenCalledWith({
             title: 'Success',
             color: 'success',
-            text: 'CBD List updated',
+            text: 'CDB List updated',
             toastLifeTimeMs: 3000,
           });
         });
