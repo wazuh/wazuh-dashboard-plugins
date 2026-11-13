@@ -155,6 +155,15 @@ export const RequirementFlyout = connect(mapStateToProps)(
           ),
         },
         {
+          id: 'wazuh.rule.title',
+          displayAsText: i18n.translate(
+            'wazuh.complianceTable.requirementFlyout.columnRuleTitle',
+            {
+              defaultMessage: 'Rule title',
+            },
+          ),
+        },
+        {
           id: 'wazuh.integration.decoders',
           displayAsText: i18n.translate(
             'wazuh.complianceTable.requirementFlyout.columnDecoders',
