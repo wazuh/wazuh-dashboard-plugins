@@ -72,9 +72,8 @@ export class ManageHosts {
   ) {}
 
   /**
-   * Calculate verify_ca based on certificate paths.
-   * If key, cert, and ca are all configured, verify_ca is true.
-   * Otherwise, verify_ca is null (not configured) or false (partially configured).
+   * Calculate verify_ca from the host configuration: true when ca is set, false otherwise.
+   * key and cert are client certificates and do not affect it.
    */
   private calculateVerifyCa(host: IAPIHost): boolean | null {
     // Check if certificate paths are defined

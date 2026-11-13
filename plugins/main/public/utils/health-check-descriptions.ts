@@ -6,6 +6,7 @@ import {
   HEALTH_CHECK_TASK_INDEX_PATTERNS,
   HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS,
   HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
+  HEALTH_CHECK_TASK_SERVER_API_CERTIFICATE_VERIFICATION,
   HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
 } from '../../common/constants';
 
@@ -97,6 +98,28 @@ export const getHealthCheckDescriptions = (): Record<
       {
         defaultMessage:
           'If the details say it could not check, fix the Server API connection first. Otherwise, set run_as: true for the host in the dashboard configuration and allow run_as for the API user on the manager. Then restart the dashboard.',
+      },
+    ),
+  },
+  [HEALTH_CHECK_TASK_SERVER_API_CERTIFICATE_VERIFICATION]: {
+    title: i18n.translate(
+      'wazuh.healthCheck.serverApiCertificateVerification.title',
+      {
+        defaultMessage: 'Server API certificate verification',
+      },
+    ),
+    description: i18n.translate(
+      'wazuh.healthCheck.serverApiCertificateVerification.description',
+      {
+        defaultMessage:
+          'Checks that the dashboard verifies the server API certificate of each host. A host without the ca setting is connected to without verification.',
+      },
+    ),
+    remediation: i18n.translate(
+      'wazuh.healthCheck.serverApiCertificateVerification.remediation',
+      {
+        defaultMessage:
+          'For each host the details name, set ca in the dashboard configuration to the CA certificate that signed the server API certificate, and use an https URL. Then restart the dashboard.',
       },
     ),
   },

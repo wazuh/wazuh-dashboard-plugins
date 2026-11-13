@@ -38,6 +38,7 @@ import {
   getWazuhCheckUpdatesPlugin,
   getWazuhCorePlugin,
 } from '../../../kibana-services';
+import { VerifyCaStatus } from './verify-ca-status';
 import { AvailableUpdatesFlyout } from './available-updates-flyout';
 import { AddApi } from './add-api';
 import {
@@ -297,53 +298,9 @@ export const ApiTableCCS = ({
       align: 'center',
       sortable: true,
       width: '80px',
-      render: (value, row) => {
-        const verify_ca = row.verify_ca;
-
-        if (verify_ca === true) {
-          return (
-            <EuiToolTip
-              position='top'
-              content={i18n.translate(
-                'wazuh.dashboardsSettings.apiTableCcs.verifyCa.enabledTooltip',
-                { defaultMessage: 'CA certificate verification is enabled.' },
-              )}
-            >
-              <EuiIcon type='check' />
-            </EuiToolTip>
-          );
-        } else if (verify_ca === false) {
-          return (
-            <EuiToolTip
-              position='top'
-              content={i18n.translate(
-                'wazuh.dashboardsSettings.apiTableCcs.verifyCa.disabledTooltip',
-                {
-                  defaultMessage:
-                    'CA certificate verification is disabled. Either certificate paths are not configured.',
-                },
-              )}
-            >
-              <p>-</p>
-            </EuiToolTip>
-          );
-        } else {
-          return (
-            <EuiToolTip
-              position='top'
-              content={i18n.translate(
-                'wazuh.dashboardsSettings.apiTableCcs.verifyCa.unknownTooltip',
-                {
-                  defaultMessage:
-                    'CA certificate verification status is unknown.',
-                },
-              )}
-            >
-              <p>-</p>
-            </EuiToolTip>
-          );
-        }
-      },
+      render: (value, row) => (
+        <VerifyCaStatus verifyCa={row.verify_ca} url={row.url} />
+      ),
     },
     {
       name: i18n.translate(

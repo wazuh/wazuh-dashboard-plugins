@@ -1123,6 +1123,9 @@ export const HEALTH_CHECK_TASK_SERVER_API_CONNECTION =
 
 export const HEALTH_CHECK_TASK_SERVER_API_RUN_AS = 'server-api:run-as';
 
+export const HEALTH_CHECK_TASK_SERVER_API_CERTIFICATE_VERIFICATION =
+  'server-api:certificate-verification';
+
 export const HEALTH_CHECK_TASK_DASHBOARDS = 'saved-objects:dashboards';
 
 export const HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS =
