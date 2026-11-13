@@ -13,13 +13,13 @@ export function EngineSwitch({
   ariaLabel,
   engine,
   updateEngine,
-  saving,
+  disabled,
 }: {
   field: keyof Engine;
   ariaLabel: string;
   engine: Engine;
   updateEngine: UpdateEngineFn;
-  saving: boolean;
+  disabled: boolean;
 }) {
   const value = engine[field];
   const checked = typeof value === 'boolean' ? value : Boolean(value);
@@ -38,7 +38,7 @@ export function EngineSwitch({
         }
         checked={checked}
         onChange={() => updateEngine(field, !checked as Engine[typeof field])}
-        disabled={saving}
+        disabled={disabled}
         aria-label={ariaLabel}
       />
     </EuiCompressedFormRow>

@@ -32,6 +32,7 @@ import WzWazuhAPINotReachable from '../util-components/wz-api-not-reachable';
 import WzConfigurationPath from '../util-components/configuration-path';
 import WzRefreshClusterInfoButton from '../util-components/refresh-cluster-info-button';
 import { WzButtonPermissions } from '../../../../../../components/common/permissions/button';
+import { WzEmptyPromptNoPermissions } from '../../../../../../components/common/permissions/prompt';
 import withLoading from '../util-hocs/loading';
 import { updateWazuhNotReadyYet } from '../../../../../../redux/actions/appStateActions';
 import {
@@ -156,7 +157,9 @@ class WzEditConfiguration extends Component {
           message: errorMessage || error,
           title: i18n.translate(
             'wazuh.configuration.editConfiguration.saveErrorTitle',
-            { defaultMessage: 'Error found saving the file.' },
+            {
+              defaultMessage: 'Error found saving the file.',
+            },
           ),
         },
       };
@@ -310,7 +313,9 @@ class WzEditConfiguration extends Component {
               <EuiButton iconType='alert' isDisabled>
                 {i18n.translate(
                   'wazuh.configuration.editConfiguration.xmlFormatErrorButton',
-                  { defaultMessage: 'XML format error' },
+                  {
+                    defaultMessage: 'XML format error',
+                  },
                 )}
               </EuiButton>
             ) : (
@@ -318,7 +323,7 @@ class WzEditConfiguration extends Component {
                 permissions={[
                   {
                     action: 'cluster:update_config',
-                    resource: `node:id:${this.props.clusterNodeSelected}`,
+                    resource: `node:id:${clusterNodeSelected || '*'}`,
                   },
                 ]}
                 isDisabled={
@@ -331,7 +336,9 @@ class WzEditConfiguration extends Component {
               >
                 {i18n.translate(
                   'wazuh.configuration.editConfiguration.saveButton',
-                  { defaultMessage: 'Save' },
+                  {
+                    defaultMessage: 'Save',
+                  },
                 )}
               </WzButtonPermissions>
             )}
@@ -341,7 +348,7 @@ class WzEditConfiguration extends Component {
               permissions={[
                 {
                   action: 'cluster:restart',
-                  resource: `node:id:${this.props.clusterNodeSelected}`,
+                  resource: `node:id:${clusterNodeSelected || '*'}`,
                 },
               ]}
               fill
@@ -551,6 +558,15 @@ const WzEditorConfiguration = compose(
                 />
               )}
             </Fragment>
+          ) : this.props.errorXMLFetched?.response?.status === 403 ? (
+            <WzEmptyPromptNoPermissions
+              permissions={[
+                {
+                  action: 'cluster:read',
+                  resource: `node:id:${clusterNodeSelected || '*'}`,
+                },
+              ]}
+            />
           ) : (
             <WzWazuhAPINotReachable error={this.props.errorXMLFetched} />
           )}
