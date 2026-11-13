@@ -158,6 +158,17 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
     [runGuarded, onClose, core.application],
   );
 
+  const openPrivacySettings = useCallback(
+    () =>
+      runGuarded(() => {
+        onClose();
+        void core.application.navigateToApp(PLUGIN_ID, {
+          path: '#/settings?tab=privacy',
+        });
+      }),
+    [runGuarded, onClose, core.application],
+  );
+
   const newConversationLabel = i18n.translate(
     'wazuhAiAssistant.headerPanel.newConversationButtonLabel',
     {
@@ -388,6 +399,7 @@ export const AssistantChatPanel: React.FC<AssistantChatPanelProps> = ({
             selectedProviderId={selectedProviderId}
             onProviderChange={setSelectedProviderId}
             onNavigateToSettings={openSettingsToAddProvider}
+            onOpenPrivacySettings={openPrivacySettings}
             // Plain Settings visit (iteration-4 item 2's "Manage providers" footer item) — the
             // same `openSettings` callback the panel's own settings toolbar button already uses,
             // rather than a second hardcoded `#/settings` navigateToApp call.

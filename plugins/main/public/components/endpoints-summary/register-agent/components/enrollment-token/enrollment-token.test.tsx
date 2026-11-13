@@ -10,6 +10,7 @@ import '@testing-library/jest-dom/extend-expect';
 import EnrollmentTokenInput from './enrollment-token';
 import {
   createEnrollmentToken,
+  getEnrollmentToken,
   getEnrollmentTokens,
   revokeEnrollmentToken,
 } from '../../../../../services/enrollment-tokens';
@@ -40,7 +41,11 @@ jest.mock('../../../../../kibana-services', () => {
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
   ...jest.requireActual('../../../../../services/enrollment-tokens/constants'),
+  ...jest.requireActual(
+    '../../../../../services/enrollment-tokens/decode-enrollment-token',
+  ),
   createEnrollmentToken: jest.fn(),
+  getEnrollmentToken: jest.fn(),
   getEnrollmentTokens: jest.fn(),
   revokeEnrollmentToken: jest.fn(),
 }));
@@ -83,6 +88,7 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
 
 const createToken = createEnrollmentToken as jest.Mock;
 const listTokens = getEnrollmentTokens as jest.Mock;
+const lookupToken = getEnrollmentToken as jest.Mock;
 const revokeToken = revokeEnrollmentToken as jest.Mock;
 
 const MINTED = {
@@ -152,10 +158,12 @@ const Harness = ({
   formFields,
   initialToken,
   onTokenChange,
+  canCreateEnrollmentToken,
 }: {
   formFields: UseFormReturn['fields'];
   initialToken: EnrollmentToken | null;
   onTokenChange: (token: EnrollmentToken | null) => void;
+  canCreateEnrollmentToken?: boolean;
 }) => {
   const [token, setToken] = useState<EnrollmentToken | null>(initialToken);
   return (
@@ -166,6 +174,7 @@ const Harness = ({
         setToken(next);
         onTokenChange(next);
       }}
+      canCreateEnrollmentToken={canCreateEnrollmentToken}
     />
   );
 };
@@ -177,6 +186,7 @@ interface RenderOptions {
   formFields?: Partial<UseFormReturn['fields']>;
   enrollmentToken?: EnrollmentToken | null;
   collapsed?: boolean;
+  canCreateEnrollmentToken?: boolean;
 }
 
 const renderInput = (props: RenderOptions = {}) => {
@@ -186,6 +196,7 @@ const renderInput = (props: RenderOptions = {}) => {
       formFields={buildFormFields(props.formFields)}
       initialToken={props.enrollmentToken ?? null}
       onTokenChange={onEnrollmentTokenChange}
+      canCreateEnrollmentToken={props.canCreateEnrollmentToken}
     />,
   );
   if (!props.collapsed && screen.queryByText('View advanced options')) {
@@ -219,7 +230,51 @@ beforeEach(() => {
   createToken.mockReset();
   listTokens.mockReset();
   listTokens.mockResolvedValue({ tokens: [], total: 0 });
+  lookupToken.mockReset();
+  lookupToken.mockResolvedValue(undefined);
   revokeToken.mockReset();
+});
+
+/* Pasting a stored token needs no permission, so an operator who cannot mint
+keeps the step with only that tab. */
+describe('EnrollmentTokenInput without the permission to mint', () => {
+  it('offers only the reuse tab', () => {
+    renderInput({ canCreateEnrollmentToken: false });
+
+    expect(existingTab()).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.queryByRole('tab', { name: 'Generate a new token' }),
+    ).not.toBeInTheDocument();
+    expect(existingTokenInput()).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Generate/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows no warning about the permission', () => {
+    renderInput({ canCreateEnrollmentToken: false });
+
+    expect(document.querySelector('.euiCallOut')).toBeNull();
+  });
+
+  it('deploys with a pasted token', () => {
+    const { onEnrollmentTokenChange } = renderInput({
+      canCreateEnrollmentToken: false,
+      formFields: { existingEnrollmentToken: field('eyJ2ZXIiOjEs') },
+    });
+
+    expect(onEnrollmentTokenChange).toHaveBeenCalledWith({
+      source: 'existing',
+      token: 'eyJ2ZXIiOjEs',
+    });
+  });
+
+  it('offers both tabs when the permission is there', () => {
+    renderInput();
+
+    expect(generateTab()).toBeInTheDocument();
+    expect(existingTab()).toBeInTheDocument();
+  });
 });
 
 /* A token is either minted here or reused from an earlier deployment. Reading
@@ -503,6 +558,36 @@ describe('EnrollmentTokenInput', () => {
     expect(onEnrollmentTokenChange).toHaveBeenCalledWith({
       source: 'existing',
       token: 'eyJ2ZXIiOjEs',
+    });
+  });
+
+  /* A pasted token is checked against the token list rather than trusted:
+  the step used to report a revoked token as in use without a warning. */
+  it('warns about a revoked stored token while still deploying with it', async () => {
+    const toBase64Url = (binary: string) =>
+      btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const key = toBase64Url(
+      String.fromCharCode(...Array.from({ length: 32 }, (_, i) => i)),
+    );
+    const stored = toBase64Url(
+      JSON.stringify({ ver: 1, adr: 'manager.example.com', pin: key, key }),
+    );
+    lookupToken.mockResolvedValue({
+      id: 'AAECAwQFBgcICQoLDA0ODw',
+      revoked: true,
+    });
+
+    const { onEnrollmentTokenChange } = renderInput({
+      formFields: { existingEnrollmentToken: field(stored) },
+    });
+
+    expect(
+      await screen.findByText('This token is revoked'),
+    ).toBeInTheDocument();
+    expect(lookupToken).toHaveBeenCalledWith('AAECAwQFBgcICQoLDA0ODw');
+    expect(onEnrollmentTokenChange).toHaveBeenCalledWith({
+      source: 'existing',
+      token: stored,
     });
   });
 

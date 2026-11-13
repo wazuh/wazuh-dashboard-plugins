@@ -13,16 +13,10 @@ const CTI_CONSOLE_REQUEST_HEADERS = {
 };
 
 /**
- * OAuth `client_id` (environment UID): optional body override, then
- * `WAZUH_CTI_CLIENT_ID`, otherwise cluster `cluster_uuid` from `GET /`.
+ * OAuth `client_id` (environment UID): `WAZUH_CTI_CLIENT_ID`, otherwise cluster
+ * `cluster_uuid` from `GET /`. Never taken from the request.
  */
-export async function resolveCtiOAuthClientId(
-  fromBody?: string,
-): Promise<string> {
-  const fromRequest = fromBody?.trim();
-  if (fromRequest) {
-    return fromRequest;
-  }
+export async function resolveCtiOAuthClientId(): Promise<string> {
   const fromEnv = process.env.WAZUH_CTI_CLIENT_ID?.trim();
   if (fromEnv) {
     return fromEnv;

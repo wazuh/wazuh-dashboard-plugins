@@ -29,6 +29,8 @@ jest.mock('../../utils/navigation', () => ({
   getIntegrationsUrl: jest.fn(() => '/manage-content'),
   getKvdbsUrl: jest.fn(),
   getFiltersUrl: jest.fn(),
+  getCtiExplorerIocsUrl: jest.fn(() => '/cti-explorer-iocs'),
+  getCtiFeedUrl: jest.fn(() => '/cti-feed'),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
@@ -79,6 +81,33 @@ describe('ThreatIntelligenceFeedSection', () => {
     expect(navigation.getRulesUrl).toHaveBeenCalled();
     fireEvent.click(screen.getByText('Ruleset management'));
     expect(navigation.getIntegrationsUrl).toHaveBeenCalled();
+  });
+
+  it('says the content comes from the CTI feed and links to it', () => {
+    asMock(navigation.getCtiFeedUrl).mockReturnValue('/cti-feed');
+    render(
+      <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
+    );
+    expect(
+      screen.getByText(/Detection content and IOCs from the/),
+    ).toBeInTheDocument();
+    expect(screen.getByText('CTI feed').closest('a')).toHaveAttribute(
+      'href',
+      '/cti-feed',
+    );
+  });
+
+  it('links the Threat catalog title to the CTI Explorer IOCs tab', () => {
+    asMock(navigation.getCtiExplorerIocsUrl).mockReturnValue(
+      '/cti-explorer-iocs',
+    );
+    render(
+      <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
+    );
+    expect(screen.getByText('Threat catalog').closest('a')).toHaveAttribute(
+      'href',
+      '/cti-explorer-iocs',
+    );
   });
 
   it('always renders both cards, even when every tile is unavailable', () => {

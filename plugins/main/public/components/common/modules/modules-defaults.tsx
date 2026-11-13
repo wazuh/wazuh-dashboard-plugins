@@ -14,7 +14,10 @@ import { i18n } from '@osd/i18n';
 import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
-import { ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent } from '../modules/buttons';
+import {
+  ButtonInventoryGenerateReport as ButtonInventoryGenerateReportComponent,
+  ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent,
+} from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
 import { GitHubPanel } from '../../overview/github/panel';
 import {
@@ -133,6 +136,7 @@ import { ButtonAboutVulnerabilityDetection } from '../../overview/vulnerabilitie
 import { ButtonAboutMitreAttack } from '../../overview/mitre/components/about/button-about-mitre-attack';
 import { ButtonAboutCaseManagement } from '../../overview/case-management/components/about/button-about-case-management';
 import { ButtonAboutRegulatoryCompliance } from '../../overview/regulatory-compliance/components/about/button-about-regulatory-compliance';
+import { ButtonComplianceGenerateReport as ButtonComplianceGenerateReportComponent } from '../../overview/regulatory-compliance/components/generate-report/button-compliance-generate-report';
 import { ButtonAboutDocker } from '../../overview/docker/components/about/button-about-docker';
 import { ButtonAboutAmazonWebServices } from '../../overview/amazon-web-services/components/about/button-about-amazon-web-services';
 import { ButtonAboutGoogleCloud } from '../../overview/google-cloud/components/about/button-about-google-cloud';
@@ -148,6 +152,21 @@ import { WAZUH_MODULES } from '../../../../common/wazuh-modules';
 const ButtonModuleGenerateReport = {
   condition: () => new ReportingService().reportDashboardPluginExist(),
   component: ButtonModuleGenerateReportComponent,
+};
+
+const ButtonComplianceGenerateReport = {
+  condition: () => new ReportingService().reportDashboardPluginExist(),
+  component: ButtonComplianceGenerateReportComponent,
+};
+
+// Buttons of each framework tab of Regulatory Compliance
+const regulatoryComplianceButtons = [
+  ButtonExploreAgent,
+  ButtonComplianceGenerateReport,
+];
+
+const ButtonInventoryGenerateReport = {
+  component: ButtonInventoryGenerateReportComponent,
 };
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
@@ -706,37 +725,61 @@ export const ModulesDefaults = {
       {
         id: 'system',
         name: TAB_NAMES.system,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneSystemInventory,
       },
       {
         id: 'software',
         name: TAB_NAMES.software,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygienePackagesInventory,
       },
       {
         id: 'processes',
         name: TAB_NAMES.processes,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneProcessesInventory,
       },
       {
         id: 'network',
         name: TAB_NAMES.network,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneNetworksInventory,
       },
       {
         id: 'users',
         name: TAB_NAMES.identity,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneUsersInventory,
       },
       {
         id: 'services',
         name: TAB_NAMES.services,
-        buttons: [ButtonAboutITHygiene, ButtonExploreAgent],
+        buttons: [
+          ButtonAboutITHygiene,
+          ButtonExploreAgent,
+          ButtonInventoryGenerateReport,
+        ],
         component: ITHygieneServicesInventory,
       },
       {
@@ -815,61 +858,61 @@ export const ModulesDefaults = {
         {
           id: WAZUH_MODULES_ID.PCI_DSS,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.PCI_DSS].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryCompliancePCIDSS,
         },
         {
           id: WAZUH_MODULES_ID.CMMC,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.CMMC].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceCMMC,
         },
         {
           id: WAZUH_MODULES_ID.FEDRAMP,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.FEDRAMP].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceFedRAMP,
         },
         {
           id: WAZUH_MODULES_ID.GDPR,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.GDPR].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceGDPR,
         },
         {
           id: WAZUH_MODULES_ID.HIPAA,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.HIPAA].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceHIPAA,
         },
         {
           id: WAZUH_MODULES_ID.ISO_27001,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.ISO_27001].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceISO27001,
         },
         {
           id: WAZUH_MODULES_ID.NIS2,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.NIS2].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceNIS2,
         },
         {
           id: WAZUH_MODULES_ID.NIST_800_53,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_53].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceNIST80053,
         },
         {
           id: WAZUH_MODULES_ID.NIST_800_171,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.NIST_800_171].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceNIST800171,
         },
         {
           id: WAZUH_MODULES_ID.TSC,
           name: WAZUH_MODULES[WAZUH_MODULES_ID.TSC].title,
-          buttons: [ButtonExploreAgent],
+          buttons: regulatoryComplianceButtons,
           component: RegulatoryComplianceTSC,
         },
       ],

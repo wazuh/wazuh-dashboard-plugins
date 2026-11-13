@@ -188,7 +188,8 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * Returns current security platform
+   * Returns current security platform and the user fields of its
+   * authentication context
    * @param {Object} req
    * @param {Object} reply
    * @returns {String}
@@ -202,6 +203,7 @@ export class WazuhElasticCtrl {
       return response.ok({
         body: {
           platform: context.wazuh.security.platform,
+          authContextFields: context.wazuh.security.authContextFields,
         },
       });
     } catch (error) {

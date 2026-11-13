@@ -5,6 +5,9 @@ import {
   TabsManagedBySearchParamProps,
 } from '../../navigation/tabs-managed-by-search-params';
 
+// Search parameter that holds the selected sub-tab
+export const MODULE_SUB_TABS_SEARCH_PARAM = 'tabSubView';
+
 export const ModuleSubTabs = ({
   tabs,
 }: {
@@ -13,7 +16,7 @@ export const ModuleSubTabs = ({
   return (
     <TabsManagedBySearchParam
       tabs={tabs}
-      searchParamNavigation='tabSubView'
+      searchParamNavigation={MODULE_SUB_TABS_SEARCH_PARAM}
       tabsProps={{ size: 's' }}
     />
   );

@@ -16,8 +16,9 @@ import { EuiConfirmModal, EuiOverlayMask } from '@elastic/eui';
 import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
 import WzGroupEditor from './groups-editor';
-import { updateGroupDetail } from '../../../../../redux/actions/groupsActions';
 import {
+  updateGroupDetail,
+  updateFileContent,
   updateShowAddAgents,
   resetGroup,
   cleanFileContent,
@@ -37,6 +38,11 @@ import {
 import { endpointGroups } from '../../../../../utils/applications';
 import { ManageAgents } from '../../../../../components/management/groups/manage-agents';
 import NavigationService from '../../../../../react-services/navigation-service';
+import {
+  EDIT_GROUP_CONFIGURATION_SEARCH_PARAM,
+  getGroupConfigurationFile,
+  isGroupConfigurationEditRequested,
+} from './utils/group-configuration';
 
 export class WzGroups extends Component {
   constructor(props) {
@@ -55,6 +61,7 @@ export class WzGroups extends Component {
         });
         const dataGroup = responseGroup?.data?.data?.affected_items?.[0];
         this.props.updateGroupDetail(dataGroup);
+        return dataGroup;
       } catch (error) {
         const options = {
           context: `${WzGroups.name}.componentDidMount`,
@@ -74,8 +81,34 @@ export class WzGroups extends Component {
       }
     }
   };
+
+  /* Other views link to the configuration editor of a group through the URL.
+  The editor opens once the group is known to be readable, so closing it lands
+  on the group's detail. */
+  openGroupConfigurationFromUrl = async groupName => {
+    if (!isGroupConfigurationEditRequested(this.props.search)) {
+      return;
+    }
+    // A one-off request: a reload or a step back must not reopen the editor
+    NavigationService.getInstance().updateAndNavigateSearchParams(
+      { [EDIT_GROUP_CONFIGURATION_SEARCH_PARAM]: null },
+      { replace: true },
+    );
+    const file = await getGroupConfigurationFile(groupName);
+    if (file) {
+      this.props.updateFileContent(file);
+    }
+  };
+
+  loadGroup = async () => {
+    const groupDetail = await this.getGroupDetail();
+    if (groupDetail) {
+      await this.openGroupConfigurationFromUrl(groupDetail.name);
+    }
+  };
+
   async componentDidMount() {
-    await this.getGroupDetail();
+    await this.loadGroup();
   }
 
   async componentDidUpdate(prevProps) {
@@ -85,8 +118,13 @@ export class WzGroups extends Component {
         this.props.cleanFileContent();
         this.props.updateGroupDetail(false);
       } else {
-        await this.getGroupDetail();
+        await this.loadGroup();
       }
+    } else if (
+      isGroupConfigurationEditRequested(this.props.search) &&
+      !isGroupConfigurationEditRequested(prevProps.search)
+    ) {
+      await this.loadGroup();
     }
   }
 
@@ -166,6 +204,7 @@ const mapDispatchToProps = dispatch => {
   return {
     resetGroup: () => dispatch(resetGroup()),
     cleanFileContent: () => dispatch(cleanFileContent()),
+    updateFileContent: content => dispatch(updateFileContent(content)),
     updateShowDiscardChangesModal: show =>
       dispatch(updateShowDiscardChangesModal(show)),
     updateShowAddAgents: showAddAgents =>
