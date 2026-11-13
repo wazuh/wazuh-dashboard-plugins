@@ -27,15 +27,16 @@ The plugin provides a function for fetching the available updates for each API. 
 
 The plugin registers the environment with Wazuh Cyber Threat Intelligence (CTI) through the OAuth
 2.0 device authorization grant, then hands the resulting subscription to the content manager of
-the Wazuh indexer (`/_plugins/_content_manager/subscription`). The registration UI is enabled by
-`wazuh_check_updates.ctiRegistrationUiEnabled` and has two entry points:
+the Wazuh indexer (`/_plugins/_content_manager/subscription`). The registration UI has two entry
+points:
 
 - The registration modal (`ModalCti`), opened from the CTI feed app. `useCtiRegistrationModal`
   holds its open state and cancels a pending activation when the modal closes.
 - The `CtiUpsellNotification` bottom bar, exposed in the start contract and rendered by the main
   plugin while the environment is not registered. Its **Register now** button opens the CTI feed
-  app with the registration modal already open (location state `openRegistration`). The bar can be
-  turned off with `wazuh_check_updates.ctiUpsellEnabled`.
+  app with the registration modal already open (location state `openRegistration`). The bar is
+  shown only when both `wazuh_check_updates.ctiRegistrationUiEnabled` and
+  `wazuh_check_updates.ctiUpsellEnabled` are `true`.
 
 The routes of the registration flow live under `/api/wazuh-check-updates/cti-registration/`.
 
@@ -45,7 +46,8 @@ The plugin registers the **CTI feed** app (`cti-feed`) in the **Threat intellige
 in both the classic navigation (`wz-category-threat-intelligence`) and the new navigation
 (`wazuh-threat-intelligence`). The category ids are duplicated in `common/cti-feed.ts` and must
 match the main plugin's own, which is what places the app next to the main plugin's Threat
-intelligence apps. The app is registered only when `ctiRegistrationUiEnabled` is `true`.
+intelligence apps. The app is always registered, whatever the value of
+`ctiRegistrationUiEnabled`.
 
 The app has three panels and one action:
 

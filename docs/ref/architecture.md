@@ -117,8 +117,7 @@ any plugin reaches the server API client as `context.wazuh_core.api.client.asCur
   the Wazuh indexer (`/_plugins/_content_manager/subscription`).
 - **CTI feed app**: the **CTI feed** application, under **Threat intelligence**, shows the
   registration status, the sync state of each feed and the content the feed delivered, and
-  requests an on-demand content update. It is registered only when `ctiRegistrationUiEnabled` is
-  set. See [CTI feed](modules/cti-feed.md).
+  requests an on-demand content update. See [CTI feed](modules/cti-feed.md).
 
 Its server routes live under `/api/wazuh-check-updates/`.
 

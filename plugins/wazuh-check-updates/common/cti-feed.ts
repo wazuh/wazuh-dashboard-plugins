@@ -42,8 +42,11 @@ export const THREAT_INTELLIGENCE_NAV_CATEGORY = {
   order: 400,
 };
 
-/** Placed after the main plugin's apps in the same category (orders 300-303). */
-export const CTI_FEED_APP_ORDER = 304;
+/**
+ * Placed after the main plugin's apps in the same category (orders 300-304),
+ * right after CTI Explorer, which lists the content this app reports the sync of.
+ */
+export const CTI_FEED_APP_ORDER = 305;
 
 /** Feed content counts served by `routes.ctiFeedIndicators`. */
 export interface CtiFeedIndicatorsResponse {

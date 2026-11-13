@@ -39,6 +39,7 @@ import {
 import { WzRequest, WzUserPermissions } from '../../../../../react-services';
 import { getToasts } from '../../../../../kibana-services';
 import GroupsHandler from './utils/groups-handler';
+import { getGroupConfigurationFile } from './utils/group-configuration';
 import { SEARCH_BAR_WQL_VALUE_SUGGESTIONS_COUNT } from '../../../../../../common/constants';
 import NavigationService from '../../../../../react-services/navigation-service';
 
@@ -224,17 +225,10 @@ export class WzGroupsOverview extends Component {
   }
 
   async showGroupConfiguration(groupId) {
-    const result = await GroupsHandler.getFileContent(
-      `/groups/${groupId}/files/agent.conf?raw=true`,
-    );
-
-    const file = {
-      name: 'agent.conf',
-      content: result?.toString(),
-      isEditable: true,
-      groupName: groupId,
-    };
-    this.props.updateFileContent(file);
+    const file = await getGroupConfigurationFile(groupId);
+    if (file) {
+      this.props.updateFileContent(file);
+    }
   }
 
   render() {

@@ -30,6 +30,7 @@ export const ITHygieneSystemInventorySystem =
           },
         ]}
         tableId='it-hygiene-inventory-system'
+        exportFileName='os'
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );

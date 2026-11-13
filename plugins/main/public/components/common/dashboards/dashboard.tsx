@@ -13,8 +13,17 @@ import { compose } from 'redux';
 import DashboardRenderer from './dashboard-renderer/dashboard-renderer';
 import classnames from 'classnames';
 import { QueryErrorPrompt } from '../query-error';
+import {
+  DisplayFieldFormats,
+  useDisplayFieldFormats,
+} from './use-display-field-formats';
 
 export const Dashboard = props => {
+  useDisplayFieldFormats(
+    props.dataSource.dataSource?.indexPattern,
+    props.displayFieldFormats,
+  );
+
   const hasPinnedAgent = Boolean(
     props.dataSource.dataSource?.getPinnedAgentFilter()?.length,
   );
@@ -124,7 +133,8 @@ export const Dashboard = props => {
  *
  * This renders a search bar with a dashboard. Communicate the state with Generate Report button.
  * An optional `emptyState` replaces the default no results callout, so a module can explain why
- * it has no data yet.
+ * it has no data yet. Optional `displayFieldFormats` are applied to the index pattern while the
+ * dashboard is shown, so its panels render those fields with them.
  * @param param0
  * @returns
  */
@@ -135,6 +145,7 @@ export const createDashboard = ({
   getDashboardPanels,
   managedFilters,
   emptyState,
+  displayFieldFormats,
 }: {
   DataSource: any;
   DataSourceRepositoryCreator: any;
@@ -149,6 +160,8 @@ export const createDashboard = ({
   }>;
   /** Rendered instead of the default no results callout when the search has no hits. */
   emptyState?: React.ReactNode;
+  /** Formats of the fields the panels render, applied while the dashboard is shown. */
+  displayFieldFormats?: DisplayFieldFormats;
 }) =>
   compose(
     withErrorBoundary,
@@ -157,6 +170,7 @@ export const createDashboard = ({
       getDashboardPanels,
       managedFilters,
       emptyState,
+      displayFieldFormats,
     }),
     withDataSourceFetchSearchBar({
       DataSource,

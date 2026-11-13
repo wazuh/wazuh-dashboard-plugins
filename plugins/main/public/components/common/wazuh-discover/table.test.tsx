@@ -13,6 +13,7 @@ jest.mock('@elastic/eui', () => ({
 }));
 
 jest.mock('../data-grid', () => ({
+  ...jest.requireActual('../data-grid'),
   exportSearchToCSV: (params: any) => mockExportSearchToCSV(params),
   getAllCustomRenders: jest.fn(),
   MAX_ENTRIES_PER_QUERY: 10000,
@@ -20,6 +21,7 @@ jest.mock('../data-grid', () => ({
 }));
 
 jest.mock('../../../kibana-services', () => ({
+  ...jest.requireActual('../../../kibana-services'),
   getWazuhCorePlugin: () => ({ hooks: { useDockedSideNav: () => false } }),
 }));
 

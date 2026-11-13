@@ -18,6 +18,7 @@ import clsx from 'clsx';
 import { AgentTabs } from '../../endpoints-summary/agent/agent-tabs';
 import { Agent } from '../../endpoints-summary/types';
 import { ButtonExploreAgent } from '../../wz-agent-selector/button-explore-agent';
+import { ModuleHeaderButtons } from './module-header-buttons';
 
 export class MainModuleAgent extends Component {
   props!: {
@@ -76,22 +77,19 @@ export class MainModuleAgent extends Component {
                         grow={false}
                         style={{ marginTop: 6, marginRight: 5 }}
                       >
-                        <EuiFlexGroup>
-                          {ModuleTabView?.buttons?.map(
-                            (ModuleViewButton, index) =>
-                              typeof ModuleViewButton !== 'string' ? (
-                                <EuiFlexItem key={`module_button_${index}`}>
-                                  <ModuleViewButton
-                                    {...{
-                                      ...this.props,
-                                      ...this.props.agentsSelectionProps,
-                                    }}
-                                    moduleID={section}
-                                  />
-                                </EuiFlexItem>
-                              ) : null,
-                          )}
-                        </EuiFlexGroup>
+                        {ModuleTabView && (
+                          <ModuleHeaderButtons
+                            key={ModuleTabView.id}
+                            buttons={(ModuleTabView.buttons || []).filter(
+                              button => typeof button !== 'string',
+                            )}
+                            buttonProps={{
+                              ...this.props,
+                              ...this.props.agentsSelectionProps,
+                              moduleID: section,
+                            }}
+                          />
+                        )}
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   </div>

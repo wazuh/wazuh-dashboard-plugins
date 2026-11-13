@@ -21,7 +21,7 @@ export const ButtonAboutRegulatoryCompliance = () => (
         <p>
           {i18n.translate('wazuh.regulatoryCompliance.aboutFlyout.overview', {
             defaultMessage:
-              'Regulatory Compliance assesses your environment against regulatory frameworks, such as PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIS2 and NIST 800-171. Each tab is one framework.',
+              'Regulatory Compliance maps the findings of your endpoints to the requirements of regulatory frameworks, such as PCI DSS, GDPR, HIPAA, NIST 800-53, TSC, CMMC, FedRAMP, ISO 27001, NIS2 and NIST 800-171. The findings are evidence that supports compliance, but they do not establish it. Each tab is one framework.',
           })}
         </p>
       </>
@@ -50,6 +50,19 @@ export const ButtonAboutRegulatoryCompliance = () => (
           {
             defaultMessage:
               'A control of a framework. The events that match the rules mapped to a requirement are listed under it.',
+          },
+        ),
+      },
+      {
+        title: i18n.translate(
+          'wazuh.regulatoryCompliance.aboutFlyout.findingsCountTerm',
+          { defaultMessage: 'Findings count' },
+        ),
+        description: i18n.translate(
+          'wazuh.regulatoryCompliance.aboutFlyout.findingsCountDescription',
+          {
+            defaultMessage:
+              'The number on each requirement of the Controls tab: the findings mapped to the requirement in the selected time range. 0 means that no finding was mapped to it, not that the requirement is met.',
           },
         ),
       },
@@ -87,7 +100,7 @@ export const ButtonAboutRegulatoryCompliance = () => (
             'wazuh.regulatoryCompliance.aboutFlyout.howToStart1',
             {
               defaultMessage:
-                'A framework stays empty until an event matches a rule that is mapped to one of its requirements.',
+                'A framework stays empty until an event matches a rule that is mapped to one of its requirements. A new finding can take a minute to show up.',
             },
           )}
         </p>

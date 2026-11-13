@@ -1,5 +1,6 @@
 import React from 'react';
 import { EuiToolTip } from '@elastic/eui';
+import { i18n } from '@osd/i18n';
 import { SearchResponse } from '../../../../../../src/core/server';
 import * as FileSaver from '../../../services/file-saver';
 import { SearchParams, search } from '../search-bar/search-bar-service';
@@ -14,6 +15,7 @@ import { cellFilterActions } from './cell-filter-actions';
 import { onFilterCellActions } from './filter-cell-actions';
 import converter from 'json-2-csv';
 import { neutralizeCsvFormulaValues } from '../../../../common/services/neutralize-csv-formula';
+import { getToasts } from '../../../kibana-services';
 
 type ParseData<T> =
   | {
@@ -82,6 +84,7 @@ export const getFieldFormatted = (
 // receive search params
 export const exportSearchToCSV = async (
   params: SearchParams,
+  { fileName = 'events' }: { fileName?: string } = {},
 ): Promise<void> => {
   const DEFAULT_MAX_SIZE_PER_CALL = 1000;
   const {
@@ -165,8 +168,19 @@ export const exportSearchToCSV = async (
   });
 
   if (blobData) {
+    const fullFileName = `${fileName}-${new Date().toISOString()}.csv`;
     // @ts-ignore
-    FileSaver?.saveAs(blobData, `events-${new Date().toISOString()}.csv`);
+    FileSaver?.saveAs(blobData, fullFileName);
+    getToasts().addSuccess({
+      title: i18n.translate('wazuh.common.dataGrid.exportCsvDownloadedTitle', {
+        defaultMessage: 'Downloaded {fileName}',
+        values: { fileName: fullFileName },
+      }),
+      text: i18n.translate('wazuh.common.dataGrid.exportCsvDownloadedRows', {
+        defaultMessage: '{count, plural, one {# row} other {# rows}}',
+        values: { count: data.length },
+      }),
+    });
   }
 };
 

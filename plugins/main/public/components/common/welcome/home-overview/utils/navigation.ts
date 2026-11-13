@@ -11,6 +11,7 @@ import {
   activeResponses,
   regulatoryCompliance,
   endpointSummary,
+  ctiExplorer,
 } from '../../../../../utils/applications';
 import {
   FILTER_OPERATOR,
@@ -332,14 +333,9 @@ const CTI_FEED_APP_ID = 'cti-feed';
 /** Opens the CTI feed app from its Home overview shortcut. */
 export const getCtiFeedUrl = () => getUrlForApp(CTI_FEED_APP_ID);
 
-/**
- * Whether the CTI feed app is registered. It is not when
- * `wazuh_check_updates.ctiRegistrationUiEnabled` is off, and its URL then opens
- * "Application Not Found".
- */
-export const isCtiFeedRegistered = (
-  applications: ReadonlyMap<string, unknown>,
-): boolean => applications.has(CTI_FEED_APP_ID);
+/** CTI Explorer > Indicators of compromise tab. */
+export const getCtiExplorerIocsUrl = () =>
+  getUrlForApp(ctiExplorer.id, { path: '#/cti-explorer/?tab=iocs' });
 
 export const getRulesUrl = () => getUrlForApp(SECURITY_ANALYTICS_APP_IDS.rules);
 export const getDecodersUrl = () =>

@@ -20,9 +20,9 @@ feed**, which delivers vulnerabilities, IOCs and rules with no delay.
 
 Open the menu and go to **Threat intelligence > CTI feed**.
 
-The app is available when `wazuh_check_updates.ctiRegistrationUiEnabled` is `true` in
-`opensearch_dashboards.yml`. When it is `false`, the app is not registered. See
-[Configuration](../configuration.md).
+The app is always available. `wazuh_check_updates.ctiRegistrationUiEnabled` in
+`opensearch_dashboards.yml` only decides whether the bottom bar that invites users to register is
+shown. See [Configuration](../configuration.md).
 
 ## Subscription
 
@@ -69,6 +69,10 @@ create is not counted.
   Management, through the same Security Analytics endpoints the Home page uses.
 - Indicators of compromise are counted in the `wazuh-threatintel-enrichments*` indices.
 - Vulnerabilities are the CVE records in the `.wazuh-threatintel-vulnerabilities*` indices.
+
+The ruleset tiles open their Ruleset Management page on the `standard` space, and the
+indicators of compromise and vulnerabilities tiles open their tab of the
+[CTI Explorer](cti-explorer.md) app.
 
 A count shows **—** when it cannot be read, for example when the content is not synced yet or
 the user lacks access to it. The counts refresh after a sync finishes, or on demand with the
