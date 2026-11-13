@@ -1,5 +1,8 @@
 /* eslint-disable camelcase -- the Wazuh Server API listing is snake_case */
-import { getEnrollmentTokens } from './get-enrollment-tokens';
+import {
+  getEnrollmentToken,
+  getEnrollmentTokens,
+} from './get-enrollment-tokens';
 import { ENROLLMENT_TOKENS_ENDPOINT } from './constants';
 import { WzRequest } from '../../react-services/wz-request';
 
@@ -105,5 +108,48 @@ describe('getEnrollmentTokens', () => {
       tokens: [],
       total: 0,
     });
+  });
+});
+
+describe('getEnrollmentToken', () => {
+  beforeEach(() => {
+    apiReq.mockReset();
+  });
+
+  it('asks for the token by its whole id', async () => {
+    apiReq.mockResolvedValue({ data: { data: { affected_items: [] } } });
+
+    await getEnrollmentToken('-AECAwQFBgcICQoLDA0ODw');
+
+    expect(apiReq).toHaveBeenCalledWith('GET', ENROLLMENT_TOKENS_ENDPOINT, {
+      params: { q: 'id=-AECAwQFBgcICQoLDA0ODw', limit: 1 },
+    });
+  });
+
+  it('returns the listed token with that id', async () => {
+    const token = { id: 'AAECAwQFBgcICQoLDA0ODw', revoked: true };
+    apiReq.mockResolvedValue({ data: { data: { affected_items: [token] } } });
+
+    await expect(getEnrollmentToken('AAECAwQFBgcICQoLDA0ODw')).resolves.toEqual(
+      token,
+    );
+  });
+
+  it('reports a token the manager does not list as unknown', async () => {
+    apiReq.mockResolvedValue({ data: { data: { affected_items: [] } } });
+
+    await expect(
+      getEnrollmentToken('AAECAwQFBgcICQoLDA0ODw'),
+    ).resolves.toBeUndefined();
+  });
+
+  it('ignores a row whose id is not an exact match', async () => {
+    apiReq.mockResolvedValue({
+      data: { data: { affected_items: [{ id: 'other' }] } },
+    });
+
+    await expect(
+      getEnrollmentToken('AAECAwQFBgcICQoLDA0ODw'),
+    ).resolves.toBeUndefined();
   });
 });

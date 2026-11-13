@@ -62,7 +62,7 @@ interface SecurityAnalyticsSearchRequest {
  * POSTs a `_search` to one of the SA routes and reads the total. Decoders
  * report the count as `response.total`; the others as `hits.total`.
  */
-async function fetchSecurityAnalyticsSearchCount({
+export async function fetchSecurityAnalyticsSearchCount({
   route,
   body,
   query,

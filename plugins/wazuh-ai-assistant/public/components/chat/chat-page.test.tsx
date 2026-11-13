@@ -181,6 +181,7 @@ function renderChatPage(
     selectedProviderId: PROVIDER.id,
     onProviderChange: jest.fn(),
     onNavigateToSettings: jest.fn(),
+    onOpenPrivacySettings: jest.fn(),
     onManageProviders: jest.fn(),
     // A real browser history, backed by jsdom's own `window.history`/`window.location` — reads
     // whatever path a test seeded via `window.history.replaceState` before mounting, and its own

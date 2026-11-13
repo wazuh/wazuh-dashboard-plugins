@@ -30,6 +30,7 @@ export const ITHygieneNetworksInventoryServices =
           },
         ]}
         tableId='it-hygiene-inventory-services'
+        exportFileName='listeners'
         categoriesSampleData={[WAZUH_SAMPLE_INVENTORY_AGENT]}
       />
     );

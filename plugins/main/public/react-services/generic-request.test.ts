@@ -157,7 +157,7 @@ describe('Generic Request', () => {
       mockNavigate.mockClear();
     });
 
-    it('Should redirect to the health check', async () => {
+    it('Should check the API without redirecting', async () => {
       mockIsLoggingOut.mockReturnValue(false);
 
       await expect(
@@ -165,7 +165,7 @@ describe('Generic Request', () => {
       ).rejects.toThrow('Error message');
 
       expect(ApiCheck.checkStored).toHaveBeenCalledWith('mocked-api-id');
-      expect(mockNavigate).toHaveBeenCalledWith('/health-check');
+      expect(mockNavigate).not.toHaveBeenCalled();
     });
 
     it('Should not check the API nor redirect while logging out', async () => {
@@ -176,6 +176,22 @@ describe('Generic Request', () => {
       ).rejects.toThrow('Error message');
 
       expect(ApiCheck.checkStored).not.toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('Should not redirect when the API check times out', async () => {
+      mockIsLoggingOut.mockReturnValue(false);
+      jest.spyOn(ApiCheck, 'checkStored').mockRejectedValue(
+        Object.assign(new Error('timeout of 20000ms exceeded'), {
+          code: 'ECONNABORTED',
+        }),
+      );
+
+      await expect(
+        GenericRequest.request('GET', '/api/request'),
+      ).rejects.toThrow('Error message');
+
+      expect(ApiCheck.checkStored).toHaveBeenCalledWith('mocked-api-id');
       expect(mockNavigate).not.toHaveBeenCalled();
     });
   });

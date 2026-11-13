@@ -39,11 +39,12 @@ function normalizeMissingPrivileges(value: unknown): string[] {
  * register a CTI subscription, without starting anything: the probe reads no body and
  * has no side effects.
  *
- * Never rejects — an unusable answer resolves to {@link PERMISSION_NOT_EVALUATED}.
+ * Never rejects: resolves to `null` when the answer cannot be evaluated, so routes that
+ * change the registration can deny instead of allowing.
  */
-export async function checkCtiRegistrationPermission(
+export async function evaluateCtiRegistrationPermission(
   wazuhClient: IScopedClusterClient,
-): Promise<CtiRegistrationPermissionApiBody> {
+): Promise<CtiRegistrationPermissionApiBody | null> {
   try {
     const response = await wazuhClient.asCurrentUser.transport.request({
       method: 'POST',
@@ -58,9 +59,9 @@ export async function checkCtiRegistrationPermission(
 
     if (typeof body?.accessAllowed !== 'boolean') {
       logWarning(
-        'CTI registration permission check answered without an accessAllowed flag; treating the current user as allowed to register.',
+        'CTI registration permission check answered without an accessAllowed flag.',
       );
-      return PERMISSION_NOT_EVALUATED;
+      return null;
     }
 
     return {
@@ -76,8 +77,21 @@ export async function checkCtiRegistrationPermission(
         : 'unknown error';
 
     logWarning(
-      `CTI registration permission check could not be evaluated (${message}); treating the current user as allowed to register.`,
+      `CTI registration permission check could not be evaluated (${message}).`,
     );
-    return PERMISSION_NOT_EVALUATED;
+    return null;
   }
+}
+
+/**
+ * Same probe for the registration modal: an unusable answer resolves to
+ * {@link PERMISSION_NOT_EVALUATED}.
+ */
+export async function checkCtiRegistrationPermission(
+  wazuhClient: IScopedClusterClient,
+): Promise<CtiRegistrationPermissionApiBody> {
+  return (
+    (await evaluateCtiRegistrationPermission(wazuhClient)) ??
+    PERMISSION_NOT_EVALUATED
+  );
 }

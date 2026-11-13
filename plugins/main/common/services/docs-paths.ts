@@ -47,8 +47,12 @@ export const DOCS_PATHS = {
   microsoftGraphApi: 'cloud-security/azure/index.html',
   centralizedConfiguration:
     'user-manual/reference/centralized-configuration.html',
+  commandMonitoringRemoteCommands:
+    'user-manual/capabilities/command-monitoring/requirements.html#remote-command-execution',
   apiRbac: 'user-manual/user-administration/rbac.html',
   indexerSecurityRoles: 'user-manual/wazuh-indexer/security.html#roles',
+  /** Page of the CTI feed (published in 5.0-rc). */
+  ctiExplorer: 'wazuh-cti/index.html',
 } as const;
 
 export type DocsPathKey = keyof typeof DOCS_PATHS;

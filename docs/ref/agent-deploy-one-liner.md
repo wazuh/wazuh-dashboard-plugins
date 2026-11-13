@@ -18,9 +18,11 @@ interface, for example in end-to-end testing scenarios.
 ![Select platform](../img/agent-deploy-oneliner/agent-wizard-platform.webp)
 
 4. In **Server address**, enter the hostname or IP address of the Wazuh manager
-   the agent will register against. The port and the path prefix sit behind
-   **View advanced options** and are only needed when the manager does not
-   listen on the defaults.
+   the agent will register against. The field suggests the names in the
+   manager listener certificate, as the **Create enrollment token** flyout
+   does, and still takes any other address. The port and the path prefix sit
+   behind **View advanced options** and are only needed when the manager does
+   not listen on the defaults.
 
 ![Set manager address](../img/agent-deploy-oneliner/set-server-address.webp)
 
@@ -113,13 +115,23 @@ and is never listed again, so the deployment command has to be copied before
 leaving the page.
 
 An operator who kept a token from an earlier deployment can reuse it on the
-**Use an existing token** tab instead of minting a new one. Only the token text is
-known in that case -- the manager returns the metadata once, at mint time -- so
-the wizard shows neither the address it names nor its expiry, and it is the
-manager that refuses an expired or exhausted token at enrollment time. The field
-is checked only for what would break the generated command apart, a space or a
-single quote, since the manager is what decides whether the text is a token it
-issued.
+**Use an existing token** tab instead of minting a new one. The field rejects only
+what would break the generated command apart, a space or a single quote. The
+wizard then reads the token itself: it carries the manager address, and the first
+16 bytes of its key are the id the token list names it by
+(`GET /agents/enrollment-tokens?q=id=<id>`). From these the wizard shows the
+token's id, address, expiry and enrollments used, and warns, without blocking the
+command, when the token:
+
+- cannot be read as an enrollment token,
+- is not in the token list (minted by another manager, or purged),
+- is revoked, expired or exhausted,
+- names a different address than the server address step (the port and the path
+  are compared only when they were entered),
+- carries no credential, so it has no id and its status cannot be checked,
+- cannot be looked up, for example without the `enrollment_token:read` permission.
+
+The manager still decides at enrollment time whether it accepts the token.
 
 `WAZUH_ENROLLMENT_TOKEN` is the only way the 5.0 agent installer registers an
 agent. The token names the manager, pins the certificate authority of the
@@ -150,14 +162,15 @@ until it is.
 
 Minting requires the `enrollment_token:create` permission. Where it is missing --
 including against a server whose RBAC policy predates the action -- the
-**Enrollment token** step is not shown and the wizard falls back to the 4.x
-variables, `WAZUH_MANAGER_ENDPOINT` and `WAZUH_REGISTRATION_PASSWORD`. A 5.0
-agent installer ignores both, so the command installs the agent but does not
-register it: the agent is left with no manager to connect to. Grant the
-permission and generate the command again, or register the installed agent
-afterwards with a token minted on the manager, as described in the manager
-documentation, _Wazuh Manager > Getting Started > Installation > Installing
-without a token_.
+**Enrollment token** step still shows, with only the **Use an existing token**
+tab. A pasted token is deployed as usual. Until one is pasted, the wizard falls
+back to the 4.x variables, `WAZUH_MANAGER_ENDPOINT` and
+`WAZUH_REGISTRATION_PASSWORD`. A 5.0 agent installer ignores both, so the command installs the agent but does not
+register it: the agent is left with no manager to connect to. Paste a stored
+token, grant the permission and generate the command again, or register the
+installed agent afterwards with a token minted on the manager, as described in
+the manager documentation, _Wazuh Manager > Getting Started > Installation >
+Installing without a token_.
 
 The tokens the server has minted are listed, revoked and purged in the
 [Enrollment tokens](modules/enrollment-tokens/README.md) module, reachable from
