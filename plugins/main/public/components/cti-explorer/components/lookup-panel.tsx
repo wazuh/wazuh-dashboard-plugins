@@ -26,7 +26,7 @@ import {
   toCtiRequestError,
 } from '../services/cti-explorer-api';
 import { getIocTypeLabel, getProviderName } from '../utils/labels';
-import { getThreatHuntingIocUrl } from '../utils/navigation';
+import { getCtiCveUrl, getThreatHuntingIocUrl } from '../utils/navigation';
 import { RequestErrorCallout } from './request-error-callout';
 import {
   VulnerabilityRow,
@@ -35,8 +35,12 @@ import {
   toVulnerabilityRows,
 } from './vulnerability-columns';
 
-/** Examples to try: a documentation address (RFC 5737), a reserved domain and a well-known CVE. */
-const EXAMPLES = ['192.0.2.100', 'example.com', 'CVE-2021-44228'];
+/**
+ * Examples to try, picked from the feed for a rich result: a C2 address with several
+ * frameworks, a domain several providers report and a critical CVE with references.
+ * The feed rotates its indicators: replace a value once it stops matching.
+ */
+const EXAMPLES = ['192.169.176.54', 'ackeamann.xyz', 'CVE-2026-76312'];
 
 type LookupState =
   | { status: 'idle' }
@@ -121,13 +125,35 @@ const VulnerabilityMatch = ({
       {
         name: ACTIONS_COLUMN_NAME,
         render: (row: VulnerabilityRow) => (
-          <EuiButtonEmpty
-            size='xs'
-            onClick={() => onOpenVulnerability(row.id)}
-            data-test-subj='ctiExplorerLookupOpenVulnerability'
-          >
-            {OPEN_RECORD}
-          </EuiButtonEmpty>
+          <EuiFlexGroup gutterSize='none' responsive={false} wrap>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                size='xs'
+                iconType='inspect'
+                onClick={() => onOpenVulnerability(row.id)}
+                data-test-subj='ctiExplorerLookupOpenVulnerability'
+              >
+                {OPEN_RECORD}
+              </EuiButtonEmpty>
+            </EuiFlexItem>
+            {record.type === 'CVE' ? (
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  size='xs'
+                  iconType='popout'
+                  iconSide='right'
+                  href={getCtiCveUrl(row.id)}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  data-test-subj='ctiExplorerLookupOpenInCti'
+                >
+                  {i18n.translate('wazuh.ctiExplorer.lookup.openInCti', {
+                    defaultMessage: 'Full advisory on cti.wazuh.com',
+                  })}
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+            ) : null}
+          </EuiFlexGroup>
         ),
       },
     ]}
@@ -187,6 +213,7 @@ const IocMatch = ({
               <EuiFlexItem grow={false}>
                 <EuiButtonEmpty
                   size='xs'
+                  iconType='inspect'
                   onClick={() => onOpenIoc(group.records[0].id)}
                   data-test-subj='ctiExplorerLookupOpenIoc'
                 >

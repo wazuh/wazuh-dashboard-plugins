@@ -2,12 +2,17 @@ import { i18n } from '@osd/i18n';
 import { WAZUH_ROLE_ADMINISTRATOR_ID } from '../../common/constants';
 import { ILogger } from '../../common/services/configuration';
 
+type CurrentPlatformResponse = {
+  platform: string;
+  authContextFields: string[];
+};
+
 export class DashboardSecurity {
   private securityPlatform: string = '';
-  private currentPlatformRequest?: Promise<string>;
+  private currentPlatformRequest?: Promise<CurrentPlatformResponse>;
   constructor(private logger: ILogger, private http) {}
   // The platform does not change at runtime, so later callers reuse the first request
-  private fetchCurrentPlatform() {
+  private requestOnce() {
     if (!this.currentPlatformRequest) {
       this.currentPlatformRequest = this.requestCurrentPlatform().catch(
         error => {
@@ -18,14 +23,23 @@ export class DashboardSecurity {
     }
     return this.currentPlatformRequest;
   }
-  private async requestCurrentPlatform() {
+  private async fetchCurrentPlatform() {
+    return (await this.requestOnce()).platform;
+  }
+  /** User fields of the authentication context of the security platform */
+  async fetchAuthContextFields() {
+    return (await this.requestOnce()).authContextFields;
+  }
+  private async requestCurrentPlatform(): Promise<CurrentPlatformResponse> {
     try {
       this.logger.debug('Fetching the security platform');
       const response = await this.http.get(
         '/elastic/security/current-platform',
       );
-      this.logger.debug(`Security platform: ${this.securityPlatform}`);
-      return response.platform;
+      return {
+        platform: response.platform,
+        authContextFields: response.authContextFields ?? [],
+      };
     } catch (error) {
       this.logger.error(error.message);
       throw error;
@@ -34,7 +48,8 @@ export class DashboardSecurity {
   async setup() {
     try {
       this.logger.debug('Setup');
-      this.securityPlatform = await this.fetchCurrentPlatform();
+      const response = await this.requestOnce();
+      this.securityPlatform = response.platform;
       this.logger.debug(`Security platform: ${this.securityPlatform}`);
     } catch (error) {
       this.logger.error(error.message);

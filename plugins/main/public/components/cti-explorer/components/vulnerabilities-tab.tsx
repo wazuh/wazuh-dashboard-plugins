@@ -4,6 +4,7 @@ import {
   EuiBasicTable,
   EuiBasicTableColumn,
   EuiButtonGroup,
+  EuiButtonIcon,
   EuiFieldSearch,
   EuiFlexGroup,
   EuiFlexItem,
@@ -13,6 +14,7 @@ import {
   EuiSpacer,
   EuiText,
   EuiTitle,
+  EuiToolTip,
   Criteria,
 } from '@elastic/eui';
 import {
@@ -30,6 +32,7 @@ import { CtiRequestState, useCtiRequest } from '../hooks/use-cti-request';
 import { searchVulnerabilities } from '../services/cti-explorer-api';
 import type { CsvColumn } from '../services/export-csv';
 import { formatNumber } from '../utils/labels';
+import { getCtiCveUrl } from '../utils/navigation';
 import { NORMAL_FONT_WEIGHT } from '../utils/styles';
 import { ExportCsvButton } from './export-csv-button';
 import { RequestErrorCallout } from './request-error-callout';
@@ -329,6 +332,47 @@ export const VulnerabilitiesTab = ({
           },
         ]),
     ...getCveColumns({ publishedSortable: !isTid }),
+    // Only CVE records have a page on the CTI site: translation rules do not.
+    ...(type === 'CVE'
+      ? [
+          {
+            name: i18n.translate(
+              'wazuh.ctiExplorer.vulnerabilities.columns.actions',
+              { defaultMessage: 'Actions' },
+            ),
+            width: '80px',
+            align: 'center' as const,
+            render: (row: VulnerabilityRow) => {
+              // The flyout and the lookup show this label in full: the table
+              // repeats it on every row, so it keeps only the icon.
+              const label = i18n.translate(
+                'wazuh.ctiExplorer.vulnerabilities.openInCti',
+                {
+                  defaultMessage:
+                    'Full advisory of {id} on cti.wazuh.com, in a new tab',
+                  values: { id: row.id },
+                },
+              );
+              return (
+                <EuiToolTip content={label}>
+                  <EuiButtonIcon
+                    iconType='popout'
+                    href={getCtiCveUrl(row.id)}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    aria-label={label}
+                    // The row opens the flyout: the link opens only the CTI site.
+                    onClick={(event: React.MouseEvent) =>
+                      event.stopPropagation()
+                    }
+                    data-test-subj='ctiExplorerVulnerabilityOpenInCti'
+                  />
+                </EuiToolTip>
+              );
+            },
+          },
+        ]
+      : []),
   ];
 
   return (

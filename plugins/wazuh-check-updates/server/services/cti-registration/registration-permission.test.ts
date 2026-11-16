@@ -1,5 +1,8 @@
 import type { IScopedClusterClient } from 'opensearch-dashboards/server';
-import { checkCtiRegistrationPermission } from './registration-permission';
+import {
+  checkCtiRegistrationPermission,
+  evaluateCtiRegistrationPermission,
+} from './registration-permission';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import {
   CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM,
@@ -126,5 +129,48 @@ describe('checkCtiRegistrationPermission', () => {
     await expect(
       checkCtiRegistrationPermission(buildWazuhClient(request)),
     ).resolves.toEqual({ accessAllowed: true, missingPrivileges: [] });
+  });
+});
+
+describe('evaluateCtiRegistrationPermission', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedGetWazuhCheckUpdatesServices.mockReturnValue({ logger });
+  });
+
+  test.each([
+    [{ accessAllowed: true, missingPrivileges: [] }],
+    [{ accessAllowed: false, missingPrivileges: ['a-privilege'] }],
+  ])('passes an evaluated answer through: %o', async body => {
+    const request = jest.fn().mockResolvedValue({ body });
+
+    await expect(
+      evaluateCtiRegistrationPermission(buildWazuhClient(request)),
+    ).resolves.toEqual(body);
+  });
+
+  test.each([
+    ['a missing accessAllowed flag', { body: { missingPrivileges: [] } }],
+    ['a non-boolean accessAllowed', { body: { accessAllowed: 'true' } }],
+    ['an empty body', { body: null }],
+  ])('resolves to null on %s', async (_label, response) => {
+    const request = jest.fn().mockResolvedValue(response);
+
+    await expect(
+      evaluateCtiRegistrationPermission(buildWazuhClient(request)),
+    ).resolves.toBeNull();
+  });
+
+  test('resolves to null when the probe request rejects', async () => {
+    const request = jest.fn().mockRejectedValue(new Error('timeout'));
+
+    await expect(
+      evaluateCtiRegistrationPermission(buildWazuhClient(request)),
+    ).resolves.toBeNull();
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('timeout'),
+    );
   });
 });

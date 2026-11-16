@@ -31,12 +31,12 @@ import type {
 import { useCtiRequest } from '../hooks/use-cti-request';
 import { fetchIocRecord } from '../services/cti-explorer-api';
 import {
-  formatDateTime,
   getIocTypeLabel,
   getMalwareRoleLabel,
   getProviderName,
 } from '../utils/labels';
 import { getThreatHuntingIocUrl } from '../utils/navigation';
+import { CatalogDate } from './catalog-date';
 import { NORMAL_FONT_WEIGHT } from '../utils/styles';
 import { RequestErrorCallout } from './request-error-callout';
 
@@ -252,13 +252,13 @@ const IocFlyoutOverview = ({
       title: i18n.translate('wazuh.ctiExplorer.iocFlyout.fields.firstSeen', {
         defaultMessage: 'First seen',
       }),
-      description: formatDateTime(record.firstSeen),
+      description: <CatalogDate value={record.firstSeen} />,
     },
     {
       title: i18n.translate('wazuh.ctiExplorer.iocFlyout.fields.lastSeen', {
         defaultMessage: 'Last seen',
       }),
-      description: formatDateTime(record.lastSeen),
+      description: <CatalogDate value={record.lastSeen} />,
     },
     {
       title: i18n.translate('wazuh.ctiExplorer.iocFlyout.fields.family', {
@@ -404,7 +404,7 @@ const IocFlyoutOverview = ({
                   'wazuh.ctiExplorer.iocFlyout.related.lastSeen',
                   { defaultMessage: 'Last seen' },
                 ),
-                render: (value: string | null) => formatDateTime(value),
+                render: (value: string | null) => <CatalogDate value={value} />,
               },
             ]}
             data-test-subj='ctiExplorerIocRelated'

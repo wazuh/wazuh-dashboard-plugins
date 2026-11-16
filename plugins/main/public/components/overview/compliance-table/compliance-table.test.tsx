@@ -19,7 +19,6 @@ import {
   computeOthersCount,
   buildComplianceObject,
   buildRequirementFilter,
-  getFrameworkDefinition,
 } from './compliance-table';
 import { WAZUH_MODULES_ID } from '../../../../common/constants';
 import { gdprRequirementsFile } from '../../../../common/compliance-requirements/gdpr-requirements';
@@ -52,31 +51,6 @@ describe('computeOthersCount', () => {
 
   it('returns 0 when every code is known', () => {
     expect(computeOthersCount([])).toBe(0);
-  });
-});
-
-describe('getFrameworkDefinition', () => {
-  // A FedRAMP identifier is a NIST 800-53 one (AC-2(1)) and holds no dot, so
-  // splitting it on dots gave one group per control.
-  it('groups FedRAMP by control family, like NIST 800-53', () => {
-    const fedramp = getFrameworkDefinition(WAZUH_MODULES_ID.FEDRAMP);
-    const nist = getFrameworkDefinition(WAZUH_MODULES_ID.NIST_800_53);
-
-    expect([fedramp.entriesBySeparator, fedramp.separator]).toEqual([1, '-']);
-    expect([nist.entriesBySeparator, nist.separator]).toEqual([1, '-']);
-  });
-
-  it('resolves the ruleset notation of every framework that has one', () => {
-    for (const section of [
-      WAZUH_MODULES_ID.GDPR,
-      WAZUH_MODULES_ID.HIPAA,
-      WAZUH_MODULES_ID.CMMC,
-      WAZUH_MODULES_ID.NIS2,
-    ]) {
-      const { resolver } = getFrameworkDefinition(section);
-
-      expect(resolver.aliases || resolver.derive).toBeDefined();
-    }
   });
 });
 

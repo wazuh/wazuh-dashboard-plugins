@@ -9,6 +9,10 @@ import { CtiConfigurationError } from '../../services/cti-registration/cti-conso
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+import {
+  ctiRegistrationAccessError,
+  getCtiRegistrationAccess,
+} from './registration-access';
 
 type StatusWithoutSubscriptionFields = Omit<
   CtiRegistrationStatusApiBody,
@@ -51,7 +55,7 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
     },
     async (context, _request, response) => {
       try {
-        const environmentUuid = await resolveCtiOAuthClientId(undefined);
+        const environmentUuid = await resolveCtiOAuthClientId();
         const wazuhClient = context.core.opensearch.client;
         const store = CtiRegistrationStore.getInstance();
         const rec = store.getStatus(environmentUuid);
@@ -93,6 +97,20 @@ export const getCtiRegistrationStatusRoute = (router: IRouter) => {
             body: await withSubscriptionFields(wazuhClient, environmentUuid, {
               registrationComplete: false,
               inProgress: false,
+            }),
+          });
+        }
+
+        // The pending codes let anyone holding them finish or cancel the activation.
+        const access = await getCtiRegistrationAccess(context);
+        if (access === 'unknown') {
+          return ctiRegistrationAccessError(response, access);
+        }
+        if (access === 'denied') {
+          return response.ok({
+            body: await withSubscriptionFields(wazuhClient, environmentUuid, {
+              registrationComplete: false,
+              inProgress: true,
             }),
           });
         }

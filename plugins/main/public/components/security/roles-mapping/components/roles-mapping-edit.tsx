@@ -35,6 +35,7 @@ export const RolesMappingEdit = ({
   internalUsers,
   onSave,
   currentPlatform,
+  userFields,
 }) => {
   const getEquivalences = roles => {
     const list = roles.map(item => {
@@ -280,6 +281,7 @@ export const RolesMappingEdit = ({
                 isReserved={WzAPIUtils.isReservedID(rule.id)}
                 internalUsers={internalUsers}
                 currentPlatform={currentPlatform}
+                userFields={userFields}
                 onFormChange={hasChange => setHasChangeMappingRules(hasChange)}
               ></RuleEditor>
             </EuiFlexItem>

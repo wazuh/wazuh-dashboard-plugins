@@ -19,6 +19,7 @@ jest.mock('../services/cti-explorer-api', () => ({
 }));
 jest.mock('../utils/navigation', () => ({
   getThreatHuntingIocUrl: (value: string) => `/app/threat-hunting#${value}`,
+  getCtiCveUrl: (id: string) => `https://cti.example/cves/${id}`,
 }));
 
 const mockLookup = lookupValue as jest.Mock;
@@ -135,6 +136,13 @@ describe('LookupPanel', () => {
     expect(found).toHaveTextContent('redhat');
     expect(found).not.toHaveTextContent('Vendor pattern');
     expect(found.closest('.euiCallOut')).toBeNull();
+    // The full advisory opens on the CTI site, in a new tab.
+    const advisory = screen.getByTestId('ctiExplorerLookupOpenInCti');
+    expect(advisory).toHaveAttribute(
+      'href',
+      'https://cti.example/cves/CVE-2024-6387',
+    );
+    expect(advisory).toHaveAttribute('target', '_blank');
 
     fireEvent.click(screen.getByTestId('ctiExplorerLookupOpenVulnerability'));
     expect(onOpenVulnerability).toHaveBeenCalledWith('CVE-2024-6387');
@@ -170,6 +178,7 @@ describe('LookupPanel', () => {
       screen.getByTestId('ctiExplorerLookupOpenVulnerability'),
     ).toBeInTheDocument();
     expect(screen.queryByTestId('ctiExplorerLookupHunt')).toBeNull();
+    expect(screen.queryByTestId('ctiExplorerLookupOpenInCti')).toBeNull();
   });
 
   it('names the index the user cannot read', async () => {
@@ -197,9 +206,11 @@ describe('LookupPanel', () => {
     mockLookup.mockResolvedValue({ kind: 'ioc', category: 'ip', records: [] });
     renderPanel();
 
-    fireEvent.click(screen.getByTestId('ctiExplorerLookupExample-192.0.2.100'));
+    fireEvent.click(
+      screen.getByTestId('ctiExplorerLookupExample-192.169.176.54'),
+    );
 
     await screen.findByTestId('ctiExplorerLookupNotListed');
-    expect(mockLookup).toHaveBeenCalledWith('192.0.2.100');
+    expect(mockLookup).toHaveBeenCalledWith('192.169.176.54');
   });
 });

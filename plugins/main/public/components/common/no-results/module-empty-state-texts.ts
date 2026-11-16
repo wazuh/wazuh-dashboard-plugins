@@ -93,7 +93,7 @@ const MODULE_EMPTY_STATE_TEXTS: Record<string, () => ModuleEmptyStateTexts> = {
       'wazuh.regulatoryCompliance.emptyState.description',
       {
         defaultMessage:
-          'Findings appear when a rule mapped to a requirement of this standard matched. Try changing the search or time range.',
+          'Findings appear when an event of an agent matches a rule mapped to a requirement of this framework, and a new one can take a minute to show up. Try changing the search or time range.',
       },
     ),
   }),

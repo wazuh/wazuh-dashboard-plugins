@@ -20,9 +20,11 @@ describe('ButtonAboutRegulatoryCompliance', () => {
 
     const flyout = screen.getByRole('dialog');
     expect(flyout).toHaveTextContent(
-      'Regulatory Compliance assesses your envi',
+      'Regulatory Compliance maps the findings of your endpoints',
     );
-    ['Framework', 'Requirement'].forEach(term =>
+    // The findings support compliance, a count does not establish it.
+    expect(flyout).toHaveTextContent('they do not establish it');
+    ['Framework', 'Requirement', 'Findings count'].forEach(term =>
       expect(flyout).toHaveTextContent(term),
     );
     expect(flyout).toHaveTextContent('How to start');

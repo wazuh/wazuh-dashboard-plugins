@@ -5,6 +5,7 @@ import {
   vulnerabilityDetection,
 } from '../../../utils/applications';
 import {
+  CTI_CVE_LINK_BASE_PATH,
   WAZUH_FINDINGS_PATTERN,
   WAZUH_VULNERABILITIES_PATTERN,
 } from '../../../../common/constants';
@@ -71,6 +72,10 @@ export const getVulnerabilityDetectionCveUrl = (id: string): string =>
       WAZUH_VULNERABILITIES_PATTERN,
     )}&_g=${STATE_G_STATE}`,
   });
+
+/** Full advisory of one CVE on the CTI site. */
+export const getCtiCveUrl = (id: string): string =>
+  `${CTI_CVE_LINK_BASE_PATH}${encodeURIComponent(id)}`;
 
 /** Ruleset Management pages, opened with the links of the Home page. */
 const RULESET_PAGE_URLS: Record<DetectionContentKey, () => string> = {

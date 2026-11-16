@@ -539,7 +539,7 @@ export const AgentsTable = withErrorBoundary((props: AgentsTableProps) => {
             }}
             saveStateStorage={{
               system: 'localStorage',
-              key: 'wz-agents-overview-table',
+              key: 'wz-agents-overview-table-v2',
             }}
             tableProps={{
               itemId: 'id',
