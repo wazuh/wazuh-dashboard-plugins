@@ -5,6 +5,7 @@ import {
   HEALTH_CHECK_TASK_DASHBOARDS,
   HEALTH_CHECK_TASK_INDEX_PATTERNS,
   HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS,
+  HEALTH_CHECK_TASK_SAVED_OBJECTS_MISSING_FIELDS,
   HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
   HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
 } from '../../common/constants';
@@ -48,6 +49,25 @@ export const getHealthCheckDescriptions = (): Record<
       defaultMessage:
         'Check that the indexer is reachable, and read the dashboard logs for the failing file. The next scheduled run creates the missing ones.',
     }),
+  },
+  [HEALTH_CHECK_TASK_SAVED_OBJECTS_MISSING_FIELDS]: {
+    title: i18n.translate('wazuh.healthCheck.savedObjectsMissingFields.title', {
+      defaultMessage: 'Fields of saved objects',
+    }),
+    description: i18n.translate(
+      'wazuh.healthCheck.savedObjectsMissingFields.description',
+      {
+        defaultMessage:
+          'Checks that the visualizations and saved searches only use fields their index pattern has. Panels that use other fields load empty.',
+      },
+    ),
+    remediation: i18n.translate(
+      'wazuh.healthCheck.savedObjectsMissingFields.remediation',
+      {
+        defaultMessage:
+          'The details name each object and its missing fields. Edit the object in Dashboards Management > Saved objects to use fields that exist. If a field exists in the indexer, refresh the field list of the index pattern in Dashboards Management > Index patterns.',
+      },
+    ),
   },
   [HEALTH_CHECK_TASK_INDEX_PATTERNS]: {
     title: i18n.translate('wazuh.healthCheck.indexPatterns.title', {

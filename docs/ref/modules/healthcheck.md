@@ -37,6 +37,7 @@ The checks represents the unit to check and some could do some write actions suc
 | `server-api:run-as`                           | Validate that the `run_as` setting is enabled in each host and is allowed to use by the configured user.                                                                                                                                                   |
 | `integrations:default-notifications-channels` | Validate the existence of the default Notifications channels (provisioned by `wazuh-indexer-notifications`). It does not create any Alerting monitors. See [Notifications and Alerting](./notifications-alerting.md) for details.                          |
 | `saved-objects:dashboards`                    | Provision saved visualizations and dashboards from the bundled NDJSON definitions so the UI can rely on saved-object references. See [Saved objects for dashboards and visualizations](./saved-objects-dashboards.md) for details.                         |
+| `saved-objects:missing-fields`                | Warn about the visualizations and saved searches that use fields their index pattern does not have. See [Saved object fields](#saved-object-fields).                                                                                                       |
 | `server-api:certificate-validity`             | Report the validity of the TLS certificates of every manager node: the listener certificate and the CA bundle served to agents. It does not block the dashboard start. See [Server Certificate Validity](#server-certificate-validity).                    |
 
 ### Index pattern fields
@@ -48,6 +49,22 @@ For example, `@timestamp` is `date_nanos` in the events, events-raw, findings an
 - It shows `@timestamp` with millisecond precision.
 - **Discover** sorts `@timestamp` out of order when the pattern covers indices created both before and after the change.
 - The Wazuh views sort correctly either way.
+
+### Saved object fields
+
+`saved-objects:missing-fields` reads every visualization and saved search and compares the fields they use with the field list of their index pattern. It reads the fields of the query (KQL and Lucene), the enabled filters, the aggregations, and the columns and sort of saved searches. A visualization built on a saved search is checked against the index pattern of that search.
+
+It turns yellow and names each object, its index pattern and its missing fields. The message lists the first 20 objects; the exported data lists them all. It never blocks the start.
+
+It skips:
+
+- visualizations with no index pattern (TSVB, Vega, Timeline, Markdown);
+- objects whose index pattern does not exist, since their panel already shows that error;
+- index patterns with no stored field list yet.
+
+At start and on schedule, it reads the saved objects of the global tenant.
+
+On dashboards, a **Missing fields** badge marks each panel whose object uses missing fields. Selecting it lists the fields and where the object uses them. The badge uses the same check, through `POST /indexer/saved-objects/missing-fields`.
 
 ### Notifications and Alerting
 
@@ -222,6 +239,7 @@ Each check shows a plain title and a one-line description, with its name below. 
 | `integrations:default-notifications-channels` | Default notification channels |
 | `saved-objects:dashboards`                    | Built-in dashboards           |
 | `saved-objects:index-patterns`                | Index patterns                |
+| `saved-objects:missing-fields`                | Fields of saved objects       |
 | `server-api:certificate-validity`             | Manager certificates          |
 | `server-api:connection-compatibility`         | Server API connection         |
 | `server-api:run-as`                           | Server API run as             |
