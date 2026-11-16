@@ -216,14 +216,22 @@ export const ModuleEmptyState = ({
           {allActions.length ? (
             <>
               <EuiSpacer size='m' />
-              <EuiFlexGroup gutterSize='s' wrap responsive={false}>
-                {allActions.map((action, index) => (
-                  /* The unpin button, then the module actions, in a fixed order. */
-                  <EuiFlexItem key={index} grow={false}>
-                    {action}
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
+              {/* Small text, so link actions match the size of the text around them. */}
+              <EuiText size='s'>
+                <EuiFlexGroup
+                  gutterSize='s'
+                  alignItems='center'
+                  wrap
+                  responsive={false}
+                >
+                  {allActions.map((action, index) => (
+                    /* The unpin button, then the module actions, in a fixed order. */
+                    <EuiFlexItem key={index} grow={false}>
+                      {action}
+                    </EuiFlexItem>
+                  ))}
+                </EuiFlexGroup>
+              </EuiText>
             </>
           ) : null}
           {children || docsLink ? (
