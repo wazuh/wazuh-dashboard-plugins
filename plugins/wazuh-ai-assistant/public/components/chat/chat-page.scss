@@ -840,7 +840,8 @@ $wzMsgAvatarColumn: 40px;
  * barely readable. The subdued text color keeps the cards reading as inactive (with the disabled
  * fill and cursor) while meeting the 4.5:1 text contrast.
  */
-.euiCard.wzWelcomeCard.euiCard-isDisabled {
+.euiCard.wzWelcomeCard.euiCard-isDisabled,
+.euiCard.wzWelcomeCard.euiCard-isDisabled .euiCard__titleButton {
   color: var(--wz-text-subdued, #{$euiTextSubduedColor});
 }
 

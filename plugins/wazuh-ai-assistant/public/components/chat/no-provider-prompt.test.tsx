@@ -56,7 +56,7 @@ describe('NoProviderPrompt', () => {
       'utf8',
     );
     expect(scssSource).toMatch(
-      /\.euiCard\.wzWelcomeCard\.euiCard-isDisabled \{[^}]*color: var\(--wz-text-subdued/,
+      /\.euiCard\.wzWelcomeCard\.euiCard-isDisabled,\s*\.euiCard\.wzWelcomeCard\.euiCard-isDisabled \.euiCard__titleButton \{[^}]*color: var\(--wz-text-subdued/,
     );
   });
 
