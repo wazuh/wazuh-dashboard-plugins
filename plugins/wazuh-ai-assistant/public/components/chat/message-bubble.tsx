@@ -560,17 +560,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
     />
   );
 
-  // Prose keeps a fixed reading measure even when the turn is wide. A turn carrying a table
-  // widens up to the table's own breakout width (see the wrapper below), and without this the
-  // answer's sentences inherited that width and ran to ~117 characters a line — roughly 60% past
-  // the point where the eye reliably finds the next line, which reads as a wall of text. Only
-  // block content (the table, the raw query view) is allowed to use the extra width.
-  // `.wzProseMeasure` (chat-page.scss) reads `$wzProseMeasure` — this component has no colocated
-  // .scss file of its own, but the plugin's whole stylesheet loads once, globally, from
-  // chat-page.tsx's own import, so this global class is reachable here without a separate import
-  // (the same way `wzMsgRow` below already is). Kept as a class rather than an inline style so this
-  // 68ch figure has exactly one home instead of a second copy restated in this file.
-  const PROSE_MEASURE_CLASS = 'wzProseMeasure';
+  // Answer prose fills the assistant column, the same width as the results card below it, so the
+  // text and its card end on the same right edge. `.wzProse` (chat-page.scss) carries the
+  // inline-code chip and paragraph rhythm — this component has no colocated .scss file of its own,
+  // but the plugin's whole stylesheet loads once, globally, from chat-page.tsx's own import, so
+  // this global class is reachable here without a separate import (the same way `wzMsgRow` below
+  // already is).
+  const PROSE_CLASS = 'wzProse';
 
   const bubbleContent = (
     <>
@@ -579,7 +575,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
         // branch also covers): announces incoming delta tokens to screen readers, which
         // otherwise stay silent for the whole stream since nothing else here changes focus.
         <div
-          className={PROSE_MEASURE_CLASS}
+          className={PROSE_CLASS}
           {...(!isUser
             ? {
                 'aria-live': 'polite' as const,
@@ -625,7 +621,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           </EuiText>
         </div>
       ) : (
-        <div className={PROSE_MEASURE_CLASS}>
+        <div className={PROSE_CLASS}>
           <EuiText size='s'>
             <EuiMarkdownFormat
               processingPluginList={assistantAnswerProcessingPlugins}
@@ -655,7 +651,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           sentence, and the whole point of suppressing the card was to stop answering "nothing
           matched" with a box. */}
       {showEmptyResultNote && (
-        <div className={PROSE_MEASURE_CLASS}>
+        <div className={PROSE_CLASS}>
           <EuiSpacer size='xs' />
           <EuiText size='s' color='subdued'>
             <p style={{ margin: 0 }}>
@@ -702,13 +698,9 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
   const bubble = (
     <EuiFlexItem
       grow={false}
-      // No `PROSE_MEASURE_CLASS` here: this item's own inline `maxWidth` below is ALWAYS set
-      // (`'75%'` or `'100%'`), and an inline style always wins over a class on specificity — so
-      // the class here would do nothing for either turn kind: dead weight for a table-bearing turn
-      // (its `'100%'` matches the class's own no-op) and, worse, misleading for a prose-only one,
-      // where it would read as "the 68ch cap lives here" while the `'100%'` inline value silently
-      // overrides it. The real cap is the INNER prose `<div className={PROSE_MEASURE_CLASS}>` a
-      // few lines below, which carries no inline style of its own to fight it.
+      // No `PROSE_CLASS` here: the prose styles belong to the INNER prose
+      // `<div className={PROSE_CLASS}>` below, not to the results card or callouts that share
+      // this item.
       style={{
         // The user turn keeps its 75% share — a question is always prose, and the figure is
         // genuinely local to this decision, with no token or class behind it to drift from.
@@ -903,7 +895,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
               <div
                 key={toolCall.id}
                 id={`${rawViewId}-${toolCall.id}`}
-                className={PROSE_MEASURE_CLASS}
+                className={PROSE_CLASS}
               >
                 <EuiSpacer size='xs' />
                 <EuiText size='xs'>

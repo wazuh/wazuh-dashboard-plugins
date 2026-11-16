@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path from 'path';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -44,6 +46,18 @@ describe('NoProviderPrompt', () => {
       expect(screen.getByText(question)).toBeInTheDocument();
     }
     expect(document.querySelectorAll('.euiCard-isDisabled')).toHaveLength(3);
+  });
+
+  it('paints the disabled example cards in the subdued text color, not the disabled one', () => {
+    // Reads the source directly because jest maps `.scss` to a style mock. EUI's disabled text
+    // color sits near 2:1 against the page; the subdued color meets the 4.5:1 text contrast.
+    const scssSource = fs.readFileSync(
+      path.join(__dirname, 'chat-page.scss'),
+      'utf8',
+    );
+    expect(scssSource).toMatch(
+      /\.euiCard\.wzWelcomeCard\.euiCard-isDisabled \{[^}]*color: var\(--wz-text-subdued/,
+    );
   });
 
   it('says data is sent to the provider and links to the privacy tab', () => {
