@@ -105,6 +105,22 @@ describe('FeedSyncPanel', () => {
     ).toEqual(['Professional catalog', 'Open catalog']);
   });
 
+  test('says an update is in progress before any feed shows it', () => {
+    renderPanel([consumer()], { updateInProgress: true });
+
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Content update in progress',
+    );
+  });
+
+  test('lets a failed feed lead over an update known to be running', () => {
+    renderPanel([consumer({ status: 'failed' })], { updateInProgress: true });
+
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Some feeds could not sync',
+    );
+  });
+
   test('shows the progress of a feed that is syncing', () => {
     renderPanel([
       consumer({ status: 'running', local_offset: 40, remote_offset: 80 }),

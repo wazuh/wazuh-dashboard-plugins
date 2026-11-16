@@ -33,14 +33,21 @@ describe('CheckForUpdatesButton', () => {
     });
   });
 
-  test('requests a check and reads the sync state', async () => {
+  test('requests a check, reports the update running and reads the sync state', async () => {
     mockRequest.mockResolvedValue(undefined);
     const onRequested = jest.fn();
-    render(<CheckForUpdatesButton onRequested={onRequested} />);
+    const onUpdateRunning = jest.fn();
+    render(
+      <CheckForUpdatesButton
+        onRequested={onRequested}
+        onUpdateRunning={onUpdateRunning}
+      />,
+    );
 
     fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
     await waitFor(() => expect(onRequested).toHaveBeenCalledTimes(1));
+    expect(onUpdateRunning).toHaveBeenCalledTimes(1);
     expect(addSuccess).toHaveBeenCalledTimes(1);
     expect(
       screen.queryByTestId('ctiFeedCheckForUpdatesButtonInProgressTooltip'),
@@ -59,28 +66,43 @@ describe('CheckForUpdatesButton', () => {
     ).toBeInTheDocument();
   });
 
-  test('reads the sync state when the indexer says an update is already running', async () => {
+  test('shows an update already running as running, not as an error', async () => {
     mockRequest.mockRejectedValue({
       response: { status: 409 },
       body: { message: 'A content update is already in progress.' },
     });
     const onRequested = jest.fn();
-    render(<CheckForUpdatesButton onRequested={onRequested} />);
+    const onUpdateRunning = jest.fn();
+    render(
+      <CheckForUpdatesButton
+        onRequested={onRequested}
+        onUpdateRunning={onUpdateRunning}
+      />,
+    );
 
     fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
     await waitFor(() => expect(onRequested).toHaveBeenCalledTimes(1));
-    expect(addError).toHaveBeenCalledTimes(1);
+    expect(onUpdateRunning).toHaveBeenCalledTimes(1);
+    expect(addError).not.toHaveBeenCalled();
+    expect(addSuccess).not.toHaveBeenCalled();
   });
 
-  test('does not read the sync state after any other failure', async () => {
+  test('reports any other failure as an error', async () => {
     mockRequest.mockRejectedValue({ response: { status: 500 } });
     const onRequested = jest.fn();
-    render(<CheckForUpdatesButton onRequested={onRequested} />);
+    const onUpdateRunning = jest.fn();
+    render(
+      <CheckForUpdatesButton
+        onRequested={onRequested}
+        onUpdateRunning={onUpdateRunning}
+      />,
+    );
 
     fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
     await waitFor(() => expect(addError).toHaveBeenCalledTimes(1));
     expect(onRequested).not.toHaveBeenCalled();
+    expect(onUpdateRunning).not.toHaveBeenCalled();
   });
 });

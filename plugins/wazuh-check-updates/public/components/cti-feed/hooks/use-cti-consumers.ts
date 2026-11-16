@@ -13,6 +13,11 @@ export const CTI_CHECK_RETRIES = 3;
 export const CTI_CHECK_RETRY_MS = 2000;
 /** How often the sync state is read again while a feed is syncing (`followSync`). */
 export const CTI_SYNC_POLL_MS = 5000;
+/**
+ * Longest time an update known to be running (see `followRunningUpdate`) is assumed
+ * to last while no feed shows it syncing and the indexer records no new check.
+ */
+export const CTI_RUNNING_UPDATE_GRACE_MS = 30000;
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -36,6 +41,18 @@ export interface CtiConsumersState {
    * indexer records the check (`last_checked_at` changes).
    */
   refetchAfterCheck: () => Promise<void>;
+  /**
+   * A content update is running although no feed may show it yet: the indexer
+   * answered that one is already in progress, or a registration or plan change
+   * started one. Counts as in progress until a feed shows it syncing (then until the
+   * sync ends); until a read after the indexer recorded a new check still finds nothing
+   * syncing, as the check is recorded before a feed starts syncing; or until
+   * {@link CTI_RUNNING_UPDATE_GRACE_MS} pass. With `followSync`, the state is read
+   * meanwhile.
+   */
+  followRunningUpdate: () => void;
+  /** A feed is syncing, or an update is known to be running. */
+  updateInProgress: boolean;
 }
 
 export interface UseCtiConsumersOptions {
@@ -56,6 +73,14 @@ export const useCtiConsumers = ({
   const [error, setError] = useState<string | null>(null);
   // Bumped after each follow-up read, to schedule the next one.
   const [followTick, setFollowTick] = useState(0);
+  // An update known to be running, not yet visible in the feeds.
+  const [runningUpdate, setRunningUpdate] = useState<{
+    since: number;
+    /** The last check time when the update was known to start. */
+    lastCheckedAt?: string;
+    /** The follow-up read that first saw a newer check. */
+    checkSeenAtTick?: number;
+  } | null>(null);
   const mounted = useRef(true);
   // The last check time already read, to tell when a new check lands.
   const lastCheckedAtRef = useRef<string | undefined>();
@@ -121,8 +146,53 @@ export const useCtiConsumers = ({
   const summary = getFeedSyncSummary(consumers);
   const syncing = summary === 'syncing';
 
+  const followRunningUpdate = useCallback(() => {
+    setRunningUpdate({
+      since: Date.now(),
+      lastCheckedAt: lastCheckedAtRef.current,
+    });
+  }, []);
+
+  // Once the feeds can tell, they alone say whether an update is in progress.
   useEffect(() => {
-    if (!followSync || !syncing) {
+    if (!runningUpdate) {
+      return;
+    }
+    if (syncing) {
+      setRunningUpdate(null);
+      return;
+    }
+    if (runningUpdate.checkSeenAtTick !== undefined) {
+      // A read after the new check still finds nothing syncing: nothing new.
+      if (followTick > runningUpdate.checkSeenAtTick) {
+        setRunningUpdate(null);
+      }
+      return;
+    }
+    if (lastCheckedAt !== runningUpdate.lastCheckedAt) {
+      setRunningUpdate({ ...runningUpdate, checkSeenAtTick: followTick });
+    }
+  }, [runningUpdate, syncing, lastCheckedAt, followTick]);
+
+  const runningUpdateSince = runningUpdate?.since ?? null;
+  useEffect(() => {
+    if (runningUpdateSince === null) {
+      return undefined;
+    }
+    const timeoutId = setTimeout(
+      () => setRunningUpdate(null),
+      Math.max(
+        0,
+        runningUpdateSince + CTI_RUNNING_UPDATE_GRACE_MS - Date.now(),
+      ),
+    );
+    return () => clearTimeout(timeoutId);
+  }, [runningUpdateSince]);
+
+  const following = syncing || runningUpdate !== null;
+
+  useEffect(() => {
+    if (!followSync || !following) {
       return undefined;
     }
     const timeoutId = setTimeout(async () => {
@@ -134,7 +204,7 @@ export const useCtiConsumers = ({
       }
     }, CTI_SYNC_POLL_MS);
     return () => clearTimeout(timeoutId);
-  }, [followSync, syncing, followTick, read]);
+  }, [followSync, following, followTick, read]);
 
   return {
     consumers,
@@ -145,5 +215,7 @@ export const useCtiConsumers = ({
     error,
     refetch,
     refetchAfterCheck,
+    followRunningUpdate,
+    updateInProgress: following,
   };
 };

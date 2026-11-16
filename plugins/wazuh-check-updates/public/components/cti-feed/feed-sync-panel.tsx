@@ -47,8 +47,29 @@ const AUTOMATIC_SYNC_HINT = i18n.translate(
   },
 );
 
-function getSummaryView(summary: FeedSyncSummary): SummaryView {
+/**
+ * `checking`: an update is known to be running, but no feed shows it syncing yet (it
+ * may never, when there is nothing new).
+ */
+type PanelSummary = FeedSyncSummary | 'checking';
+
+function getSummaryView(summary: PanelSummary): SummaryView {
   switch (summary) {
+    case 'checking':
+      return {
+        iconType: 'refresh',
+        iconColor: 'primary',
+        title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.checkingTitle', {
+          defaultMessage: 'Content update in progress',
+        }),
+        description: i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.sync.checkingDescription',
+          {
+            defaultMessage:
+              'The indexer is checking the feed for new content. The feeds below show it once they start syncing. Detection keeps using the current content meanwhile.',
+          },
+        ),
+      };
     case 'upToDate':
       return {
         iconType: 'checkInCircleFilled',
@@ -227,6 +248,10 @@ export interface FeedSyncPanelProps {
   onRefresh: () => void;
   /** Called after an update check is requested from a feed's details. */
   onUpdateRequested: () => void | Promise<void>;
+  /** A feed is syncing, or an update is known to be running. */
+  updateInProgress?: boolean;
+  /** An update is known to be running (see `CheckForUpdatesButton`). */
+  onUpdateRunning?: () => void;
 }
 
 export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
@@ -237,8 +262,15 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
   error,
   onRefresh,
   onUpdateRequested,
+  updateInProgress,
+  onUpdateRunning,
 }) => {
-  const view = getSummaryView(summary);
+  // An update known to be running leads, until a feed shows it (or something failed).
+  const panelSummary: PanelSummary =
+    updateInProgress && (summary === 'upToDate' || summary === 'pending')
+      ? 'checking'
+      : summary;
+  const view = getSummaryView(panelSummary);
   const [selectedFeedKey, setSelectedFeedKey] = useState<string | null>(null);
   // Looked up on every render so the details follow the latest read.
   const selectedFeed = selectedFeedKey
@@ -320,7 +352,7 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
             data-test-subj='ctiFeedSyncSummary'
           >
             <EuiFlexItem grow={false}>
-              {summary === 'syncing' ? (
+              {panelSummary === 'syncing' || panelSummary === 'checking' ? (
                 <EuiLoadingSpinner size='l' />
               ) : (
                 <EuiIcon
@@ -362,7 +394,8 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
           consumer={selectedFeed}
           onClose={() => setSelectedFeedKey(null)}
           onUpdateRequested={onUpdateRequested}
-          updateInProgress={summary === 'syncing'}
+          updateInProgress={updateInProgress ?? summary === 'syncing'}
+          onUpdateRunning={onUpdateRunning}
         />
       ) : null}
     </EuiPanel>

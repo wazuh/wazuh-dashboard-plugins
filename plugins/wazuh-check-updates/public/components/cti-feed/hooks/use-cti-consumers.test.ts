@@ -5,6 +5,7 @@ import { fetchCtiConsumers } from '../../../services/cti-feed';
 import {
   CTI_CHECK_RETRIES,
   CTI_CHECK_RETRY_MS,
+  CTI_RUNNING_UPDATE_GRACE_MS,
   CTI_SYNC_POLL_MS,
   useCtiConsumers,
 } from './use-cti-consumers';
@@ -117,6 +118,73 @@ describe('useCtiConsumers', () => {
 
       await advance(5 * 60000);
       expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    test('treats an update known to be running as in progress until a feed shows it', async () => {
+      mockFetch
+        .mockResolvedValueOnce({ data: [consumer()] })
+        .mockResolvedValueOnce({ data: [consumer({ status: 'running' })] })
+        .mockResolvedValue({ data: [consumer()] });
+
+      const { result } = renderHook(() =>
+        useCtiConsumers({ followSync: true }),
+      );
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(result.current.updateInProgress).toBe(false);
+
+      act(() => result.current.followRunningUpdate());
+      expect(result.current.updateInProgress).toBe(true);
+      expect(result.current.summary).toBe('upToDate');
+
+      // The feeds start syncing: they lead from now on.
+      await advance(CTI_SYNC_POLL_MS);
+      await waitFor(() => expect(result.current.summary).toBe('syncing'));
+      expect(result.current.updateInProgress).toBe(true);
+
+      await advance(CTI_SYNC_POLL_MS);
+      await waitFor(() => expect(result.current.summary).toBe('upToDate'));
+      expect(result.current.updateInProgress).toBe(false);
+    });
+
+    test('ends an update with nothing new one read after the indexer records the check', async () => {
+      mockFetch
+        .mockResolvedValueOnce({ data: [consumer()], last_checked_at: 'T1' })
+        .mockResolvedValue({ data: [consumer()], last_checked_at: 'T2' });
+
+      const { result } = renderHook(() =>
+        useCtiConsumers({ followSync: true }),
+      );
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      act(() => result.current.followRunningUpdate());
+      // This read sees the new check: a feed may still start syncing.
+      await advance(CTI_SYNC_POLL_MS);
+      await waitFor(() => expect(result.current.lastCheckedAt).toBe('T2'));
+      expect(result.current.updateInProgress).toBe(true);
+
+      // The next one still finds nothing syncing: the update had nothing new.
+      await advance(CTI_SYNC_POLL_MS);
+      await waitFor(() => expect(result.current.updateInProgress).toBe(false));
+    });
+
+    test('ends an update no feed ever shows after the grace period', async () => {
+      mockFetch.mockResolvedValue({ data: [consumer()] });
+
+      const { result } = renderHook(() =>
+        useCtiConsumers({ followSync: true }),
+      );
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      act(() => result.current.followRunningUpdate());
+      await advance(CTI_RUNNING_UPDATE_GRACE_MS - CTI_SYNC_POLL_MS);
+      expect(result.current.updateInProgress).toBe(true);
+      expect(mockFetch.mock.calls.length).toBeGreaterThan(1);
+
+      await advance(CTI_SYNC_POLL_MS);
+      await waitFor(() => expect(result.current.updateInProgress).toBe(false));
+      const reads = mockFetch.mock.calls.length;
+      await advance(5 * 60000);
+      expect(mockFetch).toHaveBeenCalledTimes(reads);
     });
 
     test('skips the reads while the tab is hidden and resumes after', async () => {

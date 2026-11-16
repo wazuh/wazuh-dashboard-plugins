@@ -181,10 +181,10 @@ describe('CtiFeedApp', () => {
         'Last checked: a few seconds ago',
       ),
     );
-    await waitFor(() =>
-      expect(
-        screen.getByTestId('ctiFeedCheckForUpdatesButton'),
-      ).not.toBeDisabled(),
+    // The check started an update: in progress until the feeds can tell.
+    expect(screen.getByTestId('ctiFeedCheckForUpdatesButton')).toBeDisabled();
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Content update in progress',
     );
   });
 
@@ -209,7 +209,7 @@ describe('CtiFeedApp', () => {
     );
   });
 
-  test('reports the server message of a failed update check', async () => {
+  test('shows an update already running as in progress, without an error', async () => {
     const error = Object.assign(new Error('Conflict'), {
       body: {
         statusCode: 409,
@@ -224,11 +224,34 @@ describe('CtiFeedApp', () => {
 
     fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
+    await waitFor(() =>
+      expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+        'Content update in progress',
+      ),
+    );
+    expect(screen.getByTestId('ctiFeedCheckForUpdatesButton')).toBeDisabled();
+    expect(mockAddError).not.toHaveBeenCalled();
+  });
+
+  test('reports the server message of a failed update check', async () => {
+    const error = Object.assign(new Error('Forbidden'), {
+      body: {
+        statusCode: 403,
+        error: 'Forbidden',
+        message: 'Could not update the CTI content: no permissions',
+      },
+    });
+    mockRequestUpdate.mockRejectedValue(error);
+    render(<CtiFeedApp />);
+    await settle();
+
+    fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
+
     await waitFor(() => expect(mockAddError).toHaveBeenCalledTimes(1));
     const [reported, options] = mockAddError.mock.calls[0];
     expect(reported).toBeInstanceOf(Error);
     expect(reported.message).toBe(
-      'Could not update the CTI content: A content update is already in progress.',
+      'Could not update the CTI content: no permissions',
     );
     expect(reported.body).toBe(error.body);
     expect(options).toEqual({ title: 'Could not check for updates' });
@@ -303,6 +326,11 @@ describe('CtiFeedApp', () => {
     });
 
     await waitFor(() => expect(mockFetchConsumers).toHaveBeenCalledTimes(2));
+    // The change started an update: shown as running before any feed syncs.
+    expect(screen.getByTestId('ctiFeedCheckForUpdatesButton')).toBeDisabled();
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Content update in progress',
+    );
   });
 
   test('does not read the feed sync again when the status is only unknown', async () => {

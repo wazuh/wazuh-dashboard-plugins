@@ -328,8 +328,10 @@ export interface FeedDetailsFlyoutProps {
   consumer: CtiConsumer;
   onClose: () => void;
   onUpdateRequested: () => void | Promise<void>;
-  /** Some feed is syncing: Check for updates waits for it. */
+  /** Some feed is syncing, or an update is known to be running: Check for updates waits. */
   updateInProgress?: boolean;
+  /** An update is known to be running (see `CheckForUpdatesButton`). */
+  onUpdateRunning?: () => void;
 }
 
 export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
@@ -337,6 +339,7 @@ export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
   onClose,
   onUpdateRequested,
   updateInProgress = false,
+  onUpdateRunning,
 }) => {
   const metadata = getFeedMetadata(consumer);
   const state = getConsumerSyncState(consumer);
@@ -452,6 +455,7 @@ export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
               fill
               onRequested={onUpdateRequested}
               updateInProgress={updateInProgress}
+              onUpdateRunning={onUpdateRunning}
               dataTestSubj='ctiFeedDetailsCheckForUpdatesButton'
             />
           </EuiFlexItem>

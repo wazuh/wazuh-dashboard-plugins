@@ -49,11 +49,14 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
   // A registration or plan change starts a content update on the server: read the feed
   // sync state again, waiting for the indexer to record the check. Covers a change made
   // elsewhere (the CTI console, another tab) as well as clearing the local registration.
+  // The update is treated as running from that moment, even before a feed shows it.
   const refetchSync = sync.refetchAfterCheck;
+  const followRunningUpdate = sync.followRunningUpdate;
   useSubscriptionChange(
     useCallback(() => {
+      followRunningUpdate();
       void refetchSync();
-    }, [refetchSync]),
+    }, [followRunningUpdate, refetchSync]),
   );
 
   // The status read turns the card to Open feed; the change above refreshes the feeds.
@@ -97,7 +100,8 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
                     {/* The check writes `last_checked_at`, so read it back. */}
                     <CheckForUpdatesButton
                       onRequested={sync.refetchAfterCheck}
-                      updateInProgress={sync.summary === 'syncing'}
+                      updateInProgress={sync.updateInProgress}
+                      onUpdateRunning={sync.followRunningUpdate}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
@@ -140,6 +144,8 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
               refreshing={sync.refreshing}
               onRefresh={sync.refetch}
               onUpdateRequested={sync.refetchAfterCheck}
+              updateInProgress={sync.updateInProgress}
+              onUpdateRunning={sync.followRunningUpdate}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
