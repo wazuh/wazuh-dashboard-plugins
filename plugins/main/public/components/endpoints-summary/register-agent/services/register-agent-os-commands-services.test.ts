@@ -37,11 +37,14 @@ beforeEach(() => {
 });
 
 const debImportKey =
-  'wget -qO - https://test.com/GPG-KEY | sudo tee /usr/share/keyrings/wazuh.asc > /dev/null';
+  'sudo wget -qO /usr/share/keyrings/wazuh.asc https://test.com/GPG-KEY && sudo chmod 644 /usr/share/keyrings/wazuh.asc';
 // The package is installed only when it matches the SHA-256 of the index apt verified.
 const debVerify = (pkg: string) =>
-  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=/usr/share/keyrings/wazuh.asc] https://test.com/apt stable main" > $d/wazuh.list && o="-o Dir::Etc::SourceList=$d/wazuh.list -o Dir::Etc::SourceParts=$d/lists -o Dir::State::Lists=$d/lists -o Dir::Cache=$d" && sudo mkdir -p $d/lists/partial && sudo apt-get update -qq $o && echo "$(apt-cache $o show wazuh-agent | awk -v f=/${pkg} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${pkg}" | sha256sum -c --quiet && sudo rm -rf $d`;
+  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=/usr/share/keyrings/wazuh.asc] https://test.com/apt stable main" > $d/wazuh.list && echo "Dir::Etc::SourceList \\"$d/wazuh.list\\"; Dir::Etc::SourceParts \\"$d/lists\\"; Dir::State::Lists \\"$d/lists\\"; Dir::Cache \\"$d\\";" > $d/apt.conf && sudo mkdir -m 755 $d/lists $d/lists/partial && sudo apt-get update -qq -c $d/apt.conf && echo "$(sudo apt-cache -c $d/apt.conf show wazuh-agent | awk -v f=/${pkg} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${pkg}" | sha256sum -c --quiet && sudo rm -rf $d`;
 const rpmImportKey = 'sudo rpm --import https://test.com/GPG-KEY';
+// The package is installed only when its signature is present and verified.
+const rpmVerify = (pkg: string) =>
+  `rpm -K ${pkg} && LC_ALL=C rpm -Kv ${pkg} | grep -q 'Signature, key ID [0-9a-f]*: OK'`;
 
 describe('getAllOptionals', () => {
   it('should return empty string if optionals is falsy', () => {
@@ -145,7 +148,13 @@ describe('getDEBARM64InstallCommand', () => {
 describe('getRPMAMD64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.x86_64.rpm`;
-    let expected = `${rpmImportKey} && curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} rpm -ihv ${test.packageName}`;
+    let expected = `${rpmImportKey} && curl -o ${test.packageName} ${
+      test.urlPackage
+    } && ${rpmVerify(test.packageName)} && sudo ${
+      test.optionals.serverAddress
+    } ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${
+      test.optionals.agentName
+    } ${test.optionals.sslVerification} rpm -ihv ${test.packageName}`;
     const withAllOptionals = getRPMAMD64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
@@ -153,7 +162,11 @@ describe('getRPMAMD64InstallCommand', () => {
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
 
-    expected = `${rpmImportKey} && curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} rpm -ihv ${test.packageName}`;
+    expected = `${rpmImportKey} && curl -o ${test.packageName} ${
+      test.urlPackage
+    } && ${rpmVerify(test.packageName)} && sudo ${
+      test.optionals.serverAddress
+    } ${test.optionals.agentGroups} rpm -ihv ${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
       getRPMAMD64InstallCommand(test);
     expect(withServerAddresAndAgentGroupsOptions).toEqual(expected);
@@ -163,7 +176,13 @@ describe('getRPMAMD64InstallCommand', () => {
 describe('getRPMARM64InstallCommand', () => {
   it('should return the correct command', () => {
     test.packageName = `wazuh-agent-${test.wazuhVersion}-beta2.aarch64.rpm`;
-    let expected = `${rpmImportKey} && curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${test.optionals.agentName} ${test.optionals.sslVerification} rpm -ihv ${test.packageName}`;
+    let expected = `${rpmImportKey} && curl -o ${test.packageName} ${
+      test.urlPackage
+    } && ${rpmVerify(test.packageName)} && sudo ${
+      test.optionals.serverAddress
+    } ${test.optionals.wazuhPassword} ${test.optionals.agentGroups} ${
+      test.optionals.agentName
+    } ${test.optionals.sslVerification} rpm -ihv ${test.packageName}`;
     const withAllOptionals = getRPMARM64InstallCommand(test);
     expect(withAllOptionals).toEqual(expected);
 
@@ -171,7 +190,11 @@ describe('getRPMARM64InstallCommand', () => {
     delete test.optionals.agentName;
     delete test.optionals.sslVerification;
 
-    expected = `${rpmImportKey} && curl -o ${test.packageName} ${test.urlPackage} && sudo ${test.optionals.serverAddress} ${test.optionals.agentGroups} rpm -ihv ${test.packageName}`;
+    expected = `${rpmImportKey} && curl -o ${test.packageName} ${
+      test.urlPackage
+    } && ${rpmVerify(test.packageName)} && sudo ${
+      test.optionals.serverAddress
+    } ${test.optionals.agentGroups} rpm -ihv ${test.packageName}`;
     const withServerAddresAndAgentGroupsOptions =
       getRPMARM64InstallCommand(test);
     expect(withServerAddresAndAgentGroupsOptions).toEqual(expected);
@@ -342,7 +365,11 @@ describe('SSL verification states', () => {
       packageName: 'wazuh-agent-5.0.0.x86_64.rpm',
     });
     expect(result).toEqual(
-      `${rpmImportKey} && curl -o wazuh-agent-5.0.0.x86_64.rpm https://example.com/package.rpm && sudo ${serverAddress} ${expectedTail[state]}rpm -ihv wazuh-agent-5.0.0.x86_64.rpm`,
+      `${rpmImportKey} && curl -o wazuh-agent-5.0.0.x86_64.rpm https://example.com/package.rpm && ${rpmVerify(
+        'wazuh-agent-5.0.0.x86_64.rpm',
+      )} && sudo ${serverAddress} ${
+        expectedTail[state]
+      }rpm -ihv wazuh-agent-5.0.0.x86_64.rpm`,
     );
   });
 
@@ -354,7 +381,11 @@ describe('SSL verification states', () => {
       packageName: 'wazuh-agent-5.0.0.aarch64.rpm',
     });
     expect(result).toEqual(
-      `${rpmImportKey} && curl -o wazuh-agent-5.0.0.aarch64.rpm https://example.com/package.rpm && sudo ${serverAddress} ${expectedTail[state]}rpm -ihv wazuh-agent-5.0.0.aarch64.rpm`,
+      `${rpmImportKey} && curl -o wazuh-agent-5.0.0.aarch64.rpm https://example.com/package.rpm && ${rpmVerify(
+        'wazuh-agent-5.0.0.aarch64.rpm',
+      )} && sudo ${serverAddress} ${
+        expectedTail[state]
+      }rpm -ihv wazuh-agent-5.0.0.aarch64.rpm`,
     );
   });
 

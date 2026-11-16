@@ -80,11 +80,11 @@ const DEB_KEYRING = '/usr/share/keyrings/wazuh.asc';
 
 // dpkg checks no signature: apt verifies the signed index; the package must match its SHA-256.
 const getDEBVerifyCommand = (packageName: string, aptSource: string) =>
-  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=${DEB_KEYRING}] ${aptSource} main" > $d/wazuh.list && o="-o Dir::Etc::SourceList=$d/wazuh.list -o Dir::Etc::SourceParts=$d/lists -o Dir::State::Lists=$d/lists -o Dir::Cache=$d" && sudo mkdir -p $d/lists/partial && sudo apt-get update -qq $o && echo "$(apt-cache $o show wazuh-agent | awk -v f=/${packageName} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${packageName}" | sha256sum -c --quiet && sudo rm -rf $d`;
+  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=${DEB_KEYRING}] ${aptSource} main" > $d/wazuh.list && echo "Dir::Etc::SourceList \\"$d/wazuh.list\\"; Dir::Etc::SourceParts \\"$d/lists\\"; Dir::State::Lists \\"$d/lists\\"; Dir::Cache \\"$d\\";" > $d/apt.conf && sudo mkdir -m 755 $d/lists $d/lists/partial && sudo apt-get update -qq -c $d/apt.conf && echo "$(sudo apt-cache -c $d/apt.conf show wazuh-agent | awk -v f=/${packageName} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${packageName}" | sha256sum -c --quiet && sudo rm -rf $d`;
 
 const getDEBInstallCommand = (props: tDEBInstallCommand) => {
   const { optionals, urlPackage, packageName, gpgKeyUrl, aptSource } = props;
-  return `wget -qO - ${gpgKeyUrl} | sudo tee ${DEB_KEYRING} > /dev/null && wget ${urlPackage} && ${getDEBVerifyCommand(
+  return `sudo wget -qO ${DEB_KEYRING} ${gpgKeyUrl} && sudo chmod 644 ${DEB_KEYRING} && wget ${urlPackage} && ${getDEBVerifyCommand(
     packageName,
     aptSource,
   )} && sudo ${
@@ -102,7 +102,8 @@ export const getDEBARM64InstallCommand = (props: tDEBInstallCommand) =>
 
 const getRPMInstallCommand = (props: tLinuxInstallCommand) => {
   const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
-  return `sudo rpm --import ${gpgKeyUrl} && curl -o ${packageName} ${urlPackage} && sudo ${
+  // rpm -K rejects bad or unknown signatures; the grep rejects unsigned packages.
+  return `sudo rpm --import ${gpgKeyUrl} && curl -o ${packageName} ${urlPackage} && rpm -K ${packageName} && LC_ALL=C rpm -Kv ${packageName} | grep -q 'Signature, key ID [0-9a-f]*: OK' && sudo ${
     optionals && getAllOptionals(optionals)
   }rpm -ihv ${packageName}`;
 };
