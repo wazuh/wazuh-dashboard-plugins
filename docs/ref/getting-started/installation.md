@@ -59,7 +59,7 @@ Edit the `/etc/wazuh-dashboard/opensearch_dashboards.yml` file and replace the f
 server.host: 0.0.0.0
 server.port: 443
 opensearch.hosts: https://localhost:9200
-opensearch.ssl.verificationMode: certificate
+opensearch.ssl.verificationMode: full
 opensearch.ssl.certificateAuthorities:
   ['/etc/wazuh-dashboard/certs/indexer-ca.pem']
 wazuh_core.hosts:

@@ -88,7 +88,7 @@ With the monitor saved, produce a real `SSH root login via password authenticati
 
 **Pre-requisites on the target agent:**
 
-- A Linux agent enrolled and `Active` in **Endpoint Summary**, with `firewalld` (or `iptables`) running — the `block-ip` script needs one of them present to add and revert the rule.
+- A Linux agent enrolled and `Active` in the agents **Summary** page, with `firewalld` (or `iptables`) running — the `block-ip` script needs one of them present to add and revert the rule.
 - Root login via password enabled on the agent, in `/etc/ssh/sshd_config`:
   - `PermitRootLogin yes`
   - `PasswordAuthentication yes`

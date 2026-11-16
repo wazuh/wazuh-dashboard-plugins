@@ -67,16 +67,16 @@ The key differences are:
 
 ### Available host properties in 5.x
 
-| Property   | Description                                            | Required | Default |
-| ---------- | ------------------------------------------------------ | -------- | ------- |
-| `url`      | URL of the Wazuh server API                            | Yes      | —       |
-| `port`     | TCP port of the Wazuh server API                       | Yes      | —       |
-| `username` | API user                                               | Yes      | —       |
-| `password` | API user password                                      | Yes      | —       |
-| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `true`  |
-| `key`      | Path to an SSL/TLS client private key file             | No       | —       |
-| `cert`     | Path to an SSL/TLS client certificate file             | No       | —       |
-| `ca`       | Path to a CA certificate file for server verification  | No       | —       |
+| Property   | Description                                            | Required | Default                 |
+| ---------- | ------------------------------------------------------ | -------- | ----------------------- |
+| `url`      | URL of the Wazuh server API                            | No       | `https://localhost`     |
+| `port`     | TCP port of the Wazuh server API                       | No       | `55000`                 |
+| `username` | API user                                               | No       | `wazuh-internal-client` |
+| `password` | API user password                                      | Yes      | —                       |
+| `run_as`   | Use the logged-in user context to retrieve permissions | No       | `true`                  |
+| `key`      | Path to an SSL/TLS client private key file             | No       | —                       |
+| `cert`     | Path to an SSL/TLS client certificate file             | No       | —                       |
+| `ca`       | Path to a CA certificate file for server verification  | No       | —                       |
 
 For full details on these properties, see the [Configuration reference](../../ref/configuration.md).
 
