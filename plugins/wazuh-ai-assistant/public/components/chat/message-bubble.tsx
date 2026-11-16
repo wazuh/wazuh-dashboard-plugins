@@ -701,25 +701,13 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       // No `PROSE_CLASS` here: the prose styles belong to the INNER prose
       // `<div className={PROSE_CLASS}>` below, not to the results card or callouts that share
       // this item.
-      style={{
-        // The user turn keeps its 75% share — a question is always prose, and the figure is
-        // genuinely local to this decision, with no token or class behind it to drift from.
-        maxWidth: isUser ? '75%' : '100%',
-        minWidth: isUser ? 180 : 0,
-        // The assistant column is forced to a DETERMINISTIC width (the full row) instead of EUI's
-        // default shrink-to-fit sizing. Shrink-to-fit would make this flex item's resolved width
-        // track whatever it happens to be rendering — 605px for a collapsed/prose-only turn, 1260px
-        // once a `wzResultsCard` is expanded — so the results card would jog ~115px sideways as it
-        // expands/collapses instead of just changing height, and a collapsed card would hug its own
-        // content rather than filling the wide row it is given.
-        // `flex: 1 1 auto` makes the item grow to fill the row like any other block, and `min-width: 0`
-        // is required alongside it — a flex item's automatic minimum is its content's, which for a
-        // wide `wzResultsCard` would otherwise refuse to shrink back down and re-introduce the same
-        // instability from the other direction. The user bubble is deliberately left out of this: it
-        // is a real chat bubble that is supposed to hug its own text up to the 75% cap above, and nothing
-        // about it collapses/expands the way a results card does.
-        ...(!isUser ? { flex: '1 1 auto', width: '100%' } : {}),
-      }}
+      // Both turns fill the row: the user's question and the assistant's answer share the same
+      // width as the results card. The width is DETERMINISTIC (the full row) instead of EUI's
+      // default shrink-to-fit sizing, which would make the item track whatever it renders — so a
+      // results card would jog sideways as it expands/collapses instead of just changing height.
+      // `min-width: 0` is required alongside `flex: 1 1 auto`: a flex item's automatic minimum is
+      // its content's, which for a wide `wzResultsCard` would otherwise refuse to shrink back down.
+      style={{ flex: '1 1 auto', width: '100%', maxWidth: '100%', minWidth: 0 }}
     >
       {isUser ? (
         // The question is a discrete card; the answer is undecorated prose on the canvas, so the

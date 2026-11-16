@@ -518,6 +518,22 @@ describe('MessageBubble', () => {
   // table) both fill the content column up to $wzContentMaxWidth — the same column the composer
   // uses — so the answer and its card share one width, never reaching past the composer's edge.
   describe('answer width vs. results card (layout contract §5)', () => {
+    it('gives the user question the full row width, like the answer', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({ role: 'user', content: 'How many agents?' })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      const bubbleItem = screen
+        .getByText('How many agents?')
+        .closest('.euiFlexItem') as HTMLElement;
+      expect(bubbleItem.style.maxWidth).toBe('100%');
+      expect(bubbleItem.style.width).toBe('100%');
+    });
+
     it('renders a prose-only assistant answer in the full-width prose container', () => {
       render(
         <MessageBubble
