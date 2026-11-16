@@ -6,6 +6,10 @@ import {
   ModuleEmptyState,
   unpinPinnedAgent,
 } from '../../../../common/no-results/module-empty-state';
+import {
+  getSearchHint,
+  getSearchOrTimeRangeHint,
+} from '../../../../common/no-results/module-empty-state-texts';
 import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 import {
   MonitoredDirectories,
@@ -68,7 +72,7 @@ const getDescription = (kind: EmptyStateKind, withCurrentState: boolean) =>
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescriptionShort',
         {
           defaultMessage:
-            "Findings list the changes detected after each file's baseline was recorded. Try changing the search or time range.",
+            "Findings list the changes detected after each file's baseline was recorded.",
         },
       )
     : kind === 'findings'
@@ -76,16 +80,20 @@ const getDescription = (kind: EmptyStateKind, withCurrentState: boolean) =>
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescription',
         {
           defaultMessage:
-            "Findings list the changes detected after each file's baseline was recorded, so this tab can be empty while the Dashboard and Inventory show the monitored files. Try changing the search or time range.",
+            "Findings list the changes detected after each file's baseline was recorded. This tab can be empty while the Dashboard and Inventory show the monitored files.",
         },
       )
     : i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.dashboardDescription',
         {
           defaultMessage:
-            'Try changing the search. Monitored files appear after the agents scan their monitored directories and record a baseline.',
+            'Monitored files appear after the agents scan their monitored directories and record a baseline.',
         },
       );
+
+/** First paragraph: Findings are filtered by the time range, the Dashboard state is not. */
+const getHint = (kind: EmptyStateKind) =>
+  kind === 'findings' ? getSearchOrTimeRangeHint() : getSearchHint();
 
 const getEndpointStatusMessage = (
   status: Exclude<MonitoredDirectories['status'], 'loading' | 'monitored'>,
@@ -198,6 +206,7 @@ export const FimEmptyStateView = ({
         ),
       }}
     >
+      <p>{getHint(kind)}</p>
       <p>
         {getDescription(
           kind,

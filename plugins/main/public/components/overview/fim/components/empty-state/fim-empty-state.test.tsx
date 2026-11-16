@@ -44,14 +44,33 @@ describe('FimEmptyStateView', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it.each([
-    ['findings', 'No file changes found', /search or time range/],
-    ['dashboard', 'No monitored files found', /Try changing the search\./],
-  ] as const)('titles the %s empty state', (kind, title, hint) => {
-    renderView(kind);
+    [
+      'findings',
+      'No file changes found',
+      'Try changing the search or time range.',
+      /^Findings list the changes detected/,
+    ],
+    [
+      'dashboard',
+      'No monitored files found',
+      'Try changing the search.',
+      /^Monitored files appear after the agents scan/,
+    ],
+  ] as const)(
+    'titles the %s empty state and leads with the hint in its own paragraph',
+    (kind, title, hint, explanation) => {
+      renderView(kind);
 
-    expect(screen.getByText(title)).toBeInTheDocument();
-    expect(screen.getByText(hint)).toBeInTheDocument();
-  });
+      expect(screen.getByText(title)).toBeInTheDocument();
+      const hintParagraph = screen.getByText(hint);
+      const explanationParagraph = screen.getByText(explanation);
+      expect(hintParagraph.tagName).toBe('P');
+      expect(explanationParagraph.tagName).toBe('P');
+      expect(hintParagraph.compareDocumentPosition(explanationParagraph)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    },
+  );
 
   it('asks to select an agent and links the setup guide without a pinned agent', () => {
     renderView('findings');

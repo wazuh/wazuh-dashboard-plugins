@@ -72,13 +72,17 @@ export const DiscoverNoResults = ({
         })
       }
     >
-      <p>
-        {description ??
-          moduleTexts?.description ??
-          i18n.translate('wazuh.common.noResults.hint', {
-            defaultMessage: 'Try widening the time range or removing filters.',
-          })}
-      </p>
+      {(description
+        ? [description]
+        : moduleTexts?.description ?? [
+            i18n.translate('wazuh.common.noResults.hint', {
+              defaultMessage:
+                'Try widening the time range or removing filters.',
+            }),
+          ]
+      ).map(paragraph => (
+        <p key={paragraph}>{paragraph}</p>
+      ))}
     </ModuleEmptyState>
   );
 };

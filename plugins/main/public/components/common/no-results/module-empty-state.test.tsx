@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { getWzCurrentAppID } from '../../../kibana-services';
-import { ModuleEmptyState } from './module-empty-state';
+import { ModuleEmptyState, ModuleEmptyStateList } from './module-empty-state';
 
 jest.mock('../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
@@ -151,4 +151,33 @@ describe('ModuleEmptyState', () => {
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
+});
+
+describe('ModuleEmptyStateList', () => {
+  it.each([
+    [false, 'UL'],
+    [true, 'OL'],
+  ])(
+    'renders each item in a left aligned list (ordered: %s)',
+    (ordered, tag) => {
+      render(
+        <ModuleEmptyStateList
+          ordered={ordered}
+          data-test-subj='someChecks'
+          items={['First check.', <strong key='b'>Second check.</strong>]}
+        />,
+      );
+
+      const container = document.querySelector(
+        '[data-test-subj="someChecks"]',
+      ) as HTMLElement;
+      expect(container).toHaveStyle({ textAlign: 'left' });
+      expect(container.firstElementChild?.tagName).toBe(tag);
+      expect(
+        within(container)
+          .getAllByRole('listitem')
+          .map(item => item.textContent),
+      ).toEqual(['First check.', 'Second check.']);
+    },
+  );
 });

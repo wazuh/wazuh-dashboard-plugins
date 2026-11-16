@@ -23,6 +23,21 @@ describe('DiscoverNoResults', () => {
     ).toBeVisible();
   });
 
+  it('renders the hint and each explanation of the module as its own paragraph', () => {
+    (getWzCurrentAppID as jest.Mock).mockReturnValue('mitre-attack');
+    render(<DiscoverNoResults />);
+
+    const hint = screen.getByText('Try changing the search or time range.');
+    const explanation = screen.getByText(
+      'Only findings that match a rule mapped to a MITRE technique appear here.',
+    );
+    expect(hint.tagName).toBe('P');
+    expect(explanation.tagName).toBe('P');
+    expect(hint.compareDocumentPosition(explanation)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
   it('renders the generic text outside a module', () => {
     (getWzCurrentAppID as jest.Mock).mockImplementation(() => {
       throw new Error('WzCurrentAppID was not set.');
@@ -81,7 +96,24 @@ describe('getModuleEmptyStateTexts', () => {
     const texts = getModuleEmptyStateTexts(appId);
 
     expect(texts?.title).toBeTruthy();
-    expect(texts?.description).toBeTruthy();
+    expect(texts?.description.length).toBeGreaterThan(0);
+    texts?.description.forEach(paragraph => expect(paragraph).toBeTruthy());
+  });
+
+  it.each([
+    'vulnerability-detection',
+    'configuration-assessment',
+    'it-hygiene',
+    'incident-response-dashboard',
+    'case-management',
+    'mitre-attack',
+    'regulatory-compliance',
+    'amazon-web-services',
+    'statistics',
+  ])('keeps each paragraph of %s short enough to scan', appId => {
+    getModuleEmptyStateTexts(appId)!.description.forEach(paragraph =>
+      expect(paragraph.length).toBeLessThanOrEqual(160),
+    );
   });
 
   it('has none for a module with its own empty state or an unknown id', () => {
@@ -101,8 +133,9 @@ describe('getModuleEmptyStateTexts', () => {
     'regulatory-compliance',
   ])('calls the data of %s findings, not events', appId => {
     const { title, description } = getModuleEmptyStateTexts(appId)!;
+    const text = [title, ...description].join(' ');
 
-    expect(`${title} ${description}`).toMatch(/findings/i);
-    expect(`${title} ${description}`).not.toMatch(/events/i);
+    expect(text).toMatch(/findings/i);
+    expect(text).not.toMatch(/events/i);
   });
 });

@@ -74,7 +74,13 @@ export interface ModuleEmptyStateProps {
   testSubj: string;
   /** What is empty, for the situation (never received data, pinned agent, search, ...). */
   title: React.ReactNode;
-  /** Why it is empty and what to try. Paragraphs are rendered centered in small text. */
+  /**
+   * Why it is empty and what to try, rendered centered in small text. Keep it quick to scan:
+   * - Lead with a short sentence that says what to try first, such as changing the search.
+   * - Then short paragraphs of one idea each.
+   * - Put checks or steps in a `ModuleEmptyStateList`, not in one comma-separated sentence.
+   * - Bold only the UI names the user acts on, through a `FormattedMessage` placeholder.
+   */
   children?: React.ReactNode;
   /**
    * Unpins the agent. The button is shown whenever an agent is pinned; pass this to replace the
@@ -98,6 +104,39 @@ export interface ModuleEmptyStateProps {
   /** Replaces the test id derived from `testSubj`. */
   dataTestSubj?: string;
 }
+
+export interface ModuleEmptyStateListProps {
+  /** Checks or steps, one short sentence each. */
+  items: React.ReactNode[];
+  /** Numbers the items, for steps that follow an order. */
+  ordered?: boolean;
+  'data-test-subj'?: string;
+}
+
+/**
+ * Checks or steps of an empty state. The list is left aligned inside the centered prompt, because
+ * centered lines of different lengths are hard to follow.
+ */
+export const ModuleEmptyStateList = ({
+  items,
+  ordered = false,
+  'data-test-subj': dataTestSubj,
+}: ModuleEmptyStateListProps) => {
+  const List = ordered ? 'ol' : 'ul';
+  return (
+    <div
+      style={{ display: 'inline-block', textAlign: 'left' }}
+      data-test-subj={dataTestSubj}
+    >
+      <List>
+        {items.map((item, index) => (
+          /* The items are static text, their order never changes. */
+          <li key={index}>{item}</li>
+        ))}
+      </List>
+    </div>
+  );
+};
 
 /**
  * Empty state shared by the module tabs (Dashboard, Inventory and Findings): a centered prompt
