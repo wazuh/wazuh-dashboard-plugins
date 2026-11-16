@@ -7,6 +7,7 @@ jest.mock('../../plugin-services', () => ({
 }));
 
 import React from 'react';
+import moment from 'moment';
 import {
   configure,
   fireEvent,
@@ -228,6 +229,40 @@ describe('SubscriptionPanel', () => {
     expect(details).toHaveTextContent('9ckQEmDsQ9eReRTUH4xPMg');
     expect(details).toHaveTextContent('Yearly');
     expect(details).toHaveTextContent('Renews');
+    expect(details).not.toHaveTextContent('Registered');
+  });
+
+  test('shows the registration date in the header, under the plan', () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+        environment: { registered_at: '2026-02-01T10:00:00Z' },
+      },
+    });
+
+    renderPanel({ statusCTI: SUCCESS });
+
+    expect(
+      screen.getByTestId('ctiFeedSubscriptionRegisteredAt'),
+    ).toHaveTextContent(
+      `Registered ${moment('2026-02-01T10:00:00Z').format('ll')}`,
+    );
+  });
+
+  test('shows no registration date when the console did not report one', () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+      },
+    });
+
+    renderPanel({ statusCTI: SUCCESS });
+
+    expect(screen.queryByTestId('ctiFeedSubscriptionRegisteredAt')).toBeNull();
   });
 
   test('opens the console from a registered environment', () => {

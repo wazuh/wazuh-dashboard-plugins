@@ -87,9 +87,8 @@ describe('SubscriptionDetails', () => {
     expect(
       screen.getByTestId('ctiFeedSubscriptionCopyEnvironmentId'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByTestId('ctiFeedSubscriptionRegisteredAt'),
-    ).toHaveTextContent(date('2026-03-01T10:00:00Z'));
+    // The registration date is in the card header, not in this list.
+    expect(screen.queryByTestId('ctiFeedSubscriptionRegisteredAt')).toBeNull();
     expect(
       screen.getByTestId('ctiFeedSubscriptionStartedAt'),
     ).toHaveTextContent(date('2026-03-01T10:00:00Z'));

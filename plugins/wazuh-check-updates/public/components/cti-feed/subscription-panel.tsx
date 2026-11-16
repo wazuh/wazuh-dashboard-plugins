@@ -11,10 +11,15 @@ import {
   EuiSpacer,
   EuiText,
   EuiTitle,
+  EuiToolTip,
 } from '@elastic/eui';
 import { statusCodes, WAZUH_CTI_CONSOLE_HREF } from '../../../common/constants';
 import type { CtiSubscriptionPlan } from '../../../common/cti-registration-status-api';
 import { ctiFlowState } from '../../services/cti-flow-state';
+import {
+  formatCtiDate,
+  formatCtiTimestamp,
+} from '../../services/cti-timestamp';
 import { ISubscriptionResponse } from '../../services/types';
 import { useCtiRegistrationPermission } from '../../shared-components/cti-registration/hooks/use-cti-registration-permission';
 import { SubscriptionDetails } from './subscription-details';
@@ -274,6 +279,9 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
   const subscriptionMessage = ctiFlowState.getSubscription()?.message;
   const view = getSubscriptionView(state, subscriptionMessage?.plan);
   const registered = state === 'registered';
+  // When the CTI console registered this environment, shown under the plan.
+  const registeredAt = subscriptionMessage?.environment?.registered_at;
+  const registeredDate = formatCtiDate(registeredAt);
   // Only a registration the indexer holds can be cleared.
   const clearable = registered && Boolean(subscriptionMessage?.is_registered);
   const clearPermission = useCtiRegistrationPermission(clearable, 'clear');
@@ -325,15 +333,46 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
               </span>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiTitle size='s'>
-                <h3 data-test-subj='ctiFeedSubscriptionTitle'>{view.title}</h3>
-              </EuiTitle>
-              <EuiHealth
-                color={HEALTH_COLOR[view.tone]}
-                data-test-subj='ctiFeedSubscriptionStatus'
+              <EuiFlexGroup
+                gutterSize='s'
+                alignItems='center'
+                wrap
+                responsive={false}
               >
-                {view.status}
-              </EuiHealth>
+                <EuiFlexItem grow={false}>
+                  <EuiTitle size='s'>
+                    <h3 data-test-subj='ctiFeedSubscriptionTitle'>
+                      {view.title}
+                    </h3>
+                  </EuiTitle>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiHealth
+                    color={HEALTH_COLOR[view.tone]}
+                    data-test-subj='ctiFeedSubscriptionStatus'
+                  >
+                    {view.status}
+                  </EuiHealth>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              {registered && registeredDate && registeredAt ? (
+                <EuiText size='s' color='subdued'>
+                  <EuiToolTip content={formatCtiTimestamp(registeredAt)}>
+                    <time
+                      dateTime={registeredAt}
+                      data-test-subj='ctiFeedSubscriptionRegisteredAt'
+                    >
+                      {i18n.translate(
+                        'wazuhCheckUpdates.ctiFeed.subscription.registeredOn',
+                        {
+                          defaultMessage: 'Registered {date}',
+                          values: { date: registeredDate },
+                        },
+                      )}
+                    </time>
+                  </EuiToolTip>
+                </EuiText>
+              ) : null}
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size='m' />

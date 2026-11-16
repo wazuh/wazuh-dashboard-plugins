@@ -140,8 +140,8 @@ export interface SubscriptionDetailsProps {
 
 /**
  * How the CTI console knows this environment: its name, organization, ID, and the
- * dates of the registration and of the subscription that pays for the plan. A value
- * the console did not report hides its row.
+ * dates of the subscription that pays for the plan (the registration date is in the
+ * card header). A value the console did not report hides its row.
  */
 export const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
   message,
@@ -211,19 +211,6 @@ export const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
           </EuiFlexItem>
         </EuiFlexGroup>
       ),
-    });
-  }
-  const registeredAt = renderDate(
-    environment?.registered_at,
-    'ctiFeedSubscriptionRegisteredAt',
-  );
-  if (registeredAt) {
-    rows.push({
-      title: i18n.translate(
-        'wazuhCheckUpdates.ctiFeed.subscription.details.registeredAt',
-        { defaultMessage: 'Registered' },
-      ),
-      description: registeredAt,
     });
   }
   rows.push(...getSubscriptionRows(getCurrentPlanSubscription(message)));
