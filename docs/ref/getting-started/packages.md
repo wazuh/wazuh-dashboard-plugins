@@ -82,8 +82,7 @@ manager installs nothing else:
 - `/bin/sh`
 - `groupadd` and `useradd` before installation, `userdel` and `groupdel` after removal
 
-The package does not declare the system libraries of the bundled Node.js runtime. Any host that
-can install the package already has them. See [Credentials](credentials.md).
+See [Credentials](credentials.md).
 
 ## Package repositories
 
