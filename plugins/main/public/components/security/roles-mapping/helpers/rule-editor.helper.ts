@@ -178,6 +178,43 @@ export const decodeJsonRule = (jsonRule, internalUsers) => {
   }
 };
 
+/**
+ * Returns the distinct user fields of the rules that are not in the known
+ * list. An empty field is reported as an empty string.
+ */
+export const getUnknownUserFields = (
+  rules: { user_field?: string }[],
+  knownFields: string[],
+): string[] => [
+  ...new Set(
+    rules
+      .map(rule => (rule.user_field || '').trim())
+      .filter(field => !knownFields.includes(field)),
+  ),
+];
+
+// AND and OR wrap an array of clauses, NOT wraps a single clause (or an array)
+const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
+
+/** Collects the user fields used by a rule in its JSON form. */
+export const getUserFieldsFromRuleObject = (
+  rule: unknown,
+): { user_field: string }[] => {
+  if (!rule || typeof rule !== 'object') {
+    return [];
+  }
+  return Object.entries(rule).flatMap(([key, content]) => {
+    if (LOGICAL_OPERATORS.includes(key)) {
+      return Array.isArray(content)
+        ? content.flatMap(getUserFieldsFromRuleObject)
+        : getUserFieldsFromRuleObject(content);
+    }
+    return content && typeof content === 'object' && !Array.isArray(content)
+      ? Object.keys(content).map(user_field => ({ user_field }))
+      : [];
+  });
+};
+
 export const getSelectedUsersFromRules = rules => {
   return rules.map(rule => ({ label: rule.value, id: rule.value }));
 };

@@ -8,6 +8,7 @@ import md5 from 'md5';
 
 export class DefaultFactory implements ISecurityFactory {
   platform: string = '';
+  authContextFields: string[] = ['username'];
   async getCurrentUser(
     request: OpenSearchDashboardsRequest,
     context?: RequestHandlerContext,

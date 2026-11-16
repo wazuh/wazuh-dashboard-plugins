@@ -32,6 +32,7 @@ export const RolesMappingCreate = ({
   internalUsers,
   onSave,
   currentPlatform,
+  userFields,
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<any[]>([]);
   const [ruleName, setRuleName] = useState('');
@@ -231,6 +232,7 @@ export const RolesMappingCreate = ({
                 isLoading={isLoading}
                 internalUsers={internalUsers}
                 currentPlatform={currentPlatform}
+                userFields={userFields}
                 onFormChange={hasChange => {
                   setHasChangeMappingRules(hasChange);
                 }}

@@ -1,8 +1,12 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { agentsTableColumns } from './columns';
 import { Agent } from '../types';
+
+jest.mock('../../../react-services/time-service', () => ({
+  formatUIDate: () => 'Jan 1, 2026 @ 10:00:00.000',
+}));
 
 const getColumn = (field: string, pendingUpgradeAgentIds?: Set<string>) => {
   const columns = agentsTableColumns(
@@ -58,5 +62,47 @@ describe('agentsTableColumns status column', () => {
     );
 
     expect(getByText('Upgrading')).toBeInTheDocument();
+  });
+});
+
+describe('agentsTableColumns date columns', () => {
+  it('shows the last keep alive column by default', () => {
+    expect(getColumn('lastKeepAlive').show).toBe(true);
+  });
+
+  it('keeps the registration date column hidden by default', () => {
+    expect(getColumn('dateAdd').show).toBe(false);
+  });
+
+  it.each(['lastKeepAlive', 'dateAdd'])(
+    'uses an info icon for the not searchable note of %s',
+    field => {
+      const { container } = render(getColumn(field).name);
+
+      expect(
+        container.querySelector('[data-euiicon-type="iInCircle"]'),
+      ).not.toBeNull();
+      expect(container.querySelector('[data-euiicon-type="alert"]')).toBeNull();
+    },
+  );
+
+  it('renders the last keep alive in relative time with the date in a tooltip', async () => {
+    const lastKeepAlive = new Date(Date.now() - 12 * 60 * 1000).toISOString();
+    const { getByText } = render(
+      <>{getColumn('lastKeepAlive').render(lastKeepAlive, {} as Agent)}</>,
+    );
+
+    fireEvent.mouseOver(getByText('12 minutes ago'));
+    expect(
+      await screen.findByText('Jan 1, 2026 @ 10:00:00.000'),
+    ).toBeInTheDocument();
+  });
+
+  it('renders a dash when there is no last keep alive', () => {
+    const { getByText } = render(
+      <>{getColumn('lastKeepAlive').render(undefined, {} as Agent)}</>,
+    );
+
+    expect(getByText('-')).toBeInTheDocument();
   });
 });

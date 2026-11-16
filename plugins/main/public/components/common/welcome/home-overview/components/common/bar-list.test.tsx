@@ -25,6 +25,18 @@ describe('BarList', () => {
     expect(link).toHaveStyle({ fontWeight: 'normal' });
   });
 
+  it('shows the tooltip of a linked row on hover', async () => {
+    render(
+      <BarList
+        items={items}
+        getHref={item => `#/mitre/${item.key}`}
+        getTooltip={item => `Open ${item.key}`}
+      />,
+    );
+    fireEvent.mouseOver(screen.getByText('Discovery'));
+    expect(await screen.findByText('Open Discovery')).toBeInTheDocument();
+  });
+
   it('renders the empty message instead of a blank list when items is empty', () => {
     const { container } = render(
       <BarList

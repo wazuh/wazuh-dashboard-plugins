@@ -52,6 +52,13 @@ jest.mock('../rules/services', () => ({
   __esModule: true,
   default: { GetRules: jest.fn() },
 }));
+jest.mock('../../../kibana-services', () => ({
+  getWazuhCorePlugin: () => ({
+    dashboardSecurity: {
+      fetchAuthContextFields: jest.fn().mockResolvedValue(['user_name']),
+    },
+  }),
+}));
 jest.mock('react-redux', () => ({ useSelector: () => undefined }));
 jest.mock('../../common/hocs', () => ({
   withUserAuthorizationPrompt: () => (Component: unknown) => Component,

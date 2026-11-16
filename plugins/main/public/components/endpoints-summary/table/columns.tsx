@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { agentsTableActions } from './actions/actions';
 import { AgentStatus } from '../../agents/agent-status';
 import { formatUIDate } from '../../../react-services/time-service';
@@ -152,39 +153,11 @@ export const agentsTableColumns = (
           )}
           size='s'
           color='subdued'
-          type='alert'
+          type='iInCircle'
         />
       </span>
     ),
     render: dateAdd => formatUIDate(dateAdd),
-    sortable: true,
-    show: false,
-    searchable: false,
-  },
-  {
-    field: 'lastKeepAlive',
-    name: (
-      <span>
-        {i18n.translate(
-          'wazuh.endpointsSummary.agentsTableColumns.lastKeepAlive',
-          {
-            defaultMessage: 'Last keep alive',
-          },
-        )}{' '}
-        <EuiIconTip
-          content={i18n.translate(
-            'wazuh.endpointsSummary.agentsTableColumns.lastKeepAliveNotSearchableTooltip',
-            {
-              defaultMessage: 'This is not searchable through a search term.',
-            },
-          )}
-          size='s'
-          color='subdued'
-          type='alert'
-        />
-      </span>
-    ),
-    render: lastKeepAlive => formatUIDate(lastKeepAlive),
     sortable: true,
     show: false,
     searchable: false,
@@ -235,6 +208,41 @@ export const agentsTableColumns = (
         ) : null}
       </EuiFlexGroup>
     ),
+  },
+  {
+    field: 'lastKeepAlive',
+    name: (
+      <span>
+        {i18n.translate(
+          'wazuh.endpointsSummary.agentsTableColumns.lastKeepAlive',
+          {
+            defaultMessage: 'Last keep alive',
+          },
+        )}{' '}
+        <EuiIconTip
+          content={i18n.translate(
+            'wazuh.endpointsSummary.agentsTableColumns.lastKeepAliveNotSearchableTooltip',
+            {
+              defaultMessage: 'This is not searchable through a search term.',
+            },
+          )}
+          size='s'
+          color='subdued'
+          type='iInCircle'
+        />
+      </span>
+    ),
+    render: lastKeepAlive =>
+      lastKeepAlive ? (
+        <EuiToolTip content={formatUIDate(lastKeepAlive)}>
+          <span>{moment(lastKeepAlive).fromNow()}</span>
+        </EuiToolTip>
+      ) : (
+        '-'
+      ),
+    sortable: true,
+    show: true,
+    searchable: false,
   },
   {
     field: 'actions',

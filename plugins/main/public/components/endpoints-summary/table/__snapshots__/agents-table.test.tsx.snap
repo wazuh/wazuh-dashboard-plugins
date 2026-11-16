@@ -530,6 +530,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                         </button>
                       </th>
                       <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_lastKeepAlive_7"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              <span>
+                                Last keep alive 
+                                <span
+                                  class="euiToolTipAnchor"
+                                >
+                                  <span
+                                    aria-label="Info"
+                                    color="subdued"
+                                    data-euiicon-type="iInCircle"
+                                    tabindex="0"
+                                  />
+                                </span>
+                              </span>
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
                         class="euiTableHeaderCell"
                         role="columnheader"
                         scope="col"
@@ -552,7 +588,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot 1`] = `
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="9"
+                        colspan="10"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -1107,6 +1143,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                         </button>
                       </th>
                       <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_lastKeepAlive_7"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              <span>
+                                Last keep alive 
+                                <span
+                                  class="euiToolTipAnchor"
+                                >
+                                  <span
+                                    aria-label="Info"
+                                    color="subdued"
+                                    data-euiicon-type="iInCircle"
+                                    tabindex="0"
+                                  />
+                                </span>
+                              </span>
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
                         class="euiTableHeaderCell"
                         role="columnheader"
                         scope="col"
@@ -1129,7 +1201,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with cust
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="9"
+                        colspan="10"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
@@ -1684,6 +1756,42 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                         </button>
                       </th>
                       <th
+                        aria-live="polite"
+                        aria-sort="none"
+                        class="euiTableHeaderCell"
+                        data-test-subj="tableHeaderCell_lastKeepAlive_7"
+                        role="columnheader"
+                        scope="col"
+                      >
+                        <button
+                          class="euiTableHeaderButton"
+                          data-test-subj="tableHeaderSortButton"
+                          type="button"
+                        >
+                          <span
+                            class="euiTableCellContent"
+                          >
+                            <span
+                              class="euiTableCellContent__text"
+                            >
+                              <span>
+                                Last keep alive 
+                                <span
+                                  class="euiToolTipAnchor"
+                                >
+                                  <span
+                                    aria-label="Info"
+                                    color="subdued"
+                                    data-euiicon-type="iInCircle"
+                                    tabindex="0"
+                                  />
+                                </span>
+                              </span>
+                            </span>
+                          </span>
+                        </button>
+                      </th>
+                      <th
                         class="euiTableHeaderCell"
                         role="columnheader"
                         scope="col"
@@ -1706,7 +1814,7 @@ exports[`AgentsTable component Renders correctly to match the snapshot with no p
                     >
                       <td
                         class="euiTableRowCell euiTableRowCell--isMobileFullWidth"
-                        colspan="9"
+                        colspan="10"
                       >
                         <div
                           class="euiTableCellContent euiTableCellContent--alignCenter"
