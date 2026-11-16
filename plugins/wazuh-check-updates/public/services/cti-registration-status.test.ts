@@ -97,6 +97,8 @@ describe('hydrateCtiFlowFromServer', () => {
 
     expect(ctiFlowState.isRegistrationComplete()).toBe(false);
     expect(ctiFlowState.getEnvironmentUid()).toBe('env-uuid-1');
+    // Kept too, so the page can tell the registration ended.
+    expect(ctiFlowState.getSubscription()?.message?.is_registered).toBe(false);
   });
 
   it('restores how long an in-progress device code has been pending', async () => {

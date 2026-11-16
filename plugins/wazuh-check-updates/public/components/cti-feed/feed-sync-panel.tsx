@@ -69,7 +69,7 @@ function getSummaryView(summary: FeedSyncSummary): SummaryView {
           'wazuhCheckUpdates.ctiFeed.sync.syncingDescription',
           {
             defaultMessage:
-              'The indexer is downloading content from the feed. Detection keeps using the current content until the sync finishes. Refresh to see its progress.',
+              'The indexer is downloading content from the feed. Detection keeps using the current content until the sync finishes. This page follows its progress.',
           },
         ),
       };
@@ -362,6 +362,7 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
           consumer={selectedFeed}
           onClose={() => setSelectedFeedKey(null)}
           onUpdateRequested={onUpdateRequested}
+          updateInProgress={summary === 'syncing'}
         />
       ) : null}
     </EuiPanel>

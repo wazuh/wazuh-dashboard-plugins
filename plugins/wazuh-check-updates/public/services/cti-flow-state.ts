@@ -20,10 +20,11 @@ let openModals = 0;
 let version = 0;
 const listeners = new Set<() => void>();
 
+// The plan name is part of it so a plan change notifies subscribers too.
 const flowKey = () =>
   `${deviceCode}|${registrationComplete}|${Boolean(
     subscription?.message?.is_registered,
-  )}|${openModals}`;
+  )}|${subscription?.message?.plan?.name ?? ''}|${openModals}`;
 
 /** Runs `change` and notifies subscribers if the flow or registration state moved. */
 const track = (change: () => void): void => {

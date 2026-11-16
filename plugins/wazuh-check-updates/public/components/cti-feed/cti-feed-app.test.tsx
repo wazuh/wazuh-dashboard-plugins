@@ -43,7 +43,9 @@ import {
 } from '../../services/cti-feed';
 import { useCtiRegistrationModal } from '../../shared-components/cti-registration/hooks/use-cti-registration-modal';
 import { statusCodes } from '../../../common/constants';
+import { ctiFlowState } from '../../services/cti-flow-state';
 import { CtiFeedApp } from './cti-feed-app';
+import { CTI_SYNC_POLL_MS } from './hooks/use-cti-consumers';
 
 configure({ testIdAttribute: 'data-test-subj' });
 
@@ -87,6 +89,7 @@ const settle = async () => {
 describe('CtiFeedApp', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    ctiFlowState.reset();
     (getCore as jest.Mock).mockReturnValue({
       application: {
         currentAppId$: of('cti-feed'),
@@ -231,7 +234,7 @@ describe('CtiFeedApp', () => {
     expect(options).toEqual({ title: 'Could not check for updates' });
   });
 
-  test('does not poll; a refresh finding the sync done refreshes the counts', async () => {
+  test('follows a running sync until it finishes, then refreshes the counts', async () => {
     jest.useFakeTimers();
     try {
       mockFetchConsumers
@@ -243,17 +246,89 @@ describe('CtiFeedApp', () => {
       expect(mockFetchCounts).toHaveBeenCalledTimes(1);
 
       await act(async () => {
-        jest.advanceTimersByTime(5 * 60000);
+        jest.advanceTimersByTime(CTI_SYNC_POLL_MS);
         await Promise.resolve();
       });
-      expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
-
-      fireEvent.click(screen.getByTestId('ctiFeedSyncRefresh'));
 
       await screen.findByText('All feeds are up to date');
       await waitFor(() => expect(mockFetchCounts).toHaveBeenCalledTimes(2));
+      expect(mockFetchConsumers).toHaveBeenCalledTimes(2);
+
+      // Nothing syncs any more: no further reads.
+      await act(async () => {
+        jest.advanceTimersByTime(5 * 60000);
+        await Promise.resolve();
+      });
+      expect(mockFetchConsumers).toHaveBeenCalledTimes(2);
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  test('keeps Check for updates disabled while a feed syncs', async () => {
+    mockFetchConsumers.mockResolvedValue({ data: [consumer('running')] });
+
+    render(<CtiFeedApp />);
+    await screen.findByText('Syncing new content');
+
+    const button = screen.getByTestId('ctiFeedCheckForUpdatesButton');
+    expect(button).toBeDisabled();
+    fireEvent.mouseOver(button.parentElement as HTMLElement);
+    expect(
+      await screen.findByText(/A content update is in progress/),
+    ).toBeInTheDocument();
+  });
+
+  test('reads the feed sync again when the registration or the plan changes', async () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+      },
+    });
+    render(<CtiFeedApp />);
+    await settle();
+    expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
+
+    // A status read finds the plan changed (in the CTI console, for example).
+    act(() => {
+      ctiFlowState.setSubscription({
+        status: 200,
+        message: {
+          is_registered: true,
+          plan: { name: 'Open', is_public: true },
+        },
+      });
+    });
+
+    await waitFor(() => expect(mockFetchConsumers).toHaveBeenCalledTimes(2));
+  });
+
+  test('does not read the feed sync again when the status is only unknown', async () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+      },
+    });
+    render(<CtiFeedApp />);
+    await settle();
+
+    act(() => {
+      ctiFlowState.setSubscription({ status: 502, message: null });
+    });
+    act(() => {
+      ctiFlowState.setSubscription({
+        status: 200,
+        message: {
+          is_registered: true,
+          plan: { name: 'Professional', is_public: false },
+        },
+      });
+    });
+
+    expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
   });
 });

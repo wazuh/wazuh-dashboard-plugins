@@ -124,7 +124,9 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
   );
 
   applyStatusBody(body);
-  // After `applyStatusBody`, whose reset would drop it: the card shows it in every state.
+  // After `applyStatusBody`, whose reset would drop them: the card shows the environment
+  // ID in every state, and the page compares each subscription read with the previous one.
+  ctiFlowState.setSubscription(body.subscription ?? null);
   ctiFlowState.setEnvironmentUid(body.environment_uid);
 }
 

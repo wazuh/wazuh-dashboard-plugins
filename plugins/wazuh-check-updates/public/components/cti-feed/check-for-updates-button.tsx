@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiButton } from '@elastic/eui';
+import { EuiButton, EuiToolTip } from '@elastic/eui';
 import { getCore } from '../../plugin-services';
 import { requestCtiContentUpdate } from '../../services/cti-feed';
 import { withHttpErrorBodyMessage } from '../../../common/http-error';
@@ -11,12 +11,27 @@ export interface CheckForUpdatesButtonProps {
   /** Filled only where checking is the main action, not a secondary one. */
   fill?: boolean;
   dataTestSubj?: string;
+  /**
+   * A feed is syncing (a check, or the content update a registration or plan change
+   * starts): the indexer would reject another check, so the button waits for it.
+   */
+  updateInProgress?: boolean;
+}
+
+/** The indexer answers 409 while a content update is already running. */
+function isUpdateAlreadyRunning(error: unknown): boolean {
+  const { response, body } = (error ?? {}) as {
+    response?: { status?: number };
+    body?: { statusCode?: number };
+  };
+  return response?.status === 409 || body?.statusCode === 409;
 }
 
 export const CheckForUpdatesButton: React.FC<CheckForUpdatesButtonProps> = ({
   onRequested,
   fill = false,
   dataTestSubj = 'ctiFeedCheckForUpdatesButton',
+  updateInProgress = false,
 }) => {
   const [requesting, setRequesting] = useState(false);
 
@@ -47,16 +62,21 @@ export const CheckForUpdatesButton: React.FC<CheckForUpdatesButtonProps> = ({
           { defaultMessage: 'Could not check for updates' },
         ),
       });
+      // Read the sync state, so the running update shows and the button waits for it.
+      if (isUpdateAlreadyRunning(error)) {
+        await onRequested();
+      }
     } finally {
       setRequesting(false);
     }
   };
 
-  return (
+  const button = (
     <EuiButton
       fill={fill}
       iconType='refresh'
       isLoading={requesting}
+      isDisabled={updateInProgress && !requesting}
       onClick={handleClick}
       data-test-subj={dataTestSubj}
     >
@@ -64,5 +84,26 @@ export const CheckForUpdatesButton: React.FC<CheckForUpdatesButtonProps> = ({
         defaultMessage: 'Check for updates',
       })}
     </EuiButton>
+  );
+
+  if (!updateInProgress || requesting) {
+    return button;
+  }
+
+  return (
+    // On the left, so it does not cover the last check time under the button.
+    <EuiToolTip
+      position='left'
+      content={i18n.translate(
+        'wazuhCheckUpdates.ctiFeed.checkForUpdatesButton.updateInProgressTooltip',
+        {
+          defaultMessage:
+            'A content update is in progress. Check for updates again once the feeds finish syncing.',
+        },
+      )}
+      data-test-subj={`${dataTestSubj}InProgressTooltip`}
+    >
+      {button}
+    </EuiToolTip>
   );
 };

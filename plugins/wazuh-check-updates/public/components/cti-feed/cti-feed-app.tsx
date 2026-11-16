@@ -14,6 +14,7 @@ import { SubscriptionPanel } from './subscription-panel';
 import { FeedSyncPanel } from './feed-sync-panel';
 import { FeedContentPanel } from './feed-content-panel';
 import { useCtiConsumers } from './hooks/use-cti-consumers';
+import { useSubscriptionChange } from './hooks/use-subscription-change';
 import { useFeedContentCounts } from './hooks/use-feed-content-counts';
 import { CheckForUpdatesAbout } from './check-for-updates-about';
 import { CheckForUpdatesButton } from './check-for-updates-button';
@@ -28,7 +29,8 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
   openRegistration = false,
 }) => {
   const registration = useCtiRegistrationModal(openRegistration);
-  const sync = useCtiConsumers();
+  // Follows a running update until it finishes, so the page and the button catch up.
+  const sync = useCtiConsumers({ followSync: true });
   const content = useFeedContentCounts();
 
   // Counts change when a sync lands, so refresh them when a read finds it done.
@@ -44,14 +46,21 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
     previousSummary.current = sync.summary;
   }, [sync.summary, refetchContent]);
 
-  // The status turns to Open feed, and the content update the server starts shows
-  // up in the feed sync state.
-  const refetchStatus = registration.refetchStatus;
+  // A registration or plan change starts a content update on the server: read the feed
+  // sync state again, waiting for the indexer to record the check. Covers a change made
+  // elsewhere (the CTI console, another tab) as well as clearing the local registration.
   const refetchSync = sync.refetchAfterCheck;
+  useSubscriptionChange(
+    useCallback(() => {
+      void refetchSync();
+    }, [refetchSync]),
+  );
+
+  // The status read turns the card to Open feed; the change above refreshes the feeds.
+  const refetchStatus = registration.refetchStatus;
   const onRegistrationCleared = useCallback(() => {
     void refetchStatus();
-    void refetchSync();
-  }, [refetchStatus, refetchSync]);
+  }, [refetchStatus]);
 
   return (
     <EuiPage paddingSize='l' className='ctiFeed' data-test-subj='ctiFeedApp'>
@@ -88,6 +97,7 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
                     {/* The check writes `last_checked_at`, so read it back. */}
                     <CheckForUpdatesButton
                       onRequested={sync.refetchAfterCheck}
+                      updateInProgress={sync.summary === 'syncing'}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
