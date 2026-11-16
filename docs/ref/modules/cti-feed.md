@@ -14,7 +14,7 @@ Threat Intelligence (CTI) delivers to the environment:
 
 Every installation receives the **Open feed**. Registering the environment with Wazuh Cyber
 Threat Intelligence lets you manage it from the Wazuh Console and upgrade to the **Professional
-feed**, which delivers vulnerabilities, IOCs and rules with no delay.
+feed**, which keeps detection current with every new vulnerability, IOC and rule.
 
 ## Accessing the CTI feed app
 

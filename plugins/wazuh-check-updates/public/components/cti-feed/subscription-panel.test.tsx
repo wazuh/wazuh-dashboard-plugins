@@ -137,8 +137,13 @@ describe('SubscriptionPanel', () => {
       'Registered',
     );
     expect(
-      screen.getByText(/Upgrade it to the Professional feed/),
+      screen.getByText(
+        /Upgrade it to the Professional feed from the Wazuh Console to keep detection current/,
+      ),
     ).toBeInTheDocument();
+    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
+      'Detection that stays current with every vulnerability, IOC and rule Wazuh publishes.',
+    );
     expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
       'Open feed (included)',
     );
