@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import {
   EuiFlexGroup,
@@ -18,9 +18,11 @@ import {
   EuiPageHeader,
   EuiSpacer,
 } from '@elastic/eui';
-import type {
-  CveSeverityFilter,
-  VulnerabilityRecordType,
+import {
+  CTI_EXPLORER_IOC_TYPE_PARAM,
+  isIocType,
+  type CveSeverityFilter,
+  type VulnerabilityRecordType,
 } from '../../../common/cti-explorer/constants';
 import type { IocFilters } from '../../../common/cti-explorer/types';
 import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
@@ -60,9 +62,14 @@ const CTI_EXPLORER_FEEDS: Array<'iocs' | 'vulnerabilities'> = [
   'vulnerabilities',
 ];
 
+/** The IOC filters that a link opens the list with (`iocType`), if any. */
+const getLinkedIocFilters = (iocType?: string): IocFilters | undefined =>
+  isIocType(iocType) ? { type: iocType } : undefined;
+
 /**
  * The open tab and the open record live in the URL (`tab`, `ioc`, `record`),
- * so a reload or a shared link opens the same view.
+ * so a reload or a shared link opens the same view. A link from another page
+ * can also open the IOC list filtered to one type (`iocType`).
  */
 export const CtiExplorer = () => {
   const search = useRouterSearch() as Record<string, string | undefined>;
@@ -75,7 +82,14 @@ export const CtiExplorer = () => {
   // Read once for the page: the tabs share them and switching tabs keeps them.
   const iocSummary = useCtiRequest(fetchIocSummary, []);
   const vulnerabilitySummary = useCtiRequest(fetchVulnerabilitySummary, []);
-  const [iocFilters, setIocFilters] = useState<IocFilters>({});
+  const linkedIocType = search[CTI_EXPLORER_IOC_TYPE_PARAM];
+  // Read on the first render, so the list does not search without the filter first.
+  const [iocFilters, setIocFilters] = useState<IocFilters>(
+    () => getLinkedIocFilters(linkedIocType) ?? {},
+  );
+  const [scrollToIocList, setScrollToIocList] = useState(() =>
+    Boolean(getLinkedIocFilters(linkedIocType)),
+  );
   const [vulnerabilityType, setVulnerabilityType] =
     useState<VulnerabilityRecordType>();
   const [severities, setSeverities] = useState<CveSeverityFilter[]>([]);
@@ -89,6 +103,24 @@ export const CtiExplorer = () => {
   const openVulnerability = (id: string) =>
     setParams({ record: id, ioc: null });
   const closeFlyout = () => setParams({ ioc: null, record: null });
+
+  // The linked filter is applied once and is then edited like any other: drop
+  // it from the URL, replacing the entry so Back returns to the linking page.
+  useEffect(() => {
+    if (linkedIocType === undefined) {
+      return;
+    }
+    const filters = getLinkedIocFilters(linkedIocType);
+    if (filters) {
+      setIocFilters(filters);
+      setScrollToIocList(true);
+    }
+    NavigationService.getInstance().updateAndNavigateSearchParams(
+      { [CTI_EXPLORER_IOC_TYPE_PARAM]: null },
+      { replace: true },
+    );
+  }, [linkedIocType]);
+
   const browseIocs = (filters: IocFilters) => {
     setIocFilters(filters);
     setParams({ tab: 'iocs', ioc: null, record: null });
@@ -157,6 +189,8 @@ export const CtiExplorer = () => {
           filters={iocFilters}
           onFiltersChange={setIocFilters}
           onOpenIoc={openIoc}
+          scrollToList={scrollToIocList}
+          onListScrolled={() => setScrollToIocList(false)}
         />
       ) : null}
       {tab === 'vulnerabilities' ? (
