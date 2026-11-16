@@ -39,8 +39,6 @@ import {
   initializationTaskCreatorIndexPatternBatch,
   initializationTaskCreatorServerAPIConnectionCompatibility,
   initializationTaskCreatorServerAPIRunAs,
-  initializationTaskCreatorServerAPICertificateVerification,
-  type ServerAPICertificateVerificationServices,
   initializationTaskCreatorCertificateValidity,
   createRateLimitRerun,
   type RateLimitRerun,
@@ -54,7 +52,6 @@ import {
   HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
   HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
   HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
-  HEALTH_CHECK_TASK_SERVER_API_CERTIFICATE_VERIFICATION,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_EVENTS_ACCESS_MANAGEMENT,
@@ -807,14 +804,6 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
         taskName: HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
         services: plugins.wazuhCore,
         rateLimitRerun: this.rateLimitRerun,
-      }),
-    );
-
-    // server API certificate verification (ca setting)
-    core.healthCheck.register(
-      initializationTaskCreatorServerAPICertificateVerification({
-        taskName: HEALTH_CHECK_TASK_SERVER_API_CERTIFICATE_VERIFICATION,
-        services: plugins.wazuhCore as ServerAPICertificateVerificationServices,
       }),
     );
 
