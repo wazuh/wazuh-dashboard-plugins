@@ -83,7 +83,6 @@ const getEnableIntegrationStep = () =>
 
 const SetUpSteps = () => (
   <>
-    <p>{getPageIntro()}</p>
     <p>
       {i18n.translate('wazuh.docker.emptyState.setUpStepsIntro', {
         defaultMessage:
@@ -108,12 +107,6 @@ const SetUpSteps = () => (
 const AwaitingFindings = () => (
   <>
     <p>{getPageIntro()}</p>
-    <p>
-      {i18n.translate('wazuh.docker.emptyState.listenerEnabledSetUp', {
-        defaultMessage:
-          'The Docker listener is enabled on this endpoint, but no Docker findings have been received yet.',
-      })}
-    </p>
     <p>{getEnableIntegrationStep()}</p>
   </>
 );
@@ -170,14 +163,22 @@ export const DockerEmptyStateView = ({
         }),
         testSubj: 'wzDockerEmptyStateGuide',
       }}
+      hint={
+        awaitingFindings
+          ? i18n.translate('wazuh.docker.emptyState.listenerEnabledSetUp', {
+              defaultMessage:
+                'The Docker listener is enabled on this endpoint, but no Docker findings have been received yet.',
+            })
+          : notSetUp
+          ? getPageIntro()
+          : getSearchOrTimeRangeHint()
+      }
     >
       {awaitingFindings ? (
         <AwaitingFindings />
       ) : notSetUp ? (
         <SetUpSteps />
-      ) : (
-        <p>{getSearchOrTimeRangeHint()}</p>
-      )}
+      ) : null}
       {listener && !awaitingFindings && (
         <p>
           <EndpointListener listener={listener} />

@@ -76,11 +76,11 @@ describe('FimEmptyStateView', () => {
     renderView('findings');
 
     expect(getReport).not.toHaveBeenCalled();
-    expect(
-      screen.getByText(
-        /Use Explore agent to see the directories an agent monitors\./,
-      ),
-    ).toBeInTheDocument();
+    const exploreAgent = screen.getByText('Explore agent');
+    expect(exploreAgent.tagName).toBe('STRONG');
+    expect(exploreAgent.parentElement).toHaveTextContent(
+      'Use Explore agent to see the directories an agent monitors.',
+    );
     const link = screen.getByRole('link', {
       name: /How to configure File Integrity Monitoring/,
     });
@@ -105,6 +105,11 @@ describe('FimEmptyStateView', () => {
     expect(
       [...container.querySelectorAll('code')].map(code => code.textContent),
     ).toEqual(['/etc', '/home']);
+    expect(
+      container.querySelectorAll(
+        '[data-test-subj="wzFimEmptyStateDirectories"] li',
+      ),
+    ).toHaveLength(2);
 
     unmount();
 

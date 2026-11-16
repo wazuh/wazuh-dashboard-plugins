@@ -71,7 +71,7 @@ describe('DockerEmptyStateView', () => {
     const steps = document.querySelector(
       '[data-test-subj="wzDockerEmptyStateSteps"]',
     ) as HTMLElement;
-    expect(steps.querySelector('ol')).toBeInTheDocument();
+    expect(steps.tagName).toBe('OL');
     expect(
       within(steps)
         .getAllByRole('listitem')

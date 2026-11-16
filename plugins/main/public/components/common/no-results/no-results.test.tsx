@@ -3,7 +3,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { getWzCurrentAppID } from '../../../kibana-services';
 import { DiscoverNoResults } from './no-results';
-import { getModuleEmptyStateTexts } from './module-empty-state-texts';
+import {
+  getModuleEmptyStateTexts,
+  getSearchHint,
+  getSearchOrTimeRangeHint,
+} from './module-empty-state-texts';
 
 jest.mock('../../../kibana-services', () => ({
   ...jest.requireActual('../../../kibana-services'),
@@ -113,6 +117,22 @@ describe('getModuleEmptyStateTexts', () => {
   ])('keeps each paragraph of %s short enough to scan', appId => {
     getModuleEmptyStateTexts(appId)!.description.forEach(paragraph =>
       expect(paragraph.length).toBeLessThanOrEqual(160),
+    );
+  });
+
+  it.each([
+    'vulnerability-detection',
+    'configuration-assessment',
+    'it-hygiene',
+    'incident-response-dashboard',
+    'case-management',
+    'mitre-attack',
+    'regulatory-compliance',
+    'amazon-web-services',
+    'statistics',
+  ])('leads %s with what to try', appId => {
+    expect([getSearchHint(), getSearchOrTimeRangeHint()]).toContain(
+      getModuleEmptyStateTexts(appId)!.description[0],
     );
   });
 

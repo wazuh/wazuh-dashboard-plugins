@@ -57,6 +57,7 @@ const MODULE_EMPTY_STATE_TEXTS: Record<string, () => ModuleEmptyStateTexts> = {
       defaultMessage: 'No checks found',
     }),
     description: [
+      getSearchHint(),
       i18n.translate('wazuh.configurationAssessment.emptyState.description', {
         defaultMessage: 'Checks appear after an agent reports its first scan.',
       }),
@@ -83,6 +84,7 @@ const MODULE_EMPTY_STATE_TEXTS: Record<string, () => ModuleEmptyStateTexts> = {
       defaultMessage: 'No active responses triggered',
     }),
     description: [
+      getSearchOrTimeRangeHint(),
       i18n.translate('wazuh.incidentResponse.emptyState.description', {
         defaultMessage:
           'This page reports the active responses that ran. It stays empty until one is triggered.',

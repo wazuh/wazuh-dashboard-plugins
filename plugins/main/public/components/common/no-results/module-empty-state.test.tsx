@@ -33,6 +33,33 @@ describe('ModuleEmptyState', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows what to try under the title, then the actions, then why it is empty', () => {
+    render(
+      <ModuleEmptyState
+        testSubj='Some'
+        title='Nothing here'
+        hint='Try changing the search.'
+        actions={[<button key='a'>Module action</button>]}
+      >
+        <p>Why it is empty.</p>
+      </ModuleEmptyState>,
+    );
+
+    const title = screen.getByRole('heading', { name: 'Nothing here' });
+    const hint = screen.getByText('Try changing the search.');
+    const action = screen.getByRole('button', { name: 'Module action' });
+    const explanation = screen.getByText('Why it is empty.');
+    expect(title.compareDocumentPosition(hint)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(hint.compareDocumentPosition(action)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(action.compareDocumentPosition(explanation)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+  });
+
   it('offers to unpin the agent only when asked, before the module actions', () => {
     const onUnpinAgent = jest.fn();
     render(
@@ -157,27 +184,23 @@ describe('ModuleEmptyStateList', () => {
   it.each([
     [false, 'UL'],
     [true, 'OL'],
-  ])(
-    'renders each item in a left aligned list (ordered: %s)',
-    (ordered, tag) => {
-      render(
-        <ModuleEmptyStateList
-          ordered={ordered}
-          data-test-subj='someChecks'
-          items={['First check.', <strong key='b'>Second check.</strong>]}
-        />,
-      );
+  ])('renders each item in a list (ordered: %s)', (ordered, tag) => {
+    render(
+      <ModuleEmptyStateList
+        ordered={ordered}
+        data-test-subj='someChecks'
+        items={['First check.', <strong key='b'>Second check.</strong>]}
+      />,
+    );
 
-      const container = document.querySelector(
-        '[data-test-subj="someChecks"]',
-      ) as HTMLElement;
-      expect(container).toHaveStyle({ textAlign: 'left' });
-      expect(container.firstElementChild?.tagName).toBe(tag);
-      expect(
-        within(container)
-          .getAllByRole('listitem')
-          .map(item => item.textContent),
-      ).toEqual(['First check.', 'Second check.']);
-    },
-  );
+    const list = document.querySelector(
+      '[data-test-subj="someChecks"]',
+    ) as HTMLElement;
+    expect(list.tagName).toBe(tag);
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map(item => item.textContent),
+    ).toEqual(['First check.', 'Second check.']);
+  });
 });
