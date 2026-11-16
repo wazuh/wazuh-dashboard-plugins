@@ -6,6 +6,7 @@
 var SCENARIOS = [
   'professional',
   'canceling',
+  'past_due',
   'open',
   'token_rejected',
   'unavailable',

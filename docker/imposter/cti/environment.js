@@ -9,6 +9,8 @@
 //     subscription, which renews.
 //   - `canceling`: the same subscription, set to end instead of renewing
 //     (`renews_at: null`, `expires_at` set).
+//   - `past_due`: a payment is overdue; the subscription is suspended on
+//     `past_due_ends_at` unless it is paid.
 //   - `open`: the public plan and no subscription.
 //   - `token_rejected`: 401, so the indexer clears its credentials.
 //   - `unavailable`: 503, so the indexer keeps the registration and answers
@@ -46,12 +48,15 @@ function buildEnvironment(scenario) {
         started_at: '2026-03-01T10:00:00Z',
         renews_at: '2027-03-01T10:00:00Z',
         expires_at: null,
+        past_due_ends_at: null,
       },
     ],
   };
   if (scenario === 'canceling') {
     environment.subscriptions[0].renews_at = null;
     environment.subscriptions[0].expires_at = '2027-03-01T10:00:00Z';
+  } else if (scenario === 'past_due') {
+    environment.subscriptions[0].past_due_ends_at = '2026-12-08T10:00:00Z';
   } else if (scenario === 'open') {
     environment.plans = [OPEN_PLAN];
     environment.subscriptions = [];

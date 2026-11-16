@@ -7,13 +7,13 @@ import type {
   CtiSubscriptionSnapshot,
 } from '../../../common/cti-registration-status-api';
 import { contentManagerRoutes } from '../../../common/constants';
+import { requestContentManager } from './content-manager-transport';
 
 interface ContentManagerSubscriptionGetResponse {
   message?: {
     plan?: { name?: string; is_public?: boolean };
     is_registered?: boolean;
     environment?: unknown;
-    subscriptions?: unknown;
   };
   status?: number;
 }
@@ -45,30 +45,6 @@ function toNullableDate(value: unknown): string | null | undefined {
   return value === null ? null : toDate(value);
 }
 
-function normalizeEnvironment(
-  raw: unknown,
-): CtiSubscriptionEnvironment | undefined {
-  if (!isRecord(raw)) {
-    return undefined;
-  }
-  const environment: CtiSubscriptionEnvironment = {};
-  const name = toText(raw.name);
-  if (name) {
-    environment.name = name;
-  }
-  const organizationName = isRecord(raw.organization)
-    ? toText(raw.organization.name)
-    : undefined;
-  if (organizationName) {
-    environment.organization = { name: organizationName };
-  }
-  const registeredAt = toDate(raw.registered_at);
-  if (registeredAt) {
-    environment.registered_at = registeredAt;
-  }
-  return Object.keys(environment).length > 0 ? environment : undefined;
-}
-
 function normalizePlanSubscription(
   raw: unknown,
 ): CtiPlanSubscription | undefined {
@@ -98,6 +74,10 @@ function normalizePlanSubscription(
   if (expiresAt !== undefined) {
     subscription.expires_at = expiresAt;
   }
+  const pastDueEndsAt = toNullableDate(raw.past_due_ends_at);
+  if (pastDueEndsAt !== undefined) {
+    subscription.past_due_ends_at = pastDueEndsAt;
+  }
   return subscription;
 }
 
@@ -112,10 +92,40 @@ function normalizePlanSubscriptions(
     .filter((item): item is CtiPlanSubscription => item !== undefined);
 }
 
+function normalizeEnvironment(
+  raw: unknown,
+): CtiSubscriptionEnvironment | undefined {
+  if (!isRecord(raw)) {
+    return undefined;
+  }
+  const environment: CtiSubscriptionEnvironment = {};
+  const name = toText(raw.name);
+  if (name) {
+    environment.name = name;
+  }
+  const organizationName = isRecord(raw.organization)
+    ? toText(raw.organization.name)
+    : undefined;
+  if (organizationName) {
+    environment.organization = { name: organizationName };
+  }
+  const registeredAt = toDate(raw.registered_at);
+  if (registeredAt) {
+    environment.registered_at = registeredAt;
+  }
+  const subscriptions = normalizePlanSubscriptions(raw.subscriptions);
+  if (subscriptions) {
+    environment.subscriptions = subscriptions;
+  }
+  return Object.keys(environment).length > 0 ? environment : undefined;
+}
+
 /**
  * Copies the fields the browser renders from the Content Manager subscription message.
- * The `environments/me` fields (`environment`, `subscriptions`) are validated one by one:
- * an invalid value is dropped, never passed through, and no other field is copied.
+ * `environment` is the CTI console `environments/me` body, passed through verbatim by
+ * Content Manager: only the name, organization, registration date and subscriptions are
+ * kept, each validated. An invalid value is dropped, never passed through, and no other
+ * field (`plans`, their `features`, anything new) reaches the browser.
  */
 export function normalizeSubscriptionMessage(
   raw: ContentManagerSubscriptionGetResponse['message'],
@@ -144,10 +154,6 @@ export function normalizeSubscriptionMessage(
   if (environment) {
     message.environment = environment;
   }
-  const subscriptions = normalizePlanSubscriptions(raw.subscriptions);
-  if (subscriptions) {
-    message.subscriptions = subscriptions;
-  }
   return message;
 }
 
@@ -167,7 +173,7 @@ export async function getCtiSubscriptionStatus(
   wazuhClient: IScopedClusterClient,
 ): Promise<CtiSubscriptionSnapshot> {
   try {
-    const response = await wazuhClient.asCurrentUser.transport.request({
+    const response = await requestContentManager(wazuhClient, {
       method: 'GET',
       path: contentManagerRoutes.subscription,
     });

@@ -30,17 +30,20 @@ const YEARLY: CtiPlanSubscription = {
   expires_at: null,
 };
 
-const message = (
-  overrides: Partial<CtiSubscriptionMessage> = {},
-): CtiSubscriptionMessage => ({
+const message = ({
+  subscriptions = [YEARLY],
+  ...overrides
+}: Partial<CtiSubscriptionMessage> & {
+  subscriptions?: CtiPlanSubscription[];
+} = {}): CtiSubscriptionMessage => ({
   is_registered: true,
   plan: { name: 'Professional', is_public: false },
   environment: {
     name: 'environment-01',
     organization: { name: 'Acme Corp' },
     registered_at: '2026-03-01T10:00:00Z',
+    subscriptions,
   },
-  subscriptions: [YEARLY],
   ...overrides,
 });
 
@@ -123,6 +126,32 @@ describe('SubscriptionDetails', () => {
     expect(screen.getByTestId('ctiFeedSubscriptionDetails')).toHaveTextContent(
       'Monthly',
     );
+  });
+
+  test('warns until when an overdue payment can be made', () => {
+    render(
+      <SubscriptionDetails
+        message={message({
+          subscriptions: [
+            { ...YEARLY, past_due_ends_at: '2026-12-08T10:00:00Z' },
+          ],
+        })}
+        environmentUid={null}
+      />,
+    );
+
+    expect(
+      screen.getByTestId('ctiFeedSubscriptionPastDueEndsAt'),
+    ).toHaveTextContent(date('2026-12-08T10:00:00Z'));
+    expect(screen.getByTestId('ctiFeedSubscriptionDetails')).toHaveTextContent(
+      'Payment due by',
+    );
+  });
+
+  test('shows no payment row while the subscription is paid', () => {
+    render(<SubscriptionDetails message={message()} environmentUid={null} />);
+
+    expect(screen.queryByTestId('ctiFeedSubscriptionPastDueEndsAt')).toBeNull();
   });
 
   test('hides the subscription rows on the Open feed', () => {

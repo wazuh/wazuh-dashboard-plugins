@@ -26,7 +26,9 @@ bodies are accepted.
 
 The indexer Content Manager calls these with the stored access token to read
 the plan. Point the indexer at the mock to use them (see
-[Pointing the indexer at this mock](#pointing-the-indexer-at-this-mock)).
+[Pointing the indexer at this mock](#pointing-the-indexer-at-this-mock)), or
+use the dashboard's Content Manager mock, which calls them the same way (see
+[Content Manager](#content-manager-_plugins_content_managersubscription)).
 
 ```
 GET /api/v1/platform/environments/me
@@ -48,14 +50,15 @@ registration date, the active plan and the subscriptions paying for it:
       "interval": "year",
       "started_at": "2026-03-01T10:00:00Z",
       "renews_at": "2027-03-01T10:00:00Z",
-      "expires_at": null
+      "expires_at": null,
+      "past_due_ends_at": null
     }
   ]
 }
 ```
 
-The indexer does not forward any mock header, so store the scenario in the
-mock:
+Neither the indexer nor the dashboard forwards any mock header, so store the
+scenario in the mock:
 
 ```bash
 curl -X POST http://imposter:8080/mock/cti/environment/scenario -d 'scenario=canceling'
@@ -65,6 +68,7 @@ curl -X POST http://imposter:8080/mock/cti/environment/scenario -d 'scenario=can
 | ------------------------ | ---------------------------------------------------------------------------- |
 | `professional` (default) | The Professional plan and its yearly subscription, which renews.             |
 | `canceling`              | The same subscription set to end: `renews_at: null`, `expires_at` set.       |
+| `past_due`               | A payment is overdue: `past_due_ends_at` set.                                |
 | `open`                   | The public plan and no subscription.                                         |
 | `token_rejected`         | `401`: the indexer clears its credentials and falls back to the public plan. |
 | `unavailable`            | `503`: the indexer keeps the registration and answers its GET with `502`.    |
@@ -77,6 +81,43 @@ curl -X POST http://imposter:8080/mock/cti/environment/scenario -d 'scenario=can
 **Not mocked here.** The dashboard calls those paths on the **OpenSearch
 cluster** configured for OpenSearch Dashboards. Use your indexer directly
 (e.g. `curl` against `:9200`) to test GET/POST subscription.
+
+To develop against Content Manager changes the indexer does not ship yet, the
+`wazuhCheckUpdates` server can answer the subscription API itself
+(development only). Start the dashboard with:
+
+```bash
+WAZUH_CTI_CONTENT_MANAGER_MOCK=registered yarn start --no-base-path
+```
+
+| Variable                              | Values                                                                                                  |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `WAZUH_CTI_CONTENT_MANAGER_MOCK`      | `registered`: starts with a token stored. Any other value (`true`, `unregistered`) starts unregistered. |
+| `WAZUH_CTI_CONTENT_MANAGER_MOCK_DENY` | Comma-separated actions whose permission check is denied: `register` (`POST`), `clear` (`DELETE`).      |
+
+The mock keeps the token in memory (a dashboard restart forgets it) and
+behaves as the indexer will:
+
+- `GET` with a token reads `environments/me` from the CTI API the dashboard
+  is configured with (`wazuh_check_updates.ctiApiUrl`) and returns its body,
+  verbatim, as `message.environment`, with `message.plan` taken from its first
+  plan. A `401` forgets the token and returns the public plan; any other
+  failure answers `502`. Without a token it returns the public plan from
+  `catalog/plans`, with `is_registered: false`.
+- `POST` stores the `access_token` of the body. `DELETE` removes it.
+- `POST` and `DELETE` with `?perform_permission_check=true` (an empty value
+  counts as `true`) answer `{ "accessAllowed", "missingPrivileges" }` and
+  change nothing.
+
+Every other Content Manager path (content update, consumers) still goes to the
+indexer. Point the dashboard at this mock to switch the `environments/me`
+scenario at runtime, and to register through the mocked device flow:
+
+```yml
+wazuh_check_updates.ctiApiUrl: 'http://imposter:8080'
+```
+
+The dashboard logs a warning at startup while the mock is on.
 
 ## Forcing a polling result
 

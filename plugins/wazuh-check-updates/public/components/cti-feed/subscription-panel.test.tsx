@@ -202,16 +202,16 @@ describe('SubscriptionPanel', () => {
           name: 'environment-01',
           organization: { name: 'Acme Corp' },
           registered_at: '2026-03-01T10:00:00Z',
+          subscriptions: [
+            {
+              plan: 'Professional',
+              interval: 'year',
+              started_at: '2026-03-01T10:00:00Z',
+              renews_at: '2027-03-01T10:00:00Z',
+              expires_at: null,
+            },
+          ],
         },
-        subscriptions: [
-          {
-            plan: 'Professional',
-            interval: 'year',
-            started_at: '2026-03-01T10:00:00Z',
-            renews_at: '2027-03-01T10:00:00Z',
-            expires_at: null,
-          },
-        ],
       },
     });
 

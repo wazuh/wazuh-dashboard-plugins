@@ -6,6 +6,7 @@ import {
   EuiDescriptionList,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiTextColor,
   EuiToolTip,
 } from '@elastic/eui';
 import type {
@@ -48,7 +49,7 @@ export function getCurrentPlanSubscription(
   if (!planName) {
     return undefined;
   }
-  return message?.subscriptions?.find(
+  return message?.environment?.subscriptions?.find(
     subscription => subscription.plan === planName,
   );
 }
@@ -112,6 +113,20 @@ function getSubscriptionRows(
         { defaultMessage: 'Expires' },
       ),
       description: expiresAt,
+    });
+  }
+  // A payment is overdue: the subscription is suspended once this date passes.
+  const pastDueEndsAt = renderDate(
+    subscription.past_due_ends_at,
+    'ctiFeedSubscriptionPastDueEndsAt',
+  );
+  if (pastDueEndsAt) {
+    rows.push({
+      title: i18n.translate(
+        'wazuhCheckUpdates.ctiFeed.subscription.details.pastDueEndsAt',
+        { defaultMessage: 'Payment due by' },
+      ),
+      description: <EuiTextColor color='warning'>{pastDueEndsAt}</EuiTextColor>,
     });
   }
   return rows;

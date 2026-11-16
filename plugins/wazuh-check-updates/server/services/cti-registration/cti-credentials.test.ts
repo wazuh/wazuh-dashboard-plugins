@@ -60,46 +60,88 @@ describe('getCtiSubscriptionStatus', () => {
 
 describe('normalizeSubscriptionMessage', () => {
   const registered = {
-    plan: { name: 'Professional', is_public: false },
+    plan: { name: 'Pro', is_public: true },
     is_registered: true,
   };
 
-  it('copies the environment and the subscriptions of environments/me', () => {
+  // The `environments/me` body Content Manager passes through as `environment`.
+  const environmentsMe = {
+    name: 'environment-01',
+    registered_at: '2026-02-14T09:30:00Z',
+    organization: { name: 'Acme Corp' },
+    plans: [
+      {
+        name: 'Pro',
+        is_public: true,
+        features: [
+          {
+            name: 'Vulnerability CVE Stream',
+            description: 'Delta updates for vulnerability entries.',
+            resource: 'https://cti.example.test/consumers/vdp_v1',
+            type: 'cti:catalog:consumer:vulnerabilities',
+          },
+        ],
+      },
+    ],
+    subscriptions: [
+      {
+        plan: 'Pro',
+        interval: 'year',
+        started_at: '2026-03-01T10:00:00Z',
+        renews_at: '2027-03-01T10:00:00Z',
+        expires_at: null,
+        past_due_ends_at: null,
+      },
+    ],
+  };
+
+  it('keeps the identity and the subscriptions of the environment', () => {
     expect(
       normalizeSubscriptionMessage({
         ...registered,
-        environment: {
-          name: 'environment-01',
-          organization: { name: 'Acme Corp' },
-          registered_at: '2026-03-01T10:00:00Z',
-        },
-        subscriptions: [
-          {
-            plan: 'Professional',
-            interval: 'year',
-            started_at: '2026-03-01T10:00:00Z',
-            renews_at: '2027-03-01T10:00:00Z',
-            expires_at: null,
-          },
-        ],
+        environment: environmentsMe,
       }),
     ).toEqual({
       ...registered,
       environment: {
         name: 'environment-01',
         organization: { name: 'Acme Corp' },
-        registered_at: '2026-03-01T10:00:00Z',
+        registered_at: '2026-02-14T09:30:00Z',
+        subscriptions: [
+          {
+            plan: 'Pro',
+            interval: 'year',
+            started_at: '2026-03-01T10:00:00Z',
+            renews_at: '2027-03-01T10:00:00Z',
+            expires_at: null,
+            past_due_ends_at: null,
+          },
+        ],
       },
-      subscriptions: [
-        {
-          plan: 'Professional',
-          interval: 'year',
-          started_at: '2026-03-01T10:00:00Z',
-          renews_at: '2027-03-01T10:00:00Z',
-          expires_at: null,
-        },
-      ],
     });
+  });
+
+  it('keeps the date a past-due subscription is suspended on', () => {
+    const message = normalizeSubscriptionMessage({
+      ...registered,
+      environment: {
+        subscriptions: [
+          {
+            plan: 'Pro',
+            renews_at: null,
+            past_due_ends_at: '2026-12-08T10:00:00Z',
+          },
+        ],
+      },
+    });
+
+    expect(message?.environment?.subscriptions).toEqual([
+      {
+        plan: 'Pro',
+        renews_at: null,
+        past_due_ends_at: '2026-12-08T10:00:00Z',
+      },
+    ]);
   });
 
   it('drops invalid values instead of passing them through', () => {
@@ -110,40 +152,56 @@ describe('normalizeSubscriptionMessage', () => {
           name: '  ',
           organization: { name: 42 },
           registered_at: 'yesterday',
-          token: 'secret',
+          subscriptions: [
+            {
+              plan: 'Pro',
+              interval: 'week',
+              started_at: 'not a date',
+              renews_at: 7,
+              expires_at: '2027-03-01T10:00:00Z',
+              past_due_ends_at: 'soon',
+            },
+            { interval: 'month' },
+            'Pro',
+          ],
         },
-        subscriptions: [
-          {
-            plan: 'Professional',
-            interval: 'week',
-            started_at: 'not a date',
-            renews_at: 7,
-            expires_at: '2027-03-01T10:00:00Z',
-            price: 99,
-          },
-          { interval: 'month' },
-          'Professional',
-        ],
       } as never),
     ).toEqual({
       ...registered,
-      subscriptions: [
-        { plan: 'Professional', expires_at: '2027-03-01T10:00:00Z' },
-      ],
+      environment: {
+        subscriptions: [{ plan: 'Pro', expires_at: '2027-03-01T10:00:00Z' }],
+      },
     });
   });
 
-  it('keeps only the fields it knows', () => {
+  it('never passes plans, features or unknown fields to the browser', () => {
     const message = normalizeSubscriptionMessage({
       ...registered,
-      environment: { name: 'environment-01', features: ['x'] },
-      plans: [{ name: 'Professional' }],
+      environment: {
+        ...environmentsMe,
+        subscriptions: undefined,
+        token: 'secret',
+        new_console_field: { anything: true },
+      },
     } as never);
 
     expect(message).toEqual({
       ...registered,
-      environment: { name: 'environment-01' },
+      environment: {
+        name: 'environment-01',
+        organization: { name: 'Acme Corp' },
+        registered_at: '2026-02-14T09:30:00Z',
+      },
     });
+  });
+
+  it('accepts a null interval', () => {
+    const message = normalizeSubscriptionMessage({
+      ...registered,
+      environment: { subscriptions: [{ plan: 'Pro', interval: null }] },
+    } as never);
+
+    expect(message?.environment?.subscriptions).toEqual([{ plan: 'Pro' }]);
   });
 
   it('never describes an environment that is not registered', () => {
@@ -151,8 +209,7 @@ describe('normalizeSubscriptionMessage', () => {
       normalizeSubscriptionMessage({
         plan: { name: 'Open', is_public: true },
         is_registered: false,
-        environment: { name: 'environment-01' },
-        subscriptions: [],
+        environment: environmentsMe,
       }),
     ).toEqual({
       plan: { name: 'Open', is_public: true },
@@ -160,7 +217,7 @@ describe('normalizeSubscriptionMessage', () => {
     });
   });
 
-  it('leaves the fields out when older indexers do not send them', () => {
+  it('leaves the environment out when older indexers do not send it', () => {
     expect(normalizeSubscriptionMessage(registered)).toEqual(registered);
   });
 });
