@@ -138,11 +138,11 @@ describe('SubscriptionPanel', () => {
     );
     expect(
       screen.getByText(
-        /Upgrade it to the Professional feed from the Wazuh Console to keep detection current/,
+        /Upgrade it to the Professional feed from the Wazuh Console to get new vulnerabilities, IOCs and rules faster/,
       ),
     ).toBeInTheDocument();
     expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
-      'Detection that stays current with every vulnerability, IOC and rule Wazuh publishes.',
+      'New vulnerabilities, IOCs and rules, delivered faster.',
     );
     expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
       'Open feed (included)',

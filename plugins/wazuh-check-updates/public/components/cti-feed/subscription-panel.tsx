@@ -86,7 +86,7 @@ function getSubscriptionView(
               'wazuhCheckUpdates.ctiFeed.subscription.registeredOpenDescription',
               {
                 defaultMessage:
-                  'This environment is registered with Wazuh Cyber Threat Intelligence and receives the Open feed. Upgrade it to the Professional feed from the Wazuh Console to keep detection current with every new vulnerability, IOC and rule.',
+                  'This environment is registered with Wazuh Cyber Threat Intelligence and receives the Open feed. Upgrade it to the Professional feed from the Wazuh Console to get new vulnerabilities, IOCs and rules faster.',
               },
             )
           : plan?.name
@@ -246,7 +246,7 @@ const FeedTiers: React.FC = () => (
           'wazuhCheckUpdates.ctiFeed.subscription.tiers.proDescription',
           {
             defaultMessage:
-              'Detection that stays current with every vulnerability, IOC and rule Wazuh publishes.',
+              'New vulnerabilities, IOCs and rules, delivered faster.',
           },
         )}
       />
