@@ -1,7 +1,7 @@
 /**
  * Chat transcript geometry — durable regression guard for spacing/alignment defects in the
  * message transcript (see chat-page.scss's comments around `.wzMessageRow`,
- * `.wzMessageRow--wide .wzProseMeasure`, `.wzStatusCallouts`, etc.).
+ * `.wzMessageRow--wide .wzProse`, `.wzStatusCallouts`, etc.).
  *
  * Encodes the numeric layout spec as plain `getBoundingClientRect()` / `getComputedStyle()`
  * arithmetic, so a future change that reintroduces any of these defects fails a specific, named
@@ -217,7 +217,7 @@ describe('AI Assistant — transcript geometry', () => {
       .then($proseRow => {
         const normalRow = rectOf($proseRow);
         const avatar = rectOf($proseRow.find('.wzMsgAvatarItem').first());
-        const prose = rectOf($proseRow.find('.wzProseMeasure').first());
+        const prose = rectOf($proseRow.find('.wzProse').first());
         const meta = rectOf($proseRow.find('.wzMsgMetaRow').first());
 
         // Normal row: prose/meta sit exactly one avatar-column-width right of the avatar.
@@ -238,7 +238,7 @@ describe('AI Assistant — transcript geometry', () => {
               $wideRow.find('.wzMsgAvatarItem').first(),
             );
             const wideCard = rectOf($wideRow.find('.wzResultsCard').first());
-            const wideProse = rectOf($wideRow.find('.wzProseMeasure').first());
+            const wideProse = rectOf($wideRow.find('.wzProse').first());
             const wideMeta = rectOf($wideRow.find('.wzMsgMetaRow').first());
 
             // A table-bearing turn must never pull the avatar (or the prose, or the meta row)
@@ -301,7 +301,7 @@ describe('AI Assistant — transcript geometry', () => {
       cy.get('.wzMessageRow')
         .eq(idx)
         .then($row => {
-          const prose = rectOf($row.find('.wzProseMeasure').first());
+          const prose = rectOf($row.find('.wzProse').first());
           const timestamp = rectOf(
             $row.find('.wzAiAssistantMessageTimestamp').first(),
           );
@@ -316,7 +316,7 @@ describe('AI Assistant — transcript geometry', () => {
   it('6. prose rhythm: paragraph→paragraph and paragraph→list are 16px, list-item→list-item is 4px', () => {
     cy.get('.wzMessageRow')
       .eq(WIDE_ROW)
-      .find('.wzProseMeasure .euiMarkdownFormat')
+      .find('.wzProse .euiMarkdownFormat')
       .first()
       .then($md => {
         // `.euiMarkdownFormat` wraps the actual sequence of <p>/<ul>/<p> blocks in one or more
@@ -374,7 +374,7 @@ describe('AI Assistant — transcript geometry', () => {
     cy.get('.wzMessageRow')
       .eq(WIDE_ROW)
       .then($row => {
-        const prose = rectOf($row.find('.wzProseMeasure').first());
+        const prose = rectOf($row.find('.wzProse').first());
         const card = rectOf($row.find('.wzResultsCard').first());
         const timestamp = rectOf(
           $row.find('.wzAiAssistantMessageTimestamp').first(),
@@ -395,7 +395,7 @@ describe('AI Assistant — transcript geometry', () => {
     cy.get('.wzMessageRow')
       .eq(BADGE_ROW)
       .then($row => {
-        const prose = rectOf($row.find('.wzProseMeasure').first());
+        const prose = rectOf($row.find('.wzProse').first());
         const timestamp = rectOf(
           $row.find('.wzAiAssistantMessageTimestamp').first(),
         );

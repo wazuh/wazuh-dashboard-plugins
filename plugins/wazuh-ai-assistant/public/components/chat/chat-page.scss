@@ -440,7 +440,7 @@ $wzWelcomeFadeOut: 180ms;
  * row could not size itself independently of this shared 1060px column, and every row's own width
  * would resolve against THIS element's padded box. Each row instead centres on the content measure
  * on its own (`.wzMessageRow`), which is what lets a table row fill that measure to its right edge
- * while prose stays capped at 68ch.
+ * while prose shares that same width.
  */
 .wzContentMeasure {
   max-width: $wzContentMaxWidth;
@@ -560,9 +560,10 @@ $wzWelcomeFadeOut: 180ms;
 /**
  * Per-turn measure: each transcript row centres itself independently on the content
  * measure instead of the whole transcript sharing one column. A table-bearing turn (`--wide`
- * below) fills this same measure to its right edge with the results card, while a prose turn caps
- * its text at 68ch inside it — both bounded by the one content column the composer also uses, so a
- * table's right edge lands on the composer's right edge rather than reaching past it.
+ * below) fills this same measure to its right edge with the results card, and the answer text fills
+ * it too — both bounded by the one content column the composer also uses, so a table's right edge
+ * lands on the composer's right edge rather than reaching past it, and the answer above it ends on
+ * that same edge.
  */
 .wzMessageRow {
   max-width: $wzContentMaxWidth;
@@ -616,15 +617,16 @@ $wzWelcomeFadeOut: 180ms;
 }
 
 /**
- * Assistant prose measure ("prose is held to 68ch"): message-bubble.tsx has no
- * colocated `.scss` of its own to import `$wzProseMeasure` from directly, but this plugin's whole
- * stylesheet loads once, globally, from THIS file's own import in chat-page.tsx — so a class defined
- * here is reachable from any component in the plugin without a separate import, the same way
+ * Assistant prose: the inline-code chip and paragraph rhythm of an answer. No reading measure of
+ * its own — the answer text fills the assistant column, the same width as the results card below
+ * it, so the two line up on the row's right edge; the row itself is already capped at
+ * `$wzContentMaxWidth` (`.wzMessageRow`), which bounds line length on very wide screens.
+ * message-bubble.tsx has no colocated `.scss` of its own, but this plugin's whole stylesheet loads
+ * once, globally, from THIS file's own import in chat-page.tsx — so a class defined here is
+ * reachable from any component in the plugin without a separate import, the same way
  * message-bubble.tsx already consumes `.wzMsgRow` below without importing this file itself.
  */
-.wzProseMeasure {
-  max-width: $wzProseMeasure;
-
+.wzProse {
   /* Inline code inside an answer (`EuiMarkdownFormat`, message-bubble.tsx). EUI gives it a fill with
      `border-radius: 0` and `padding: 0 8px`, which reads as the single worst-reading element on a
      finished answer: a square, 8px-padded slab wrapped around a 4-letter field name reads as
@@ -679,7 +681,7 @@ $wzWelcomeFadeOut: 180ms;
   /* Paragraph/list/blockquote rhythm inside a finished answer:
      EUI's own markdown styling gives these an off-scale `1.5 * $euiSize` bottom margin (21px) and
      adjacent list items a 3.5px gap, neither of which sits on this plugin's 4/8/16/24 rhythm.
-     Pinned to the ladder's own 16px/4px instead. Scoped under `.wzProseMeasure` — the ancestor that
+     Pinned to the ladder's own 16px/4px instead. Scoped under `.wzProse` — the ancestor that
      ONLY ever wraps prose — rather than as bare top-level `p`/`ul` rules, so nothing outside a
      finished answer picks this up. No `:not(pre)`-style exclusion is needed for the block margins:
      a fenced code block renders as `pre > code` and a table as `table`, neither of which this
@@ -830,6 +832,20 @@ $wzMsgAvatarColumn: 40px;
  */
 .euiCard.wzWelcomeCard {
   border-radius: $wzPanelRadius;
+}
+
+/**
+ * The no-provider prompt shows the example cards disabled. EUI paints disabled card text in its
+ * disabled color, which sits near 2:1 against the card in both themes and leaves the questions
+ * barely readable. A subdued tone keeps the cards reading as inactive (with the disabled fill and
+ * cursor). Plain `$euiTextSubduedColor` is tuned against the page background, and the card's own
+ * fill is darker than that in the dark theme (4.3:1 there), so the tone is pushed to 4.5:1 against
+ * `$euiColorLightestShade`: the card fill is lighter than that shade in the light theme and darker
+ * in the dark one, so the text clears 4.5:1 on the card in both.
+ */
+.euiCard.wzWelcomeCard.euiCard-isDisabled,
+.euiCard.wzWelcomeCard.euiCard-isDisabled .euiCard__titleButton {
+  color: makeHighContrastColor($euiTextSubduedColor, $euiColorLightestShade);
 }
 
 /**

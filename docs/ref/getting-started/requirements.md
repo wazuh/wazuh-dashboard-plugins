@@ -28,10 +28,11 @@ supported operating system versions and architectures.
 
 ### System dependencies
 
-Required packages (automatically installed with Wazuh dashboard):
+The package declares only what it needs to create the service user and group, and the package
+manager installs it when missing:
 
-- **Debian/Ubuntu**: `tar`, `curl`, `libcap2-bin`, `openssl`
-- **RHEL/CentOS**: `libcap`, `openssl`, `diffutils`, `util-linux`
+- **Debian/Ubuntu**: `passwd`
+- **RHEL/CentOS**: `/bin/sh`, `groupadd`, `useradd`, `userdel`, `groupdel`
 
 ## Network requirements
 
