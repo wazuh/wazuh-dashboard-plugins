@@ -10,7 +10,7 @@ A set of **OpenSearch Dashboards (OSD) plugins** that make up the Wazuh UI. It i
 _not_ the platform — the platform is the sibling repo `wazuh-dashboard` (an OSD
 fork), into which these plugins are installed under its `plugins/` directory.
 
-- Node: see [`.nvmrc`](.nvmrc) (currently 22.22.0). Package manager: Yarn v1.
+- Node: see [`.nvmrc`](.nvmrc) (currently 22.23.4). Package manager: Yarn v1.
 - Versioning: `plugins/*/opensearch_dashboards.json` (e.g. `5.0.0-04`); platform
   version in each plugin's `package.json` → `pluginPlatform.version`.
 - Default branch `main`; work happens on version branches (`5.0.0`, `6.0.0`, …).

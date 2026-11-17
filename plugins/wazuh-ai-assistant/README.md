@@ -6,7 +6,7 @@ language, the plugin turns it into read-only queries against the Wazuh Indexer /
 and streams back a short answer plus the real result table.
 
 **Target platform: Wazuh 5.0 / OpenSearch Dashboards 3.6.0** (React 18, `@elastic/eui` aliased to
-`@opensearch-project/oui` 1.22.1, Node 22.22.0).
+`@opensearch-project/oui` 1.22.1, Node 22.23.4).
 
 ## What it does
 
@@ -60,7 +60,7 @@ This plugin is **not** standalone-buildable; it builds inside a `wazuh-dashboard
 same way Wazuh's own `main` / `wazuh-core` / `wazuh-check-updates` plugins do.
 
 1. Get a `wazuh-dashboard` checkout matching your target (Wazuh 5.0 → OSD **3.6.0**).
-2. Use the Node version pinned by that checkout's `.nvmrc` (**22.22.0** for 5.0): `nvm use`.
+2. Use the Node version pinned by that checkout's `.nvmrc` (**22.23.4** for 5.0): `nvm use`.
 3. Copy this folder into `wazuh-dashboard/plugins/wazuh_ai_assistant`.
 4. From the `wazuh-dashboard` repo root:
    ```
