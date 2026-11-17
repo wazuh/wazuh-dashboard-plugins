@@ -23,6 +23,11 @@
     font-family: $euiCodeFontFamily;
   }
 
+  // Custom-rendered values (links, lists) wrap too, so no row widens the table.
+  td:not(.wzDocViewer__field) {
+    overflow-wrap: anywhere;
+  }
+
   td,
   tr {
     position: relative;

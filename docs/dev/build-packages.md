@@ -189,13 +189,21 @@ After completing the previous steps, you will have the following packages in the
 - `-c`, `--commit-sha`: _(Optional)_ Commit SHA identifier for the build (see [Generating commit SHA](#generating-commit-sha) below). Defaults to the short SHA of the current `wazuh-dashboard` commit.
 - `-r`, `--revision`: _(Optional)_ Revision of the package. Defaults to `1`.
 - `--deb` or `--rpm`: Distribution of the package.
-- `-a`: URL of the `wazuh-package.zip`.
+- `-a`, `--app`: URL of the `wazuh-package.zip`.
 - `-b`, `--base`: URL of the `dashboard-package.zip`.
-- `-rp`: URL of the `reporting-package.zip`.
-- `-s`: URL of the `security-package.zip`.
-- `-sa`: URL of the `security-analytics-package.zip`.
-- `-al`: URL of the `alerting-package.zip`.
-- `-no`: URL of the `notifications-package.zip`.
+- `-rp`, `--reportPlugin`: URL of the `reporting-package.zip`.
+- `-s`, `--security`: URL of the `security-package.zip`.
+- `-sa`, `--securityAnalytics`: URL of the `security-analytics-package.zip`.
+- `-al`, `--alertingPlugin`: URL of the `alerting-package.zip`.
+- `-no`, `--notificationsPlugin`: URL of the `notifications-package.zip`.
+- `--tar`: Build the tar package.
+- `--all-platforms`: Build for all platforms.
+- `--arm`: _(Optional)_ Build for `arm64` instead of `x64`.
+- `--production`: _(Optional)_ Name the package for production.
+- `--debug`: _(Optional)_ Debug mode.
+- `--silent`: _(Optional)_ Silent mode. Has no effect with `--debug`.
+- `--retry-attempts <n>`: _(Optional)_ Retry transient steps up to `n` times. Defaults to `3`.
+- `--retry-delay <seconds>`: _(Optional)_ Seconds to wait between retries. Defaults to `15`.
 
 ```bash
 cd ../wazuh-dashboard/dev-tools/build-packages/
