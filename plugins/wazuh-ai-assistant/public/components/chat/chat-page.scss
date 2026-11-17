@@ -836,13 +836,16 @@ $wzMsgAvatarColumn: 40px;
 
 /**
  * The no-provider prompt shows the example cards disabled. EUI paints disabled card text in its
- * disabled color, which sits near 2:1 against the page in both themes and leaves the questions
- * barely readable. The subdued text color keeps the cards reading as inactive (with the disabled
- * fill and cursor) while meeting the 4.5:1 text contrast.
+ * disabled color, which sits near 2:1 against the card in both themes and leaves the questions
+ * barely readable. A subdued tone keeps the cards reading as inactive (with the disabled fill and
+ * cursor). Plain `$euiTextSubduedColor` is tuned against the page background, and the card's own
+ * fill is darker than that in the dark theme (4.3:1 there), so the tone is pushed to 4.5:1 against
+ * `$euiColorLightestShade`: the card fill is lighter than that shade in the light theme and darker
+ * in the dark one, so the text clears 4.5:1 on the card in both.
  */
 .euiCard.wzWelcomeCard.euiCard-isDisabled,
 .euiCard.wzWelcomeCard.euiCard-isDisabled .euiCard__titleButton {
-  color: var(--wz-text-subdued, #{$euiTextSubduedColor});
+  color: makeHighContrastColor($euiTextSubduedColor, $euiColorLightestShade);
 }
 
 /**

@@ -50,13 +50,13 @@ describe('NoProviderPrompt', () => {
 
   it('paints the disabled example cards in the subdued text color, not the disabled one', () => {
     // Reads the source directly because jest maps `.scss` to a style mock. EUI's disabled text
-    // color sits near 2:1 against the page; the subdued color meets the 4.5:1 text contrast.
+    // color sits near 2:1 against the card; the tone is pushed to 4.5:1 in both themes.
     const scssSource = fs.readFileSync(
       path.join(__dirname, 'chat-page.scss'),
       'utf8',
     );
     expect(scssSource).toMatch(
-      /\.euiCard\.wzWelcomeCard\.euiCard-isDisabled,\s*\.euiCard\.wzWelcomeCard\.euiCard-isDisabled \.euiCard__titleButton \{[^}]*color: var\(--wz-text-subdued/,
+      /\.euiCard\.wzWelcomeCard\.euiCard-isDisabled,\s*\.euiCard\.wzWelcomeCard\.euiCard-isDisabled \.euiCard__titleButton \{[^}]*color: makeHighContrastColor\(\$euiTextSubduedColor, \$euiColorLightestShade\)/,
     );
   });
 
