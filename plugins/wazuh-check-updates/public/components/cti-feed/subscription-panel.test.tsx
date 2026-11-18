@@ -320,7 +320,7 @@ describe('SubscriptionPanel', () => {
       'https://console.pre.cloud.wazuh.com/cti/deployments',
     );
     expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveTextContent('Open in Wazuh Console');
+    expect(link).toHaveTextContent('Manage in Wazuh Console');
   });
 
   test('shows no details or console link before the registration', () => {

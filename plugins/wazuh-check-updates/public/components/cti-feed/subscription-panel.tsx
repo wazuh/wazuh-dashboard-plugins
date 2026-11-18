@@ -416,7 +416,7 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
                 >
                   {i18n.translate(
                     'wazuhCheckUpdates.ctiFeed.subscription.openConsole',
-                    { defaultMessage: 'Open in Wazuh Console' },
+                    { defaultMessage: 'Manage in Wazuh Console' },
                   )}
                 </EuiLink>
               </EuiText>
