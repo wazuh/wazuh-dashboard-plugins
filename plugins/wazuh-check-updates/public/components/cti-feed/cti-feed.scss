@@ -73,13 +73,33 @@
 
 // Subscription details: short labels, the environment ID keeps one line or wraps
 // anywhere on a narrow card.
-.ctiFeed__subscriptionDetails .euiDescriptionList__description {
+// Subscription details: two columns of a subdued label over a bold value.
+.ctiFeed__subscriptionDetails {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $euiSizeM $euiSizeL;
+  margin: 0;
+}
+
+.ctiFeed__subscriptionDetailTitle {
+  font-size: $euiFontSizeS;
+  line-height: $euiLineHeight;
+  color: $euiTextSubduedColor;
+}
+
+.ctiFeed__subscriptionDetailValue {
+  margin: 0;
+  font-size: $euiFontSizeM;
+  font-weight: $euiFontWeightBold;
+  color: $euiTitleColor;
+  // The environment ID keeps one line or wraps anywhere on a narrow card.
   overflow-wrap: anywhere;
 }
 
 .ctiFeed__environmentId {
   font-family: $euiCodeFontFamily;
   font-size: $euiFontSizeS;
+  font-weight: $euiFontWeightBold;
 }
 
 // Plan cards: the plan this environment is on gets a primary outline over its tint.

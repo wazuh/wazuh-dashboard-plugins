@@ -3,9 +3,9 @@ import { i18n } from '@osd/i18n';
 import {
   EuiButtonIcon,
   EuiCopy,
-  EuiDescriptionList,
   EuiFlexGroup,
   EuiFlexItem,
+  EuiPanel,
   EuiTextColor,
   EuiToolTip,
 } from '@elastic/eui';
@@ -219,13 +219,21 @@ export const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
     return null;
   }
 
+  // Two columns of label over value, the value in bold. A `div` around each pair is
+  // valid inside a `dl` and keeps every label with its value.
   return (
-    <EuiDescriptionList
-      type='responsiveColumn'
-      compressed
-      className='ctiFeed__subscriptionDetails'
-      data-test-subj='ctiFeedSubscriptionDetails'
-      listItems={rows}
-    />
+    <EuiPanel color='subdued' hasShadow={false} paddingSize='m'>
+      <dl
+        className='ctiFeed__subscriptionDetails'
+        data-test-subj='ctiFeedSubscriptionDetails'
+      >
+        {rows.map(({ title, description }) => (
+          <div key={title} className='ctiFeed__subscriptionDetail'>
+            <dt className='ctiFeed__subscriptionDetailTitle'>{title}</dt>
+            <dd className='ctiFeed__subscriptionDetailValue'>{description}</dd>
+          </div>
+        ))}
+      </dl>
+    </EuiPanel>
   );
 };
