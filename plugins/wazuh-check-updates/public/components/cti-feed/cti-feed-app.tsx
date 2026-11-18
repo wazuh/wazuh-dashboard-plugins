@@ -28,7 +28,11 @@ export interface CtiFeedAppProps {
 export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
   openRegistration = false,
 }) => {
-  const registration = useCtiRegistrationModal(openRegistration);
+  // A plan or registration change made in the CTI console shows as soon as the user
+  // comes back to this page.
+  const registration = useCtiRegistrationModal(openRegistration, {
+    refreshOnFocus: true,
+  });
   // Follows a running update until it finishes, so the page and the button catch up.
   const sync = useCtiConsumers({ followSync: true });
   const content = useFeedContentCounts();

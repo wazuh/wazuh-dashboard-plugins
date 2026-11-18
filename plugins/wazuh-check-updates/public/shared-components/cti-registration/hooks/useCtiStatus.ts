@@ -10,6 +10,27 @@ import {
 /** Floor for the steady-state re-poll interval, guards against a misconfigured tight loop. */
 const MIN_STATUS_POLL_SEC = 5;
 const DEFAULT_STATUS_POLL_SEC = 30;
+/**
+ * With `refreshOnFocus`, returning to the page reads the status again unless the last
+ * read is younger than this, so quick back-and-forth switching does not flood the
+ * indexer and the CTI console.
+ */
+export const CTI_FOCUS_REFRESH_MIN_MS = 5000;
+
+export interface UseCtiStatusOptions {
+  /**
+   * Read the status every time the page comes back (tab visible again, or window
+   * focused), not only once the polling interval has passed. For the page that shows
+   * the subscription, where a change made in the CTI console should show at once.
+   */
+  refreshOnFocus?: boolean;
+}
+
+/** Whether the last read is younger than `minAgeMs`. */
+function wasFetchedWithin(minAgeMs: number): boolean {
+  const last = ctiFlowState.getLastStatusFetchAtMs();
+  return last !== null && Date.now() - last < minAgeMs;
+}
 
 function isSteadyRegistered(): boolean {
   return ctiFlowState.isRegistered() || ctiFlowState.isRegistrationComplete();
@@ -57,6 +78,7 @@ function computeInitialStatus(): ISubscriptionResponse {
 export const useCtiStatus = (
   deviceFlowNonce = 0,
   pollIntervalSec = DEFAULT_STATUS_POLL_SEC,
+  { refreshOnFocus = false }: UseCtiStatusOptions = {},
 ) => {
   const [statusCTI, setStatusCTI] =
     useState<ISubscriptionResponse>(computeInitialStatus);
@@ -240,7 +262,7 @@ export const useCtiStatus = (
     if (typeof document === 'undefined') {
       return undefined;
     }
-    const onVisibilityChange = () => {
+    const onPageBack = () => {
       if (document.visibilityState !== 'visible') {
         return;
       }
@@ -252,21 +274,31 @@ export const useCtiStatus = (
       if (!hasActiveDeviceFlow && !isCurrentlyRegistered) {
         return;
       }
-      // Steady-state (no active device flow): let the scheduled re-poll
-      // drive the cadence instead of re-fetching on every tab/window focus.
-      if (
-        !hasActiveDeviceFlow &&
-        isCurrentlyRegistered &&
-        isStatusStillFresh(pollIntervalSec)
-      ) {
-        return;
+      if (!hasActiveDeviceFlow && isCurrentlyRegistered) {
+        // Steady state. With `refreshOnFocus`, coming back reads the status unless
+        // it was read moments ago; otherwise the scheduled re-poll drives the
+        // cadence instead of re-fetching on every return.
+        const recentlyRead = refreshOnFocus
+          ? wasFetchedWithin(CTI_FOCUS_REFRESH_MIN_MS)
+          : isStatusStillFresh(pollIntervalSec);
+        if (recentlyRead) {
+          return;
+        }
       }
       void fetchStatus({ silent: true });
     };
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    return () =>
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-  }, [fetchStatus, pollIntervalSec]);
+    document.addEventListener('visibilitychange', onPageBack);
+    // Returning from another window leaves the tab visible: only `focus` tells.
+    if (refreshOnFocus) {
+      window.addEventListener('focus', onPageBack);
+    }
+    return () => {
+      document.removeEventListener('visibilitychange', onPageBack);
+      if (refreshOnFocus) {
+        window.removeEventListener('focus', onPageBack);
+      }
+    };
+  }, [fetchStatus, pollIntervalSec, refreshOnFocus]);
 
   return {
     statusCTI,

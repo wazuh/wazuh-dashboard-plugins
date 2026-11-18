@@ -132,7 +132,10 @@ describe('CtiFeedApp', () => {
   test('opens the registration modal when asked on arrival', async () => {
     render(<CtiFeedApp openRegistration />);
 
-    expect(mockUseRegistration).toHaveBeenCalledWith(true);
+    // It also reads the status whenever the user comes back to the page.
+    expect(mockUseRegistration).toHaveBeenCalledWith(true, {
+      refreshOnFocus: true,
+    });
     expect(screen.getByTestId('ctiRegistrationModal')).toBeInTheDocument();
     await settle();
   });
