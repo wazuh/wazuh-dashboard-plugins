@@ -19,6 +19,7 @@ import {
   VulnerabilitiesDataSourceRepository,
   ActiveResponsesDataSource,
   ActiveResponsesDataSourceRepository,
+  CasesDataSource,
   ThreatIntelEnrichmentsStatesDataSource,
   ThreatIntelEnrichmentsStatesDataSourceRepository,
   IDataSourceFactoryConstructor,
@@ -30,10 +31,12 @@ import {
 import { WzRequest } from '../../../../../react-services';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
+  buildCaseManagementAggs,
   buildCloudSecurityByModuleAgg,
   buildComplianceControlsAgg,
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
+  buildIncidentResponseAggs,
   buildMalwareFilterAgg,
   buildPlatformsCountAgg,
   buildSCATilesAgg,
@@ -53,6 +56,7 @@ import { AGG } from '../lib/constants';
 import {
   mapAgentStatus,
   mapCardinality,
+  mapCaseManagement,
   mapCloudSecurityByModule,
   mapComplianceControls,
   mapDocCount,
@@ -71,9 +75,11 @@ import {
 } from '../services/security-analytics.service';
 import {
   AgentStatus,
+  CaseManagementOverview,
   FimOverview,
   FindingsBreakdowns,
   FindingsOverview,
+  IncidentResponseOverview,
   ScaOverview,
   ThreatIntelEnrichments,
   TopItem,
@@ -705,16 +711,74 @@ export function useItHygieneServicesCount(
   );
 }
 
-export function useActiveResponseOverview(
+/** Active responses of the last 24 hours: total, top responses and top agents. */
+export function useIncidentResponseOverview(
   enabled: boolean,
-): DataGroupResult<number | undefined> {
-  return useIndexDocCount(
-    ActiveResponsesDataSource,
-    () => new ActiveResponsesDataSourceRepository(),
-    enabled,
-    i18n.translate('wazuh.common.homeOverviewDataGroup.activeResponse', {
-      defaultMessage: 'Active Response',
-    }),
-    LAST_24H,
+): DataGroupResult<IncidentResponseOverview> & { indexPatternId?: string } {
+  const { dataSource, ...result } =
+    useAggregationGroup<IncidentResponseOverview>({
+      DataSource: ActiveResponsesDataSource,
+      createRepository: () => new ActiveResponsesDataSourceRepository(),
+      enabled,
+      label: i18n.translate(
+        'wazuh.common.homeOverviewDataGroup.activeResponse',
+        { defaultMessage: 'Active Response' },
+      ),
+      fetch: async fetchData => {
+        const response = await fetchData({
+          aggs: buildIncidentResponseAggs(),
+          dateRange: LAST_24H,
+          pagination: NO_HITS,
+        });
+        return {
+          total: mapDocCount(response),
+          topResponses: mapTopBuckets(
+            response?.aggregations,
+            AGG.topActiveResponses,
+          ),
+          topAgents: mapTopBuckets(
+            response?.aggregations,
+            AGG.topResponseAgents,
+          ),
+        };
+      },
+    });
+
+  const indexPatternId = dataSource?.indexPattern?.id;
+
+  return useMemo(
+    () => ({ ...result, indexPatternId }),
+    [result.status, result.data, indexPatternId],
+  );
+}
+
+/** Cases (current state): counts per status, open cases per severity, latest open cases. */
+export function useCaseManagementOverview(
+  enabled: boolean,
+): DataGroupResult<CaseManagementOverview> & { indexPatternId?: string } {
+  const { dataSource, ...result } = useAggregationGroup<CaseManagementOverview>(
+    {
+      DataSource: CasesDataSource,
+      createRepository: () => new FindingsDataSourceRepository(),
+      enabled,
+      label: i18n.translate(
+        'wazuh.common.homeOverviewDataGroup.caseManagement',
+        { defaultMessage: 'Case management' },
+      ),
+      fetch: async fetchData => {
+        const response = await fetchData({
+          aggs: buildCaseManagementAggs(),
+          pagination: NO_HITS,
+        });
+        return mapCaseManagement(response?.aggregations);
+      },
+    },
+  );
+
+  const indexPatternId = dataSource?.indexPattern?.id;
+
+  return useMemo(
+    () => ({ ...result, indexPatternId }),
+    [result.status, result.data, indexPatternId],
   );
 }

@@ -41,6 +41,20 @@ export const FIM_FILE_PATH_FIELD = 'file.path';
 /** Last modification time of a monitored file; ranks the FIM list. */
 export const FIM_FILE_MTIME_FIELD = 'file.mtime';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
+/** Active response that ran, on the active responses index. */
+export const ACTIVE_RESPONSE_NAME_FIELD = 'wazuh.active_response.name';
+export const AGENT_NAME_FIELD = 'wazuh.agent.name';
+/** Case fields of a findings document; a case exists when the status does. */
+export const CASE_STATUS_FIELD = 'wazuh.case.status';
+export const CASE_SEVERITY_FIELD = 'wazuh.case.severity';
+export const CASE_PRIORITY_FIELD = 'wazuh.case.priority';
+export const CASE_TITLE_FIELD = 'wazuh.case.title';
+export const CASE_UPDATED_AT_FIELD = 'wazuh.case.updated_at';
+export const CASE_CREATED_AT_FIELD = 'wazuh.case.created_at';
+
+/** Case statuses shown as tiles; the first two are the open ones. */
+export const CASE_STATUSES = ['active', 'acknowledged', 'completed'] as const;
+export const OPEN_CASE_STATUSES = ['active', 'acknowledged'];
 /** Package name on a vulnerability state document. */
 export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';
 /**

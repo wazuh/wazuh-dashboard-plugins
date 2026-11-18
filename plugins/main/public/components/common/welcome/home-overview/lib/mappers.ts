@@ -1,13 +1,20 @@
 import {
   AgentStatus,
+  CaseManagementOverview,
+  CaseStatusCounts,
   CountsByKey,
+  RecentCase,
   ScaBenchmark,
   ScaTilesData,
   SeverityBand,
   SeverityCounts,
   TopItem,
 } from '../interfaces/types';
-import { COMPLIANCE_FRAMEWORK_FIELDS, FINDING_SEVERITY_BANDS } from './fields';
+import {
+  CASE_STATUSES,
+  COMPLIANCE_FRAMEWORK_FIELDS,
+  FINDING_SEVERITY_BANDS,
+} from './fields';
 import { AGG, SCA_RESULT_BUCKET } from './constants';
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 
@@ -170,5 +177,57 @@ export function mapAgentStatus(
     pending: connection?.pending,
     neverConnected: connection?.never_connected,
     total: connection?.total,
+  };
+}
+
+interface CaseHit {
+  _id: string;
+  _source?: {
+    wazuh?: {
+      case?: {
+        title?: string;
+        status?: string;
+        priority?: string;
+        updated_at?: string;
+        created_at?: string;
+      };
+    };
+  };
+}
+
+function mapRecentCase(hit: CaseHit): RecentCase {
+  const data = hit._source?.wazuh?.case ?? {};
+  return {
+    id: hit._id,
+    title: data.title,
+    status: data.status,
+    priority: data.priority,
+    updatedAt: data.updated_at ?? data.created_at,
+  };
+}
+
+/** Case management card: see `buildCaseManagementAggs`. */
+export function mapCaseManagement(
+  aggregations: Aggregations,
+): CaseManagementOverview {
+  const statusBuckets =
+    (aggregations?.[AGG.caseStatus]?.buckets as
+      | Record<string, FiltersAggBucket>
+      | undefined) ?? {};
+  const byStatus = CASE_STATUSES.reduce((acc, status) => {
+    acc[status] = statusBuckets[status]?.doc_count;
+    return acc;
+  }, {} as CaseStatusCounts);
+  const openCases = aggregations?.[AGG.openCases] as unknown as
+    | (Aggregations & {
+        [AGG.recentCases]?: { hits?: { hits?: CaseHit[] } };
+      })
+    | undefined;
+  return {
+    byStatus,
+    openBySeverity: mapSeverityCounts(openCases, AGG.caseSeverity),
+    recentOpen: (openCases?.[AGG.recentCases]?.hits?.hits ?? []).map(
+      mapRecentCase,
+    ),
   };
 }

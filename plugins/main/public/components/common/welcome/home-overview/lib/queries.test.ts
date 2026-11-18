@@ -14,6 +14,8 @@ import {
   buildThreatIntelFeedByTypeAgg,
   buildCloudSecurityByModuleAgg,
   buildPlatformsCountAgg,
+  buildIncidentResponseAggs,
+  buildCaseManagementAggs,
 } from './queries';
 import {
   FINDING_SEVERITY_BANDS,
@@ -208,5 +210,37 @@ describe('query builders', () => {
     });
     // Feed-by-type is no longer part of the findings search.
     expect(agg.malware.aggs.ioc_feed_by_type).toBeUndefined();
+  });
+
+  it('builds the Incident Response top lists on the response name and the agent name', () => {
+    expect(buildIncidentResponseAggs()).toEqual({
+      top_active_responses: {
+        terms: { field: 'wazuh.active_response.name', size: 5 },
+      },
+      top_response_agents: { terms: { field: 'wazuh.agent.name', size: 5 } },
+    });
+  });
+
+  it('builds the case counts per status, and the severity and latest cases of the open ones', () => {
+    const agg = buildCaseManagementAggs();
+    expect(agg.case_status.filters.filters).toEqual({
+      active: { term: { 'wazuh.case.status': 'active' } },
+      acknowledged: { term: { 'wazuh.case.status': 'acknowledged' } },
+      completed: { term: { 'wazuh.case.status': 'completed' } },
+    });
+    expect(agg.open_cases.filter).toEqual({
+      terms: { 'wazuh.case.status': ['active', 'acknowledged'] },
+    });
+    expect(
+      Object.keys(agg.open_cases.aggs.case_severity.filters.filters),
+    ).toEqual(FINDING_SEVERITY_BANDS);
+    expect(agg.open_cases.aggs.recent_cases.top_hits).toMatchObject({
+      size: 5,
+      sort: [
+        {
+          'wazuh.case.updated_at': { order: 'desc', unmapped_type: 'date' },
+        },
+      ],
+    });
   });
 });

@@ -1,13 +1,9 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
-import { getCore } from '../../../../../../kibana-services';
-import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { EuiFlexGroup, EuiFlexItem, EuiSpacer } from '@elastic/eui';
 import { withErrorBoundary } from '../../../../hocs/error-boundary/with-error-boundary';
 import {
   WidgetGroup,
-  StatTile,
-  TabNumber,
   SectionHeader,
   BarList,
   WIDGET_LOADING_MIN_HEIGHT,
@@ -19,9 +15,8 @@ import {
 } from './regulatory-compliance-badges';
 import { TopNetworkServicesTable } from '../overview/top-network-services-table';
 import { useInViewport } from '../../../../hooks';
-import { CARD_MIN_WIDTH, KPI_LINK_STYLE } from '../../lib/constants';
+import { CARD_MIN_WIDTH } from '../../lib/constants';
 import {
-  useActiveResponseOverview,
   useItHygienePlatformsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
@@ -30,8 +25,6 @@ import {
   useTopOperatingSystems,
 } from '../../hooks/use-overview-data';
 import {
-  getActiveResponseResponsesUrl,
-  getActiveResponseUrl,
   getItHygieneSystemOsUrl,
   getItHygieneUrl,
   getRegulatoryComplianceUrlHome,
@@ -41,7 +34,7 @@ export interface SecurityOperationsSectionProps {
   complianceControls: RegulatoryComplianceBadgesProps['controls'];
 }
 
-/** IT Hygiene and Active Response load lazily; the chips navigate regardless. */
+/** IT Hygiene loads lazily; the chips navigate regardless. */
 const SecurityOperationsSectionComponent: React.FC<
   SecurityOperationsSectionProps
 > = ({ complianceControls }) => {
@@ -50,7 +43,6 @@ const SecurityOperationsSectionComponent: React.FC<
   const packages = useItHygienePackagesCount(visible);
   const users = useItHygieneUsersCount(visible);
   const services = useItHygieneServicesCount(visible);
-  const activeResponse = useActiveResponseOverview(visible);
   const topOs = useTopOperatingSystems(visible);
   const topServices = useTopNetworkServices(visible);
   // When every tile is denied, show the card-level permission message used by
@@ -70,13 +62,12 @@ const SecurityOperationsSectionComponent: React.FC<
           'wazuh.common.homeOverviewSecurityOperations.description',
           {
             defaultMessage:
-              'Fleet inventory scale, automated response activity, and the regulatory frameworks you can jump to.',
+              'Fleet inventory scale and the regulatory frameworks you can jump to.',
           },
         )}
       />
-      {/* Incident Response holds a single KPI, so it takes half the width of the other two. */}
       <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status={itHygieneDenied ? 'error' : 'available'}
             errorLabel={itHygieneDenied ? platforms.error?.message : undefined}
@@ -101,51 +92,7 @@ const SecurityOperationsSectionComponent: React.FC<
             />
           </WidgetGroup>
         </EuiFlexItem>
-        <EuiFlexItem grow={1} style={{ minWidth: CARD_MIN_WIDTH }}>
-          <WidgetGroup
-            status={activeResponse.status}
-            errorLabel={activeResponse.error?.message}
-            showManageIndexPatternsLink={
-              activeResponse.error?.kind === 'index-pattern-missing'
-            }
-            isPermissionDenied={
-              activeResponse.error?.kind === 'permission-denied'
-            }
-            title={i18n.translate(
-              'wazuh.common.homeOverviewSecurityOperations.incidentResponseTitle',
-              { defaultMessage: 'Incident Response' },
-            )}
-            titleLink={{ href: getActiveResponseUrl() }}
-            caption={i18n.translate(
-              'wazuh.common.homeOverviewWidget.captionLast24Hours',
-              { defaultMessage: 'Last 24 hours' },
-            )}
-            centerBody
-            data-test-subj='home-overview-active-response'
-          >
-            <StatTile
-              textAlign='center'
-              reverse
-              value={
-                <RedirectAppLinks application={getCore().application}>
-                  <EuiLink
-                    style={KPI_LINK_STYLE}
-                    href={getActiveResponseResponsesUrl()}
-                    data-test-subj='active-response-stat-link'
-                  >
-                    <TabNumber value={activeResponse.data} />
-                  </EuiLink>
-                </RedirectAppLinks>
-              }
-              label={i18n.translate(
-                'wazuh.common.homeOverviewSecurityOperations.actionsTriggered',
-                { defaultMessage: 'Actions triggered, last 24 hours' },
-              )}
-              data-test-subj='active-response-stat'
-            />
-          </WidgetGroup>
-        </EuiFlexItem>
-        <EuiFlexItem grow={2} style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <WidgetGroup
             status='available'
             title={i18n.translate(

@@ -8,6 +8,7 @@ import {
   mapDocCount,
   mapScaTiles,
   mapScaBenchmarks,
+  mapCaseManagement,
 } from './mappers';
 import { VULNERABILITY_SEVERITY_BANDS } from './fields';
 
@@ -244,6 +245,84 @@ describe('mappers', () => {
         pending: 0,
         neverConnected: 2,
         total: 8,
+      });
+    });
+  });
+
+  describe('mapCaseManagement', () => {
+    it('maps the status counts, the open severity split and the latest cases', () => {
+      expect(
+        mapCaseManagement({
+          case_status: {
+            buckets: {
+              active: { doc_count: 3 },
+              acknowledged: { doc_count: 1 },
+              completed: { doc_count: 9 },
+            },
+          },
+          open_cases: {
+            case_severity: {
+              buckets: { critical: { doc_count: 1 }, high: { doc_count: 3 } },
+            },
+            recent_cases: {
+              hits: {
+                hits: [
+                  {
+                    _id: 'doc-1',
+                    _source: {
+                      wazuh: {
+                        case: {
+                          title: 'Brute force',
+                          status: 'active',
+                          severity: 'high',
+                          priority: 'urgent',
+                          created_at: '2026-11-17T09:00:00Z',
+                        },
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        } as never),
+      ).toEqual({
+        byStatus: { active: 3, acknowledged: 1, completed: 9 },
+        openBySeverity: {
+          critical: 1,
+          high: 3,
+          medium: undefined,
+          low: undefined,
+          informational: undefined,
+        },
+        recentOpen: [
+          {
+            id: 'doc-1',
+            title: 'Brute force',
+            status: 'active',
+            priority: 'urgent',
+            // Never updated: falls back to the creation date.
+            updatedAt: '2026-11-17T09:00:00Z',
+          },
+        ],
+      });
+    });
+
+    it('returns no counts and no cases on an empty response', () => {
+      expect(mapCaseManagement(undefined)).toEqual({
+        byStatus: {
+          active: undefined,
+          acknowledged: undefined,
+          completed: undefined,
+        },
+        openBySeverity: {
+          critical: undefined,
+          high: undefined,
+          medium: undefined,
+          low: undefined,
+          informational: undefined,
+        },
+        recentOpen: [],
       });
     });
   });

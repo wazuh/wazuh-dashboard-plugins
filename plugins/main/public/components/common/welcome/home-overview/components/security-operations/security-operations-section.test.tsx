@@ -4,7 +4,6 @@ import { render, screen, fireEvent, within } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { SecurityOperationsSection } from './security-operations-section';
 import {
-  useActiveResponseOverview,
   useItHygienePlatformsCount,
   useItHygienePackagesCount,
   useItHygieneServicesCount,
@@ -20,15 +19,12 @@ jest.mock('../../hooks/use-overview-data', () => ({
   useItHygienePackagesCount: jest.fn(),
   useItHygieneUsersCount: jest.fn(),
   useItHygieneServicesCount: jest.fn(),
-  useActiveResponseOverview: jest.fn(),
   useTopOperatingSystems: jest.fn(),
   useTopNetworkServices: jest.fn(),
 }));
 jest.mock('../../utils/navigation', () => ({
   getItHygieneUrl: jest.fn(() => '#it-hygiene'),
   getItHygieneSystemOsUrl: jest.fn(() => '#it-hygiene-os'),
-  getActiveResponseUrl: jest.fn(),
-  getActiveResponseResponsesUrl: jest.fn(() => '#active-response-responses'),
   getRegulatoryComplianceUrl: jest.fn(),
   getRegulatoryComplianceUrlHome: jest.fn(),
 }));
@@ -56,10 +52,6 @@ beforeEach(() => {
     status: 'available',
     data: 320,
   });
-  asMock(useActiveResponseOverview).mockReturnValue({
-    status: 'available',
-    data: 7,
-  });
   asMock(useTopOperatingSystems).mockReturnValue({
     status: 'available',
     data: [{ key: 'Ubuntu 24.04.2 LTS', count: 2 }],
@@ -73,7 +65,7 @@ beforeEach(() => {
 });
 
 describe('SecurityOperationsSection', () => {
-  it('renders IT Hygiene, Incident Response, and Regulatory Compliance', () => {
+  it('renders IT Hygiene and Regulatory Compliance, without Incident Response', () => {
     const { container } = render(
       <SecurityOperationsSection complianceControls={complianceControls} />,
     );
@@ -81,17 +73,14 @@ describe('SecurityOperationsSection', () => {
       '[data-test-subj="home-overview-it-hygiene"]',
     ) as HTMLElement;
     expect(within(itHygienePanel).getByText('IT Hygiene')).toBeInTheDocument();
-    expect(screen.getByText('Incident Response')).toBeInTheDocument();
+    expect(screen.queryByText('Incident Response')).not.toBeInTheDocument();
     expect(screen.getByText('Regulatory Compliance')).toBeInTheDocument();
     expect(screen.getByText('Platforms')).toBeInTheDocument();
     expect(screen.getByText('35,682')).toBeInTheDocument();
-    expect(
-      screen.getByText('Actions triggered, last 24 hours'),
-    ).toBeInTheDocument();
     expect(screen.getByText('PCI DSS')).toBeInTheDocument();
   });
 
-  it('renders the Top 5 operating systems and network services cards below the existing three', () => {
+  it('renders the Top 5 operating systems and network services cards below the first row', () => {
     render(
       <SecurityOperationsSection complianceControls={complianceControls} />,
     );
@@ -112,17 +101,6 @@ describe('SecurityOperationsSection', () => {
     );
   });
 
-  it('links the Incident Response KPI to the Responses tab', () => {
-    const { container } = render(
-      <SecurityOperationsSection complianceControls={complianceControls} />,
-    );
-    const link = container.querySelector(
-      '[data-test-subj="active-response-stat-link"]',
-    ) as HTMLElement;
-    fireEvent.click(link);
-    expect(navigation.getActiveResponseResponsesUrl).toHaveBeenCalled();
-  });
-
   it('keeps the IT Hygiene panel (never hidden) even when every tile is unavailable', () => {
     asMock(useItHygienePlatformsCount).mockReturnValue({
       status: 'unavailable',
@@ -140,7 +118,6 @@ describe('SecurityOperationsSection', () => {
     expect(
       container.querySelector('[data-test-subj="home-overview-it-hygiene"]'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Incident Response')).toBeInTheDocument();
   });
 
   it('shows the permission message on the IT Hygiene card when every tile is denied', () => {
@@ -186,20 +163,6 @@ describe('SecurityOperationsSection', () => {
     expect(packages?.textContent).toContain('-');
   });
 
-  it('keeps Incident Response (never hidden) when its index is unavailable', () => {
-    asMock(useActiveResponseOverview).mockReturnValue({
-      status: 'unavailable',
-    });
-    const { container } = render(
-      <SecurityOperationsSection complianceControls={complianceControls} />,
-    );
-    expect(
-      container.querySelector(
-        '[data-test-subj="home-overview-active-response"]',
-      ),
-    ).toBeInTheDocument();
-  });
-
   it('navigates to IT Hygiene from the panel title', () => {
     const { container } = render(
       <SecurityOperationsSection complianceControls={complianceControls} />,
@@ -211,32 +174,12 @@ describe('SecurityOperationsSection', () => {
     expect(navigation.getItHygieneUrl).toHaveBeenCalled();
   });
 
-  it('gives Incident Response half the width of the other two cards', () => {
-    const { container } = render(
-      <SecurityOperationsSection complianceControls={complianceControls} />,
-    );
-    const growOf = (testSubj: string) =>
-      container
-        .querySelector(`[data-test-subj="${testSubj}"]`)
-        ?.closest('.euiFlexItem')?.className;
-    expect(growOf('home-overview-it-hygiene')).toContain(
-      'euiFlexItem--flexGrow2',
-    );
-    expect(growOf('home-overview-active-response')).toContain(
-      'euiFlexItem--flexGrow1',
-    );
-    expect(growOf('home-overview-regulatory-compliance')).toContain(
-      'euiFlexItem--flexGrow2',
-    );
-  });
-
   it('fetches lazily once the section enters the viewport', () => {
     asMock(useInViewport).mockReturnValue([{ current: null }, false]);
     render(
       <SecurityOperationsSection complianceControls={complianceControls} />,
     );
     expect(asMock(useItHygienePlatformsCount)).toHaveBeenCalledWith(false);
-    expect(asMock(useActiveResponseOverview)).toHaveBeenCalledWith(false);
     expect(asMock(useTopOperatingSystems)).toHaveBeenCalledWith(false);
     expect(asMock(useTopNetworkServices)).toHaveBeenCalledWith(false);
   });

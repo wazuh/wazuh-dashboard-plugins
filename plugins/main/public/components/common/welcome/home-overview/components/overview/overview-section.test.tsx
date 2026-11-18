@@ -3,7 +3,11 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
-import { useAgentStatus } from '../../hooks/use-overview-data';
+import {
+  useAgentStatus,
+  useCaseManagementOverview,
+  useIncidentResponseOverview,
+} from '../../hooks/use-overview-data';
 import * as navigation from '../../utils/navigation';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
@@ -11,6 +15,15 @@ import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermiss
 // are never loaded — this section is tested purely against the seam boundary.
 jest.mock('../../hooks/use-overview-data', () => ({
   useAgentStatus: jest.fn(),
+  useIncidentResponseOverview: jest.fn(),
+  useCaseManagementOverview: jest.fn(),
+}));
+// The cards have their own suites; here only their place in the layout matters.
+jest.mock('./incident-response-card', () => ({
+  IncidentResponseCard: () => <div data-test-subj='incident-response-card' />,
+}));
+jest.mock('./case-management-card', () => ({
+  CaseManagementCard: () => <div data-test-subj='case-management-card' />,
 }));
 jest.mock('../../utils/navigation', () => ({
   getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
@@ -55,6 +68,8 @@ const findingsAvailable = {
 beforeEach(() => {
   jest.clearAllMocks();
   asMock(useUserPermissionsRequirements).mockReturnValue([false, {}]);
+  asMock(useIncidentResponseOverview).mockReturnValue({ status: 'loading' });
+  asMock(useCaseManagementOverview).mockReturnValue({ status: 'loading' });
   asMock(useAgentStatus).mockReturnValue({
     status: 'available',
     data: {
@@ -79,6 +94,30 @@ describe('OverviewSection', () => {
     expect(container.textContent).toContain('agents active');
     expect(screen.getByText('35,682')).toBeInTheDocument();
     expect(screen.getByText('Initial Access')).toBeInTheDocument();
+  });
+
+  it('places Incident Response and Case management between the findings and MITRE rows', () => {
+    const { container } = render(
+      <OverviewSection findings={findingsAvailable} />,
+    );
+    const order = [
+      'home-overview-findings-severity',
+      'incident-response-card',
+      'case-management-card',
+      'home-overview-mitre-tactics',
+    ].map(testSubj =>
+      container.querySelector(`[data-test-subj="${testSubj}"]`),
+    );
+    order.reduce((previous, current) => {
+      expect(previous).toBeInTheDocument();
+      expect(
+        previous!.compareDocumentPosition(current!) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+      return current;
+    });
+    expect(useIncidentResponseOverview).toHaveBeenCalledWith(true);
+    expect(useCaseManagementOverview).toHaveBeenCalledWith(true);
   });
 
   it('shows a contained error for a failed group (distinct from hidden)', () => {

@@ -10,6 +10,15 @@ import {
 } from '../../../../../utils/applications';
 import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
+  ACTIVE_RESPONSE_NAME_FIELD,
+  AGENT_NAME_FIELD,
+  CASE_CREATED_AT_FIELD,
+  CASE_PRIORITY_FIELD,
+  CASE_SEVERITY_FIELD,
+  CASE_STATUS_FIELD,
+  CASE_STATUSES,
+  CASE_TITLE_FIELD,
+  CASE_UPDATED_AT_FIELD,
   COMPLIANCE_FRAMEWORK_FIELDS,
   EVENT_DOC_ID_FIELD,
   FIM_FILE_MTIME_FIELD,
@@ -21,6 +30,7 @@ import {
   MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
+  OPEN_CASE_STATUSES,
   RULE_TITLE_FIELD,
   SCA_CHECK_RESULT_FIELD,
   SCA_POLICY_NAME_FIELD,
@@ -289,4 +299,65 @@ export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
     THREAT_INTEL_THREAT_TYPE_FIELD,
     size,
   );
+}
+
+/** Incident Response card: top active responses and top agents that ran them. */
+export function buildIncidentResponseAggs(size = TOP_N) {
+  return {
+    ...buildTopTermsAgg(
+      AGG.topActiveResponses,
+      ACTIVE_RESPONSE_NAME_FIELD,
+      size,
+    ),
+    ...buildTopTermsAgg(AGG.topResponseAgents, AGENT_NAME_FIELD, size),
+  };
+}
+
+/**
+ * Case management card in one search: cases per status, and for the open ones
+ * the severity split and the latest updated cases.
+ */
+export function buildCaseManagementAggs(size = TOP_N) {
+  const severityFilters: Record<string, unknown> = {};
+  for (const band of FINDING_SEVERITY_BANDS) {
+    severityFilters[band] = { term: { [CASE_SEVERITY_FIELD]: band } };
+  }
+  return {
+    [AGG.caseStatus]: {
+      filters: {
+        filters: Object.fromEntries(
+          CASE_STATUSES.map(status => [
+            status,
+            { term: { [CASE_STATUS_FIELD]: status } },
+          ]),
+        ),
+      },
+    },
+    [AGG.openCases]: {
+      filter: { terms: { [CASE_STATUS_FIELD]: OPEN_CASE_STATUSES } },
+      aggs: {
+        [AGG.caseSeverity]: { filters: { filters: severityFilters } },
+        [AGG.recentCases]: {
+          top_hits: {
+            size,
+            sort: [
+              {
+                [CASE_UPDATED_AT_FIELD]: {
+                  order: 'desc',
+                  unmapped_type: 'date',
+                },
+              },
+            ],
+            _source: [
+              CASE_TITLE_FIELD,
+              CASE_STATUS_FIELD,
+              CASE_PRIORITY_FIELD,
+              CASE_UPDATED_AT_FIELD,
+              CASE_CREATED_AT_FIELD,
+            ],
+          },
+        },
+      },
+    },
+  };
 }

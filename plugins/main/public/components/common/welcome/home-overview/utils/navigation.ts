@@ -9,6 +9,7 @@ import {
   malwareDetection,
   vulnerabilityDetection,
   activeResponses,
+  caseManagement,
   regulatoryCompliance,
   endpointSummary,
   ctiExplorer,
@@ -255,11 +256,68 @@ export const getVulnerabilityDetectionBySeverityUrl = (
 };
 
 export const getActiveResponseUrl = () => getUrlForApp(activeResponses.id);
-/** Incident Response > Responses tab (triggered actions list). */
-export const getActiveResponseResponsesUrl = () =>
-  getUrlForApp(activeResponses.id, {
-    path: '#overview/?tab=incident-response-dashboard&tabView=responses',
+/**
+ * Incident Response > Responses tab (triggered actions list), last 24 hours,
+ * optionally filtered to one value of `field`.
+ */
+export const getActiveResponseResponsesUrl = (
+  filter?: { field: string; value: string },
+  indexPatternId?: string,
+) => {
+  const path = '#overview/?tab=incident-response-dashboard&tabView=responses';
+  if (!filter || !indexPatternId) {
+    return getUrlForApp(activeResponses.id, { path });
+  }
+  const queryState = rison.encode({
+    filters: [
+      PatternDataSourceFilterManager.createFilter(
+        FILTER_OPERATOR.IS,
+        filter.field,
+        filter.value,
+        indexPatternId,
+      ),
+    ],
+    query: { language: 'kuery', query: '' },
   });
+  return getUrlForApp(activeResponses.id, {
+    path: `${path}&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
+  });
+};
+
+export const getCaseManagementUrl = () => getUrlForApp(caseManagement.id);
+
+/**
+ * The Cases tab filters by the time of the finding, while the Home card counts
+ * every case, so the link opens a range wide enough to list them all. Findings
+ * store nanosecond dates, which cannot go before 1970.
+ */
+const CASES_G_STATE =
+  '(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-10y,to:now))';
+
+/** Case Management > Cases, filtered by case fields (`IS`, or `IS ONE OF` for a list). */
+export const getCaseManagementCasesUrl = (
+  filters: Array<{ field: string; value: string | string[] }>,
+  indexPatternId?: string,
+): string => {
+  const path = '#overview/?tab=caseManagement&tabView=cases';
+  if (!indexPatternId) {
+    return getUrlForApp(caseManagement.id, { path });
+  }
+  const queryState = rison.encode({
+    filters: filters.map(({ field, value }) =>
+      PatternDataSourceFilterManager.createFilter(
+        Array.isArray(value) ? FILTER_OPERATOR.IS_ONE_OF : FILTER_OPERATOR.IS,
+        field,
+        value,
+        indexPatternId,
+      ),
+    ),
+    query: { language: 'kuery', query: '' },
+  });
+  return getUrlForApp(caseManagement.id, {
+    path: `${path}&_a=${queryState}&_g=${CASES_G_STATE}`,
+  });
+};
 
 /**
  * The Active Responses app id, owned by the separate `wazuh-dashboard-notifications` plugin
