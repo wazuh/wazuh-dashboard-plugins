@@ -146,16 +146,46 @@ describe('SubscriptionPanel', () => {
         /Upgrade it to the Professional feed from the Wazuh Console to get new vulnerabilities, IOCs and rules faster/,
       ),
     ).toBeInTheDocument();
-    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
+    // The plans are compared in cards, the Open one marked as this plan.
+    expect(screen.queryByTestId('ctiFeedSubscriptionTiers')).toBeNull();
+    expect(screen.getByTestId('ctiFeedPlanCard-open')).toHaveAttribute(
+      'data-current',
+      'true',
+    );
+    expect(
+      screen.getByTestId('ctiFeedPlanCard-professional'),
+    ).toHaveTextContent(
       'New vulnerabilities, IOCs and rules, delivered faster.',
     );
-    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
-      'Open feed (included)',
-    );
-    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
-      'Professional feed',
-    );
     expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
+  });
+
+  test('marks the Professional plan card on the Professional feed', () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+      },
+    });
+
+    renderPanel({ statusCTI: SUCCESS });
+
+    expect(screen.getByTestId('ctiFeedPlanCard-professional')).toHaveAttribute(
+      'data-current',
+      'true',
+    );
+    expect(screen.getByTestId('ctiFeedPlanCard-open')).toHaveAttribute(
+      'data-current',
+      'false',
+    );
+  });
+
+  test('keeps the feed tiers list before the registration', () => {
+    renderPanel();
+
+    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toBeInTheDocument();
+    expect(screen.queryByTestId('ctiFeedPlanCards')).toBeNull();
   });
 
   test('falls back to a generic title when the plan is unknown', () => {

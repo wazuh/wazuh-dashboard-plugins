@@ -6,6 +6,7 @@ import {
   EuiFlexItem,
   EuiHealth,
   EuiIcon,
+  EuiLink,
   EuiLoadingContent,
   EuiPanel,
   EuiSpacer,
@@ -28,6 +29,12 @@ import { ISubscriptionResponse } from '../../services/types';
 import { useCtiRegistrationPermission } from '../../shared-components/cti-registration/hooks/use-cti-registration-permission';
 import { SubscriptionDetails } from './subscription-details';
 import { RegistrationOptions } from './registration-options';
+import {
+  FeedPlan,
+  OPEN_FEED_DESCRIPTION,
+  PlanCards,
+  PROFESSIONAL_FEED_DESCRIPTION,
+} from './plan-cards';
 
 type SubscriptionState = 'registered' | 'pending' | 'failed' | 'notRegistered';
 
@@ -42,7 +49,7 @@ interface SubscriptionView {
   /** Opens the registration flow; a registered environment has none. */
   action?: string;
   fillAction: boolean;
-  /** Open versus Professional, for environments that do not have the latter. */
+  /** Open versus Professional, for environments that are not registered yet. */
   showFeedTiers: boolean;
 }
 
@@ -114,7 +121,8 @@ function getSubscriptionView(
               },
             ),
         fillAction: false,
-        showFeedTiers: Boolean(plan?.is_public),
+        // A registered environment compares the plans in cards instead.
+        showFeedTiers: false,
       };
     case 'pending':
       return {
@@ -234,13 +242,7 @@ const FeedTiers: React.FC = () => (
           'wazuhCheckUpdates.ctiFeed.subscription.tiers.openTitle',
           { defaultMessage: 'Open feed (included)' },
         )}
-        description={i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.tiers.openDescription',
-          {
-            defaultMessage:
-              'Public rules, IOCs and vulnerabilities for every installation.',
-          },
-        )}
+        description={OPEN_FEED_DESCRIPTION}
       />
     </EuiFlexItem>
     <EuiFlexItem>
@@ -251,13 +253,7 @@ const FeedTiers: React.FC = () => (
           'wazuhCheckUpdates.ctiFeed.subscription.tiers.proTitle',
           { defaultMessage: 'Professional feed' },
         )}
-        description={i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.tiers.proDescription',
-          {
-            defaultMessage:
-              'New vulnerabilities, IOCs and rules, delivered faster.',
-          },
-        )}
+        description={PROFESSIONAL_FEED_DESCRIPTION}
       />
     </EuiFlexItem>
   </EuiFlexGroup>
@@ -283,6 +279,13 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
   const subscriptionMessage = ctiFlowState.getSubscription()?.message;
   const view = getSubscriptionView(state, subscriptionMessage?.plan);
   const registered = state === 'registered';
+  // The public plan is the Open feed; any other plan is the Professional one.
+  const plan = subscriptionMessage?.plan;
+  const currentPlan: FeedPlan | null = plan
+    ? plan.is_public
+      ? 'open'
+      : 'professional'
+    : null;
   // When the CTI console registered this environment, shown under the plan.
   const registeredAt = subscriptionMessage?.environment?.registered_at;
   const registeredDate = formatCtiDate(registeredAt);
@@ -400,21 +403,23 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
           ) : null}
           {registered ? (
             <>
-              <EuiSpacer size='l' />
-              <EuiButton
-                fill
-                href={`${WAZUH_CTI_CONSOLE_HREF}${ctiConsolePaths.deployments}`}
-                target='_blank'
-                rel='noopener noreferrer'
-                iconType='popout'
-                iconSide='right'
-                data-test-subj='ctiFeedSubscriptionConsoleLink'
-              >
-                {i18n.translate(
-                  'wazuhCheckUpdates.ctiFeed.subscription.openConsole',
-                  { defaultMessage: 'Open in Wazuh Console' },
-                )}
-              </EuiButton>
+              <EuiSpacer size='m' />
+              <PlanCards currentPlan={currentPlan} />
+              <EuiSpacer size='m' />
+              <EuiText size='s'>
+                <EuiLink
+                  href={`${WAZUH_CTI_CONSOLE_HREF}${ctiConsolePaths.deployments}`}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  external
+                  data-test-subj='ctiFeedSubscriptionConsoleLink'
+                >
+                  {i18n.translate(
+                    'wazuhCheckUpdates.ctiFeed.subscription.openConsole',
+                    { defaultMessage: 'Open in Wazuh Console' },
+                  )}
+                </EuiLink>
+              </EuiText>
             </>
           ) : null}
           {view.action ? (
