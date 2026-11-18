@@ -20,6 +20,7 @@ jest.mock('../../utils/navigation', () => ({
   getFileIntegrityMonitoringUrl: jest.fn(),
   getFileIntegrityMonitoringInventoryFilesUrl: jest.fn(() => '#fim-files'),
   getMalwareDetectionUrl: jest.fn(),
+  getCtiExplorerIocsUrl: jest.fn(() => '#cti-explorer-iocs'),
 }));
 jest.mock('../../../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),

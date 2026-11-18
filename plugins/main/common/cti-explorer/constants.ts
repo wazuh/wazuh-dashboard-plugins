@@ -59,6 +59,15 @@ export const IOC_TYPES = [
 ] as const;
 export type IocType = (typeof IOC_TYPES)[number];
 
+/**
+ * URL param that opens the IOC list filtered to one type, from a link of another
+ * page. The page applies it once and removes it from the URL.
+ */
+export const CTI_EXPLORER_IOC_TYPE_PARAM = 'iocType';
+
+export const isIocType = (value: unknown): value is IocType =>
+  IOC_TYPES.includes(value as IocType);
+
 /** `document.software.name` of the records with no malware family. */
 export const IOC_UNKNOWN_FAMILY = 'unknown';
 
