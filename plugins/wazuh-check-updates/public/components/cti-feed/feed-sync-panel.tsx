@@ -40,16 +40,7 @@ interface SummaryView {
   iconType: string;
   iconColor: string;
   title: string;
-  description: string;
 }
-
-const AUTOMATIC_SYNC_HINT = i18n.translate(
-  'wazuhCheckUpdates.ctiFeed.sync.automaticHint',
-  {
-    defaultMessage:
-      'The indexer syncs the feed automatically. Use Check for updates to sync it now.',
-  },
-);
 
 /**
  * `checking`: an update is known to be running, but no feed shows it syncing yet (it
@@ -66,22 +57,14 @@ function getSummaryView(summary: PanelSummary): SummaryView {
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.checkingTitle', {
           defaultMessage: 'Content update in progress',
         }),
-        description: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.sync.checkingDescription',
-          {
-            defaultMessage:
-              'The indexer is checking the feed for new content. The feeds below show it once they start syncing. Detection keeps using the current content meanwhile.',
-          },
-        ),
       };
     case 'upToDate':
       return {
-        iconType: 'checkInCircleFilled',
+        iconType: 'check',
         iconColor: 'success',
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.upToDateTitle', {
           defaultMessage: 'All feeds are up to date',
         }),
-        description: AUTOMATIC_SYNC_HINT,
       };
     case 'syncing':
       return {
@@ -90,13 +73,6 @@ function getSummaryView(summary: PanelSummary): SummaryView {
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.syncingTitle', {
           defaultMessage: 'Syncing new content',
         }),
-        description: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.sync.syncingDescription',
-          {
-            defaultMessage:
-              'The indexer is downloading content from the feed. Detection keeps using the current content until the sync finishes. This page follows its progress.',
-          },
-        ),
       };
     case 'pending':
       return {
@@ -105,13 +81,6 @@ function getSummaryView(summary: PanelSummary): SummaryView {
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.pendingTitle', {
           defaultMessage: 'New content is available',
         }),
-        description: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.sync.pendingDescription',
-          {
-            defaultMessage:
-              'The next sync brings it in. Use Check for updates to sync it now.',
-          },
-        ),
       };
     case 'failed':
       return {
@@ -120,13 +89,6 @@ function getSummaryView(summary: PanelSummary): SummaryView {
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.failedTitle', {
           defaultMessage: 'Some feeds could not sync',
         }),
-        description: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.sync.failedDescription',
-          {
-            defaultMessage:
-              'Detection keeps using the content already synced. Use Check for updates to try again, or check the indexer logs if it keeps failing.',
-          },
-        ),
       };
     case 'empty':
       return {
@@ -135,13 +97,6 @@ function getSummaryView(summary: PanelSummary): SummaryView {
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.emptyTitle', {
           defaultMessage: 'No feed content yet',
         }),
-        description: i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.sync.emptyDescription',
-          {
-            defaultMessage:
-              'The feeds appear here after the indexer syncs them for the first time.',
-          },
-        ),
       };
     default:
       return {
@@ -150,7 +105,6 @@ function getSummaryView(summary: PanelSummary): SummaryView {
         title: i18n.translate('wazuhCheckUpdates.ctiFeed.sync.unknownTitle', {
           defaultMessage: 'Sync state unknown',
         }),
-        description: AUTOMATIC_SYNC_HINT,
       };
   }
 }
@@ -425,23 +379,23 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
           >
             <EuiFlexItem grow={false}>
               {panelSummary === 'syncing' || panelSummary === 'checking' ? (
-                <EuiLoadingSpinner size='l' />
+                <EuiLoadingSpinner size='m' />
               ) : (
                 <EuiIcon
                   type={view.iconType}
                   color={view.iconColor}
-                  size='l'
+                  size='m'
                   aria-hidden
                 />
               )}
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiTitle size='xs'>
-                <h3 data-test-subj='ctiFeedSyncSummaryTitle'>{view.title}</h3>
-              </EuiTitle>
-              <EuiText size='s' color='subdued'>
-                {view.description}
-              </EuiText>
+              <h3
+                className='ctiFeed__syncSummaryTitle'
+                data-test-subj='ctiFeedSyncSummaryTitle'
+              >
+                {view.title}
+              </h3>
             </EuiFlexItem>
           </EuiFlexGroup>
           {consumers.length > 0 ? (

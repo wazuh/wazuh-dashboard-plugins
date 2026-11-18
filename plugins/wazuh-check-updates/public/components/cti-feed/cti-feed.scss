@@ -157,3 +157,12 @@
     border-radius: $euiSizeXL;
   }
 }
+
+// Feed sync summary: a plain 14px line next to its icon, not a title.
+.ctiFeed__syncSummaryTitle {
+  margin: 0;
+  font-size: $euiFontSizeS;
+  font-weight: $euiFontWeightRegular;
+  line-height: $euiLineHeight;
+  color: $euiTextColor;
+}
