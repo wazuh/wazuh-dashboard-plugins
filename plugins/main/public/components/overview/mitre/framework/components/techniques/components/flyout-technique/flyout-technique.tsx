@@ -42,7 +42,6 @@ import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/
 import store from '../../../../../../../../redux/store';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
 import { setFilters } from '../../../../../../../common/search-bar/set-filters';
-import { SearchResponse } from '../../../../../../../../../../../src/core/server';
 import { useAsyncActionRunOnStart } from '../../../../../../../common/hooks/use_async_action_run_on_start';
 import { getMitreResourcesByIds } from '../../../../../lib/get-mitre-resources-by-ids';
 import {
@@ -161,7 +160,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
-  const onResults = (response?: SearchResponse) =>
+  const onResults = (response?: Parameters<typeof parseStats>[0]) =>
     setStats({
       data: response ? parseStats(response) : undefined,
       isLoading: false,
