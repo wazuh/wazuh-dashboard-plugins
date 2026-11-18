@@ -150,6 +150,20 @@ describe('FeedSyncPanel', () => {
     );
   });
 
+  test('warns about sync steps waiting to be retried', () => {
+    renderPanel([
+      consumer({ pending_sync_phases: ['detectors'] }),
+      consumer({ name: 'public-iocs-5', type: 'cti:catalog:consumer:iocs' }),
+    ]);
+
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Some sync steps are waiting to be retried',
+    );
+    expect(
+      screen.getAllByTestId('ctiFeedSyncBadge').map(badge => badge.textContent),
+    ).toEqual(['Retry pending', 'Up to date']);
+  });
+
   test('shows the progress of a feed that is syncing', () => {
     renderPanel([
       consumer({ status: 'running', local_offset: 40, remote_offset: 80 }),
@@ -210,6 +224,21 @@ describe('FeedSyncPanel', () => {
       expect(
         screen.getByTestId('ctiFeedSyncProgressCaption'),
       ).toHaveTextContent('Finishing the sync');
+    });
+
+    test('shows an indeterminate bar while the new content is prepared', () => {
+      // A plan change: offset 0 until the new snapshot goes live, not 0% done.
+      renderPanel([
+        consumer({ status: 'running', local_offset: 0, remote_offset: 1899 }),
+      ]);
+
+      expect(screen.getByTestId('ctiFeedSyncProgress')).not.toHaveAttribute(
+        'value',
+      );
+      expect(screen.queryByText('0% synced')).toBeNull();
+      expect(
+        screen.getByTestId('ctiFeedSyncProgressCaption'),
+      ).toHaveTextContent('Preparing the new content');
     });
 
     test('shows an indeterminate bar when the remote offset is unknown', () => {

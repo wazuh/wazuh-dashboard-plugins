@@ -74,6 +74,15 @@ function getSummaryView(summary: PanelSummary): SummaryView {
           defaultMessage: 'Syncing new content',
         }),
       };
+    case 'retryPending':
+      return {
+        iconType: 'alert',
+        iconColor: 'warning',
+        title: i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.sync.retryPendingTitle',
+          { defaultMessage: 'Some sync steps are waiting to be retried' },
+        ),
+      };
     case 'pending':
       return {
         iconType: 'clock',
@@ -116,14 +125,18 @@ const renderLastUpdated = (time: string) =>
   });
 
 /**
- * How far a syncing feed is. Caught up with the remote content but still running
- * (the indexer is applying what it downloaded), or with no known remote offset,
- * there is no meaningful percentage: the bar is indeterminate instead of a full bar
- * that does not move.
+ * How far a syncing feed is. While the new content is prepared (`local_offset` 0, e.g.
+ * a plan change downloading a snapshot), caught up with the remote content but still
+ * running (the indexer is applying what it downloaded), or with no known remote
+ * offset, there is no meaningful percentage: the bar is indeterminate instead of one
+ * stuck at 0% or full and not moving.
  */
-const SyncProgress: React.FC<{ progress: number | null }> = ({ progress }) => {
+const SyncProgress: React.FC<{
+  progress: number | null;
+  preparing: boolean;
+}> = ({ progress, preparing }) => {
   const percent = progress === null ? null : Math.round(progress * 100);
-  if (percent !== null && percent < 100) {
+  if (!preparing && percent !== null && percent < 100) {
     return (
       <EuiProgress
         value={percent}
@@ -146,7 +159,11 @@ const SyncProgress: React.FC<{ progress: number | null }> = ({ progress }) => {
         textAlign='right'
         data-test-subj='ctiFeedSyncProgressCaption'
       >
-        {percent === null
+        {preparing
+          ? i18n.translate('wazuhCheckUpdates.ctiFeed.sync.preparing', {
+              defaultMessage: 'Preparing the new content',
+            })
+          : percent === null
           ? i18n.translate('wazuhCheckUpdates.ctiFeed.sync.downloading', {
               defaultMessage: 'Downloading content',
             })
@@ -238,7 +255,10 @@ const FeedRow: React.FC<{
       {state.kind === 'syncing' || hasFeedContent(consumer.type) ? (
         <div className='ctiFeed__feedRowFooter'>
           {state.kind === 'syncing' ? (
-            <SyncProgress progress={state.progress} />
+            <SyncProgress
+              progress={state.progress}
+              preparing={state.preparing}
+            />
           ) : (
             <FeedContentLine
               feedType={consumer.type}

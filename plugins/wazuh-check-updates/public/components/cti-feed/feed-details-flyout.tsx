@@ -22,6 +22,7 @@ import {
 import type { CtiConsumer } from '../../../common/cti-consumers';
 import {
   ConsumerSyncState,
+  formatSyncPhases,
   getConsumerSyncState,
   getSyncProgress,
 } from '../../services/cti-consumer-sync-state';
@@ -92,7 +93,28 @@ function getStateExplanation(
           'wazuhCheckUpdates.ctiFeed.details.state.syncingBody',
           {
             defaultMessage:
-              'The indexer is downloading changes from this feed. Detection keeps using the current content until the sync finishes. Refresh the feed sync to see its progress.',
+              'The indexer is downloading changes from this feed. Detection keeps using the current content until the sync finishes. This page follows its progress.',
+          },
+        ),
+      };
+    case 'retryPending':
+      return {
+        color: 'warning',
+        iconType: 'alert',
+        title: i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.details.state.retryPendingTitle',
+          { defaultMessage: 'Some sync steps are waiting to be retried' },
+        ),
+        body: i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.details.state.retryPendingBody',
+          {
+            defaultMessage:
+              'The content of this feed is downloaded, but the last sync left {count, plural, one {a step} other {steps}} to finish: {phases}. Until then, detection may not use all of it. The next sync retries {count, plural, one {it} other {them}}, or use Check for updates to retry now. If it keeps failing, search the indexer logs for the consumer {name}.',
+            values: {
+              phases: formatSyncPhases(state.phases),
+              count: state.phases.length,
+              name: consumer.name,
+            },
           },
         ),
       };
@@ -151,6 +173,37 @@ const SyncProgress: React.FC<{
           defaultMessage: 'The feed has not published any content yet.',
         })}
       </EuiText>
+    );
+  }
+
+  // No content of the new data source is live yet: the offsets say nothing until it is.
+  if (state.kind === 'syncing' && state.preparing) {
+    return (
+      <>
+        <EuiProgress
+          size='m'
+          color='primary'
+          label={i18n.translate(
+            'wazuhCheckUpdates.ctiFeed.details.progress.preparing',
+            { defaultMessage: 'Preparing the new content' },
+          )}
+          data-test-subj='ctiFeedDetailsProgress'
+        />
+        <EuiSpacer size='xs' />
+        <EuiText
+          size='xs'
+          color='subdued'
+          data-test-subj='ctiFeedDetailsPreparing'
+        >
+          {i18n.translate(
+            'wazuhCheckUpdates.ctiFeed.details.progress.preparingHint',
+            {
+              defaultMessage:
+                'The new content goes live once it is ready, then the remaining changes sync.',
+            },
+          )}
+        </EuiText>
+      </>
     );
   }
 

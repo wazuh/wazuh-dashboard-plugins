@@ -50,15 +50,17 @@ The **Feed sync** panel summarizes the sync state of the feeds and lists each on
 
 Each feed shows one of these states:
 
-| State                | Meaning                                                                 |
-| :------------------- | :---------------------------------------------------------------------- |
-| **Up to date**       | The feed holds all the content the CTI service offers.                  |
-| **Update available** | The CTI service has new content that the next sync brings in.           |
-| **Syncing**          | The indexer is downloading content. A progress bar shows how far it is. |
-| **Sync failed**      | The last sync failed. Detection keeps using the content already synced. |
+| State                | Meaning                                                                                                                                                                                                                          |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Up to date**       | The feed holds all the content the CTI service offers.                                                                                                                                                                           |
+| **Update available** | The CTI service has new content that the next sync brings in.                                                                                                                                                                    |
+| **Syncing**          | The indexer is downloading content. A progress bar shows how far it is.                                                                                                                                                          |
+| **Retry pending**    | The content is downloaded, but steps of the last sync failed (`pending_sync_phases`): the ruleset's integrations, rules or detectors in Ruleset Management, or the load of the IOCs into the engine. The next sync retries them. |
+| **Sync failed**      | The last sync failed. Detection keeps using the content already synced.                                                                                                                                                          |
 
 The state comes from the `.wazuh-cti-consumers` index of the Wazuh indexer. While a feed is
-syncing, the panel refreshes itself every few seconds.
+syncing, the panel refreshes itself every few seconds. While a plan change prepares the new
+content (the feed restarts at offset 0 until its snapshot is live), the bar shows no percentage.
 
 ### What each feed delivered
 
