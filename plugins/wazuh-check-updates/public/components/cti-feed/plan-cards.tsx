@@ -73,9 +73,12 @@ const PlanCard: React.FC<PlanCardProps> = ({
       </EuiFlexItem>
       {current ? (
         <EuiFlexItem grow={false}>
+          {/* `hollow` is styled by classes only (named colors are inline styles), so
+              the stylesheet can give it a solid, theme-aware fill. */}
           <EuiBadge
-            color='primary'
+            color='hollow'
             iconType='checkInCircleFilled'
+            className='ctiFeed__planBadge'
             data-test-subj='ctiFeedPlanCardCurrent'
           >
             {YOUR_PLAN}
