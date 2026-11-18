@@ -7,6 +7,7 @@ import {
   EuiFlyoutHeader,
   EuiLink,
   EuiLoadingContent,
+  EuiText,
   EuiTitle,
 } from '@elastic/eui';
 import { MitreItem, MitreTechnique } from './lib/technique';
@@ -86,14 +87,16 @@ export const TechniqueHeader = ({
       </EuiFlexItem>
       {technique?.url && (
         <EuiFlexItem grow={false}>
-          <EuiLink href={technique.url} target='_blank' external>
-            {i18n.translate(
-              'wazuh.mitreAttack.techniqueFlyout.header.viewOnMitre',
-              {
-                defaultMessage: 'View on MITRE ATT&CK',
-              },
-            )}
-          </EuiLink>
+          <EuiText size='s'>
+            <EuiLink href={technique.url} target='_blank' external>
+              {i18n.translate(
+                'wazuh.mitreAttack.techniqueFlyout.header.viewOnMitre',
+                {
+                  defaultMessage: 'View on MITRE ATT&CK',
+                },
+              )}
+            </EuiLink>
+          </EuiText>
         </EuiFlexItem>
       )}
     </EuiFlexGroup>

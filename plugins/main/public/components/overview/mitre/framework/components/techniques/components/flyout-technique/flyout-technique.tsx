@@ -19,6 +19,7 @@ import {
   EuiFlyoutBody,
   EuiLink,
   EuiSpacer,
+  EuiText,
   EuiTitle,
 } from '@elastic/eui';
 import { getUiSettings } from '../../../../../../../../kibana-services';
@@ -241,12 +242,14 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
                   </EuiBadge>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  <EuiLink onClick={e => openDiscover(e, currentTechnique)}>
-                    {i18n.translate(
-                      'wazuh.mitreAttack.techniqueFlyout.recentFindings.openInFindings',
-                      { defaultMessage: 'Open in Findings' },
-                    )}
-                  </EuiLink>
+                  <EuiText size='s'>
+                    <EuiLink onClick={e => openDiscover(e, currentTechnique)}>
+                      {i18n.translate(
+                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.openInFindings',
+                        { defaultMessage: 'Open in Findings' },
+                      )}
+                    </EuiLink>
+                  </EuiText>
                 </EuiFlexItem>
               </EuiFlexGroup>
             }
