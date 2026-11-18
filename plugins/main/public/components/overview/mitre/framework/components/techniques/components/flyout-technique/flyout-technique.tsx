@@ -9,34 +9,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { useEffect, useState, useMemo, Fragment } from 'react';
-import $ from 'jquery';
+import React, { useEffect, useMemo, useState } from 'react';
 import { i18n } from '@osd/i18n';
 import {
-  EuiFlyoutHeader,
-  EuiLoadingContent,
-  EuiTitle,
+  EuiAccordion,
+  EuiBadge,
   EuiFlexGroup,
   EuiFlexItem,
   EuiFlyoutBody,
-  EuiDescriptionList,
-  EuiSpacer,
   EuiLink,
-  EuiAccordion,
-  EuiToolTip,
-  EuiIcon,
+  EuiSpacer,
+  EuiTitle,
 } from '@elastic/eui';
-import { WzRequest } from '../../../../../../../../react-services/wz-request';
 import { getUiSettings } from '../../../../../../../../kibana-services';
 import {
   FilterManager,
   IndexPattern,
 } from '../../../../../../../../../../../src/plugins/data/public/';
-import {
-  TAB_VIEW_NAME_DASHBOARD,
-  TAB_VIEW_NAME_EVENTS,
-  UI_LOGGER_LEVELS,
-} from '../../../../../../../../../common/constants';
+import { UI_LOGGER_LEVELS } from '../../../../../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../../../../../react-services/common-services';
 import { WzFlyout } from '../../../../../../../../components/common/flyouts';
@@ -50,167 +40,70 @@ import { tFilterParams } from '../../../../mitre';
 import TechniqueRowDetails from './technique-row-details';
 import { buildPhraseFilter } from '../../../../../../../../../../../src/plugins/data/common';
 import store from '../../../../../../../../redux/store';
-import NavigationService from '../../../../../../../../react-services/navigation-service';
 import { wzDiscoverRenderColumns } from '../../../../../../../common/wazuh-discover/render-columns';
 import { setFilters } from '../../../../../../../common/search-bar/set-filters';
+import { SearchResponse } from '../../../../../../../../../../../src/core/server';
+import { useAsyncActionRunOnStart } from '../../../../../../../common/hooks/use_async_action_run_on_start';
+import { getMitreResourcesByIds } from '../../../../../lib/get-mitre-resources-by-ids';
+import {
+  fetchTechnique,
+  MitreItem,
+  parseStats,
+  STATS_AGGS,
+  TechniqueStats as tTechniqueStats,
+} from './lib/technique';
+import { TechniqueHeader } from './technique-header';
+import { TechniqueStats } from './technique-stats';
+import { TechniqueDetails } from './technique-details';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
   onChangeFlyout: (value: boolean) => void;
-  openDashboard: (e: any, id: string) => void;
   openDiscover: (e: any, id: string) => void;
-  filterParams: tFilterParams;
+  filterParams?: Pick<tFilterParams, 'filters'>;
 };
 
-type tFlyoutTechniqueState = {
-  techniqueData: {
-    [key: string]: any;
-  };
-  totalHits?: number;
-};
+const getTactics = (ids?: string[]): Promise<MitreItem[]> =>
+  ids?.length
+    ? getMitreResourcesByIds<MitreItem>('tactics', ids)
+    : Promise.resolve([]);
 
 export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
+  const { currentTechnique, onChangeFlyout, openDiscover, filterParams } =
+    props;
   const filterManager = useMemo(() => new FilterManager(getUiSettings()), []);
-  const [state, setState] = useState<tFlyoutTechniqueState>({
-    techniqueData: {},
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { onChangeFlyout, openDashboard, openDiscover, filterParams } = props;
-  const { techniqueData } = state;
-
-  useEffect(() => {
-    initialize();
-  }, []);
-
-  const initialize = async () => {
-    await getTechniqueData();
-    addListenersToCitations();
-  };
+  const technique = useAsyncActionRunOnStart(fetchTechnique, [
+    currentTechnique,
+  ]);
+  const tactics = useAsyncActionRunOnStart(getTactics, [
+    technique.data?.tactics,
+  ]);
+  const [stats, setStats] = useState<{
+    data?: tTechniqueStats;
+    isLoading: boolean;
+  }>({ isLoading: true });
 
   useEffect(() => {
-    const componentDidUpdate = async prevProps => {
-      const { currentTechnique } = props;
-      if (prevProps.currentTechnique !== currentTechnique) {
-        await getTechniqueData();
-      }
-      addListenersToCitations();
-    };
-
-    componentDidUpdate(props);
-
-    return () => {
-      // remove listeners of citations if these exist
-      if (
-        state.techniqueData &&
-        state.techniqueData.replaced_external_references &&
-        state.techniqueData.replaced_external_references.length > 0
-      ) {
-        state.techniqueData.replaced_external_references.forEach(reference => {
-          $(`.technique-reference-${reference.index}`).each(function () {
-            $(this).off();
-          });
-        });
-      }
-    };
-  }, [props.currentTechnique]);
-
-  const addListenersToCitations = () => {
-    if (
-      state.techniqueData &&
-      state.techniqueData.replaced_external_references &&
-      state.techniqueData.replaced_external_references.length > 0
-    ) {
-      state.techniqueData.replaced_external_references.forEach(reference => {
-        $(`.technique-reference-citation-${reference.index}`).each(function () {
-          $(this).off();
-          $(this).click(() => {
-            $(`.euiFlyoutBody__overflow`).scrollTop(
-              $(`#technique-reference-${reference.index}`).position().top - 150,
-            );
-          });
-        });
-      });
+    const error = technique.error || tactics.error;
+    if (!error) {
+      return;
     }
-  };
-
-  const getTechniqueData = async () => {
-    try {
-      setIsLoading(true);
-      setState({ techniqueData: {} });
-      const { currentTechnique } = props;
-      const techniqueResponse = await WzRequest.apiReq(
-        'GET',
-        '/mitre/techniques',
-        {
-          params: {
-            q: `external_id=${currentTechnique}`,
-          },
-        },
-      );
-      const [techniqueData] = (
-        ((techniqueResponse || {}).data || {}).data || {}
-      ).affected_items;
-      const tacticsResponse = await WzRequest.apiReq(
-        'GET',
-        '/mitre/tactics',
-        {},
-      );
-      const tacticsData = (((tacticsResponse || {}).data || {}).data || {})
-        .affected_items;
-
-      techniqueData.tactics &&
-        (techniqueData.tactics = techniqueData.tactics.map(tacticID => {
-          const tactic = tacticsData.find(
-            tacticData => tacticData.id === tacticID,
-          );
-          return { id: tactic.external_id, name: tactic.name };
-        }));
-      const { name, mitre_version, tactics } = techniqueData;
-
-      setState({
-        techniqueData: { name, mitre_version, tactics },
-      });
-      setIsLoading(false);
-    } catch (error) {
-      const options = {
-        context: `${FlyoutTechnique.name}.getTechniqueData`,
-        level: UI_LOGGER_LEVELS.ERROR,
-        severity: UI_ERROR_SEVERITIES.BUSINESS,
-        store: true,
-        display: true,
-        error: {
-          error: error,
-          message: error.message || error,
-          title: i18n.translate(
-            'wazuh.mitreAttack.techniqueFlyout.errorFetchingTechnique',
-            {
-              defaultMessage: 'Error obtaining the requested technique',
-            },
-          ),
-        },
-      };
-      getErrorOrchestrator().handleError(options);
-      setIsLoading(false);
-    }
-  };
-
-  const renderHeader = () => {
-    const { techniqueData } = state;
-    return (
-      <EuiFlyoutHeader hasBorder style={{ padding: '12px 16px' }}>
-        {(Object.keys(techniqueData).length === 0 && (
-          <div>
-            <EuiLoadingContent lines={1} />
-          </div>
-        )) || (
-          <EuiTitle size='m'>
-            <h2 id='flyoutSmallTitle'>{techniqueData.name}</h2>
-          </EuiTitle>
-        )}
-      </EuiFlyoutHeader>
-    );
-  };
+    getErrorOrchestrator().handleError({
+      context: `${FlyoutTechnique.name}.getTechniqueData`,
+      level: UI_LOGGER_LEVELS.ERROR,
+      severity: UI_ERROR_SEVERITIES.BUSINESS,
+      store: true,
+      display: true,
+      error: {
+        error,
+        message: error.message || error,
+        title: i18n.translate(
+          'wazuh.mitreAttack.techniqueFlyout.errorFetchingTechnique',
+          { defaultMessage: 'Error obtaining the requested technique' },
+        ),
+      },
+    });
+  }, [technique.error, tactics.error]);
 
   const getFilters = (filter: { [key: string]: any }, indexPattern) => {
     const filtersToAdd = [];
@@ -268,225 +161,11 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       : addRenderColumn(techniquesColumns);
   };
 
-  const goToTechniqueInIntelligence = (e, currentTechnique) => {
-    NavigationService.getInstance().updateAndNavigateSearchParams({
-      tab: 'mitre',
-      tabView: 'intelligence',
-      tabRedirect: 'techniques',
-      idToRedirect: currentTechnique,
+  const onResults = (response?: SearchResponse) =>
+    setStats({
+      data: response ? parseStats(response) : undefined,
+      isLoading: false,
     });
-  };
-
-  const goToTacticInIntelligence = async (e, tactic) => {
-    NavigationService.getInstance().updateAndNavigateSearchParams({
-      tab: 'mitre',
-      tabView: 'intelligence',
-      tabRedirect: 'tactics',
-      idToRedirect: tactic.id,
-    });
-  };
-
-  const renderBody = () => {
-    const { currentTechnique } = props;
-    const { techniqueData } = state;
-    const data = [
-      {
-        title: i18n.translate('wazuh.mitreAttack.techniqueFlyout.details.id', {
-          defaultMessage: 'ID',
-        }),
-        description: (
-          <EuiToolTip
-            position='top'
-            content={i18n.translate(
-              'wazuh.mitreAttack.techniqueFlyout.openTechniqueInIntelligenceTooltip',
-              {
-                defaultMessage:
-                  'Open {technique} details in the Intelligence section',
-                values: { technique: currentTechnique },
-              },
-            )}
-          >
-            <EuiLink
-              onClick={e => {
-                goToTechniqueInIntelligence(e, currentTechnique);
-                e.stopPropagation();
-              }}
-            >
-              {currentTechnique}
-            </EuiLink>
-          </EuiToolTip>
-        ),
-      },
-      {
-        title: i18n.translate(
-          'wazuh.mitreAttack.techniqueFlyout.details.tactics',
-          {
-            defaultMessage: 'Tactics',
-          },
-        ),
-        description: techniqueData.tactics
-          ? techniqueData.tactics.map(tactic => {
-              return (
-                <Fragment key={tactic.id}>
-                  <EuiToolTip
-                    position='top'
-                    content={i18n.translate(
-                      'wazuh.mitreAttack.techniqueFlyout.openTacticInIntelligenceTooltip',
-                      {
-                        defaultMessage:
-                          'Open {tactic} details in the Intelligence section',
-                        values: { tactic: tactic.name },
-                      },
-                    )}
-                  >
-                    <EuiLink
-                      onClick={e => {
-                        goToTacticInIntelligence(e, tactic);
-                        e.stopPropagation();
-                      }}
-                    >
-                      {tactic.name}
-                    </EuiLink>
-                  </EuiToolTip>
-                  <br />
-                </Fragment>
-              );
-            })
-          : '',
-      },
-      {
-        title: i18n.translate(
-          'wazuh.mitreAttack.techniqueFlyout.details.version',
-          {
-            defaultMessage: 'Version',
-          },
-        ),
-        description: techniqueData.mitre_version,
-      },
-    ];
-    return (
-      <EuiFlyoutBody>
-        <EuiAccordion
-          id='details'
-          initialIsOpen={true}
-          buttonContent={
-            <EuiTitle size='s'>
-              <h3>
-                {i18n.translate(
-                  'wazuh.mitreAttack.techniqueFlyout.details.title',
-                  {
-                    defaultMessage: 'Technique details',
-                  },
-                )}
-              </h3>
-            </EuiTitle>
-          }
-        >
-          <div className='flyout-row details-row'>
-            <EuiFlexGroup direction='column' gutterSize='none'>
-              {(Object.keys(techniqueData).length === 0 && (
-                <EuiFlexItem>
-                  <EuiLoadingContent lines={2} />
-                  <EuiLoadingContent lines={3} />
-                </EuiFlexItem>
-              )) || (
-                <EuiFlexItem style={{ marginBottom: 30 }}>
-                  <EuiDescriptionList listItems={data} />
-                </EuiFlexItem>
-              )}
-            </EuiFlexGroup>
-          </div>
-        </EuiAccordion>
-
-        <EuiSpacer size='s' />
-        <EuiAccordion
-          style={{ textDecoration: 'none' }}
-          id={'recent_events'}
-          className='events-accordion'
-          buttonContent={
-            <EuiTitle size='s'>
-              <h3>
-                {i18n.translate(
-                  'wazuh.mitreAttack.techniqueFlyout.recentFindings.title',
-                  {
-                    defaultMessage: 'Recent findings',
-                  },
-                )}
-                <span style={{ marginLeft: 16 }}>
-                  <span>
-                    <EuiToolTip
-                      position='top'
-                      content={i18n.translate(
-                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.showInDashboardTooltip',
-                        {
-                          defaultMessage: 'Show {id} in {tabName}',
-                          values: {
-                            id: currentTechnique,
-                            tabName: TAB_VIEW_NAME_DASHBOARD,
-                          },
-                        },
-                      )}
-                    >
-                      <EuiIcon
-                        onMouseDown={e => {
-                          openDashboard(e, currentTechnique);
-                          e.stopPropagation();
-                        }}
-                        color='primary'
-                        type='visualizeApp'
-                        style={{ marginRight: '10px' }}
-                      ></EuiIcon>
-                    </EuiToolTip>
-                    <EuiToolTip
-                      position='top'
-                      content={i18n.translate(
-                        'wazuh.mitreAttack.techniqueFlyout.recentFindings.inspectInFindingsTooltip',
-                        {
-                          defaultMessage: 'Inspect {id} in {tabName}',
-                          values: {
-                            id: currentTechnique,
-                            tabName: TAB_VIEW_NAME_EVENTS,
-                          },
-                        },
-                      )}
-                    >
-                      <EuiIcon
-                        onMouseDown={e => {
-                          openDiscover(e, currentTechnique);
-                          e.stopPropagation();
-                        }}
-                        color='primary'
-                        type='discoverApp'
-                      ></EuiIcon>
-                    </EuiToolTip>
-                  </span>
-                </span>
-              </h3>
-            </EuiTitle>
-          }
-          paddingSize='none'
-          initialIsOpen={true}
-        >
-          <WazuhFlyoutDiscover
-            DataSource={PatternDataSource}
-            tableColumns={getDiscoverColumns()}
-            filterManager={filterManager}
-            initialFetchFilters={filterParams?.filters || []}
-            expandedRowComponent={expandedRow}
-          />
-        </EuiAccordion>
-      </EuiFlyoutBody>
-    );
-  };
-
-  const renderLoading = () => {
-    return (
-      <EuiFlyoutBody>
-        <EuiLoadingContent lines={2} />
-        <EuiLoadingContent lines={3} />
-      </EuiFlyoutBody>
-    );
-  };
 
   return (
     <WzFlyout
@@ -497,9 +176,95 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         'aria-labelledby': 'flyoutSmallTitle',
       }}
     >
-      {techniqueData && renderHeader()}
-      {renderBody()}
-      {isLoading && renderLoading()}
+      <TechniqueHeader
+        techniqueId={currentTechnique}
+        technique={technique.data ?? undefined}
+        tactics={tactics.data ?? []}
+        isLoading={technique.running}
+      />
+      <EuiFlyoutBody>
+        <div style={{ padding: '16px 16px 0' }}>
+          <TechniqueStats stats={stats.data} isLoading={stats.isLoading} />
+        </div>
+        <EuiSpacer size='m' />
+        <EuiAccordion
+          id='details'
+          initialIsOpen={true}
+          buttonContent={
+            <EuiTitle size='s'>
+              <h3>
+                {i18n.translate(
+                  'wazuh.mitreAttack.techniqueFlyout.details.title',
+                  { defaultMessage: 'Technique details' },
+                )}
+              </h3>
+            </EuiTitle>
+          }
+          paddingSize='m'
+        >
+          <TechniqueDetails
+            techniqueId={currentTechnique}
+            technique={technique.data ?? undefined}
+            isLoading={technique.running}
+            error={technique.error}
+          />
+        </EuiAccordion>
+        <EuiSpacer size='s' />
+        <EuiAccordion
+          id='recent_events'
+          className='events-accordion'
+          buttonContent={
+            <EuiTitle size='s'>
+              <h3>
+                {i18n.translate(
+                  'wazuh.mitreAttack.techniqueFlyout.recentFindings.title',
+                  { defaultMessage: 'Recent findings' },
+                )}
+              </h3>
+            </EuiTitle>
+          }
+          extraAction={
+            <EuiFlexGroup
+              gutterSize='m'
+              alignItems='center'
+              responsive={false}
+              style={{ marginRight: 16 }}
+            >
+              <EuiFlexItem grow={false}>
+                <EuiBadge color='hollow' iconType='filter'>
+                  {i18n.translate(
+                    'wazuh.mitreAttack.techniqueFlyout.recentFindings.filteredTo',
+                    {
+                      defaultMessage: 'Filtered to {id}',
+                      values: { id: currentTechnique },
+                    },
+                  )}
+                </EuiBadge>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiLink onClick={e => openDiscover(e, currentTechnique)}>
+                  {i18n.translate(
+                    'wazuh.mitreAttack.techniqueFlyout.recentFindings.openInFindings',
+                    { defaultMessage: 'Open in Findings' },
+                  )}
+                </EuiLink>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          }
+          paddingSize='none'
+          initialIsOpen={true}
+        >
+          <WazuhFlyoutDiscover
+            DataSource={PatternDataSource}
+            tableColumns={getDiscoverColumns()}
+            filterManager={filterManager}
+            initialFetchFilters={filterParams?.filters || []}
+            expandedRowComponent={expandedRow}
+            aggs={STATS_AGGS}
+            onResults={onResults}
+          />
+        </EuiAccordion>
+      </EuiFlyoutBody>
     </WzFlyout>
   );
 };
