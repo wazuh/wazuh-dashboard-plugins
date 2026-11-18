@@ -30,10 +30,9 @@ import { getFeedMetadata } from './feed-metadata';
 import { FeedSyncBadge } from './feed-sync-badge';
 import { CtiTimestamp } from './cti-timestamp';
 import { CheckForUpdatesButton } from './check-for-updates-button';
+import { formatCtiNumber } from '../../services/cti-number-format';
 
 const TITLE_ID = 'ctiFeedDetailsFlyoutTitle';
-
-const numberFormat = new Intl.NumberFormat();
 
 interface StateExplanation {
   color: 'success' | 'primary' | 'warning' | 'danger';
@@ -170,8 +169,8 @@ const SyncProgress: React.FC<{
           {
             defaultMessage: '{synced} of {total} changes synced',
             values: {
-              synced: numberFormat.format(consumer.local_offset),
-              total: numberFormat.format(consumer.remote_offset),
+              synced: formatCtiNumber(consumer.local_offset),
+              total: formatCtiNumber(consumer.remote_offset),
             },
           },
         )}
@@ -301,14 +300,14 @@ function getDetailItems(consumer: CtiConsumer) {
         'wazuhCheckUpdates.ctiFeed.details.fields.localOffset',
         { defaultMessage: 'Local offset' },
       ),
-      description: numberFormat.format(consumer.local_offset),
+      description: formatCtiNumber(consumer.local_offset),
     },
     {
       title: i18n.translate(
         'wazuhCheckUpdates.ctiFeed.details.fields.remoteOffset',
         { defaultMessage: 'Remote offset' },
       ),
-      description: numberFormat.format(consumer.remote_offset),
+      description: formatCtiNumber(consumer.remote_offset),
     },
     {
       title: i18n.translate(

@@ -12,6 +12,7 @@ import type {
   FeedContentKey,
 } from '../../services/cti-feed';
 import { getCore } from '../../plugin-services';
+import { formatCtiNumber } from '../../services/cti-number-format';
 
 /** Page a count links to. */
 interface ContentPage {
@@ -105,7 +106,10 @@ interface ContentItem {
   key: FeedContentKey;
   /** Name of the content, for a count that is not available. */
   label: string;
-  /** The count with its noun, pluralized ("603 rules"). */
+  /**
+   * The count with its noun, pluralized ("603 rules"). The number follows the number
+   * format of the advanced settings; the plural follows the count itself.
+   */
   formatCount: (count: number) => string;
   page: ContentPage;
 }
@@ -118,8 +122,8 @@ const CONTENT_ITEMS: Record<FeedContentKey, ContentItem> = {
     }),
     formatCount: count =>
       i18n.translate('wazuhCheckUpdates.ctiFeed.content.counts.rules', {
-        defaultMessage: '{count, plural, one {# rule} other {# rules}}',
-        values: { count },
+        defaultMessage: '{formatted} {count, plural, one {rule} other {rules}}',
+        values: { count, formatted: formatCtiNumber(count) },
       }),
     page: RULESET_MANAGEMENT_PAGES.rules,
   },
@@ -130,8 +134,9 @@ const CONTENT_ITEMS: Record<FeedContentKey, ContentItem> = {
     }),
     formatCount: count =>
       i18n.translate('wazuhCheckUpdates.ctiFeed.content.counts.decoders', {
-        defaultMessage: '{count, plural, one {# decoder} other {# decoders}}',
-        values: { count },
+        defaultMessage:
+          '{formatted} {count, plural, one {decoder} other {decoders}}',
+        values: { count, formatted: formatCtiNumber(count) },
       }),
     page: RULESET_MANAGEMENT_PAGES.decoders,
   },
@@ -144,8 +149,8 @@ const CONTENT_ITEMS: Record<FeedContentKey, ContentItem> = {
     formatCount: count =>
       i18n.translate('wazuhCheckUpdates.ctiFeed.content.counts.integrations', {
         defaultMessage:
-          '{count, plural, one {# integration} other {# integrations}}',
-        values: { count },
+          '{formatted} {count, plural, one {integration} other {integrations}}',
+        values: { count, formatted: formatCtiNumber(count) },
       }),
     page: RULESET_MANAGEMENT_PAGES.integrations,
   },
@@ -156,8 +161,8 @@ const CONTENT_ITEMS: Record<FeedContentKey, ContentItem> = {
     }),
     formatCount: count =>
       i18n.translate('wazuhCheckUpdates.ctiFeed.content.counts.kvdbs', {
-        defaultMessage: '{count, plural, one {# KVDB} other {# KVDBs}}',
-        values: { count },
+        defaultMessage: '{formatted} {count, plural, one {KVDB} other {KVDBs}}',
+        values: { count, formatted: formatCtiNumber(count) },
       }),
     page: RULESET_MANAGEMENT_PAGES.kvdbs,
   },
@@ -168,8 +173,8 @@ const CONTENT_ITEMS: Record<FeedContentKey, ContentItem> = {
     }),
     formatCount: count =>
       i18n.translate('wazuhCheckUpdates.ctiFeed.content.counts.iocs', {
-        defaultMessage: '{count, plural, one {# IOC} other {# IOCs}}',
-        values: { count },
+        defaultMessage: '{formatted} {count, plural, one {IOC} other {IOCs}}',
+        values: { count, formatted: formatCtiNumber(count) },
       }),
     page: CTI_EXPLORER_PAGES.iocs,
   },
@@ -183,8 +188,8 @@ const CONTENT_ITEMS: Record<FeedContentKey, ContentItem> = {
       i18n.translate(
         'wazuhCheckUpdates.ctiFeed.content.counts.vulnerabilities',
         {
-          defaultMessage: '{count, plural, one {# CVE} other {# CVEs}}',
-          values: { count },
+          defaultMessage: '{formatted} {count, plural, one {CVE} other {CVEs}}',
+          values: { count, formatted: formatCtiNumber(count) },
         },
       ),
     page: CTI_EXPLORER_PAGES.vulnerabilities,

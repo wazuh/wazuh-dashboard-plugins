@@ -1,9 +1,15 @@
+const mockSettings: Record<string, string> = {
+  'format:number:defaultPattern': '0,0.[000]',
+  'format:number:defaultLocale': 'en',
+};
+
 jest.mock('../../plugin-services', () => ({
   getCore: () => ({
     application: {
       getUrlForApp: (appId: string, { path = '' } = {}) =>
         `/app/${appId}${path}`,
     },
+    uiSettings: { get: (key: string) => mockSettings[key] },
   }),
 }));
 
@@ -70,6 +76,22 @@ describe('FeedContentLine', () => {
     expect(
       screen.getByTestId('ctiFeedContentCount-vulnerabilities'),
     ).toHaveTextContent('1 CVE');
+  });
+
+  test('formats the counts with the number format of the advanced settings', () => {
+    mockSettings['format:number:defaultPattern'] = '0.0,[000]';
+    try {
+      render(
+        <FeedContentLine feedType={IOCS} counts={COUNTS} loading={false} />,
+      );
+
+      // The number follows the setting; the plural, the count itself.
+      expect(screen.getByTestId('ctiFeedContentCount-iocs')).toHaveTextContent(
+        '952,987.00 IOCs',
+      );
+    } finally {
+      mockSettings['format:number:defaultPattern'] = '0,0.[000]';
+    }
   });
 
   test('names the page a count opens in its tooltip', async () => {
