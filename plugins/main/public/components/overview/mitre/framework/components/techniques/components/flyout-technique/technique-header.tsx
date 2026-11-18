@@ -26,8 +26,8 @@ export const TechniqueHeader = ({
   tactics,
   isLoading,
 }: TechniqueHeaderProps) => (
-  // The right padding keeps the link clear of the flyout close button
-  <EuiFlyoutHeader hasBorder style={{ padding: '12px 48px 12px 16px' }}>
+  // The title row is centered on the flyout close button; the right padding keeps the link clear of it
+  <EuiFlyoutHeader hasBorder style={{ padding: '4px 48px 12px 16px' }}>
     <EuiFlexGroup
       alignItems='center'
       justifyContent='spaceBetween'
@@ -39,7 +39,7 @@ export const TechniqueHeader = ({
         {isLoading ? (
           <EuiLoadingContent lines={1} />
         ) : (
-          <EuiTitle size='m'>
+          <EuiTitle size='s'>
             <h2 id='flyoutSmallTitle'>{technique?.name ?? techniqueId}</h2>
           </EuiTitle>
         )}

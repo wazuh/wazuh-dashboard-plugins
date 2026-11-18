@@ -2,14 +2,14 @@ import React from 'react';
 import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
 import {
-  EuiFlexGroup,
+  EuiFlexGrid,
   EuiFlexItem,
-  EuiLoadingSpinner,
   EuiPanel,
+  EuiStat,
+  EuiText,
   EuiToolTip,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../../../../react-services/time-service';
-import { StatTile } from '../../../../../../../common/welcome/home-overview/components/common/stat-tile';
 import { SEVERITY_PRESENTATION } from '../../../../../../../common/welcome/home-overview/lib/severity-presentation';
 import { TechniqueStats as tTechniqueStats } from './lib/technique';
 
@@ -20,7 +20,7 @@ type TechniqueStatsProps = {
   isLoading: boolean;
 };
 
-/** The findings summary of the technique, styled like the Home page KPIs. */
+/** The findings summary of the technique, one card per value. */
 export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
   const severity = SEVERITY_PRESENTATION.find(
     ({ band }) => band === stats?.highestSeverity,
@@ -67,21 +67,27 @@ export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
   ];
 
   return (
-    <EuiPanel paddingSize='m' hasBorder hasShadow={false}>
-      <EuiFlexGroup gutterSize='m' responsive={false} wrap>
-        {items.map(({ key, value, color, label }) => (
-          <EuiFlexItem key={key} style={{ minWidth: 120 }}>
-            <StatTile
-              value={isLoading ? <EuiLoadingSpinner size='l' /> : value}
-              label={label}
-              color={color}
-              titleSize='m'
-              reverse
+    <EuiFlexGrid columns={4} gutterSize='s' responsive>
+      {items.map(({ key, value, color, label }) => (
+        <EuiFlexItem key={key}>
+          <EuiPanel paddingSize='s' hasBorder hasShadow={false}>
+            <EuiStat
               data-test-subj={`technique-stat-${key}`}
+              title={value}
+              titleElement='div'
+              titleSize='s'
+              titleColor={color ?? 'default'}
+              description={
+                <EuiText size='xs' color='subdued'>
+                  {label}
+                </EuiText>
+              }
+              descriptionElement='div'
+              isLoading={isLoading}
             />
-          </EuiFlexItem>
-        ))}
-      </EuiFlexGroup>
-    </EuiPanel>
+          </EuiPanel>
+        </EuiFlexItem>
+      ))}
+    </EuiFlexGrid>
   );
 };
