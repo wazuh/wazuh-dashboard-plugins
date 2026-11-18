@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
 import {
   EuiBadge,
@@ -13,7 +14,6 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
-import { formatUIDate } from '../../../../../../../../react-services/time-service';
 import { useAsyncActionRunOnStart } from '../../../../../../../common/hooks/use_async_action_run_on_start';
 import { getMitreResourcesByIds } from '../../../../../lib/get-mitre-resources-by-ids';
 import {
@@ -27,6 +27,9 @@ import { goToIntelligence, IntelligenceResource } from './lib/navigation';
 import { TechniqueDescription } from './technique-description';
 
 const NAMES_SHOWN = 3;
+
+// The time of day means nothing for MITRE ATT&CK metadata
+const formatDay = (date: string) => moment(date).format('ll');
 
 const getFirstItems = (resource: string, ids: string[]) =>
   getMitreResourcesByIds<MitreItem>(resource, ids.slice(0, NAMES_SHOWN));
@@ -217,7 +220,7 @@ export const TechniqueDetails = ({
         { defaultMessage: 'Created' },
       ),
       description: technique.created_time
-        ? formatUIDate(technique.created_time)
+        ? formatDay(technique.created_time)
         : '-',
     },
     {
@@ -226,7 +229,7 @@ export const TechniqueDetails = ({
         { defaultMessage: 'Last modified' },
       ),
       description: technique.modified_time
-        ? formatUIDate(technique.modified_time)
+        ? formatDay(technique.modified_time)
         : '-',
     },
     {
@@ -300,7 +303,7 @@ export const TechniqueDetails = ({
         </>
       )}
       <EuiFlexGroup gutterSize='l'>
-        <EuiFlexItem grow={3}>
+        <EuiFlexItem>
           {technique.description && (
             <TechniqueDescription
               id={`technique-description-${techniqueId}`}
@@ -313,7 +316,7 @@ export const TechniqueDetails = ({
           <EuiSpacer size='m' />
           <Family {...family} />
         </EuiFlexItem>
-        <EuiFlexItem grow={2}>
+        <EuiFlexItem grow={false} style={{ width: 320 }}>
           <EuiPanel color='subdued' paddingSize='m' hasShadow={false}>
             <EuiDescriptionList
               compressed

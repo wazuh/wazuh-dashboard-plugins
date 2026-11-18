@@ -1,4 +1,5 @@
 import React from 'react';
+import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
 import {
   EuiFlexGrid,
@@ -6,6 +7,7 @@ import {
   EuiIcon,
   EuiPanel,
   EuiStat,
+  EuiToolTip,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../../../../react-services/time-service';
 import { SEVERITY_PRESENTATION } from '../../../../../../../common/welcome/home-overview/lib/severity-presentation';
@@ -55,7 +57,13 @@ export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
     },
     {
       key: 'lastSeen',
-      title: stats?.lastSeen ? formatUIDate(stats.lastSeen) : EMPTY_VALUE,
+      title: stats?.lastSeen ? (
+        <EuiToolTip content={formatUIDate(stats.lastSeen)}>
+          <span tabIndex={0}>{moment(stats.lastSeen).fromNow()}</span>
+        </EuiToolTip>
+      ) : (
+        EMPTY_VALUE
+      ),
       description: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.stats.lastSeen',
         { defaultMessage: 'Last seen' },

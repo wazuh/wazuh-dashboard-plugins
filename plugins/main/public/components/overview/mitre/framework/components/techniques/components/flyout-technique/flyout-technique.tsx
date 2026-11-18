@@ -182,87 +182,88 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
         isLoading={technique.running}
       />
       <EuiFlyoutBody>
+        {/* One inset for every section, so they share a left edge */}
         <div style={{ padding: '16px 16px 0' }}>
           <TechniqueStats stats={stats.data} isLoading={stats.isLoading} />
+          <EuiSpacer size='m' />
+          <EuiAccordion
+            id='details'
+            initialIsOpen={true}
+            buttonContent={
+              <EuiTitle size='s'>
+                <h3>
+                  {i18n.translate(
+                    'wazuh.mitreAttack.techniqueFlyout.details.title',
+                    { defaultMessage: 'Technique details' },
+                  )}
+                </h3>
+              </EuiTitle>
+            }
+            paddingSize='none'
+          >
+            <EuiSpacer size='m' />
+            <TechniqueDetails
+              techniqueId={currentTechnique}
+              technique={technique.data ?? undefined}
+              isLoading={technique.running}
+              error={technique.error}
+            />
+          </EuiAccordion>
+          <EuiSpacer size='s' />
+          <EuiAccordion
+            id='recent_events'
+            className='events-accordion'
+            buttonContent={
+              <EuiTitle size='s'>
+                <h3>
+                  {i18n.translate(
+                    'wazuh.mitreAttack.techniqueFlyout.recentFindings.title',
+                    { defaultMessage: 'Recent findings' },
+                  )}
+                </h3>
+              </EuiTitle>
+            }
+            extraAction={
+              <EuiFlexGroup
+                gutterSize='m'
+                alignItems='center'
+                responsive={false}
+              >
+                <EuiFlexItem grow={false}>
+                  <EuiBadge color='hollow' iconType='filter'>
+                    {i18n.translate(
+                      'wazuh.mitreAttack.techniqueFlyout.recentFindings.filteredTo',
+                      {
+                        defaultMessage: 'Filtered to {id}',
+                        values: { id: currentTechnique },
+                      },
+                    )}
+                  </EuiBadge>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
+                  <EuiLink onClick={e => openDiscover(e, currentTechnique)}>
+                    {i18n.translate(
+                      'wazuh.mitreAttack.techniqueFlyout.recentFindings.openInFindings',
+                      { defaultMessage: 'Open in Findings' },
+                    )}
+                  </EuiLink>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            }
+            paddingSize='none'
+            initialIsOpen={true}
+          >
+            <WazuhFlyoutDiscover
+              DataSource={PatternDataSource}
+              tableColumns={getDiscoverColumns()}
+              filterManager={filterManager}
+              initialFetchFilters={filterParams?.filters || []}
+              expandedRowComponent={expandedRow}
+              aggs={STATS_AGGS}
+              onResults={onResults}
+            />
+          </EuiAccordion>
         </div>
-        <EuiSpacer size='m' />
-        <EuiAccordion
-          id='details'
-          initialIsOpen={true}
-          buttonContent={
-            <EuiTitle size='s'>
-              <h3>
-                {i18n.translate(
-                  'wazuh.mitreAttack.techniqueFlyout.details.title',
-                  { defaultMessage: 'Technique details' },
-                )}
-              </h3>
-            </EuiTitle>
-          }
-          paddingSize='m'
-        >
-          <TechniqueDetails
-            techniqueId={currentTechnique}
-            technique={technique.data ?? undefined}
-            isLoading={technique.running}
-            error={technique.error}
-          />
-        </EuiAccordion>
-        <EuiSpacer size='s' />
-        <EuiAccordion
-          id='recent_events'
-          className='events-accordion'
-          buttonContent={
-            <EuiTitle size='s'>
-              <h3>
-                {i18n.translate(
-                  'wazuh.mitreAttack.techniqueFlyout.recentFindings.title',
-                  { defaultMessage: 'Recent findings' },
-                )}
-              </h3>
-            </EuiTitle>
-          }
-          extraAction={
-            <EuiFlexGroup
-              gutterSize='m'
-              alignItems='center'
-              responsive={false}
-              style={{ marginRight: 16 }}
-            >
-              <EuiFlexItem grow={false}>
-                <EuiBadge color='hollow' iconType='filter'>
-                  {i18n.translate(
-                    'wazuh.mitreAttack.techniqueFlyout.recentFindings.filteredTo',
-                    {
-                      defaultMessage: 'Filtered to {id}',
-                      values: { id: currentTechnique },
-                    },
-                  )}
-                </EuiBadge>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiLink onClick={e => openDiscover(e, currentTechnique)}>
-                  {i18n.translate(
-                    'wazuh.mitreAttack.techniqueFlyout.recentFindings.openInFindings',
-                    { defaultMessage: 'Open in Findings' },
-                  )}
-                </EuiLink>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          }
-          paddingSize='none'
-          initialIsOpen={true}
-        >
-          <WazuhFlyoutDiscover
-            DataSource={PatternDataSource}
-            tableColumns={getDiscoverColumns()}
-            filterManager={filterManager}
-            initialFetchFilters={filterParams?.filters || []}
-            expandedRowComponent={expandedRow}
-            aggs={STATS_AGGS}
-            onResults={onResults}
-          />
-        </EuiAccordion>
       </EuiFlyoutBody>
     </WzFlyout>
   );
