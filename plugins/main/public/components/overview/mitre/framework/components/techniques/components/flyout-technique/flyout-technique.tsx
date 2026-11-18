@@ -218,13 +218,15 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
             }
             paddingSize='none'
           >
-            <EuiSpacer size='m' />
-            <TechniqueDetails
-              techniqueId={currentTechnique}
-              technique={technique.data ?? undefined}
-              isLoading={technique.running}
-              error={technique.error}
-            />
+            {/* Same inset as the Recent findings content */}
+            <div style={{ padding: '16px 24px 0' }}>
+              <TechniqueDetails
+                techniqueId={currentTechnique}
+                technique={technique.data ?? undefined}
+                isLoading={technique.running}
+                error={technique.error}
+              />
+            </div>
           </EuiAccordion>
           <EuiSpacer size='l' />
           <EuiAccordion
