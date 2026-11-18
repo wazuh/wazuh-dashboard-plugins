@@ -86,7 +86,7 @@ describe('SubscriptionPanel', () => {
     expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
   });
 
-  test('offers to register and explains the feed tiers when not registered', () => {
+  test('offers to register and compares the plans when not registered', () => {
     const { onOpenRegistration } = renderPanel();
 
     expect(screen.getByTestId('ctiFeedSubscriptionTitle')).toHaveTextContent(
@@ -95,9 +95,9 @@ describe('SubscriptionPanel', () => {
     expect(screen.getByTestId('ctiFeedSubscriptionStatus')).toHaveTextContent(
       'Not registered',
     );
-    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toHaveTextContent(
-      'Professional feed',
-    );
+    expect(
+      screen.getByTestId('ctiFeedPlanCard-professional'),
+    ).toHaveTextContent('Professional feed');
 
     fireEvent.click(screen.getByTestId('ctiFeedSubscriptionAction'));
     expect(onOpenRegistration).toHaveBeenCalledTimes(1);
@@ -121,7 +121,6 @@ describe('SubscriptionPanel', () => {
       'Registered',
     );
     expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
-    expect(screen.queryByTestId('ctiFeedSubscriptionTiers')).toBeNull();
   });
 
   test('suggests the Professional feed when registered on the Open one', () => {
@@ -147,7 +146,6 @@ describe('SubscriptionPanel', () => {
       ),
     ).toBeInTheDocument();
     // The plans are compared in cards, the Open one marked as this plan.
-    expect(screen.queryByTestId('ctiFeedSubscriptionTiers')).toBeNull();
     expect(screen.getByTestId('ctiFeedPlanCard-open')).toHaveAttribute(
       'data-current',
       'true',
@@ -181,10 +179,26 @@ describe('SubscriptionPanel', () => {
     );
   });
 
-  test('keeps the feed tiers list before the registration', () => {
+  test('shows the plan cards before the registration, the Open feed as the plan', () => {
     renderPanel();
 
-    expect(screen.getByTestId('ctiFeedSubscriptionTiers')).toBeInTheDocument();
+    expect(screen.getByTestId('ctiFeedPlanCard-open')).toHaveAttribute(
+      'data-current',
+      'true',
+    );
+    expect(screen.getByTestId('ctiFeedPlanCard-professional')).toHaveAttribute(
+      'data-current',
+      'false',
+    );
+    // Not registered: still the Register button, no console link.
+    expect(screen.getByTestId('ctiFeedSubscriptionAction')).toHaveTextContent(
+      'Register',
+    );
+    expect(screen.queryByTestId('ctiFeedSubscriptionConsoleLink')).toBeNull();
+  });
+
+  test('shows no plan cards while an activation is pending or after a failure', () => {
+    renderPanel({ deviceFlowActive: true });
     expect(screen.queryByTestId('ctiFeedPlanCards')).toBeNull();
   });
 

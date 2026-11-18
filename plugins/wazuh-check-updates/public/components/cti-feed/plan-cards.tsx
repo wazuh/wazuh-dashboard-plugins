@@ -9,8 +9,8 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 
-/** What each feed brings, shared by the plan cards and the feed tiers list. */
-export const OPEN_FEED_DESCRIPTION = i18n.translate(
+/** What each feed brings. */
+const OPEN_FEED_DESCRIPTION = i18n.translate(
   'wazuhCheckUpdates.ctiFeed.subscription.tiers.openDescription',
   {
     defaultMessage:
@@ -18,7 +18,7 @@ export const OPEN_FEED_DESCRIPTION = i18n.translate(
   },
 );
 
-export const PROFESSIONAL_FEED_DESCRIPTION = i18n.translate(
+const PROFESSIONAL_FEED_DESCRIPTION = i18n.translate(
   'wazuhCheckUpdates.ctiFeed.subscription.tiers.proDescription',
   {
     defaultMessage: 'New vulnerabilities, IOCs and rules, delivered faster.',

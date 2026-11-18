@@ -29,12 +29,7 @@ import { ISubscriptionResponse } from '../../services/types';
 import { useCtiRegistrationPermission } from '../../shared-components/cti-registration/hooks/use-cti-registration-permission';
 import { SubscriptionDetails } from './subscription-details';
 import { RegistrationOptions } from './registration-options';
-import {
-  FeedPlan,
-  OPEN_FEED_DESCRIPTION,
-  PlanCards,
-  PROFESSIONAL_FEED_DESCRIPTION,
-} from './plan-cards';
+import { FeedPlan, PlanCards } from './plan-cards';
 
 type SubscriptionState = 'registered' | 'pending' | 'failed' | 'notRegistered';
 
@@ -49,8 +44,8 @@ interface SubscriptionView {
   /** Opens the registration flow; a registered environment has none. */
   action?: string;
   fillAction: boolean;
-  /** Open versus Professional, for environments that are not registered yet. */
-  showFeedTiers: boolean;
+  /** The Open and Professional plan cards, for a registered or an unregistered environment. */
+  showPlanCards: boolean;
 }
 
 export function getSubscriptionState(
@@ -121,8 +116,7 @@ function getSubscriptionView(
               },
             ),
         fillAction: false,
-        // A registered environment compares the plans in cards instead.
-        showFeedTiers: false,
+        showPlanCards: true,
       };
     case 'pending':
       return {
@@ -148,7 +142,7 @@ function getSubscriptionView(
           { defaultMessage: 'View activation details' },
         ),
         fillAction: true,
-        showFeedTiers: false,
+        showPlanCards: false,
       };
     case 'failed':
       return {
@@ -171,7 +165,7 @@ function getSubscriptionView(
           { defaultMessage: 'View details' },
         ),
         fillAction: true,
-        showFeedTiers: false,
+        showPlanCards: false,
       };
     default:
       return {
@@ -194,7 +188,7 @@ function getSubscriptionView(
           { defaultMessage: 'Register' },
         ),
         fillAction: true,
-        showFeedTiers: true,
+        showPlanCards: true,
       };
   }
 }
@@ -205,59 +199,6 @@ const HEALTH_COLOR: Record<Tone, string> = {
   danger: 'danger',
   primary: 'subdued',
 };
-
-const FeedTier: React.FC<{
-  iconType: string;
-  iconColor: string;
-  title: string;
-  description: string;
-}> = ({ iconType, iconColor, title, description }) => (
-  <EuiFlexGroup gutterSize='s' responsive={false} alignItems='flexStart'>
-    <EuiFlexItem grow={false}>
-      <EuiIcon type={iconType} color={iconColor} aria-hidden />
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <EuiText size='s'>
-        <strong>{title}</strong>
-      </EuiText>
-      <EuiText size='xs' color='subdued'>
-        {description}
-      </EuiText>
-    </EuiFlexItem>
-  </EuiFlexGroup>
-);
-
-/** Open versus Professional, so the paid tier is visible to those without it. */
-const FeedTiers: React.FC = () => (
-  <EuiFlexGroup
-    direction='column'
-    gutterSize='s'
-    data-test-subj='ctiFeedSubscriptionTiers'
-  >
-    <EuiFlexItem>
-      <FeedTier
-        iconType='check'
-        iconColor='success'
-        title={i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.tiers.openTitle',
-          { defaultMessage: 'Open feed (included)' },
-        )}
-        description={OPEN_FEED_DESCRIPTION}
-      />
-    </EuiFlexItem>
-    <EuiFlexItem>
-      <FeedTier
-        iconType='starFilled'
-        iconColor='warning'
-        title={i18n.translate(
-          'wazuhCheckUpdates.ctiFeed.subscription.tiers.proTitle',
-          { defaultMessage: 'Professional feed' },
-        )}
-        description={PROFESSIONAL_FEED_DESCRIPTION}
-      />
-    </EuiFlexItem>
-  </EuiFlexGroup>
-);
 
 export interface SubscriptionPanelProps {
   statusCTI: ISubscriptionResponse;
@@ -281,11 +222,15 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
   const registered = state === 'registered';
   // The public plan is the Open feed; any other plan is the Professional one.
   const plan = subscriptionMessage?.plan;
-  const currentPlan: FeedPlan | null = plan
-    ? plan.is_public
+  // An environment that is not registered receives the Open feed.
+  const currentPlan: FeedPlan | null =
+    state === 'notRegistered'
       ? 'open'
-      : 'professional'
-    : null;
+      : plan
+      ? plan.is_public
+        ? 'open'
+        : 'professional'
+      : null;
   // When the CTI console registered this environment, shown under the plan.
   const registeredAt = subscriptionMessage?.environment?.registered_at;
   const registeredDate = formatCtiDate(registeredAt);
@@ -395,16 +340,14 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
               />
             </>
           ) : null}
-          {view.showFeedTiers ? (
+          {view.showPlanCards ? (
             <>
               <EuiSpacer size='m' />
-              <FeedTiers />
+              <PlanCards currentPlan={currentPlan} />
             </>
           ) : null}
           {registered ? (
             <>
-              <EuiSpacer size='m' />
-              <PlanCards currentPlan={currentPlan} />
               <EuiSpacer size='m' />
               <EuiText size='s'>
                 <EuiLink
