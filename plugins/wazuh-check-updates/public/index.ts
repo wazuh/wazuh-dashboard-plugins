@@ -13,3 +13,5 @@ export {
   WazuhCheckUpdatesPluginSetup,
   WazuhCheckUpdatesPluginStart,
 } from './types';
+// Static code for other plugins: their bundles can only import from this directory.
+export { formatNumberWithSettings } from '../common/number-format';

@@ -1,7 +1,8 @@
 /* eslint-disable camelcase -- the keys are catalog values: document.type and document.software.type */
 import { i18n } from '@osd/i18n';
 import moment from 'moment-timezone';
-import { formatNumberWithSettings } from '../../../../../wazuh-check-updates/common/number-format';
+// Through the public entry: a bundle can only import another plugin's public directory.
+import { formatNumberWithSettings } from '../../../../../wazuh-check-updates/public';
 import { getCore } from '../../../kibana-services';
 
 /** `document.type` → label. An unknown type shows as stored. */
