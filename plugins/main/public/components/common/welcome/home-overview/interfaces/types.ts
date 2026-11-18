@@ -99,29 +99,19 @@ export interface VulnerabilityOverview {
 /** Active responses of the last 24 hours. */
 export interface IncidentResponseOverview {
   total?: number;
-  topResponses: TopItem[];
-  topAgents: TopItem[];
+  /** Executables run (`wazuh.active_response.executable`). */
+  topCommands: TopItem[];
 }
 
 export type CaseStatusCounts = Partial<
   Record<'active' | 'acknowledged' | 'completed', number>
 >;
 
-/** A case as listed on the Case management card. */
-export interface RecentCase {
-  /** Findings document holding the case. */
-  id: string;
-  title?: string;
-  status?: string;
-  priority?: string;
-  /** Last update, or creation when never updated (ISO date). */
-  updatedAt?: string;
-}
-
 /** Current state of the cases, not time-bounded. */
 export interface CaseManagementOverview {
+  /** Cases of any status. */
+  total?: number;
   byStatus: CaseStatusCounts;
   /** Open cases per severity. */
   openBySeverity: SeverityCounts;
-  recentOpen: RecentCase[];
 }

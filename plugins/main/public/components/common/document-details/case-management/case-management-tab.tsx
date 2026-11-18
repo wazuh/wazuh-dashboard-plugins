@@ -56,13 +56,72 @@ import {
   useCaseManagementForm,
 } from './use-case-management-form';
 import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
-import {
-  CASE_PRIORITY_OPTIONS,
-  CASE_SEVERITY_OPTIONS,
-  CASE_STATUS_OPTIONS,
-  EMPTY_OPTION,
-} from './case-options';
+import { CASE_STATUS_OPTIONS } from './case-options';
 import './case-management-tab.scss';
+
+const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
+  {
+    value: 'informational',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.informational', {
+      defaultMessage: 'Informational',
+    }),
+  },
+  {
+    value: 'low',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.low', {
+      defaultMessage: 'Low',
+    }),
+  },
+  {
+    value: 'medium',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.medium', {
+      defaultMessage: 'Medium',
+    }),
+  },
+  {
+    value: 'high',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.high', {
+      defaultMessage: 'High',
+    }),
+  },
+  {
+    value: 'critical',
+    text: i18n.translate('wazuh.common.caseManagementSeverity.critical', {
+      defaultMessage: 'Critical',
+    }),
+  },
+];
+
+const EMPTY_OPTION = { value: '' as const, text: '—' };
+
+const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
+  [
+    EMPTY_OPTION,
+    {
+      value: 'urgent',
+      text: i18n.translate('wazuh.common.caseManagementPriority.urgent', {
+        defaultMessage: 'Urgent',
+      }),
+    },
+    {
+      value: 'high',
+      text: i18n.translate('wazuh.common.caseManagementPriority.high', {
+        defaultMessage: 'High',
+      }),
+    },
+    {
+      value: 'medium',
+      text: i18n.translate('wazuh.common.caseManagementPriority.medium', {
+        defaultMessage: 'Medium',
+      }),
+    },
+    {
+      value: 'low',
+      text: i18n.translate('wazuh.common.caseManagementPriority.low', {
+        defaultMessage: 'Low',
+      }),
+    },
+  ];
 
 const CASE_TLP_OPTIONS: Array<{
   value: CaseTLP | '';

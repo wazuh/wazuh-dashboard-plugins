@@ -1,11 +1,10 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiFlexGroup, EuiFlexItem, EuiLink, EuiSpacer } from '@elastic/eui';
+import { EuiLink, EuiSpacer } from '@elastic/eui';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import {
   BarList,
-  EmptyState,
   StatTile,
   TabNumber,
   WidgetGroup,
@@ -16,23 +15,18 @@ import {
   getActiveResponseResponsesUrl,
   getActiveResponseUrl,
 } from '../../utils/navigation';
-import { ACTIVE_RESPONSE_NAME_FIELD, AGENT_NAME_FIELD } from '../../lib/fields';
+import { ACTIVE_RESPONSE_EXECUTABLE_FIELD } from '../../lib/fields';
 import { KPI_LINK_STYLE } from '../../lib/constants';
-
-/** The two lists sit side by side and stack when the card gets narrow. */
-const LIST_MIN_WIDTH = 'min(220px, 100%)';
 
 export interface IncidentResponseCardProps {
   incidentResponse: ReturnType<typeof useIncidentResponseOverview>;
 }
 
-/** Active responses of the last 24 hours: total, top responses and top agents. */
+/** Active responses of the last 24 hours: total and top commands. */
 export const IncidentResponseCard: React.FC<IncidentResponseCardProps> = ({
   incidentResponse,
 }) => {
   const { data, indexPatternId } = incidentResponse;
-  const listHref = (field: string) => (item: { key: string }) =>
-    getActiveResponseResponsesUrl({ field, value: item.key }, indexPatternId);
 
   return (
     <WidgetGroup
@@ -77,41 +71,24 @@ export const IncidentResponseCard: React.FC<IncidentResponseCardProps> = ({
             data-test-subj='incident-response-total'
           />
           <EuiSpacer size='m' />
-          {data.total === 0 ? (
-            <EmptyState
-              message={i18n.translate(
-                'wazuh.common.homeOverviewSection.noActiveResponses',
-                { defaultMessage: 'No active responses ran in this period' },
-              )}
-              minHeight={WIDGET_LOADING_MIN_HEIGHT.list}
-              data-test-subj='incident-response-empty'
-            />
-          ) : (
-            <EuiFlexGroup wrap responsive={false} gutterSize='l'>
-              <EuiFlexItem style={{ minWidth: LIST_MIN_WIDTH }}>
-                <BarList
-                  title={i18n.translate(
-                    'wazuh.common.homeOverviewSection.topActiveResponses',
-                    { defaultMessage: 'Top 5 active responses' },
-                  )}
-                  items={data.topResponses}
-                  getHref={listHref(ACTIVE_RESPONSE_NAME_FIELD)}
-                  data-test-subj='incident-response-top-responses'
-                />
-              </EuiFlexItem>
-              <EuiFlexItem style={{ minWidth: LIST_MIN_WIDTH }}>
-                <BarList
-                  title={i18n.translate(
-                    'wazuh.common.homeOverviewSection.topResponseAgents',
-                    { defaultMessage: 'Top 5 agents' },
-                  )}
-                  items={data.topAgents}
-                  getHref={listHref(AGENT_NAME_FIELD)}
-                  data-test-subj='incident-response-top-agents'
-                />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          )}
+          <BarList
+            title={i18n.translate(
+              'wazuh.common.homeOverviewSection.topCommands',
+              { defaultMessage: 'Top 5 commands executed' },
+            )}
+            items={data.topCommands}
+            emptyMessage={i18n.translate(
+              'wazuh.common.homeOverviewSection.noActiveResponses',
+              { defaultMessage: 'No active responses ran in this period' },
+            )}
+            getHref={item =>
+              getActiveResponseResponsesUrl(
+                { field: ACTIVE_RESPONSE_EXECUTABLE_FIELD, value: item.key },
+                indexPatternId,
+              )
+            }
+            data-test-subj='incident-response-top-commands'
+          />
         </>
       )}
     </WidgetGroup>

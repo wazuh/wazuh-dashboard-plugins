@@ -10,15 +10,10 @@ import {
 } from '../../../../../utils/applications';
 import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
-  ACTIVE_RESPONSE_NAME_FIELD,
-  AGENT_NAME_FIELD,
-  CASE_CREATED_AT_FIELD,
-  CASE_PRIORITY_FIELD,
+  ACTIVE_RESPONSE_EXECUTABLE_FIELD,
   CASE_SEVERITY_FIELD,
   CASE_STATUS_FIELD,
   CASE_STATUSES,
-  CASE_TITLE_FIELD,
-  CASE_UPDATED_AT_FIELD,
   COMPLIANCE_FRAMEWORK_FIELDS,
   EVENT_DOC_ID_FIELD,
   FIM_FILE_MTIME_FIELD,
@@ -301,23 +296,17 @@ export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
   );
 }
 
-/** Incident Response card: top active responses and top agents that ran them. */
+/** Incident Response card: top commands run by the active responses. */
 export function buildIncidentResponseAggs(size = TOP_N) {
-  return {
-    ...buildTopTermsAgg(
-      AGG.topActiveResponses,
-      ACTIVE_RESPONSE_NAME_FIELD,
-      size,
-    ),
-    ...buildTopTermsAgg(AGG.topResponseAgents, AGENT_NAME_FIELD, size),
-  };
+  return buildTopTermsAgg(
+    AGG.topActiveResponseCommands,
+    ACTIVE_RESPONSE_EXECUTABLE_FIELD,
+    size,
+  );
 }
 
-/**
- * Case management card in one search: cases per status, and for the open ones
- * the severity split and the latest updated cases.
- */
-export function buildCaseManagementAggs(size = TOP_N) {
+/** Case management card in one search: cases per status, open cases per severity. */
+export function buildCaseManagementAggs() {
   const severityFilters: Record<string, unknown> = {};
   for (const band of FINDING_SEVERITY_BANDS) {
     severityFilters[band] = { term: { [CASE_SEVERITY_FIELD]: band } };
@@ -337,26 +326,6 @@ export function buildCaseManagementAggs(size = TOP_N) {
       filter: { terms: { [CASE_STATUS_FIELD]: OPEN_CASE_STATUSES } },
       aggs: {
         [AGG.caseSeverity]: { filters: { filters: severityFilters } },
-        [AGG.recentCases]: {
-          top_hits: {
-            size,
-            sort: [
-              {
-                [CASE_UPDATED_AT_FIELD]: {
-                  order: 'desc',
-                  unmapped_type: 'date',
-                },
-              },
-            ],
-            _source: [
-              CASE_TITLE_FIELD,
-              CASE_STATUS_FIELD,
-              CASE_PRIORITY_FIELD,
-              CASE_UPDATED_AT_FIELD,
-              CASE_CREATED_AT_FIELD,
-            ],
-          },
-        },
       },
     },
   };

@@ -250,43 +250,28 @@ describe('mappers', () => {
   });
 
   describe('mapCaseManagement', () => {
-    it('maps the status counts, the open severity split and the latest cases', () => {
+    it('maps the total, the status counts and the open severity split', () => {
       expect(
         mapCaseManagement({
-          case_status: {
-            buckets: {
-              active: { doc_count: 3 },
-              acknowledged: { doc_count: 1 },
-              completed: { doc_count: 9 },
+          hits: { total: 15 },
+          aggregations: {
+            case_status: {
+              buckets: {
+                active: { doc_count: 3 },
+                acknowledged: { doc_count: 1 },
+                completed: { doc_count: 9 },
+              },
             },
-          },
-          open_cases: {
-            case_severity: {
-              buckets: { critical: { doc_count: 1 }, high: { doc_count: 3 } },
-            },
-            recent_cases: {
-              hits: {
-                hits: [
-                  {
-                    _id: 'doc-1',
-                    _source: {
-                      wazuh: {
-                        case: {
-                          title: 'Brute force',
-                          status: 'active',
-                          severity: 'high',
-                          priority: 'urgent',
-                          created_at: '2026-11-17T09:00:00Z',
-                        },
-                      },
-                    },
-                  },
-                ],
+            open_cases: {
+              case_severity: {
+                buckets: { critical: { doc_count: 1 }, high: { doc_count: 3 } },
               },
             },
           },
         } as never),
       ).toEqual({
+        // Includes the statuses without a tile (audit, error, deleted).
+        total: 15,
         byStatus: { active: 3, acknowledged: 1, completed: 9 },
         openBySeverity: {
           critical: 1,
@@ -295,21 +280,12 @@ describe('mappers', () => {
           low: undefined,
           informational: undefined,
         },
-        recentOpen: [
-          {
-            id: 'doc-1',
-            title: 'Brute force',
-            status: 'active',
-            priority: 'urgent',
-            // Never updated: falls back to the creation date.
-            updatedAt: '2026-11-17T09:00:00Z',
-          },
-        ],
       });
     });
 
-    it('returns no counts and no cases on an empty response', () => {
+    it('returns no counts on an empty response', () => {
       expect(mapCaseManagement(undefined)).toEqual({
+        total: undefined,
         byStatus: {
           active: undefined,
           acknowledged: undefined,
@@ -322,7 +298,6 @@ describe('mappers', () => {
           low: undefined,
           informational: undefined,
         },
-        recentOpen: [],
       });
     });
   });

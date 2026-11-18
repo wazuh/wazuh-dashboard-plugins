@@ -38,13 +38,11 @@ export const AGG = {
    * top tactic/technique bucket, so links can open the Intelligence resource.
    */
   externalId: 'external_id',
-  topActiveResponses: 'top_active_responses',
-  topResponseAgents: 'top_response_agents',
+  topActiveResponseCommands: 'top_active_response_commands',
   caseStatus: 'case_status',
-  /** Open cases only; holds the severity split and the latest cases. */
+  /** Open cases only; holds their severity split. */
   openCases: 'open_cases',
   caseSeverity: 'case_severity',
-  recentCases: 'recent_cases',
   /** Prefix of the per-framework controls cardinality aggs, one per framework. */
   complianceControlsPrefix: 'compliance_controls_',
 } as const;

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Case management option labels
+ * Wazuh app - Case management status labels
  * Copyright (C) 2015-2026 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,11 +11,7 @@
  */
 
 import { i18n } from '@osd/i18n';
-import {
-  CasePriority,
-  CaseSeverity,
-  CaseStatus,
-} from './case-management-service';
+import { CaseStatus } from './case-management-service';
 
 export const CASE_STATUS_OPTIONS: Array<{
   value: CaseStatus;
@@ -81,74 +77,5 @@ export const CASE_STATUS_OPTIONS: Array<{
       'wazuh.common.caseManagementStatus.deletedDescription',
       { defaultMessage: 'Marked as removed. Kept for history.' },
     ),
-  },
-];
-
-export const CASE_SEVERITY_OPTIONS: Array<{
-  value: CaseSeverity;
-  text: string;
-}> = [
-  {
-    value: 'informational',
-    text: i18n.translate('wazuh.common.caseManagementSeverity.informational', {
-      defaultMessage: 'Informational',
-    }),
-  },
-  {
-    value: 'low',
-    text: i18n.translate('wazuh.common.caseManagementSeverity.low', {
-      defaultMessage: 'Low',
-    }),
-  },
-  {
-    value: 'medium',
-    text: i18n.translate('wazuh.common.caseManagementSeverity.medium', {
-      defaultMessage: 'Medium',
-    }),
-  },
-  {
-    value: 'high',
-    text: i18n.translate('wazuh.common.caseManagementSeverity.high', {
-      defaultMessage: 'High',
-    }),
-  },
-  {
-    value: 'critical',
-    text: i18n.translate('wazuh.common.caseManagementSeverity.critical', {
-      defaultMessage: 'Critical',
-    }),
-  },
-];
-
-export const EMPTY_OPTION = { value: '' as const, text: '—' };
-
-export const CASE_PRIORITY_OPTIONS: Array<{
-  value: CasePriority | '';
-  text: string;
-}> = [
-  EMPTY_OPTION,
-  {
-    value: 'urgent',
-    text: i18n.translate('wazuh.common.caseManagementPriority.urgent', {
-      defaultMessage: 'Urgent',
-    }),
-  },
-  {
-    value: 'high',
-    text: i18n.translate('wazuh.common.caseManagementPriority.high', {
-      defaultMessage: 'High',
-    }),
-  },
-  {
-    value: 'medium',
-    text: i18n.translate('wazuh.common.caseManagementPriority.medium', {
-      defaultMessage: 'Medium',
-    }),
-  },
-  {
-    value: 'low',
-    text: i18n.translate('wazuh.common.caseManagementPriority.low', {
-      defaultMessage: 'Low',
-    }),
   },
 ];

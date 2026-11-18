@@ -711,7 +711,21 @@ export function useItHygieneServicesCount(
   );
 }
 
-/** Active responses of the last 24 hours: total, top responses and top agents. */
+export function useActiveResponseOverview(
+  enabled: boolean,
+): DataGroupResult<number | undefined> {
+  return useIndexDocCount(
+    ActiveResponsesDataSource,
+    () => new ActiveResponsesDataSourceRepository(),
+    enabled,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.activeResponse', {
+      defaultMessage: 'Active Response',
+    }),
+    LAST_24H,
+  );
+}
+
+/** Active responses of the last 24 hours: total and top commands. */
 export function useIncidentResponseOverview(
   enabled: boolean,
 ): DataGroupResult<IncidentResponseOverview> & { indexPatternId?: string } {
@@ -732,13 +746,9 @@ export function useIncidentResponseOverview(
         });
         return {
           total: mapDocCount(response),
-          topResponses: mapTopBuckets(
+          topCommands: mapTopBuckets(
             response?.aggregations,
-            AGG.topActiveResponses,
-          ),
-          topAgents: mapTopBuckets(
-            response?.aggregations,
-            AGG.topResponseAgents,
+            AGG.topActiveResponseCommands,
           ),
         };
       },
@@ -752,7 +762,7 @@ export function useIncidentResponseOverview(
   );
 }
 
-/** Cases (current state): counts per status, open cases per severity, latest open cases. */
+/** Cases (current state): total, counts per status and open cases per severity. */
 export function useCaseManagementOverview(
   enabled: boolean,
 ): DataGroupResult<CaseManagementOverview> & { indexPatternId?: string } {
@@ -770,7 +780,7 @@ export function useCaseManagementOverview(
           aggs: buildCaseManagementAggs(),
           pagination: NO_HITS,
         });
-        return mapCaseManagement(response?.aggregations);
+        return mapCaseManagement(response);
       },
     },
   );

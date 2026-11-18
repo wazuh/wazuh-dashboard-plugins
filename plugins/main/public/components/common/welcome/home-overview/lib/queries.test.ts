@@ -212,16 +212,15 @@ describe('query builders', () => {
     expect(agg.malware.aggs.ioc_feed_by_type).toBeUndefined();
   });
 
-  it('builds the Incident Response top lists on the response name and the agent name', () => {
+  it('builds the Incident Response top commands on the executable', () => {
     expect(buildIncidentResponseAggs()).toEqual({
-      top_active_responses: {
-        terms: { field: 'wazuh.active_response.name', size: 5 },
+      top_active_response_commands: {
+        terms: { field: 'wazuh.active_response.executable', size: 5 },
       },
-      top_response_agents: { terms: { field: 'wazuh.agent.name', size: 5 } },
     });
   });
 
-  it('builds the case counts per status, and the severity and latest cases of the open ones', () => {
+  it('builds the case counts per status and the severity of the open ones', () => {
     const agg = buildCaseManagementAggs();
     expect(agg.case_status.filters.filters).toEqual({
       active: { term: { 'wazuh.case.status': 'active' } },
@@ -234,13 +233,5 @@ describe('query builders', () => {
     expect(
       Object.keys(agg.open_cases.aggs.case_severity.filters.filters),
     ).toEqual(FINDING_SEVERITY_BANDS);
-    expect(agg.open_cases.aggs.recent_cases.top_hits).toMatchObject({
-      size: 5,
-      sort: [
-        {
-          'wazuh.case.updated_at': { order: 'desc', unmapped_type: 'date' },
-        },
-      ],
-    });
   });
 });
