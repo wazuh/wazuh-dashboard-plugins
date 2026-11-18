@@ -85,9 +85,10 @@ describe('FeedContentLine', () => {
         <FeedContentLine feedType={IOCS} counts={COUNTS} loading={false} />,
       );
 
-      // The number follows the setting; the plural, the count itself.
+      // The number follows the setting (no decimals for a whole count); the
+      // plural, the count itself.
       expect(screen.getByTestId('ctiFeedContentCount-iocs')).toHaveTextContent(
-        '952,987.00 IOCs',
+        '952,987 IOCs',
       );
     } finally {
       mockSettings['format:number:defaultPattern'] = '0,0.[000]';

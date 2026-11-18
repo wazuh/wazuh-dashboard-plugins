@@ -21,7 +21,30 @@ describe('formatCtiNumber', () => {
       'format:number:defaultLocale': 'en',
     });
 
-    expect(formatCtiNumber(952987)).toBe('952,987.00');
+    // A whole number shows no decimals; a fraction keeps them.
+    expect(formatCtiNumber(952987)).toBe('952,987');
+    expect(formatCtiNumber(1.5)).toBe('1.50');
+  });
+
+  test('drops zero decimals with the separator of the configured locale', () => {
+    withSettings({
+      'format:number:defaultPattern': '0,0.00',
+      'format:number:defaultLocale': 'de',
+    });
+
+    expect(formatCtiNumber(952987)).toBe('952 987');
+    expect(formatCtiNumber(2.5)).toBe('2,50');
+  });
+
+  test('keeps the suffix of an abbreviated whole number', () => {
+    withSettings({
+      'format:number:defaultPattern': '0.0a',
+      'format:number:defaultLocale': 'en',
+    });
+
+    expect(formatCtiNumber(953000)).toBe('953k');
+    expect(formatCtiNumber(952987)).toBe('953k');
+    expect(formatCtiNumber(1250)).toBe('1.3k');
   });
 
   test('follows the default pattern', () => {
