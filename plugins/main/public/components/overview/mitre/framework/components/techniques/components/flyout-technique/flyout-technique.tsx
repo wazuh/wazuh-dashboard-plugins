@@ -210,7 +210,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
               error={technique.error}
             />
           </EuiAccordion>
-          <EuiSpacer size='s' />
+          <EuiSpacer size='l' />
           <EuiAccordion
             id='recent_events'
             className='events-accordion'

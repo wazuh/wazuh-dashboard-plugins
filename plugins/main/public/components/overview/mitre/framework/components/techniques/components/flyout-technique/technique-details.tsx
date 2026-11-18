@@ -4,7 +4,6 @@ import { i18n } from '@osd/i18n';
 import {
   EuiBadge,
   EuiCallOut,
-  EuiDescriptionList,
   EuiFlexGroup,
   EuiFlexItem,
   EuiLink,
@@ -27,6 +26,13 @@ import { goToIntelligence, IntelligenceResource } from './lib/navigation';
 import { TechniqueDescription } from './technique-description';
 
 const NAMES_SHOWN = 3;
+
+const DETAILS_GRID: React.CSSProperties = {
+  margin: 0,
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+  gap: '12px 20px',
+};
 
 // The time of day means nothing for MITRE ATT&CK metadata
 const formatDay = (date: string) => moment(date).format('ll');
@@ -318,13 +324,20 @@ export const TechniqueDetails = ({
         </EuiFlexItem>
         <EuiFlexItem>
           <EuiPanel color='subdued' paddingSize='m' hasShadow={false}>
-            <EuiDescriptionList
-              compressed
-              type='responsiveColumn'
-              titleProps={{ style: { width: '40%' } }}
-              descriptionProps={{ style: { width: '60%' } }}
-              listItems={listItems}
-            />
+            <dl style={DETAILS_GRID}>
+              {listItems.map(({ title, description }) => (
+                <div key={title} style={{ minWidth: 0 }}>
+                  <dt>
+                    <EuiText size='xs' color='subdued'>
+                      {title}
+                    </EuiText>
+                  </dt>
+                  <dd style={{ margin: '2px 0 0' }}>
+                    <EuiText size='s'>{description}</EuiText>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </EuiPanel>
         </EuiFlexItem>
       </EuiFlexGroup>
