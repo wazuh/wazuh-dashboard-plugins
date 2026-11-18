@@ -14,7 +14,6 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../../../../react-services/time-service';
-import { Markdown } from '../../../../../../../common/util';
 import { useAsyncActionRunOnStart } from '../../../../../../../common/hooks/use_async_action_run_on_start';
 import { getMitreResourcesByIds } from '../../../../../lib/get-mitre-resources-by-ids';
 import {
@@ -25,6 +24,7 @@ import {
   TechniqueFamily,
 } from './lib/technique';
 import { goToIntelligence, IntelligenceResource } from './lib/navigation';
+import { TechniqueDescription } from './technique-description';
 
 const NAMES_SHOWN = 3;
 
@@ -302,26 +302,13 @@ export const TechniqueDetails = ({
       <EuiFlexGroup gutterSize='l'>
         <EuiFlexItem grow={3}>
           {technique.description && (
-            <EuiText size='s'>
-              <Markdown
-                markdown={resolveCitations(
-                  technique.description,
-                  technique.references,
-                )}
-              />
-            </EuiText>
-          )}
-          {technique.url && (
-            <EuiText size='s'>
-              <EuiLink href={technique.url} target='_blank' external>
-                {i18n.translate(
-                  'wazuh.mitreAttack.techniqueFlyout.details.fullDescription',
-                  {
-                    defaultMessage: 'Read the full description on MITRE ATT&CK',
-                  },
-                )}
-              </EuiLink>
-            </EuiText>
+            <TechniqueDescription
+              id={`technique-description-${techniqueId}`}
+              markdown={resolveCitations(
+                technique.description,
+                technique.references,
+              )}
+            />
           )}
           <EuiSpacer size='m' />
           <Family {...family} />

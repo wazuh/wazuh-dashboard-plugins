@@ -3,7 +3,7 @@ import { i18n } from '@osd/i18n';
 import {
   EuiFlexGrid,
   EuiFlexItem,
-  EuiHealth,
+  EuiIcon,
   EuiPanel,
   EuiStat,
 } from '@elastic/eui';
@@ -42,7 +42,9 @@ export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
     {
       key: 'severity',
       title: severity ? (
-        <EuiHealth color={severity.color}>{severity.label}</EuiHealth>
+        <span>
+          <EuiIcon type='dot' color={severity.color} /> {severity.label}
+        </span>
       ) : (
         EMPTY_VALUE
       ),
