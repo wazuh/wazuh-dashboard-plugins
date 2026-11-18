@@ -71,6 +71,12 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
  */
 export const WAZUH_CTI_CONSOLE_HREF = 'https://console.pre.cloud.wazuh.com';
 
+/** Pages of the CTI console, appended to {@link WAZUH_CTI_CONSOLE_HREF}. */
+export const ctiConsolePaths = {
+  /** The deployments registered to the organization, with their subscriptions. */
+  deployments: '/cti/deployments',
+} as const;
+
 /**
  * Default base URL of the Wazuh Cyber Threat Intelligence Console API (server-side OAuth device
  * flow). Overridable with the `wazuh_check_updates.ctiApiUrl` setting.

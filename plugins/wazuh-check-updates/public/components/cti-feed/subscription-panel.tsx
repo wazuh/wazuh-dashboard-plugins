@@ -13,7 +13,11 @@ import {
   EuiTitle,
   EuiToolTip,
 } from '@elastic/eui';
-import { statusCodes, WAZUH_CTI_CONSOLE_HREF } from '../../../common/constants';
+import {
+  ctiConsolePaths,
+  statusCodes,
+  WAZUH_CTI_CONSOLE_HREF,
+} from '../../../common/constants';
 import type { CtiSubscriptionPlan } from '../../../common/cti-registration-status-api';
 import { ctiFlowState } from '../../services/cti-flow-state';
 import {
@@ -399,7 +403,7 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
               <EuiSpacer size='l' />
               <EuiButton
                 fill
-                href={WAZUH_CTI_CONSOLE_HREF}
+                href={`${WAZUH_CTI_CONSOLE_HREF}${ctiConsolePaths.deployments}`}
                 target='_blank'
                 rel='noopener noreferrer'
                 iconType='popout'

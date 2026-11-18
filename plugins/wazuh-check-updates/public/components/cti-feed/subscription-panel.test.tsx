@@ -16,7 +16,11 @@ import {
   waitFor,
 } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { statusCodes, WAZUH_CTI_CONSOLE_HREF } from '../../../common/constants';
+import {
+  ctiConsolePaths,
+  statusCodes,
+  WAZUH_CTI_CONSOLE_HREF,
+} from '../../../common/constants';
 import { ctiFlowState } from '../../services/cti-flow-state';
 import { fetchCtiRegistrationPermission } from '../../services/cti-registration-permission';
 import { getSubscriptionState, SubscriptionPanel } from './subscription-panel';
@@ -277,7 +281,14 @@ describe('SubscriptionPanel', () => {
     renderPanel({ statusCTI: SUCCESS });
 
     const link = screen.getByTestId('ctiFeedSubscriptionConsoleLink');
-    expect(link).toHaveAttribute('href', WAZUH_CTI_CONSOLE_HREF);
+    expect(link).toHaveAttribute(
+      'href',
+      `${WAZUH_CTI_CONSOLE_HREF}${ctiConsolePaths.deployments}`,
+    );
+    expect(link).toHaveAttribute(
+      'href',
+      'https://console.pre.cloud.wazuh.com/cti/deployments',
+    );
     expect(link).toHaveAttribute('target', '_blank');
     expect(link).toHaveTextContent('Open in Wazuh Console');
   });
