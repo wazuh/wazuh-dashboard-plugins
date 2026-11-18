@@ -83,10 +83,6 @@ export const WAZUH_CTI_CONSOLE_BASE_URL = 'https://api.pre.cloud.wazuh.com';
  */
 export const ctiConsoleApiPaths = {
   environmentsToken: '/api/v1/platform/environments/token',
-  /** Plan and identity of the registered environment (read with its access token). */
-  environmentsMe: '/api/v1/platform/environments/me',
-  /** Public catalog of plans. */
-  catalogPlans: '/api/v1/catalog/plans',
 } as const;
 
 /** Content Manager plugin HTTP path prefix (cluster plugin / Imposter mock). */

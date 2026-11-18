@@ -1,7 +1,6 @@
 import { IScopedClusterClient } from 'opensearch-dashboards/server';
 import { contentManagerRoutes } from '../../../common/constants';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
-import { requestContentManager } from './content-manager-transport';
 
 /**
  * Forwards the CTI OAuth access token to the indexer Content Manager plugin
@@ -15,7 +14,7 @@ export async function postContentManagerSubscription(
   const { logger } = getWazuhCheckUpdatesServices();
 
   try {
-    const response = await requestContentManager(wazuhClient, {
+    const response = await wazuhClient.asCurrentUser.transport.request({
       method: 'POST',
       path: contentManagerRoutes.subscription,
       body: { access_token: accessToken },
@@ -60,7 +59,7 @@ export async function postContentManagerSubscription(
 export async function deleteContentManagerSubscription(
   wazuhClient: IScopedClusterClient,
 ): Promise<void> {
-  const response = await requestContentManager(wazuhClient, {
+  const response = await wazuhClient.asCurrentUser.transport.request({
     method: 'DELETE',
     path: contentManagerRoutes.subscription,
   });

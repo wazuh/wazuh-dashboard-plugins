@@ -7,7 +7,6 @@ import type {
   CtiSubscriptionSnapshot,
 } from '../../../common/cti-registration-status-api';
 import { contentManagerRoutes } from '../../../common/constants';
-import { requestContentManager } from './content-manager-transport';
 
 interface ContentManagerSubscriptionGetResponse {
   message?: {
@@ -173,7 +172,7 @@ export async function getCtiSubscriptionStatus(
   wazuhClient: IScopedClusterClient,
 ): Promise<CtiSubscriptionSnapshot> {
   try {
-    const response = await requestContentManager(wazuhClient, {
+    const response = await wazuhClient.asCurrentUser.transport.request({
       method: 'GET',
       path: contentManagerRoutes.subscription,
     });

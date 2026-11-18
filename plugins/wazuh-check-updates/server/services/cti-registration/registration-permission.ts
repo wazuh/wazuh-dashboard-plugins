@@ -8,7 +8,6 @@ import type {
   CtiRegistrationPermissionApiBody,
 } from '../../../common/cti-registration-permission-api';
 import { getWazuhCheckUpdatesServices } from '../../plugin-services';
-import { requestContentManager } from './content-manager-transport';
 
 /**
  * Answer used whenever the registration probe cannot be evaluated (older indexer without
@@ -67,7 +66,7 @@ export async function evaluateCtiRegistrationPermission(
   action: CtiRegistrationPermissionAction = 'register',
 ): Promise<CtiRegistrationPermissionApiBody | null> {
   try {
-    const response = await requestContentManager(wazuhClient, {
+    const response = await wazuhClient.asCurrentUser.transport.request({
       method: PROBE_METHOD[action],
       path: contentManagerRoutes.subscription,
       querystring: { [CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM]: 'true' },

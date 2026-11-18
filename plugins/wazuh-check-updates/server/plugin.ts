@@ -27,7 +27,6 @@ import {
 import { ISecurityFactory } from '../../wazuh-core/server/services/security-factory';
 import { initializeClientContentManager } from './services/plugins/content-manager';
 import { setCtiConsoleBaseUrl } from './services/cti-registration/cti-console-url';
-import { announceContentManagerMock } from './services/cti-registration/content-manager-mock';
 import type { WazuhCheckUpdatesPluginConfigType } from './index';
 
 declare module 'opensearch-dashboards/server' {
@@ -65,8 +64,6 @@ export class WazuhCheckUpdatesPlugin
 
     setWazuhCore(plugins.wazuhCore);
     setWazuhCheckUpdatesServices({ logger: this.logger });
-    // Development only: warns when the Content Manager subscription mock is on.
-    announceContentManagerMock();
 
     const contentManagerClient = core.opensearch.legacy.createClient(
       'content-manager',
