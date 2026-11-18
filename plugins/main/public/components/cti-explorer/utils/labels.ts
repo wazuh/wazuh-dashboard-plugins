@@ -1,6 +1,8 @@
 /* eslint-disable camelcase -- the keys are catalog values: document.type and document.software.type */
 import { i18n } from '@osd/i18n';
 import moment from 'moment-timezone';
+import { formatNumberWithSettings } from '../../../../../wazuh-check-updates/common/number-format';
+import { getCore } from '../../../kibana-services';
 
 /** `document.type` → label. An unknown type shows as stored. */
 const IOC_TYPE_LABELS: Record<string, string> = {
@@ -88,9 +90,12 @@ const CONFIDENCE_LABELS: Record<string, string> = {
 export const getConfidenceBandLabel = (band: string): string =>
   CONFIDENCE_LABELS[band] ?? band;
 
-const numberFormat = new Intl.NumberFormat();
+/**
+ * A number as the advanced settings format numbers (pattern and locale), like the CTI
+ * feed page; whole numbers show no decimals.
+ */
 export const formatNumber = (value: number): string =>
-  numberFormat.format(value);
+  formatNumberWithSettings(value, key => getCore().uiSettings.get(key));
 
 /**
  * A date of the catalog, stored in UTC: a value without an offset is read as
