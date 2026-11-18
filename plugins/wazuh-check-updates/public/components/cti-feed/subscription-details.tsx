@@ -23,6 +23,23 @@ interface DetailRow {
   description: React.ReactElement | string;
 }
 
+/**
+ * A value kept on one line: cut with an ellipsis when its column is too narrow, with
+ * the full value (or `tooltip`) on hover.
+ */
+const OneLine: React.FC<{ tooltip: React.ReactNode }> = ({
+  tooltip,
+  children,
+}) => (
+  <EuiToolTip
+    content={tooltip}
+    display='block'
+    anchorClassName='ctiFeed__oneLine'
+  >
+    <span className='ctiFeed__oneLine'>{children}</span>
+  </EuiToolTip>
+);
+
 /** A calendar date with the exact time in a tooltip; `null` when there is no valid date. */
 function renderDate(
   timestamp: string | null | undefined,
@@ -33,11 +50,11 @@ function renderDate(
     return null;
   }
   return (
-    <EuiToolTip content={formatCtiTimestamp(timestamp)}>
+    <OneLine tooltip={formatCtiTimestamp(timestamp)}>
       <time dateTime={timestamp} data-test-subj={dataTestSubj}>
         {date}
       </time>
-    </EuiToolTip>
+    </OneLine>
   );
 }
 
@@ -67,14 +84,17 @@ function getSubscriptionRows(
         'wazuhCheckUpdates.ctiFeed.subscription.details.billing',
         { defaultMessage: 'Billing' },
       ),
-      description: i18n.translate(
-        'wazuhCheckUpdates.ctiFeed.subscription.details.billingInterval',
-        {
-          defaultMessage:
-            '{interval, select, month {Monthly} year {Yearly} other {{interval}}}',
-          values: { interval: subscription.interval },
-        },
-      ),
+      description: (() => {
+        const billing = i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.subscription.details.billingInterval',
+          {
+            defaultMessage:
+              '{interval, select, month {Monthly} year {Yearly} other {{interval}}}',
+            values: { interval: subscription.interval },
+          },
+        );
+        return <OneLine tooltip={billing}>{billing}</OneLine>;
+      })(),
     });
   }
   const startedAt = renderDate(
@@ -126,7 +146,11 @@ function getSubscriptionRows(
         'wazuhCheckUpdates.ctiFeed.subscription.details.pastDueEndsAt',
         { defaultMessage: 'Payment due by' },
       ),
-      description: <EuiTextColor color='warning'>{pastDueEndsAt}</EuiTextColor>,
+      description: (
+        <EuiTextColor color='warning' component='div'>
+          {pastDueEndsAt}
+        </EuiTextColor>
+      ),
     });
   }
   return rows;
@@ -157,9 +181,11 @@ export const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         { defaultMessage: 'Environment' },
       ),
       description: (
-        <span data-test-subj='ctiFeedSubscriptionEnvironmentName'>
-          {environment.name}
-        </span>
+        <OneLine tooltip={environment.name}>
+          <span data-test-subj='ctiFeedSubscriptionEnvironmentName'>
+            {environment.name}
+          </span>
+        </OneLine>
       ),
     });
   }
@@ -170,9 +196,11 @@ export const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
         { defaultMessage: 'Organization' },
       ),
       description: (
-        <span data-test-subj='ctiFeedSubscriptionOrganization'>
-          {environment.organization.name}
-        </span>
+        <OneLine tooltip={environment.organization.name}>
+          <span data-test-subj='ctiFeedSubscriptionOrganization'>
+            {environment.organization.name}
+          </span>
+        </OneLine>
       ),
     });
   }
@@ -188,13 +216,16 @@ export const SubscriptionDetails: React.FC<SubscriptionDetailsProps> = ({
       ),
       description: (
         <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
-          <EuiFlexItem grow={false}>
-            <code
-              className='ctiFeed__environmentId'
-              data-test-subj='ctiFeedSubscriptionEnvironmentId'
-            >
-              {environmentUid}
-            </code>
+          {/* Shrinks before the copy button does, cut with an ellipsis. */}
+          <EuiFlexItem grow={false} style={{ minWidth: 0 }}>
+            <OneLine tooltip={environmentUid}>
+              <code
+                className='ctiFeed__environmentId'
+                data-test-subj='ctiFeedSubscriptionEnvironmentId'
+              >
+                {environmentUid}
+              </code>
+            </OneLine>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiCopy textToCopy={environmentUid}>

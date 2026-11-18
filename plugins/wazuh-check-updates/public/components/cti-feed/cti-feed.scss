@@ -50,11 +50,30 @@
   }
 }
 
-// Feed sync rows open the feed details: an inset primary outline on hover makes
-// the whole row read as one target. A shadow, because OUI's `--noBorder` wins
-// over any border set here.
-.ctiFeed__feedRow.euiPanel--isClickable:hover {
+// Feed sync rows: the top part opens the feed details; an inset primary outline
+// around the whole row on its hover makes it read as one target. A shadow, because
+// OUI's `--noBorder` wins over any border set here.
+.ctiFeed__feedRow:has(> .ctiFeed__feedRowButton:hover) {
   box-shadow: inset 0 0 0 $euiBorderWidthThin $euiColorPrimary;
+}
+
+// The clickable part blends into the row: no button border, no own hover effect.
+.euiPanel.ctiFeed__feedRowButton {
+  width: 100%;
+  border: none;
+  text-align: left;
+
+  &:hover,
+  &:focus {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+// What the feed delivered, under the row, aligned with its text (after the icon).
+.ctiFeed__feedContent {
+  // Row padding, icon and the gutter after it.
+  padding: 0 $euiSize $euiSize ($euiSize + $euiSizeXL + $euiSize);
 }
 
 // Feed details: short labels, long identifiers (types, URLs) get the room.
@@ -92,8 +111,21 @@
   font-size: $euiFontSizeS;
   font-weight: $euiFontWeightBold;
   color: $euiTitleColor;
-  // The environment ID keeps one line or wraps anywhere on a narrow card.
-  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+// Grid items shrink below their content, so a long value can be cut.
+.ctiFeed__subscriptionDetail {
+  min-width: 0;
+}
+
+// One line, cut with an ellipsis; the full value is in a tooltip.
+.ctiFeed__oneLine {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .ctiFeed__environmentId {

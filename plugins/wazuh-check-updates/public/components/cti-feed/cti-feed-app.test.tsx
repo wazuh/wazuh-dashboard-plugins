@@ -80,8 +80,8 @@ const consumer = (status: string) => ({
 const settle = async () => {
   await screen.findByText('All feeds are up to date');
   await waitFor(() =>
-    expect(screen.getByTestId('ctiFeedContentStat-rules')).toHaveTextContent(
-      '365',
+    expect(screen.getByTestId('ctiFeedContentCount-rules')).toHaveTextContent(
+      '365 rules',
     ),
   );
 };
@@ -116,17 +116,35 @@ describe('CtiFeedApp', () => {
     mockRequestUpdate.mockResolvedValue(undefined);
   });
 
-  test('shows the subscription, the feed sync and the feed content', async () => {
+  test('shows the subscription and the feed sync, with what each feed delivered', async () => {
     render(<CtiFeedApp />);
 
     expect(screen.getByTestId('ctiFeedSubscriptionPanel')).toBeInTheDocument();
     expect(
       await screen.findByText('All feeds are up to date'),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByTestId('ctiFeedContentStat-rules'),
-    ).toHaveTextContent('365');
+    await waitFor(() =>
+      expect(
+        screen.getByTestId('ctiFeedContent-cti:catalog:consumer:ruleset'),
+      ).toHaveTextContent(
+        'Delivered: 365 rules · 514 decoders · 127 integrations · 49 KVDBs',
+      ),
+    );
+    // No separate Feed content card any more.
+    expect(screen.queryByTestId('ctiFeedContentPanel')).toBeNull();
     expect(screen.queryByTestId('ctiRegistrationModal')).toBeNull();
+  });
+
+  test('refreshes the feeds and their content counts together', async () => {
+    render(<CtiFeedApp />);
+    await settle();
+    mockFetchConsumers.mockClear();
+    mockFetchCounts.mockClear();
+
+    fireEvent.click(screen.getByTestId('ctiFeedSyncRefresh'));
+
+    await waitFor(() => expect(mockFetchCounts).toHaveBeenCalledTimes(1));
+    expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
   });
 
   test('opens the registration modal when asked on arrival', async () => {

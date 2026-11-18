@@ -28,6 +28,10 @@ import {
 import { FeedSyncBadge } from './feed-sync-badge';
 import { FeedDetailsFlyout } from './feed-details-flyout';
 import { CtiTimestamp } from './cti-timestamp';
+import { FeedContentLine } from './feed-content';
+import type { FeedContentCounts } from '../../services/cti-feed';
+import { getCore } from '../../plugin-services';
+import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
 
 /** Stable key of a feed across reads: its `type`, or its `name` if missing. */
 const getFeedKey = (consumer: CtiConsumer) => consumer.type || consumer.name;
@@ -157,82 +161,99 @@ const renderLastUpdated = (time: string) =>
     values: { time },
   });
 
-const FeedRow: React.FC<{ consumer: CtiConsumer; onOpen: () => void }> = ({
-  consumer,
-  onOpen,
-}) => {
+const FeedRow: React.FC<{
+  consumer: CtiConsumer;
+  onOpen: () => void;
+  contentCounts: FeedContentCounts | null;
+  contentLoading: boolean;
+}> = ({ consumer, onOpen, contentCounts, contentLoading }) => {
   const metadata = getFeedMetadata(consumer);
   const state = getConsumerSyncState(consumer);
 
+  // The clickable part opens the details; the content line sits outside it, as its
+  // links cannot go inside a button.
   return (
     <EuiPanel
       color='subdued'
       hasShadow={false}
-      paddingSize='m'
-      onClick={onOpen}
-      aria-haspopup='dialog'
+      paddingSize='none'
       className='ctiFeed__feedRow'
-      data-test-subj='ctiFeedSyncRow'
+      data-test-subj='ctiFeedSyncRowContainer'
     >
-      <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false}>
-        <EuiFlexItem grow={false}>
-          <span className='ctiFeed__feedIcon'>
-            <EuiIcon type={metadata.iconType} aria-hidden />
-          </span>
-        </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: 0 }}>
-          <EuiText size='s'>
-            <strong>{metadata.label}</strong>
-          </EuiText>
-          <EuiText size='xs' color='subdued'>
-            {metadata.description}
-          </EuiText>
-          <EuiText size='xs' color='subdued' data-test-subj='ctiFeedCatalog'>
-            {getFeedCatalogLabel(consumer)}
-          </EuiText>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiFlexGroup
-            direction='column'
-            alignItems='flexEnd'
-            gutterSize='xs'
-            responsive={false}
-          >
-            <EuiFlexItem grow={false}>
-              <FeedSyncBadge state={state} />
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <CtiTimestamp
-                timestamp={consumer.updated_at}
-                renderText={renderLastUpdated}
-                dataTestSubj='ctiFeedUpdatedAt'
-              />
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>
-          <EuiIcon type='arrowRight' color='subdued' aria-hidden />
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      {state.kind === 'syncing' && state.progress !== null ? (
-        <>
-          <EuiSpacer size='s' />
-          <EuiProgress
-            value={Math.round(state.progress * 100)}
-            max={100}
-            size='s'
-            color='primary'
-            valueText={i18n.translate(
-              'wazuhCheckUpdates.ctiFeed.sync.progress',
-              {
-                defaultMessage: '{percent}% synced',
-                values: { percent: Math.round(state.progress * 100) },
-              },
-            )}
-            data-test-subj='ctiFeedSyncProgress'
-          />
-        </>
-      ) : null}
+      <EuiPanel
+        color='transparent'
+        hasShadow={false}
+        paddingSize='m'
+        onClick={onOpen}
+        aria-haspopup='dialog'
+        className='ctiFeed__feedRowButton'
+        data-test-subj='ctiFeedSyncRow'
+      >
+        <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false}>
+          <EuiFlexItem grow={false}>
+            <span className='ctiFeed__feedIcon'>
+              <EuiIcon type={metadata.iconType} aria-hidden />
+            </span>
+          </EuiFlexItem>
+          <EuiFlexItem style={{ minWidth: 0 }}>
+            <EuiText size='s'>
+              <strong>{metadata.label}</strong>
+            </EuiText>
+            <EuiText size='xs' color='subdued'>
+              {metadata.description}
+            </EuiText>
+            <EuiText size='xs' color='subdued' data-test-subj='ctiFeedCatalog'>
+              {getFeedCatalogLabel(consumer)}
+            </EuiText>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiFlexGroup
+              direction='column'
+              alignItems='flexEnd'
+              gutterSize='xs'
+              responsive={false}
+            >
+              <EuiFlexItem grow={false}>
+                <FeedSyncBadge state={state} />
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <CtiTimestamp
+                  timestamp={consumer.updated_at}
+                  renderText={renderLastUpdated}
+                  dataTestSubj='ctiFeedUpdatedAt'
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiIcon type='arrowRight' color='subdued' aria-hidden />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        {state.kind === 'syncing' && state.progress !== null ? (
+          <>
+            <EuiSpacer size='s' />
+            <EuiProgress
+              value={Math.round(state.progress * 100)}
+              max={100}
+              size='s'
+              color='primary'
+              valueText={i18n.translate(
+                'wazuhCheckUpdates.ctiFeed.sync.progress',
+                {
+                  defaultMessage: '{percent}% synced',
+                  values: { percent: Math.round(state.progress * 100) },
+                },
+              )}
+              data-test-subj='ctiFeedSyncProgress'
+            />
+          </>
+        ) : null}
+      </EuiPanel>
+      <FeedContentLine
+        feedType={consumer.type}
+        counts={contentCounts}
+        loading={contentLoading}
+      />
     </EuiPanel>
   );
 };
@@ -252,6 +273,9 @@ export interface FeedSyncPanelProps {
   updateInProgress?: boolean;
   /** An update is known to be running (see `CheckForUpdatesButton`). */
   onUpdateRunning?: () => void;
+  /** What each feed has delivered, shown in its row. */
+  contentCounts?: FeedContentCounts | null;
+  contentLoading?: boolean;
 }
 
 export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
@@ -264,6 +288,8 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
   onUpdateRequested,
   updateInProgress,
   onUpdateRunning,
+  contentCounts = null,
+  contentLoading = false,
 }) => {
   // An update known to be running leads, until a feed shows it (or something failed).
   const panelSummary: PanelSummary =
@@ -294,7 +320,7 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
     >
       <EuiFlexGroup
         justifyContent='spaceBetween'
-        alignItems='center'
+        alignItems='flexStart'
         responsive={false}
       >
         <EuiFlexItem>
@@ -305,6 +331,12 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
               })}
             </h2>
           </EuiTitle>
+          <EuiText size='s' color='subdued'>
+            {i18n.translate('wazuhCheckUpdates.ctiFeed.sync.description', {
+              defaultMessage:
+                'The sync state of each feed and the content it delivered to this environment. Content you create yourself is not counted.',
+            })}
+          </EuiText>
         </EuiFlexItem>
         <EuiFlexItem grow={false}>
           <EuiButtonIcon
@@ -375,16 +407,20 @@ export const FeedSyncPanel: React.FC<FeedSyncPanelProps> = ({
           {consumers.length > 0 ? (
             <>
               <EuiSpacer size='l' />
-              <EuiFlexGroup direction='column' gutterSize='s'>
-                {sortFeeds(consumers).map(consumer => (
-                  <EuiFlexItem key={getFeedKey(consumer)}>
-                    <FeedRow
-                      consumer={consumer}
-                      onOpen={() => setSelectedFeedKey(getFeedKey(consumer))}
-                    />
-                  </EuiFlexItem>
-                ))}
-              </EuiFlexGroup>
+              <RedirectAppLinks application={getCore().application}>
+                <EuiFlexGroup direction='column' gutterSize='s'>
+                  {sortFeeds(consumers).map(consumer => (
+                    <EuiFlexItem key={getFeedKey(consumer)}>
+                      <FeedRow
+                        consumer={consumer}
+                        onOpen={() => setSelectedFeedKey(getFeedKey(consumer))}
+                        contentCounts={contentCounts}
+                        contentLoading={contentLoading}
+                      />
+                    </EuiFlexItem>
+                  ))}
+                </EuiFlexGroup>
+              </RedirectAppLinks>
             </>
           ) : null}
         </>

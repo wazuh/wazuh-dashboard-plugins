@@ -7,8 +7,8 @@ Threat Intelligence (CTI) delivers to the environment:
 
 - The **subscription**: whether the environment is registered, the plan, and the registration
   flow.
-- The **feed sync**: whether each feed is up to date, syncing, or failed.
-- The **feed content**: how much content each feed has delivered.
+- The **feed sync**: whether each feed is up to date, syncing, or failed, and how much content
+  each feed has delivered.
 - The **Update CTI content** action, which requests a sync now instead of waiting for the next
   automatic one.
 
@@ -28,14 +28,15 @@ shown. See [Configuration](../configuration.md).
 
 The **Subscription** panel shows the registration state of the environment:
 
-| State                   | Meaning                                                                                     | Action                      |
-| :---------------------- | :------------------------------------------------------------------------------------------ | :-------------------------- |
-| **Not registered**      | The environment receives the Open feed. The panel compares the Open and Professional feeds. | **Register**                |
-| **Activation pending**  | A registration started and waits for the activation in the Wazuh Console.                   | **View activation details** |
-| **Registered**          | The environment is registered. The panel shows the plan name.                               | **View registration**       |
-| **Registration failed** | The registration could not be completed. The environment keeps receiving the Open feed.     | **View details**            |
+| State                   | Meaning                                                                                                                | Action                      |
+| :---------------------- | :--------------------------------------------------------------------------------------------------------------------- | :-------------------------- |
+| **Not registered**      | The environment receives the Open feed. The panel compares the Open and Professional feeds.                            | **Register**                |
+| **Activation pending**  | A registration started and waits for the activation in the Wazuh Console.                                              | **View activation details** |
+| **Registered**          | The environment is registered. The panel shows the plan, the environment and its subscription, and compares the plans. | **Manage in Wazuh Console** |
+| **Registration failed** | The registration could not be completed. The environment keeps receiving the Open feed.                                | **View details**            |
 
-Each action opens the registration dialog, which walks through the activation with a user code.
+**Manage in Wazuh Console** opens the Deployments page of the console in a new tab. The other
+actions open the registration dialog, which walks through the activation with a user code.
 The bar at the bottom of the interface that invites users to register opens this app with the
 registration dialog already open.
 
@@ -59,31 +60,19 @@ Each feed shows one of these states:
 The state comes from the `.wazuh-cti-consumers` index of the Wazuh indexer. While a feed is
 syncing, the panel refreshes itself every few seconds.
 
-## Feed content
+### What each feed delivered
 
-The **Feed content** panel counts the content the feed delivered: rules, decoders,
-integrations, KVDBs, indicators of compromise and vulnerabilities (CVEs). Content that users
+Under each feed, a line counts the content it delivered to the environment. Content that users
 create is not counted.
 
-- Rules, decoders, integrations and KVDBs are counted in the `standard` space of Ruleset
-  Management, through the same Security Analytics endpoints the Home page uses.
-- Indicators of compromise are counted in the `wazuh-threatintel-enrichments*` indices.
-- Vulnerabilities are the CVE records in the `.wazuh-threatintel-vulnerabilities*` indices.
+- **Ruleset**: rules, decoders, integrations and KVDBs, counted in the `standard` space of
+  Ruleset Management, through the same Security Analytics endpoints the Home page uses.
+- **Indicators of compromise**: the IOCs in the `wazuh-threatintel-enrichments*` indices.
+- **Vulnerabilities**: the CVE records in the `.wazuh-threatintel-vulnerabilities*` indices.
 
-The ruleset tiles open their Ruleset Management page on the `standard` space, and the
-indicators of compromise and vulnerabilities tiles open their tab of the
-[CTI Explorer](cti-explorer.md) app.
+Each count links to the page that lists that content: the Ruleset Management page on the
+`standard` space, or the matching tab of the [CTI Explorer](cti-explorer.md) app.
 
 A count shows **—** when it cannot be read, for example when the content is not synced yet or
 the user lacks access to it. The counts refresh after a sync finishes, or on demand with the
-refresh button.
-
-## Updating the CTI content
-
-Click **Update CTI content** to request a sync of the CTI content now.
-
-- The request runs asynchronously. A notification confirms it was requested, and the **Feed
-  sync** panel follows the sync as it runs.
-- The button calls `POST /api/wazuh-check-updates/cti-feed/update` on the dashboard server, which
-  forwards the request to `POST /_plugins/_content_manager/update` on the Wazuh indexer as the
-  current user. The indexer privileges of that user decide whether the request is allowed.
+refresh button of the **Feed sync** panel.

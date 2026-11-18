@@ -1,6 +1,13 @@
 /* eslint-disable camelcase -- CTI consumer and query fields keep their API names */
 jest.mock('../../plugin-services', () => ({
-  getCore: jest.fn(),
+  getCore: () => ({
+    application: {
+      currentAppId$: { subscribe: () => ({ unsubscribe: () => undefined }) },
+      getUrlForApp: (appId: string, { path = '' } = {}) =>
+        `/app/${appId}${path}`,
+      navigateToUrl: jest.fn(),
+    },
+  }),
   getWazuhCore: () => ({
     utils: { formatUIDate: (date: string) => `formatted ${date}` },
   }),
@@ -118,6 +125,28 @@ describe('FeedSyncPanel', () => {
 
     expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
       'Some feeds could not sync',
+    );
+  });
+
+  test('shows what each feed delivered under its row', () => {
+    renderPanel([consumer()], {
+      contentCounts: {
+        rules: 603,
+        decoders: 524,
+        integrations: 132,
+        kvdbs: 49,
+        iocs: 952987,
+        vulnerabilities: 423061,
+      },
+    });
+
+    const row = screen.getByTestId('ctiFeedSyncRowContainer');
+    expect(row).toHaveTextContent(
+      'Delivered: 603 rules · 524 decoders · 132 integrations · 49 KVDBs',
+    );
+    // The counts are links of their own, outside the part that opens the details.
+    expect(screen.getByTestId('ctiFeedSyncRow')).not.toContainElement(
+      screen.getByTestId('ctiFeedContentCount-rules'),
     );
   });
 

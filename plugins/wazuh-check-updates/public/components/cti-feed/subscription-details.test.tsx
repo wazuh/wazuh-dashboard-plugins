@@ -6,7 +6,13 @@ jest.mock('../../plugin-services', () => ({
 }));
 
 import React from 'react';
-import { configure, render, screen } from '@testing-library/react';
+import {
+  configure,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import moment from 'moment';
 import type {
@@ -99,6 +105,29 @@ describe('SubscriptionDetails', () => {
     const details = screen.getByTestId('ctiFeedSubscriptionDetails');
     expect(details).toHaveTextContent('Billing');
     expect(details).toHaveTextContent('Yearly');
+  });
+
+  test('keeps long values on one line, the full value in a tooltip', async () => {
+    const name = 'An environment name long enough to be cut with an ellipsis';
+    render(
+      <SubscriptionDetails
+        message={message({
+          environment: { name, organization: { name: 'Acme Corp' } },
+        })}
+        environmentUid='9ckQEmDsQ9eReRTUH4xPMg'
+      />,
+    );
+
+    const value = screen.getByTestId('ctiFeedSubscriptionEnvironmentName');
+    expect(value.closest('.ctiFeed__oneLine')).not.toBeNull();
+    expect(
+      screen
+        .getByTestId('ctiFeedSubscriptionEnvironmentId')
+        .closest('.ctiFeed__oneLine'),
+    ).not.toBeNull();
+    fireEvent.mouseOver(value);
+    // The value itself, and the same text in the tooltip.
+    await waitFor(() => expect(screen.getAllByText(name)).toHaveLength(2));
   });
 
   test('says when a subscription that does not renew expires', () => {

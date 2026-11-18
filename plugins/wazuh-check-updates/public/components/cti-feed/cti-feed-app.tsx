@@ -12,7 +12,6 @@ import { ModalCti } from '../../shared-components/cti-registration/components/mo
 import { useCtiRegistrationModal } from '../../shared-components/cti-registration/hooks/use-cti-registration-modal';
 import { SubscriptionPanel } from './subscription-panel';
 import { FeedSyncPanel } from './feed-sync-panel';
-import { FeedContentPanel } from './feed-content-panel';
 import { useCtiConsumers } from './hooks/use-cti-consumers';
 import { useSubscriptionChange } from './hooks/use-subscription-change';
 import { useFeedContentCounts } from './hooks/use-feed-content-counts';
@@ -40,6 +39,12 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
   // Counts change when a sync lands, so refresh them when a read finds it done.
   const previousSummary = useRef(sync.summary);
   const refetchContent = content.refetch;
+  // The refresh button of Feed sync reads the counts again too: they show in its rows.
+  const refetchSyncState = sync.refetch;
+  const refreshFeeds = useCallback(() => {
+    void refetchSyncState();
+    void refetchContent();
+  }, [refetchSyncState, refetchContent]);
   useEffect(() => {
     const wasMoving =
       previousSummary.current === 'syncing' ||
@@ -146,19 +151,15 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
               loading={sync.loading}
               error={sync.error}
               refreshing={sync.refreshing}
-              onRefresh={sync.refetch}
+              onRefresh={refreshFeeds}
               onUpdateRequested={sync.refetchAfterCheck}
               updateInProgress={sync.updateInProgress}
               onUpdateRunning={sync.followRunningUpdate}
+              contentCounts={content.counts}
+              contentLoading={content.loading}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiSpacer size='l' />
-        <FeedContentPanel
-          counts={content.counts}
-          loading={content.loading}
-          onRefresh={content.refetch}
-        />
         {registration.isModalOpen ? (
           <ModalCti
             handleModalToggle={registration.toggleModal}
