@@ -147,6 +147,9 @@ describe('FlyoutTechnique', () => {
     );
     expect(await screen.findByText('Password Policies')).toBeTruthy();
     expect(screen.getByText('and 1 more')).toBeTruthy();
+    expect(screen.getByText('Mitigations (4)')).toBeTruthy();
+    expect(screen.getByText('Used by groups (0)')).toBeTruthy();
+    expect(screen.getAllByText('None').length).toBe(2);
     expect(await screen.findByText('Password Guessing')).toBeTruthy();
     expect(screen.getByText('175')).toBeTruthy();
     expect(screen.getByText('Critical')).toBeTruthy();

@@ -46,7 +46,7 @@ type RelatedItemsProps = {
   techniqueId: string;
 };
 
-/** The count of a related resource, a few of its names and "and N more". */
+/** A few names of a related resource and "and N more". */
 const RelatedItems = ({ resource, ids, techniqueId }: RelatedItemsProps) => {
   const { data, running } = useAsyncActionRunOnStart<MitreItem[]>(
     getFirstItems,
@@ -56,7 +56,13 @@ const RelatedItems = ({ resource, ids, techniqueId }: RelatedItemsProps) => {
 
   return (
     <>
-      <span>{ids.length}</span>
+      {ids.length === 0 && (
+        <EuiText size='s' color='subdued'>
+          {i18n.translate('wazuh.mitreAttack.techniqueFlyout.details.none', {
+            defaultMessage: 'None',
+          })}
+        </EuiText>
+      )}
       {running && ids.length > 0 && <EuiLoadingContent lines={1} />}
       {!running && data && data.length > 0 && (
         <EuiText size='xs'>
@@ -241,7 +247,10 @@ export const TechniqueDetails = ({
     {
       title: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.details.mitigations',
-        { defaultMessage: 'Mitigations' },
+        {
+          defaultMessage: 'Mitigations ({count})',
+          values: { count: technique.mitigations?.length ?? 0 },
+        },
       ),
       description: (
         <RelatedItems
@@ -255,7 +264,8 @@ export const TechniqueDetails = ({
       title: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.details.groups',
         {
-          defaultMessage: 'Used by groups',
+          defaultMessage: 'Used by groups ({count})',
+          values: { count: technique.groups?.length ?? 0 },
         },
       ),
       description: (
@@ -269,7 +279,10 @@ export const TechniqueDetails = ({
     {
       title: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.details.software',
-        { defaultMessage: 'Software' },
+        {
+          defaultMessage: 'Software ({count})',
+          values: { count: technique.software?.length ?? 0 },
+        },
       ),
       description: (
         <RelatedItems
