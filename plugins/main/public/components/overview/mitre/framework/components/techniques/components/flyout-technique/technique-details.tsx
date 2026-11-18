@@ -316,11 +316,13 @@ export const TechniqueDetails = ({
           <EuiSpacer size='m' />
           <Family {...family} />
         </EuiFlexItem>
-        <EuiFlexItem grow={false} style={{ width: 320 }}>
+        <EuiFlexItem>
           <EuiPanel color='subdued' paddingSize='m' hasShadow={false}>
             <EuiDescriptionList
               compressed
               type='responsiveColumn'
+              titleProps={{ style: { width: '40%' } }}
+              descriptionProps={{ style: { width: '60%' } }}
               listItems={listItems}
             />
           </EuiPanel>
