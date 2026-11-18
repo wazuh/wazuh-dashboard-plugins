@@ -160,7 +160,7 @@ const Family = ({ data, error, running }: FamilyProps) => {
       <EuiTitle size='xxs'>
         <h4>{title}</h4>
       </EuiTitle>
-      <EuiSpacer size='xs' />
+      <EuiSpacer size='s' />
       {content}
     </div>
   );
