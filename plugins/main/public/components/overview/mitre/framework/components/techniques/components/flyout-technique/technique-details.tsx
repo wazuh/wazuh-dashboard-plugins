@@ -48,7 +48,7 @@ type RelatedItemsProps = {
 
 /** A few names of a related resource and "and N more". */
 const RelatedItems = ({ resource, ids, techniqueId }: RelatedItemsProps) => {
-  const { data, running } = useAsyncActionRunOnStart<MitreItem[]>(
+  const { data, error, running } = useAsyncActionRunOnStart<MitreItem[]>(
     getFirstItems,
     [resource, ids],
   );
@@ -61,6 +61,14 @@ const RelatedItems = ({ resource, ids, techniqueId }: RelatedItemsProps) => {
           {i18n.translate('wazuh.mitreAttack.techniqueFlyout.details.none', {
             defaultMessage: 'None',
           })}
+        </EuiText>
+      )}
+      {error && (
+        <EuiText size='xs' color='danger'>
+          {i18n.translate(
+            'wazuh.mitreAttack.techniqueFlyout.details.namesError',
+            { defaultMessage: 'The names could not be loaded.' },
+          )}
         </EuiText>
       )}
       {running && ids.length > 0 && <EuiLoadingContent lines={1} />}

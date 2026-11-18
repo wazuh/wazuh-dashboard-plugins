@@ -205,6 +205,24 @@ describe('FlyoutTechnique', () => {
     ).toBeTruthy();
   });
 
+  it('says when the related names fail and keeps the rest', async () => {
+    mockApi({ T1110: BRUTE_FORCE });
+    const defaultImplementation = apiReq.getMockImplementation()!;
+    apiReq.mockImplementation(async (method, path: string, options) => {
+      if (path.startsWith('/mitre/mitigations')) {
+        throw new Error('Request failed');
+      }
+      return defaultImplementation(method, path, options);
+    });
+    renderFlyout('T1110');
+
+    expect(
+      await screen.findByText('The names could not be loaded.'),
+    ).toBeTruthy();
+    expect(screen.getByText('Mitigations (4)')).toBeTruthy();
+    expect(screen.getByText('Credential Access')).toBeTruthy();
+  });
+
   it('keeps the stats and findings when the technique request fails', async () => {
     mockApi({ T1110: new Error('Request failed') });
     renderFlyout('T1110');

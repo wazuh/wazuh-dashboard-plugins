@@ -83,8 +83,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
     isLoading: boolean;
   }>({ isLoading: true });
 
-  useEffect(() => {
-    const error = technique.error || tactics.error;
+  const reportError = (error: Error | null, title: string) => {
     if (!error) {
       return;
     }
@@ -94,16 +93,33 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       severity: UI_ERROR_SEVERITIES.BUSINESS,
       store: true,
       display: true,
-      error: {
-        error,
-        message: error.message || error,
-        title: i18n.translate(
+      error: { error, message: error.message || error, title },
+    });
+  };
+
+  useEffect(
+    () =>
+      reportError(
+        technique.error,
+        i18n.translate(
           'wazuh.mitreAttack.techniqueFlyout.errorFetchingTechnique',
           { defaultMessage: 'Error obtaining the requested technique' },
         ),
-      },
-    });
-  }, [technique.error, tactics.error]);
+      ),
+    [technique.error],
+  );
+
+  useEffect(
+    () =>
+      reportError(
+        tactics.error,
+        i18n.translate(
+          'wazuh.mitreAttack.techniqueFlyout.errorFetchingTactics',
+          { defaultMessage: 'Error obtaining the tactics of the technique' },
+        ),
+      ),
+    [tactics.error],
+  );
 
   const getFilters = (filter: { [key: string]: any }, indexPattern) => {
     const filtersToAdd = [];
