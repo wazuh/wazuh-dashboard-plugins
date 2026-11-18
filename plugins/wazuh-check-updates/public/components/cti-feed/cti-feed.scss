@@ -70,9 +70,9 @@
   }
 }
 
-// What the feed delivered, under the row, aligned with its text (after the icon).
-.ctiFeed__feedContent {
-  // Row padding, icon and the gutter after it.
+// The line under a feed row (what it delivered, or the sync progress), aligned with
+// the row text: row padding, icon and the gutter after it.
+.ctiFeed__feedRowFooter {
   padding: 0 $euiSize $euiSize ($euiSize + $euiSizeXL + $euiSize);
 }
 

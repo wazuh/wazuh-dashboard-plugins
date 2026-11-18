@@ -166,6 +166,78 @@ describe('FeedSyncPanel', () => {
     expect(screen.getByText('50% synced')).toBeInTheDocument();
   });
 
+  describe('line under a feed row', () => {
+    const COUNTS = {
+      rules: 603,
+      decoders: 524,
+      integrations: 132,
+      kvdbs: 49,
+      iocs: 952987,
+      vulnerabilities: 423061,
+    };
+
+    test('shows the progress instead of the counts while the feed syncs', () => {
+      renderPanel(
+        [
+          consumer({ status: 'running', local_offset: 40, remote_offset: 80 }),
+          consumer({
+            name: 'public-iocs-5',
+            type: 'cti:catalog:consumer:iocs',
+          }),
+        ],
+        { contentCounts: COUNTS },
+      );
+
+      const [ruleset, iocs] = screen.getAllByTestId('ctiFeedSyncRowContainer');
+      // The syncing feed: its counts are about to change.
+      expect(ruleset).toContainElement(
+        screen.getByTestId('ctiFeedSyncProgress'),
+      );
+      expect(ruleset).not.toHaveTextContent('Delivered');
+      // The feed that is up to date keeps its counts.
+      expect(iocs).toHaveTextContent('Delivered: 952,987 IOCs');
+    });
+
+    test('shows an indeterminate bar when the feed caught up but still runs', () => {
+      renderPanel([
+        consumer({ status: 'running', local_offset: 80, remote_offset: 80 }),
+      ]);
+
+      expect(screen.getByTestId('ctiFeedSyncProgress')).not.toHaveAttribute(
+        'value',
+      );
+      expect(screen.queryByText('100% synced')).toBeNull();
+      expect(
+        screen.getByTestId('ctiFeedSyncProgressCaption'),
+      ).toHaveTextContent('Finishing the sync');
+    });
+
+    test('shows an indeterminate bar when the remote offset is unknown', () => {
+      renderPanel([
+        consumer({ status: 'running', local_offset: 10, remote_offset: 0 }),
+      ]);
+
+      expect(screen.getByTestId('ctiFeedSyncProgress')).not.toHaveAttribute(
+        'value',
+      );
+      expect(
+        screen.getByTestId('ctiFeedSyncProgressCaption'),
+      ).toHaveTextContent('Downloading content');
+    });
+
+    test('is left out for a feed with no known content that is not syncing', () => {
+      renderPanel([consumer({ type: 'cti:catalog:consumer:other' })], {
+        contentCounts: COUNTS,
+      });
+
+      expect(
+        screen
+          .getByTestId('ctiFeedSyncRowContainer')
+          .querySelector('.ctiFeed__feedRowFooter'),
+      ).toBeNull();
+    });
+  });
+
   test('flags a feed that failed to sync', () => {
     renderPanel([consumer(), consumer({ status: 'failed', type: 'other' })]);
 

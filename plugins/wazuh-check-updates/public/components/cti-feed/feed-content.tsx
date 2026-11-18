@@ -203,6 +203,10 @@ const FEED_CONTENT: Record<string, FeedContentKey[]> = {
   'cti:catalog:consumer:vulnerabilities': ['vulnerabilities'],
 };
 
+/** Whether the feed of this consumer `type` has content to count. */
+export const hasFeedContent = (feedType: string): boolean =>
+  Boolean(FEED_CONTENT[feedType]);
+
 const UNAVAILABLE_TOOLTIP = i18n.translate(
   'wazuhCheckUpdates.ctiFeed.content.unavailableTooltip',
   {
@@ -263,11 +267,7 @@ export const FeedContentLine: React.FC<FeedContentLineProps> = ({
     return null;
   }
   return (
-    <EuiText
-      size='s'
-      className='ctiFeed__feedContent'
-      data-test-subj={`ctiFeedContent-${feedType}`}
-    >
+    <EuiText size='s' data-test-subj={`ctiFeedContent-${feedType}`}>
       {loading && !counts ? (
         <EuiLoadingContent lines={1} data-test-subj='ctiFeedContentLoading' />
       ) : (

@@ -28,7 +28,7 @@ import {
 import { FeedSyncBadge } from './feed-sync-badge';
 import { FeedDetailsFlyout } from './feed-details-flyout';
 import { CtiTimestamp } from './cti-timestamp';
-import { FeedContentLine } from './feed-content';
+import { FeedContentLine, hasFeedContent } from './feed-content';
 import type { FeedContentCounts } from '../../services/cti-feed';
 import { getCore } from '../../plugin-services';
 import { RedirectAppLinks } from '../../../../../src/plugins/opensearch_dashboards_react/public';
@@ -161,6 +161,54 @@ const renderLastUpdated = (time: string) =>
     values: { time },
   });
 
+/**
+ * How far a syncing feed is. Caught up with the remote content but still running
+ * (the indexer is applying what it downloaded), or with no known remote offset,
+ * there is no meaningful percentage: the bar is indeterminate instead of a full bar
+ * that does not move.
+ */
+const SyncProgress: React.FC<{ progress: number | null }> = ({ progress }) => {
+  const percent = progress === null ? null : Math.round(progress * 100);
+  if (percent !== null && percent < 100) {
+    return (
+      <EuiProgress
+        value={percent}
+        max={100}
+        size='s'
+        color='primary'
+        valueText={i18n.translate('wazuhCheckUpdates.ctiFeed.sync.progress', {
+          defaultMessage: '{percent}% synced',
+          values: { percent },
+        })}
+        data-test-subj='ctiFeedSyncProgress'
+      />
+    );
+  }
+  return (
+    <>
+      <EuiText
+        size='xs'
+        color='subdued'
+        textAlign='right'
+        data-test-subj='ctiFeedSyncProgressCaption'
+      >
+        {percent === null
+          ? i18n.translate('wazuhCheckUpdates.ctiFeed.sync.downloading', {
+              defaultMessage: 'Downloading content',
+            })
+          : i18n.translate('wazuhCheckUpdates.ctiFeed.sync.finishing', {
+              defaultMessage: 'Finishing the sync',
+            })}
+      </EuiText>
+      <EuiProgress
+        size='s'
+        color='primary'
+        data-test-subj='ctiFeedSyncProgress'
+      />
+    </>
+  );
+};
+
 const FeedRow: React.FC<{
   consumer: CtiConsumer;
   onOpen: () => void;
@@ -229,31 +277,23 @@ const FeedRow: React.FC<{
             <EuiIcon type='arrowRight' color='subdued' aria-hidden />
           </EuiFlexItem>
         </EuiFlexGroup>
-        {state.kind === 'syncing' && state.progress !== null ? (
-          <>
-            <EuiSpacer size='s' />
-            <EuiProgress
-              value={Math.round(state.progress * 100)}
-              max={100}
-              size='s'
-              color='primary'
-              valueText={i18n.translate(
-                'wazuhCheckUpdates.ctiFeed.sync.progress',
-                {
-                  defaultMessage: '{percent}% synced',
-                  values: { percent: Math.round(state.progress * 100) },
-                },
-              )}
-              data-test-subj='ctiFeedSyncProgress'
-            />
-          </>
-        ) : null}
       </EuiPanel>
-      <FeedContentLine
-        feedType={consumer.type}
-        counts={contentCounts}
-        loading={contentLoading}
-      />
+      {/* One line under the row, so it keeps its height whatever the state: the sync
+          progress while syncing (the counts are about to change), otherwise what
+          the feed delivered. */}
+      {state.kind === 'syncing' || hasFeedContent(consumer.type) ? (
+        <div className='ctiFeed__feedRowFooter'>
+          {state.kind === 'syncing' ? (
+            <SyncProgress progress={state.progress} />
+          ) : (
+            <FeedContentLine
+              feedType={consumer.type}
+              counts={contentCounts}
+              loading={contentLoading}
+            />
+          )}
+        </div>
+      ) : null}
     </EuiPanel>
   );
 };
