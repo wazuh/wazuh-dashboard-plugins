@@ -2,14 +2,14 @@ import React from 'react';
 import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
 import {
-  EuiFlexGrid,
+  EuiFlexGroup,
   EuiFlexItem,
-  EuiIcon,
+  EuiLoadingSpinner,
   EuiPanel,
-  EuiStat,
   EuiToolTip,
 } from '@elastic/eui';
 import { formatUIDate } from '../../../../../../../../react-services/time-service';
+import { StatTile } from '../../../../../../../common/welcome/home-overview/components/common/stat-tile';
 import { SEVERITY_PRESENTATION } from '../../../../../../../common/welcome/home-overview/lib/severity-presentation';
 import { TechniqueStats as tTechniqueStats } from './lib/technique';
 
@@ -20,6 +20,7 @@ type TechniqueStatsProps = {
   isLoading: boolean;
 };
 
+/** The findings summary of the technique, styled like the Home page KPIs. */
 export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
   const severity = SEVERITY_PRESENTATION.find(
     ({ band }) => band === stats?.highestSeverity,
@@ -27,44 +28,38 @@ export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
   const items = [
     {
       key: 'findings',
-      title: stats ? stats.findings.toLocaleString() : EMPTY_VALUE,
-      description: i18n.translate(
+      value: stats ? stats.findings.toLocaleString() : EMPTY_VALUE,
+      label: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.stats.findings',
         { defaultMessage: 'Findings' },
       ),
     },
     {
       key: 'agents',
-      title: stats ? stats.agents.toLocaleString() : EMPTY_VALUE,
-      description: i18n.translate(
-        'wazuh.mitreAttack.techniqueFlyout.stats.agents',
-        { defaultMessage: 'Agents affected' },
-      ),
+      value: stats ? stats.agents.toLocaleString() : EMPTY_VALUE,
+      label: i18n.translate('wazuh.mitreAttack.techniqueFlyout.stats.agents', {
+        defaultMessage: 'Agents affected',
+      }),
     },
     {
       key: 'severity',
-      title: severity ? (
-        <span>
-          <EuiIcon type='dot' color={severity.color} /> {severity.label}
-        </span>
-      ) : (
-        EMPTY_VALUE
-      ),
-      description: i18n.translate(
+      value: severity?.label ?? EMPTY_VALUE,
+      color: severity?.color,
+      label: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.stats.highestSeverity',
         { defaultMessage: 'Highest severity' },
       ),
     },
     {
       key: 'lastSeen',
-      title: stats?.lastSeen ? (
+      value: stats?.lastSeen ? (
         <EuiToolTip content={formatUIDate(stats.lastSeen)}>
           <span tabIndex={0}>{moment(stats.lastSeen).fromNow()}</span>
         </EuiToolTip>
       ) : (
         EMPTY_VALUE
       ),
-      description: i18n.translate(
+      label: i18n.translate(
         'wazuh.mitreAttack.techniqueFlyout.stats.lastSeen',
         { defaultMessage: 'Last seen' },
       ),
@@ -72,21 +67,21 @@ export const TechniqueStats = ({ stats, isLoading }: TechniqueStatsProps) => {
   ];
 
   return (
-    <EuiFlexGrid columns={4} gutterSize='s' responsive>
-      {items.map(({ key, title, description }) => (
-        <EuiFlexItem key={key}>
-          <EuiPanel paddingSize='s' hasBorder hasShadow={false}>
-            <EuiStat
-              data-test-subj={`technique-stat-${key}`}
-              title={title}
-              titleSize='xs'
-              description={description}
+    <EuiPanel paddingSize='m' hasBorder hasShadow={false}>
+      <EuiFlexGroup gutterSize='m' responsive={false} wrap>
+        {items.map(({ key, value, color, label }) => (
+          <EuiFlexItem key={key} style={{ minWidth: 120 }}>
+            <StatTile
+              value={isLoading ? <EuiLoadingSpinner size='l' /> : value}
+              label={label}
+              color={color}
+              titleSize='m'
               reverse
-              isLoading={isLoading}
+              data-test-subj={`technique-stat-${key}`}
             />
-          </EuiPanel>
-        </EuiFlexItem>
-      ))}
-    </EuiFlexGrid>
+          </EuiFlexItem>
+        ))}
+      </EuiFlexGroup>
+    </EuiPanel>
   );
 };
