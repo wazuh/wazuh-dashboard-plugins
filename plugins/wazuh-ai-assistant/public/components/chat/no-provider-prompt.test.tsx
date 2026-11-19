@@ -99,13 +99,9 @@ describe('NoProviderPrompt', () => {
     ).toBeInTheDocument();
   });
 
-  it('omits the add button when no add handler is given (Settings)', () => {
-    renderPrompt({ headingLevel: 'h2', onAddProvider: undefined });
-    expect(
-      screen.queryByRole('button', { name: 'Add provider' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Connect an AI provider' }),
-    ).toBeInTheDocument();
+  it('disables the add button when settings are locked', () => {
+    renderPrompt({ headingLevel: 'h2', isAddProviderDisabled: true });
+    expect(screen.getByRole('button', { name: 'Add provider' })).toBeDisabled();
+    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
   });
 });

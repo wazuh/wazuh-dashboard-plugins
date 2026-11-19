@@ -1855,10 +1855,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
             )}
 
             {providersLoaded && providers.length === 0 ? (
-              // No `onAddProvider`: the page header's "Add provider" button is the only one.
               <NoProviderPrompt
                 headingLevel='h2'
+                onAddProvider={openCreateForm}
                 onOpenPrivacySettings={() => switchTab('privacy')}
+                isAddProviderDisabled={settingsLocked}
                 showExamples={false}
               />
             ) : (

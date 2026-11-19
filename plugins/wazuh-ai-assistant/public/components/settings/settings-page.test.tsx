@@ -669,9 +669,14 @@ describe('SettingsPage — settings-access probe', () => {
     await waitFor(() =>
       expect(mockService.getSettingsAccess).toHaveBeenCalled(),
     );
-    expect(
-      await screen.findByRole('button', { name: /add provider/i }),
-    ).toBeEnabled();
+    // Both the page header's and the empty prompt's "Add provider" buttons stay enabled.
+    const addButtons = await screen.findAllByRole('button', {
+      name: /^add provider$/i,
+    });
+    expect(addButtons).toHaveLength(2);
+    for (const button of addButtons) {
+      expect(button).toBeEnabled();
+    }
   });
 });
 
@@ -860,15 +865,14 @@ describe('SettingsPage — settings tabs', () => {
     expect(providersTab).toHaveAttribute('aria-selected', 'true');
     expect(privacyTab).toHaveAttribute('aria-selected', 'false');
     expect(retentionTab).toHaveAttribute('aria-selected', 'false');
-    // The Providers card's own content (its empty-state prompt) is visible; the other two cards'
-    // content isn't.
+    // The Providers card's own content (its empty-state prompt, with an "Add provider" action of
+    // the same name as the page header's button) is visible; the other two cards' content isn't.
     expect(
       screen.getByRole('heading', { name: /connect an ai provider/i }),
     ).toBeInTheDocument();
-    // The prompt has no button of its own: the page header's "Add provider" is the only one.
     expect(
       screen.getAllByRole('button', { name: /^add provider$/i }),
-    ).toHaveLength(1);
+    ).toHaveLength(2);
     expect(isHidden(screen.getByText(/enable privacy mode by default/i))).toBe(
       true,
     );
@@ -1138,8 +1142,8 @@ describe('SettingsPage — settings tabs', () => {
   });
 
   it('sends the header "Add provider" button to the Providers tab, and back to the original tab when the flyout closes', async () => {
-    // The header button (the only "Add provider" button: the Providers card's empty state has
-    // none) is visible on every tab, but the create form only ever lives on the Providers tab
+    // The header button (distinct from the Providers card's own empty-state "Add provider"
+    // action, which is only on the Providers tab) is visible on every tab, but the create form only ever lives on the Providers tab
     // — clicking it from Privacy must switch to the Providers tab rather than opening the flyout
     // ON TOP of the (still-selected) Privacy tab.
     render(
