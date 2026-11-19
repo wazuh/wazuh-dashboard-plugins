@@ -242,7 +242,7 @@ describe('CreateEnrollmentTokenFlyout', () => {
   describe('address outside the certificate', () => {
     const warning = () =>
       document.querySelector(
-        '[data-test-subj="enrollmentTokenAddressWarning"]',
+        '[data-test-subj="addressOutsideCertificateWarning"]',
       );
     const createButton = () =>
       screen.getByText('Create').closest('button') as HTMLElement;

@@ -21,6 +21,7 @@ import {
   AGENT_ENDPOINT_DEFAULT_PORT,
 } from '../../../../../../common/services/agent-endpoint';
 import '../group-input/group-input.scss';
+import { AddressOutsideCertificateWarning } from '../../../../enrollment-tokens/components/address-outside-certificate-warning';
 import { RememberServerEndpointSwitch } from '../../../../common/remember-server-endpoint';
 
 interface ServerAddressInputProps {
@@ -29,6 +30,9 @@ interface ServerAddressInputProps {
     serverPort: EnhancedFieldConfiguration;
     serverPath: EnhancedFieldConfiguration;
   };
+  /* The names in the manager listener certificate, to warn about an address
+  outside them. */
+  certificateNames?: string[];
 }
 
 /* `InputForm` forwards unknown props to the input itself, so the hint is
@@ -66,7 +70,7 @@ const popoverServerAddress = (
 );
 
 const ServerAddressInput = (props: ServerAddressInputProps) => {
-  const { formFields } = props;
+  const { formFields, certificateNames = [] } = props;
   const { serverAddress, serverPort, serverPath } = formFields;
   const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
   const onButtonServerAddress = () =>
@@ -130,15 +134,21 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             footer={
-              <EndpointDefaultHint>
-                {i18n.translate(
-                  'wazuh.endpointsSummary.serverAddress.addressHint',
-                  {
-                    defaultMessage:
-                      'Pick one of the names in the manager listener certificate, or type another.',
-                  },
-                )}
-              </EndpointDefaultHint>
+              <>
+                <EndpointDefaultHint>
+                  {i18n.translate(
+                    'wazuh.endpointsSummary.serverAddress.addressHint',
+                    {
+                      defaultMessage:
+                        'Pick one of the names in the manager listener certificate, or type another.',
+                    },
+                  )}
+                </EndpointDefaultHint>
+                <AddressOutsideCertificateWarning
+                  address={serverAddress.value}
+                  certificateNames={certificateNames}
+                />
+              </>
             }
             fullWidth={false}
             placeholder={i18n.translate(

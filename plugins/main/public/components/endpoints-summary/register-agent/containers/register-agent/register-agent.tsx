@@ -76,6 +76,9 @@ export const RegisterAgent = compose(
   const configuration = useSelector(
     (state: { appConfig: { data: any } }) => state.appConfig.data,
   );
+  /* Reported by the address input, to warn about an address the manager would
+  refuse. */
+  const [certificateNames, setCertificateNames] = useState<string[]>([]);
   const [wazuhVersion, setWazuhVersion] = useState('');
   const [loading, setLoading] = useState(false);
   const [wazuhPassword, setWazuhPassword] = useState('');
@@ -147,6 +150,7 @@ export const RegisterAgent = compose(
       component: props => (
         <AddressComboBox
           {...props}
+          onNamesLoaded={setCertificateNames}
           data-test-subj='registerAgentServerAddress'
         />
       ),
@@ -373,6 +377,7 @@ export const RegisterAgent = compose(
                       canCreateEnrollmentToken={canCreateEnrollmentToken}
                       enrollmentToken={enrollmentToken}
                       onEnrollmentTokenChange={setEnrollmentToken}
+                      certificateNames={certificateNames}
                       osCard={osCard}
                     />
                   </EuiFlexItem>

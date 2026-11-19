@@ -9,7 +9,13 @@ import { getListenerCertificateNames } from '../../../../../services/enrollment-
 
 const mockSet = jest.fn();
 
-jest.mock('react-redux', () => ({ useDispatch: () => jest.fn() }));
+let mockAppConfig: Record<string, string> = {};
+
+jest.mock('react-redux', () => ({
+  useDispatch: () => jest.fn(),
+  useSelector: (selector: (state: unknown) => unknown) =>
+    selector({ appConfig: { data: mockAppConfig } }),
+}));
 
 jest.mock('../../../../../kibana-services', () => ({
   getUiSettings: () => ({
@@ -44,7 +50,7 @@ const fieldsConfiguration: FormConfiguration = {
 
 let currentAddress: unknown;
 
-const Harness = () => {
+const Harness = ({ names = [] }: { names?: string[] }) => {
   const { fields } = useForm(fieldsConfiguration);
   currentAddress = fields.serverAddress.value;
 
@@ -55,6 +61,7 @@ const Harness = () => {
         serverPort: fields.serverPort,
         serverPath: fields.serverPath,
       }}
+      certificateNames={names}
     />
   );
 };
@@ -65,6 +72,7 @@ const addressInput = () =>
   ) as HTMLElement;
 
 beforeEach(() => {
+  mockAppConfig = {};
   mockSet.mockReset();
   mockSet.mockResolvedValue(undefined);
   currentAddress = undefined;
@@ -122,5 +130,38 @@ describe('ServerAddressInput', () => {
       expect(mockSet).toHaveBeenCalledWith('enrollment.dns', 'manager.local'),
     );
     expect(mockSet).toHaveBeenCalledTimes(3);
+  });
+
+  describe('address outside the certificate', () => {
+    const warning = () =>
+      document.querySelector(
+        '[data-test-subj="addressOutsideCertificateWarning"]',
+      );
+
+    it('warns that the address is not in the certificate', async () => {
+      getNames.mockResolvedValue([]);
+      render(<Harness names={['manager.example.com']} />);
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), { target: { value: 'other.example' } });
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+
+      await waitFor(() => expect(warning()).not.toBeNull());
+    });
+
+    it('does not warn for a name in the certificate or without names', async () => {
+      getNames.mockResolvedValue([]);
+      const { rerender } = render(<Harness names={['manager.example.com']} />);
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), {
+        target: { value: 'Manager.Example.com' },
+      });
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+      expect(warning()).toBeNull();
+
+      rerender(<Harness names={[]} />);
+      expect(warning()).toBeNull();
+    });
   });
 });

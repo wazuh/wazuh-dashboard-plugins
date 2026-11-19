@@ -55,6 +55,7 @@ import {
 } from '../../../services/enrollment-tokens';
 import { TruncatedValuePopover } from './truncated-value-popover';
 import { AddressComboBox } from './address-combo-box';
+import { AddressOutsideCertificateWarning } from './address-outside-certificate-warning';
 
 interface CreateEnrollmentTokenFlyoutProps {
   /* Called with `true` once a token was minted, so the listing behind the
@@ -144,15 +145,6 @@ const CreateEnrollmentTokenFlyoutContent = ({
 
   const addressIsMissing =
     String(fields.address?.value ?? '').trim().length === 0;
-  const address = String(fields.address?.value ?? '').trim();
-  const addressIsOutsideCertificate =
-    address.length > 0 &&
-    certificateNames.length > 0 &&
-    !certificateNames.some(
-      name => name.toLowerCase() === address.toLowerCase(),
-    );
-  const addressComesFromSetting =
-    address.length > 0 && address === (configuration['enrollment.dns'] || '');
   const formIsInvalid = addressIsMissing || Object.keys(errors).length > 0;
 
   const onCreate = async () => {
@@ -315,44 +307,10 @@ const CreateEnrollmentTokenFlyoutContent = ({
                       },
                     )}
                   </EuiText>
-                  {addressIsOutsideCertificate && (
-                    <>
-                      <EuiSpacer size='s' />
-                      <EuiCallOut
-                        size='s'
-                        color='warning'
-                        iconType='alert'
-                        data-test-subj='enrollmentTokenAddressWarning'
-                        title={i18n.translate(
-                          'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateTitle',
-                          {
-                            defaultMessage:
-                              'The address is not in the manager certificate',
-                          },
-                        )}
-                      >
-                        <p>
-                          {addressComesFromSetting ? (
-                            <FormattedMessage
-                              id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateFromSetting'
-                              defaultMessage='This value comes from the {setting} setting. The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names, add this name to the certificate, or remember another address below to update the setting.'
-                              values={{
-                                setting: <EuiCode>enrollment.dns</EuiCode>,
-                              }}
-                            />
-                          ) : (
-                            i18n.translate(
-                              'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateTyped',
-                              {
-                                defaultMessage:
-                                  'The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names or add this name to the certificate.',
-                              },
-                            )
-                          )}
-                        </p>
-                      </EuiCallOut>
-                    </>
-                  )}
+                  <AddressOutsideCertificateWarning
+                    address={fields.address?.value}
+                    certificateNames={certificateNames}
+                  />
                 </>
               }
               placeholder='wazuh-manager.example.com'
