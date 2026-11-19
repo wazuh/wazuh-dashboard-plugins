@@ -100,7 +100,7 @@
 - Rules, Decoders, CDB List, and Ruleset Test applications removed from the dashboard [#7901](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7901). Content management moved to the Wazuh Indexer Content Manager plugin [wazuh/wazuh-indexer-plugins#214](https://github.com/wazuh/wazuh-indexer-plugins/issues/214).
 - Backend monitoring and statistics jobs removed from the dashboard server [#7597](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7597). Agent and communications telemetry is now written to dedicated metrics data streams managed by the Wazuh indexer.
 - App Settings application removed — settings are now managed via `opensearch_dashboards.yml` or **Dashboard management > Dashboards Management > Advanced settings** [#7871](https://github.com/wazuh/wazuh-dashboard-plugins/pull/7871).
-- Default value of `wazuh.updates.disabled` changed from `false` to `true` — update notifications are disabled by default in Advanced settings [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236).
+- The update check setting `wazuh.updates.disabled` is replaced by `check_updates.enabled` (**Check for updates**), and update notifications are disabled by default in Advanced settings [#8236](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8236) [#9677](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9677).
 - Only one Wazuh server API host configuration is allowed per indexer [#8436](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8436).
 - Sample Data, and Cluster standalone applications removed [#8214](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8214) [#8220](https://github.com/wazuh/wazuh-dashboard-plugins/pull/8220). The views of cluster has been redistributed to the Status app.
 
