@@ -860,11 +860,15 @@ describe('SettingsPage — settings tabs', () => {
     expect(providersTab).toHaveAttribute('aria-selected', 'true');
     expect(privacyTab).toHaveAttribute('aria-selected', 'false');
     expect(retentionTab).toHaveAttribute('aria-selected', 'false');
-    // The Providers card's own content (its "Add provider" empty-state action, distinct from the
-    // page header's own button of the same name) is visible; the other two cards' content isn't.
+    // The Providers card's own content (its empty-state prompt) is visible; the other two cards'
+    // content isn't.
     expect(
-      screen.getByRole('button', { name: /add a provider/i }),
+      screen.getByRole('heading', { name: /connect an ai provider/i }),
     ).toBeInTheDocument();
+    // The prompt has no button of its own: the page header's "Add provider" is the only one.
+    expect(
+      screen.getAllByRole('button', { name: /^add provider$/i }),
+    ).toHaveLength(1);
     expect(isHidden(screen.getByText(/enable privacy mode by default/i))).toBe(
       true,
     );
@@ -888,7 +892,7 @@ describe('SettingsPage — settings tabs', () => {
     );
     expect(isHidden(privacyText)).toBe(false);
     expect(
-      screen.queryByRole('button', { name: /add a provider/i }),
+      screen.queryByRole('heading', { name: /connect an ai provider/i }),
     ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: /conversation history/i }));
@@ -917,7 +921,7 @@ describe('SettingsPage — settings tabs', () => {
     // (which would have reset EuiInMemoryTable's own search box — see the B1 test below).
     expect(providersTab).toHaveAttribute('aria-selected', 'true');
     expect(
-      screen.getByRole('button', { name: /add a provider/i }),
+      screen.getByRole('heading', { name: /connect an ai provider/i }),
     ).toBeInTheDocument();
   });
 
@@ -937,7 +941,7 @@ describe('SettingsPage — settings tabs', () => {
     await screen.findByText(/enable privacy mode by default/i);
 
     fireEvent.click(screen.getByRole('tab', { name: /^providers$/i }));
-    await screen.findByRole('button', { name: /add a provider/i });
+    await screen.findByRole('heading', { name: /connect an ai provider/i });
     // Providers is this page's DEFAULT tab, so `?tab=` itself drops — but `utm_source` (an
     // unrelated param neither this page nor its tabs own) must survive the switch regardless.
     expect(history.location.search).toBe('?utm_source=digest');
@@ -953,7 +957,7 @@ describe('SettingsPage — settings tabs', () => {
     act(() => {
       history.goBack();
     });
-    await screen.findByRole('button', { name: /add a provider/i });
+    await screen.findByRole('heading', { name: /connect an ai provider/i });
     const afterBack = new URLSearchParams(history.location.search);
     expect(afterBack.get('tab')).toBeNull();
     expect(afterBack.get('utm_source')).toBe('digest');
@@ -1134,8 +1138,8 @@ describe('SettingsPage — settings tabs', () => {
   });
 
   it('sends the header "Add provider" button to the Providers tab, and back to the original tab when the flyout closes', async () => {
-    // The header button (distinct from the Providers card's own empty-state "Add a provider"
-    // action) is visible on every tab, but the create form only ever lives on the Providers tab
+    // The header button (the only "Add provider" button: the Providers card's empty state has
+    // none) is visible on every tab, but the create form only ever lives on the Providers tab
     // — clicking it from Privacy must switch to the Providers tab rather than opening the flyout
     // ON TOP of the (still-selected) Privacy tab.
     render(

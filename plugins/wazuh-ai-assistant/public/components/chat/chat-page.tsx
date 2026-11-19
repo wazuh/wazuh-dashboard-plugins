@@ -99,7 +99,7 @@ interface ChatPageProps {
   /** Owned by the app shell (application.tsx); rendered here so the provider selector sits in the
    * chat column's own header row next to the privacy chip, instead of a separate top-level row. */
   onProviderChange: (id: string) => void;
-  /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
+  /** The no-provider empty state's "Add provider" CTA — its only caller. Owners wire it to
    * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
   /** The no-provider empty state's link to Settings > Privacy & data protection

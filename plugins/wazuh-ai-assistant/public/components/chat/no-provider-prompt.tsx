@@ -19,9 +19,9 @@ import { EXAMPLE_CARDS } from './example-questions';
 interface NoProviderPromptProps {
   /** `h1` where the prompt is the view's only heading (chat), `h2` under a page title (settings). */
   headingLevel: 'h1' | 'h2';
-  onAddProvider: () => void;
+  /** Renders the "Add provider" button. Omitted on Settings, whose page header has its own. */
+  onAddProvider?: () => void;
   onOpenPrivacySettings: () => void;
-  isAddProviderDisabled?: boolean;
   /** Example questions; off on Settings, where they read as chat content. */
   showExamples?: boolean;
 }
@@ -73,7 +73,6 @@ export const NoProviderPrompt = ({
   headingLevel: Heading,
   onAddProvider,
   onOpenPrivacySettings,
-  isAddProviderDisabled = false,
   showExamples = true,
 }: NoProviderPromptProps) => {
   const SubHeading = Heading === 'h1' ? 'h2' : 'h3';
@@ -98,16 +97,13 @@ export const NoProviderPrompt = ({
           </p>
         }
         actions={
-          <EuiButton
-            color='primary'
-            fill
-            isDisabled={isAddProviderDisabled}
-            onClick={onAddProvider}
-          >
-            {i18n.translate('wazuhAiAssistant.noProvider.action', {
-              defaultMessage: 'Add a provider',
-            })}
-          </EuiButton>
+          onAddProvider && (
+            <EuiButton color='primary' fill onClick={onAddProvider}>
+              {i18n.translate('wazuhAiAssistant.noProvider.action', {
+                defaultMessage: 'Add provider',
+              })}
+            </EuiButton>
+          )
         }
       />
       <EuiText

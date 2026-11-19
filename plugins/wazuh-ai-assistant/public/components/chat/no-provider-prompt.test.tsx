@@ -81,7 +81,7 @@ describe('NoProviderPrompt', () => {
 
   it('adds a provider', () => {
     const { onAddProvider } = renderPrompt();
-    fireEvent.click(screen.getByRole('button', { name: 'Add a provider' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add provider' }));
     expect(onAddProvider).toHaveBeenCalledTimes(1);
   });
 
@@ -99,11 +99,13 @@ describe('NoProviderPrompt', () => {
     ).toBeInTheDocument();
   });
 
-  it('disables the add button when settings are locked', () => {
-    renderPrompt({ headingLevel: 'h2', isAddProviderDisabled: true });
+  it('omits the add button when no add handler is given (Settings)', () => {
+    renderPrompt({ headingLevel: 'h2', onAddProvider: undefined });
     expect(
-      screen.getByRole('button', { name: 'Add a provider' }),
-    ).toBeDisabled();
-    expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
+      screen.queryByRole('button', { name: 'Add provider' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Connect an AI provider' }),
+    ).toBeInTheDocument();
   });
 });
