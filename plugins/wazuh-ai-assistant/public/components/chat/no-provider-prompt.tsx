@@ -10,6 +10,7 @@ import {
   EuiPopover,
   EuiSpacer,
   EuiText,
+  EuiTitle,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
@@ -21,7 +22,7 @@ interface NoProviderPromptProps {
   onAddProvider: () => void;
   onOpenPrivacySettings: () => void;
   isAddProviderDisabled?: boolean;
-  /** Example question cards; off on Settings, where they read as chat content. */
+  /** Example questions; off on Settings, where they read as chat content. */
   showExamples?: boolean;
 }
 
@@ -65,9 +66,9 @@ const ProviderHelp = () => {
   );
 };
 
-/** Empty state shown while no AI provider is configured: what the assistant answers, what it
- * sends to the provider, and how to add one. Shared by the chat (page and header panel) and the
- * Settings > Providers tab. */
+/** Empty state shown while no AI provider is configured. Order: what the assistant does, the
+ * action, what a provider is, example questions (chat only), and what is sent to the provider.
+ * Shared by the chat (page and header panel) and the Settings > Providers tab. */
 export const NoProviderPrompt = ({
   headingLevel: Heading,
   onAddProvider,
@@ -75,119 +76,109 @@ export const NoProviderPrompt = ({
   isAddProviderDisabled = false,
   showExamples = true,
 }: NoProviderPromptProps) => {
-  const title = (
-    <Heading>
-      {i18n.translate('wazuhAiAssistant.noProvider.title', {
-        defaultMessage: 'No AI provider configured',
-      })}
-    </Heading>
-  );
-  const purpose = (
-    <p>
-      {i18n.translate('wazuhAiAssistant.noProvider.purpose', {
-        defaultMessage:
-          'Ask questions about your agents, findings and vulnerabilities in plain language.',
-      })}
-    </p>
-  );
-  const details = (
-    <>
-      <p>
-        <FormattedMessage
-          id='wazuhAiAssistant.noProvider.needsProvider'
-          defaultMessage='The AI Assistant needs at least one connected provider (OpenAI-compatible or Anthropic) {providerHelp} before it can answer questions. Add one to get started.'
-          values={{
-            providerHelp: <ProviderHelp />,
-          }}
-        />
-      </p>
-      <p>
-        <FormattedMessage
-          id='wazuhAiAssistant.noProvider.dataSent'
-          defaultMessage='Your questions, and the security data read to answer them, are sent to the provider. {privacyLink} sets what is masked or left out.'
-          values={{
-            privacyLink: (
-              <EuiLink
-                onClick={onOpenPrivacySettings}
-                data-test-subj='wzAiNoProviderPrivacyLink'
-              >
-                {i18n.translate('wazuhAiAssistant.noProvider.privacyLink', {
-                  defaultMessage: 'Privacy & data protection',
-                })}
-              </EuiLink>
-            ),
-          }}
-        />
-      </p>
-    </>
-  );
-  const action = (
-    <EuiButton
-      color='primary'
-      fill
-      isDisabled={isAddProviderDisabled}
-      onClick={onAddProvider}
-    >
-      {i18n.translate('wazuhAiAssistant.noProvider.action', {
-        defaultMessage: 'Add a provider',
-      })}
-    </EuiButton>
-  );
-
-  // Without examples (Settings) it is a plain empty prompt, like the page's other empty states.
-  if (!showExamples) {
-    return (
-      <div data-test-subj='wzAiNoProviderPrompt'>
-        <EuiEmptyPrompt
-          iconType='machineLearningApp'
-          title={title}
-          body={
-            <>
-              {purpose}
-              {details}
-            </>
-          }
-          actions={action}
-        />
-      </div>
-    );
-  }
+  const SubHeading = Heading === 'h1' ? 'h2' : 'h3';
 
   return (
     <div className='wzNoProviderPrompt' data-test-subj='wzAiNoProviderPrompt'>
       <EuiEmptyPrompt
         iconType='machineLearningApp'
-        title={title}
-        body={purpose}
+        title={
+          <Heading>
+            {i18n.translate('wazuhAiAssistant.noProvider.title', {
+              defaultMessage: 'Connect an AI provider',
+            })}
+          </Heading>
+        }
+        body={
+          <p>
+            {i18n.translate('wazuhAiAssistant.noProvider.purpose', {
+              defaultMessage:
+                'Ask about your agents, findings and vulnerabilities in plain language.',
+            })}
+          </p>
+        }
+        actions={
+          <EuiButton
+            color='primary'
+            fill
+            isDisabled={isAddProviderDisabled}
+            onClick={onAddProvider}
+          >
+            {i18n.translate('wazuhAiAssistant.noProvider.action', {
+              defaultMessage: 'Add a provider',
+            })}
+          </EuiButton>
+        }
       />
-      <EuiSpacer size='m' />
-      <div className='wzExampleCardsGrid'>
-        {EXAMPLE_CARDS.map(card => (
-          <EuiCard
-            key={card.id}
-            className='wzWelcomeCard'
-            layout='horizontal'
-            display='plain'
-            hasBorder
-            isDisabled
-            titleSize='xs'
-            icon={<EuiIcon type={card.icon} size='l' />}
-            title={card.title}
-            description={card.question}
-          />
-        ))}
-      </div>
-      <EuiSpacer size='m' />
       <EuiText
         size='s'
         color='subdued'
         textAlign='center'
         className='wzNoProviderPrompt__text'
       >
-        {details}
+        <p>
+          <FormattedMessage
+            id='wazuhAiAssistant.noProvider.needsProvider'
+            defaultMessage='The assistant uses an AI provider to write its answers: an OpenAI-compatible service or Anthropic {providerHelp}'
+            values={{ providerHelp: <ProviderHelp /> }}
+          />
+        </p>
       </EuiText>
-      <EuiSpacer size='m' />
-      {action}
+      {showExamples && (
+        <>
+          <EuiSpacer size='xl' />
+          <EuiTitle size='xxxs' className='wzNoProviderPrompt__examplesHeading'>
+            <SubHeading>
+              {i18n.translate('wazuhAiAssistant.noProvider.examplesHeading', {
+                defaultMessage: 'Examples of what you can ask',
+              })}
+            </SubHeading>
+          </EuiTitle>
+          <EuiSpacer size='s' />
+          {/* Previews, not actions: no onClick, no border, so they don't read as buttons. */}
+          <div className='wzExampleCardsGrid'>
+            {EXAMPLE_CARDS.map(card => (
+              <EuiCard
+                key={card.id}
+                className='wzWelcomeCard'
+                layout='horizontal'
+                display='plain'
+                hasBorder={false}
+                titleSize='xs'
+                icon={<EuiIcon type={card.icon} size='l' color='subdued' />}
+                title={card.title}
+                description={card.question}
+              />
+            ))}
+          </div>
+        </>
+      )}
+      <EuiSpacer size='l' />
+      <EuiText
+        size='xs'
+        color='subdued'
+        textAlign='center'
+        className='wzNoProviderPrompt__text'
+      >
+        <p>
+          <FormattedMessage
+            id='wazuhAiAssistant.noProvider.dataSent'
+            defaultMessage='Your questions and the security data used to answer them are sent to the provider. Choose what is masked or left out in {privacyLink}.'
+            values={{
+              privacyLink: (
+                <EuiLink
+                  onClick={onOpenPrivacySettings}
+                  data-test-subj='wzAiNoProviderPrivacyLink'
+                >
+                  {i18n.translate('wazuhAiAssistant.noProvider.privacyLink', {
+                    defaultMessage: 'Privacy & data protection',
+                  })}
+                </EuiLink>
+              ),
+            }}
+          />
+        </p>
+      </EuiText>
     </div>
   );
 };

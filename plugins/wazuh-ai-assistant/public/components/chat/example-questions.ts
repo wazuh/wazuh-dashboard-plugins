@@ -5,7 +5,7 @@ import { i18n } from '@osd/i18n';
  * state reads as a real product surface: one short title + icon per card, the full question as
  * the card description. Clicking a card only fills the input (existing `setInputText` behavior),
  * it does not auto-send, matching how the previous badge chips behaved. The no-provider prompt
- * shows the same cards disabled.
+ * shows the same cards as non-interactive previews.
  */
 export const EXAMPLE_CARDS = [
   {

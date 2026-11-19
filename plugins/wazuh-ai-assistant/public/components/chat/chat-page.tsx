@@ -3377,8 +3377,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                   // because the sticky status-callout band above (`.wzStatusCallouts`) wraps its own
                   // content in a plain `.wzContentMeasure` too — an unscoped `.wzChatPane--welcome
                   // .wzContentMeasure` rule narrowed that band as an unrelated side effect.
+                  // The no-provider prompt stretches the measure too, so it centres vertically.
                   className={
-                    welcomeIsInFlow
+                    welcomeIsInFlow || showNoProviderState
                       ? 'wzContentMeasure wzContentMeasure--stretch wzWelcomeMeasure'
                       : 'wzContentMeasure wzWelcomeMeasure'
                   }
