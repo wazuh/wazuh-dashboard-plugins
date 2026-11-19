@@ -38,6 +38,7 @@ import {
   useUnsavedChangesGuard,
 } from '../../common/unsaved-changes-guard';
 import { InputForm } from '../../common/form';
+import { RememberServerEndpointSwitch } from '../../common/remember-server-endpoint';
 import { useForm } from '../../common/form/hooks';
 import { FormConfiguration } from '../../common/form/types';
 import { getWazuhCorePlugin } from '../../../kibana-services';
@@ -334,7 +335,7 @@ const CreateEnrollmentTokenFlyoutContent = ({
                           {addressComesFromSetting ? (
                             <FormattedMessage
                               id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateFromSetting'
-                              defaultMessage='This value comes from the {setting} setting. The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names, add this name to the certificate, or update the setting.'
+                              defaultMessage='This value comes from the {setting} setting. The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names, add this name to the certificate, or remember another address below to update the setting.'
                               values={{
                                 setting: <EuiCode>enrollment.dns</EuiCode>,
                               }}
@@ -404,6 +405,13 @@ const CreateEnrollmentTokenFlyoutContent = ({
               }
               placeholder='/wazuh-manager/'
             />
+            <EuiSpacer size='s' />
+            <RememberServerEndpointSwitch
+              address={fields.address}
+              port={fields.port}
+              path={fields.prefix}
+            />
+            <EuiSpacer size='m' />
             <InputForm
               {...fields.ttl}
               label={

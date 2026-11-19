@@ -14,12 +14,21 @@ test so only the tests that set them see prefilled fields. */
 let mockAppConfig: Record<string, string> = {};
 let mockAddressError: (value: string) => string | undefined = () => undefined;
 
+const mockSetSetting = jest.fn();
+
 jest.mock('react-redux', () => ({
   useSelector: (selector: (state: AppConfigState) => unknown) =>
     selector({ appConfig: { data: mockAppConfig } }),
+  useDispatch: () => jest.fn(),
 }));
 
+jest.mock(
+  '../../../react-services/error-management/error-handler/error-handler',
+  () => ({ ErrorHandler: { handleError: jest.fn() } }),
+);
+
 jest.mock('../../../kibana-services', () => ({
+  getUiSettings: () => ({ set: mockSetSetting }),
   getWazuhCorePlugin: () => ({
     SettingsValidator: {
       serverEndpointAddress: (value: string) => mockAddressError(value),
@@ -101,6 +110,8 @@ const mint = async () => {
 };
 
 beforeEach(() => {
+  mockSetSetting.mockReset();
+  mockSetSetting.mockResolvedValue(undefined);
   mockAppConfig = {};
   mockAddressError = () => undefined;
   createToken.mockReset();
@@ -297,6 +308,48 @@ describe('CreateEnrollmentTokenFlyout', () => {
       await waitFor(() => expect(warning()).not.toBeNull());
 
       expect(createButton()).not.toBeDisabled();
+    });
+  });
+
+  describe('remember the endpoint', () => {
+    const rememberSwitch = () =>
+      document.querySelector(
+        '[data-test-subj="rememberServerEndpoint"]',
+      ) as HTMLElement;
+
+    it('saves the address, port and prefix as the settings', async () => {
+      mockAppConfig = {
+        'enrollment.dns': 'old.example.com',
+        'enrollment.port': '1517',
+        'enrollment.path': '',
+      };
+      getNames.mockResolvedValue(['manager.example.com']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      typeAddress('manager.example.com');
+      fireEvent.click(rememberSwitch());
+
+      await waitFor(() => expect(mockSetSetting).toHaveBeenCalledTimes(3));
+      expect(mockSetSetting).toHaveBeenCalledWith(
+        'enrollment.dns',
+        'manager.example.com',
+      );
+      expect(mockSetSetting).toHaveBeenCalledWith('enrollment.port', '1517');
+      expect(mockSetSetting).toHaveBeenCalledWith('enrollment.path', '');
+    });
+
+    it('is on for the endpoint the settings already hold', () => {
+      mockAppConfig = { 'enrollment.dns': 'manager.example.com' };
+      renderFlyout();
+
+      expect(rememberSwitch()).toHaveAttribute('aria-checked', 'true');
+    });
+
+    it('cannot be turned on without an address', () => {
+      renderFlyout();
+
+      expect(rememberSwitch()).toBeDisabled();
     });
   });
 

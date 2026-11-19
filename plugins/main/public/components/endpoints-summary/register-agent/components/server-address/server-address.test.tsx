@@ -7,8 +7,15 @@ import { FormConfiguration } from '../../../../common/form/types';
 import { AddressComboBox } from '../../../../enrollment-tokens/components/address-combo-box';
 import { getListenerCertificateNames } from '../../../../../services/enrollment-tokens';
 
+const mockSet = jest.fn();
+
+jest.mock('react-redux', () => ({ useDispatch: () => jest.fn() }));
+
 jest.mock('../../../../../kibana-services', () => ({
-  getUiSettings: () => ({ get: jest.fn(), set: jest.fn() }),
+  getUiSettings: () => ({
+    get: jest.fn(),
+    set: (...args: unknown[]) => mockSet(...args),
+  }),
 }));
 
 jest.mock(
@@ -58,6 +65,8 @@ const addressInput = () =>
   ) as HTMLElement;
 
 beforeEach(() => {
+  mockSet.mockReset();
+  mockSet.mockResolvedValue(undefined);
   currentAddress = undefined;
   getNames.mockReset();
 });
@@ -94,5 +103,24 @@ describe('ServerAddressInput', () => {
     fireEvent.keyDown(addressInput(), { key: 'Enter' });
 
     expect(currentAddress).toBe('manager.local');
+  });
+
+  it('remembers the typed endpoint as the enrollment settings', async () => {
+    getNames.mockResolvedValue([]);
+    render(<Harness />);
+    await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+    fireEvent.change(addressInput(), { target: { value: 'manager.local' } });
+    fireEvent.keyDown(addressInput(), { key: 'Enter' });
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="rememberServerEndpoint"]',
+      ) as HTMLElement,
+    );
+
+    await waitFor(() =>
+      expect(mockSet).toHaveBeenCalledWith('enrollment.dns', 'manager.local'),
+    );
+    expect(mockSet).toHaveBeenCalledTimes(3);
   });
 });
