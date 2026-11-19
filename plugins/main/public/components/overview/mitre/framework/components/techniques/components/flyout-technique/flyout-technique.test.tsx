@@ -2,6 +2,11 @@ import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { WzRequest } from '../../../../../../../../react-services/wz-request';
 import NavigationService from '../../../../../../../../react-services/navigation-service';
+import { getWzCurrentAppID } from '../../../../../../../../kibana-services';
+import {
+  endpointSummary,
+  mitreAttack,
+} from '../../../../../../../../utils/applications';
 import { FlyoutTechnique } from './flyout-technique';
 
 jest.mock('../../../../../../../../react-services/wz-request', () => ({
@@ -32,11 +37,11 @@ jest.mock('../../../../../../../../react-services/common-services', () => ({
   getErrorOrchestrator: () => ({ handleError: jest.fn() }),
 }));
 jest.mock('../../../../../../../../react-services/navigation-service', () => {
-  const updateAndNavigateSearchParams = jest.fn();
-  return {
-    __esModule: true,
-    default: { getInstance: () => ({ updateAndNavigateSearchParams }) },
+  const instance = {
+    updateAndNavigateSearchParams: jest.fn(),
+    navigateToApp: jest.fn(),
   };
+  return { __esModule: true, default: { getInstance: () => instance } };
 });
 jest.mock('../../../../../../../../components/common/flyouts', () => ({
   WzFlyout: ({ children }: { children: React.ReactNode }) => (
@@ -67,6 +72,8 @@ jest.mock(
 const apiReq = WzRequest.apiReq as jest.Mock;
 const navigate = NavigationService.getInstance()
   .updateAndNavigateSearchParams as jest.Mock;
+const navigateToApp = NavigationService.getInstance()
+  .navigateToApp as jest.Mock;
 
 const items = (affected_items: any[]) => ({
   data: { data: { affected_items } },
@@ -126,6 +133,8 @@ describe('FlyoutTechnique', () => {
   beforeEach(() => {
     apiReq.mockReset();
     navigate.mockReset();
+    navigateToApp.mockReset();
+    (getWzCurrentAppID as jest.Mock).mockReturnValue(mitreAttack.id);
   });
 
   it('shows the technique, its tactics, related items and stats', async () => {
@@ -179,6 +188,18 @@ describe('FlyoutTechnique', () => {
 
     fireEvent.click(screen.getByText('Open in Findings'));
     expect(openDiscover).toHaveBeenCalledWith(expect.anything(), 'T1110');
+  });
+
+  it('opens MITRE ATT&CK on the Intelligence tab from another app', async () => {
+    (getWzCurrentAppID as jest.Mock).mockReturnValue(endpointSummary.id);
+    mockApi({ T1110: BRUTE_FORCE });
+    renderFlyout('T1110');
+
+    fireEvent.click(await screen.findByText('Password Policies'));
+    expect(navigate).not.toHaveBeenCalled();
+    expect(navigateToApp).toHaveBeenCalledWith(mitreAttack.id, {
+      path: '#/overview?tab=mitre&tabView=intelligence&tabRedirect=mitigations&idToRedirect=M1027',
+    });
   });
 
   it('links a sub-technique to its parent', async () => {
