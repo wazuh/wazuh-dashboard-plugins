@@ -43,8 +43,8 @@ export const AGG = {
   /** Per level / per rule split inside `answered_findings` and `serious_findings`. */
   byLevel: 'by_level',
   byRule: 'by_rule',
-  /** Distinct `event.doc_id` in an `answered_findings` bucket. */
-  answeredDocs: 'answered_docs',
+  /** `event.doc_id` values in `answered_findings`, on the active responses. */
+  answeredIds: 'answered_ids',
   /** Critical/high findings and the rules behind them, in the findings search. */
   seriousFindings: 'serious_findings',
   ruleTitle: 'rule_title',

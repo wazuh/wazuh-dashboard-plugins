@@ -1,5 +1,5 @@
 import {
-  IncidentResponseOverview,
+  AnsweredFindings,
   SeriousFindings,
   SeriousLevel,
   SeriousRule,
@@ -27,12 +27,12 @@ export interface ResponseCoverage {
 const LEVEL_RANK: Record<SeriousLevel, number> = { critical: 2, high: 1 };
 
 /**
- * Joins the critical/high findings with the active responses that answered them. A response in
- * the window can answer a finding from before it, so answered counts are capped at the totals.
+ * Joins the critical/high findings with those of them an active response answered. Both come from
+ * the same window; the caps only guard against the two searches seeing different data.
  */
 export function computeResponseCoverage(
   findings: SeriousFindings,
-  answered: IncidentResponseOverview['answered'],
+  answered: AnsweredFindings,
 ): ResponseCoverage {
   const levels = Object.keys(findings.byLevel) as SeriousLevel[];
   const total = levels.reduce((sum, l) => sum + (findings.byLevel[l] ?? 0), 0);

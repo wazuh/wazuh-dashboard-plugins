@@ -13,6 +13,7 @@ import { IncidentResponseCard } from './incident-response-card';
 import { CaseManagementCard } from './case-management-card';
 import {
   useAgentStatus,
+  useAnsweredFindings,
   useCaseManagementOverview,
   useFindingsOverview,
   useIncidentResponseOverview,
@@ -49,6 +50,9 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 }) => {
   const agents = useAgentStatus();
   const incidentResponse = useIncidentResponseOverview(true);
+  const answeredFindings = useAnsweredFindings(
+    incidentResponse.data?.answeredIds,
+  );
   const cases = useCaseManagementOverview(true);
   const [missingAgentRead] = useUserPermissionsRequirements(
     AGENT_READ_PERMISSIONS,
@@ -140,6 +144,7 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
           <IncidentResponseCard
             incidentResponse={incidentResponse}
             findings={findings}
+            answeredFindings={answeredFindings}
           />
         </EuiFlexItem>
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>

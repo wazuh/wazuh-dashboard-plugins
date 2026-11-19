@@ -36,7 +36,7 @@ describe('computeResponseCoverage', () => {
     ]);
   });
 
-  it('caps the answers at the totals: a response can answer an older finding', () => {
+  it('caps the answers at the totals', () => {
     const coverage = computeResponseCoverage(findings, {
       byLevel: { critical: 99, high: 30 },
       byRule: { c1: 99, h1: 20, h2: 10 },

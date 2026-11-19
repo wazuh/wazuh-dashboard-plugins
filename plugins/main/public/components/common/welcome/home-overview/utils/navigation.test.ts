@@ -265,19 +265,6 @@ describe('getActiveResponseResponsesUrl', () => {
       '/app/incident-response-dashboard#overview/?tab=incident-response-dashboard&tabView=responses',
     );
   });
-
-  it('filters the Responses tab to one value, last 24 hours', () => {
-    const url = getActiveResponseResponsesUrl(
-      { field: 'wazuh.agent.name', value: 'linux-1' },
-      'idx-ar',
-    );
-    expect(decodeAppState(url)?.filters[0].meta).toMatchObject({
-      key: 'wazuh.agent.name',
-      value: 'linux-1',
-      index: 'idx-ar',
-    });
-    expect(url).toContain('time:(from:now-24h,to:now)');
-  });
 });
 
 describe('getCaseManagementCasesUrl', () => {

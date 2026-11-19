@@ -9,7 +9,7 @@ import {
   IncidentResponseCardProps,
 } from './incident-response-card';
 import * as navigation from '../../utils/navigation';
-import { SeriousFindings } from '../../interfaces/types';
+import { AnsweredFindings, SeriousFindings } from '../../interfaces/types';
 
 jest.mock('../../utils/navigation', () => ({
   getActiveResponseUrl: jest.fn(() => '#incident-response'),
@@ -27,12 +27,18 @@ const bySubj = (container: HTMLElement, subj: string) =>
 
 const incidentResponse = {
   status: 'available' as const,
-  data: {
-    total: 250,
-    answered: { byLevel: { critical: 4, high: 6 }, byRule: { c1: 4 } },
-  },
+  data: { total: 250, answeredIds: ['f1'], answeredIdsPartial: false },
   indexPatternId: 'idx-ar',
 };
+
+const answeredWith = (answered: AnsweredFindings) => ({
+  status: 'available' as const,
+  data: answered,
+});
+const answered = answeredWith({
+  byLevel: { critical: 4, high: 6 },
+  byRule: { c1: 4 },
+});
 
 const seriousFindings: SeriousFindings = {
   byLevel: { critical: 10, high: 30 },
@@ -70,6 +76,7 @@ describe('IncidentResponseCard', () => {
       <IncidentResponseCard
         incidentResponse={incidentResponse}
         findings={findingsWith()}
+        answeredFindings={answered}
       />,
     );
     expect(screen.getByText('Incident Response')).toBeInTheDocument();
@@ -90,6 +97,7 @@ describe('IncidentResponseCard', () => {
       <IncidentResponseCard
         incidentResponse={incidentResponse}
         findings={findingsWith()}
+        answeredFindings={answered}
       />,
     );
     const rows = container.querySelectorAll(
@@ -112,6 +120,7 @@ describe('IncidentResponseCard', () => {
       <IncidentResponseCard
         incidentResponse={incidentResponse}
         findings={findingsWith()}
+        answeredFindings={answered}
       />,
     );
     expect(bySubj(container, 'incident-response-create')).toBeInTheDocument();
@@ -122,6 +131,7 @@ describe('IncidentResponseCard', () => {
       <IncidentResponseCard
         incidentResponse={incidentResponse}
         findings={findingsWith()}
+        answeredFindings={answered}
       />,
     );
     expect(bySubj(without, 'incident-response-create')).toBeNull();
@@ -130,17 +140,12 @@ describe('IncidentResponseCard', () => {
   it('says every finding got a response when no rule is left', () => {
     render(
       <IncidentResponseCard
-        incidentResponse={{
-          ...incidentResponse,
-          data: {
-            total: 250,
-            answered: {
-              byLevel: { critical: 10, high: 30 },
-              byRule: { c1: 10, h1: 30 },
-            },
-          },
-        }}
+        incidentResponse={incidentResponse}
         findings={findingsWith()}
+        answeredFindings={answeredWith({
+          byLevel: { critical: 10, high: 30 },
+          byRule: { c1: 10, h1: 30 },
+        })}
       />,
     );
     expect(
@@ -153,6 +158,7 @@ describe('IncidentResponseCard', () => {
       <IncidentResponseCard
         incidentResponse={incidentResponse}
         findings={findingsWith({ byLevel: {}, rules: [], partial: false })}
+        answeredFindings={answered}
       />,
     );
     expect(
@@ -166,6 +172,7 @@ describe('IncidentResponseCard', () => {
       <IncidentResponseCard
         incidentResponse={incidentResponse}
         findings={findingsWith({ ...seriousFindings, partial: true })}
+        answeredFindings={answered}
       />,
     );
     expect(screen.getByText('· more may exist')).toBeInTheDocument();
@@ -178,9 +185,10 @@ describe('IncidentResponseCard', () => {
         findings={
           {
             status: 'error',
-            error: { kind: 'error', message: 'Findings failed' },
+            error: { kind: 'unknown', message: 'Findings failed' },
           } as unknown as IncidentResponseCardProps['findings']
         }
+        answeredFindings={answered}
       />,
     );
     expect(bySubj(container, 'incident-response-total')).toHaveTextContent(
@@ -188,6 +196,34 @@ describe('IncidentResponseCard', () => {
     );
     expect(screen.getByText('Findings failed')).toBeInTheDocument();
     expect(bySubj(container, 'incident-response-gaps')).toBeNull();
+  });
+
+  it('waits for the answered findings before showing the coverage', () => {
+    const { container } = render(
+      <IncidentResponseCard
+        incidentResponse={incidentResponse}
+        findings={findingsWith()}
+        answeredFindings={{ status: 'loading' }}
+      />,
+    );
+    expect(bySubj(container, 'incident-response-total')).toHaveTextContent(
+      '250',
+    );
+    expect(bySubj(container, 'incident-response-coverage')).toBeNull();
+  });
+
+  it('shows the error of the answered findings search', () => {
+    render(
+      <IncidentResponseCard
+        incidentResponse={incidentResponse}
+        findings={findingsWith()}
+        answeredFindings={{
+          status: 'error',
+          error: { kind: 'unknown', message: 'Answered findings failed' },
+        }}
+      />,
+    );
+    expect(screen.getByText('Answered findings failed')).toBeInTheDocument();
   });
 
   it('offers to manage index patterns when the index pattern is missing', () => {
@@ -198,6 +234,7 @@ describe('IncidentResponseCard', () => {
           error: { kind: 'index-pattern-missing', message: 'No index pattern' },
         }}
         findings={findingsWith()}
+        answeredFindings={answered}
       />,
     );
     expect(screen.getByText('No index pattern')).toBeInTheDocument();

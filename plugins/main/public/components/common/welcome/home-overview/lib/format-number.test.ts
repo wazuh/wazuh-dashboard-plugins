@@ -45,6 +45,24 @@ describe('formatHomeNumber', () => {
     ).toHaveBeenCalledWith('number');
   });
 
+  it('drops the zero decimals the pattern adds to a whole number', () => {
+    // Pattern `0,0.00`, `en` locale.
+    withFieldFormats((value: number) =>
+      value.toLocaleString('en-US', { minimumFractionDigits: 2 }),
+    );
+    expect(formatHomeNumber(1234)).toBe('1,234');
+    // Not a whole number: the decimals stay.
+    expect(formatHomeNumber(2.5)).toBe('2.50');
+  });
+
+  it('reads the decimal separator of the locale', () => {
+    // Pattern `0,0.00`, `de` locale.
+    withFieldFormats((value: number) =>
+      value.toLocaleString('de-DE', { minimumFractionDigits: 2 }),
+    );
+    expect(formatHomeNumber(1234)).toBe('1.234');
+  });
+
   it('falls back to the en-US format when no settings can be read', () => {
     expect(formatHomeNumber(35682)).toBe('35,682');
   });

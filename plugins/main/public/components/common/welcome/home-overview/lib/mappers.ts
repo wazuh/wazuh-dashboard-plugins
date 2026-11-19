@@ -1,5 +1,6 @@
 import {
   AgentStatus,
+  AnsweredFindings,
   CaseManagementOverview,
   CaseStatusCounts,
   CaseSummary,
@@ -262,10 +263,6 @@ const subBuckets = (bucket: unknown, aggName: string): LevelBucket[] => {
   return Array.isArray(buckets) ? (buckets as LevelBucket[]) : [];
 };
 
-const cardinalityOf = (bucket: unknown): number =>
-  (bucket as Record<string, { value?: number } | undefined>)?.[AGG.answeredDocs]
-    ?.value ?? 0;
-
 /** Critical/high findings per level and their top rules (`buildSeriousFindingsAgg`). */
 export function mapSeriousFindings(
   aggregations: Aggregations,
@@ -305,15 +302,32 @@ export function mapIncidentResponse(
     | undefined,
 ): IncidentResponseOverview {
   const answered = response?.aggregations?.[AGG.answeredFindings];
-  const byLevel: IncidentResponseOverview['answered']['byLevel'] = {};
+  const idsAgg = (answered as Record<string, unknown> | undefined)?.[
+    AGG.answeredIds
+  ] as { sum_other_doc_count?: number } | undefined;
+  return {
+    total: mapDocCount(response),
+    answeredIds: subBuckets(answered, AGG.answeredIds).map(bucket =>
+      String(bucket.key),
+    ),
+    answeredIdsPartial: (idsAgg?.sum_other_doc_count ?? 0) > 0,
+  };
+}
+
+/** Answered findings of the window, per level and per rule id (`buildAnsweredFindingsAgg`). */
+export function mapAnsweredFindings(
+  aggregations: Aggregations,
+): AnsweredFindings {
+  const answered = aggregations?.[AGG.answeredFindings];
+  const byLevel: AnsweredFindings['byLevel'] = {};
   for (const bucket of subBuckets(answered, AGG.byLevel)) {
     if (isSeriousLevel(bucket.key)) {
-      byLevel[bucket.key] = cardinalityOf(bucket);
+      byLevel[bucket.key] = bucket.doc_count ?? 0;
     }
   }
-  const byRule: Record<string, number> = {};
+  const byRule: AnsweredFindings['byRule'] = {};
   for (const bucket of subBuckets(answered, AGG.byRule)) {
-    byRule[String(bucket.key)] = cardinalityOf(bucket);
+    byRule[String(bucket.key)] = bucket.doc_count ?? 0;
   }
-  return { total: mapDocCount(response), answered: { byLevel, byRule } };
+  return { byLevel, byRule };
 }

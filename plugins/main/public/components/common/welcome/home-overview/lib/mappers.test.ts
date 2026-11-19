@@ -9,6 +9,7 @@ import {
   mapScaTiles,
   mapScaBenchmarks,
   mapCaseManagement,
+  mapAnsweredFindings,
   mapIncidentResponse,
   mapSeriousFindings,
 } from './mappers';
@@ -416,36 +417,58 @@ describe('mappers', () => {
   });
 
   describe('mapIncidentResponse', () => {
-    it('maps the total and the answered findings per level and per rule', () => {
+    it('maps the total and the ids of the answered findings', () => {
       expect(
         mapIncidentResponse({
           hits: { total: 250 },
           aggregations: {
             answered_findings: {
-              by_level: {
-                buckets: [
-                  { key: 'critical', answered_docs: { value: 4 } },
-                  { key: 'high', answered_docs: { value: 6 } },
-                  // Not a level the coverage tracks.
-                  { key: 'medium', answered_docs: { value: 9 } },
-                ],
-              },
-              by_rule: {
-                buckets: [{ key: 'r1', answered_docs: { value: 4 } }],
+              answered_ids: {
+                sum_other_doc_count: 2,
+                buckets: [{ key: 'f1' }, { key: 'f2' }],
               },
             },
           },
         } as never),
       ).toEqual({
         total: 250,
-        answered: { byLevel: { critical: 4, high: 6 }, byRule: { r1: 4 } },
+        answeredIds: ['f1', 'f2'],
+        // More ids exist than the search returned.
+        answeredIdsPartial: true,
       });
     });
 
-    it('returns no answers on an empty response', () => {
+    it('returns no ids on an empty response', () => {
       expect(mapIncidentResponse(undefined)).toEqual({
         total: undefined,
-        answered: { byLevel: {}, byRule: {} },
+        answeredIds: [],
+        answeredIdsPartial: false,
+      });
+    });
+  });
+
+  describe('mapAnsweredFindings', () => {
+    it('maps the answered findings per level and per rule', () => {
+      expect(
+        mapAnsweredFindings({
+          answered_findings: {
+            by_level: {
+              buckets: [
+                { key: 'critical', doc_count: 4 },
+                // Not a level the coverage tracks.
+                { key: 'medium', doc_count: 9 },
+              ],
+            },
+            by_rule: { buckets: [{ key: 'r1', doc_count: 4 }] },
+          },
+        } as never),
+      ).toEqual({ byLevel: { critical: 4 }, byRule: { r1: 4 } });
+    });
+
+    it('returns nothing on an empty response', () => {
+      expect(mapAnsweredFindings(undefined)).toEqual({
+        byLevel: {},
+        byRule: {},
       });
     });
   });

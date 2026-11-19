@@ -337,29 +337,44 @@ export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
   );
 }
 
+/** Most answered findings the coverage looks up; past it, coverage undercounts. */
+export const MAX_ANSWERED_FINDINGS = 10000;
+
 /**
- * Distinct critical/high findings an active response answered: a response copies the finding's
- * `wazuh` fields and stores its `_id` in `event.doc_id`. Per level and per rule id.
+ * The critical/high findings the active responses answered: a response copies the finding's
+ * `wazuh` fields and stores its `_id` in `event.doc_id`. The ids feed `buildAnsweredFindingsAgg`.
  */
-export function buildIncidentResponseAggs(maxRules = 500) {
-  const answeredDocs = {
-    [AGG.answeredDocs]: { cardinality: { field: EVENT_DOC_ID_FIELD } },
-  };
+export function buildIncidentResponseAggs(maxIds = MAX_ANSWERED_FINDINGS) {
   return {
     [AGG.answeredFindings]: {
       filter: seriousLevelsFilter,
+      aggs: {
+        [AGG.answeredIds]: {
+          terms: { field: EVENT_DOC_ID_FIELD, size: maxIds },
+        },
+      },
+    },
+  };
+}
+
+/**
+ * Of the findings the responses answered, those of the findings search window (a response of the
+ * last 24 hours can answer an older finding), per level and per rule id.
+ */
+export function buildAnsweredFindingsAgg(ids: string[]) {
+  return {
+    [AGG.answeredFindings]: {
+      filter: {
+        bool: { filter: [{ ids: { values: ids } }, seriousLevelsFilter] },
+      },
       aggs: {
         [AGG.byLevel]: {
           terms: {
             field: FINDING_SEVERITY_FIELD,
             size: SERIOUS_FINDING_LEVELS.length,
           },
-          aggs: answeredDocs,
         },
-        [AGG.byRule]: {
-          terms: { field: RULE_ID_FIELD, size: maxRules },
-          aggs: answeredDocs,
-        },
+        [AGG.byRule]: { terms: { field: RULE_ID_FIELD, size: ids.length } },
       },
     },
   };
@@ -397,7 +412,8 @@ const BY_URGENCY = {
     script: {
       lang: 'painless',
       source: [
-        'def rank(def d, String f, Map m) { return d[f].size() == 0 ? 0 : m.getOrDefault(d[f].value, 0); }',
+        // A field never written to an index is unmapped there: `doc[f]` would fail the shard.
+        'def rank(def d, String f, Map m) { return !d.containsKey(f) || d[f].size() == 0 ? 0 : m.getOrDefault(d[f].value, 0); }',
         `return rank(doc, '${CASE_PRIORITY_FIELD}', ${painlessRanks(
           CASE_PRIORITIES,
         )}) * 10 + rank(doc, '${CASE_SEVERITY_FIELD}', ${painlessRanks(

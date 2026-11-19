@@ -5,6 +5,7 @@ import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
 import {
   useAgentStatus,
+  useAnsweredFindings,
   useCaseManagementOverview,
   useIncidentResponseOverview,
 } from '../../hooks/use-overview-data';
@@ -17,6 +18,7 @@ import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermiss
 jest.mock('../../hooks/use-overview-data', () => ({
   useAgentStatus: jest.fn(),
   useIncidentResponseOverview: jest.fn(),
+  useAnsweredFindings: jest.fn(),
   useCaseManagementOverview: jest.fn(),
 }));
 // The cards have their own suites; here only their place in the layout matters.
@@ -128,6 +130,19 @@ describe('OverviewSection', () => {
     expect((IncidentResponseCard as jest.Mock).mock.calls[0][0].findings).toBe(
       findingsAvailable,
     );
+  });
+
+  it('looks up which findings the responses answered once their ids are known', () => {
+    asMock(useIncidentResponseOverview).mockReturnValue({
+      status: 'available',
+      data: { total: 3, answeredIds: ['f1'], answeredIdsPartial: false },
+    });
+    asMock(useAnsweredFindings).mockReturnValue({ status: 'loading' });
+    render(<OverviewSection findings={findingsAvailable} />);
+    expect(useAnsweredFindings).toHaveBeenCalledWith(['f1']);
+    expect(
+      (IncidentResponseCard as jest.Mock).mock.calls[0][0].answeredFindings,
+    ).toEqual({ status: 'loading' });
   });
 
   it('shows a contained error for a failed group (distinct from hidden)', () => {

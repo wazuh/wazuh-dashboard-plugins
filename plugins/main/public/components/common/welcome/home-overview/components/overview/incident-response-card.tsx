@@ -47,6 +47,7 @@ import {
   HOME_OVERVIEW_TEXT_COLOR,
 } from '../../lib/theme-colors';
 import { DataGroupResult } from '../../interfaces/data-group';
+import { AnsweredFindings } from '../../interfaces/types';
 
 type TileKey = 'total' | 'unanswered';
 
@@ -210,6 +211,8 @@ export interface IncidentResponseCardProps {
   incidentResponse: ReturnType<typeof useIncidentResponseOverview>;
   /** Home's findings search, which carries the critical/high findings and their rules. */
   findings: ReturnType<typeof useFindingsOverview>;
+  /** Those findings an active response answered (`useAnsweredFindings`). */
+  answeredFindings: DataGroupResult<AnsweredFindings>;
 }
 
 /**
@@ -219,15 +222,23 @@ export interface IncidentResponseCardProps {
 export const IncidentResponseCard: React.FC<IncidentResponseCardProps> = ({
   incidentResponse,
   findings,
+  answeredFindings,
 }) => {
   const applications = useObservable(
     getCore().application.applications$,
     NO_APPLICATIONS,
   );
   const { data } = incidentResponse;
+  // The coverage needs both searches; the first one not available stands for both.
+  const pending = [findings, answeredFindings].find(
+    group => group.status !== 'available',
+  );
   const coverage =
-    data && findings.status === 'available' && findings.data
-      ? computeResponseCoverage(findings.data.seriousFindings, data.answered)
+    data && !pending && findings.data && answeredFindings.data
+      ? computeResponseCoverage(
+          findings.data.seriousFindings,
+          answeredFindings.data,
+        )
       : undefined;
 
   const tiles: Array<StatTileSpec<TileKey>> = [
@@ -259,7 +270,7 @@ export const IncidentResponseCard: React.FC<IncidentResponseCardProps> = ({
     total: { status: 'available', data: data?.total },
     unanswered: coverage
       ? { status: 'available', data: coverage.unanswered }
-      : { status: findings.status, error: findings.error },
+      : { status: pending?.status ?? 'loading', error: pending?.error },
   };
 
   const gaps = coverage?.gaps ?? [];
@@ -304,9 +315,9 @@ export const IncidentResponseCard: React.FC<IncidentResponseCardProps> = ({
           <EuiSpacer size='m' />
           {!coverage ? (
             <WidgetGroupBody
-              status={findings.status}
-              errorLabel={findings.error?.message}
-              isPermissionDenied={findings.error?.kind === 'permission-denied'}
+              status={pending?.status ?? 'loading'}
+              errorLabel={pending?.error?.message}
+              isPermissionDenied={pending?.error?.kind === 'permission-denied'}
               loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.list}
             >
               {null}

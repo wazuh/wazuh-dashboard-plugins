@@ -36,6 +36,7 @@ import {
   buildComplianceControlsAgg,
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
+  buildAnsweredFindingsAgg,
   buildIncidentResponseAggs,
   buildMalwareFilterAgg,
   buildPlatformsCountAgg,
@@ -59,6 +60,7 @@ import {
   mapCaseManagement,
   mapCloudSecurityByModule,
   mapComplianceControls,
+  mapAnsweredFindings,
   mapIncidentResponse,
   mapDocCount,
   mapScaBenchmarks,
@@ -81,6 +83,7 @@ import {
   FimOverview,
   FindingsBreakdowns,
   FindingsOverview,
+  AnsweredFindings,
   IncidentResponseOverview,
   ScaOverview,
   ThreatIntelEnrichments,
@@ -742,6 +745,42 @@ export function useIncidentResponseOverview(
   return useMemo(
     () => ({ ...result, indexPatternId }),
     [result.status, result.data, indexPatternId],
+  );
+}
+
+const NO_ANSWERED_FINDINGS: AnsweredFindings = { byLevel: {}, byRule: {} };
+
+/**
+ * Of the findings the active responses answered (`ids`, from `useIncidentResponseOverview`), those
+ * of the last 24 hours, per level and per rule. Waits for the ids; none means no search.
+ */
+export function useAnsweredFindings(
+  ids: string[] | undefined,
+): DataGroupResult<AnsweredFindings> {
+  const result = useAggregationGroup<AnsweredFindings>({
+    DataSource: OverviewDataSource,
+    createRepository: () => new FindingsDataSourceRepository(),
+    enabled: Boolean(ids?.length),
+    label: i18n.translate(
+      'wazuh.common.homeOverviewDataGroup.answeredFindings',
+      { defaultMessage: 'Findings answered by active responses' },
+    ),
+    fetch: async fetchData => {
+      const response = await fetchData({
+        aggs: buildAnsweredFindingsAgg(ids ?? []),
+        dateRange: LAST_24H,
+        pagination: NO_HITS,
+      });
+      return mapAnsweredFindings(response?.aggregations);
+    },
+  });
+  const noIds = ids !== undefined && ids.length === 0;
+  return useMemo(
+    () =>
+      noIds
+        ? { status: 'available', data: NO_ANSWERED_FINDINGS }
+        : { status: result.status, data: result.data, error: result.error },
+    [noIds, result.status, result.data, result.error],
   );
 }
 

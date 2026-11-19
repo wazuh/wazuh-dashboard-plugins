@@ -291,33 +291,11 @@ export const getVulnerabilityDetectionBySeverityUrl = (
 };
 
 export const getActiveResponseUrl = () => getUrlForApp(activeResponses.id);
-/**
- * Incident Response > Responses tab (triggered actions list), last 24 hours,
- * optionally filtered to one value of `field`.
- */
-export const getActiveResponseResponsesUrl = (
-  filter?: { field: string; value: string },
-  indexPatternId?: string,
-) => {
-  const path = '#overview/?tab=incident-response-dashboard&tabView=responses';
-  if (!filter || !indexPatternId) {
-    return getUrlForApp(activeResponses.id, { path });
-  }
-  const queryState = rison.encode({
-    filters: [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        filter.field,
-        filter.value,
-        indexPatternId,
-      ),
-    ],
-    query: { language: 'kuery', query: '' },
+/** Incident Response > Responses tab (triggered actions list). */
+export const getActiveResponseResponsesUrl = () =>
+  getUrlForApp(activeResponses.id, {
+    path: '#overview/?tab=incident-response-dashboard&tabView=responses',
   });
-  return getUrlForApp(activeResponses.id, {
-    path: `${path}&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
-  });
-};
 
 export const getCaseManagementUrl = () => getUrlForApp(caseManagement.id);
 

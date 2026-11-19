@@ -17,6 +17,7 @@ import {
   buildIncidentResponseAggs,
   buildCaseManagementAggs,
   buildSeriousFindingsAgg,
+  buildAnsweredFindingsAgg,
   ATTENTION_CASES_QUERY,
 } from './queries';
 import {
@@ -214,22 +215,31 @@ describe('query builders', () => {
     expect(agg.malware.aggs.ioc_feed_by_type).toBeUndefined();
   });
 
-  it('counts the distinct critical/high findings answered, per level and per rule', () => {
-    const answeredDocs = {
-      answered_docs: { cardinality: { field: 'event.doc_id' } },
-    };
-    expect(buildIncidentResponseAggs()).toEqual({
+  it('collects the ids of the critical/high findings the responses answered', () => {
+    expect(buildIncidentResponseAggs(100)).toEqual({
       answered_findings: {
         filter: { terms: { 'wazuh.rule.level': ['critical', 'high'] } },
         aggs: {
-          by_level: {
-            terms: { field: 'wazuh.rule.level', size: 2 },
-            aggs: answeredDocs,
+          answered_ids: { terms: { field: 'event.doc_id', size: 100 } },
+        },
+      },
+    });
+  });
+
+  it('counts the answered findings of the window per level and per rule', () => {
+    expect(buildAnsweredFindingsAgg(['f1', 'f2'])).toEqual({
+      answered_findings: {
+        filter: {
+          bool: {
+            filter: [
+              { ids: { values: ['f1', 'f2'] } },
+              { terms: { 'wazuh.rule.level': ['critical', 'high'] } },
+            ],
           },
-          by_rule: {
-            terms: { field: 'wazuh.rule.id', size: 500 },
-            aggs: answeredDocs,
-          },
+        },
+        aggs: {
+          by_level: { terms: { field: 'wazuh.rule.level', size: 2 } },
+          by_rule: { terms: { field: 'wazuh.rule.id', size: 2 } },
         },
       },
     });

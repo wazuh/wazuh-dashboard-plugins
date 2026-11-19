@@ -371,16 +371,14 @@ distinct OS platforms on the system inventory (`buildPlatformsCountAgg()`).
 
 DQL: `*`.
 
-## 9. Incident Response — `wazuh-active-responses*`, last 24h
+## 9. Incident Response — `wazuh-active-responses*` then `wazuh-findings-v5*`, last 24h
 
-`buildIncidentResponseAggs()`. An active response copies the `wazuh` object of the
-finding it answers and stores the finding's `_id` in `event.doc_id`.
+An active response copies the `wazuh` object of the finding it answers and stores the
+finding's `_id` in `event.doc_id`. A response of the last 24 hours can answer an older
+finding, so the coverage takes two searches.
 
-**Represents:** responses triggered (`hits.total`) and the distinct critical/high
-findings they answered, per level and per rule id. Joined in the browser
-(`computeResponseCoverage`) with `serious_findings` (§1): unanswered = findings −
-answered (capped at the findings, since a response in the window can answer an
-older finding); a rule is listed when it has unanswered findings, critical first.
+**1. Responses** (`buildIncidentResponseAggs()`): responses triggered (`hits.total`) and the
+ids of the critical/high findings they answered (up to 10,000).
 
 ```jsonc
 {
@@ -390,26 +388,45 @@ older finding); a rule is listed when it has unanswered findings, critical first
     "answered_findings": {
       "filter": { "terms": { "wazuh.rule.level": ["critical", "high"] } },
       "aggs": {
-        "by_level": {
-          "terms": { "field": "wazuh.rule.level", "size": 2 },
-          "aggs": {
-            "answered_docs": { "cardinality": { "field": "event.doc_id" } }
-          }
-        },
-        "by_rule": {
-          "terms": { "field": "wazuh.rule.id", "size": 500 },
-          "aggs": {
-            "answered_docs": { "cardinality": { "field": "event.doc_id" } }
-          }
-        }
+        "answered_ids": { "terms": { "field": "event.doc_id", "size": 10000 } }
       }
     }
   }
 }
 ```
 
-A response to a raw event (not a finding) carries no `wazuh.rule.level`, so it does
-not count as answering a finding.
+**2. Answered findings** (`buildAnsweredFindingsAgg(ids)`), after the first returns and only
+when it found ids: those findings that are critical/high findings of the last 24 hours, per
+level and per rule id.
+
+```jsonc
+{
+  "size": 0,
+  // time filter: timestamp >= now-24h
+  "aggs": {
+    "answered_findings": {
+      "filter": {
+        "bool": {
+          "filter": [
+            { "ids": { "values": ["<event.doc_id>", "…"] } },
+            { "terms": { "wazuh.rule.level": ["critical", "high"] } }
+          ]
+        }
+      },
+      "aggs": {
+        "by_level": { "terms": { "field": "wazuh.rule.level", "size": 2 } },
+        "by_rule": { "terms": { "field": "wazuh.rule.id", "size": "<ids>" } }
+      }
+    }
+  }
+}
+```
+
+Joined in the browser (`computeResponseCoverage`) with `serious_findings` (§1): unanswered =
+findings − answered; a rule is listed when it has unanswered findings, critical first.
+
+A response to a raw event (not a finding) carries no `wazuh.rule.level`, so it does not count
+as answering a finding.
 
 ## 9.1 Case Management — `wazuh-findings-v5*` with a case, current
 
