@@ -1,7 +1,7 @@
 import React from 'react';
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import { WzCtiUpsellNotification } from '.';
+import { WzCtiRegisterNotification } from '.';
 import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
 
 jest.mock('../../kibana-services', () => ({
@@ -10,17 +10,17 @@ jest.mock('../../kibana-services', () => ({
 
 const renderWith = (
   ctiRegistrationUiEnabled: boolean,
-  ctiUpsellEnabled: boolean,
+  ctiUpgradeEnabled: boolean,
 ) => {
   (getWazuhCheckUpdatesPlugin as jest.Mock).mockReturnValue({
     ctiRegistrationUiEnabled,
-    ctiUpsellEnabled,
-    CtiUpsellNotification: () => <div>CTI upsell</div>,
+    ctiUpgradeEnabled,
+    CtiRegisterNotification: () => <div>CTI upsell</div>,
   });
-  render(<WzCtiUpsellNotification />);
+  render(<WzCtiRegisterNotification />);
 };
 
-describe('WzCtiUpsellNotification', () => {
+describe('WzCtiRegisterNotification', () => {
   test('renders the upsell when the CTI UI and the upsell are enabled', () => {
     renderWith(true, true);
     expect(screen.getByText('CTI upsell')).toBeInTheDocument();

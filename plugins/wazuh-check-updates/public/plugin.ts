@@ -21,7 +21,7 @@ import {
   setCtiRegistrationStatusPollIntervalSec,
 } from './plugin-services';
 import { getAvailableUpdates } from './services';
-import { CtiUpsellNotification } from './shared-components/cti-registration/components/cti-upsell-notification';
+import { CtiRegisterNotification } from './shared-components/cti-registration/components/cti-register-notification';
 import { CtiFeedSyncStatus } from './shared-components/cti-feed-sync-status';
 import {
   CTI_FEED_APP_ID,
@@ -86,7 +86,7 @@ export class WazuhCheckUpdatesPlugin
 
     const {
       ctiRegistrationUiEnabled,
-      ctiUpsellEnabled,
+      ctiUpgradeEnabled,
       ctiRegistrationStatusPollIntervalSec,
     } = this.initializerContext.config.get();
 
@@ -99,9 +99,9 @@ export class WazuhCheckUpdatesPlugin
       getAvailableUpdates,
       DismissNotificationCheck,
       ctiRegistrationUiEnabled,
-      ctiUpsellEnabled,
+      ctiUpgradeEnabled,
       ctiRegistrationStatusPollIntervalSec,
-      CtiUpsellNotification,
+      CtiRegisterNotification,
       CtiFeedSyncStatus,
     };
   }

@@ -15,7 +15,7 @@ import { getCore } from '../../../plugin-services';
 import { ctiFlowState } from '../../../services/cti-flow-state';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { routes } from '../../../../common/constants';
-import { CtiUpsellNotification } from './cti-upsell-notification';
+import { CtiRegisterNotification } from './cti-register-notification';
 
 jest.mock('@osd/i18n', () => ({
   i18n: {
@@ -56,7 +56,7 @@ const mockResponses = (ctiStatus: object, userPreferences: object = {}) => {
   );
 };
 
-describe('CtiUpsellNotification', () => {
+describe('CtiRegisterNotification', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     ctiFlowState.reset();
@@ -75,7 +75,7 @@ describe('CtiUpsellNotification', () => {
       subscription: { message: null, status: 502 },
     });
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     await waitFor(() => {
       expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus);
@@ -92,7 +92,7 @@ describe('CtiUpsellNotification', () => {
   test('shows the upsell bar when CM confirms the instance is not registered', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     expect(await screen.findByText('Register now')).toBeInTheDocument();
     expect(
@@ -105,7 +105,7 @@ describe('CtiUpsellNotification', () => {
   test('opens the CTI feed app on its registration modal from Register now', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
     fireEvent.click(await screen.findByText('Register now'));
 
     expect(mockNavigateToApp).toHaveBeenCalledWith('cti-feed', {
@@ -119,7 +119,7 @@ describe('CtiUpsellNotification', () => {
     appWrapper.id = 'app-wrapper';
     document.body.appendChild(appWrapper);
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     const bar = await screen.findByRole('region', {
       name: 'Wazuh Cyber Threat Intelligence registration',
@@ -133,7 +133,7 @@ describe('CtiUpsellNotification', () => {
   test('does not show the upsell bar when the user dismissed it before', async () => {
     mockResponses(NOT_REGISTERED_STATUS, { hide_cti_upsell: true });
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     await waitFor(() => {
       expect(mockHttpGet).toHaveBeenCalledWith(routes.userPreferences);
@@ -148,7 +148,7 @@ describe('CtiUpsellNotification', () => {
   test('stores the dismissal in the user preferences', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     fireEvent.click(await screen.findByText("Don't show again"));
 
@@ -164,7 +164,7 @@ describe('CtiUpsellNotification', () => {
   test('holds the bottom bar slot while shown and releases it on dismiss', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     // Held while the status loads, so the updates bar never flashes first.
     expect(ctiUpsellBarVisible$.getValue()).toBe(true);
@@ -176,7 +176,7 @@ describe('CtiUpsellNotification', () => {
   test('releases the bottom bar slot when the user dismissed it before', async () => {
     mockResponses(NOT_REGISTERED_STATUS, { hide_cti_upsell: true });
 
-    render(<CtiUpsellNotification />);
+    render(<CtiRegisterNotification />);
 
     // Held while the preferences load, then released for the updates bar.
     expect(ctiUpsellBarVisible$.getValue()).toBe(true);
@@ -189,7 +189,7 @@ describe('CtiUpsellNotification', () => {
   test('releases the bottom bar slot on unmount', async () => {
     mockResponses(NOT_REGISTERED_STATUS);
 
-    const { unmount } = render(<CtiUpsellNotification />);
+    const { unmount } = render(<CtiRegisterNotification />);
     await screen.findByText('Register now');
     expect(ctiUpsellBarVisible$.getValue()).toBe(true);
 
@@ -203,7 +203,7 @@ describe('CtiUpsellNotification', () => {
     });
 
     test('hides while a device flow is in progress and shows again when it ends', async () => {
-      render(<CtiUpsellNotification />);
+      render(<CtiRegisterNotification />);
       expect(await screen.findByText('Register now')).toBeInTheDocument();
 
       act(() => ctiFlowState.setDeviceCode('device-code'));
@@ -214,7 +214,7 @@ describe('CtiUpsellNotification', () => {
     });
 
     test('hides while a registration modal is open and shows again when it closes', async () => {
-      render(<CtiUpsellNotification />);
+      render(<CtiRegisterNotification />);
       expect(await screen.findByText('Register now')).toBeInTheDocument();
 
       let closeModal = () => {};
@@ -228,7 +228,7 @@ describe('CtiUpsellNotification', () => {
     });
 
     test('keeps the bottom bar slot while a registration modal is open', async () => {
-      render(<CtiUpsellNotification />);
+      render(<CtiRegisterNotification />);
       await screen.findByText('Register now');
 
       let closeModal = () => {};
@@ -241,7 +241,7 @@ describe('CtiUpsellNotification', () => {
     });
 
     test('hides once registration completes', async () => {
-      render(<CtiUpsellNotification />);
+      render(<CtiRegisterNotification />);
       expect(await screen.findByText('Register now')).toBeInTheDocument();
 
       act(() => ctiFlowState.setDeviceCode('device-code'));

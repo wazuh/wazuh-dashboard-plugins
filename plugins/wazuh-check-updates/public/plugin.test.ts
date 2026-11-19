@@ -19,7 +19,7 @@ const createPlugin = (ctiRegistrationUiEnabled: boolean) =>
     config: {
       get: () => ({
         ctiRegistrationUiEnabled,
-        ctiUpsellEnabled: true,
+        ctiUpgradeEnabled: true,
         ctiRegistrationStatusPollIntervalSec: 30,
       }),
     },
