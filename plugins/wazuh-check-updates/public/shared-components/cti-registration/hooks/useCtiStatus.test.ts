@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCtiStatus } from './useCtiStatus';
+import { CTI_FOCUS_REFRESH_MIN_MS, useCtiStatus } from './useCtiStatus';
 import { ctiFlowState } from '../../../services/cti-flow-state';
 import { fetchCtiRegistrationStatus } from '../../../services/cti-registration-status';
 
@@ -236,6 +236,93 @@ describe('useCtiStatus — freshness guard on remount / visibility focus', () =>
       document.dispatchEvent(new Event('visibilitychange'));
       await Promise.resolve();
     });
+
+    expect(mockedFetchCtiRegistrationStatus).not.toHaveBeenCalled();
+  });
+});
+
+describe('useCtiStatus — refreshOnFocus', () => {
+  const settle = async () => {
+    await act(async () => {
+      await Promise.resolve();
+    });
+  };
+
+  const comeBack = async (event: 'visibilitychange' | 'focus') => {
+    await act(async () => {
+      if (event === 'focus') {
+        window.dispatchEvent(new Event('focus'));
+      } else {
+        document.dispatchEvent(new Event('visibilitychange'));
+      }
+      await Promise.resolve();
+    });
+  };
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    ctiFlowState.reset();
+    mockedFetchCtiRegistrationStatus.mockReset();
+    Object.defineProperty(document, 'hidden', {
+      configurable: true,
+      value: false,
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it.each(['visibilitychange', 'focus'] as const)(
+    'reads the status on %s although the polling interval has not passed',
+    async event => {
+      mockRegisteredResolution();
+      renderHook(() => useCtiStatus(0, 30, { refreshOnFocus: true }));
+      await settle();
+      mockedFetchCtiRegistrationStatus.mockClear();
+
+      jest.advanceTimersByTime(CTI_FOCUS_REFRESH_MIN_MS);
+      await comeBack(event);
+
+      expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalledTimes(1);
+    },
+  );
+
+  it('skips the read when the status was read moments ago', async () => {
+    mockRegisteredResolution();
+    renderHook(() => useCtiStatus(0, 30, { refreshOnFocus: true }));
+    await settle();
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    jest.advanceTimersByTime(CTI_FOCUS_REFRESH_MIN_MS - 1000);
+    await comeBack('focus');
+
+    expect(mockedFetchCtiRegistrationStatus).not.toHaveBeenCalled();
+  });
+
+  it('does not listen to window focus without the option', async () => {
+    mockRegisteredResolution();
+    renderHook(() => useCtiStatus(0, 30));
+    await settle();
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    jest.advanceTimersByTime(CTI_FOCUS_REFRESH_MIN_MS);
+    await comeBack('focus');
+
+    expect(mockedFetchCtiRegistrationStatus).not.toHaveBeenCalled();
+  });
+
+  it('stops listening once unmounted', async () => {
+    mockRegisteredResolution();
+    const { unmount } = renderHook(() =>
+      useCtiStatus(0, 30, { refreshOnFocus: true }),
+    );
+    await settle();
+    unmount();
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    jest.advanceTimersByTime(CTI_FOCUS_REFRESH_MIN_MS);
+    await comeBack('focus');
 
     expect(mockedFetchCtiRegistrationStatus).not.toHaveBeenCalled();
   });

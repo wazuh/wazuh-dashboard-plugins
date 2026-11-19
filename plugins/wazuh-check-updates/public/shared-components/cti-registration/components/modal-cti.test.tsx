@@ -121,7 +121,9 @@ describe('ModalCti component', () => {
       screen.getByRole('button', { name: 'Register' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Register it in the Wazuh Console to manage it there/),
+      screen.getByText(
+        /Register it in the Wazuh Console to manage your instance/,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -217,7 +219,7 @@ describe('ModalCti component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Complete activation in Wazuh CTI'),
+        screen.getByText('Complete activation in the Wazuh Console'),
       ).toBeInTheDocument();
       expect(
         document.querySelector('[data-test-subj="ctiModalDeviceFlowSubtitle"]'),
@@ -226,7 +228,9 @@ describe('ModalCti component', () => {
         document.querySelector('[data-test-subj="ctiDeviceUserCode"]'),
       ).toHaveTextContent('WZH-REST');
     });
-    expect(queryByText('Complete activation in Wazuh CTI')).toBeInTheDocument();
+    expect(
+      queryByText('Complete activation in the Wazuh Console'),
+    ).toBeInTheDocument();
     // Closing cancels the pending activation, so the footer says so.
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(
@@ -301,7 +305,7 @@ describe('ModalCti component', () => {
       fireEvent.click(button);
     });
 
-    await screen.findByText('Complete activation in Wazuh CTI');
+    await screen.findByText('Complete activation in the Wazuh Console');
 
     // A pending activation asks for confirmation before cancelling.
     act(() => {
@@ -336,7 +340,7 @@ describe('ModalCti component', () => {
     act(() => {
       fireEvent.click(registerButton);
     });
-    await screen.findByText('Complete activation in Wazuh CTI');
+    await screen.findByText('Complete activation in the Wazuh Console');
 
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     fireEvent.click(screen.getByRole('button', { name: 'Keep waiting' }));
@@ -380,7 +384,7 @@ describe('ModalCti component', () => {
     ).not.toBeInTheDocument();
   });
 
-  describe('environment already exists in Wazuh CTI', () => {
+  describe('environment already exists in the Wazuh Console', () => {
     const restorePendingFlow = (pendingForSec: number) => {
       mockRefetchStatus.mockImplementation(() => {
         ctiFlowState.setDeviceCode('dc-pending');
@@ -438,7 +442,7 @@ describe('ModalCti component', () => {
         jest.advanceTimersByTime(1000);
       });
       expect(queryHelp()).toHaveTextContent(
-        'Did Wazuh CTI show "Environment already exists"?',
+        'Did the Wazuh Console show "Environment already exists"?',
       );
       expect(queryHelp()).toHaveTextContent('CTI > Deployments');
     });
@@ -501,7 +505,7 @@ describe('ModalCti component', () => {
 
       await waitFor(() => {
         expect(queryHelp()).toHaveTextContent(
-          'In Wazuh CTI, go to CTI > Deployments and delete this deployment.',
+          'In the Wazuh Console, go to CTI > Deployments and delete this deployment.',
         );
       });
       expect(
@@ -636,7 +640,7 @@ describe('ModalCti component', () => {
         ).toBeInTheDocument();
       });
       expect(
-        screen.queryByText(/Your instance already gets the Open feed/),
+        screen.queryByText(/Your instance already receives the Open CTI feed/),
       ).not.toBeInTheDocument();
     });
 

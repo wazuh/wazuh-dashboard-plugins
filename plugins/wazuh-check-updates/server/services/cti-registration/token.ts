@@ -32,7 +32,7 @@ export async function resolveCtiOAuthClientId(): Promise<string> {
 }
 
 /**
- * Starts OAuth 2.0 device authorization against the CTI Console (not the Wazuh manager).
+ * Starts OAuth 2.0 device authorization against the Wazuh Console (not the Wazuh manager).
  * Base URL comes from {@link getCtiConsoleBaseUrl} (`wazuh_check_updates.ctiApiUrl`
  * when set, otherwise the compiled constant).
  */
@@ -64,7 +64,7 @@ export const getCtiToken = async (clientId: string): Promise<any> => {
 };
 
 /**
- * Polls the same CTI Console token endpoint for an access token after the user
+ * Polls the same Wazuh Console token endpoint for an access token after the user
  * completes device authorization (RFC 8628). CTI may respond HTTP 200 with
  * `access_token` or HTTP 400 with an OAuth `error` field (e.g. `authorization_pending`).
  */

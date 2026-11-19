@@ -39,7 +39,7 @@ function coerceNonEmptyString(value: unknown): string {
 }
 
 /**
- * Normalizes the CTI Console device-authorization JSON into fields we persist per environment.
+ * Normalizes the Wazuh Console device-authorization JSON into fields we persist per environment.
  */
 export function parseDeviceAuthorizationForStore(
   responseData: unknown,
