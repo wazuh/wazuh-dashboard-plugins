@@ -13,6 +13,10 @@ export const CTI_CHECK_RETRIES = 3;
 export const CTI_CHECK_RETRY_MS = 2000;
 /** How often the sync state is read again while a feed is syncing (`followSync`). */
 export const CTI_SYNC_POLL_MS = 5000;
+/** Reads at {@link CTI_SYNC_POLL_MS} before the pause starts doubling. */
+export const CTI_SYNC_FAST_POLLS = 12;
+/** Longest pause between reads, for a feed that stays syncing. */
+export const CTI_SYNC_POLL_MAX_MS = 60000;
 /**
  * Longest time an update known to be running (see `followRunningUpdate`) is assumed
  * to last while no feed shows it syncing and the indexer records no new check.
@@ -20,6 +24,19 @@ export const CTI_SYNC_POLL_MS = 5000;
 export const CTI_RUNNING_UPDATE_GRACE_MS = 30000;
 
 const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Pause before the next follow-up read, after `readsSoFar` of them in a row: a sync
+ * usually ends within a minute, so a feed reported syncing for longer is read less
+ * often, down to once per {@link CTI_SYNC_POLL_MAX_MS}.
+ */
+export const getSyncPollDelay = (readsSoFar: number): number =>
+  readsSoFar < CTI_SYNC_FAST_POLLS
+    ? CTI_SYNC_POLL_MS
+    : Math.min(
+        CTI_SYNC_POLL_MS * 2 ** (readsSoFar - CTI_SYNC_FAST_POLLS + 1),
+        CTI_SYNC_POLL_MAX_MS,
+      );
 
 export interface CtiConsumersState {
   consumers: CtiConsumer[];
@@ -57,8 +74,9 @@ export interface CtiConsumersState {
 
 export interface UseCtiConsumersOptions {
   /**
-   * Reads the sync state every {@link CTI_SYNC_POLL_MS} while a feed is syncing, so
-   * the page shows when the update finishes. Reads are skipped while the tab is hidden.
+   * Reads the sync state while a feed is syncing, so the page shows when the update
+   * finishes: every {@link CTI_SYNC_POLL_MS} at first, then less often (see
+   * {@link getSyncPollDelay}). Reads are skipped while the tab is hidden.
    */
   followSync?: boolean;
 }
@@ -82,6 +100,8 @@ export const useCtiConsumers = ({
     checkSeenAtTick?: number;
   } | null>(null);
   const mounted = useRef(true);
+  // Follow-up reads since the update started being followed, to space them out.
+  const followReads = useRef(0);
   // The last check time already read, to tell when a new check lands.
   const lastCheckedAtRef = useRef<string | undefined>();
 
@@ -193,16 +213,18 @@ export const useCtiConsumers = ({
 
   useEffect(() => {
     if (!followSync || !following) {
+      followReads.current = 0;
       return undefined;
     }
     const timeoutId = setTimeout(async () => {
       if (typeof document === 'undefined' || !document.hidden) {
         await read();
       }
+      followReads.current += 1;
       if (mounted.current) {
         setFollowTick(tick => tick + 1);
       }
-    }, CTI_SYNC_POLL_MS);
+    }, getSyncPollDelay(followReads.current));
     return () => clearTimeout(timeoutId);
   }, [followSync, following, followTick, read]);
 

@@ -6,7 +6,10 @@ import {
   CTI_CHECK_RETRIES,
   CTI_CHECK_RETRY_MS,
   CTI_RUNNING_UPDATE_GRACE_MS,
+  CTI_SYNC_FAST_POLLS,
+  CTI_SYNC_POLL_MAX_MS,
   CTI_SYNC_POLL_MS,
+  getSyncPollDelay,
   useCtiConsumers,
 } from './use-cti-consumers';
 
@@ -187,6 +190,29 @@ describe('useCtiConsumers', () => {
       expect(mockFetch).toHaveBeenCalledTimes(reads);
     });
 
+    test('reads a feed that stays syncing less often', async () => {
+      mockFetch.mockResolvedValue({ data: [consumer({ status: 'running' })] });
+
+      const { result } = renderHook(() =>
+        useCtiConsumers({ followSync: true }),
+      );
+      await waitFor(() => expect(result.current.summary).toBe('syncing'));
+
+      /* eslint-disable no-await-in-loop -- each read schedules the next one */
+      for (let read = 0; read < CTI_SYNC_FAST_POLLS; read++) {
+        await advance(CTI_SYNC_POLL_MS);
+        await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(read + 2));
+      }
+      /* eslint-enable no-await-in-loop */
+
+      // Past the fast reads, the next one waits twice as long.
+      const reads = mockFetch.mock.calls.length;
+      await advance(CTI_SYNC_POLL_MS);
+      expect(mockFetch).toHaveBeenCalledTimes(reads);
+      await advance(CTI_SYNC_POLL_MS);
+      await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(reads + 1));
+    });
+
     test('skips the reads while the tab is hidden and resumes after', async () => {
       mockFetch
         .mockResolvedValueOnce({ data: [consumer({ status: 'running' })] })
@@ -209,6 +235,23 @@ describe('useCtiConsumers', () => {
       } finally {
         hidden.mockRestore();
       }
+    });
+  });
+
+  describe('getSyncPollDelay', () => {
+    test('reads at the base pace first', () => {
+      expect(getSyncPollDelay(0)).toBe(CTI_SYNC_POLL_MS);
+      expect(getSyncPollDelay(CTI_SYNC_FAST_POLLS - 1)).toBe(CTI_SYNC_POLL_MS);
+    });
+
+    test('then doubles the pause up to the longest one', () => {
+      expect(getSyncPollDelay(CTI_SYNC_FAST_POLLS)).toBe(2 * CTI_SYNC_POLL_MS);
+      expect(getSyncPollDelay(CTI_SYNC_FAST_POLLS + 1)).toBe(
+        4 * CTI_SYNC_POLL_MS,
+      );
+      expect(getSyncPollDelay(CTI_SYNC_FAST_POLLS + 10)).toBe(
+        CTI_SYNC_POLL_MAX_MS,
+      );
     });
   });
 
