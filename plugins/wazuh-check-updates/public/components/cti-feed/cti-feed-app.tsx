@@ -78,6 +78,7 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
     <EuiPage paddingSize='l' className='ctiFeed' data-test-subj='ctiFeedApp'>
       <EuiPageBody>
         <EuiPageHeader
+          className='ctiFeed__header'
           pageTitle={i18n.translate('wazuhCheckUpdates.ctiFeed.page.title', {
             defaultMessage: 'CTI feed',
           })}

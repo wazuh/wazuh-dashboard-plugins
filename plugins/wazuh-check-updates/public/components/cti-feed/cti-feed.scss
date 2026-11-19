@@ -166,3 +166,11 @@
   line-height: $euiLineHeight;
   color: $euiTextColor;
 }
+
+// Page header description: the full width of the header, not the readable line
+// length OUI keeps it to (`grow={false}`: 36em, at least 75% of the column).
+.ctiFeed__header .euiText.euiText--constrainedWidth,
+.ctiFeed__header .ouiText.ouiText--constrainedWidth {
+  max-width: none;
+  min-width: 0;
+}

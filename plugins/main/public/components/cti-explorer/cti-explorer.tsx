@@ -40,6 +40,7 @@ import { VulnerabilitiesTab } from './components/vulnerabilities-tab';
 import { IocFlyout } from './components/ioc-flyout';
 import { VulnerabilityFlyout } from './components/vulnerability-flyout';
 import { NORMAL_FONT_WEIGHT, PAGE_DESCRIPTION_STYLE } from './utils/styles';
+import './cti-explorer.scss';
 
 const TABS = ['overview', 'iocs', 'vulnerabilities'] as const;
 type CtiExplorerTab = (typeof TABS)[number];
@@ -138,6 +139,7 @@ export const CtiExplorer = () => {
   return (
     <>
       <EuiPageHeader
+        className='ctiExplorer__header'
         pageTitle={i18n.translate('wazuh.ctiExplorer.page.title', {
           defaultMessage: 'CTI Explorer',
         })}
