@@ -228,6 +228,78 @@ describe('CreateEnrollmentTokenFlyout', () => {
     });
   });
 
+  describe('address outside the certificate', () => {
+    const warning = () =>
+      document.querySelector(
+        '[data-test-subj="enrollmentTokenAddressWarning"]',
+      );
+    const createButton = () =>
+      screen.getByText('Create').closest('button') as HTMLElement;
+
+    /* After a migration the setting carries a name the certificate lacks; the
+    warning has to say where the value came from. */
+    it('names the setting when the prefilled address is not in the certificate', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockResolvedValue(['manager.example.com', '10.0.0.5']);
+      renderFlyout();
+
+      await waitFor(() => expect(warning()).not.toBeNull());
+      expect(warning()?.textContent).toContain('enrollment.dns');
+    });
+
+    it('does not warn when the address is one of the certificate names', async () => {
+      mockAppConfig = { 'enrollment.dns': 'Manager.Example.com' };
+      getNames.mockResolvedValue(['manager.example.com']);
+      renderFlyout();
+
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      await screen.findByText('Create');
+      expect(warning()).toBeNull();
+    });
+
+    it('warns without naming the setting for a typed address', async () => {
+      getNames.mockResolvedValue(['manager.example.com']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      typeAddress('other.example.com');
+
+      await waitFor(() => expect(warning()).not.toBeNull());
+      expect(warning()?.textContent).not.toContain('enrollment.dns');
+    });
+
+    it('clears the warning once a certificate name is picked', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockResolvedValue(['10.0.0.5']);
+      renderFlyout();
+      await waitFor(() => expect(warning()).not.toBeNull());
+
+      fireEvent.focus(addressInput());
+      fireEvent.click(await screen.findByText('10.0.0.5'));
+
+      await waitFor(() => expect(warning()).toBeNull());
+    });
+
+    it('does not warn when there are no names to compare with', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockRejectedValue(new Error('unavailable'));
+      renderFlyout();
+
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      await screen.findByText('Create');
+      expect(warning()).toBeNull();
+    });
+
+    it('keeps Create enabled, the manager decides', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockResolvedValue(['10.0.0.5']);
+      renderFlyout();
+      await waitFor(() => expect(warning()).not.toBeNull());
+
+      expect(createButton()).not.toBeDisabled();
+    });
+  });
+
   describe('address suggestions', () => {
     const createButton = () =>
       screen.getByText('Create').closest('button') as HTMLElement;

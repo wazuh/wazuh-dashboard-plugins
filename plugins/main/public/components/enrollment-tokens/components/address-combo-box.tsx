@@ -21,6 +21,9 @@ interface AddressComboBoxProps {
   isInvalid?: boolean;
   placeholder?: string;
   fullWidth?: boolean;
+  /* Called with the names once they are known, `[]` when they cannot be
+  loaded, so the parent can compare the address against them. */
+  onNamesLoaded?: (names: string[]) => void;
   'data-test-subj'?: string;
 }
 
@@ -51,9 +54,17 @@ export const AddressComboBox = ({
   isInvalid,
   placeholder,
   fullWidth = true,
+  onNamesLoaded,
   'data-test-subj': dataTestSubj = 'enrollmentTokenAddress',
 }: AddressComboBoxProps) => {
   const { names, isLoading } = useListenerCertificateNames();
+
+  useEffect(() => {
+    if (!isLoading) {
+      onNamesLoaded?.(names);
+    }
+  }, [isLoading, names, onNamesLoaded]);
+
   const setValue = (address: string) =>
     onChange({ target: { value: address } });
 

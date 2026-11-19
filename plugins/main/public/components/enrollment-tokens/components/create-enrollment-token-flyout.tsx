@@ -85,13 +85,18 @@ const CreateEnrollmentTokenFlyoutContent = ({
   their own. */
   const [embedCa, setEmbedCa] = useState(false);
   const [noCredential, setNoCredential] = useState(false);
+  /* Reported by the address input once loaded; empty while loading or when
+  they cannot be loaded, which leaves nothing to compare the address with. */
+  const [certificateNames, setCertificateNames] = useState<string[]>([]);
 
   const initialFields: FormConfiguration = {
     address: {
       type: 'custom',
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
-      component: props => <AddressComboBox {...props} />,
+      component: props => (
+        <AddressComboBox {...props} onNamesLoaded={setCertificateNames} />
+      ),
     },
     /* Offered from the same settings the deploy wizard reads, so a token
     minted here points the agent at the same endpoint as one minted there. */
@@ -138,6 +143,15 @@ const CreateEnrollmentTokenFlyoutContent = ({
 
   const addressIsMissing =
     String(fields.address?.value ?? '').trim().length === 0;
+  const address = String(fields.address?.value ?? '').trim();
+  const addressIsOutsideCertificate =
+    address.length > 0 &&
+    certificateNames.length > 0 &&
+    !certificateNames.some(
+      name => name.toLowerCase() === address.toLowerCase(),
+    );
+  const addressComesFromSetting =
+    address.length > 0 && address === (configuration['enrollment.dns'] || '');
   const formIsInvalid = addressIsMissing || Object.keys(errors).length > 0;
 
   const onCreate = async () => {
@@ -290,15 +304,55 @@ const CreateEnrollmentTokenFlyoutContent = ({
                 },
               )}
               footer={
-                <EuiText size='xs' color='subdued'>
-                  {i18n.translate(
-                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
-                    {
-                      defaultMessage:
-                        'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
-                    },
+                <>
+                  <EuiText size='xs' color='subdued'>
+                    {i18n.translate(
+                      'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
+                      {
+                        defaultMessage:
+                          'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
+                      },
+                    )}
+                  </EuiText>
+                  {addressIsOutsideCertificate && (
+                    <>
+                      <EuiSpacer size='s' />
+                      <EuiCallOut
+                        size='s'
+                        color='warning'
+                        iconType='alert'
+                        data-test-subj='enrollmentTokenAddressWarning'
+                        title={i18n.translate(
+                          'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateTitle',
+                          {
+                            defaultMessage:
+                              'The address is not in the manager certificate',
+                          },
+                        )}
+                      >
+                        <p>
+                          {addressComesFromSetting ? (
+                            <FormattedMessage
+                              id='wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateFromSetting'
+                              defaultMessage='This value comes from the {setting} setting. The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names, add this name to the certificate, or update the setting.'
+                              values={{
+                                setting: <EuiCode>enrollment.dns</EuiCode>,
+                              }}
+                            />
+                          ) : (
+                            i18n.translate(
+                              'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressNotInCertificateTyped',
+                              {
+                                defaultMessage:
+                                  'The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names or add this name to the certificate.',
+                              },
+                            )
+                          )}
+                        </p>
+                      </EuiCallOut>
+                    </>
                   )}
-                </EuiText>
+                </>
               }
               placeholder='wazuh-manager.example.com'
             />
