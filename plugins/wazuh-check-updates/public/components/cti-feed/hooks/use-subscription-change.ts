@@ -3,7 +3,7 @@ import { ctiFlowState } from '../../../services/cti-flow-state';
 
 /**
  * What a subscription change is made of: registered or not, and the plan. `null` while
- * the subscription is unknown (not read yet, or the CTI console could not answer), which
+ * the subscription is unknown (not read yet, or the Wazuh Console could not answer), which
  * is never a change.
  */
 export function getSubscriptionKey(): string | null {

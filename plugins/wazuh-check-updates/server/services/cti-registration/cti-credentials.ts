@@ -121,7 +121,7 @@ function normalizeEnvironment(
 
 /**
  * Copies the fields the browser renders from the Content Manager subscription message.
- * `environment` is the CTI console `environments/me` body, passed through verbatim by
+ * `environment` is the Wazuh Console `environments/me` body, passed through verbatim by
  * Content Manager: only the name, organization, registration date and subscriptions are
  * kept, each validated. An invalid value is dropped, never passed through, and no other
  * field (`plans`, their `features`, anything new) reaches the browser.
@@ -163,7 +163,7 @@ export function normalizeSubscriptionMessage(
  * `transport.request` throws on any HTTP status >= 400. A `401` (token
  * rejected) never reaches here: the Content Manager already answers that
  * case with a `200` and a public plan. What does reach here is a `502`
- * (CTI Console unreachable; registration unchanged) or a lower-level
+ * (Wazuh Console unreachable; registration unchanged) or a lower-level
  * network/timeout failure, so the thrown status is preserved instead of
  * being discarded, letting callers tell "unknown" apart from "not
  * registered".

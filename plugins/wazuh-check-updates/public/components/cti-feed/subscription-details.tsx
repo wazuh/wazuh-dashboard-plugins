@@ -58,7 +58,7 @@ function renderDate(
   );
 }
 
-/** The paid subscription behind the current plan, if the CTI console reported one. */
+/** The paid subscription behind the current plan, if the Wazuh Console reported one. */
 export function getCurrentPlanSubscription(
   message: CtiSubscriptionMessage | null | undefined,
 ): CtiPlanSubscription | undefined {
@@ -163,7 +163,7 @@ export interface SubscriptionDetailsProps {
 }
 
 /**
- * How the CTI console knows this environment: its name, organization, ID, and the
+ * How the Wazuh Console knows this environment: its name, organization, ID, and the
  * dates of the subscription that pays for the plan (the registration date is in the
  * card header). A value the console did not report hides its row.
  */

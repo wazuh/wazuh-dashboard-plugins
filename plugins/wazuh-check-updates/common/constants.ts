@@ -22,7 +22,7 @@ export enum routes {
   ctiFeedIndicators = `${ctiFeedBasePath}/indicators`,
 }
 
-/** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
+/** OAuth 2.0 device authorization grant type (RFC 8628) for Wazuh Console token polling. */
 export const CTI_OAUTH_DEVICE_GRANT_TYPE =
   'urn:ietf:params:oauth:grant-type:device_code';
 
@@ -45,7 +45,7 @@ export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
 
 /**
  * Seconds a device code stays pending before the registration modal explains the
- * "Environment already exists" rejection. The CTI console never reports that rejection to
+ * "Environment already exists" rejection. The Wazuh Console never reports that rejection to
  * the token endpoint, so the help is shown once a normal activation should be done.
  */
 export const CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC = 60;
@@ -66,12 +66,12 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
 );
 
 /**
- * Wazuh Cyber Threat Intelligence console, opened in the browser. It belongs to the same CTI
+ * Wazuh Console, opened in the browser. It belongs to the same CTI
  * environment as {@link WAZUH_CTI_CONSOLE_BASE_URL}: change both together.
  */
 export const WAZUH_CTI_CONSOLE_HREF = 'https://console.pre.cloud.wazuh.com';
 
-/** Pages of the CTI console, appended to {@link WAZUH_CTI_CONSOLE_HREF}. */
+/** Pages of the Wazuh Console, appended to {@link WAZUH_CTI_CONSOLE_HREF}. */
 export const ctiConsolePaths = {
   /** The deployments registered to the organization, with their subscriptions. */
   deployments: '/cti/deployments',

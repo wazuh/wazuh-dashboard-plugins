@@ -203,12 +203,12 @@ describe('fetchCtiRegistrationStatus', () => {
     /* eslint-enable camelcase */
     mockHttpPost.mockRejectedValue(
       Object.assign(new Error('Bad Gateway'), {
-        body: { message: 'The CTI console is unreachable' },
+        body: { message: 'The Wazuh Console is unreachable' },
       }),
     );
 
     await expect(fetchCtiRegistrationStatus()).rejects.toMatchObject({
-      message: 'The CTI console is unreachable',
+      message: 'The Wazuh Console is unreachable',
     });
   });
 });

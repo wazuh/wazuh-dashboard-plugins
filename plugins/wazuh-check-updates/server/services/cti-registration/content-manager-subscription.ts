@@ -50,7 +50,7 @@ export async function postContentManagerSubscription(
 /**
  * Removes the CTI access token stored by the indexer Content Manager plugin
  * (`DELETE /_plugins/_content_manager/subscription`), so the indexer falls back to
- * the public plan. The CTI console is not notified: the environment stays registered
+ * the public plan. The Wazuh Console is not notified: the environment stays registered
  * there.
  *
  * Rejects with the transport error (its `meta.statusCode` is kept) or when the body

@@ -28,7 +28,7 @@ export interface CtiPlanSubscription {
 }
 
 /**
- * The registered environment as the CTI console describes it (`environments/me`), which
+ * The registered environment as the Wazuh Console describes it (`environments/me`), which
  * Content Manager passes through verbatim as `message.environment`. The status route keeps
  * only the fields below, validated. Every field is optional: older indexers do not send
  * the environment at all.
@@ -36,7 +36,7 @@ export interface CtiPlanSubscription {
 export interface CtiSubscriptionEnvironment {
   name?: string;
   organization?: { name?: string };
-  /** ISO 8601 date the environment was registered in the CTI console. */
+  /** ISO 8601 date the environment was registered in the Wazuh Console. */
   registered_at?: string;
   subscriptions?: CtiPlanSubscription[];
 }
@@ -66,7 +66,7 @@ export interface CtiRegistrationStatusApiBody {
   /** Seconds since the device code was issued. */
   pending_for_sec?: number;
   /**
-   * Environment UID sent as `client_id`. The CTI console shows it as the deployment ID, which
+   * Environment UID sent as `client_id`. The Wazuh Console shows it as the deployment ID, which
    * identifies the deployment to delete after an "Environment already exists" rejection.
    * Returned in every state.
    */

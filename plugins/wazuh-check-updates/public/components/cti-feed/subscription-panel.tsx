@@ -231,7 +231,7 @@ export const SubscriptionPanel: React.FC<SubscriptionPanelProps> = ({
         ? 'open'
         : 'professional'
       : null;
-  // When the CTI console registered this environment, shown under the plan.
+  // When the Wazuh Console registered this environment, shown under the plan.
   const registeredAt = subscriptionMessage?.environment?.registered_at;
   const registeredDate = formatCtiDate(registeredAt);
   // Only a registration the indexer holds can be cleared.

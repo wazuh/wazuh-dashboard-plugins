@@ -335,7 +335,7 @@ describe('CtiFeedApp', () => {
     await settle();
     expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
 
-    // A status read finds the plan changed (in the CTI console, for example).
+    // A status read finds the plan changed (in the Wazuh Console, for example).
     act(() => {
       ctiFlowState.setSubscription({
         status: 200,

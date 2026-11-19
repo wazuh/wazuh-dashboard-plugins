@@ -13,7 +13,7 @@ const DEFAULT_STATUS_POLL_SEC = 30;
 /**
  * With `refreshOnFocus`, returning to the page reads the status again unless the last
  * read is younger than this, so quick back-and-forth switching does not flood the
- * indexer and the CTI console.
+ * indexer and the Wazuh Console.
  */
 export const CTI_FOCUS_REFRESH_MIN_MS = 5000;
 
@@ -21,7 +21,7 @@ export interface UseCtiStatusOptions {
   /**
    * Read the status every time the page comes back (tab visible again, or window
    * focused), not only once the polling interval has passed. For the page that shows
-   * the subscription, where a change made in the CTI console should show at once.
+   * the subscription, where a change made in the Wazuh Console should show at once.
    */
   refreshOnFocus?: boolean;
 }

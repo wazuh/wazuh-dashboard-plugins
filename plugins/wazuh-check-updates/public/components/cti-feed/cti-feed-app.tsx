@@ -27,7 +27,7 @@ export interface CtiFeedAppProps {
 export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
   openRegistration = false,
 }) => {
-  // A plan or registration change made in the CTI console shows as soon as the user
+  // A plan or registration change made in the Wazuh Console shows as soon as the user
   // comes back to this page.
   const registration = useCtiRegistrationModal(openRegistration, {
     refreshOnFocus: true,
@@ -57,7 +57,7 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
 
   // A registration or plan change starts a content update on the server: read the feed
   // sync state again, waiting for the indexer to record the check. Covers a change made
-  // elsewhere (the CTI console, another tab) as well as clearing the local registration.
+  // elsewhere (the Wazuh Console, another tab) as well as clearing the local registration.
   // The update is treated as running from that moment, even before a feed shows it.
   const refetchSync = sync.refetchAfterCheck;
   const followRunningUpdate = sync.followRunningUpdate;
