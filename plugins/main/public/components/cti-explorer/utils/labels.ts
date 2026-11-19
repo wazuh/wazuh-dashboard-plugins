@@ -1,9 +1,7 @@
 /* eslint-disable camelcase -- the keys are catalog values: document.type and document.software.type */
 import { i18n } from '@osd/i18n';
 import moment from 'moment-timezone';
-// Through the public entry: a bundle can only import another plugin's public directory.
-import { formatNumberWithSettings } from '../../../../../wazuh-check-updates/public';
-import { getCore } from '../../../kibana-services';
+import { getWazuhCheckUpdatesPlugin } from '../../../kibana-services';
 
 /** `document.type` → label. An unknown type shows as stored. */
 const IOC_TYPE_LABELS: Record<string, string> = {
@@ -93,10 +91,11 @@ export const getConfidenceBandLabel = (band: string): string =>
 
 /**
  * A number as the advanced settings format numbers (pattern and locale), like the CTI
- * feed page; whole numbers show no decimals.
+ * feed page; whole numbers show no decimals. Shared through the start contract of the
+ * plugin that owns the CTI feed page.
  */
 export const formatNumber = (value: number): string =>
-  formatNumberWithSettings(value, key => getCore().uiSettings.get(key));
+  getWazuhCheckUpdatesPlugin().formatNumber(value);
 
 /**
  * A date of the catalog, stored in UTC: a value without an offset is read as

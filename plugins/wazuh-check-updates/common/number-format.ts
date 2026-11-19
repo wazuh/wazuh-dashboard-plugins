@@ -1,7 +1,11 @@
-import { NumberFormat } from '../../../src/plugins/data/common';
-
-/** Reads an advanced setting, as `uiSettings.get` does. */
-export type GetUiSetting = (key: string) => unknown;
+/**
+ * The part of a field format this module uses (`FieldFormat.convert`). The number
+ * format of the `data` plugin reads its pattern and locale from the advanced
+ * settings on every conversion.
+ */
+export interface NumberConverter {
+  convert: (value: unknown) => unknown;
+}
 
 const browserNumberFormat = new Intl.NumberFormat();
 
@@ -13,7 +17,7 @@ const escapeRegExp = (text: string) =>
  * zeros ("602.00" → "602", "952 987,00" → "952 987", "953.0k" → "953k"). The decimal
  * separator of the configured locale is read from how the same format writes 1.5.
  */
-function dropZeroDecimals(formatted: string, format: NumberFormat): string {
+function dropZeroDecimals(formatted: string, format: NumberConverter): string {
   const probe = format.convert(1.5);
   const separator =
     typeof probe === 'string' ? /1(\D+)5/.exec(probe)?.[1] : null;
@@ -30,14 +34,14 @@ function dropZeroDecimals(formatted: string, format: NumberFormat): string {
  * A number as the advanced settings format numbers (`format:number:defaultPattern`
  * and `format:number:defaultLocale`), like the rest of the dashboard. A whole number
  * shows no decimals even when the pattern adds them: counts have none. Falls back to
- * the browser locale when the settings cannot be read.
+ * the browser locale when the number format cannot be read.
  */
 export function formatNumberWithSettings(
   value: number,
-  getUiSetting: GetUiSetting,
+  getNumberFormat: () => NumberConverter,
 ): string {
   try {
-    const format = new NumberFormat({}, getUiSetting);
+    const format = getNumberFormat();
     const formatted = format.convert(value);
     if (typeof formatted === 'string' && formatted !== '') {
       return Number.isInteger(value)

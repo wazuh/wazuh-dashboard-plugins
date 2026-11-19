@@ -1,13 +1,18 @@
-import { formatNumberWithSettings, GetUiSetting } from './number-format';
+// The number format the `data` plugin hands out through its start contract.
+import { NumberFormat } from '../../../src/plugins/data/common';
+import { formatNumberWithSettings } from './number-format';
 
-let getUiSetting: GetUiSetting = () => undefined;
+let getUiSetting: (key: string) => unknown = () => undefined;
 
 const withSettings = (settings: Record<string, unknown>) => {
   getUiSetting = (key: string) => settings[key];
 };
 
 const format = (value: number) =>
-  formatNumberWithSettings(value, key => getUiSetting(key));
+  formatNumberWithSettings(
+    value,
+    () => new NumberFormat({}, key => getUiSetting(key)),
+  );
 
 describe('formatNumberWithSettings', () => {
   test('follows the number pattern of the advanced settings', () => {
@@ -67,5 +72,13 @@ describe('formatNumberWithSettings', () => {
     };
 
     expect(format(952987)).toBe(new Intl.NumberFormat().format(952987));
+  });
+
+  test('falls back to the browser locale without a number format', () => {
+    expect(
+      formatNumberWithSettings(952987, () => {
+        throw new Error('FieldFormats was not set');
+      }),
+    ).toBe(new Intl.NumberFormat().format(952987));
   });
 });

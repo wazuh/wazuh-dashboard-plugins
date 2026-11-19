@@ -1,4 +1,10 @@
-import { formatDate, formatUtcTimestamp } from './labels';
+import { formatDate, formatNumber, formatUtcTimestamp } from './labels';
+
+const mockFormatNumber = jest.fn((value: number) => `formatted ${value}`);
+
+jest.mock('../../../kibana-services', () => ({
+  getWazuhCheckUpdatesPlugin: () => ({ formatNumber: mockFormatNumber }),
+}));
 
 /** The day as the browser's locale writes it, in UTC. */
 const localeDay = (utc: number) =>
@@ -49,5 +55,12 @@ describe('formatUtcTimestamp', () => {
   it('has no timestamp for a missing or invalid date', () => {
     expect(formatUtcTimestamp(null)).toBeNull();
     expect(formatUtcTimestamp('not a date')).toBeNull();
+  });
+});
+
+describe('formatNumber', () => {
+  it('formats with the start contract of the CTI feed plugin', () => {
+    expect(formatNumber(952987)).toBe('formatted 952987');
+    expect(mockFormatNumber).toHaveBeenCalledWith(952987);
   });
 });
