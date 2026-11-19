@@ -9,17 +9,8 @@ import {
 } from '../../services/cti-registration';
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
+import { safeLog } from '../../services/cti-registration/safe-log';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
-import { getWazuhCheckUpdatesServices } from '../../plugin-services';
-
-/** The plugin services are unavailable in some contexts; never fail on the logger. */
-function logError(message: string): void {
-  try {
-    getWazuhCheckUpdatesServices().logger.error(message);
-  } catch {
-    // Logger itself unavailable; nothing more we can safely do here.
-  }
-}
 
 /**
  * Records the subscription seen now, so the read after the removal is a registration
@@ -38,7 +29,7 @@ async function observeSubscription(
 }
 
 /**
- * Clears the registration stored in the indexer (its CTI access token). The CTI console
+ * Clears the registration stored in the indexer (its CTI access token). The Wazuh Console
  * is not notified, so the environment stays registered there.
  *
  * Fails closed: 403 when the indexer denies the privilege to remove the subscription,
@@ -90,6 +81,7 @@ export const getCtiClearRegistrationRoute = (router: IRouter) => {
         });
       }
 
+      // Awaited: the snapshot must be stored before the removal changes the subscription.
       await observeSubscription(wazuhClient, environmentUuid);
 
       try {
@@ -97,7 +89,10 @@ export const getCtiClearRegistrationRoute = (router: IRouter) => {
       } catch (error) {
         const message =
           error instanceof Error ? error.message : 'unknown error';
-        logError(`The local CTI registration could not be cleared: ${message}`);
+        safeLog(
+          'error',
+          `The local CTI registration could not be cleared: ${message}`,
+        );
         const statusCode = (error as { meta?: { statusCode?: unknown } })?.meta
           ?.statusCode;
         return response.customError({
@@ -113,7 +108,15 @@ export const getCtiClearRegistrationRoute = (router: IRouter) => {
 
       // The finished device flow no longer applies; a new registration starts over.
       CtiRegistrationStore.getInstance().clear(environmentUuid);
-      await observeSubscription(wazuhClient, environmentUuid);
+      // Not awaited: the answer does not wait for the content update to start.
+      observeSubscription(wazuhClient, environmentUuid).catch(error => {
+        safeLog(
+          'error',
+          `Unexpected error triggering CTI content update for ${environmentUuid}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      });
 
       return response.ok<CtiClearRegistrationApiBody>({
         body: { cleared: true },

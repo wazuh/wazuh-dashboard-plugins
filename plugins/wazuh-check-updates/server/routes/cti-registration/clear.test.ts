@@ -18,6 +18,7 @@ import {
 } from '../../services/cti-registration/cti-registration-store';
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
+import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 
 jest.mock('../../services/cti-registration', () => ({
   deleteContentManagerSubscription: jest.fn(),
@@ -136,6 +137,8 @@ describe(`DELETE ${routes.ctiRegistration}`, () => {
     await supertest(innerServer.listener)
       .delete(routes.ctiRegistration)
       .expect(200);
+    // The read after the removal is not awaited by the route.
+    await new Promise(resolve => setImmediate(resolve));
 
     expect(mockedTrigger).toHaveBeenNthCalledWith(
       1,
@@ -154,6 +157,33 @@ describe(`DELETE ${routes.ctiRegistration}`, () => {
     );
     expect(mockedDelete.mock.invocationCallOrder[0]).toBeLessThan(
       mockedTrigger.mock.invocationCallOrder[1],
+    );
+  });
+
+  test('answers without waiting for the content update', async () => {
+    mockedTrigger
+      .mockResolvedValueOnce({ triggered: false, failed: false })
+      .mockReturnValueOnce(new Promise(() => {}));
+
+    const response = await supertest(innerServer.listener)
+      .delete(routes.ctiRegistration)
+      .expect(200);
+
+    expect(response.body).toEqual({ cleared: true });
+  });
+
+  test('logs a failed content update after answering', async () => {
+    mockedTrigger
+      .mockResolvedValueOnce({ triggered: false, failed: false })
+      .mockRejectedValueOnce(new Error('boom'));
+
+    await supertest(innerServer.listener)
+      .delete(routes.ctiRegistration)
+      .expect(200);
+    await new Promise(resolve => setImmediate(resolve));
+
+    expect(getWazuhCheckUpdatesServices().logger.error).toHaveBeenCalledWith(
+      'Unexpected error triggering CTI content update for env-uuid-1: boom',
     );
   });
 

@@ -7,7 +7,7 @@ import type {
   CtiRegistrationPermissionAction,
   CtiRegistrationPermissionApiBody,
 } from '../../../common/cti-registration-permission-api';
-import { getWazuhCheckUpdatesServices } from '../../plugin-services';
+import { safeLog } from './safe-log';
 
 /**
  * Answer used whenever the registration probe cannot be evaluated (older indexer without
@@ -36,15 +36,6 @@ const PROBE_METHOD: Record<CtiRegistrationPermissionAction, 'POST' | 'DELETE'> =
     register: 'POST',
     clear: 'DELETE',
   };
-
-/** The plugin services are unavailable in some contexts; never fail on the logger. */
-function logWarning(message: string): void {
-  try {
-    getWazuhCheckUpdatesServices().logger.warn(message);
-  } catch {
-    // Logger itself unavailable; nothing more we can safely do here.
-  }
-}
 
 function normalizeMissingPrivileges(value: unknown): string[] {
   if (!Array.isArray(value)) {
@@ -78,7 +69,8 @@ export async function evaluateCtiRegistrationPermission(
     } | null;
 
     if (typeof body?.accessAllowed !== 'boolean') {
-      logWarning(
+      safeLog(
+        'warn',
         `CTI registration permission check (${action}) answered without an accessAllowed flag.`,
       );
       return null;
@@ -96,7 +88,8 @@ export async function evaluateCtiRegistrationPermission(
         ? error
         : 'unknown error';
 
-    logWarning(
+    safeLog(
+      'warn',
       `CTI registration permission check (${action}) could not be evaluated (${message}).`,
     );
     return null;

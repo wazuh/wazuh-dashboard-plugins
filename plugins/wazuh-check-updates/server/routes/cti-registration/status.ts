@@ -7,8 +7,8 @@ import {
 } from '../../services/cti-registration';
 import { CtiConfigurationError } from '../../services/cti-registration/cti-console-url';
 import { CtiRegistrationStore } from '../../services/cti-registration/cti-registration-store';
+import { safeLog } from '../../services/cti-registration/safe-log';
 import { triggerContentUpdateOnChange } from '../../services/cti-registration/trigger-content-update-on-change';
-import { getWazuhCheckUpdatesServices } from '../../plugin-services';
 import {
   ctiRegistrationAccessError,
   getCtiRegistrationAccess,
@@ -30,15 +30,12 @@ async function withSubscriptionFields(
     environmentUuid,
     subscription,
   ).catch(error => {
-    try {
-      getWazuhCheckUpdatesServices().logger.error(
-        `Unexpected error triggering CTI content update for ${environmentUuid}: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-    } catch {
-      // Logger itself unavailable; nothing more we can safely do here.
-    }
+    safeLog(
+      'error',
+      `Unexpected error triggering CTI content update for ${environmentUuid}: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
   });
 
   return {
