@@ -48,7 +48,7 @@ function buildDeviceAuthLinksFromStatusBody(
 }
 
 /**
- * Clears the registration stored in the indexer. The CTI console still lists the
+ * Clears the registration stored in the indexer. The Wazuh Console still lists the
  * environment as registered.
  */
 export async function clearCtiRegistration(): Promise<void> {
@@ -76,11 +76,12 @@ export function cancelCtiRegistrationOnUnload(): void {
 }
 
 function applyStatusBody(body: CtiRegistrationStatusApiBody): void {
+  // First, so subscribers notified by the changes below already read this subscription.
   ctiFlowState.setSubscription(body.subscription ?? null);
 
   if (body.registrationComplete) {
     // The server already decided this registration is still valid (it only
-    // clears a completed registration when the CTI Console confirms it's
+    // clears a completed registration when the Wazuh Console confirms it's
     // unregistered, not on an unknown/502 subscription read), so trust it
     // without re-requiring `is_registered` here too.
     ctiFlowState.setRegistrationComplete(true);
@@ -115,6 +116,8 @@ function applyStatusBody(body: CtiRegistrationStatusApiBody): void {
 
   if (ctiFlowState.getDeviceCode() || ctiFlowState.isRegistrationComplete()) {
     ctiFlowState.reset();
+    // The page compares each subscription read with the previous one: keep this one.
+    ctiFlowState.setSubscription(body.subscription ?? null);
   }
 }
 
@@ -124,9 +127,8 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
   );
 
   applyStatusBody(body);
-  // After `applyStatusBody`, whose reset would drop them: the card shows the environment
-  // ID in every state, and the page compares each subscription read with the previous one.
-  ctiFlowState.setSubscription(body.subscription ?? null);
+  // After `applyStatusBody`, whose reset would drop it: the card shows the environment
+  // ID in every state.
   ctiFlowState.setEnvironmentUid(body.environment_uid);
 }
 
@@ -240,7 +242,7 @@ let statusRequestInFlight: Promise<CtiRegistrationStatusResult> | null = null;
 /**
  * Reads the registration status, polling the device code while an activation
  * is pending. Concurrent callers (the polling timer and the tab-visibility
- * refresh) share one request: the CTI console redeems a device code once, and
+ * refresh) share one request: the Wazuh Console redeems a device code once, and
  * a duplicate poll would get `not_found` and report a false failure.
  */
 export function fetchCtiRegistrationStatus(): Promise<CtiRegistrationStatusResult> {
