@@ -9,8 +9,8 @@ Wazuh indexer for the latest published version and presents the result in two pl
 - The **Updates status** of each API connection in **Dashboard management > Server API**: a field
   of the connection details, or a column of the connections table in Cross-Cluster Search mode.
 
-The check is disabled by default (`wazuh.updates.disabled: true`): neither place is rendered until
-you set `wazuh.updates.disabled` to `false` in
+The check is disabled by default (`wazuh.updates.enabled: false`): neither place is rendered until
+you set `wazuh.updates.enabled` to `true` in
 **Dashboard management > Dashboards Management > Advanced settings** (see
 [Tenant configuration](../configuration.md#tenant-configuration)).
 

@@ -630,20 +630,21 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     },
   },
-  'wazuh.updates.disabled': {
-    title: i18n.translate('wazuhCore.settings.wazuhUpdatesDisabled.title', {
-      defaultMessage: 'Check updates',
+  'wazuh.updates.enabled': {
+    title: i18n.translate('wazuhCore.settings.wazuhUpdatesEnabled.title', {
+      defaultMessage: 'Check for updates',
     }),
     description: i18n.translate(
-      'wazuhCore.settings.wazuhUpdatesDisabled.description',
+      'wazuhCore.settings.wazuhUpdatesEnabled.description',
       {
-        defaultMessage: 'Define if the check updates service is disabled.',
+        defaultMessage:
+          'When on, the available updates are checked and the update notifications are shown. When off, no check is done.',
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
-    defaultValue: true,
+    defaultValue: false,
     validate: SettingsValidator.isBoolean,
   },
   healthCheckCertificateExpiryWarningDays: {
@@ -837,5 +838,5 @@ export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PORT = 'enrollment.port';
 export const ENROLLMENT_PATH = 'enrollment.path';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
+export const WAZUH_UPDATES_ENABLED = 'wazuh.updates.enabled';
 export const REQUEST_TIMEOUT = 'timeout';
