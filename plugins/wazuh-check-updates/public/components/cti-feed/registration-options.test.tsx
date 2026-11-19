@@ -52,16 +52,16 @@ describe('RegistrationOptions', () => {
     expect(mockedClear).not.toHaveBeenCalled();
   });
 
-  test('warns that the CTI console registration stays and links to the console', () => {
+  test('warns that the Wazuh Console registration stays and links to the console', () => {
     render(<RegistrationOptions onCleared={jest.fn()} />);
 
     openModal();
 
     const warning = screen.getByTestId('ctiFeedClearRegistrationWarning');
     expect(warning).toHaveTextContent(
-      'This does not unregister the environment from the CTI console',
+      'This does not unregister the environment from the Wazuh Console',
     );
-    expect(warning).toHaveTextContent('must be made in the CTI console');
+    expect(warning).toHaveTextContent('must be made in the Wazuh Console');
     const link = screen.getByTestId('ctiFeedClearRegistrationConsoleLink');
     expect(link).toHaveAttribute('href', WAZUH_CTI_CONSOLE_HREF);
     expect(link).toHaveAttribute('target', '_blank');
@@ -77,6 +77,34 @@ describe('RegistrationOptions', () => {
     expect(screen.queryByTestId('ctiFeedClearRegistrationModal')).toBeNull();
     expect(mockedClear).not.toHaveBeenCalled();
     expect(onCleared).not.toHaveBeenCalled();
+  });
+
+  test('cannot be closed while the registration is being cleared', async () => {
+    let finish: () => void = () => {};
+    mockedClear.mockReturnValue(
+      new Promise<void>(resolve => {
+        finish = resolve;
+      }),
+    );
+    const onCleared = jest.fn();
+    render(<RegistrationOptions onCleared={onCleared} />);
+
+    openModal();
+    confirm();
+
+    const cancel = screen.getByTestId('confirmModalCancelButton');
+    expect(cancel).toBeDisabled();
+    fireEvent.click(cancel);
+    fireEvent.keyDown(screen.getByTestId('ctiFeedClearRegistrationModal'), {
+      key: 'Escape',
+    });
+    expect(
+      screen.getByTestId('ctiFeedClearRegistrationModal'),
+    ).toBeInTheDocument();
+
+    finish();
+    await waitFor(() => expect(onCleared).toHaveBeenCalledTimes(1));
+    expect(screen.queryByTestId('ctiFeedClearRegistrationModal')).toBeNull();
   });
 
   test('clears the local registration once confirmed', async () => {
