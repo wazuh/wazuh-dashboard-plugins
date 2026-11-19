@@ -23,6 +23,13 @@ import { Agent, ResponseUpgradeAgents } from '../../../types';
 import { UpgradeAgentsModalResult } from './result';
 import { ErrorAgent } from '../../../services/paginated-agents-request';
 import { upgradeStatusState } from '../../../services/upgrade-status-state';
+import {
+  UPGRADE_ERROR_TOAST_LIFETIME_MS,
+  UpgradeDialogInfo,
+  addRepositoryUrl,
+  isLegacyAgentVersion,
+  useUpgradeTargetVersion,
+} from '../../upgrade-dialog-info';
 
 export type Result = {
   successAgents?: ResponseUpgradeAgents[];
@@ -67,9 +74,10 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
         );
       }
 
-      return message;
+      return addRepositoryUrl(message, error);
     };
 
+    const targetVersion = useUpgradeTargetVersion();
     const [finalAgents, setFinalAgents] = useState<Agent[]>([]);
     const [getAgentsStatus, setGetAgentsStatus] = useState('disabled');
     const [getAgentsError, setGetAgentsError] = useState();
@@ -168,6 +176,7 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
+          toastLifeTimeMs: UPGRADE_ERROR_TOAST_LIFETIME_MS,
           error: {
             error,
             message: errorMessage,
@@ -209,6 +218,15 @@ export const UpgradeAgentsModal = compose(withErrorBoundary)(
             <EuiText>{selectedAgents.length}</EuiText>
           </EuiFormRow>
         )}
+        <EuiFormRow>
+          <UpgradeDialogInfo
+            targetVersion={targetVersion}
+            showLegacyAgentsNote={
+              allAgentsSelected ||
+              selectedAgents.some(agent => isLegacyAgentVersion(agent.version))
+            }
+          />
+        </EuiFormRow>
       </EuiForm>
     );
 
