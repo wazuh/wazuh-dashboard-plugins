@@ -55,6 +55,7 @@ import {
 import { TechniqueHeader } from './technique-header';
 import { TechniqueStats } from './technique-stats';
 import { TechniqueDetails } from './technique-details';
+import './flyout-technique.scss';
 
 type tFlyoutTechniqueProps = {
   currentTechnique: string;
@@ -188,7 +189,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
       onClose={() => onChangeFlyout(false)}
       flyoutProps={{
         size: 'l',
-        className: 'flyout-no-overlap wz-inventory wzApp',
+        className: 'flyout-no-overlap wz-inventory wzApp wz-technique-flyout',
         'aria-labelledby': 'flyoutSmallTitle',
       }}
     >
@@ -218,8 +219,7 @@ export const FlyoutTechnique = (props: tFlyoutTechniqueProps) => {
             }
             paddingSize='none'
           >
-            {/* Same inset as the Recent findings content */}
-            <div style={{ padding: '16px 24px 0' }}>
+            <div style={{ paddingTop: 16 }}>
               <TechniqueDetails
                 techniqueId={currentTechnique}
                 technique={technique.data ?? undefined}
