@@ -13,3 +13,4 @@ export * from './distribution-bar';
 export * from './severity-distribution-bar';
 export * from './score-gauge';
 export * from './dual-bar-list';
+export * from './action-list';

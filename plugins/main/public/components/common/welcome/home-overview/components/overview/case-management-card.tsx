@@ -1,8 +1,24 @@
 import React from 'react';
+import moment from 'moment';
 import { i18n } from '@osd/i18n';
-import { EuiSpacer } from '@elastic/eui';
-import { CASE_STATUS_OPTIONS } from '../../../../document-details/case-management/case-options';
 import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiLink,
+  EuiSpacer,
+  EuiText,
+  EuiToolTip,
+} from '@elastic/eui';
+import { getCore } from '../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { formatUIDate } from '../../../../../../react-services/time-service';
+import {
+  CASE_PRIORITY_OPTIONS,
+  CASE_STATUS_OPTIONS,
+} from '../../../../document-details/case-management/case-options';
+import {
+  ActionList,
+  ActionListItem,
   EmptyState,
   SeverityDistributionBar,
   StatTileGroup,
@@ -21,15 +37,64 @@ import {
   CASE_STATUSES,
   OPEN_CASE_STATUSES,
 } from '../../lib/fields';
+import { ATTENTION_CASES_QUERY } from '../../lib/queries';
+import { ACTION_LIST_ROWS, NON_TITLE_LINK_STYLE } from '../../lib/constants';
+import { formatHomeNumber } from '../../lib/format-number';
+import { SEVERITY_PRESENTATION } from '../../lib/severity-presentation';
+import {
+  HOME_OVERVIEW_COLOR,
+  HOME_OVERVIEW_TEXT_COLOR,
+} from '../../lib/theme-colors';
+import { CaseSummary } from '../../interfaces/types';
 import { DataGroupResult } from '../../interfaces/data-group';
 
 type CaseStatusKey = (typeof CASE_STATUSES)[number];
+
+/** Priority, then when the case last changed. */
+const caseDetails = (item: CaseSummary) => {
+  const priority = CASE_PRIORITY_OPTIONS.find(
+    option => option.value === item.priority,
+  )?.text;
+  return (
+    <EuiFlexGroup gutterSize='m' alignItems='center' responsive={false}>
+      <EuiFlexItem grow={false}>
+        <EuiText
+          size='xs'
+          color={item.priority === 'urgent' ? undefined : 'subdued'}
+          style={
+            item.priority === 'urgent'
+              ? { color: HOME_OVERVIEW_TEXT_COLOR.danger }
+              : undefined
+          }
+        >
+          {priority ??
+            i18n.translate('wazuh.common.homeOverviewCases.noPriority', {
+              defaultMessage: 'No priority',
+            })}
+        </EuiText>
+      </EuiFlexItem>
+      <EuiFlexItem grow={false} style={{ minWidth: 76, textAlign: 'right' }}>
+        {item.updatedAt ? (
+          <EuiToolTip content={formatUIDate(item.updatedAt)}>
+            <EuiText size='xs' color='subdued'>
+              {moment(item.updatedAt).fromNow()}
+            </EuiText>
+          </EuiToolTip>
+        ) : (
+          <EuiText size='xs' color='subdued'>
+            -
+          </EuiText>
+        )}
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  );
+};
 
 export interface CaseManagementCardProps {
   cases: ReturnType<typeof useCaseManagementOverview>;
 }
 
-/** Cases (current state): counts per status and open cases by severity. */
+/** Cases (current state): counts per status, open cases by severity, and the ones to act on. */
 export const CaseManagementCard: React.FC<CaseManagementCardProps> = ({
   cases,
 }) => {
@@ -48,6 +113,27 @@ export const CaseManagementCard: React.FC<CaseManagementCardProps> = ({
       onSelect: () => casesUrl([{ field: CASE_STATUS_FIELD, value: status }]),
     }),
   );
+  const attentionItem = (item: CaseSummary): ActionListItem => {
+    const severity = SEVERITY_PRESENTATION.find(p => p.band === item.severity);
+    return {
+      key: item.id,
+      label:
+        item.title ??
+        i18n.translate('wazuh.common.homeOverviewCases.untitled', {
+          defaultMessage: 'Untitled case',
+        }),
+      href: casesUrl([{ field: '_id', value: item.id }]),
+      dot: {
+        color: severity?.color ?? HOME_OVERVIEW_COLOR.disabled,
+        label:
+          severity?.label ??
+          i18n.translate('wazuh.common.homeOverviewCases.noSeverity', {
+            defaultMessage: 'No severity',
+          }),
+      },
+      end: caseDetails(item),
+    };
+  };
   // A bar of zeros reads as data; with no open case, show the empty message.
   const hasOpenCases =
     data &&
@@ -92,10 +178,16 @@ export const CaseManagementCard: React.FC<CaseManagementCardProps> = ({
             <EuiSpacer size='m' />
             <SeverityDistributionBar
               counts={hasOpenCases ? data.openBySeverity : {}}
-              headline={i18n.translate(
-                'wazuh.common.homeOverviewSection.openCasesBySeverity',
-                { defaultMessage: 'Open cases by severity' },
-              )}
+              headline={
+                <EuiText size='xs'>
+                  <strong>
+                    {i18n.translate(
+                      'wazuh.common.homeOverviewSection.openCasesBySeverity',
+                      { defaultMessage: 'Open cases by severity' },
+                    )}
+                  </strong>
+                </EuiText>
+              }
               onSelect={band =>
                 casesUrl([
                   { field: CASE_STATUS_FIELD, value: OPEN_CASE_STATUSES },
@@ -107,6 +199,60 @@ export const CaseManagementCard: React.FC<CaseManagementCardProps> = ({
                 { defaultMessage: 'No open cases' },
               )}
               testSubjPrefix='open-cases-severity'
+            />
+            <EuiSpacer size='l' />
+            <ActionList
+              title={i18n.translate(
+                'wazuh.common.homeOverviewCases.needsAttention',
+                { defaultMessage: 'Needs attention' },
+              )}
+              titleTooltip={i18n.translate(
+                'wazuh.common.homeOverviewCases.needsAttentionTooltip',
+                {
+                  defaultMessage:
+                    'Open cases that are urgent or critical, most urgent first.',
+                },
+              )}
+              action={
+                data.attention.total ? (
+                  <EuiText size='xs'>
+                    <RedirectAppLinks application={getCore().application}>
+                      <EuiLink
+                        href={getCaseManagementCasesUrl(
+                          [
+                            {
+                              field: CASE_STATUS_FIELD,
+                              value: OPEN_CASE_STATUSES,
+                            },
+                          ],
+                          indexPatternId,
+                          ATTENTION_CASES_QUERY,
+                        )}
+                        style={NON_TITLE_LINK_STYLE}
+                        data-test-subj='case-management-attention-all'
+                      >
+                        {i18n.translate(
+                          'wazuh.common.homeOverviewCases.viewAll',
+                          {
+                            defaultMessage: 'View all {count}',
+                            values: {
+                              count: formatHomeNumber(data.attention.total),
+                            },
+                          },
+                        )}
+                      </EuiLink>
+                    </RedirectAppLinks>
+                  </EuiText>
+                ) : undefined
+              }
+              items={data.attention.cases.map(attentionItem)}
+              slots={ACTION_LIST_ROWS}
+              emptyMessage={i18n.translate(
+                'wazuh.common.homeOverviewCases.noAttention',
+                { defaultMessage: 'No urgent or critical case is open' },
+              )}
+              emptyIconType='checkInCircleFilled'
+              data-test-subj='case-management-attention'
             />
           </>
         ) : (

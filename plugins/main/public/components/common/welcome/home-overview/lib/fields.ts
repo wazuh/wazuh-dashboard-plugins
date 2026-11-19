@@ -28,6 +28,7 @@ export const MITRE_TACTIC_ID_FIELD = 'wazuh.rule.mitre.tactic.id';
 export const MITRE_TECHNIQUE_ID_FIELD = 'wazuh.rule.mitre.technique.id';
 export const MITRE_TECHNIQUE_NAME_FIELD = 'wazuh.rule.mitre.technique.name';
 export const RULE_TITLE_FIELD = 'wazuh.rule.title';
+export const RULE_ID_FIELD = 'wazuh.rule.id';
 /** Integration a finding came from, i.e. the module that produced it. */
 export const INTEGRATION_NAME_FIELD = 'wazuh.integration.name';
 export const HOST_OS_NAME_FIELD = 'host.os.name';
@@ -41,16 +42,19 @@ export const FIM_FILE_PATH_FIELD = 'file.path';
 /** Last modification time of a monitored file; ranks the FIM list. */
 export const FIM_FILE_MTIME_FIELD = 'file.mtime';
 export const VULNERABILITY_SEVERITY_FIELD = 'vulnerability.severity';
-/** Command an active response ran, on the active responses index. */
-export const ACTIVE_RESPONSE_EXECUTABLE_FIELD =
-  'wazuh.active_response.executable';
 /** Case fields of a findings document; a case exists when the status does. */
 export const CASE_STATUS_FIELD = 'wazuh.case.status';
 export const CASE_SEVERITY_FIELD = 'wazuh.case.severity';
+export const CASE_PRIORITY_FIELD = 'wazuh.case.priority';
+export const CASE_UPDATED_AT_FIELD = 'wazuh.case.updated_at';
 
 /** Case statuses shown as tiles; the first two are the open ones. */
 export const CASE_STATUSES = ['active', 'acknowledged', 'completed'] as const;
 export const OPEN_CASE_STATUSES = ['active', 'acknowledged'];
+/** Case priorities, most urgent first. */
+export const CASE_PRIORITIES = ['urgent', 'high', 'medium', 'low'] as const;
+/** Finding levels whose response coverage the Incident Response card tracks. */
+export const SERIOUS_FINDING_LEVELS = ['critical', 'high'] as const;
 /** Package name on a vulnerability state document. */
 export const VULNERABILITY_PACKAGE_NAME_FIELD = 'package.name';
 /**

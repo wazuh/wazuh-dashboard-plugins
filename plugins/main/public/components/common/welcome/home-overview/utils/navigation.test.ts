@@ -5,6 +5,7 @@ import {
   getAiAssistantUrl,
   getCreateActiveResponseUrl,
   getCtiExplorerIocsUrl,
+  getFindingsByRuleUrl,
   isActiveResponsesRegistered,
   getMitreFindingsByTechniqueUrl,
   getMitreIntelligenceResourceUrl,
@@ -104,6 +105,7 @@ interface DecodedFilterAppState {
       controlledBy?: string;
     };
   }>;
+  query?: { language: string; query: string };
 }
 
 const decodeAppState = (url: string): DecodedFilterAppState | undefined => {
@@ -306,5 +308,43 @@ describe('getCaseManagementCasesUrl', () => {
       ['is', 'wazuh.case.severity', 'high'],
     ]);
     expect(url).toContain('time:(from:now-10y,to:now)');
+    expect(decodeAppState(url)?.query).toEqual({
+      language: 'kuery',
+      query: '',
+    });
+  });
+
+  it('carries a KQL query for conditions filters cannot express', () => {
+    const url = getCaseManagementCasesUrl(
+      [{ field: 'wazuh.case.status', value: ['active', 'acknowledged'] }],
+      'idx-findings',
+      'wazuh.case.priority:urgent or wazuh.case.severity:critical',
+    );
+    expect(decodeAppState(url)?.query).toEqual({
+      language: 'kuery',
+      query: 'wazuh.case.priority:urgent or wazuh.case.severity:critical',
+    });
+  });
+});
+
+describe('getFindingsByRuleUrl', () => {
+  it('opens Threat Hunting unfiltered without an index pattern', () => {
+    expect(getFindingsByRuleUrl('r1', 'high')).toBe('/app/threat-hunting');
+  });
+
+  it('opens the findings of the last 24 hours of the rule at its level', () => {
+    const url = getFindingsByRuleUrl('r1', 'high', 'idx-findings');
+    expect(url).toContain('#overview/?tab=general&tabView=findings');
+    const filters = decodeAppState(url)?.filters as unknown as Array<{
+      meta: { key: string; value: unknown };
+      type: string;
+    }>;
+    expect(
+      filters.map(({ meta, type }) => [type, meta.key, meta.value]),
+    ).toEqual([
+      ['is', 'wazuh.rule.id', 'r1'],
+      ['is', 'wazuh.rule.level', 'high'],
+    ]);
+    expect(url).toContain('time:(from:now-24h,to:now)');
   });
 });

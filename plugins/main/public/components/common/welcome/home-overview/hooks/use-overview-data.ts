@@ -59,9 +59,11 @@ import {
   mapCaseManagement,
   mapCloudSecurityByModule,
   mapComplianceControls,
+  mapIncidentResponse,
   mapDocCount,
   mapScaBenchmarks,
   mapScaTiles,
+  mapSeriousFindings,
   mapSeverityCounts,
   mapTopBuckets,
 } from '../lib/mappers';
@@ -278,6 +280,7 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
             AGG.topTechniques,
           ),
           iocMatches: mapCardinality(malware, AGG.iocMatches),
+          seriousFindings: mapSeriousFindings(response?.aggregations),
         };
       },
     });
@@ -711,21 +714,7 @@ export function useItHygieneServicesCount(
   );
 }
 
-export function useActiveResponseOverview(
-  enabled: boolean,
-): DataGroupResult<number | undefined> {
-  return useIndexDocCount(
-    ActiveResponsesDataSource,
-    () => new ActiveResponsesDataSourceRepository(),
-    enabled,
-    i18n.translate('wazuh.common.homeOverviewDataGroup.activeResponse', {
-      defaultMessage: 'Active Response',
-    }),
-    LAST_24H,
-  );
-}
-
-/** Active responses of the last 24 hours: total and top commands. */
+/** Active responses of the last 24 hours: total and the critical/high findings they answered. */
 export function useIncidentResponseOverview(
   enabled: boolean,
 ): DataGroupResult<IncidentResponseOverview> & { indexPatternId?: string } {
@@ -744,13 +733,7 @@ export function useIncidentResponseOverview(
           dateRange: LAST_24H,
           pagination: NO_HITS,
         });
-        return {
-          total: mapDocCount(response),
-          topCommands: mapTopBuckets(
-            response?.aggregations,
-            AGG.topActiveResponseCommands,
-          ),
-        };
+        return mapIncidentResponse(response);
       },
     });
 
@@ -762,7 +745,10 @@ export function useIncidentResponseOverview(
   );
 }
 
-/** Cases (current state): total, counts per status and open cases per severity. */
+/**
+ * Cases (current state): total, counts per status, open cases per severity, and the open urgent
+ * or critical cases.
+ */
 export function useCaseManagementOverview(
   enabled: boolean,
 ): DataGroupResult<CaseManagementOverview> & { indexPatternId?: string } {

@@ -8,7 +8,7 @@ import {
   EuiText,
   EuiToolTip,
 } from '@elastic/eui';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { formatHomeNumber } from '../../lib/format-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EmptyState } from './empty-state';
@@ -136,7 +136,7 @@ export const DistributionBar: React.FC<DistributionBarProps> = ({
                       defaultMessage: '{label}: {count}',
                       values: {
                         label: segment.label,
-                        count: formatUINumber(segment.count),
+                        count: formatHomeNumber(segment.count),
                       },
                     },
                   )

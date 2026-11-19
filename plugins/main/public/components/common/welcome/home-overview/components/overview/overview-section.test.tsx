@@ -9,6 +9,7 @@ import {
   useIncidentResponseOverview,
 } from '../../hooks/use-overview-data';
 import * as navigation from '../../utils/navigation';
+import { IncidentResponseCard } from './incident-response-card';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Explicit factories so the real modules (and their heavy data-source imports)
@@ -20,7 +21,9 @@ jest.mock('../../hooks/use-overview-data', () => ({
 }));
 // The cards have their own suites; here only their place in the layout matters.
 jest.mock('./incident-response-card', () => ({
-  IncidentResponseCard: () => <div data-test-subj='incident-response-card' />,
+  IncidentResponseCard: jest.fn(() => (
+    <div data-test-subj='incident-response-card' />
+  )),
 }));
 jest.mock('./case-management-card', () => ({
   CaseManagementCard: () => <div data-test-subj='case-management-card' />,
@@ -118,6 +121,13 @@ describe('OverviewSection', () => {
     });
     expect(useIncidentResponseOverview).toHaveBeenCalledWith(true);
     expect(useCaseManagementOverview).toHaveBeenCalledWith(true);
+  });
+
+  it('gives Incident Response the findings search, which carries the critical/high rules', () => {
+    render(<OverviewSection findings={findingsAvailable} />);
+    expect((IncidentResponseCard as jest.Mock).mock.calls[0][0].findings).toBe(
+      findingsAvailable,
+    );
   });
 
   it('shows a contained error for a failed group (distinct from hidden)', () => {

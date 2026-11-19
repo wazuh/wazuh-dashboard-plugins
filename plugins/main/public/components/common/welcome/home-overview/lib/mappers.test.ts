@@ -9,6 +9,8 @@ import {
   mapScaTiles,
   mapScaBenchmarks,
   mapCaseManagement,
+  mapIncidentResponse,
+  mapSeriousFindings,
 } from './mappers';
 import { VULNERABILITY_SEVERITY_BANDS } from './fields';
 
@@ -267,6 +269,40 @@ describe('mappers', () => {
                 buckets: { critical: { doc_count: 1 }, high: { doc_count: 3 } },
               },
             },
+            attention_cases: {
+              doc_count: 2,
+              attention_top: {
+                hits: {
+                  hits: [
+                    {
+                      _id: 'c1',
+                      _source: {
+                        wazuh: {
+                          case: {
+                            title: 'Brute force',
+                            severity: 'critical',
+                            priority: 'urgent',
+                            updated_at: '2026-11-18T10:00:00Z',
+                          },
+                          agent: { name: 'web-01' },
+                        },
+                      },
+                    },
+                    {
+                      _id: 'c2',
+                      _source: {
+                        wazuh: {
+                          case: {
+                            title: 'Never updated',
+                            created_at: '2026-11-17T10:00:00Z',
+                          },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
           },
         } as never),
       ).toEqual({
@@ -279,6 +315,28 @@ describe('mappers', () => {
           medium: undefined,
           low: undefined,
           informational: undefined,
+        },
+        attention: {
+          total: 2,
+          cases: [
+            {
+              id: 'c1',
+              title: 'Brute force',
+              severity: 'critical',
+              priority: 'urgent',
+              updatedAt: '2026-11-18T10:00:00Z',
+              agentName: 'web-01',
+            },
+            {
+              id: 'c2',
+              title: 'Never updated',
+              severity: undefined,
+              priority: undefined,
+              // Falls back to the creation date.
+              updatedAt: '2026-11-17T10:00:00Z',
+              agentName: undefined,
+            },
+          ],
         },
       });
     });
@@ -298,6 +356,96 @@ describe('mappers', () => {
           low: undefined,
           informational: undefined,
         },
+        attention: { total: undefined, cases: [] },
+      });
+    });
+  });
+
+  describe('mapSeriousFindings', () => {
+    it('maps the counts per level and the top rules, keeping the level of each', () => {
+      expect(
+        mapSeriousFindings({
+          serious_findings: {
+            by_level: {
+              buckets: [
+                {
+                  key: 'high',
+                  doc_count: 40,
+                  by_rule: {
+                    sum_other_doc_count: 0,
+                    buckets: [
+                      {
+                        key: 'r2',
+                        doc_count: 40,
+                        rule_title: { buckets: [{ key: 'Brute force' }] },
+                      },
+                    ],
+                  },
+                },
+                {
+                  key: 'critical',
+                  doc_count: 5,
+                  by_rule: {
+                    sum_other_doc_count: 3,
+                    buckets: [{ key: 'r1', doc_count: 5 }],
+                  },
+                },
+              ],
+            },
+          },
+        } as never),
+      ).toEqual({
+        byLevel: { high: 40, critical: 5 },
+        rules: [
+          { id: 'r2', title: 'Brute force', level: 'high', count: 40 },
+          // No title bucket: the id stands in.
+          { id: 'r1', title: 'r1', level: 'critical', count: 5 },
+        ],
+        // Critical has rules past the top ones.
+        partial: true,
+      });
+    });
+
+    it('returns nothing on an empty response', () => {
+      expect(mapSeriousFindings(undefined)).toEqual({
+        byLevel: {},
+        rules: [],
+        partial: false,
+      });
+    });
+  });
+
+  describe('mapIncidentResponse', () => {
+    it('maps the total and the answered findings per level and per rule', () => {
+      expect(
+        mapIncidentResponse({
+          hits: { total: 250 },
+          aggregations: {
+            answered_findings: {
+              by_level: {
+                buckets: [
+                  { key: 'critical', answered_docs: { value: 4 } },
+                  { key: 'high', answered_docs: { value: 6 } },
+                  // Not a level the coverage tracks.
+                  { key: 'medium', answered_docs: { value: 9 } },
+                ],
+              },
+              by_rule: {
+                buckets: [{ key: 'r1', answered_docs: { value: 4 } }],
+              },
+            },
+          },
+        } as never),
+      ).toEqual({
+        total: 250,
+        answered: { byLevel: { critical: 4, high: 6 }, byRule: { r1: 4 } },
+      });
+    });
+
+    it('returns no answers on an empty response', () => {
+      expect(mapIncidentResponse(undefined)).toEqual({
+        total: undefined,
+        answered: { byLevel: {}, byRule: {} },
       });
     });
   });

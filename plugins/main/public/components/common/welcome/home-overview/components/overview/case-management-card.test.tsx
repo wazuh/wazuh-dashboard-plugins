@@ -9,6 +9,23 @@ jest.mock('../../utils/navigation', () => ({
   getCaseManagementUrl: jest.fn(() => '#case-management'),
   getCaseManagementCasesUrl: jest.fn(() => '#cases'),
 }));
+jest.mock('../../../../../../react-services/time-service', () => ({
+  formatUIDate: (date: string) => `formatted ${date}`,
+}));
+
+const attention = {
+  total: 4,
+  cases: [
+    {
+      id: 'c1',
+      title: 'Brute force on web-01',
+      severity: 'critical',
+      priority: 'urgent',
+      updatedAt: '2026-11-18T10:00:00Z',
+    },
+    { id: 'c2', title: 'Data exfiltration', severity: 'critical' },
+  ],
+};
 
 const available = {
   status: 'available' as const,
@@ -16,6 +33,7 @@ const available = {
     total: 12,
     byStatus: { active: 3, acknowledged: 2, completed: 7 },
     openBySeverity: { critical: 1, high: 2, medium: 2, low: 0 },
+    attention,
   },
   indexPatternId: 'idx-findings',
 };
@@ -54,6 +72,54 @@ describe('CaseManagementCard', () => {
     ]);
   });
 
+  it('lists the open urgent or critical cases, linked to each case', () => {
+    const { container } = render(<CaseManagementCard cases={available} />);
+    const rows = container.querySelectorAll(
+      '[data-test-subj="case-management-attention-row"]',
+    );
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveTextContent('Brute force on web-01');
+    expect(rows[0]).toHaveTextContent('Urgent');
+    expect(rows[1]).toHaveTextContent('No priority');
+    expect(navigation.getCaseManagementCasesUrl).toHaveBeenCalledWith(
+      [{ field: '_id', value: 'c1' }],
+      'idx-findings',
+    );
+  });
+
+  it('links "View all" to the open urgent or critical cases', () => {
+    const { container } = render(<CaseManagementCard cases={available} />);
+    expect(
+      container.querySelector(
+        '[data-test-subj="case-management-attention-all"]',
+      ),
+    ).toHaveTextContent('View all 4');
+    expect(navigation.getCaseManagementCasesUrl).toHaveBeenCalledWith(
+      [{ field: 'wazuh.case.status', value: ['active', 'acknowledged'] }],
+      'idx-findings',
+      'wazuh.case.priority:urgent or wazuh.case.severity:critical',
+    );
+  });
+
+  it('says no urgent or critical case is open', () => {
+    const { container } = render(
+      <CaseManagementCard
+        cases={{
+          ...available,
+          data: { ...available.data, attention: { total: 0, cases: [] } },
+        }}
+      />,
+    );
+    expect(
+      screen.getByText('No urgent or critical case is open'),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector(
+        '[data-test-subj="case-management-attention-all"]',
+      ),
+    ).toBeNull();
+  });
+
   it('says how to create a case when there is none', () => {
     const { container } = render(
       <CaseManagementCard
@@ -63,6 +129,7 @@ describe('CaseManagementCard', () => {
             total: 0,
             byStatus: { active: 0, acknowledged: 0, completed: 0 },
             openBySeverity: {},
+            attention: { total: 0, cases: [] },
           },
         }}
       />,
@@ -92,6 +159,7 @@ describe('CaseManagementCard', () => {
               low: 0,
               informational: 0,
             },
+            attention: { total: 0, cases: [] },
           },
         }}
       />,

@@ -56,7 +56,10 @@ import {
   useCaseManagementForm,
 } from './use-case-management-form';
 import { useReportUnsavedChanges } from '../../unsaved-changes-guard';
-import { CASE_STATUS_OPTIONS } from './case-options';
+import {
+  CASE_PRIORITY_OPTIONS as CASE_PRIORITY_LABELS,
+  CASE_STATUS_OPTIONS,
+} from './case-options';
 import './case-management-tab.scss';
 
 const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
@@ -95,33 +98,7 @@ const CASE_SEVERITY_OPTIONS: Array<{ value: CaseSeverity; text: string }> = [
 const EMPTY_OPTION = { value: '' as const, text: '—' };
 
 const CASE_PRIORITY_OPTIONS: Array<{ value: CasePriority | ''; text: string }> =
-  [
-    EMPTY_OPTION,
-    {
-      value: 'urgent',
-      text: i18n.translate('wazuh.common.caseManagementPriority.urgent', {
-        defaultMessage: 'Urgent',
-      }),
-    },
-    {
-      value: 'high',
-      text: i18n.translate('wazuh.common.caseManagementPriority.high', {
-        defaultMessage: 'High',
-      }),
-    },
-    {
-      value: 'medium',
-      text: i18n.translate('wazuh.common.caseManagementPriority.medium', {
-        defaultMessage: 'Medium',
-      }),
-    },
-    {
-      value: 'low',
-      text: i18n.translate('wazuh.common.caseManagementPriority.low', {
-        defaultMessage: 'Low',
-      }),
-    },
-  ];
+  [EMPTY_OPTION, ...CASE_PRIORITY_LABELS];
 
 const CASE_TLP_OPTIONS: Array<{
   value: CaseTLP | '';

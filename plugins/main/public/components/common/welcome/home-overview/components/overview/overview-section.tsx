@@ -137,7 +137,10 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
       <EuiFlexGroup wrap responsive={false}>
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
-          <IncidentResponseCard incidentResponse={incidentResponse} />
+          <IncidentResponseCard
+            incidentResponse={incidentResponse}
+            findings={findings}
+          />
         </EuiFlexItem>
         <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
           <CaseManagementCard cases={cases} />

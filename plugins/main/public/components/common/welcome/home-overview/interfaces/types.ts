@@ -40,6 +40,26 @@ export interface FindingsOverview {
   topTechniques: TopItem[];
   /** IOC matches (last 24h detection metric), from the same findings search. */
   iocMatches?: number;
+  /** Critical/high findings and their top rules, for the Incident Response coverage. */
+  seriousFindings: SeriousFindings;
+}
+
+export type SeriousLevel = 'critical' | 'high';
+
+/** A rule behind critical/high findings, with its finding count. */
+export interface SeriousRule {
+  id: string;
+  title: string;
+  level: SeriousLevel;
+  count: number;
+}
+
+export interface SeriousFindings {
+  byLevel: Partial<Record<SeriousLevel, number>>;
+  /** Top rules per level by finding count. */
+  rules: SeriousRule[];
+  /** More rules exist past the top ones. */
+  partial: boolean;
 }
 
 /** Findings counts the two bottom sections need, from one lazy search. */
@@ -99,8 +119,11 @@ export interface VulnerabilityOverview {
 /** Active responses of the last 24 hours. */
 export interface IncidentResponseOverview {
   total?: number;
-  /** Executables run (`wazuh.active_response.executable`). */
-  topCommands: TopItem[];
+  /** Distinct critical/high findings that got a response, per level and per rule id. */
+  answered: {
+    byLevel: Partial<Record<SeriousLevel, number>>;
+    byRule: Record<string, number>;
+  };
 }
 
 export type CaseStatusCounts = Partial<
@@ -114,4 +137,16 @@ export interface CaseManagementOverview {
   byStatus: CaseStatusCounts;
   /** Open cases per severity. */
   openBySeverity: SeverityCounts;
+  /** Open cases that are urgent or critical: their count and the most urgent ones. */
+  attention: { total?: number; cases: CaseSummary[] };
+}
+
+export interface CaseSummary {
+  /** `_id` of the finding holding the case. */
+  id: string;
+  title?: string;
+  severity?: string;
+  priority?: string;
+  updatedAt?: string;
+  agentName?: string;
 }

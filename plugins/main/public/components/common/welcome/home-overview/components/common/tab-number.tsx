@@ -1,7 +1,7 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
 import { EuiIcon, EuiToolTip } from '@elastic/eui';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { formatHomeNumber } from '../../lib/format-number';
 import { VALUE_PLACEHOLDER } from '../../lib/constants';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 
@@ -46,10 +46,10 @@ export const TabNumber: React.FC<TabNumberProps> = ({
   }
   return (
     <span className='tab-num'>
-      {value === undefined ? VALUE_PLACEHOLDER : formatUINumber(value)}
+      {value === undefined ? VALUE_PLACEHOLDER : formatHomeNumber(value)}
     </span>
   );
 };
 
 export const formatValueSafely = (value?: number): string =>
-  value === undefined ? VALUE_PLACEHOLDER : formatUINumber(value);
+  value === undefined ? VALUE_PLACEHOLDER : formatHomeNumber(value);
