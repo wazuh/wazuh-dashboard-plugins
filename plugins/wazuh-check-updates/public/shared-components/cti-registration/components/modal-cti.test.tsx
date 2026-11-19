@@ -121,7 +121,9 @@ describe('ModalCti component', () => {
       screen.getByRole('button', { name: 'Register' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Register it in the Wazuh Console to manage it there/),
+      screen.getByText(
+        /Register it in the Wazuh Console to manage your instance/,
+      ),
     ).toBeInTheDocument();
   });
 
@@ -636,7 +638,7 @@ describe('ModalCti component', () => {
         ).toBeInTheDocument();
       });
       expect(
-        screen.queryByText(/Your instance already gets the Open feed/),
+        screen.queryByText(/Your instance already receives the Open CTI feed/),
       ).not.toBeInTheDocument();
     });
 

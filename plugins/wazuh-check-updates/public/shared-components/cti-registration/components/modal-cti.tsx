@@ -415,23 +415,31 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         ) : null}
         {showRegistrationIntro ? (
           <EuiText>
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
-              defaultMessage='Your instance already gets the Open feed. Register it in the Wazuh Console to manage it there and to upgrade it to the Professional feed, which delivers new vulnerabilities, IOCs and rules faster. You will need a free Wazuh Console account. For more information, visit our {documentationCTIWazuh}.'
-              values={{
-                documentationCTIWazuh: (
-                  <EuiLink
-                    href='https://cti.wazuh.com/vulnerabilities/cves'
-                    target='_blank'
-                  >
-                    <FormattedMessage
-                      id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditionalLink'
-                      defaultMessage='documentation'
-                    />
-                  </EuiLink>
-                ),
-              }}
-            />
+            <p>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
+                defaultMessage='Your instance already receives the Open CTI feed. Register it in the Wazuh Console to manage your instance and upgrade to the Professional CTI feed, with early access to vulnerabilities, IOCs, and detection rules.'
+              />
+            </p>
+            <p>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalBodyAccountRequired'
+                defaultMessage='A free Wazuh Console account is required. {learnMoreLink}.'
+                values={{
+                  learnMoreLink: (
+                    <EuiLink
+                      href='https://cti.wazuh.com/vulnerabilities/cves'
+                      target='_blank'
+                    >
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.ctiRegistration.modalBodyLearnMoreLink'
+                        defaultMessage='Learn more'
+                      />
+                    </EuiLink>
+                  ),
+                }}
+              />
+            </p>
           </EuiText>
         ) : null}
         {showPermissionDenied ? (
