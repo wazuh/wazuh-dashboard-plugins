@@ -19,7 +19,7 @@ Some settings have been removed entirely; others have been relocated to the **Ad
 | Location                                                                      | Settings                                                                    |
 | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | `opensearch_dashboards.yml`                                                   | `wazuh_core.hosts`, `healthcheck.*`, `opensearchDashboards.branding.*`      |
-| **☰ Menu > Dashboard management > Dashboards Management > Advanced settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `wazuh.updates.enabled` |
+| **☰ Menu > Dashboard management > Dashboards Management > Advanced settings** | `timeout`, `enrollment.dns`, `reports.csv.maxRows`, `check_updates.enabled` |
 
 By default, these settings are tenant-level preferences managed through the UI (or the saved objects API). They can also be forced globally for all tenants using `uiSettings.overrides` in `opensearch_dashboards.yml`.
 
@@ -105,9 +105,9 @@ The following settings have a direct equivalent in 5.x:
 | `timeout`                | `20000` | Advanced settings | `timeout` (milliseconds)                                               |
 | `enrollment.dns`         | `''`    | Advanced settings | `enrollment.dns`                                                       |
 | `reports.csv.maxRows`    | `10000` | Advanced settings | `reports.csv.maxRows`                                                  |
-| `wazuh.updates.disabled` | `false` | Advanced settings | `wazuh.updates.enabled` (renamed and inverted; default `false` in 5.x) |
+| `wazuh.updates.disabled` | `false` | Advanced settings | `check_updates.enabled` (renamed and inverted; default `false` in 5.x) |
 
-> **Note**: The `wazuh.updates.disabled` setting of 4.x is replaced by `wazuh.updates.enabled` in 5.x, and update checks are off by default (4.x: on). The old value is not carried over: if update notifications were enabled in your 4.x deployment, turn on **Check for updates** in Advanced settings after migration.
+> **Note**: The `wazuh.updates.disabled` setting of 4.x is replaced by `check_updates.enabled` in 5.x, and update checks are off by default (4.x: on). The old value is not carried over: if update notifications were enabled in your 4.x deployment, turn on **Check for updates** in Advanced settings after migration.
 
 The following settings have no equivalent in 5.x and must not be carried over to `opensearch_dashboards.yml`:
 
@@ -225,7 +225,7 @@ Reconfigure the following settings after the 5.x installation is complete. Use t
    | `timeout`               | Request timeout in milliseconds (default: `20000`)       |
    | `enrollment.dns`        | Wazuh server DNS name used in the agent deployment guide |
    | `reports.csv.maxRows`   | Maximum rows in exported CSV tables (default: `10000`)   |
-   | `wazuh.updates.enabled` | Enable the update check notification (default: `false`)  |
+   | `check_updates.enabled` | Enable the update check notification (default: `false`)  |
 
 ### 6. Remove deprecated settings
 

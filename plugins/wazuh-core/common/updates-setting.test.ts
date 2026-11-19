@@ -2,7 +2,7 @@ import { PLUGIN_SETTINGS } from './constants';
 
 describe('[settings] Update check', () => {
   it('is a switch named by its effect, off by default', () => {
-    const setting = PLUGIN_SETTINGS['wazuh.updates.enabled'];
+    const setting = PLUGIN_SETTINGS['check_updates.enabled'];
 
     expect(setting.title).toBe('Check for updates');
     expect(setting.defaultValue).toBe(false);

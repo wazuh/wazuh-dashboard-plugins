@@ -24,7 +24,7 @@ export const WzUpdatesNotification = connect(mapStateToProps)(
   ({ appConfig }) => {
     const isUpdatesEnabled =
       !appConfig?.isLoading &&
-      appConfig?.data?.['wazuh.updates.enabled'] === true;
+      appConfig?.data?.['check_updates.enabled'] === true;
     const { UpdatesNotification } = getWazuhCheckUpdatesPlugin();
 
     return isUpdatesEnabled ? <UpdatesNotification /> : <></>;

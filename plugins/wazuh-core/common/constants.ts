@@ -630,12 +630,12 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     },
   },
-  'wazuh.updates.enabled': {
-    title: i18n.translate('wazuhCore.settings.wazuhUpdatesEnabled.title', {
+  'check_updates.enabled': {
+    title: i18n.translate('wazuhCore.settings.checkUpdatesEnabled.title', {
       defaultMessage: 'Check for updates',
     }),
     description: i18n.translate(
-      'wazuhCore.settings.wazuhUpdatesEnabled.description',
+      'wazuhCore.settings.checkUpdatesEnabled.description',
       {
         defaultMessage:
           'When on, the available updates are checked and the update notifications are shown. When off, no check is done.',
@@ -838,5 +838,5 @@ export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PORT = 'enrollment.port';
 export const ENROLLMENT_PATH = 'enrollment.path';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-export const WAZUH_UPDATES_ENABLED = 'wazuh.updates.enabled';
+export const CHECK_UPDATES_ENABLED = 'check_updates.enabled';
 export const REQUEST_TIMEOUT = 'timeout';

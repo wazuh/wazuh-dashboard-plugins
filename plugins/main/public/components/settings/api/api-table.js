@@ -127,7 +127,7 @@ export const ApiTable = compose(
     async componentDidMount() {
       this.refresh();
       this.isUpdatesEnabled = await getWazuhCorePlugin().configuration.get(
-        'wazuh.updates.enabled',
+        'check_updates.enabled',
       );
 
       if (this.isUpdatesEnabled) {
