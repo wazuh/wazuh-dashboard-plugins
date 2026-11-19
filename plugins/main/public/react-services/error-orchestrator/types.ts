@@ -35,6 +35,8 @@ export type UIErrorLog = {
   severity: UIErrorSeverity;
   display?: boolean;
   store?: boolean;
+  /** Lifetime of the toast in milliseconds. Defaults to 3000. */
+  toastLifeTimeMs?: number;
   error: UIError;
 };
 
