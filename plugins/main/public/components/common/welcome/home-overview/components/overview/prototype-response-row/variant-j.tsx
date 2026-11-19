@@ -1,0 +1,389 @@
+/*
+ * PROTOTYPE (issue #9672) — throwaway. Variant J: H with the Home KPI look: centered
+ * hero column in the KPI type, a hairline divider before the details.
+ */
+import React from 'react';
+import moment from 'moment';
+import useObservable from 'react-use/lib/useObservable';
+import {
+  EuiButtonEmpty,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHealth,
+  EuiLink,
+  EuiPanel,
+  EuiText,
+  EuiTitle,
+} from '@elastic/eui';
+import { getCore } from '../../../../../../../kibana-services';
+import { RedirectAppLinks } from '../../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
+import { BarList, SeverityDistributionBar, StatTile } from '../../common';
+import {
+  getActiveResponseResponsesUrl,
+  getActiveResponseUrl,
+  getCaseManagementCasesUrl,
+  getCaseManagementUrl,
+  getCreateActiveResponseUrl,
+  isActiveResponsesRegistered,
+} from '../../../utils/navigation';
+import {
+  HOME_OVERVIEW_CHROME,
+  HOME_OVERVIEW_COLOR,
+  HOME_OVERVIEW_TEXT_COLOR,
+} from '../../../lib/theme-colors';
+import { CARD_MIN_WIDTH, KPI_LINK_STYLE } from '../../../lib/constants';
+import type { VariantProps } from './variants';
+
+export const fmt = (n?: number) =>
+  n === undefined ? '-' : new Intl.NumberFormat().format(n);
+export const NO_APPS: ReadonlyMap<string, unknown> = new Map();
+export const OPEN = ['active', 'acknowledged'];
+
+export const Redirect: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => (
+  <RedirectAppLinks application={getCore().application}>
+    {children}
+  </RedirectAppLinks>
+);
+
+/** Half header: linked title + caption left, quiet actions right. */
+export const HalfHeader: React.FC<{
+  title: string;
+  href: string;
+  caption: string;
+  actions: React.ReactNode;
+}> = ({ title, href, caption, actions }) => (
+  <EuiFlexGroup gutterSize='s' alignItems='flexStart' responsive={false}>
+    <EuiFlexItem>
+      <EuiTitle size='xxs'>
+        <h3>
+          <Redirect>
+            <EuiLink href={href}>{title}</EuiLink>
+          </Redirect>
+        </h3>
+      </EuiTitle>
+      <EuiText size='xs' color='subdued'>
+        {caption}
+      </EuiText>
+    </EuiFlexItem>
+    <EuiFlexItem grow={false}>
+      <EuiFlexGroup gutterSize='xs' responsive={false}>
+        {actions}
+      </EuiFlexGroup>
+    </EuiFlexItem>
+  </EuiFlexGroup>
+);
+
+export const Action: React.FC<{
+  href: string;
+  icon?: string;
+  children: React.ReactNode;
+}> = ({ href, icon, children }) => (
+  <EuiFlexItem grow={false}>
+    <Redirect>
+      <EuiButtonEmpty size='xs' flush='right' iconType={icon} href={href}>
+        {children}
+      </EuiButtonEmpty>
+    </Redirect>
+  </EuiFlexItem>
+);
+
+/** The hero number, same weight and size as the other Home KPIs. */
+export const Hero: React.FC<{
+  value?: number;
+  label: string;
+  href: string;
+}> = ({ value, label, href }) => (
+  <StatTile
+    reverse
+    value={
+      <Redirect>
+        <EuiLink href={href} style={KPI_LINK_STYLE}>
+          {fmt(value)}
+        </EuiLink>
+      </Redirect>
+    }
+    label={label}
+  />
+);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const Sparkline: React.FC<{
+  hourly: Array<{ time: number; count: number }>;
+}> = ({ hourly }) => {
+  const max = Math.max(1, ...hourly.map(h => h.count));
+  return (
+    <div>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'flex-end',
+          gap: 1,
+          height: 28,
+          marginTop: 12,
+        }}
+      >
+        {hourly.map(h => (
+          <div
+            key={h.time}
+            title={`${moment(h.time).format('HH:mm')}: ${fmt(h.count)}`}
+            style={{
+              flex: 1,
+              height: `${Math.max(h.count ? 8 : 4, (h.count / max) * 100)}%`,
+              background: h.count
+                ? HOME_OVERVIEW_COLOR.info
+                : HOME_OVERVIEW_CHROME.trackBackground,
+              borderRadius: 1,
+            }}
+          />
+        ))}
+      </div>
+      <EuiText size='xs' color='subdued' style={{ marginTop: 2 }}>
+        Per hour
+      </EuiText>
+    </div>
+  );
+};
+
+export const Callout: React.FC<{
+  color?: string;
+  value?: number;
+  label: string;
+  href?: string;
+}> = ({ color, value, label, href }) => {
+  const text = (
+    <>
+      <strong className='tab-num'>{fmt(value)}</strong> {label}
+    </>
+  );
+  // A dot only where its color means something (cases: red when above zero).
+  if (!color) {
+    return <EuiText size='s'>{text}</EuiText>;
+  }
+  return (
+    <EuiHealth color={value ? color : HOME_OVERVIEW_COLOR.disabled}>
+      <EuiText size='s'>
+        {href ? (
+          <Redirect>
+            <EuiLink href={href} style={{ fontWeight: 'normal' }}>
+              {text}
+            </EuiLink>
+          </Redirect>
+        ) : (
+          text
+        )}
+      </EuiText>
+    </EuiHealth>
+  );
+};
+
+const STATUSES = [
+  { key: 'active', label: 'Active' },
+  { key: 'acknowledged', label: 'Acknowledged' },
+  { key: 'completed', label: 'Completed' },
+];
+
+export const VariantJ: React.FC<
+  VariantProps & { irSlot?: React.ReactNode }
+> = ({ ir, cases, irSlot }) => {
+  const apps = useObservable(getCore().application.applications$, NO_APPS);
+  const d = ir.data;
+  const c = cases.data;
+  const s = c?.byStatus ?? {};
+  const open = (s.active ?? 0) + (s.acknowledged ?? 0);
+  const url = (f: Parameters<typeof getCaseManagementCasesUrl>[0]) =>
+    getCaseManagementCasesUrl(f, cases.indexPatternId);
+  const openFilter = { field: 'wazuh.case.status', value: OPEN };
+
+  // Same grid in both cards, so the heroes and the details line up.
+  const body: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: '180px minmax(0, 1fr)',
+    gap: 24,
+    alignItems: 'center',
+    marginTop: 16,
+  };
+  const heroCol: React.CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%',
+    paddingRight: 24,
+    borderRight: HOME_OVERVIEW_CHROME.hairline,
+  };
+  const side: React.CSSProperties = {
+    display: 'grid',
+    gap: 4,
+    marginTop: 12,
+    justifyItems: 'center',
+  };
+
+  return (
+    <EuiFlexGroup wrap responsive={false}>
+      <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        {irSlot ?? (
+          <EuiPanel paddingSize='m' hasBorder>
+            <HalfHeader
+              title='Incident Response'
+              href={getActiveResponseUrl()}
+              caption='Last 24 hours'
+              actions={
+                <>
+                  {isActiveResponsesRegistered(apps) && (
+                    <Action
+                      href={getCreateActiveResponseUrl()}
+                      icon='plusInCircle'
+                    >
+                      Create
+                    </Action>
+                  )}
+                  <Action href={getActiveResponseResponsesUrl()}>
+                    View responses
+                  </Action>
+                </>
+              }
+            />
+            <div style={body}>
+              <div style={heroCol}>
+                <Hero
+                  value={d?.total}
+                  label='active responses'
+                  href={getActiveResponseResponsesUrl()}
+                />
+                {d && d.total > 0 && (
+                  <div style={side}>
+                    <Callout value={d.agentsCount} label='agents' />
+                    <Callout value={d.commandsCount} label='commands' />
+                  </div>
+                )}
+              </div>
+              <BarList
+                title='Top 5 commands executed'
+                items={d?.topCommands ?? []}
+                emptyMessage='No active responses ran in this period'
+                getHref={item =>
+                  getActiveResponseResponsesUrl(
+                    {
+                      field: 'wazuh.active_response.executable',
+                      value: item.key,
+                    },
+                    ir.indexPatternId,
+                  )
+                }
+              />
+            </div>
+          </EuiPanel>
+        )}
+      </EuiFlexItem>
+      <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
+        <EuiPanel paddingSize='m' hasBorder>
+          <HalfHeader
+            title='Case Management'
+            href={getCaseManagementUrl()}
+            caption='Current state'
+            actions={<Action href={url([openFilter])}>View open cases</Action>}
+          />
+          {c && !c.total ? (
+            <EuiText size='s' color='subdued' style={{ marginTop: 24 }}>
+              No cases yet. Open a finding and create one from its Case tab.
+            </EuiText>
+          ) : (
+            <div style={body}>
+              <div style={heroCol}>
+                <Hero
+                  value={open}
+                  label='open cases'
+                  href={url([openFilter])}
+                />
+                <div style={side}>
+                  <Callout
+                    color={HOME_OVERVIEW_COLOR.danger}
+                    value={c?.openByPriority?.urgent}
+                    label='urgent'
+                    href={url([
+                      openFilter,
+                      { field: 'wazuh.case.priority', value: 'urgent' },
+                    ])}
+                  />
+                  <Callout
+                    color={HOME_OVERVIEW_COLOR.danger}
+                    value={c?.openBySeverity?.critical}
+                    label='critical'
+                    href={url([
+                      openFilter,
+                      { field: 'wazuh.case.severity', value: 'critical' },
+                    ])}
+                  />
+                </div>
+              </div>
+              <div>
+                <EuiText size='xs'>
+                  <strong>Cases by status</strong>
+                </EuiText>
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+                    margin: '8px 0 20px',
+                    borderTop: HOME_OVERVIEW_CHROME.hairline,
+                  }}
+                >
+                  {STATUSES.map((st, i) => (
+                    <div
+                      key={st.key}
+                      style={{
+                        paddingTop: 8,
+                        borderLeft: i
+                          ? HOME_OVERVIEW_CHROME.hairline
+                          : undefined,
+                        textAlign: 'center',
+                      }}
+                    >
+                      <Redirect>
+                        <EuiLink
+                          href={url([
+                            { field: 'wazuh.case.status', value: st.key },
+                          ])}
+                          style={{
+                            fontSize: 20,
+                            fontWeight: 400,
+                            color: HOME_OVERVIEW_TEXT_COLOR.info,
+                          }}
+                          className='tab-num'
+                        >
+                          {fmt(s[st.key])}
+                        </EuiLink>
+                      </Redirect>
+                      <EuiText size='xs' color='subdued'>
+                        {st.label}
+                      </EuiText>
+                    </div>
+                  ))}
+                </div>
+                <SeverityDistributionBar
+                  counts={open ? (c?.openBySeverity as any) ?? {} : {}}
+                  headline={
+                    <EuiText size='xs'>
+                      <strong>Open cases by severity</strong>
+                    </EuiText>
+                  }
+                  onSelect={band =>
+                    url([
+                      openFilter,
+                      { field: 'wazuh.case.severity', value: band },
+                    ])
+                  }
+                  emptyMessage='No open cases'
+                  testSubjPrefix='proto-j-open-cases-severity'
+                />
+              </div>
+            </div>
+          )}
+        </EuiPanel>
+      </EuiFlexItem>
+    </EuiFlexGroup>
+  );
+};
+VariantJ.displayName = 'H with the Home KPI look';

@@ -9,8 +9,7 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { IncidentResponseCard } from './incident-response-card';
-import { CaseManagementCard } from './case-management-card';
+import { PrototypeResponseRow } from './prototype-response-row';
 import {
   useAgentStatus,
   useCaseManagementOverview,
@@ -28,7 +27,6 @@ import {
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
-import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Same requirement as the Agents section.
@@ -135,14 +133,11 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
 
       <EuiSpacer size='m' />
 
-      <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
-          <IncidentResponseCard incidentResponse={incidentResponse} />
-        </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
-          <CaseManagementCard cases={cases} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+      {/* PROTOTYPE (issue #9672): variants of this row. */}
+      <PrototypeResponseRow
+        current={{ incidentResponse, cases }}
+        findings={findings}
+      />
 
       <EuiSpacer size='m' />
 

@@ -73,6 +73,7 @@ export const CaseManagementCard: React.FC<CaseManagementCardProps> = ({
         { defaultMessage: 'Current state' },
       )}
       loadingMinHeight={WIDGET_LOADING_MIN_HEIGHT.heroAndList}
+      centerBody
       data-test-subj='home-overview-case-management'
     >
       {data &&
