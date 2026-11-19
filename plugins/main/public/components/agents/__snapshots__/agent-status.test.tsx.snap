@@ -8,7 +8,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     class="euiToolTipAnchor"
   >
     <div
-      class="euiHealth euiHealth--textSizeS wz-flex"
+      class="euiHealth euiHealth--textSizeS"
     >
       <div
         class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
@@ -23,14 +23,15 @@ exports[`AgentStatus component Renders status indicator with the its color and t
         </div>
         <div
           class="euiFlexItem euiFlexItem--flexGrowZero"
-        />
+        >
+          <span
+            class="hide-agent-status"
+          >
+            active
+          </span>
+        </div>
       </div>
     </div>
-  </span>
-  <span
-    class="hide-agent-status"
-  >
-    active
   </span>
   <span
     class="euiToolTipAnchor wz-agent-icon-tip"
@@ -53,7 +54,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     class="euiToolTipAnchor"
   >
     <div
-      class="euiHealth euiHealth--textSizeS wz-flex"
+      class="euiHealth euiHealth--textSizeS"
     >
       <div
         class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
@@ -68,14 +69,15 @@ exports[`AgentStatus component Renders status indicator with the its color and t
         </div>
         <div
           class="euiFlexItem euiFlexItem--flexGrowZero"
-        />
+        >
+          <span
+            class="hide-agent-status"
+          >
+            disconnected
+          </span>
+        </div>
       </div>
     </div>
-  </span>
-  <span
-    class="hide-agent-status"
-  >
-    disconnected
   </span>
   <span
     class="euiToolTipAnchor wz-agent-icon-tip"
@@ -98,7 +100,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     class="euiToolTipAnchor"
   >
     <div
-      class="euiHealth euiHealth--textSizeS wz-flex"
+      class="euiHealth euiHealth--textSizeS"
     >
       <div
         class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
@@ -113,14 +115,15 @@ exports[`AgentStatus component Renders status indicator with the its color and t
         </div>
         <div
           class="euiFlexItem euiFlexItem--flexGrowZero"
-        />
+        >
+          <span
+            class="hide-agent-status"
+          >
+            never connected
+          </span>
+        </div>
       </div>
     </div>
-  </span>
-  <span
-    class="hide-agent-status"
-  >
-    never connected
   </span>
   <span
     class="euiToolTipAnchor wz-agent-icon-tip"
@@ -143,7 +146,7 @@ exports[`AgentStatus component Renders status indicator with the its color and t
     class="euiToolTipAnchor"
   >
     <div
-      class="euiHealth euiHealth--textSizeS wz-flex"
+      class="euiHealth euiHealth--textSizeS"
     >
       <div
         class="euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow"
@@ -158,14 +161,15 @@ exports[`AgentStatus component Renders status indicator with the its color and t
         </div>
         <div
           class="euiFlexItem euiFlexItem--flexGrowZero"
-        />
+        >
+          <span
+            class="hide-agent-status"
+          >
+            pending
+          </span>
+        </div>
       </div>
     </div>
-  </span>
-  <span
-    class="hide-agent-status"
-  >
-    pending
   </span>
   <span
     class="euiToolTipAnchor wz-agent-icon-tip"
