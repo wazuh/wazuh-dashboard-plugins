@@ -58,7 +58,7 @@ export const getHealthCheckDescriptions = (): Record<
       'wazuh.healthCheck.savedObjectsMissingFields.description',
       {
         defaultMessage:
-          'Checks that the visualizations and saved searches only use fields their index pattern has. Panels that use other fields load empty.',
+          'Checks that the visualizations and saved searches only use fields their index pattern has. Panels that use other fields may show no data or wrong data.',
       },
     ),
     remediation: i18n.translate(

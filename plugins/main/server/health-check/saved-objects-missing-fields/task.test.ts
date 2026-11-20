@@ -37,7 +37,7 @@ const createContext = () => ({
 describe('buildMissingFieldsMessage', () => {
   it('names each object, its index pattern, and its missing fields', () => {
     expect(buildMissingFieldsMessage([report(1)])).toBe(
-      'A visualization or saved search uses fields its index pattern does not have, so its panel loads empty.\n\n' +
+      'A visualization or saved search uses fields its index pattern does not have, so its panel may show no data or wrong data.\n\n' +
         '- visualization [Vis 1] on index pattern [wazuh-findings-v5*]: rule.groups (query, aggregation), timestamp (sort)',
     );
   });
@@ -62,7 +62,9 @@ describe('initializationTaskCreatorSavedObjectsMissingFields', () => {
   });
 
   beforeEach(() => {
-    jest.mocked(findScannedObjects).mockResolvedValue([]);
+    jest
+      .mocked(findScannedObjects)
+      .mockResolvedValue({ objects: [], total: 0 });
   });
 
   it('is green when every object uses existing fields', async () => {
@@ -88,7 +90,24 @@ describe('initializationTaskCreatorSavedObjectsMissingFields', () => {
       data: [report(1)],
     });
     expect(ctx.logger.warn).toHaveBeenCalledWith(
+      'Visualizations and saved searches using missing fields: 1',
+    );
+    expect(ctx.logger.debug).toHaveBeenCalledWith(
       buildMissingFieldsMessage([report(1)]),
+    );
+  });
+
+  it('warns when there are more objects than it can read', async () => {
+    jest
+      .mocked(findScannedObjects)
+      .mockResolvedValue({ objects: [], total: 12000 });
+    jest.mocked(scanMissingFields).mockResolvedValue([]);
+    const ctx = createContext();
+
+    await task.run(ctx as unknown as InitializationTaskRunContext);
+
+    expect(ctx.logger.warn).toHaveBeenCalledWith(
+      'Checked the fields of the first 0 of 12000 visualizations and saved searches',
     );
   });
 

@@ -13,6 +13,7 @@ export interface SavedObjectLike {
     columns?: string[];
     sort?: unknown[];
     savedSearchRefName?: string;
+    savedSearchId?: string;
     kibanaSavedObjectMeta?: { searchSourceJSON?: string };
     [attribute: string]: unknown;
   };
@@ -20,11 +21,11 @@ export interface SavedObjectLike {
 }
 
 interface Filter {
-  meta?: { key?: string; disabled?: boolean };
-  query?: Filter;
-  exists?: { field?: string };
+  meta?: { key?: string; type?: string; disabled?: boolean };
   [clause: string]: unknown;
 }
+
+type DslClause = Record<string, unknown> | null;
 
 interface Aggregation {
   params?: {
@@ -52,15 +53,23 @@ const ALWAYS_PRESENT = new Set([
   '*',
 ]);
 
-const FILTER_CLAUSES = [
+// Clauses keyed by field name: `{ term: { field: value } }`.
+const FIELD_CLAUSES = [
   'match_phrase',
+  'match_phrase_prefix',
   'match',
   'term',
   'terms',
   'range',
   'prefix',
   'wildcard',
+  'regexp',
+  'fuzzy',
 ];
+const CLAUSE_OPTIONS = new Set(['boost', '_name']);
+const BOOL_CLAUSES = ['must', 'should', 'filter', 'must_not'];
+// Filters whose `meta.key` is a clause name, not a field.
+const DSL_FILTER_TYPES = new Set(['custom', 'query_string', 'match_all']);
 
 // Aggregation params that hold a nested aggregation (order by metric, pipeline aggs).
 const NESTED_AGG_PARAMS = ['orderAgg', 'customMetric', 'customBucket'];
@@ -81,47 +90,112 @@ const getSearchSource = (so: SavedObjectLike) =>
     so.attributes?.kibanaSavedObjectMeta?.searchSourceJSON,
   );
 
+const FIELD_RE = /([A-Za-z_@][\w.@*-]*)\s*(:|<=|>=|<|>)\s*/y;
+// A field value: a range, or a run up to the next space or group delimiter.
+const VALUE_RE = /\[[^\]]*\]|\{[^{}:]*\bTO\b[^{}:]*\}|(?:\\.|[^\s(){}])+/y;
+const SEPARATOR_RE = /[\s(){!+-]/;
+
+const matchAt = (re: RegExp, text: string, index: number) => {
+  re.lastIndex = index;
+  return re.exec(text);
+};
+
 /**
  * Fields of a KQL or Lucene query: `field:value`, `field : value`, `field >= 1`,
- * `_exists_:field`. Quoted values are dropped first, so `"a:b"` does not count.
+ * `_exists_:field`, KQL nested `parent:{ child: x }`. Values are skipped, so `"a:b"` or
+ * `url: foo-bar:baz` add nothing.
  */
 export function extractQueryFields(query: unknown): string[] {
   if (typeof query !== 'string' || !query.trim()) {
     return [];
   }
-  const unquoted = query.replace(/"(?:[^"\\]|\\.)*"/g, '""');
+  const text = query.replace(/"(?:[^"\\]|\\.)*"/g, '""');
   const fields = new Set<string>();
-  const fieldRe = /(^|[\s(!+-])([A-Za-z_@][\w.@*-]*)\s*(?::|<=|>=|<|>)/g;
-  const existsRe = /_exists_\s*:\s*([A-Za-z_@][\w.@*-]*)/g;
-  let match: RegExpExecArray | null;
+  const parents: string[] = [];
+  let index = 0;
 
-  while ((match = fieldRe.exec(unquoted))) {
-    if (match[2] !== '_exists_') {
-      fields.add(match[2]);
+  while (index < text.length) {
+    const char = text[index];
+    const field = matchAt(FIELD_RE, text, index);
+
+    if (SEPARATOR_RE.test(char)) {
+      index++;
+    } else if (char === '}') {
+      parents.pop();
+      index++;
+    } else if (field) {
+      index = FIELD_RE.lastIndex;
+      const value = matchAt(VALUE_RE, text, index);
+      const name = [...parents.slice(-1), field[1]].join('.');
+
+      if (field[1] === '_exists_') {
+        fields.add(value?.[0] ?? '');
+      } else if (field[2] === ':' && text[index] === '{' && !value) {
+        parents.push(name);
+      } else {
+        fields.add(name);
+      }
+      index = value ? VALUE_RE.lastIndex : index;
+    } else {
+      // A free-text term or a keyword such as AND.
+      index =
+        (matchAt(VALUE_RE, text, index) && VALUE_RE.lastIndex) || index + 1;
     }
   }
-  while ((match = existsRe.exec(unquoted))) {
-    fields.add(match[1]);
-  }
+  fields.delete('');
 
   return [...fields];
 }
 
-function extractFilterFields(filter: Filter): string[] {
-  if (filter?.meta?.disabled) {
+/** Fields of a query DSL clause. Scripts are not parsed. */
+function extractDslFields(query: unknown): string[] {
+  if (Array.isArray(query)) {
+    return query.flatMap(extractDslFields);
+  }
+  if (!query || typeof query !== 'object') {
     return [];
   }
-  if (filter?.meta?.key) {
-    return [filter.meta.key];
-  }
-  const query = filter?.query ?? filter;
-  const clause = FILTER_CLAUSES.find(name => query?.[name]);
 
-  if (clause) {
-    return Object.keys(query[clause] as object);
-  }
+  return Object.entries(query as Record<string, DslClause>).flatMap(
+    ([clause, body]) => {
+      if (!body || typeof body !== 'object') {
+        return [];
+      }
+      if (FIELD_CLAUSES.includes(clause)) {
+        return Object.keys(body).filter(key => !CLAUSE_OPTIONS.has(key));
+      }
+      switch (clause) {
+        case 'exists':
+          return typeof body.field === 'string' ? [body.field] : [];
+        case 'query_string':
+          return extractQueryFields(body.query);
+        case 'bool':
+          return BOOL_CLAUSES.flatMap(name => extractDslFields(body[name]));
+        case 'query':
+          return extractDslFields(body);
+        case 'nested':
+          return extractDslFields(body.query);
+        case 'constant_score':
+          return extractDslFields(body.filter);
+        default:
+          return [];
+      }
+    },
+  );
+}
 
-  return query?.exists?.field ? [query.exists.field] : [];
+function extractFilterFields(filter: Filter): string[] {
+  const { meta } = filter ?? {};
+  if (meta?.disabled) {
+    return [];
+  }
+  // `meta` and `$state` are not query clauses, so the walk skips them.
+  const fields = extractDslFields(filter);
+
+  // Scripted fields filter by script; the key is the field name.
+  return fields.length || !meta?.key || DSL_FILTER_TYPES.has(meta.type ?? '')
+    ? fields
+    : [meta.key];
 }
 
 function extractAggregationFields(agg: Aggregation): unknown[] {
@@ -207,7 +281,12 @@ export function resolveSource(so: SavedObjectLike): {
       name === (so.attributes?.savedSearchRefName ?? 'search_0'),
   );
 
-  return savedSearch ? { savedSearchId: savedSearch.id } : {};
+  // Objects not migrated to references keep the id as an attribute.
+  const savedSearchId = savedSearch?.id ?? so.attributes?.savedSearchId;
+
+  return typeof savedSearchId === 'string' && savedSearchId
+    ? { savedSearchId }
+    : {};
 }
 
 const wildcardToRegExp = (pattern: string) =>

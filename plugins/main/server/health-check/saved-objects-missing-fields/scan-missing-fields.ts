@@ -7,24 +7,44 @@ import {
 } from './find-missing-fields';
 
 const SCANNED_TYPES = ['visualization', 'search'];
+// The attributes the analysis reads; references always come back.
+const SCANNED_ATTRIBUTES = [
+  'title',
+  'visState',
+  'columns',
+  'sort',
+  'savedSearchRefName',
+  'savedSearchId',
+  'kibanaSavedObjectMeta',
+];
 const PAGE_SIZE = 1000;
+// Paging uses from/size, capped by the default index.max_result_window.
+export const MAX_SCANNED_OBJECTS = 10000;
 
-/** Every visualization and saved search, page by page. */
+/**
+ * Every visualization and saved search, page by page, up to MAX_SCANNED_OBJECTS.
+ * `total` is the number of objects that exist.
+ */
 export async function findScannedObjects(
   savedObjectsClient: SavedObjectsClientContract,
-): Promise<SavedObjectLike[]> {
+): Promise<{ objects: SavedObjectLike[]; total: number }> {
   const objects: SavedObjectLike[] = [];
 
   for (let page = 1; ; page++) {
     // eslint-disable-next-line no-await-in-loop -- pages are read one after another
     const { saved_objects: batch, total } = await savedObjectsClient.find({
       type: SCANNED_TYPES,
+      fields: SCANNED_ATTRIBUTES,
       perPage: PAGE_SIZE,
       page,
     });
     objects.push(...(batch as SavedObjectLike[]));
-    if (!batch.length || objects.length >= total) {
-      return objects;
+    if (
+      !batch.length ||
+      objects.length >= total ||
+      page * PAGE_SIZE >= MAX_SCANNED_OBJECTS
+    ) {
+      return { objects, total };
     }
   }
 }
@@ -58,20 +78,23 @@ async function getIndexPatternFields(
     return undefined;
   }
   // Panels resolve fields from this stored list, not from the live mapping.
-  let fields: { name: string }[];
+  let fields: unknown;
   try {
     fields = JSON.parse(indexPattern.attributes.fields || '[]');
   } catch {
     return undefined;
   }
+  const names = (Array.isArray(fields) ? fields : [])
+    .map(field => field?.name)
+    .filter((name): name is string => typeof name === 'string');
   // An empty list is filled the first time the index pattern loads: nothing to compare yet.
-  if (!Array.isArray(fields) || !fields.length) {
+  if (!names.length) {
     return undefined;
   }
 
   return {
     title: indexPattern.attributes.title ?? id,
-    fields: new Set(fields.map(({ name }) => name)),
+    fields: new Set(names),
   };
 }
 

@@ -22,6 +22,7 @@ import { toMountPoint } from '../../../../../../../src/plugins/opensearch_dashbo
 import {
   FieldUsage,
   MissingFieldsReport,
+  SAVED_OBJECTS_MISSING_FIELDS_MAX_IDS,
   SAVED_OBJECTS_MISSING_FIELDS_ROUTE,
 } from '../../../../../common/saved-objects-missing-fields';
 import { getHttp, getOverlays } from '../../../../kibana-services';
@@ -29,6 +30,9 @@ import { getHttp, getOverlays } from '../../../../kibana-services';
 export const MISSING_FIELDS_BADGE_ACTION = 'WAZUH_MISSING_FIELDS_BADGE';
 // Dashboard panels mount over a few ticks; one request covers them all.
 const BATCH_WINDOW_MS = 50;
+// Panels re-check the badge on every query, time range or refresh change.
+export const REPORT_CACHE_TTL_MS = 60000;
+const SCANNED_TYPES = ['visualization', 'search'];
 
 const getUsageLabels = (): Record<FieldUsage, string> => ({
   query: i18n.translate('wazuh.missingFieldsBadge.usage.query', {
@@ -48,35 +52,77 @@ const getUsageLabels = (): Record<FieldUsage, string> => ({
   }),
 });
 
+async function fetchReports(ids: string[]): Promise<MissingFieldsReport[]> {
+  const chunks: string[][] = [];
+  for (let i = 0; i < ids.length; i += SAVED_OBJECTS_MISSING_FIELDS_MAX_IDS) {
+    chunks.push(ids.slice(i, i + SAVED_OBJECTS_MISSING_FIELDS_MAX_IDS));
+  }
+  const responses = await Promise.all(
+    chunks.map(chunk =>
+      getHttp().post(SAVED_OBJECTS_MISSING_FIELDS_ROUTE, {
+        body: JSON.stringify({ ids: chunk }),
+      }),
+    ),
+  );
+
+  return responses.flatMap(({ reports }) => reports as MissingFieldsReport[]);
+}
+
 let batch: {
   ids: Set<string>;
   reports: Promise<MissingFieldsReport[]>;
 } | null = null;
 
-/** The report of one panel. Panels that render together share one request. */
-export function getMissingFieldsReport(
-  id: string,
-): Promise<MissingFieldsReport | undefined> {
+function requestReports(id: string): Promise<MissingFieldsReport[]> {
   if (!batch) {
     const ids = new Set<string>();
-    const reports = new Promise(resolve =>
-      setTimeout(resolve, BATCH_WINDOW_MS),
-    ).then(() => {
-      batch = null;
-      return getHttp()
-        .post(SAVED_OBJECTS_MISSING_FIELDS_ROUTE, {
-          body: JSON.stringify({ ids: [...ids] }),
-        })
-        .then(({ reports }) => reports as MissingFieldsReport[])
-        .catch(() => []);
-    });
+    const reports = new Promise(resolve => setTimeout(resolve, BATCH_WINDOW_MS))
+      .then(() => {
+        batch = null;
+        return fetchReports([...ids]);
+      })
+      .catch(error => {
+        console.warn(
+          'Could not check the fields of the dashboard panels',
+          error,
+        );
+        throw error;
+      });
     batch = { ids, reports };
   }
   batch.ids.add(id);
 
-  return batch.reports.then(reports =>
-    reports.find(report => report.id === id),
+  return batch.reports;
+}
+
+const cache = new Map<
+  string,
+  { expires: number; report: Promise<MissingFieldsReport | undefined> }
+>();
+
+/**
+ * The report of one visualization or saved search. Panels that render together share
+ * one request; reports are reused for REPORT_CACHE_TTL_MS.
+ */
+export function getMissingFieldsReport(
+  id: string,
+  type: string,
+): Promise<MissingFieldsReport | undefined> {
+  const key = `${type}:${id}`;
+  const cached = cache.get(key);
+  if (cached && cached.expires > Date.now()) {
+    return cached.report;
+  }
+  const report = requestReports(id).then(
+    reports => reports.find(report => report.id === id && report.type === type),
+    () => {
+      cache.delete(key);
+      return undefined;
+    },
   );
+  cache.set(key, { expires: Date.now() + REPORT_CACHE_TTL_MS, report });
+
+  return report;
 }
 
 export const MissingFieldsList = ({
@@ -91,7 +137,7 @@ export const MissingFieldsList = ({
       <p>
         <FormattedMessage
           id='wazuh.missingFieldsBadge.modal.summary'
-          defaultMessage='{title} uses fields that the {indexPattern} index pattern does not have, so it shows no data:'
+          defaultMessage='{title} uses fields that the {indexPattern} index pattern does not have, so it may show no data or wrong data:'
           values={{
             title: <strong>{report.title}</strong>,
             indexPattern: <code>{report.indexPatternTitle}</code>,
@@ -151,13 +197,25 @@ function openMissingFieldsModal(report: MissingFieldsReport) {
   );
 }
 
-// Panels that fail to render become error embeddables, which keep their input.
-const getSavedObjectId = (context: unknown): string | undefined =>
-  (
-    (context as EmbeddableContext)?.embeddable?.getInput() as
-      | { savedObjectId?: string }
+// Panels that fail to render become error embeddables: they keep their input, and the
+// dashboard keeps the panel type.
+function getPanelReport(
+  context: unknown,
+): Promise<MissingFieldsReport | undefined> {
+  const embeddable = (context as EmbeddableContext)?.embeddable;
+  const id = (embeddable?.getInput() as { savedObjectId?: string } | undefined)
+    ?.savedObjectId;
+  const panels = (
+    embeddable?.parent?.getInput() as
+      | { panels?: Record<string, { type?: string }> }
       | undefined
-  )?.savedObjectId;
+  )?.panels;
+  const type = panels?.[embeddable.id]?.type ?? embeddable?.type;
+
+  return id && SCANNED_TYPES.includes(type)
+    ? getMissingFieldsReport(id, type)
+    : Promise.resolve(undefined);
+}
 
 export const createMissingFieldsBadgeAction = () =>
   createAction({
@@ -168,13 +226,9 @@ export const createMissingFieldsBadgeAction = () =>
         defaultMessage: 'Missing fields',
       }),
     getIconType: () => 'alert',
-    isCompatible: async context => {
-      const id = getSavedObjectId(context);
-      return Boolean(id && (await getMissingFieldsReport(id)));
-    },
+    isCompatible: async context => Boolean(await getPanelReport(context)),
     execute: async context => {
-      const id = getSavedObjectId(context);
-      const report = id && (await getMissingFieldsReport(id));
+      const report = await getPanelReport(context);
       if (report) {
         openMissingFieldsModal(report);
       }

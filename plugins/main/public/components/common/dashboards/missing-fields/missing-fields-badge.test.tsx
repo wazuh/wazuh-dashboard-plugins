@@ -14,6 +14,7 @@ import {
   getMissingFieldsReport,
   MissingFieldsList,
   registerMissingFieldsBadgeAction,
+  REPORT_CACHE_TTL_MS,
 } from './missing-fields-badge';
 
 jest.mock('../../../../kibana-services', () => ({
@@ -33,15 +34,23 @@ const report: MissingFieldsReport = {
   ],
 };
 
-const contextFor = (savedObjectId?: string) =>
+const contextFor = (savedObjectId?: string, type = 'visualization') =>
   ({
-    embeddable: { getInput: () => ({ savedObjectId }) },
+    embeddable: { type, getInput: () => ({ savedObjectId }) },
   } as unknown as EmbeddableContext & ActionExecutionMeta);
 
 const post = jest.fn();
+const reportFor = (id: string): MissingFieldsReport => ({ ...report, id });
 
+// Reports are cached by id, so each test uses its own ids.
 beforeEach(() => {
-  post.mockReset().mockResolvedValue({ reports: [report] });
+  post.mockReset().mockImplementation((_path, { body }) =>
+    Promise.resolve({
+      reports: JSON.parse(body)
+        .ids.filter((id: string) => id.startsWith('legacy'))
+        .map(reportFor),
+    }),
+  );
   jest
     .mocked(getHttp)
     .mockReturnValue({ post } as unknown as ReturnType<typeof getHttp>);
@@ -50,43 +59,110 @@ beforeEach(() => {
 describe('getMissingFieldsReport', () => {
   it('sends one request for the panels that render together', async () => {
     const [legacy, ok] = await Promise.all([
-      getMissingFieldsReport('legacy'),
-      getMissingFieldsReport('ok'),
+      getMissingFieldsReport('legacy-1', 'visualization'),
+      getMissingFieldsReport('ok-1', 'visualization'),
     ]);
 
     expect(post).toHaveBeenCalledTimes(1);
     expect(JSON.parse(post.mock.calls[0][1].body)).toEqual({
-      ids: ['legacy', 'ok'],
+      ids: ['legacy-1', 'ok-1'],
     });
-    expect(legacy).toEqual(report);
+    expect(legacy).toEqual(reportFor('legacy-1'));
     expect(ok).toBeUndefined();
   });
 
-  it('reports nothing when the request fails', async () => {
-    post.mockRejectedValue(new Error('403'));
+  it('matches the report on the type of the object', async () => {
+    expect(await getMissingFieldsReport('legacy-2', 'search')).toBeUndefined();
+  });
 
-    expect(await getMissingFieldsReport('legacy')).toBeUndefined();
+  it('reuses a report until it expires', async () => {
+    const now = jest.spyOn(Date, 'now').mockReturnValue(0);
+
+    await getMissingFieldsReport('legacy-3', 'visualization');
+    await getMissingFieldsReport('legacy-3', 'visualization');
+    expect(post).toHaveBeenCalledTimes(1);
+
+    now.mockReturnValue(REPORT_CACHE_TTL_MS + 1);
+    await getMissingFieldsReport('legacy-3', 'visualization');
+    expect(post).toHaveBeenCalledTimes(2);
+    now.mockRestore();
+  });
+
+  it('splits large batches into requests the route accepts', async () => {
+    const ids = Array.from({ length: 501 }, (_, i) => `legacy-4-${i}`);
+
+    const reports = await Promise.all(
+      ids.map(id => getMissingFieldsReport(id, 'visualization')),
+    );
+
+    expect(
+      post.mock.calls.map(([, { body }]) => JSON.parse(body).ids.length),
+    ).toEqual([500, 1]);
+    expect(reports.every(Boolean)).toBe(true);
+  });
+
+  it('logs a failed request, reports nothing and retries next time', async () => {
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    post.mockRejectedValueOnce(new Error('403'));
+
+    expect(
+      await getMissingFieldsReport('legacy-5', 'visualization'),
+    ).toBeUndefined();
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(await getMissingFieldsReport('legacy-5', 'visualization')).toEqual(
+      reportFor('legacy-5'),
+    );
+    warn.mockRestore();
   });
 });
 
 describe('createMissingFieldsBadgeAction', () => {
-  it('shows only on panels whose object uses missing fields', async () => {
+  it('shows only on visualization and saved search panels that use missing fields', async () => {
     const action = createMissingFieldsBadgeAction();
 
-    expect(await action.isCompatible(contextFor('legacy'))).toBe(true);
-    expect(await action.isCompatible(contextFor('ok'))).toBe(false);
+    expect(await action.isCompatible(contextFor('legacy-6'))).toBe(true);
+    expect(await action.isCompatible(contextFor('ok-6'))).toBe(false);
     expect(await action.isCompatible(contextFor())).toBe(false);
+    expect(await action.isCompatible(contextFor('legacy-7', 'map'))).toBe(
+      false,
+    );
+    expect(post.mock.calls.map(([, { body }]) => body)).not.toContainEqual(
+      expect.stringContaining('legacy-7'),
+    );
   });
 
-  it('opens the list of missing fields', async () => {
+  it('shows on panels that failed to render, using the dashboard panel type', async () => {
+    const context = {
+      embeddable: {
+        id: 'panel-1',
+        type: 'error',
+        getInput: () => ({ savedObjectId: 'legacy-9' }),
+        parent: {
+          getInput: () => ({ panels: { 'panel-1': { type: 'search' } } }),
+        },
+      },
+    } as unknown as EmbeddableContext & ActionExecutionMeta;
+    post.mockResolvedValueOnce({
+      reports: [{ ...reportFor('legacy-9'), type: 'search' }],
+    });
+
+    expect(await createMissingFieldsBadgeAction().isCompatible(context)).toBe(
+      true,
+    );
+  });
+
+  it('opens the list of missing fields without a new request', async () => {
     const openModal = jest.fn(() => ({ close: jest.fn() }));
     jest.mocked(getOverlays).mockReturnValue({
       openModal,
     } as unknown as ReturnType<typeof getOverlays>);
+    const action = createMissingFieldsBadgeAction();
 
-    await createMissingFieldsBadgeAction().execute(contextFor('legacy'));
+    await action.isCompatible(contextFor('legacy-8'));
+    await action.execute(contextFor('legacy-8'));
 
     expect(openModal).toHaveBeenCalledTimes(1);
+    expect(post).toHaveBeenCalledTimes(1);
   });
 });
 

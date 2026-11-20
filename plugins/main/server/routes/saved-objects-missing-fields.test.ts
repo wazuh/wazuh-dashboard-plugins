@@ -13,7 +13,11 @@ const savedObjectsClient = {
   bulkGet: jest.fn(),
   get: jest.fn(),
 };
-const context = { core: { savedObjects: { client: savedObjectsClient } } };
+const logger = { error: jest.fn() };
+const context = {
+  core: { savedObjects: { client: savedObjectsClient } },
+  wazuh: { logger },
+};
 let server: HttpServer;
 let innerServer: { listener: import('http').Server };
 
@@ -87,6 +91,22 @@ describe(`POST ${SAVED_OBJECTS_MISSING_FIELDS_ROUTE}`, () => {
         missing: [{ field: 'rule.level', usedIn: ['aggregation'] }],
       }),
     ]);
+  });
+
+  it('logs and returns the error when the saved objects cannot be read', async () => {
+    savedObjectsClient.bulkGet.mockRejectedValue(
+      Object.assign(new Error('Forbidden'), { statusCode: 403 }),
+    );
+
+    const response = await supertest(innerServer.listener)
+      .post(SAVED_OBJECTS_MISSING_FIELDS_ROUTE)
+      .send({ ids: ['legacy'] })
+      .expect(403);
+
+    expect(response.body.message).toBe(
+      'Error checking the fields used by saved objects: Forbidden',
+    );
+    expect(logger.error).toHaveBeenCalledWith(response.body.message);
   });
 
   it.each([[{}], [{ ids: [] }], [{ ids: [''] }]])(

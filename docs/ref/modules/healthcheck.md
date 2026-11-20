@@ -60,11 +60,12 @@ It skips:
 
 - visualizations with no index pattern (TSVB, Vega, Timeline, Markdown);
 - objects whose index pattern does not exist, since their panel already shows that error;
-- index patterns with no stored field list yet.
+- index patterns with no stored field list yet;
+- script clauses of custom filters.
 
-At start and on schedule, it reads the saved objects of the global tenant.
+At start and on schedule, it reads the saved objects of the global tenant, up to 10,000 objects (the default `index.max_result_window` of the indexer). Above that, it logs how many it skipped.
 
-On dashboards, a **Missing fields** badge marks each panel whose object uses missing fields. Selecting it lists the fields and where the object uses them. The badge uses the same check, through `POST /indexer/saved-objects/missing-fields`.
+On dashboards, a **Missing fields** badge marks each panel whose object uses missing fields. Selecting it lists the fields and where the object uses them. The badge uses the same check, through `POST /indexer/saved-objects/missing-fields`, and reuses each result for one minute.
 
 ### Notifications and Alerting
 

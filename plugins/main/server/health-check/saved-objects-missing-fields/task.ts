@@ -28,8 +28,8 @@ export function buildMissingFieldsMessage(
 
   const summary =
     reports.length === 1
-      ? 'A visualization or saved search uses fields its index pattern does not have, so its panel loads empty.'
-      : `${reports.length} visualizations and saved searches use fields their index pattern does not have, so their panels load empty.`;
+      ? 'A visualization or saved search uses fields its index pattern does not have, so its panel may show no data or wrong data.'
+      : `${reports.length} visualizations and saved searches use fields their index pattern does not have, so their panels may show no data or wrong data.`;
 
   return `${summary}\n\n${listed.join('\n')}`;
 }
@@ -47,10 +47,13 @@ export const initializationTaskCreatorSavedObjectsMissingFields = ({
     try {
       const scope = ctx.context.scope ?? 'internal';
       const savedObjectsClient = getSavedObjectsClient(ctx.context, scope);
-      const reports = await scanMissingFields(
-        await findScannedObjects(savedObjectsClient),
-        savedObjectsClient,
-      );
+      const { objects, total } = await findScannedObjects(savedObjectsClient);
+      if (total > objects.length) {
+        ctx.logger.warn(
+          `Checked the fields of the first ${objects.length} of ${total} visualizations and saved searches`,
+        );
+      }
+      const reports = await scanMissingFields(objects, savedObjectsClient);
 
       if (!reports.length) {
         ctx.logger.debug('Every saved object uses existing fields');
@@ -58,7 +61,10 @@ export const initializationTaskCreatorSavedObjectsMissingFields = ({
       }
 
       const message = buildMissingFieldsMessage(reports);
-      ctx.logger.warn(message);
+      ctx.logger.warn(
+        `Visualizations and saved searches using missing fields: ${reports.length}`,
+      );
+      ctx.logger.debug(message);
 
       return ctx.taskResult.warning(message, reports);
     } catch (error) {

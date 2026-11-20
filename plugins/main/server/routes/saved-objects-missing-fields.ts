@@ -1,13 +1,13 @@
 import { IRouter } from 'opensearch_dashboards/server';
 import { schema } from '@osd/config-schema';
-import { SAVED_OBJECTS_MISSING_FIELDS_ROUTE } from '../../common/saved-objects-missing-fields';
+import {
+  SAVED_OBJECTS_MISSING_FIELDS_MAX_IDS,
+  SAVED_OBJECTS_MISSING_FIELDS_ROUTE,
+} from '../../common/saved-objects-missing-fields';
 import {
   getScannedObjects,
   scanMissingFields,
 } from '../health-check/saved-objects-missing-fields/scan-missing-fields';
-
-// A dashboard rarely holds more panels than this.
-const MAX_IDS = 500;
 
 export function SavedObjectsMissingFieldsRoutes(router: IRouter) {
   router.post(
@@ -17,19 +17,31 @@ export function SavedObjectsMissingFieldsRoutes(router: IRouter) {
         body: schema.object({
           ids: schema.arrayOf(schema.string({ minLength: 1 }), {
             minSize: 1,
-            maxSize: MAX_IDS,
+            maxSize: SAVED_OBJECTS_MISSING_FIELDS_MAX_IDS,
           }),
         }),
       },
     },
     async (context, request, response) => {
       const { client } = context.core.savedObjects;
-      const reports = await scanMissingFields(
-        await getScannedObjects(client, request.body.ids),
-        client,
-      );
+      try {
+        const reports = await scanMissingFields(
+          await getScannedObjects(client, request.body.ids),
+          client,
+        );
 
-      return response.ok({ body: { reports } });
+        return response.ok({ body: { reports } });
+      } catch (error) {
+        const message = `Error checking the fields used by saved objects: ${
+          error instanceof Error ? error.message : String(error)
+        }`;
+        context.wazuh.logger.error(message);
+
+        return response.customError({
+          statusCode: (error as { statusCode?: number })?.statusCode ?? 500,
+          body: { message },
+        });
+      }
     },
   );
 }

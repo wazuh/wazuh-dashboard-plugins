@@ -51,6 +51,17 @@ describe('extractQueryFields', () => {
       ['rule.level', 'location'],
     ],
     ['free text', 'failed password', []],
+    ['unquoted value with a colon', 'url: foo-bar:baz and a:1', ['url', 'a']],
+    [
+      'KQL nested',
+      'user:{ name: x and group:{ id > 3 } } or host:y',
+      ['user.name', 'user.group.id', 'host'],
+    ],
+    [
+      'Lucene ranges',
+      'rule.level:[3 TO 5] OR rule.id:{100 TO 200} AND x:1',
+      ['rule.level', 'rule.id', 'x'],
+    ],
     ['empty', '', []],
   ])('reads the fields of a %s query', (_, query, fields) => {
     expect(extractQueryFields(query).sort()).toEqual([...fields].sort());
@@ -147,6 +158,50 @@ describe('collectReferencedFields', () => {
   });
 });
 
+describe('custom filters', () => {
+  const withFilters = (filter: object[]) =>
+    usage(visualization([], { filter }));
+
+  it('reads the fields of bool, query_string and nested clauses', () => {
+    expect(
+      withFilters([
+        {
+          meta: { type: 'custom', key: 'query' },
+          query: {
+            bool: {
+              must: [{ term: { 'agent.id': '001' } }],
+              should: { query_string: { query: 'rule.level:>10' } },
+              must_not: [
+                { nested: { path: 'a', query: { match: { 'a.b': 1 } } } },
+                { constant_score: { filter: { exists: { field: 'c' } } } },
+              ],
+            },
+          },
+        },
+        {
+          meta: { type: 'query_string', key: 'query' },
+          query: { query_string: { query: 'data.srcuser:root' } },
+        },
+      ]),
+    ).toEqual({
+      'agent.id': ['filter'],
+      'rule.level': ['filter'],
+      'a.b': ['filter'],
+      c: ['filter'],
+      'data.srcuser': ['filter'],
+    });
+  });
+
+  it('skips script clauses, but keeps the field of a scripted field filter', () => {
+    expect(
+      withFilters([
+        { meta: { type: 'custom', key: 'script' }, script: { script: {} } },
+        { meta: { type: 'phrase', key: 'hour' }, script: { script: {} } },
+      ]),
+    ).toEqual({ hour: ['filter'] });
+  });
+});
+
 describe('resolveSource', () => {
   it('follows the index reference', () => {
     expect(
@@ -166,6 +221,16 @@ describe('resolveSource', () => {
         type: 'visualization',
         attributes: { savedSearchRefName: 'search_0', ...searchSourceJSON({}) },
         references: [{ name: 'search_0', type: 'search', id: 'legacy' }],
+      }),
+    ).toEqual({ savedSearchId: 'legacy' });
+  });
+
+  it('falls back to the legacy savedSearchId attribute', () => {
+    expect(
+      resolveSource({
+        id: 'vis',
+        type: 'visualization',
+        attributes: { savedSearchId: 'legacy', ...searchSourceJSON({}) },
       }),
     ).toEqual({ savedSearchId: 'legacy' });
   });

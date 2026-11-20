@@ -2,6 +2,7 @@
 import type { SavedObjectsClientContract } from 'opensearch_dashboards/server';
 import {
   findScannedObjects,
+  MAX_SCANNED_OBJECTS,
   getScannedObjects,
   scanMissingFields,
 } from './scan-missing-fields';
@@ -37,6 +38,10 @@ const indexPatterns: Record<string, object> = {
   },
   unloaded: { title: 'new-*', fields: '[]' },
   malformed: { title: 'broken-*', fields: '[{' },
+  partial: {
+    title: 'partial-*',
+    fields: JSON.stringify([null, { name: 'rule.level' }, { type: 'string' }]),
+  },
 };
 
 const createClient = (
@@ -167,6 +172,24 @@ describe('scanMissingFields', () => {
 
     expect(await scanMissingFields(objects, client)).toEqual([]);
   });
+
+  it('ignores malformed entries of the stored field list', async () => {
+    const client = createClient();
+    const vis: SavedObjectLike = {
+      id: 'partial-vis',
+      type: 'visualization',
+      ...indexRef('partial'),
+      attributes: {
+        ...indexRef('partial').attributes,
+        title: 'Partial',
+        visState: terms('rule.groups'),
+      },
+    };
+
+    expect(await scanMissingFields([vis], client)).toMatchObject([
+      { id: 'partial-vis', missing: [{ field: 'rule.groups' }] },
+    ]);
+  });
 });
 
 describe('findScannedObjects', () => {
@@ -184,12 +207,37 @@ describe('findScannedObjects', () => {
         total: 1500,
       } as never);
 
-    expect(await findScannedObjects(client)).toHaveLength(1500);
+    const { objects, total } = await findScannedObjects(client);
+
+    expect(objects).toHaveLength(1500);
+    expect(total).toBe(1500);
     expect(
       client.find.mock.calls.map(
         ([options]) => (options as { page: number }).page,
       ),
     ).toEqual([1, 2]);
+    expect(client.find.mock.calls[0][0]).toMatchObject({
+      fields: expect.arrayContaining(['visState', 'kibanaSavedObjectMeta']),
+    });
+  });
+
+  it('stops at the result window of the indexer', async () => {
+    const client = createClient();
+    client.find.mockImplementation(
+      () =>
+        Promise.resolve({
+          saved_objects: Array.from({ length: 1000 }, (_, i) => ({
+            id: String(i),
+          })),
+          total: 25000,
+        }) as never,
+    );
+
+    const { objects, total } = await findScannedObjects(client);
+
+    expect(objects).toHaveLength(MAX_SCANNED_OBJECTS);
+    expect(total).toBe(25000);
+    expect(client.find).toHaveBeenCalledTimes(MAX_SCANNED_OBJECTS / 1000);
   });
 });
 
