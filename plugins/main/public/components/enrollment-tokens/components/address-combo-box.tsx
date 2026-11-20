@@ -73,7 +73,9 @@ export const AddressComboBox = ({
       fullWidth={fullWidth}
       placeholder={placeholder}
       singleSelection={{ asPlainText: true }}
-      options={names.map(name => ({ label: name }))}
+      options={names
+        .filter(name => !name.includes('*'))
+        .map(name => ({ label: name }))}
       selectedOptions={value ? [{ label: value }] : []}
       onChange={(selected: EuiComboBoxOptionOption[]) =>
         setValue(selected[0]?.label ?? '')

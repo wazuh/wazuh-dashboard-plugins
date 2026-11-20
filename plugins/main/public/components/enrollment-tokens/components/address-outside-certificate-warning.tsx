@@ -12,6 +12,16 @@ interface AddressOutsideCertificateWarningProps {
   certificateNames: string[];
 }
 
+/* A wildcard name (`*.example.com`) covers exactly one non-empty leading label. */
+export const matchesCertificateName = (name: string, address: string) => {
+  const [first, ...domain] = name.toLowerCase().split('.');
+  const [label, ...rest] = address.toLowerCase().split('.');
+
+  return first === '*'
+    ? label.length > 0 && rest.join('.') === domain.join('.')
+    : name.toLowerCase() === address.toLowerCase();
+};
+
 /* Shared by the token flyout and the deploy wizard: the manager refuses an
 address outside its listener certificate, and the value both views prefill comes
 from `enrollment.dns`, which after a migration is often not in it. */
@@ -27,9 +37,7 @@ export const AddressOutsideCertificateWarning = ({
   const isOutsideCertificate =
     address.length > 0 &&
     certificateNames.length > 0 &&
-    !certificateNames.some(
-      name => name.toLowerCase() === address.toLowerCase(),
-    );
+    !certificateNames.some(name => matchesCertificateName(name, address));
 
   if (!isOutsideCertificate) {
     return null;

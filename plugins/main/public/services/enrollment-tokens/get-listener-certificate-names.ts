@@ -52,8 +52,9 @@ const getNodeNames = async (): Promise<string[]> => {
  * without duplicates in node and certificate order.
  *
  * A node that fails or answers without names is skipped, so the others still
- * contribute. Wildcard names are left out: they are not an address an agent
- * can connect to.
+ * contribute. Wildcard names (`*.example.com`) are kept, so an address can be
+ * matched against them; they are not an address an agent can connect to, so
+ * callers must not suggest them.
  */
 export const getListenerCertificateNames = async (): Promise<string[]> => {
   const nodes = await getNodeNames();
@@ -66,5 +67,5 @@ export const getListenerCertificateNames = async (): Promise<string[]> => {
       : [],
   );
 
-  return [...new Set(names)].filter(name => !name.includes('*'));
+  return [...new Set(names)];
 };
