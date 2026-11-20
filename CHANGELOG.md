@@ -318,6 +318,7 @@
 | [#9578](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9578)                          | Removed the `Count` legend from single-series dashboard visualizations                                                                                                                                                                                                                                |
 | [#9649](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9649)                          | Fixed the **Top 5 IOC feed types** of the Home page Malware Detection card being plain text: each type now opens `CTI Explorer` > `IOCs` filtered to it, scrolled to the IOC table                                                                                                                    |
 | [#9688](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9688)                          | Fixed browser extensions counted as packages in the **Package types** and **Top 5 installed packages** panels of IT Hygiene > Dashboard                                                                                                                                                               |
+| [#9696](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9696)                          | Fixed the `IT Hygiene` inventory tabs naming their CSV download **Generate report**, the name of the PDF report of the Dashboard tab and of the other modules: the button is now **Download CSV** and has a download icon                                         |
 
 ## Prior versions
 
