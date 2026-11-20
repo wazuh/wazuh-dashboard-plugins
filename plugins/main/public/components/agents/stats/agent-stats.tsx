@@ -301,9 +301,18 @@ const AgentStatsBody = withDataSourceInitiated({})(
               <p>
                 <FormattedMessage
                   id='wazuh.endpointsSummary.agentStats.noStatisticsBody'
-                  defaultMessage='This agent does not send statistics. Reporting is off by default: enable {option} in the agent configuration. The first report arrives after one interval, 60 seconds by default. {docsLink}'
+                  defaultMessage="This agent does not send statistics. Reporting is off by default: add {option} inside the {agentBlock} block of the agent's local {ossecConf} file and restart the agent. A group's {agentConf} does not accept this option. The first report arrives a few seconds after the restart, then once per interval, 60 seconds by default. {docsLink}"
                   values={{
-                    option: <EuiCode>{'<agent><stats_report>'}</EuiCode>,
+                    // The agent ignores `<stats_report>yes</stats_report>`
+                    // without a warning, so spell out the nested `enabled`.
+                    option: (
+                      <EuiCode>
+                        {'<stats_report><enabled>yes</enabled></stats_report>'}
+                      </EuiCode>
+                    ),
+                    agentBlock: <EuiCode>{'<agent>'}</EuiCode>,
+                    ossecConf: <EuiCode>{'ossec.conf'}</EuiCode>,
+                    agentConf: <EuiCode>{'agent.conf'}</EuiCode>,
                     docsLink: (
                       <EuiLink
                         href={webDocumentationLink(STATS_REPORT_DOCS_PATH)}

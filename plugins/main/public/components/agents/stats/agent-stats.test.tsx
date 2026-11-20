@@ -253,12 +253,25 @@ describe('AgentStats', () => {
     expect(container.textContent).toContain('No statistics reported');
   });
 
-  it('should name the stats_report option and link to its reference in the empty state', async () => {
+  it('should explain where and how to enable stats_report and link to its reference in the empty state', async () => {
     fetchDataMock.mockResolvedValue(noDocumentResponse);
 
     const { container } = await renderAndSettle({ id: agent002 });
 
-    expect(container.textContent).toContain('<agent><stats_report>');
+    const text = container.textContent;
+    // How: the nested syntax, as `<stats_report>yes</stats_report>` is ignored
+    expect(text).toContain(
+      '<stats_report><enabled>yes</enabled></stats_report>',
+    );
+    // Where: the agent's local configuration, not the group's
+    expect(text).toContain("inside the <agent> block of the agent's local");
+    expect(text).toContain('ossec.conf');
+    expect(text).toContain("A group's agent.conf does not accept this option");
+    // Restart and when the first report arrives
+    expect(text).toContain('restart the agent');
+    expect(text).toContain(
+      'The first report arrives a few seconds after the restart',
+    );
     expect(
       container
         .querySelector(queryDataTestAttr('agent-stats-stats-report-docs'))
