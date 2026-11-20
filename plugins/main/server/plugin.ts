@@ -40,6 +40,7 @@ import {
   initializationTaskCreatorServerAPIConnectionCompatibility,
   initializationTaskCreatorServerAPIRunAs,
   initializationTaskCreatorCertificateValidity,
+  initializationTaskCreatorSavedObjectsMissingFields,
   createRateLimitRerun,
   type RateLimitRerun,
   CertificateValidityServices,
@@ -50,6 +51,7 @@ import {
   FIELD_TIMESTAMP,
   HEALTH_CHECK_TASK_INDEX_PATTERNS,
   HEALTH_CHECK_TASK_CERTIFICATE_VALIDITY,
+  HEALTH_CHECK_TASK_SAVED_OBJECTS_MISSING_FIELDS,
   HEALTH_CHECK_TASK_SERVER_API_CONNECTION,
   HEALTH_CHECK_TASK_SERVER_API_RUN_AS,
   HEALTH_CHECK_TASK_INDEX_PATTERN_METRICS_AGENTS,
@@ -818,6 +820,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
 
     core.healthCheck.register(
       initializationTaskCreatorSavedObjectsForDashboardsAndVisualizations(),
+    );
+
+    core.healthCheck.register(
+      initializationTaskCreatorSavedObjectsMissingFields({
+        taskName: HEALTH_CHECK_TASK_SAVED_OBJECTS_MISSING_FIELDS,
+      }),
     );
 
     // Register all index-pattern tasks as a single batched health-check task,
