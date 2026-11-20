@@ -184,7 +184,7 @@ Plugins share code and state through two mechanisms, both provided by OpenSearch
 - **Lifecycle contracts**: the object a plugin returns from `setup()` or `start()` is handed to
   every plugin that lists it in `requiredPlugins` or `optionalPlugins`. For example, `main` reads
   `plugins.wazuhCore` for the configuration and the server API client, and
-  `plugins.wazuhCheckUpdates.CtiUpsellNotification` for the bar that invites users to register
+  `plugins.wazuhCheckUpdates.CtiRegisterNotification` for the bar that invites users to register
   for CTI.
 - **Route handler contexts**: a server plugin can attach values to the `context` argument of
   every route handler. `wazuh-core` registers `context.wazuh_core`, `main` registers
