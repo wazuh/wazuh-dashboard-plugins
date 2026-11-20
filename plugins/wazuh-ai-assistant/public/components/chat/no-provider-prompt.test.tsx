@@ -81,7 +81,9 @@ describe('NoProviderPrompt', () => {
 
   it('adds a provider', () => {
     const { onAddProvider } = renderPrompt();
-    fireEvent.click(screen.getByRole('button', { name: 'Add provider' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Add your first AI provider' }),
+    );
     expect(onAddProvider).toHaveBeenCalledTimes(1);
   });
 
@@ -101,7 +103,9 @@ describe('NoProviderPrompt', () => {
 
   it('disables the add button when settings are locked', () => {
     renderPrompt({ headingLevel: 'h2', isAddProviderDisabled: true });
-    expect(screen.getByRole('button', { name: 'Add provider' })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Add your first AI provider' }),
+    ).toBeDisabled();
     expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
   });
 });

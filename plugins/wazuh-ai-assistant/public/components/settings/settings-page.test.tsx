@@ -669,14 +669,13 @@ describe('SettingsPage — settings-access probe', () => {
     await waitFor(() =>
       expect(mockService.getSettingsAccess).toHaveBeenCalled(),
     );
-    // Both the page header's and the empty prompt's "Add provider" buttons stay enabled.
-    const addButtons = await screen.findAllByRole('button', {
-      name: /^add provider$/i,
-    });
-    expect(addButtons).toHaveLength(2);
-    for (const button of addButtons) {
-      expect(button).toBeEnabled();
-    }
+    // Both the page header's and the empty prompt's add buttons stay enabled.
+    expect(
+      await screen.findByRole('button', { name: /^add provider$/i }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /add your first ai provider/i }),
+    ).toBeEnabled();
   });
 });
 
@@ -872,7 +871,10 @@ describe('SettingsPage — settings tabs', () => {
     ).toBeInTheDocument();
     expect(
       screen.getAllByRole('button', { name: /^add provider$/i }),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
+    expect(
+      screen.getByRole('button', { name: /add your first ai provider/i }),
+    ).toBeInTheDocument();
     expect(isHidden(screen.getByText(/enable privacy mode by default/i))).toBe(
       true,
     );

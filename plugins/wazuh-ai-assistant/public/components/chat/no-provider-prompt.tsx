@@ -103,6 +103,11 @@ export const NoProviderPrompt = ({
             fill
             isDisabled={isAddProviderDisabled}
             onClick={onAddProvider}
+            // Distinct from the Settings page header's own "Add provider" button for screen readers.
+            aria-label={i18n.translate(
+              'wazuhAiAssistant.noProvider.actionAriaLabel',
+              { defaultMessage: 'Add your first AI provider' },
+            )}
           >
             {i18n.translate('wazuhAiAssistant.noProvider.action', {
               defaultMessage: 'Add provider',

@@ -1088,6 +1088,20 @@ $wzMsgAvatarColumn: 40px;
   max-width: 36em;
 }
 
+/* Three columns or one, never 2+1: the shared welcome grid wraps to two columns in a ~500px
+   sidecar and leaves the third example card alone on its own row. The track minimum is a third
+   of the row while three 240px tracks (plus the two 16px gaps, 752px) fit, and the full row
+   otherwise: `(752px - 100%) * 999` is negative when they fit and huge when they don't. */
+.wzNoProviderPrompt .wzExampleCardsGrid {
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(
+      clamp(calc((100% - 32px) / 3), calc((752px - 100%) * 999), 100%),
+      1fr
+    )
+  );
+}
+
 .wzNoProviderPrompt__examplesHeading {
   color: $euiTextSubduedColor;
   text-align: center;
