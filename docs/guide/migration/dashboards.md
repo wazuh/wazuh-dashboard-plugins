@@ -211,6 +211,8 @@ After importing, verify that the migrated objects are accessible and displaying 
 
 If multitenancy was enabled in the 4.x deployment, repeat the export and import steps for each tenant separately. Saved objects are scoped per tenant — objects exported from one tenant must be imported into the same tenant in 5.x.
 
+The **Fields of saved objects** health check reads only the global tenant. To find objects with missing fields in other tenants, open their dashboards in that tenant and look for the **Missing fields** badge.
+
 ### Using the UI
 
 1. Use the tenant selector in the top navigation bar to switch to the target tenant.
