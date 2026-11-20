@@ -98,7 +98,21 @@ const CreateEnrollmentTokenFlyoutContent = ({
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
       component: props => (
-        <AddressComboBox {...props} onNamesLoaded={setCertificateNames} />
+        <AddressComboBox
+          {...props}
+          onNamesLoaded={setCertificateNames}
+          help={
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
+                {
+                  defaultMessage:
+                    'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
+                },
+              )}
+            </EuiText>
+          }
+        />
       ),
     },
     /* Offered from the same settings the deploy wizard reads, so a token
@@ -299,15 +313,6 @@ const CreateEnrollmentTokenFlyoutContent = ({
               )}
               footer={
                 <>
-                  <EuiText size='xs' color='subdued'>
-                    {i18n.translate(
-                      'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
-                      {
-                        defaultMessage:
-                          'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
-                      },
-                    )}
-                  </EuiText>
                   <AddressOutsideCertificateWarning
                     address={fields.address?.value}
                     certificateNames={certificateNames}

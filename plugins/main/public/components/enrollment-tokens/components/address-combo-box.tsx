@@ -33,6 +33,8 @@ interface AddressComboBoxProps {
   /* Called with the names once they are known, `[]` when they cannot be
   loaded, so the parent can compare the address against them. */
   onNamesLoaded?: (names: string[]) => void;
+  /* Shown under the input, before the wildcard patterns. */
+  help?: React.ReactNode;
   'data-test-subj'?: string;
 }
 
@@ -64,6 +66,7 @@ export const AddressComboBox = ({
   placeholder,
   fullWidth = true,
   onNamesLoaded,
+  help,
   'data-test-subj': dataTestSubj = 'enrollmentTokenAddress',
 }: AddressComboBoxProps) => {
   const { names, isLoading } = useListenerCertificateNames();
@@ -121,9 +124,24 @@ export const AddressComboBox = ({
         isInvalid={isInvalid}
         data-test-subj={dataTestSubj}
       />
+      {help}
       {wildcardNames.length > 0 && (
         <>
           <EuiSpacer size='s' />
+          <EuiText
+            size='xs'
+            color='subdued'
+            data-test-subj='addressWildcardPatternsHelp'
+          >
+            {i18n.translate(
+              'wazuh.enrollmentTokens.addressComboBox.wildcardPatterns.label',
+              {
+                defaultMessage:
+                  'Also accepted: any name matching these patterns. Replace the * with the missing part of the name. The manager must be reachable from the agents at that address.',
+              },
+            )}
+          </EuiText>
+          <EuiSpacer size='xs' />
           <EuiFlexGroup
             gutterSize='s'
             alignItems='center'
@@ -131,14 +149,6 @@ export const AddressComboBox = ({
             wrap
             data-test-subj='addressWildcardPatterns'
           >
-            <EuiFlexItem grow={false}>
-              <EuiText size='xs' color='subdued'>
-                {i18n.translate(
-                  'wazuh.enrollmentTokens.addressComboBox.wildcardPatterns.label',
-                  { defaultMessage: 'Also accepted, any name matching:' },
-                )}
-              </EuiText>
-            </EuiFlexItem>
             {wildcardNames.map(pattern => (
               <EuiFlexItem key={pattern} grow={false}>
                 <EuiBadge

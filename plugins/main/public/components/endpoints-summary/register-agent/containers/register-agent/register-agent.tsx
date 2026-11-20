@@ -7,6 +7,7 @@ import {
   EuiPage,
   EuiPageBody,
   EuiSpacer,
+  EuiText,
   EuiProgress,
   EuiToolTip,
   EuiButtonIcon,
@@ -151,6 +152,17 @@ export const RegisterAgent = compose(
         <AddressComboBox
           {...props}
           onNamesLoaded={setCertificateNames}
+          help={
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuh.endpointsSummary.serverAddress.addressHint',
+                {
+                  defaultMessage:
+                    'Pick one of the names in the manager listener certificate, or type another.',
+                },
+              )}
+            </EuiText>
+          }
           data-test-subj='registerAgentServerAddress'
         />
       ),

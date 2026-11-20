@@ -136,15 +136,6 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
             }
             footer={
               <>
-                <EndpointDefaultHint>
-                  {i18n.translate(
-                    'wazuh.endpointsSummary.serverAddress.addressHint',
-                    {
-                      defaultMessage:
-                        'Pick one of the names in the manager listener certificate, or type another.',
-                    },
-                  )}
-                </EndpointDefaultHint>
                 <AddressOutsideCertificateWarning
                   address={serverAddress.value}
                   certificateNames={certificateNames}
