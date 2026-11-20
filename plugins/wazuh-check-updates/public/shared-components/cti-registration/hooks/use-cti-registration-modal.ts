@@ -13,12 +13,21 @@ import { getCtiRegistrationStatusPollIntervalSec } from '../../../plugin-service
  * (button, X, overlay or Escape). Reloading or closing the tab asks for
  * confirmation first and cancels it too.
  */
-export const useCtiRegistrationModal = (initiallyOpen = false) => {
+export interface UseCtiRegistrationModalOptions {
+  /** See `UseCtiStatusOptions.refreshOnFocus`. */
+  refreshOnFocus?: boolean;
+}
+
+export const useCtiRegistrationModal = (
+  initiallyOpen = false,
+  { refreshOnFocus = false }: UseCtiRegistrationModalOptions = {},
+) => {
   const [isModalOpen, setIsModalOpen] = useState(initiallyOpen);
   const [deviceFlowNonce, setDeviceFlowNonce] = useState(0);
   const { statusCTI, loading, deviceFlowActive, refetchStatus } = useCtiStatus(
     deviceFlowNonce,
     getCtiRegistrationStatusPollIntervalSec(),
+    { refreshOnFocus },
   );
 
   const cancelPendingActivation = useCallback(async () => {

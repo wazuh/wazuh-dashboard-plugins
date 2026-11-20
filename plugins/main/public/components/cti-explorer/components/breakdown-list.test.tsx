@@ -3,6 +3,13 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { BreakdownList } from './breakdown-list';
 
+// The counts are formatted by the plugin that owns the CTI feed page.
+jest.mock('../../../kibana-services', () => ({
+  getWazuhCheckUpdatesPlugin: () => ({
+    formatNumber: (value: number) => value.toLocaleString('en'),
+  }),
+}));
+
 describe('BreakdownList', () => {
   it('shows each row with its count and share of the total', () => {
     render(

@@ -32,6 +32,18 @@ export const FeedSyncBadge: React.FC<{
           })}
         </EuiBadge>
       );
+    case 'retryPending':
+      return (
+        <EuiBadge
+          color='warning'
+          iconType='alert'
+          data-test-subj={dataTestSubj}
+        >
+          {i18n.translate('wazuhCheckUpdates.ctiFeed.sync.badge.retryPending', {
+            defaultMessage: 'Retry pending',
+          })}
+        </EuiBadge>
+      );
     case 'failed':
       return (
         <EuiBadge color='danger' data-test-subj={dataTestSubj}>

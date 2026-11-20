@@ -1,6 +1,7 @@
 /* eslint-disable camelcase -- CTI consumer and query fields keep their API names */
 import type { CtiConsumer } from '../../common/cti-consumers';
 import {
+  formatSyncPhases,
   getConsumerSyncState,
   getFeedSyncSummary,
   getSyncProgress,
@@ -34,7 +35,44 @@ describe('getConsumerSyncState', () => {
       getConsumerSyncState(
         consumer({ status: 'running', local_offset: 25, remote_offset: 100 }),
       ),
-    ).toEqual({ kind: 'syncing', progress: 0.25 });
+    ).toEqual({ kind: 'syncing', progress: 0.25, preparing: false });
+  });
+
+  test('is preparing while no content of the new data source is live', () => {
+    // A plan change: the consumer restarts at offset 0 while its snapshot downloads.
+    expect(
+      getConsumerSyncState(
+        consumer({ status: 'running', local_offset: 0, remote_offset: 1899 }),
+      ),
+    ).toEqual({ kind: 'syncing', progress: 0, preparing: true });
+  });
+
+  test('has steps to retry when ready with pending sync phases', () => {
+    expect(
+      getConsumerSyncState(
+        consumer({ pending_sync_phases: ['rules', 'detectors'] }),
+      ),
+    ).toEqual({ kind: 'retryPending', phases: ['rules', 'detectors'] });
+  });
+
+  test('leaves the pending sync phases to the sync while it runs', () => {
+    // The indexer lists them when a sync starts and clears them as each step succeeds.
+    expect(
+      getConsumerSyncState(
+        consumer({
+          status: 'running',
+          local_offset: 50,
+          remote_offset: 100,
+          pending_sync_phases: ['rules'],
+        }),
+      ).kind,
+    ).toBe('syncing');
+  });
+
+  test('is up to date with an empty list of pending sync phases', () => {
+    expect(getConsumerSyncState(consumer({ pending_sync_phases: [] }))).toEqual(
+      { kind: 'upToDate' },
+    );
   });
 
   test('has no progress when the remote offset is unknown', () => {
@@ -42,7 +80,7 @@ describe('getConsumerSyncState', () => {
       getConsumerSyncState(
         consumer({ status: 'running', local_offset: 0, remote_offset: 0 }),
       ),
-    ).toEqual({ kind: 'syncing', progress: null });
+    ).toEqual({ kind: 'syncing', progress: null, preparing: false });
   });
 
   test('is failed when the consumer failed', () => {
@@ -96,5 +134,37 @@ describe('getFeedSyncSummary', () => {
     expect(getFeedSyncSummary([pending, syncing, consumer()])).toBe('syncing');
     expect(getFeedSyncSummary([unknown, pending])).toBe('pending');
     expect(getFeedSyncSummary([consumer(), unknown])).toBe('unknown');
+  });
+
+  test('puts steps to retry after a sync in progress, before new content', () => {
+    const retry = consumer({ pending_sync_phases: ['detectors'] });
+    const syncing = consumer({ status: 'running' });
+    const pending = consumer({ local_offset: 1 });
+
+    expect(getFeedSyncSummary([pending, retry, consumer()])).toBe(
+      'retryPending',
+    );
+    expect(getFeedSyncSummary([retry, syncing])).toBe('syncing');
+    expect(getFeedSyncSummary([retry, consumer({ status: 'failed' })])).toBe(
+      'failed',
+    );
+  });
+});
+
+describe('formatSyncPhases', () => {
+  test('lists the steps in plain words', () => {
+    expect(formatSyncPhases(['rules', 'detectors'])).toBe(
+      'rules and detectors',
+    );
+    expect(formatSyncPhases(['integrations', 'rules', 'detectors'])).toBe(
+      'integrations, rules, and detectors',
+    );
+    expect(formatSyncPhases(['ioc_load'])).toBe(
+      'loading the IOCs into the engine',
+    );
+  });
+
+  test('keeps a step it does not know as the indexer names it', () => {
+    expect(formatSyncPhases(['policies'])).toBe('policies');
   });
 });

@@ -5,6 +5,7 @@ jest.mock('../plugin-services', () => ({
 import moment from 'moment';
 import { getWazuhCore } from '../plugin-services';
 import {
+  formatCtiDate,
   formatCtiTimestamp,
   getCtiTimestampFromNow,
   parseCtiTimestamp,
@@ -61,5 +62,21 @@ describe('getCtiTimestampFromNow', () => {
     expect(
       getCtiTimestampFromNow(moment.utc('2026-05-21T12:30:20Z'), now),
     ).toBe('a few seconds ago');
+  });
+});
+
+describe('formatCtiDate', () => {
+  test('keeps only the calendar date', () => {
+    expect(formatCtiDate('2026-03-01T10:00:00Z')).toBe(
+      moment('2026-03-01T10:00:00Z').format('ll'),
+    );
+  });
+
+  test.each([
+    ['a missing date', undefined],
+    ['an empty date', ''],
+    ['an invalid date', 'next week'],
+  ])('is null for %s', (_label, value) => {
+    expect(formatCtiDate(value)).toBeNull();
   });
 });

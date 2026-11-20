@@ -4,21 +4,18 @@ import { EuiHealth, EuiToolTip } from '@elastic/eui';
 interface ColumnWithStatusIconProps {
   color: string;
   text: string;
-  tooltip?: string;
+  tooltip?: React.ReactNode;
 }
 
 export const ColumnWithStatusIcon = ({
   color,
   text,
   tooltip,
-}: ColumnWithStatusIconProps) => {
-  const textTooltip = tooltip ? tooltip : text;
-  return (
-    <>
-      <EuiToolTip position='top' content={textTooltip}>
-        <EuiHealth className='wz-flex' color={color}></EuiHealth>
-      </EuiToolTip>
+}: ColumnWithStatusIconProps) => (
+  // The tooltip anchors the whole value (icon and text), not only the icon
+  <EuiToolTip position='top' content={tooltip || text}>
+    <EuiHealth color={color}>
       <span className='hide-agent-status'>{text}</span>
-    </>
-  );
-};
+    </EuiHealth>
+  </EuiToolTip>
+);

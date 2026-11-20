@@ -7,6 +7,12 @@ const THREAT_INTEL_VULNERABILITIES_PATTERN =
   '.wazuh-threatintel-vulnerabilities*';
 /** The vulnerabilities index also holds feed metadata documents; only CVEs count. */
 const CVE_DOCUMENT_TYPE = 'CVE';
+/**
+ * The enrichments index also holds one `__ioc_type_hashes__` document, with the
+ * checksums of each IOC type and no `document`: only records with a type count, as
+ * in the CTI Explorer.
+ */
+const IOC_RECORDS_QUERY = { exists: { field: 'document.type' } };
 
 /**
  * Counts the feed content that does not live in Security Analytics: indicators
@@ -23,7 +29,10 @@ export const getCtiFeedIndicatorsRoute = (router: IRouter) => {
       const client = context.core.opensearch.client.asCurrentUser;
 
       const [iocs, vulnerabilities] = await Promise.allSettled([
-        client.count({ index: THREAT_INTEL_ENRICHMENTS_PATTERN }),
+        client.count({
+          index: THREAT_INTEL_ENRICHMENTS_PATTERN,
+          body: { query: IOC_RECORDS_QUERY },
+        }),
         client.count({
           index: THREAT_INTEL_VULNERABILITIES_PATTERN,
           body: { query: { term: { type: CVE_DOCUMENT_TYPE } } },

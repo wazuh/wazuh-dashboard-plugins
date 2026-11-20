@@ -137,6 +137,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
+      environment_uid: 'env-uuid-1',
       subscription: { message: null, status: null },
     });
     expect(mockedGetCtiSubscriptionStatus).toHaveBeenCalledWith(
@@ -160,6 +161,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
+      environment_uid: 'env-uuid-1',
       subscription: {
         message: {
           plan: { name: 'Premium Plan', is_public: true },
@@ -228,6 +230,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: true,
       inProgress: false,
+      environment_uid: 'env-uuid-1',
       subscription: {
         message: {
           plan: { name: 'Pro Plan', is_public: true },
@@ -265,6 +268,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: false,
       inProgress: false,
+      environment_uid: 'env-uuid-1',
       subscription: {
         message: { plan: { name: '', is_public: true }, is_registered: false },
         status: 200,
@@ -297,6 +301,7 @@ describe('CTI registration status route', () => {
     expect(response.body).toEqual({
       registrationComplete: true,
       inProgress: false,
+      environment_uid: 'env-uuid-1',
       subscription: { message: null, status: 502 },
     });
     expect(store.getStatus('env-uuid-1')).toBeDefined();
@@ -379,6 +384,7 @@ describe('CTI registration status route', () => {
       expect(response.body).toEqual({
         registrationComplete: false,
         inProgress: true,
+        environment_uid: 'env-uuid-1',
         subscription: { message: null, status: null },
       });
       expect(

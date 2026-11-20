@@ -219,36 +219,17 @@ const MitreTopTacticsTechniquesBody = compose(
     setShowTechniqueDetails('');
   };
 
-  const goToDashboardWithFilter = async (e, techniqueID) => {
-    const indexPatternId = dataSource.dataSource.indexPattern.id;
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `wazuh.rule.mitre.technique.id`,
-        techniqueID,
-        indexPatternId,
-      ),
-    ];
-
-    const params = `tab=mitre&tabView=dashboard&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
-      filters,
-    )}`;
-    NavigationService.getInstance().navigateToApp(mitreAttack.id, {
-      path: `#/overview?${params}`,
-    });
-  };
+  const getTechniqueFilters = techniqueID => [
+    PatternDataSourceFilterManager.createFilter(
+      FILTER_OPERATOR.IS,
+      `wazuh.rule.mitre.technique.id`,
+      techniqueID,
+      dataSource.dataSource.indexPattern.id,
+    ),
+  ];
 
   const goToEventsWithFilter = async (e, techniqueID) => {
-    const indexPatternId = dataSource.dataSource.indexPattern.id;
-    const filters = [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        `wazuh.rule.mitre.technique.id`,
-        techniqueID,
-        indexPatternId,
-      ),
-    ];
-
+    const filters = getTechniqueFilters(techniqueID);
     const params = `tab=mitre&tabView=events&agentId=${agentId}&_g=${PatternDataSourceFilterManager.filtersToURLFormat(
       filters,
     )}`;
@@ -275,12 +256,14 @@ const MitreTopTacticsTechniquesBody = compose(
         </EuiFlexItem>
         {showTechniqueDetails && (
           <FlyoutTechnique
-            openDashboard={(e, itemId) => goToDashboardWithFilter(e, itemId)}
             openDiscover={(e, itemId) => goToEventsWithFilter(e, itemId)}
             implicitFilters={[{ 'wazuh.agent.id': agentId }]}
             agentId={agentId}
             onChangeFlyout={onChangeFlyout}
             currentTechnique={showTechniqueDetails}
+            filterParams={{
+              filters: getTechniqueFilters(showTechniqueDetails),
+            }}
           />
         )}
       </EuiFlexGroup>

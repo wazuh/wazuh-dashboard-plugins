@@ -1,5 +1,5 @@
 /**
- * CTI Console URL resolution and configuration errors for CTI registration.
+ * Wazuh Console URL resolution and configuration errors for CTI registration.
  */
 import { WAZUH_CTI_CONSOLE_BASE_URL } from '../../../common/constants';
 
