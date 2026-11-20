@@ -30,8 +30,6 @@ import { getHttp, getOverlays } from '../../../../kibana-services';
 export const MISSING_FIELDS_BADGE_ACTION = 'WAZUH_MISSING_FIELDS_BADGE';
 // Dashboard panels mount over a few ticks; one request covers them all.
 const BATCH_WINDOW_MS = 50;
-// Panels re-check the badge on every query, time range or refresh change.
-export const REPORT_CACHE_TTL_MS = 60000;
 const SCANNED_TYPES = ['visualization', 'search'];
 
 const getUsageLabels = (): Record<FieldUsage, string> => ({
@@ -95,34 +93,41 @@ function requestReports(id: string): Promise<MissingFieldsReport[]> {
   return batch.reports;
 }
 
-const cache = new Map<
-  string,
-  { expires: number; report: Promise<MissingFieldsReport | undefined> }
+// Panels re-check the badge on every query, time range or refresh change, so reports are
+// kept per dashboard: opening or reloading a dashboard creates a new one and checks again.
+const cache = new WeakMap<
+  object,
+  Map<string, Promise<MissingFieldsReport | undefined>>
 >();
 
 /**
- * The report of one visualization or saved search. Panels that render together share
- * one request; reports are reused for REPORT_CACHE_TTL_MS.
+ * The report of one visualization or saved search on a dashboard (`scope`). Panels that
+ * render together share one request.
  */
 export function getMissingFieldsReport(
   id: string,
   type: string,
+  scope: object,
 ): Promise<MissingFieldsReport | undefined> {
-  const key = `${type}:${id}`;
-  const cached = cache.get(key);
-  if (cached && cached.expires > Date.now()) {
-    return cached.report;
+  if (!cache.has(scope)) {
+    cache.set(scope, new Map());
   }
-  const report = requestReports(id).then(
-    reports => reports.find(report => report.id === id && report.type === type),
-    () => {
-      cache.delete(key);
-      return undefined;
-    },
-  );
-  cache.set(key, { expires: Date.now() + REPORT_CACHE_TTL_MS, report });
+  const reports = cache.get(scope)!;
+  const key = `${type}:${id}`;
+  if (!reports.has(key)) {
+    reports.set(
+      key,
+      requestReports(id).then(
+        found => found.find(report => report.id === id && report.type === type),
+        () => {
+          reports.delete(key);
+          return undefined;
+        },
+      ),
+    );
+  }
 
-  return report;
+  return reports.get(key)!;
 }
 
 export const MissingFieldsList = ({
@@ -213,7 +218,7 @@ function getPanelReport(
   const type = panels?.[embeddable.id]?.type ?? embeddable?.type;
 
   return id && SCANNED_TYPES.includes(type)
-    ? getMissingFieldsReport(id, type)
+    ? getMissingFieldsReport(id, type, embeddable.parent ?? embeddable)
     : Promise.resolve(undefined);
 }
 

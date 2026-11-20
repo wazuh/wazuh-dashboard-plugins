@@ -91,8 +91,9 @@ const getSearchSource = (so: SavedObjectLike) =>
   );
 
 const FIELD_RE = /([A-Za-z_@][\w.@*-]*)\s*(:|<=|>=|<|>)\s*/y;
-// A field value: a range, or a run up to the next space or group delimiter.
-const VALUE_RE = /\[[^\]]*\]|\{[^{}:]*\bTO\b[^{}:]*\}|(?:\\.|[^\s(){}])+/y;
+// A field value: a Lucene range (`[a TO b]`, `{a TO b}`), or a run up to the next space or
+// group delimiter.
+const VALUE_RE = /\[[^\]]*\]|\{[^{}]*\sTO\s[^{}]*\}|(?:\\.|[^\s(){}])+/y;
 const SEPARATOR_RE = /[\s(){!+-]/;
 
 const matchAt = (re: RegExp, text: string, index: number) => {

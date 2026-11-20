@@ -62,6 +62,11 @@ describe('extractQueryFields', () => {
       'rule.level:[3 TO 5] OR rule.id:{100 TO 200} AND x:1',
       ['rule.level', 'rule.id', 'x'],
     ],
+    [
+      'Lucene ranges with times',
+      'timestamp:{2024-01-01T00:00:00 TO *} AND rule.level:[3 TO 5]',
+      ['timestamp', 'rule.level'],
+    ],
     ['empty', '', []],
   ])('reads the fields of a %s query', (_, query, fields) => {
     expect(extractQueryFields(query).sort()).toEqual([...fields].sort());

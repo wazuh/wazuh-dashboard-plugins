@@ -14,7 +14,6 @@ import {
   getMissingFieldsReport,
   MissingFieldsList,
   registerMissingFieldsBadgeAction,
-  REPORT_CACHE_TTL_MS,
 } from './missing-fields-badge';
 
 jest.mock('../../../../kibana-services', () => ({
@@ -34,9 +33,15 @@ const report: MissingFieldsReport = {
   ],
 };
 
+const dashboard = { getInput: () => ({ panels: {} }) };
+
 const contextFor = (savedObjectId?: string, type = 'visualization') =>
   ({
-    embeddable: { type, getInput: () => ({ savedObjectId }) },
+    embeddable: {
+      type,
+      getInput: () => ({ savedObjectId }),
+      parent: dashboard,
+    },
   } as unknown as EmbeddableContext & ActionExecutionMeta);
 
 const post = jest.fn();
@@ -59,8 +64,8 @@ beforeEach(() => {
 describe('getMissingFieldsReport', () => {
   it('sends one request for the panels that render together', async () => {
     const [legacy, ok] = await Promise.all([
-      getMissingFieldsReport('legacy-1', 'visualization'),
-      getMissingFieldsReport('ok-1', 'visualization'),
+      getMissingFieldsReport('legacy-1', 'visualization', dashboard),
+      getMissingFieldsReport('ok-1', 'visualization', dashboard),
     ]);
 
     expect(post).toHaveBeenCalledTimes(1);
@@ -72,27 +77,25 @@ describe('getMissingFieldsReport', () => {
   });
 
   it('matches the report on the type of the object', async () => {
-    expect(await getMissingFieldsReport('legacy-2', 'search')).toBeUndefined();
+    expect(
+      await getMissingFieldsReport('legacy-2', 'search', dashboard),
+    ).toBeUndefined();
   });
 
-  it('reuses a report until it expires', async () => {
-    const now = jest.spyOn(Date, 'now').mockReturnValue(0);
-
-    await getMissingFieldsReport('legacy-3', 'visualization');
-    await getMissingFieldsReport('legacy-3', 'visualization');
+  it('reuses a report on the same dashboard and checks again on a new one', async () => {
+    await getMissingFieldsReport('legacy-3', 'visualization', dashboard);
+    await getMissingFieldsReport('legacy-3', 'visualization', dashboard);
     expect(post).toHaveBeenCalledTimes(1);
 
-    now.mockReturnValue(REPORT_CACHE_TTL_MS + 1);
-    await getMissingFieldsReport('legacy-3', 'visualization');
+    await getMissingFieldsReport('legacy-3', 'visualization', {});
     expect(post).toHaveBeenCalledTimes(2);
-    now.mockRestore();
   });
 
   it('splits large batches into requests the route accepts', async () => {
     const ids = Array.from({ length: 501 }, (_, i) => `legacy-4-${i}`);
 
     const reports = await Promise.all(
-      ids.map(id => getMissingFieldsReport(id, 'visualization')),
+      ids.map(id => getMissingFieldsReport(id, 'visualization', dashboard)),
     );
 
     expect(
@@ -106,12 +109,12 @@ describe('getMissingFieldsReport', () => {
     post.mockRejectedValueOnce(new Error('403'));
 
     expect(
-      await getMissingFieldsReport('legacy-5', 'visualization'),
+      await getMissingFieldsReport('legacy-5', 'visualization', dashboard),
     ).toBeUndefined();
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(await getMissingFieldsReport('legacy-5', 'visualization')).toEqual(
-      reportFor('legacy-5'),
-    );
+    expect(
+      await getMissingFieldsReport('legacy-5', 'visualization', dashboard),
+    ).toEqual(reportFor('legacy-5'));
     warn.mockRestore();
   });
 });
