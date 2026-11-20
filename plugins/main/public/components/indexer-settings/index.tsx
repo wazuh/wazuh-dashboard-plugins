@@ -31,6 +31,11 @@ import { EngineSwitch } from './engine-switch';
 import type { Engine, IndexerSettings } from './types';
 import { WAZUH_DISABLED_SETTING_INDEX_RAW_EVENTS } from '../../../common/constants';
 
+// The indexer also answers 403 for other refusals, such as a read-only index
+// (cluster_block_exception).
+const isSecurityException = (message?: string) =>
+  Boolean(message?.includes('security_exception'));
+
 export const WzIndexerSettings: React.FC = () => {
   const [savedSettings, setSavedSettings] = useState<IndexerSettings | null>(
     null,
@@ -41,6 +46,7 @@ export const WzIndexerSettings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [canEdit, setCanEdit] = useState(true);
   const [bottomBarHost, setBottomBarHost] = useState<HTMLElement | null>(null);
 
   const isIndexRawEventsDisabled = isSecurityAnalyticsSettingDisabled(
@@ -63,14 +69,20 @@ export const WzIndexerSettings: React.FC = () => {
       const settings = response.data;
       setSavedSettings(settings);
       setDraftSettings(settings);
-    } catch (error: any) {
+    } catch (error) {
       setSavedSettings(null);
       setDraftSettings(null);
+      const message = (error as Error)?.message;
       setLoadError(
-        error?.message ||
-          i18n.translate('wazuh.indexerSettings.form.fetchError', {
-            defaultMessage: 'Error fetching settings.',
-          }),
+        isSecurityException(message)
+          ? i18n.translate('wazuh.indexerSettings.form.noReadPermission', {
+              defaultMessage:
+                "You don't have permission to read indexer settings.",
+            })
+          : message ||
+              i18n.translate('wazuh.indexerSettings.form.fetchError', {
+                defaultMessage: 'Error fetching settings.',
+              }),
       );
     } finally {
       setLoading(false);
@@ -84,7 +96,9 @@ export const WzIndexerSettings: React.FC = () => {
   const updateEngine = useCallback(
     <K extends keyof Engine>(key: K, value: Engine[K]) => {
       setDraftSettings(prev => {
-        if (!prev) return prev;
+        if (!prev) {
+          return prev;
+        }
         return {
           ...prev,
           engine: { ...prev.engine, [key]: value },
@@ -106,7 +120,9 @@ export const WzIndexerSettings: React.FC = () => {
   }, [savedSettings, draftSettings]);
 
   useEffect(() => {
-    if (!hasUnsavedChanges) return;
+    if (!hasUnsavedChanges) {
+      return;
+    }
 
     const handler = (e: BeforeUnloadEvent) => {
       e.preventDefault();
@@ -117,15 +133,31 @@ export const WzIndexerSettings: React.FC = () => {
   }, [hasUnsavedChanges]);
 
   const cancelChanges = () => {
-    if (savedSettings === null) return;
+    if (savedSettings === null) {
+      return;
+    }
     setDraftSettings(savedSettings);
   };
 
+  const noPermissionMessage = i18n.translate(
+    'wazuh.indexerSettings.form.noPermission',
+    {
+      defaultMessage: "You don't have permission to change indexer settings.",
+    },
+  );
+
   const saveChanges = async () => {
-    if (draftSettings === null) return;
+    if (draftSettings === null) {
+      return;
+    }
     setSaving(true);
     try {
-      await GenericRequest.request('PUT', '/indexer/settings', draftSettings);
+      await GenericRequest.request(
+        'PUT',
+        '/indexer/settings',
+        draftSettings,
+        true,
+      );
 
       setSavedSettings(draftSettings);
       getToasts().addSuccess(
@@ -133,9 +165,21 @@ export const WzIndexerSettings: React.FC = () => {
           defaultMessage: 'Settings updated successfully.',
         }),
       );
-    } catch (error: any) {
+    } catch (error) {
+      const { response, message } = error as {
+        response?: { status?: number; data?: { message?: string } };
+        message?: string;
+      };
+      const serverMessage = response?.data?.message || message;
+      if (response?.status === 403 && isSecurityException(serverMessage)) {
+        // The change was refused, so drop it and stop offering an edit that cannot be saved.
+        setDraftSettings(savedSettings);
+        setCanEdit(false);
+        getToasts().addDanger(noPermissionMessage);
+        return;
+      }
       getToasts().addDanger(
-        error?.message ||
+        serverMessage ||
           i18n.translate('wazuh.indexerSettings.form.saveErrorToast', {
             defaultMessage: 'Error updating settings.',
           }),
@@ -255,6 +299,18 @@ export const WzIndexerSettings: React.FC = () => {
             </EuiText>
           ) : draftSettings ? (
             <EuiPanel paddingSize='none' hasBorder={false} hasShadow={false}>
+              {!canEdit && (
+                <>
+                  <EuiCallOut
+                    title={noPermissionMessage}
+                    color='warning'
+                    iconType='lock'
+                    size='s'
+                    data-test-subj='indexerSettings-noPermission'
+                  />
+                  <EuiSpacer size='m' />
+                </>
+              )}
               <EuiDescribedFormGroup
                 fullWidth
                 id='indexer-settings-enable-raw-events-group'
@@ -285,11 +341,13 @@ export const WzIndexerSettings: React.FC = () => {
                   field='index_raw_events'
                   ariaLabel={i18n.translate(
                     'wazuh.indexerSettings.rawEvents.switchAriaLabel',
-                    { defaultMessage: 'Enable raw events' },
+                    {
+                      defaultMessage: 'Enable raw events',
+                    },
                   )}
                   engine={draftSettings.engine}
                   updateEngine={updateEngine}
-                  saving={saving}
+                  disabled={saving || !canEdit}
                 />
               </EuiDescribedFormGroup>
             </EuiPanel>

@@ -68,43 +68,51 @@ export const getAllOptionalsMacos = (
 
 /******* DEB *******/
 
-export const getDEBAMD64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `wget ${urlPackage} && sudo ${
+type tLinuxInstallCommand = tOSEntryInstallCommand<tOptionalParameters> & {
+  gpgKeyUrl: string;
+};
+
+type tDEBInstallCommand = tLinuxInstallCommand & {
+  aptSource: string;
+};
+
+const DEB_KEYRING = '/usr/share/keyrings/wazuh.asc';
+
+// dpkg checks no signature: apt verifies the signed index; the package must match its SHA-256.
+const getDEBVerifyCommand = (packageName: string, aptSource: string) =>
+  `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=${DEB_KEYRING}] ${aptSource} main" > $d/wazuh.list && echo "Dir::Etc::SourceList \\"$d/wazuh.list\\"; Dir::Etc::SourceParts \\"$d/lists\\"; Dir::State::Lists \\"$d/lists\\"; Dir::Cache \\"$d\\";" > $d/apt.conf && sudo mkdir -m 755 $d/lists $d/lists/partial && sudo apt-get update -qq -c $d/apt.conf && echo "$(sudo apt-cache -c $d/apt.conf show wazuh-agent | awk -v f=/${packageName} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${packageName}" | sha256sum -c --quiet && sudo rm -rf $d`;
+
+const getDEBInstallCommand = (props: tDEBInstallCommand) => {
+  const { optionals, urlPackage, packageName, gpgKeyUrl, aptSource } = props;
+  return `sudo wget -qO ${DEB_KEYRING} ${gpgKeyUrl} && sudo chmod 644 ${DEB_KEYRING} && wget ${urlPackage} && ${getDEBVerifyCommand(
+    packageName,
+    aptSource,
+  )} && sudo ${
     optionals && getAllOptionals(optionals)
   }dpkg -i ./${packageName}`;
 };
 
-export const getDEBARM64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `wget ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }dpkg -i ./${packageName}`;
-};
+export const getDEBAMD64InstallCommand = (props: tDEBInstallCommand) =>
+  getDEBInstallCommand(props);
+
+export const getDEBARM64InstallCommand = (props: tDEBInstallCommand) =>
+  getDEBInstallCommand(props);
 
 /******* RPM *******/
 
-export const getRPMAMD64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
+const getRPMInstallCommand = (props: tLinuxInstallCommand) => {
+  const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
+  // rpm -K rejects bad or unknown signatures; the grep rejects unsigned packages.
+  return `sudo rpm --import ${gpgKeyUrl} && curl -o ${packageName} ${urlPackage} && rpm -K ${packageName} && LC_ALL=C rpm -Kv ${packageName} | grep -q 'Signature, key ID [0-9a-f]*: OK' && sudo ${
     optionals && getAllOptionals(optionals)
   }rpm -ihv ${packageName}`;
 };
 
-export const getRPMARM64InstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
-) => {
-  const { optionals, urlPackage, packageName } = props;
-  return `curl -o ${packageName} ${urlPackage} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }rpm -ihv ${packageName}`;
-};
+export const getRPMAMD64InstallCommand = (props: tLinuxInstallCommand) =>
+  getRPMInstallCommand(props);
+
+export const getRPMARM64InstallCommand = (props: tLinuxInstallCommand) =>
+  getRPMInstallCommand(props);
 
 /******* Linux *******/
 

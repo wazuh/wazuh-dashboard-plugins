@@ -59,38 +59,32 @@ jest.mock('./utils/settings-search-service', () => ({
   clearSettingsSearchDataCache: jest.fn(),
 }));
 
-const store = configureMockStore()({
-  configurationReducers: {
-    clusterNodes: false,
-    clusterNodeSelected: false,
-    refreshTime: false,
-  },
-  // The manager branch renders the permissions-gated edit button.
-  appStateReducers: {
-    userPermissions: {},
-    userAccount: { administrator_requirements: null },
-    withUserLogged: true,
-  },
-});
+const createStore = ({
+  clusterNodeSelected = false as string | false,
+  userPermissions = {} as Record<string, unknown>,
+} = {}) =>
+  configureMockStore()({
+    configurationReducers: {
+      clusterNodes: false,
+      clusterNodeSelected,
+      refreshTime: false,
+    },
+    // The manager branch renders the permissions-gated edit button.
+    appStateReducers: {
+      userPermissions,
+      userAccount: { administrator_requirements: null },
+      withUserLogged: true,
+    },
+  });
 
-const managerStore = configureMockStore()({
-  configurationReducers: {
-    clusterNodes: false,
-    clusterNodeSelected: 'node01',
-    refreshTime: false,
-  },
-  appStateReducers: {
-    userPermissions: {},
-    userAccount: { administrator_requirements: null },
-    withUserLogged: true,
-  },
-});
+const store = createStore();
+const managerStore = createStore({ clusterNodeSelected: 'node01' });
 
 const agent = { id: '001', name: 'agent.deb.local', status: 'active' };
 
-const renderOverview = (props = {}) =>
+const renderOverview = (props = {}, overviewStore = store) =>
   render(
-    <Provider store={store}>
+    <Provider store={overviewStore}>
       <WzConfigurationOverview
         updateConfigurationSection={jest.fn()}
         onRefreshAgentReport={jest.fn()}
@@ -384,6 +378,38 @@ describe('WzConfigurationOverview', () => {
     ).not.toBeInTheDocument();
   });
 
+  // White mode denies any action the user has no policy for.
+  const onNode = (resource: string, effect = 'allow') => ({
+    rbac_mode: 'white',
+    'cluster:read': { [resource]: effect },
+    'cluster:update_config': { [resource]: effect },
+  });
+
+  it.each`
+    node        | userPermissions                     | enabled
+    ${false}    | ${{ rbac_mode: 'white' }}           | ${false}
+    ${false}    | ${onNode('node:id:*')}              | ${true}
+    ${'node01'} | ${onNode('node:id:node01')}         | ${true}
+    ${'node01'} | ${onNode('node:id:node01', 'deny')} | ${false}
+  `(
+    'offers Edit configuration on node $node: $enabled',
+    async ({ node, userPermissions, enabled }) => {
+      renderOverview(
+        {},
+        createStore({ clusterNodeSelected: node, userPermissions }),
+      );
+
+      const button = await screen.findByRole('button', {
+        name: /Edit configuration/,
+      });
+      if (enabled) {
+        expect(button).toBeEnabled();
+      } else {
+        expect(button).toBeDisabled();
+      }
+    },
+  );
+
   it('says nothing about reporting for the manager', async () => {
     renderOverview({});
 
@@ -548,18 +574,7 @@ describe('WzConfigurationOverview', () => {
       just switching between two already-known nodes (which is all
       withWzConfig's own reload condition needs to handle, since its
       sections never mount before a node is already selected). */
-      const noNodeYetStore = configureMockStore()({
-        configurationReducers: {
-          clusterNodes: false,
-          clusterNodeSelected: false,
-          refreshTime: false,
-        },
-        appStateReducers: {
-          userPermissions: {},
-          userAccount: { administrator_requirements: null },
-          withUserLogged: true,
-        },
-      });
+      const noNodeYetStore = createStore();
 
       const { rerender } = render(
         <Provider store={noNodeYetStore}>

@@ -43,7 +43,9 @@ import {
 } from '../../services/cti-feed';
 import { useCtiRegistrationModal } from '../../shared-components/cti-registration/hooks/use-cti-registration-modal';
 import { statusCodes } from '../../../common/constants';
+import { ctiFlowState } from '../../services/cti-flow-state';
 import { CtiFeedApp } from './cti-feed-app';
+import { CTI_SYNC_POLL_MS } from './hooks/use-cti-consumers';
 
 configure({ testIdAttribute: 'data-test-subj' });
 
@@ -78,8 +80,8 @@ const consumer = (status: string) => ({
 const settle = async () => {
   await screen.findByText('All feeds are up to date');
   await waitFor(() =>
-    expect(screen.getByTestId('ctiFeedContentStat-rules')).toHaveTextContent(
-      '365',
+    expect(screen.getByTestId('ctiFeedContentCount-rules')).toHaveTextContent(
+      '365 rules',
     ),
   );
 };
@@ -87,6 +89,7 @@ const settle = async () => {
 describe('CtiFeedApp', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    ctiFlowState.reset();
     (getCore as jest.Mock).mockReturnValue({
       application: {
         currentAppId$: of('cti-feed'),
@@ -113,23 +116,44 @@ describe('CtiFeedApp', () => {
     mockRequestUpdate.mockResolvedValue(undefined);
   });
 
-  test('shows the subscription, the feed sync and the feed content', async () => {
+  test('shows the subscription and the feed sync, with what each feed delivered', async () => {
     render(<CtiFeedApp />);
 
     expect(screen.getByTestId('ctiFeedSubscriptionPanel')).toBeInTheDocument();
     expect(
       await screen.findByText('All feeds are up to date'),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByTestId('ctiFeedContentStat-rules'),
-    ).toHaveTextContent('365');
+    await waitFor(() =>
+      expect(
+        screen.getByTestId('ctiFeedContent-cti:catalog:consumer:ruleset'),
+      ).toHaveTextContent(
+        'Delivered: 365 rules · 514 decoders · 127 integrations · 49 KVDBs',
+      ),
+    );
+    // No separate Feed content card any more.
+    expect(screen.queryByTestId('ctiFeedContentPanel')).toBeNull();
     expect(screen.queryByTestId('ctiRegistrationModal')).toBeNull();
+  });
+
+  test('refreshes the feeds and their content counts together', async () => {
+    render(<CtiFeedApp />);
+    await settle();
+    mockFetchConsumers.mockClear();
+    mockFetchCounts.mockClear();
+
+    fireEvent.click(screen.getByTestId('ctiFeedSyncRefresh'));
+
+    await waitFor(() => expect(mockFetchCounts).toHaveBeenCalledTimes(1));
+    expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
   });
 
   test('opens the registration modal when asked on arrival', async () => {
     render(<CtiFeedApp openRegistration />);
 
-    expect(mockUseRegistration).toHaveBeenCalledWith(true);
+    // It also reads the status whenever the user comes back to the page.
+    expect(mockUseRegistration).toHaveBeenCalledWith(true, {
+      refreshOnFocus: true,
+    });
     expect(screen.getByTestId('ctiRegistrationModal')).toBeInTheDocument();
     await settle();
   });
@@ -178,10 +202,10 @@ describe('CtiFeedApp', () => {
         'Last checked: a few seconds ago',
       ),
     );
-    await waitFor(() =>
-      expect(
-        screen.getByTestId('ctiFeedCheckForUpdatesButton'),
-      ).not.toBeDisabled(),
+    // The check started an update: in progress until the feeds can tell.
+    expect(screen.getByTestId('ctiFeedCheckForUpdatesButton')).toBeDisabled();
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Content update in progress',
     );
   });
 
@@ -206,7 +230,7 @@ describe('CtiFeedApp', () => {
     );
   });
 
-  test('reports the server message of a failed update check', async () => {
+  test('shows an update already running as in progress, without an error', async () => {
     const error = Object.assign(new Error('Conflict'), {
       body: {
         statusCode: 409,
@@ -221,17 +245,40 @@ describe('CtiFeedApp', () => {
 
     fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
 
+    await waitFor(() =>
+      expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+        'Content update in progress',
+      ),
+    );
+    expect(screen.getByTestId('ctiFeedCheckForUpdatesButton')).toBeDisabled();
+    expect(mockAddError).not.toHaveBeenCalled();
+  });
+
+  test('reports the server message of a failed update check', async () => {
+    const error = Object.assign(new Error('Forbidden'), {
+      body: {
+        statusCode: 403,
+        error: 'Forbidden',
+        message: 'Could not update the CTI content: no permissions',
+      },
+    });
+    mockRequestUpdate.mockRejectedValue(error);
+    render(<CtiFeedApp />);
+    await settle();
+
+    fireEvent.click(screen.getByTestId('ctiFeedCheckForUpdatesButton'));
+
     await waitFor(() => expect(mockAddError).toHaveBeenCalledTimes(1));
     const [reported, options] = mockAddError.mock.calls[0];
     expect(reported).toBeInstanceOf(Error);
     expect(reported.message).toBe(
-      'Could not update the CTI content: A content update is already in progress.',
+      'Could not update the CTI content: no permissions',
     );
     expect(reported.body).toBe(error.body);
     expect(options).toEqual({ title: 'Could not check for updates' });
   });
 
-  test('does not poll; a refresh finding the sync done refreshes the counts', async () => {
+  test('follows a running sync until it finishes, then refreshes the counts', async () => {
     jest.useFakeTimers();
     try {
       mockFetchConsumers
@@ -243,17 +290,94 @@ describe('CtiFeedApp', () => {
       expect(mockFetchCounts).toHaveBeenCalledTimes(1);
 
       await act(async () => {
-        jest.advanceTimersByTime(5 * 60000);
+        jest.advanceTimersByTime(CTI_SYNC_POLL_MS);
         await Promise.resolve();
       });
-      expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
-
-      fireEvent.click(screen.getByTestId('ctiFeedSyncRefresh'));
 
       await screen.findByText('All feeds are up to date');
       await waitFor(() => expect(mockFetchCounts).toHaveBeenCalledTimes(2));
+      expect(mockFetchConsumers).toHaveBeenCalledTimes(2);
+
+      // Nothing syncs any more: no further reads.
+      await act(async () => {
+        jest.advanceTimersByTime(5 * 60000);
+        await Promise.resolve();
+      });
+      expect(mockFetchConsumers).toHaveBeenCalledTimes(2);
     } finally {
       jest.useRealTimers();
     }
+  });
+
+  test('keeps Check for updates disabled while a feed syncs', async () => {
+    mockFetchConsumers.mockResolvedValue({ data: [consumer('running')] });
+
+    render(<CtiFeedApp />);
+    await screen.findByText('Syncing new content');
+
+    const button = screen.getByTestId('ctiFeedCheckForUpdatesButton');
+    expect(button).toBeDisabled();
+    fireEvent.mouseOver(button.parentElement as HTMLElement);
+    expect(
+      await screen.findByText(/A content update is in progress/),
+    ).toBeInTheDocument();
+  });
+
+  test('reads the feed sync again when the registration or the plan changes', async () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+      },
+    });
+    render(<CtiFeedApp />);
+    await settle();
+    expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
+
+    // A status read finds the plan changed (in the Wazuh Console, for example).
+    act(() => {
+      ctiFlowState.setSubscription({
+        status: 200,
+        message: {
+          is_registered: true,
+          plan: { name: 'Open', is_public: true },
+        },
+      });
+    });
+
+    await waitFor(() => expect(mockFetchConsumers).toHaveBeenCalledTimes(2));
+    // The change started an update: shown as running before any feed syncs.
+    expect(screen.getByTestId('ctiFeedCheckForUpdatesButton')).toBeDisabled();
+    expect(screen.getByTestId('ctiFeedSyncSummaryTitle')).toHaveTextContent(
+      'Content update in progress',
+    );
+  });
+
+  test('does not read the feed sync again when the status is only unknown', async () => {
+    ctiFlowState.setSubscription({
+      status: 200,
+      message: {
+        is_registered: true,
+        plan: { name: 'Professional', is_public: false },
+      },
+    });
+    render(<CtiFeedApp />);
+    await settle();
+
+    act(() => {
+      ctiFlowState.setSubscription({ status: 502, message: null });
+    });
+    act(() => {
+      ctiFlowState.setSubscription({
+        status: 200,
+        message: {
+          is_registered: true,
+          plan: { name: 'Professional', is_public: false },
+        },
+      });
+    });
+
+    expect(mockFetchConsumers).toHaveBeenCalledTimes(1);
   });
 });

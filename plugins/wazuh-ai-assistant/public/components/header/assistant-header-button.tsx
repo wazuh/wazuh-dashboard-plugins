@@ -168,7 +168,7 @@ export const AssistantHeaderButton: React.FC<{ core: CoreStart }> = ({
         }}
         data-test-subj='wzAiAssistantHeaderButton'
       >
-        <EuiIcon type='chatRight' size='m' />
+        <EuiIcon type='sparkleFilled' size='l' />
       </EuiHeaderSectionItemButton>
     </EuiToolTip>
   );

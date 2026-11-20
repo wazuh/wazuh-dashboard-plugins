@@ -13,6 +13,7 @@
 // Require some libraries
 import { ErrorResponse } from '../lib/error-response';
 import converter from 'json-2-csv';
+import { omit } from 'lodash';
 import {
   KeyEquivalence,
   UnsupportedKeysJson2CsvAsyncSize,
@@ -190,7 +191,7 @@ export class WazuhApiCtrl {
 
       context.wazuh.logger.debug(`${id} exists`);
 
-      const { node, cluster } =
+      const { cluster } =
         await context.wazuh_core.manageHosts.getRegistryDataByHost(
           apiHostData,
           {
@@ -202,7 +203,7 @@ export class WazuhApiCtrl {
         body: {
           statusCode: HTTP_STATUS_CODES.OK,
           // eslint-disable-next-line camelcase -- field name the UI reads
-          data: { id, cluster_info: { node, cluster } },
+          data: { id, cluster_info: { cluster } },
           idChanged: request.body.idChanged || null,
         },
       });
@@ -328,8 +329,9 @@ export class WazuhApiCtrl {
         if (responseClusterInfo.data?.data?.affected_items?.[0]?.node) {
           const result =
             await context.wazuh_core.manageHosts.getRegistryDataByHost(data);
+          // The manager node name is not needed by the UI
           return response.ok({
-            body: result,
+            body: omit(result, 'node'),
           });
         } else {
           context.wazuh.logger.warn(

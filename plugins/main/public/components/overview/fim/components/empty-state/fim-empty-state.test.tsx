@@ -44,24 +44,43 @@ describe('FimEmptyStateView', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it.each([
-    ['findings', 'No file changes found', /search or time range/],
-    ['dashboard', 'No monitored files found', /Try changing the search\./],
-  ] as const)('titles the %s empty state', (kind, title, hint) => {
-    renderView(kind);
+    [
+      'findings',
+      'No file changes found',
+      'Try changing the search or time range.',
+      /^Findings list the changes detected/,
+    ],
+    [
+      'dashboard',
+      'No monitored files found',
+      'Try changing the search.',
+      /^Monitored files appear after the agents scan/,
+    ],
+  ] as const)(
+    'titles the %s empty state and leads with the hint in its own paragraph',
+    (kind, title, hint, explanation) => {
+      renderView(kind);
 
-    expect(screen.getByText(title)).toBeInTheDocument();
-    expect(screen.getByText(hint)).toBeInTheDocument();
-  });
+      expect(screen.getByText(title)).toBeInTheDocument();
+      const hintParagraph = screen.getByText(hint);
+      const explanationParagraph = screen.getByText(explanation);
+      expect(hintParagraph.tagName).toBe('P');
+      expect(explanationParagraph.tagName).toBe('P');
+      expect(hintParagraph.compareDocumentPosition(explanationParagraph)).toBe(
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    },
+  );
 
   it('asks to select an agent and links the setup guide without a pinned agent', () => {
     renderView('findings');
 
     expect(getReport).not.toHaveBeenCalled();
-    expect(
-      screen.getByText(
-        /Use Explore agent to see the directories an agent monitors\./,
-      ),
-    ).toBeInTheDocument();
+    const exploreAgent = screen.getByText('Explore agent');
+    expect(exploreAgent.tagName).toBe('STRONG');
+    expect(exploreAgent.parentElement).toHaveTextContent(
+      'Use Explore agent to see the directories an agent monitors.',
+    );
     const link = screen.getByRole('link', {
       name: /How to configure File Integrity Monitoring/,
     });
@@ -86,6 +105,11 @@ describe('FimEmptyStateView', () => {
     expect(
       [...container.querySelectorAll('code')].map(code => code.textContent),
     ).toEqual(['/etc', '/home']);
+    expect(
+      container.querySelectorAll(
+        '[data-test-subj="wzFimEmptyStateDirectories"] li',
+      ),
+    ).toHaveLength(2);
 
     unmount();
 

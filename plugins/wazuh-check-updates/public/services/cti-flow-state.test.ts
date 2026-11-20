@@ -1,3 +1,4 @@
+/* eslint-disable camelcase -- CTI fields keep their API names */
 import { ctiFlowState } from './cti-flow-state';
 
 describe('ctiFlowState.subscribe', () => {
@@ -14,6 +15,23 @@ describe('ctiFlowState.subscribe', () => {
     ctiFlowState.reset();
 
     expect(listener).toHaveBeenCalledTimes(3);
+    unsubscribe();
+  });
+
+  it('notifies when the plan changes, but not on a read that changes nothing', () => {
+    const registeredOn = (name: string, isPublic: boolean) => ({
+      status: 200,
+      message: { is_registered: true, plan: { name, is_public: isPublic } },
+    });
+    ctiFlowState.setSubscription(registeredOn('Professional', false));
+    const listener = jest.fn();
+    const unsubscribe = ctiFlowState.subscribe(listener);
+
+    ctiFlowState.setSubscription(registeredOn('Professional', false));
+    expect(listener).not.toHaveBeenCalled();
+
+    ctiFlowState.setSubscription(registeredOn('Open', true));
+    expect(listener).toHaveBeenCalledTimes(1);
     unsubscribe();
   });
 

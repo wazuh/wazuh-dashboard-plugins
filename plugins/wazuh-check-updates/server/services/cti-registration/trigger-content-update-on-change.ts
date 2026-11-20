@@ -61,7 +61,7 @@ export async function triggerContentUpdateOnChange(
   environmentUuid: string,
   subscription: CtiSubscriptionSnapshot,
 ): Promise<CtiContentUpdateOutcome> {
-  // An unknown subscription status (e.g. a 502, CTI Console unreachable)
+  // An unknown subscription status (e.g. a 502, Wazuh Console unreachable)
   // carries no registration signal: skip the diff entirely so neither the
   // outage nor the later recovery is read as a registration flip, and the
   // stored snapshot still reflects the last known-good observation.

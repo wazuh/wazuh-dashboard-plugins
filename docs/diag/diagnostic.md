@@ -28,8 +28,9 @@ journalctl -u wazuh-dashboard -n 50
    this host first, or stage its CA as described in
    [Dashboard on a separate host](../ref/getting-started/installation.md#dashboard-on-a-separate-host).
 4. If the journal reports `UNSAFE <path>`, fix the ownership and mode of that file or directory: it
-   must be owned by root, not writable by another user, and not a symbolic link. `local.env` must
-   also not be readable by another user (mode `0600`).
+   must be owned by root, not writable by another user, and not a symbolic link. A `local.env`
+   that another user can read is still used, but the service prints a `warning: ... chmod 600`
+   line; set mode `0600` on it.
 5. Start the service again. If systemd reports that the start limit was hit, run
    `systemctl reset-failed wazuh-dashboard` first.
 

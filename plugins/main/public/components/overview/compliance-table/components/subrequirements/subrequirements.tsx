@@ -454,7 +454,9 @@ export class ComplianceSubrequirements extends Component {
           title={texts?.title}
           data-test-subj='wzComplianceRequirementsNoFindings'
         >
-          <p>{texts?.description}</p>
+          {texts?.description.map(paragraph => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
           <p>
             <EuiLink
               href={webDocumentationLink(DOCS_PATHS.regulatoryCompliance)}

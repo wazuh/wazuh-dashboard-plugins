@@ -122,6 +122,14 @@ describe('AssistantHeaderButton', () => {
     window.localStorage.clear();
   });
 
+  it('shows the sparkle icon', () => {
+    const { core } = coreMock();
+    render(<AssistantHeaderButton core={core} />);
+    expect(
+      headerButton().querySelector('[data-euiicon-type="sparkleFilled"]'),
+    ).toBeInTheDocument();
+  });
+
   it('opens the chat panel in the sidecar on click and closes it from the panel', async () => {
     const { core, sidecar } = coreMock();
     render(<AssistantHeaderButton core={core} />);
