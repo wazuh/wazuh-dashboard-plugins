@@ -1091,8 +1091,12 @@ $wzMsgAvatarColumn: 40px;
 /* Three columns or one, never 2+1: the shared welcome grid wraps to two columns in a ~500px
    sidecar and leaves the third example card alone on its own row. The track minimum is a third
    of the row while three 240px tracks (plus the two 16px gaps, 752px) fit, and the full row
-   otherwise: `(752px - 100%) * 999` is negative when they fit and huge when they don't. */
+   otherwise: `(752px - 100%) * 999` is negative when they fit and huge when they don't.
+   In the one-column case the grid is also capped at 360px and centred with the rest of the
+   prompt, so the cards don't stretch across the panel with their content pinned to the left. */
 .wzNoProviderPrompt .wzExampleCardsGrid {
+  max-width: clamp(min(360px, 100%), calc((100% - 752px) * 999), 100%);
+  margin-inline: auto;
   grid-template-columns: repeat(
     auto-fit,
     minmax(
