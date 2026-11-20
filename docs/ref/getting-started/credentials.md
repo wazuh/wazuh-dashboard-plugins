@@ -95,12 +95,17 @@ name.
 For each of the two passwords, the resolver takes the first source that gives a value:
 
 1. **Already in the keystore** (`/etc/wazuh-dashboard/opensearch_dashboards.keystore`): leave it
-   untouched.
+   untouched, except when the publisher's `export/credentials.env` on the same host holds a
+   different value that was written after the keystore was last written (the peer was reinstalled,
+   or published a new password). That value replaces the stored one, and the resolver prints
+   `replaced <entry> in the keystore with the one from …`. An export older than the keystore is
+   stale and is ignored.
 2. **Already set in `opensearch_dashboards.yml`**: leave it untouched. Nothing is written to the
    keystore.
 3. **Set in the process environment**, as the scoped name first, then the alias: store it in the
-   keystore.
-4. **Set in [`/etc/wazuh-dashboard/local.env`](#the-localenv-file)**: store it in the keystore.
+   keystore if it is empty. It never replaces a stored password.
+4. **Set in [`/etc/wazuh-dashboard/local.env`](#the-localenv-file)**: store it in the keystore if it
+   is empty. It never replaces a stored password.
 5. **Set in the publisher's `export/credentials.env`**, on the same host: store it in the keystore.
 6. **None of the above**: the password is unresolved.
 
@@ -169,8 +174,9 @@ WAZUH_MANAGER_WUI_PASSWORD='<WAZUH_INTERNAL_CLIENT_PASSWORD>'
 EOF
 ```
 
-> **Important:** Once a password is in the keystore, step 1 of the order wins. Editing `local.env`
-> afterwards does not change what the dashboard uses. See [Rotation](#rotation).
+> **Important:** Once a password is in the keystore, editing `local.env` afterwards does not change
+> what the dashboard uses. Only a different password published by a peer on the same host replaces
+> it. See [Rotation](#rotation).
 
 After the dashboard has started successfully, both passwords are in its keystore and the passwords
 in `local.env` are no longer read. You can remove them from the file; keep
@@ -527,24 +533,35 @@ Removing the dashboard never touches another component's directory.
 
 ## Rotation
 
-Use `wazuh-passwords-tool.sh` to change a password on a running deployment. The dashboard does not
-follow a change on its own, because a password already in the keystore always wins.
-
-After the password of `kibanaserver` or `wazuh-internal-client` changes on the indexer or the manager
-API, remove the matching keystore entry, supply the new value, and restart the dashboard. The next
-start stores the new value. For example, for `wazuh-internal-client`:
-
-```bash
-sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore remove \
-  wazuh_core.hosts.default.password --allow-root
-```
-
-Then set the new value as `WAZUH_MANAGER_WUI_PASSWORD` in `/etc/wazuh-dashboard/local.env`, which
-takes precedence over the manager's `export/credentials.env`, and restart:
+When the indexer or the manager runs on the same host, the dashboard follows the password it
+publishes. After a reinstall of either one, or after you change the value in its
+`export/credentials.env`, the next start of the dashboard replaces the stored password and prints
+`replaced <entry> in the keystore with the one from …`. This is the same rule the dashboard applies
+to the peers' CA files. Restart the dashboard after the peer is up again:
 
 ```bash
 sudo systemctl restart wazuh-dashboard
 ```
 
-For `kibanaserver`, remove the `opensearch.password` entry and set
-`WAZUH_INDEXER_KIBANASERVER_PASSWORD`.
+The dashboard replaces a stored password only when the export is newer than its keystore. The
+export is stale after you change a password on a running deployment:
+
+- `rbac_control change-password` and the Server API never update the manager's
+  `export/credentials.env`.
+- `wazuh-passwords-tool.sh` updates the keystore, which makes it newer than the export.
+
+So use `wazuh-passwords-tool.sh` to change the password of `kibanaserver` or
+`wazuh-internal-client` on a running deployment (`wazuh-passwords-tool.sh -u wazuh-internal-client`
+for the latter). It updates the dashboard keystore on that host. Do not edit the export to rotate.
+
+When the peer runs on another host, or when you supplied the password in `local.env` or the
+environment, the dashboard does not follow it. Write the new value into the keystore yourself and
+restart the dashboard. For example, for `wazuh-internal-client`:
+
+```bash
+sudo /usr/share/wazuh-dashboard/bin/opensearch-dashboards-keystore add \
+  wazuh_core.hosts.default.password --force --allow-root
+sudo systemctl restart wazuh-dashboard
+```
+
+For `kibanaserver`, use the `opensearch.password` entry.

@@ -96,8 +96,9 @@ The packages manage the entries of the `default` host and of the indexer connect
 | `opensearch.username`, `opensearch.password` | `WAZUH_INDEXER_KIBANASERVER_PASSWORD` |
 
 They are read from the environment, `/etc/wazuh-dashboard/local.env` or the peers'
-`export/credentials.env`, at installation and before every start, and the dashboard refuses to start while one of them is missing. A value set in
-`opensearch_dashboards.yml` counts as resolved and is never overridden. See
+`export/credentials.env`, at installation and before every start, and the dashboard refuses to start while one of them is missing. A password already in the
+keystore is replaced only by a different one that a peer on the same host published after the keystore was
+written. A value set in `opensearch_dashboards.yml` counts as resolved and is never overridden. See
 [Credentials](getting-started/credentials.md).
 
 For any other host, add the entry yourself as root, then restart the dashboard. Replace `<HOST_ID>`
