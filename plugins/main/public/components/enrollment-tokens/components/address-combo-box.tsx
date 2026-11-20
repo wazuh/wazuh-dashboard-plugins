@@ -143,6 +143,7 @@ export const AddressComboBox = ({
               <EuiFlexItem key={pattern} grow={false}>
                 <EuiBadge
                   color='primary'
+                  type='button'
                   onClick={() => fillPattern(pattern)}
                   onClickAriaLabel={i18n.translate(
                     'wazuh.enrollmentTokens.addressComboBox.wildcardPatterns.useAriaLabel',
