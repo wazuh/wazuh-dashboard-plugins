@@ -143,6 +143,7 @@ describe('AssistantHeaderButton', () => {
     fireEvent.click(headerButton());
     expect(sidecar.open).toHaveBeenCalledTimes(1);
     expect(sidecar.open.mock.calls[0][1]).toMatchObject({
+      className: 'hide-for-sharing',
       classNameButton: 'osd-resetFocusState',
     });
     // findBy: the panel module is React.lazy-loaded, so it appears asynchronously.

@@ -103,6 +103,8 @@ export const AssistantHeaderButton: React.FC<{ core: CoreStart }> = ({
       },
       {
         'data-test-subj': 'wzAiAssistantSidecar',
+        // Reporting drops `hide-for-sharing` elements, keeping the chat out of PDF reports
+        className: 'hide-for-sharing',
         // Remove some animation style on focus the button
         classNameButton: 'osd-resetFocusState',
         config: {
