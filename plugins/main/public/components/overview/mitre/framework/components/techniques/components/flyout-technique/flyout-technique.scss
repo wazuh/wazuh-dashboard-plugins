@@ -1,0 +1,11 @@
+// Recent findings share the edges of the stat cards and technique details
+.wz-inventory.wz-technique-flyout {
+  .flyout-row {
+    padding: 16px 0 0;
+  }
+
+  .wz-search-bar.euiPanel {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}

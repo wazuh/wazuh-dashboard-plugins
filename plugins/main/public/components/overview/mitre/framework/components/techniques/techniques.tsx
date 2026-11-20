@@ -712,7 +712,6 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
             query: filterParams.query,
             time: filterParams.time,
           }}
-          openDashboard={e => openDashboard(e, currentTechnique)}
           openDiscover={e => openDiscover(e, currentTechnique)}
         />
       )}

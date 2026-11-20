@@ -12,11 +12,11 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { WzRequest } from '../../../../react-services';
 import { EuiAccordion, SortDirection, EuiInMemoryTable } from '@elastic/eui';
 import { UI_LOGGER_LEVELS } from '../../../../../common/constants';
 import { UI_ERROR_SEVERITIES } from '../../../../react-services/error-orchestrator/types';
 import { getErrorOrchestrator } from '../../../../react-services/common-services';
+import { getMitreResourcesByIds } from '../lib/get-mitre-resources-by-ids';
 
 type backToTopType = () => void;
 
@@ -45,38 +45,8 @@ export const ReferencesTable = ({
 
   const getValues = async () => {
     setIsLoading(true);
-    // We extract the ids from the references tables and count them in a string for the call that will extract the info
-    const maxLength = 8100;
-    const namesConcatenated = referencesArray.reduce(
-      (namesArray = [''], element) => {
-        namesArray[namesArray.length - 1].length >= maxLength &&
-          namesArray.push('');
-        namesArray[namesArray.length - 1] += `${
-          namesArray[namesArray.length - 1].length > 0 ? ',' : ''
-        }${element}`;
-        return namesArray;
-      },
-      [''],
-    );
-
-    // We make the call to extract the necessary information from the references tables
     try {
-      const data = await Promise.all(
-        namesConcatenated.map(async nameConcatenated => {
-          const queryResult = await WzRequest.apiReq(
-            'GET',
-            `/mitre/${referencesName}?${referencesName.replace(
-              /s\s*$/,
-              '',
-            )}_ids=${nameConcatenated}`,
-            {},
-          );
-          return (
-            (((queryResult || {}).data || {}).data || {}).affected_items || []
-          );
-        }),
-      );
-      setData(data.flat());
+      setData(await getMitreResourcesByIds(referencesName, referencesArray));
     } catch (error) {
       const options = {
         context: `${ReferencesTable.name}.getValues`,
