@@ -5,6 +5,7 @@
   "server": true,
   "ui": true,
   "requiredPlugins": [
+    "data",
     "navigation",
     "opensearchDashboardsUtils",
     "opensearchDashboardsReact",

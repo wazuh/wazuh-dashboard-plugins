@@ -267,7 +267,7 @@ describe('CTI token route', () => {
     test('concurrent polls share one exchange and all report success', async () => {
       pendingRegistration();
       let redeem: (body: unknown) => void = () => undefined;
-      // The CTI console redeems a code once; a second exchange would get not_found.
+      // The Wazuh Console redeems a code once; a second exchange would get not_found.
       mockedPollCtiToken.mockImplementationOnce(
         () =>
           new Promise(resolve => {
@@ -293,7 +293,7 @@ describe('CTI token route', () => {
       ).toBe(true);
     });
 
-    test('a poll after the registration completed does not reach the CTI console', async () => {
+    test('a poll after the registration completed does not reach the Wazuh Console', async () => {
       pendingRegistration();
       CtiRegistrationStore.getInstance().setRegistrationComplete(
         'resolved-client-id',
@@ -436,7 +436,7 @@ describe('CTI token route', () => {
       ['denied', deny, 403],
       ['not evaluated', notEvaluated, 503],
     ])(
-      'POST poll is refused when the permission is %s, before reaching the CTI console',
+      'POST poll is refused when the permission is %s, before reaching the Wazuh Console',
       async (_label, setPermission, status) => {
         pending();
         setPermission();
