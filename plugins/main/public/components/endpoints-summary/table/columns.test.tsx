@@ -66,8 +66,8 @@ describe('agentsTableColumns status column', () => {
 });
 
 describe('agentsTableColumns date columns', () => {
-  it('shows the last keep alive column by default', () => {
-    expect(getColumn('lastKeepAlive').show).toBe(true);
+  it('keeps the last keep alive column hidden by default', () => {
+    expect(getColumn('lastKeepAlive').show).toBe(false);
   });
 
   it('keeps the registration date column hidden by default', () => {
@@ -104,5 +104,31 @@ describe('agentsTableColumns date columns', () => {
     );
 
     expect(getByText('-')).toBeInTheDocument();
+  });
+});
+
+describe('agentsTableColumns status column', () => {
+  it('shows the last keep alive in the tooltip of the whole status value', async () => {
+    const lastKeepAlive = new Date(Date.now() - 12 * 60 * 1000).toISOString();
+    const { getByText } = render(
+      <>
+        {getColumn('status').render('active', {
+          id: '001',
+          lastKeepAlive,
+        } as unknown as Agent)}
+      </>,
+    );
+
+    // Hovering the status text, not only the health icon, opens the tooltip
+    fireEvent.mouseOver(getByText('active'));
+    const status = await screen.findByText('active', { selector: 'strong' });
+    expect(status.closest('p')?.textContent).toBe('Connection status: active');
+    const lastKeepAliveValue = screen.getByText('12 minutes ago', {
+      selector: 'strong',
+    });
+    expect(lastKeepAliveValue.closest('p')?.textContent).toBe(
+      'Last keep alive: 12 minutes ago',
+    );
+    expect(screen.getByText('Jan 1, 2026 @ 10:00:00.000')).toBeInTheDocument();
   });
 });

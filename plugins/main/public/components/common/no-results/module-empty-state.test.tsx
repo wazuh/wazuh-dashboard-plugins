@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom';
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { PinnedAgentManager } from '../../wz-agent-selector/wz-agent-selector-service';
 import { getWzCurrentAppID } from '../../../kibana-services';
-import { ModuleEmptyState } from './module-empty-state';
+import { ModuleEmptyState, ModuleEmptyStateList } from './module-empty-state';
 
 jest.mock('../../../../common/services/web_documentation', () => ({
   webDocumentationLink: (path: string) => `https://docs.example/${path}`,
@@ -31,6 +31,33 @@ describe('ModuleEmptyState', () => {
     expect(
       document.querySelector('[data-test-subj="wzSomeEmptyState"]'),
     ).toBeInTheDocument();
+  });
+
+  it('shows what to try under the title, then the actions, then why it is empty', () => {
+    render(
+      <ModuleEmptyState
+        testSubj='Some'
+        title='Nothing here'
+        hint='Try changing the search.'
+        actions={[<button key='a'>Module action</button>]}
+      >
+        <p>Why it is empty.</p>
+      </ModuleEmptyState>,
+    );
+
+    const title = screen.getByRole('heading', { name: 'Nothing here' });
+    const hint = screen.getByText('Try changing the search.');
+    const action = screen.getByRole('button', { name: 'Module action' });
+    const explanation = screen.getByText('Why it is empty.');
+    expect(title.compareDocumentPosition(hint)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(hint.compareDocumentPosition(action)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+    expect(action.compareDocumentPosition(explanation)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
   });
 
   it('offers to unpin the agent only when asked, before the module actions', () => {
@@ -150,5 +177,30 @@ describe('ModuleEmptyState', () => {
     render(<ModuleEmptyState testSubj='Some' title='Nothing here' />);
 
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+});
+
+describe('ModuleEmptyStateList', () => {
+  it.each([
+    [false, 'UL'],
+    [true, 'OL'],
+  ])('renders each item in a list (ordered: %s)', (ordered, tag) => {
+    render(
+      <ModuleEmptyStateList
+        ordered={ordered}
+        data-test-subj='someChecks'
+        items={['First check.', <strong key='b'>Second check.</strong>]}
+      />,
+    );
+
+    const list = document.querySelector(
+      '[data-test-subj="someChecks"]',
+    ) as HTMLElement;
+    expect(list.tagName).toBe(tag);
+    expect(
+      within(list)
+        .getAllByRole('listitem')
+        .map(item => item.textContent),
+    ).toEqual(['First check.', 'Second check.']);
   });
 });

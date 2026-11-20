@@ -174,3 +174,50 @@ describe('evaluateCtiRegistrationPermission', () => {
     );
   });
 });
+
+describe('clear permission probe', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn() };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockedGetWazuhCheckUpdatesServices.mockReturnValue({ logger });
+  });
+
+  test('probes the DELETE action of the subscription endpoint', async () => {
+    const request = jest.fn().mockResolvedValue({
+      body: { accessAllowed: true, missingPrivileges: [] },
+    });
+
+    await expect(
+      evaluateCtiRegistrationPermission(buildWazuhClient(request), 'clear'),
+    ).resolves.toEqual({ accessAllowed: true, missingPrivileges: [] });
+    expect(request).toHaveBeenCalledWith({
+      method: 'DELETE',
+      path: contentManagerRoutes.subscription,
+      querystring: { [CONTENT_MANAGER_PERMISSION_CHECK_QUERY_PARAM]: 'true' },
+    });
+  });
+
+  test('denies when the probe cannot be evaluated', async () => {
+    // What the indexer answers until its DELETE handler supports the check.
+    const request = jest.fn().mockRejectedValue({
+      message: 'class_cast_exception',
+      meta: { statusCode: 500 },
+    });
+
+    await expect(
+      checkCtiRegistrationPermission(buildWazuhClient(request), 'clear'),
+    ).resolves.toEqual({ accessAllowed: false, missingPrivileges: [] });
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.stringContaining('(clear)'),
+    );
+  });
+
+  test('denies when the answer has no accessAllowed flag', async () => {
+    const request = jest.fn().mockResolvedValue({ body: {} });
+
+    await expect(
+      checkCtiRegistrationPermission(buildWazuhClient(request), 'clear'),
+    ).resolves.toEqual({ accessAllowed: false, missingPrivileges: [] });
+  });
+});

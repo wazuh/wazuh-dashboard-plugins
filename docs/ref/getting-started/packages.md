@@ -24,7 +24,7 @@ Two package formats are available:
 ## Package name
 
 - **Package name**: `wazuh-dashboard`
-- **Current version**: 5.0.0 (rc1)
+- **Current version**: 5.0.0 (the release candidate stage is in the `VERSION.json` of the package)
 - **Architecture**: 64-bit Intel/AMD (`amd64`/`x86_64`) and 64-bit ARM (`arm64`/`aarch64`) — see
   the [package name table](#package-name-1) below
 
@@ -70,24 +70,19 @@ The Wazuh dashboard package includes:
 
 ## Package dependencies
 
-Automatically installed dependencies:
+The package declares only the tools it needs to create the service user and group; the package
+manager installs nothing else:
 
 ### Debian/Ubuntu
 
-- `tar`
-- `curl`
-- `libcap2-bin`
-- `openssl`
+- `passwd` (`Pre-Depends`)
 
 ### RHEL/CentOS/Fedora
 
-- `libcap`
-- `openssl`
-- `diffutils`
-- `util-linux`
+- `/bin/sh`
+- `groupadd` and `useradd` before installation, `userdel` and `groupdel` after removal
 
-`openssl` issues the dashboard TLS certificates, and `diffutils` (`cmp`) and `util-linux` (`flock`)
-are used by the shared credentials library. See [Credentials](credentials.md).
+See [Credentials](credentials.md).
 
 ## Package repositories
 
