@@ -38,6 +38,7 @@ import {
   useUnsavedChangesGuard,
 } from '../../common/unsaved-changes-guard';
 import { InputForm } from '../../common/form';
+import { RememberServerEndpointSwitch } from '../../common/remember-server-endpoint';
 import { useForm } from '../../common/form/hooks';
 import { FormConfiguration } from '../../common/form/types';
 import { getWazuhCorePlugin } from '../../../kibana-services';
@@ -54,6 +55,8 @@ import {
 } from '../../../services/enrollment-tokens';
 import { TruncatedValuePopover } from './truncated-value-popover';
 import { AddressComboBox } from './address-combo-box';
+import { AddressOutsideCertificateWarning } from './address-outside-certificate-warning';
+import { AddressCoveredByWildcardNotice } from './address-covered-by-wildcard-notice';
 
 interface CreateEnrollmentTokenFlyoutProps {
   /* Called with `true` once a token was minted, so the listing behind the
@@ -85,13 +88,32 @@ const CreateEnrollmentTokenFlyoutContent = ({
   their own. */
   const [embedCa, setEmbedCa] = useState(false);
   const [noCredential, setNoCredential] = useState(false);
+  /* Reported by the address input once loaded; empty while loading or when
+  they cannot be loaded, which leaves nothing to compare the address with. */
+  const [certificateNames, setCertificateNames] = useState<string[]>([]);
 
   const initialFields: FormConfiguration = {
     address: {
       type: 'custom',
       initialValue: configuration['enrollment.dns'] || '',
       validate: getWazuhCorePlugin().SettingsValidator.serverEndpointAddress,
-      component: props => <AddressComboBox {...props} />,
+      component: props => (
+        <AddressComboBox
+          {...props}
+          onNamesLoaded={setCertificateNames}
+          help={
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
+                {
+                  defaultMessage:
+                    'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
+                },
+              )}
+            </EuiText>
+          }
+        />
+      ),
     },
     /* Offered from the same settings the deploy wizard reads, so a token
     minted here points the agent at the same endpoint as one minted there. */
@@ -290,15 +312,16 @@ const CreateEnrollmentTokenFlyoutContent = ({
                 },
               )}
               footer={
-                <EuiText size='xs' color='subdued'>
-                  {i18n.translate(
-                    'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
-                    {
-                      defaultMessage:
-                        'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
-                    },
-                  )}
-                </EuiText>
+                <>
+                  <AddressOutsideCertificateWarning
+                    address={fields.address?.value}
+                    certificateNames={certificateNames}
+                  />
+                  <AddressCoveredByWildcardNotice
+                    address={fields.address?.value}
+                    certificateNames={certificateNames}
+                  />
+                </>
               }
               placeholder='wazuh-manager.example.com'
             />
@@ -350,6 +373,13 @@ const CreateEnrollmentTokenFlyoutContent = ({
               }
               placeholder='/wazuh-manager/'
             />
+            <EuiSpacer size='s' />
+            <RememberServerEndpointSwitch
+              address={fields.address}
+              port={fields.port}
+              path={fields.prefix}
+            />
+            <EuiSpacer size='m' />
             <InputForm
               {...fields.ttl}
               label={

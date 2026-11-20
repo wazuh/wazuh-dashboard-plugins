@@ -234,6 +234,12 @@ The path prefix must match the manager's `<remote><https><global_prefix>`, or
 every request the agent sends answers `404`. **Remember address, port, and path prefix** stores
 all three, so the next visit is prefilled with the whole endpoint.
 
+The address is prefilled from `enrollment.dns`, which after a migration is often not one of the
+names in the manager listener certificate. When the address is not one of them, the step shows a
+warning, naming the `enrollment.dns` setting when the value comes from it, because the manager
+refuses an enrollment token for an address outside the certificate. **Create token** in
+**Enrollment tokens** shows the same warning.
+
 ## How the download URL and package name are built
 
 The wizard generates the install command at runtime in the browser. The
