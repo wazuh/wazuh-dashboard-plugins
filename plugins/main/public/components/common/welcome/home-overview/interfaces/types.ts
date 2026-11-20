@@ -40,26 +40,6 @@ export interface FindingsOverview {
   topTechniques: TopItem[];
   /** IOC matches (last 24h detection metric), from the same findings search. */
   iocMatches?: number;
-  /** Critical/high findings and their top rules, for the Incident Response coverage. */
-  seriousFindings: SeriousFindings;
-}
-
-export type SeriousLevel = 'critical' | 'high';
-
-/** A rule behind critical/high findings, with its finding count. */
-export interface SeriousRule {
-  id: string;
-  title: string;
-  level: SeriousLevel;
-  count: number;
-}
-
-export interface SeriousFindings {
-  byLevel: Partial<Record<SeriousLevel, number>>;
-  /** Top rules per level by finding count. */
-  rules: SeriousRule[];
-  /** More rules exist past the top ones. */
-  partial: boolean;
 }
 
 /** Findings counts the two bottom sections need, from one lazy search. */
@@ -114,44 +94,4 @@ export interface VulnerabilityOverview {
   severity: SeverityCounts;
   /** Top 5 vulnerable package names (`package.name`). */
   byPackage: TopItem[];
-}
-
-/** Active responses of the last 24 hours. */
-export interface IncidentResponseOverview {
-  total?: number;
-  /** `_id` of the critical/high findings the responses answered (`event.doc_id`). */
-  answeredIds: string[];
-  /** More answered findings exist than `answeredIds` holds. */
-  answeredIdsPartial: boolean;
-}
-
-/** Critical/high findings of the last 24 hours that got a response, per level and per rule id. */
-export interface AnsweredFindings {
-  byLevel: Partial<Record<SeriousLevel, number>>;
-  byRule: Record<string, number>;
-}
-
-export type CaseStatusCounts = Partial<
-  Record<'active' | 'acknowledged' | 'completed', number>
->;
-
-/** Current state of the cases, not time-bounded. */
-export interface CaseManagementOverview {
-  /** Cases of any status. */
-  total?: number;
-  byStatus: CaseStatusCounts;
-  /** Open cases per severity. */
-  openBySeverity: SeverityCounts;
-  /** Open cases that are urgent or critical: their count and the most urgent ones. */
-  attention: { total?: number; cases: CaseSummary[] };
-}
-
-export interface CaseSummary {
-  /** `_id` of the finding holding the case. */
-  id: string;
-  title?: string;
-  severity?: string;
-  priority?: string;
-  updatedAt?: string;
-  agentName?: string;
 }

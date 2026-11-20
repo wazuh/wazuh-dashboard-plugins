@@ -19,7 +19,6 @@ import {
   VulnerabilitiesDataSourceRepository,
   ActiveResponsesDataSource,
   ActiveResponsesDataSourceRepository,
-  CasesDataSource,
   ThreatIntelEnrichmentsStatesDataSource,
   ThreatIntelEnrichmentsStatesDataSourceRepository,
   IDataSourceFactoryConstructor,
@@ -31,13 +30,10 @@ import {
 import { WzRequest } from '../../../../../react-services';
 import { PinnedAgentManager } from '../../../../wz-agent-selector/wz-agent-selector-service';
 import {
-  buildCaseManagementAggs,
   buildCloudSecurityByModuleAgg,
   buildComplianceControlsAgg,
   buildFindingsOverviewAggs,
   buildFIMTopFilesAgg,
-  buildAnsweredFindingsAgg,
-  buildIncidentResponseAggs,
   buildMalwareFilterAgg,
   buildPlatformsCountAgg,
   buildSCATilesAgg,
@@ -57,15 +53,11 @@ import { AGG } from '../lib/constants';
 import {
   mapAgentStatus,
   mapCardinality,
-  mapCaseManagement,
   mapCloudSecurityByModule,
   mapComplianceControls,
-  mapAnsweredFindings,
-  mapIncidentResponse,
   mapDocCount,
   mapScaBenchmarks,
   mapScaTiles,
-  mapSeriousFindings,
   mapSeverityCounts,
   mapTopBuckets,
 } from '../lib/mappers';
@@ -79,12 +71,9 @@ import {
 } from '../services/security-analytics.service';
 import {
   AgentStatus,
-  CaseManagementOverview,
   FimOverview,
   FindingsBreakdowns,
   FindingsOverview,
-  AnsweredFindings,
-  IncidentResponseOverview,
   ScaOverview,
   ThreatIntelEnrichments,
   TopItem,
@@ -283,7 +272,6 @@ export function useFindingsOverview(): DataGroupResult<FindingsOverview> & {
             AGG.topTechniques,
           ),
           iocMatches: mapCardinality(malware, AGG.iocMatches),
-          seriousFindings: mapSeriousFindings(response?.aggregations),
         };
       },
     });
@@ -717,103 +705,16 @@ export function useItHygieneServicesCount(
   );
 }
 
-/** Active responses of the last 24 hours: total and the critical/high findings they answered. */
-export function useIncidentResponseOverview(
+export function useActiveResponseOverview(
   enabled: boolean,
-): DataGroupResult<IncidentResponseOverview> & { indexPatternId?: string } {
-  const { dataSource, ...result } =
-    useAggregationGroup<IncidentResponseOverview>({
-      DataSource: ActiveResponsesDataSource,
-      createRepository: () => new ActiveResponsesDataSourceRepository(),
-      enabled,
-      label: i18n.translate(
-        'wazuh.common.homeOverviewDataGroup.activeResponse',
-        { defaultMessage: 'Active Response' },
-      ),
-      fetch: async fetchData => {
-        const response = await fetchData({
-          aggs: buildIncidentResponseAggs(),
-          dateRange: LAST_24H,
-          pagination: NO_HITS,
-        });
-        return mapIncidentResponse(response);
-      },
-    });
-
-  const indexPatternId = dataSource?.indexPattern?.id;
-
-  return useMemo(
-    () => ({ ...result, indexPatternId }),
-    [result.status, result.data, indexPatternId],
-  );
-}
-
-const NO_ANSWERED_FINDINGS: AnsweredFindings = { byLevel: {}, byRule: {} };
-
-/**
- * Of the findings the active responses answered (`ids`, from `useIncidentResponseOverview`), those
- * of the last 24 hours, per level and per rule. Waits for the ids; none means no search.
- */
-export function useAnsweredFindings(
-  ids: string[] | undefined,
-): DataGroupResult<AnsweredFindings> {
-  const result = useAggregationGroup<AnsweredFindings>({
-    DataSource: OverviewDataSource,
-    createRepository: () => new FindingsDataSourceRepository(),
-    enabled: Boolean(ids?.length),
-    label: i18n.translate(
-      'wazuh.common.homeOverviewDataGroup.answeredFindings',
-      { defaultMessage: 'Findings answered by active responses' },
-    ),
-    fetch: async fetchData => {
-      const response = await fetchData({
-        aggs: buildAnsweredFindingsAgg(ids ?? []),
-        dateRange: LAST_24H,
-        pagination: NO_HITS,
-      });
-      return mapAnsweredFindings(response?.aggregations);
-    },
-  });
-  const noIds = ids !== undefined && ids.length === 0;
-  return useMemo(
-    () =>
-      noIds
-        ? { status: 'available', data: NO_ANSWERED_FINDINGS }
-        : { status: result.status, data: result.data, error: result.error },
-    [noIds, result.status, result.data, result.error],
-  );
-}
-
-/**
- * Cases (current state): total, counts per status, open cases per severity, and the open urgent
- * or critical cases.
- */
-export function useCaseManagementOverview(
-  enabled: boolean,
-): DataGroupResult<CaseManagementOverview> & { indexPatternId?: string } {
-  const { dataSource, ...result } = useAggregationGroup<CaseManagementOverview>(
-    {
-      DataSource: CasesDataSource,
-      createRepository: () => new FindingsDataSourceRepository(),
-      enabled,
-      label: i18n.translate(
-        'wazuh.common.homeOverviewDataGroup.caseManagement',
-        { defaultMessage: 'Case management' },
-      ),
-      fetch: async fetchData => {
-        const response = await fetchData({
-          aggs: buildCaseManagementAggs(),
-          pagination: NO_HITS,
-        });
-        return mapCaseManagement(response);
-      },
-    },
-  );
-
-  const indexPatternId = dataSource?.indexPattern?.id;
-
-  return useMemo(
-    () => ({ ...result, indexPatternId }),
-    [result.status, result.data, indexPatternId],
+): DataGroupResult<number | undefined> {
+  return useIndexDocCount(
+    ActiveResponsesDataSource,
+    () => new ActiveResponsesDataSourceRepository(),
+    enabled,
+    i18n.translate('wazuh.common.homeOverviewDataGroup.activeResponse', {
+      defaultMessage: 'Active Response',
+    }),
+    LAST_24H,
   );
 }

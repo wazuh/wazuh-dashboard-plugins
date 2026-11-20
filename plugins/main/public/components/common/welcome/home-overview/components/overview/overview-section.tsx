@@ -9,14 +9,9 @@ import {
   WIDGET_LOADING_MIN_HEIGHT,
 } from '../common';
 import { AgentsByStatus } from './agents-by-status';
-import { IncidentResponseCard } from './incident-response-card';
-import { CaseManagementCard } from './case-management-card';
 import {
   useAgentStatus,
-  useAnsweredFindings,
-  useCaseManagementOverview,
   useFindingsOverview,
-  useIncidentResponseOverview,
 } from '../../hooks/use-overview-data';
 import {
   getDeployAgentUrl,
@@ -29,7 +24,6 @@ import {
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
 import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
-import { CARD_MIN_WIDTH } from '../../lib/constants';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Same requirement as the Agents section.
@@ -49,11 +43,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
   findings,
 }) => {
   const agents = useAgentStatus();
-  const incidentResponse = useIncidentResponseOverview(true);
-  const answeredFindings = useAnsweredFindings(
-    incidentResponse.data?.answeredIds,
-  );
-  const cases = useCaseManagementOverview(true);
   const [missingAgentRead] = useUserPermissionsRequirements(
     AGENT_READ_PERMISSIONS,
   );
@@ -134,21 +123,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
               />
             )}
           </WidgetGroup>
-        </EuiFlexItem>
-      </EuiFlexGroup>
-
-      <EuiSpacer size='m' />
-
-      <EuiFlexGroup wrap responsive={false}>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
-          <IncidentResponseCard
-            incidentResponse={incidentResponse}
-            findings={findings}
-            answeredFindings={answeredFindings}
-          />
-        </EuiFlexItem>
-        <EuiFlexItem style={{ minWidth: CARD_MIN_WIDTH }}>
-          <CaseManagementCard cases={cases} />
         </EuiFlexItem>
       </EuiFlexGroup>
 

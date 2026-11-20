@@ -16,8 +16,6 @@ export interface StatTileSpec<K extends string> {
   testSubj: string;
   /** Present only for clickable tiles; reference-only tiles omit it. */
   onSelect?: () => string;
-  /** Status color of the value (`HOME_OVERVIEW_TEXT_COLOR`); neutral counts omit it. */
-  color?: string;
   /**
    * Caption shared by consecutive tiles with the same value. The strip draws its dividers between
    * groups, so a tile without a group stands on its own.
@@ -104,7 +102,6 @@ export function StatTileGroup<K extends string>({
           )
         }
         label={tile.label}
-        color={tile.color}
         reverse
         data-test-subj={tile.testSubj}
       />

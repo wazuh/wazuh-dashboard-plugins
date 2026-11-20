@@ -40,8 +40,7 @@ the filter portion. Field/agg names come from [`fields.ts`](./fields.ts) and
 | Vulnerabilities (`useVulnerabilityOverview`)           | `wazuh-states-vulnerabilities*`                            | current  |
 | Threat-intel enrichments (`useThreatIntelEnrichments`) | `wazuh-threatintel-enrichments*`                           | current  |
 | IT Hygiene counts ×4 (`useItHygiene*Count`)            | `wazuh-states-inventory-{system,packages,users,services}*` | current  |
-| Incident Response (`useIncidentResponseOverview`)      | `wazuh-active-responses*`                                  | last 24h |
-| Case Management (`useCaseManagementOverview`)          | `wazuh-findings-v5*` with `wazuh.case.status`              | current  |
+| Active Response (`useActiveResponseOverview`)          | `wazuh-active-responses*`                                  | last 24h |
 | Rules/Decoders/Integrations/Detectors                  | Ruleset Management `_search` (HTTP)                        | current  |
 | Agents by status (`useAgentStatus`)                    | Wazuh Server API (not OpenSearch)                          | current  |
 
@@ -55,9 +54,8 @@ Endpoint Security → Malware). Built by `buildFindingsOverviewAggs()` +
 separate so this on-mount one stays as small as the above-the-fold widgets need.
 
 **Represents:** finding severity distribution, top MITRE tactics, total findings,
-top rules, distinct techniques observed, top techniques, the Malware
-IOC-match hero, and the critical/high findings with their top rules that the
-Incident Response coverage (§9) is measured against.
+top rules, distinct techniques observed, top techniques, and the Malware
+IOC-match hero.
 
 ```jsonc
 {
@@ -102,26 +100,6 @@ Incident Response coverage (§9) is measured against.
     "malware": {
       "filter": { "exists": { "field": "wazuh.threat.enrichments" } },
       "aggs": { "ioc_matches": { "cardinality": { "field": "event.doc_id" } } }
-    },
-    // Incident Response coverage: critical/high findings per level, and per level the
-    // top 25 rules by finding count (sum_other_doc_count > 0 means more rules exist)
-    "serious_findings": {
-      "filter": { "terms": { "wazuh.rule.level": ["critical", "high"] } },
-      "aggs": {
-        "by_level": {
-          "terms": { "field": "wazuh.rule.level", "size": 2 },
-          "aggs": {
-            "by_rule": {
-              "terms": { "field": "wazuh.rule.id", "size": 25 },
-              "aggs": {
-                "rule_title": {
-                  "terms": { "field": "wazuh.rule.title", "size": 1 }
-                }
-              }
-            }
-          }
-        }
-      }
     }
   }
 }
@@ -371,142 +349,15 @@ distinct OS platforms on the system inventory (`buildPlatformsCountAgg()`).
 
 DQL: `*`.
 
-## 9. Incident Response — `wazuh-active-responses*` then `wazuh-findings-v5*`, last 24h
+## 9. Active Response — `wazuh-active-responses*`, last 24h
 
-An active response copies the `wazuh` object of the finding it answers and stores the
-finding's `_id` in `event.doc_id`. A response of the last 24 hours can answer an older
-finding, so the coverage takes two searches.
-
-**1. Responses** (`buildIncidentResponseAggs()`): responses triggered (`hits.total`) and the
-ids of the critical/high findings they answered (up to 10,000).
+Plain count (`hits.total`) of active-response actions in the last 24h.
 
 ```jsonc
-{
-  "size": 0,
-  // time filter: timestamp >= now-24h; responses triggered = hits.total
-  "aggs": {
-    "answered_findings": {
-      "filter": { "terms": { "wazuh.rule.level": ["critical", "high"] } },
-      "aggs": {
-        "answered_ids": { "terms": { "field": "event.doc_id", "size": 10000 } }
-      }
-    }
-  }
-}
+{ "size": 0 } // time filter: timestamp >= now-24h; value = hits.total
 ```
 
-**2. Answered findings** (`buildAnsweredFindingsAgg(ids)`), after the first returns and only
-when it found ids: those findings that are critical/high findings of the last 24 hours, per
-level and per rule id.
-
-```jsonc
-{
-  "size": 0,
-  // time filter: timestamp >= now-24h
-  "aggs": {
-    "answered_findings": {
-      "filter": {
-        "bool": {
-          "filter": [
-            { "ids": { "values": ["<event.doc_id>", "…"] } },
-            { "terms": { "wazuh.rule.level": ["critical", "high"] } }
-          ]
-        }
-      },
-      "aggs": {
-        "by_level": { "terms": { "field": "wazuh.rule.level", "size": 2 } },
-        "by_rule": { "terms": { "field": "wazuh.rule.id", "size": "<ids>" } }
-      }
-    }
-  }
-}
-```
-
-Joined in the browser (`computeResponseCoverage`) with `serious_findings` (§1): unanswered =
-findings − answered; a rule is listed when it has unanswered findings, critical first.
-
-A response to a raw event (not a finding) carries no `wazuh.rule.level`, so it does not count
-as answering a finding.
-
-## 9.1 Case Management — `wazuh-findings-v5*` with a case, current
-
-`buildCaseManagementAggs()`, on `CasesDataSource` (fixed filter: `wazuh.case.status`
-exists). A case is the `wazuh.case.*` fields of one finding. No time range: the
-cases are their current state.
-
-**Represents:** cases per status, open cases (active, acknowledged) per severity,
-and the open cases that are urgent or critical: their count and the 3 most urgent
-(priority, then severity, then last update).
-
-```jsonc
-{
-  "size": 0,
-  "aggs": {
-    "case_status": {
-      "filters": {
-        "filters": {
-          "active": { "term": { "wazuh.case.status": "active" } },
-          "acknowledged": { "term": { "wazuh.case.status": "acknowledged" } },
-          "completed": { "term": { "wazuh.case.status": "completed" } }
-        }
-      }
-    },
-    "open_cases": {
-      "filter": {
-        "terms": { "wazuh.case.status": ["active", "acknowledged"] }
-      },
-      "aggs": {
-        "case_severity": {
-          "filters": {
-            "filters": {
-              "critical": { "term": { "wazuh.case.severity": "critical" } }
-              // … one per band
-            }
-          }
-        }
-      }
-    },
-    "attention_cases": {
-      "filter": {
-        "bool": {
-          "filter": [
-            { "terms": { "wazuh.case.status": ["active", "acknowledged"] } }
-          ],
-          "should": [
-            { "term": { "wazuh.case.priority": "urgent" } },
-            { "term": { "wazuh.case.severity": "critical" } }
-          ],
-          "minimum_should_match": 1
-        }
-      },
-      "aggs": {
-        "attention_top": {
-          "top_hits": {
-            "size": 3,
-            // keyword order is alphabetical, so a painless script ranks priority × 10 + severity
-            "sort": [
-              {
-                "_script": { "type": "number", "order": "desc", "script": "…" }
-              },
-              {
-                "wazuh.case.updated_at": {
-                  "order": "desc",
-                  "unmapped_type": "date"
-                }
-              }
-            ],
-            "_source": ["wazuh.case.*", "wazuh.agent.name"]
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-The "View all" link of the list opens the Cases tab with the open statuses as a
-filter and `wazuh.case.priority:urgent or wazuh.case.severity:critical` as KQL:
-filters cannot express an OR across fields.
+DQL (filter part): `*` over the last 24h.
 
 ---
 

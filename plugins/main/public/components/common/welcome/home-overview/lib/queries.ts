@@ -8,14 +8,8 @@ import {
   microsoftGraphAPI,
   office365,
 } from '../../../../../utils/applications';
-import { ACTION_LIST_ROWS, AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
+import { AGG, SCA_RESULT_BUCKET, TOP_N } from './constants';
 import {
-  CASE_PRIORITIES,
-  CASE_PRIORITY_FIELD,
-  CASE_SEVERITY_FIELD,
-  CASE_STATUS_FIELD,
-  CASE_STATUSES,
-  CASE_UPDATED_AT_FIELD,
   COMPLIANCE_FRAMEWORK_FIELDS,
   EVENT_DOC_ID_FIELD,
   FIM_FILE_MTIME_FIELD,
@@ -27,10 +21,7 @@ import {
   MITRE_TACTIC_ID_FIELD,
   MITRE_TECHNIQUE_ID_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
-  OPEN_CASE_STATUSES,
-  RULE_ID_FIELD,
   RULE_TITLE_FIELD,
-  SERIOUS_FINDING_LEVELS,
   SCA_CHECK_RESULT_FIELD,
   SCA_POLICY_NAME_FIELD,
   FINDING_SEVERITY_BANDS,
@@ -95,42 +86,6 @@ export function buildTopTermsWithExternalIdAgg(
   };
 }
 
-/** Rules per level the coverage looks at; past them the rules list says "N+ more". */
-export const SERIOUS_RULES_PER_LEVEL = 25;
-
-const seriousLevelsFilter = {
-  terms: { [FINDING_SEVERITY_FIELD]: [...SERIOUS_FINDING_LEVELS] },
-};
-
-/** Critical/high findings per level, and per level the top rules by finding count. */
-export function buildSeriousFindingsAgg(
-  rulesPerLevel = SERIOUS_RULES_PER_LEVEL,
-) {
-  return {
-    [AGG.seriousFindings]: {
-      filter: seriousLevelsFilter,
-      aggs: {
-        [AGG.byLevel]: {
-          terms: {
-            field: FINDING_SEVERITY_FIELD,
-            size: SERIOUS_FINDING_LEVELS.length,
-          },
-          aggs: {
-            [AGG.byRule]: {
-              terms: { field: RULE_ID_FIELD, size: rulesPerLevel },
-              aggs: {
-                [AGG.ruleTitle]: {
-                  terms: { field: RULE_TITLE_FIELD, size: 1 },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  };
-}
-
 /**
  * Overview findings batch: severity bands + top MITRE tactics, plus Threat
  * Hunting's total findings + top rules + techniques, all in the one
@@ -157,7 +112,6 @@ export function buildFindingsOverviewAggs(
       MITRE_TECHNIQUE_ID_FIELD,
       topTechniquesSize,
     ),
-    ...buildSeriousFindingsAgg(),
   };
 }
 
@@ -335,140 +289,4 @@ export function buildThreatIntelByThreatTypeAgg(size = TOP_N) {
     THREAT_INTEL_THREAT_TYPE_FIELD,
     size,
   );
-}
-
-/** Most answered findings the coverage looks up; past it, coverage undercounts. */
-export const MAX_ANSWERED_FINDINGS = 10000;
-
-/**
- * The critical/high findings the active responses answered: a response copies the finding's
- * `wazuh` fields and stores its `_id` in `event.doc_id`. The ids feed `buildAnsweredFindingsAgg`.
- */
-export function buildIncidentResponseAggs(maxIds = MAX_ANSWERED_FINDINGS) {
-  return {
-    [AGG.answeredFindings]: {
-      filter: seriousLevelsFilter,
-      aggs: {
-        [AGG.answeredIds]: {
-          terms: { field: EVENT_DOC_ID_FIELD, size: maxIds },
-        },
-      },
-    },
-  };
-}
-
-/**
- * Of the findings the responses answered, those of the findings search window (a response of the
- * last 24 hours can answer an older finding), per level and per rule id.
- */
-export function buildAnsweredFindingsAgg(ids: string[]) {
-  return {
-    [AGG.answeredFindings]: {
-      filter: {
-        bool: { filter: [{ ids: { values: ids } }, seriousLevelsFilter] },
-      },
-      aggs: {
-        [AGG.byLevel]: {
-          terms: {
-            field: FINDING_SEVERITY_FIELD,
-            size: SERIOUS_FINDING_LEVELS.length,
-          },
-        },
-        [AGG.byRule]: { terms: { field: RULE_ID_FIELD, size: ids.length } },
-      },
-    },
-  };
-}
-
-/** KQL twin of the urgent-or-critical part of `ATTENTION_CASES_FILTER`, for its "View all" link. */
-export const ATTENTION_CASES_QUERY = `${CASE_PRIORITY_FIELD}:urgent or ${CASE_SEVERITY_FIELD}:critical`;
-
-/** Open cases that are urgent or critical. */
-const ATTENTION_CASES_FILTER = {
-  bool: {
-    filter: [{ terms: { [CASE_STATUS_FIELD]: OPEN_CASE_STATUSES } }],
-    should: [
-      { term: { [CASE_PRIORITY_FIELD]: 'urgent' } },
-      { term: { [CASE_SEVERITY_FIELD]: 'critical' } },
-    ],
-    minimum_should_match: 1,
-  },
-};
-
-/** Ranks of a keyword list, highest first, as a painless map literal. */
-const painlessRanks = (values: readonly string[]) =>
-  `[${values
-    .map((value, index) => `'${value}': ${values.length - index}`)
-    .join(', ')}]`;
-
-/**
- * Priority, then severity, highest first. Keyword sorting is alphabetical, so the rank comes
- * from a script; it only runs on the few open urgent or critical cases.
- */
-const BY_URGENCY = {
-  _script: {
-    type: 'number',
-    order: 'desc',
-    script: {
-      lang: 'painless',
-      source: [
-        // A field never written to an index is unmapped there: `doc[f]` would fail the shard.
-        'def rank(def d, String f, Map m) { return !d.containsKey(f) || d[f].size() == 0 ? 0 : m.getOrDefault(d[f].value, 0); }',
-        `return rank(doc, '${CASE_PRIORITY_FIELD}', ${painlessRanks(
-          CASE_PRIORITIES,
-        )}) * 10 + rank(doc, '${CASE_SEVERITY_FIELD}', ${painlessRanks(
-          FINDING_SEVERITY_BANDS,
-        )});`,
-      ].join(' '),
-    },
-  },
-};
-
-/**
- * Case management card in one search: cases per status, open cases per severity, and the open
- * urgent or critical cases.
- */
-export function buildCaseManagementAggs() {
-  const severityFilters: Record<string, unknown> = {};
-  for (const band of FINDING_SEVERITY_BANDS) {
-    severityFilters[band] = { term: { [CASE_SEVERITY_FIELD]: band } };
-  }
-  return {
-    [AGG.caseStatus]: {
-      filters: {
-        filters: Object.fromEntries(
-          CASE_STATUSES.map(status => [
-            status,
-            { term: { [CASE_STATUS_FIELD]: status } },
-          ]),
-        ),
-      },
-    },
-    [AGG.openCases]: {
-      filter: { terms: { [CASE_STATUS_FIELD]: OPEN_CASE_STATUSES } },
-      aggs: {
-        [AGG.caseSeverity]: { filters: { filters: severityFilters } },
-      },
-    },
-    [AGG.attentionCases]: {
-      filter: ATTENTION_CASES_FILTER,
-      aggs: {
-        [AGG.attentionTop]: {
-          top_hits: {
-            size: ACTION_LIST_ROWS,
-            sort: [
-              BY_URGENCY,
-              {
-                [CASE_UPDATED_AT_FIELD]: {
-                  order: 'desc',
-                  unmapped_type: 'date',
-                },
-              },
-            ],
-            _source: ['wazuh.case.*', 'wazuh.agent.name'],
-          },
-        },
-      },
-    },
-  };
 }

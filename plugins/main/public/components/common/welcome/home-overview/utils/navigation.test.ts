@@ -1,11 +1,8 @@
 import rison from 'rison-node';
 import {
-  getActiveResponseResponsesUrl,
-  getCaseManagementCasesUrl,
   getAiAssistantUrl,
   getCreateActiveResponseUrl,
   getCtiExplorerIocsUrl,
-  getFindingsByRuleUrl,
   isActiveResponsesRegistered,
   getMitreFindingsByTechniqueUrl,
   getMitreIntelligenceResourceUrl,
@@ -24,7 +21,7 @@ jest.mock('../../../../../react-services/navigation-service', () => ({
   },
 }));
 jest.mock('../../../data-source', () => ({
-  FILTER_OPERATOR: { IS: 'is', IS_ONE_OF: 'is one of' },
+  FILTER_OPERATOR: { IS: 'is' },
   PatternDataSourceFilterManager: {
     createFilter: jest.fn(
       (
@@ -46,7 +43,6 @@ jest.mock('../../../data-source', () => ({
           controlledBy,
         },
         query: { ['match_phrase']: { [key]: { query: value } } },
-        type,
         $state: { store: 'appState' },
       }),
     ),
@@ -64,7 +60,6 @@ jest.mock('../../../../../utils/applications', () => {
     malwareDetection: app('malware-detection'),
     vulnerabilityDetection: app('vulnerability-detection'),
     activeResponses: app('incident-response-dashboard'),
-    caseManagement: app('case-management'),
     regulatoryCompliance: app('regulatory-compliance'),
     endpointSummary: app('endpoint-summary'),
     ctiExplorer: app('cti-explorer'),
@@ -105,7 +100,6 @@ interface DecodedFilterAppState {
       controlledBy?: string;
     };
   }>;
-  query?: { language: string; query: string };
 }
 
 const decodeAppState = (url: string): DecodedFilterAppState | undefined => {
@@ -256,82 +250,5 @@ describe('getCtiExplorerIocsUrl', () => {
     expect(getCtiExplorerIocsUrl('hash_sha256')).toBe(
       '/app/cti-explorer#/cti-explorer/?tab=iocs&iocType=hash_sha256',
     );
-  });
-});
-
-describe('getActiveResponseResponsesUrl', () => {
-  it('opens the Responses tab', () => {
-    expect(getActiveResponseResponsesUrl()).toBe(
-      '/app/incident-response-dashboard#overview/?tab=incident-response-dashboard&tabView=responses',
-    );
-  });
-});
-
-describe('getCaseManagementCasesUrl', () => {
-  it('opens the Cases tab unfiltered without an index pattern', () => {
-    expect(
-      getCaseManagementCasesUrl([
-        { field: 'wazuh.case.status', value: 'active' },
-      ]),
-    ).toBe('/app/case-management#overview/?tab=caseManagement&tabView=cases');
-  });
-
-  it('adds one filter per field, "is one of" for a list, over a range wide enough for every case', () => {
-    const url = getCaseManagementCasesUrl(
-      [
-        { field: 'wazuh.case.status', value: ['active', 'acknowledged'] },
-        { field: 'wazuh.case.severity', value: 'high' },
-      ],
-      'idx-findings',
-    );
-    const filters = decodeAppState(url)?.filters as unknown as Array<{
-      meta: { key: string; value: unknown };
-      type: string;
-    }>;
-    expect(
-      filters.map(({ meta, type }) => [type, meta.key, meta.value]),
-    ).toEqual([
-      ['is one of', 'wazuh.case.status', ['active', 'acknowledged']],
-      ['is', 'wazuh.case.severity', 'high'],
-    ]);
-    expect(url).toContain('time:(from:now-10y,to:now)');
-    expect(decodeAppState(url)?.query).toEqual({
-      language: 'kuery',
-      query: '',
-    });
-  });
-
-  it('carries a KQL query for conditions filters cannot express', () => {
-    const url = getCaseManagementCasesUrl(
-      [{ field: 'wazuh.case.status', value: ['active', 'acknowledged'] }],
-      'idx-findings',
-      'wazuh.case.priority:urgent or wazuh.case.severity:critical',
-    );
-    expect(decodeAppState(url)?.query).toEqual({
-      language: 'kuery',
-      query: 'wazuh.case.priority:urgent or wazuh.case.severity:critical',
-    });
-  });
-});
-
-describe('getFindingsByRuleUrl', () => {
-  it('opens Threat Hunting unfiltered without an index pattern', () => {
-    expect(getFindingsByRuleUrl('r1', 'high')).toBe('/app/threat-hunting');
-  });
-
-  it('opens the findings of the last 24 hours of the rule at its level', () => {
-    const url = getFindingsByRuleUrl('r1', 'high', 'idx-findings');
-    expect(url).toContain('#overview/?tab=general&tabView=findings');
-    const filters = decodeAppState(url)?.filters as unknown as Array<{
-      meta: { key: string; value: unknown };
-      type: string;
-    }>;
-    expect(
-      filters.map(({ meta, type }) => [type, meta.key, meta.value]),
-    ).toEqual([
-      ['is', 'wazuh.rule.id', 'r1'],
-      ['is', 'wazuh.rule.level', 'high'],
-    ]);
-    expect(url).toContain('time:(from:now-24h,to:now)');
   });
 });

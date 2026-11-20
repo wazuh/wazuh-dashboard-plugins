@@ -14,11 +14,6 @@ import {
   buildThreatIntelFeedByTypeAgg,
   buildCloudSecurityByModuleAgg,
   buildPlatformsCountAgg,
-  buildIncidentResponseAggs,
-  buildCaseManagementAggs,
-  buildSeriousFindingsAgg,
-  buildAnsweredFindingsAgg,
-  ATTENTION_CASES_QUERY,
 } from './queries';
 import {
   FINDING_SEVERITY_BANDS,
@@ -213,113 +208,5 @@ describe('query builders', () => {
     });
     // Feed-by-type is no longer part of the findings search.
     expect(agg.malware.aggs.ioc_feed_by_type).toBeUndefined();
-  });
-
-  it('collects the ids of the critical/high findings the responses answered', () => {
-    expect(buildIncidentResponseAggs(100)).toEqual({
-      answered_findings: {
-        filter: { terms: { 'wazuh.rule.level': ['critical', 'high'] } },
-        aggs: {
-          answered_ids: { terms: { field: 'event.doc_id', size: 100 } },
-        },
-      },
-    });
-  });
-
-  it('counts the answered findings of the window per level and per rule', () => {
-    expect(buildAnsweredFindingsAgg(['f1', 'f2'])).toEqual({
-      answered_findings: {
-        filter: {
-          bool: {
-            filter: [
-              { ids: { values: ['f1', 'f2'] } },
-              { terms: { 'wazuh.rule.level': ['critical', 'high'] } },
-            ],
-          },
-        },
-        aggs: {
-          by_level: { terms: { field: 'wazuh.rule.level', size: 2 } },
-          by_rule: { terms: { field: 'wazuh.rule.id', size: 2 } },
-        },
-      },
-    });
-  });
-
-  it('adds the critical/high findings and their top rules per level to the findings search', () => {
-    expect(buildFindingsOverviewAggs().serious_findings).toEqual(
-      buildSeriousFindingsAgg().serious_findings,
-    );
-    expect(buildSeriousFindingsAgg(10)).toEqual({
-      serious_findings: {
-        filter: { terms: { 'wazuh.rule.level': ['critical', 'high'] } },
-        aggs: {
-          by_level: {
-            terms: { field: 'wazuh.rule.level', size: 2 },
-            aggs: {
-              by_rule: {
-                terms: { field: 'wazuh.rule.id', size: 10 },
-                aggs: {
-                  rule_title: { terms: { field: 'wazuh.rule.title', size: 1 } },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-  });
-
-  it('builds the case counts per status and the severity of the open ones', () => {
-    const agg = buildCaseManagementAggs();
-    expect(agg.case_status.filters.filters).toEqual({
-      active: { term: { 'wazuh.case.status': 'active' } },
-      acknowledged: { term: { 'wazuh.case.status': 'acknowledged' } },
-      completed: { term: { 'wazuh.case.status': 'completed' } },
-    });
-    expect(agg.open_cases.filter).toEqual({
-      terms: { 'wazuh.case.status': ['active', 'acknowledged'] },
-    });
-    expect(
-      Object.keys(agg.open_cases.aggs.case_severity.filters.filters),
-    ).toEqual(FINDING_SEVERITY_BANDS);
-  });
-
-  it('builds the open urgent or critical cases, most urgent first', () => {
-    const { attention_cases: attention } = buildCaseManagementAggs();
-    expect(attention.filter).toEqual({
-      bool: {
-        filter: [
-          { terms: { 'wazuh.case.status': ['active', 'acknowledged'] } },
-        ],
-        should: [
-          { term: { 'wazuh.case.priority': 'urgent' } },
-          { term: { 'wazuh.case.severity': 'critical' } },
-        ],
-        minimum_should_match: 1,
-      },
-    });
-    const top = attention.aggs.attention_top.top_hits;
-    expect(top.size).toBe(3);
-    expect(top._source).toEqual(['wazuh.case.*', 'wazuh.agent.name']);
-    const [byUrgency, byUpdate] = top.sort as unknown as [
-      { _script: { order: string; script: { source: string } } },
-      unknown,
-    ];
-    expect(byUrgency._script.order).toBe('desc');
-    expect(byUrgency._script.script.source).toContain(
-      "'urgent': 4, 'high': 3, 'medium': 2, 'low': 1",
-    );
-    expect(byUrgency._script.script.source).toContain(
-      "'critical': 5, 'high': 4, 'medium': 3, 'low': 2, 'informational': 1",
-    );
-    expect(byUpdate).toEqual({
-      'wazuh.case.updated_at': { order: 'desc', unmapped_type: 'date' },
-    });
-  });
-
-  it('mirrors the urgent-or-critical condition as KQL for the "View all" link', () => {
-    expect(ATTENTION_CASES_QUERY).toBe(
-      'wazuh.case.priority:urgent or wazuh.case.severity:critical',
-    );
   });
 });

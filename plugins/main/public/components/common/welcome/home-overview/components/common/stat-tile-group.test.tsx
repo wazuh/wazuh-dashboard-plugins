@@ -67,21 +67,6 @@ describe('StatTileGroup', () => {
     expect(screen.getByText('42')).toBeInTheDocument();
   });
 
-  it('colors a tile value with its status color', () => {
-    const results: Record<Key, DataGroupResult<number | undefined>> = {
-      packages: { status: 'available', data: 3 },
-    };
-    const { container } = render(
-      <StatTileGroup
-        tiles={[{ ...TILES[0], color: 'rgb(189, 39, 30)' }]}
-        results={results}
-      />,
-    );
-    expect(
-      container.querySelector('.euiStat__title') as HTMLElement,
-    ).toHaveStyle({ color: 'rgb(189, 39, 30)' });
-  });
-
   it('captions each group of tiles once, in order', () => {
     type GroupedKey = 'decoders' | 'kvdbs' | 'rules';
     const tiles: ReadonlyArray<StatTileSpec<GroupedKey>> = [

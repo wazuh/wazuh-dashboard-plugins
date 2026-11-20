@@ -3,32 +3,14 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
-import {
-  useAgentStatus,
-  useAnsweredFindings,
-  useCaseManagementOverview,
-  useIncidentResponseOverview,
-} from '../../hooks/use-overview-data';
+import { useAgentStatus } from '../../hooks/use-overview-data';
 import * as navigation from '../../utils/navigation';
-import { IncidentResponseCard } from './incident-response-card';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Explicit factories so the real modules (and their heavy data-source imports)
 // are never loaded — this section is tested purely against the seam boundary.
 jest.mock('../../hooks/use-overview-data', () => ({
   useAgentStatus: jest.fn(),
-  useIncidentResponseOverview: jest.fn(),
-  useAnsweredFindings: jest.fn(),
-  useCaseManagementOverview: jest.fn(),
-}));
-// The cards have their own suites; here only their place in the layout matters.
-jest.mock('./incident-response-card', () => ({
-  IncidentResponseCard: jest.fn(() => (
-    <div data-test-subj='incident-response-card' />
-  )),
-}));
-jest.mock('./case-management-card', () => ({
-  CaseManagementCard: () => <div data-test-subj='case-management-card' />,
 }));
 jest.mock('../../utils/navigation', () => ({
   getDeployAgentUrl: jest.fn(() => 'https://example.test/deploy'),
@@ -73,8 +55,6 @@ const findingsAvailable = {
 beforeEach(() => {
   jest.clearAllMocks();
   asMock(useUserPermissionsRequirements).mockReturnValue([false, {}]);
-  asMock(useIncidentResponseOverview).mockReturnValue({ status: 'loading' });
-  asMock(useCaseManagementOverview).mockReturnValue({ status: 'loading' });
   asMock(useAgentStatus).mockReturnValue({
     status: 'available',
     data: {
@@ -99,50 +79,6 @@ describe('OverviewSection', () => {
     expect(container.textContent).toContain('agents active');
     expect(screen.getByText('35,682')).toBeInTheDocument();
     expect(screen.getByText('Initial Access')).toBeInTheDocument();
-  });
-
-  it('places Incident Response and Case management between the findings and MITRE rows', () => {
-    const { container } = render(
-      <OverviewSection findings={findingsAvailable} />,
-    );
-    const order = [
-      'home-overview-findings-severity',
-      'incident-response-card',
-      'case-management-card',
-      'home-overview-mitre-tactics',
-    ].map(testSubj =>
-      container.querySelector(`[data-test-subj="${testSubj}"]`),
-    );
-    order.reduce((previous, current) => {
-      expect(previous).toBeInTheDocument();
-      expect(
-        previous!.compareDocumentPosition(current!) &
-          Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy();
-      return current;
-    });
-    expect(useIncidentResponseOverview).toHaveBeenCalledWith(true);
-    expect(useCaseManagementOverview).toHaveBeenCalledWith(true);
-  });
-
-  it('gives Incident Response the findings search, which carries the critical/high rules', () => {
-    render(<OverviewSection findings={findingsAvailable} />);
-    expect((IncidentResponseCard as jest.Mock).mock.calls[0][0].findings).toBe(
-      findingsAvailable,
-    );
-  });
-
-  it('looks up which findings the responses answered once their ids are known', () => {
-    asMock(useIncidentResponseOverview).mockReturnValue({
-      status: 'available',
-      data: { total: 3, answeredIds: ['f1'], answeredIdsPartial: false },
-    });
-    asMock(useAnsweredFindings).mockReturnValue({ status: 'loading' });
-    render(<OverviewSection findings={findingsAvailable} />);
-    expect(useAnsweredFindings).toHaveBeenCalledWith(['f1']);
-    expect(
-      (IncidentResponseCard as jest.Mock).mock.calls[0][0].answeredFindings,
-    ).toEqual({ status: 'loading' });
   });
 
   it('shows a contained error for a failed group (distinct from hidden)', () => {

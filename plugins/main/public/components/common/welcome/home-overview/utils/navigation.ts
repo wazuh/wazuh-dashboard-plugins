@@ -9,7 +9,6 @@ import {
   malwareDetection,
   vulnerabilityDetection,
   activeResponses,
-  caseManagement,
   regulatoryCompliance,
   endpointSummary,
   ctiExplorer,
@@ -24,7 +23,6 @@ import {
   HOST_OS_NAME_FIELD,
   MITRE_TACTIC_NAME_FIELD,
   MITRE_TECHNIQUE_NAME_FIELD,
-  RULE_ID_FIELD,
   SCA_CHECK_RESULT_FIELD,
   VULNERABILITY_SEVERITY_FIELD,
   VULNERABILITY_SEVERITY_VALUES,
@@ -89,40 +87,6 @@ export const getDiscoverFindingsBySeverityUrl = (
     path: `#overview/?tab=general&tabView=findings&_a=${queryState}&_g=(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-24h,to:now))`,
   });
 };
-/**
- * Threat Hunting > Findings of the last 24 hours of one rule (`wazuh.rule.id`) at one level, the
- * findings a coverage row counts.
- */
-export const getFindingsByRuleUrl = (
-  ruleId: string,
-  level: SeverityBand,
-  indexPatternId?: string,
-): string => {
-  if (!indexPatternId) {
-    return getUrlForApp(threatHunting.id);
-  }
-  const queryState = rison.encode({
-    filters: [
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        RULE_ID_FIELD,
-        ruleId,
-        indexPatternId,
-      ),
-      PatternDataSourceFilterManager.createFilter(
-        FILTER_OPERATOR.IS,
-        FINDING_SEVERITY_FIELD,
-        level,
-        indexPatternId,
-      ),
-    ],
-    query: { language: 'kuery', query: '' },
-  });
-  return getUrlForApp(threatHunting.id, {
-    path: `#overview/?tab=general&tabView=findings&_a=${queryState}&_g=${DISCOVER_G_STATE}`,
-  });
-};
-
 export const getMitreUrl = () => getUrlForApp(mitreAttack.id);
 
 export const getMitreIntelligenceResourceUrl = (
@@ -296,45 +260,6 @@ export const getActiveResponseResponsesUrl = () =>
   getUrlForApp(activeResponses.id, {
     path: '#overview/?tab=incident-response-dashboard&tabView=responses',
   });
-
-export const getCaseManagementUrl = () => getUrlForApp(caseManagement.id);
-
-/**
- * The Cases tab filters by the time of the finding, while the Home card counts
- * every case, so the link opens a range wide enough to list them all. Findings
- * store nanosecond dates, which cannot go before 1970.
- */
-const CASES_G_STATE =
-  '(filters:!(),refreshInterval:(pause:!t,value:0),time:(from:now-10y,to:now))';
-
-/**
- * Case Management > Cases, filtered by case fields (`IS`, or `IS ONE OF` for a list) and an
- * optional KQL query, for conditions filters cannot express (an OR across fields).
- */
-export const getCaseManagementCasesUrl = (
-  filters: Array<{ field: string; value: string | string[] }>,
-  indexPatternId?: string,
-  query = '',
-): string => {
-  const path = '#overview/?tab=caseManagement&tabView=cases';
-  if (!indexPatternId) {
-    return getUrlForApp(caseManagement.id, { path });
-  }
-  const queryState = rison.encode({
-    filters: filters.map(({ field, value }) =>
-      PatternDataSourceFilterManager.createFilter(
-        Array.isArray(value) ? FILTER_OPERATOR.IS_ONE_OF : FILTER_OPERATOR.IS,
-        field,
-        value,
-        indexPatternId,
-      ),
-    ),
-    query: { language: 'kuery', query },
-  });
-  return getUrlForApp(caseManagement.id, {
-    path: `${path}&_a=${queryState}&_g=${CASES_G_STATE}`,
-  });
-};
 
 /**
  * The Active Responses app id, owned by the separate `wazuh-dashboard-notifications` plugin

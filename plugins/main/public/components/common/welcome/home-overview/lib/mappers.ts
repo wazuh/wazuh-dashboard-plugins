@@ -1,26 +1,13 @@
 import {
   AgentStatus,
-  AnsweredFindings,
-  CaseManagementOverview,
-  CaseStatusCounts,
-  CaseSummary,
   CountsByKey,
   ScaBenchmark,
   ScaTilesData,
-  SeriousFindings,
-  SeriousLevel,
-  SeriousRule,
   SeverityBand,
   SeverityCounts,
   TopItem,
-  IncidentResponseOverview,
 } from '../interfaces/types';
-import {
-  CASE_STATUSES,
-  COMPLIANCE_FRAMEWORK_FIELDS,
-  FINDING_SEVERITY_BANDS,
-  SERIOUS_FINDING_LEVELS,
-} from './fields';
+import { COMPLIANCE_FRAMEWORK_FIELDS, FINDING_SEVERITY_BANDS } from './fields';
 import { AGG, SCA_RESULT_BUCKET } from './constants';
 import { CheckResult } from '../../../../overview/sca/utils/constants';
 
@@ -184,150 +171,4 @@ export function mapAgentStatus(
     neverConnected: connection?.never_connected,
     total: connection?.total,
   };
-}
-
-interface CaseHit {
-  _id: string;
-  _source?: {
-    wazuh?: {
-      case?: {
-        title?: string;
-        severity?: string;
-        priority?: string;
-        updated_at?: string;
-        created_at?: string;
-      };
-      agent?: { name?: string };
-    };
-  };
-}
-
-const mapCaseHit = (hit: CaseHit): CaseSummary => {
-  const wazuh = hit._source?.wazuh;
-  const fields = wazuh?.case ?? {};
-  return {
-    id: hit._id,
-    title: fields.title,
-    severity: fields.severity,
-    priority: fields.priority,
-    updatedAt: fields.updated_at ?? fields.created_at,
-    agentName: wazuh?.agent?.name,
-  };
-};
-
-/** Case management card: see `buildCaseManagementAggs`. */
-export function mapCaseManagement(
-  response:
-    | { hits?: { total?: number }; aggregations?: Aggregations }
-    | undefined,
-): CaseManagementOverview {
-  const aggregations = response?.aggregations;
-  const statusBuckets =
-    (aggregations?.[AGG.caseStatus]?.buckets as
-      | Record<string, FiltersAggBucket>
-      | undefined) ?? {};
-  const byStatus = CASE_STATUSES.reduce((acc, status) => {
-    acc[status] = statusBuckets[status]?.doc_count;
-    return acc;
-  }, {} as CaseStatusCounts);
-  const attention = aggregations?.[AGG.attentionCases] as
-    | (FiltersAggBucket & {
-        [AGG.attentionTop]?: { hits?: { hits?: CaseHit[] } };
-      })
-    | undefined;
-  return {
-    total: mapDocCount(response),
-    byStatus,
-    openBySeverity: mapSeverityCounts(
-      aggregations?.[AGG.openCases] as Aggregations,
-      AGG.caseSeverity,
-    ),
-    attention: {
-      total: attention?.doc_count,
-      cases: (attention?.[AGG.attentionTop]?.hits?.hits ?? []).map(mapCaseHit),
-    },
-  };
-}
-
-interface LevelBucket extends TermsBucket {
-  [subAgg: string]: unknown;
-}
-
-const isSeriousLevel = (level: unknown): level is SeriousLevel =>
-  (SERIOUS_FINDING_LEVELS as readonly unknown[]).includes(level);
-
-const subBuckets = (bucket: unknown, aggName: string): LevelBucket[] => {
-  const buckets = (
-    bucket as Record<string, { buckets?: unknown } | undefined>
-  )?.[aggName]?.buckets;
-  return Array.isArray(buckets) ? (buckets as LevelBucket[]) : [];
-};
-
-/** Critical/high findings per level and their top rules (`buildSeriousFindingsAgg`). */
-export function mapSeriousFindings(
-  aggregations: Aggregations,
-): SeriousFindings {
-  const byLevel: SeriousFindings['byLevel'] = {};
-  const rules: SeriousRule[] = [];
-  let partial = false;
-  for (const levelBucket of subBuckets(
-    aggregations?.[AGG.seriousFindings],
-    AGG.byLevel,
-  )) {
-    if (!isSeriousLevel(levelBucket.key)) {
-      continue;
-    }
-    const level = levelBucket.key;
-    byLevel[level] = levelBucket.doc_count ?? 0;
-    const ruleAgg = (levelBucket as Record<string, unknown>)[AGG.byRule] as
-      | { sum_other_doc_count?: number }
-      | undefined;
-    partial = partial || (ruleAgg?.sum_other_doc_count ?? 0) > 0;
-    for (const rule of subBuckets(levelBucket, AGG.byRule)) {
-      rules.push({
-        id: String(rule.key),
-        title: String(subBuckets(rule, AGG.ruleTitle)[0]?.key ?? rule.key),
-        level,
-        count: rule.doc_count ?? 0,
-      });
-    }
-  }
-  return { byLevel, rules, partial };
-}
-
-/** Active responses: total and the critical/high findings they answered (`buildIncidentResponseAggs`). */
-export function mapIncidentResponse(
-  response:
-    | { hits?: { total?: number }; aggregations?: Aggregations }
-    | undefined,
-): IncidentResponseOverview {
-  const answered = response?.aggregations?.[AGG.answeredFindings];
-  const idsAgg = (answered as Record<string, unknown> | undefined)?.[
-    AGG.answeredIds
-  ] as { sum_other_doc_count?: number } | undefined;
-  return {
-    total: mapDocCount(response),
-    answeredIds: subBuckets(answered, AGG.answeredIds).map(bucket =>
-      String(bucket.key),
-    ),
-    answeredIdsPartial: (idsAgg?.sum_other_doc_count ?? 0) > 0,
-  };
-}
-
-/** Answered findings of the window, per level and per rule id (`buildAnsweredFindingsAgg`). */
-export function mapAnsweredFindings(
-  aggregations: Aggregations,
-): AnsweredFindings {
-  const answered = aggregations?.[AGG.answeredFindings];
-  const byLevel: AnsweredFindings['byLevel'] = {};
-  for (const bucket of subBuckets(answered, AGG.byLevel)) {
-    if (isSeriousLevel(bucket.key)) {
-      byLevel[bucket.key] = bucket.doc_count ?? 0;
-    }
-  }
-  const byRule: AnsweredFindings['byRule'] = {};
-  for (const bucket of subBuckets(answered, AGG.byRule)) {
-    byRule[String(bucket.key)] = bucket.doc_count ?? 0;
-  }
-  return { byLevel, byRule };
 }

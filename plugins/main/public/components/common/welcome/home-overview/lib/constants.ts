@@ -38,23 +38,6 @@ export const AGG = {
    * top tactic/technique bucket, so links can open the Intelligence resource.
    */
   externalId: 'external_id',
-  /** Critical/high findings an active response answered (by `event.doc_id`). */
-  answeredFindings: 'answered_findings',
-  /** Per level / per rule split inside `answered_findings` and `serious_findings`. */
-  byLevel: 'by_level',
-  byRule: 'by_rule',
-  /** `event.doc_id` values in `answered_findings`, on the active responses. */
-  answeredIds: 'answered_ids',
-  /** Critical/high findings and the rules behind them, in the findings search. */
-  seriousFindings: 'serious_findings',
-  ruleTitle: 'rule_title',
-  caseStatus: 'case_status',
-  /** Open cases only; holds their severity split. */
-  openCases: 'open_cases',
-  caseSeverity: 'case_severity',
-  /** Open cases that are urgent or critical, with the most urgent ones. */
-  attentionCases: 'attention_cases',
-  attentionTop: 'attention_top',
   /** Prefix of the per-framework controls cardinality aggs, one per framework. */
   complianceControlsPrefix: 'compliance_controls_',
 } as const;
@@ -68,9 +51,6 @@ export const SCA_RESULT_BUCKET = {
 
 /** Default "top N" size for the ranked (terms) aggregations. */
 export const TOP_N = 5;
-
-/** Rows of the Incident Response and Case Management action lists. */
-export const ACTION_LIST_ROWS = 3;
 
 export const VALUE_PLACEHOLDER = '-';
 
