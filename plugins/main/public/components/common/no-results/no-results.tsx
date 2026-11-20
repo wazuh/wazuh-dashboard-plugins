@@ -58,6 +58,14 @@ export const DiscoverNoResults = ({
   const moduleTexts = message
     ? undefined
     : getModuleEmptyStateTexts(getCurrentAppId());
+  /* The first paragraph of a module says what to try, the rest why it can be empty. */
+  const [hint, ...explanation] = description
+    ? [description]
+    : moduleTexts?.description ?? [
+        i18n.translate('wazuh.common.noResults.hint', {
+          defaultMessage: 'Try widening the time range or removing filters.',
+        }),
+      ];
 
   return (
     <ModuleEmptyState
@@ -71,14 +79,11 @@ export const DiscoverNoResults = ({
           defaultMessage: 'No results match your search criteria',
         })
       }
+      hint={hint}
     >
-      <p>
-        {description ??
-          moduleTexts?.description ??
-          i18n.translate('wazuh.common.noResults.hint', {
-            defaultMessage: 'Try widening the time range or removing filters.',
-          })}
-      </p>
+      {explanation.length
+        ? explanation.map(paragraph => <p key={paragraph}>{paragraph}</p>)
+        : null}
     </ModuleEmptyState>
   );
 };

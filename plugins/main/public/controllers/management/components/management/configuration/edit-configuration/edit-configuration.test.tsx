@@ -10,8 +10,9 @@ const validXml = '<ossec_config><global></global></ossec_config>';
 const invalidXml = '<ossec_config>\n  <global>\n</ossec_config>';
 
 const mockSaveFileCluster = jest.fn();
+const mockFetchFile = jest.fn();
 jest.mock('../utils/wz-fetch', () => ({
-  fetchFile: () => Promise.resolve(validXml),
+  fetchFile: (...args: unknown[]) => mockFetchFile(...args),
   saveFileCluster: (...args: unknown[]) => mockSaveFileCluster(...args),
   restartNodeSelected: jest.fn(),
   clusterNodes: jest.fn(),
@@ -84,8 +85,30 @@ const typeContent = (value: string) =>
   });
 
 describe('WzEditConfiguration', () => {
+  beforeEach(() => {
+    mockFetchFile.mockResolvedValue(validXml);
+  });
+
   afterEach(() => {
     jest.useRealTimers();
+  });
+
+  it('names the missing permission instead of saying the API is not reachable', async () => {
+    mockFetchFile.mockRejectedValue(
+      Object.assign(new Error('Permission denied'), {
+        response: { status: 403 },
+      }),
+    );
+    render(
+      <Provider store={store}>
+        <WzEditConfiguration updateConfigurationSection={jest.fn()} />
+      </Provider>,
+    );
+
+    expect(await screen.findByText('You have no permissions')).toBeVisible();
+    expect(screen.getByText('cluster:read')).toBeInTheDocument();
+    expect(screen.getByText('node:id:master-node')).toBeInTheDocument();
+    expect(screen.queryByText('API not reachable')).not.toBeInTheDocument();
   });
 
   it('checks the XML once typing pauses and never saves invalid XML', async () => {

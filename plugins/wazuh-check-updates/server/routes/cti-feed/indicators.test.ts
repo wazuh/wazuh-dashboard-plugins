@@ -77,8 +77,10 @@ describe(`GET ${routes.ctiFeedIndicators}`, () => {
       .expect(200);
 
     expect(response.body).toEqual({ iocs: 672843, vulnerabilities: 402878 });
+    // Without the checksums document, which has no IOC type.
     expect(mockCount).toHaveBeenCalledWith({
       index: 'wazuh-threatintel-enrichments*',
+      body: { query: { exists: { field: 'document.type' } } },
     });
     expect(mockCount).toHaveBeenCalledWith({
       index: '.wazuh-threatintel-vulnerabilities*',

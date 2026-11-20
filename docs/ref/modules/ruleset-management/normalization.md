@@ -103,10 +103,10 @@ metadata:
   author: Wazuh
   references: []
 check:
-  - event.original: contains(sshd)
+  - event.original: contains('sshd')
 normalize:
   - map:
-      - '@timestamp': get_date()
+      - '@timestamp': now()
       - event.action: 'authentication_failed'
 ```
 

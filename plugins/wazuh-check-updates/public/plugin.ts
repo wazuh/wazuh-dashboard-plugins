@@ -19,8 +19,10 @@ import {
   setCore,
   setWazuhCore,
   setCtiRegistrationStatusPollIntervalSec,
+  setFieldFormats,
 } from './plugin-services';
 import { getAvailableUpdates } from './services';
+import { formatCtiNumber } from './services/cti-number-format';
 import { CtiUpsellNotification } from './shared-components/cti-registration/components/cti-upsell-notification';
 import { CtiFeedSyncStatus } from './shared-components/cti-feed-sync-status';
 import {
@@ -83,6 +85,7 @@ export class WazuhCheckUpdatesPlugin
   ): WazuhCheckUpdatesPluginStart {
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
+    setFieldFormats(plugins.data.fieldFormats);
 
     const {
       ctiRegistrationUiEnabled,
@@ -103,6 +106,7 @@ export class WazuhCheckUpdatesPlugin
       ctiRegistrationStatusPollIntervalSec,
       CtiUpsellNotification,
       CtiFeedSyncStatus,
+      formatNumber: formatCtiNumber,
     };
   }
 

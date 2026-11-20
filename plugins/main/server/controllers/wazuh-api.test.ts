@@ -361,7 +361,6 @@ describe('WazuhApiCtrl.checkStoredAPI', () => {
     expect(getRegistryDataByHost).toHaveBeenCalledTimes(1);
     expect(internalRequest).not.toHaveBeenCalled();
     expect(response.ok.mock.calls[0][0].body.data.cluster_info).toEqual({
-      node: 'node01',
       cluster: 'wazuh',
     });
   });
@@ -376,7 +375,7 @@ describe('WazuhApiCtrl.checkStoredAPI', () => {
     expect(response.ok.mock.calls[0][0].body.data).toEqual({
       id: 'default',
       // eslint-disable-next-line camelcase -- response field name
-      cluster_info: { node: 'node01', cluster: 'wazuh' },
+      cluster_info: { cluster: 'wazuh' },
     });
   });
 
@@ -390,6 +389,54 @@ describe('WazuhApiCtrl.checkStoredAPI', () => {
     const { response } = await checkStoredAPI(getRegistryDataByHost);
 
     expect(response.ok.mock.calls[0][0].body.data).toEqual({ apiIsDown: true });
+  });
+});
+
+describe('WazuhApiCtrl.checkAPI', () => {
+  it('returns the registry data without the manager node name', async () => {
+    const internalRequest = jest.fn().mockResolvedValue({
+      status: 200,
+      data: {
+        // eslint-disable-next-line camelcase -- Server API response field name
+        data: { affected_items: [{ node: 'node01', cluster: 'wazuh' }] },
+      },
+    });
+    const getRegistryDataByHost = jest.fn().mockResolvedValue({
+      node: 'node01',
+      cluster: 'wazuh',
+      // eslint-disable-next-line camelcase -- registry field name
+      allow_run_as: 3,
+      // eslint-disable-next-line camelcase -- registry field name
+      verify_ca: true,
+    });
+    const context = {
+      wazuh: {
+        logger: { debug: jest.fn(), warn: jest.fn(), error: jest.fn() },
+        api: { client: { asInternalUser: { request: internalRequest } } },
+      },
+      // eslint-disable-next-line camelcase -- OSD request context key
+      wazuh_core: {
+        manageHosts: {
+          get: jest.fn().mockResolvedValue({ id: 'default' }),
+          getRegistryDataByHost,
+        },
+      },
+    } as unknown as RequestHandlerContext;
+    const response = makeResponse();
+
+    await new WazuhApiCtrl().checkAPI(
+      context,
+      { body: { id: 'default' } } as unknown as OpenSearchDashboardsRequest,
+      response as unknown as OpenSearchDashboardsResponseFactory,
+    );
+
+    expect(response.ok.mock.calls[0][0].body).toEqual({
+      cluster: 'wazuh',
+      // eslint-disable-next-line camelcase -- response field name
+      allow_run_as: 3,
+      // eslint-disable-next-line camelcase -- response field name
+      verify_ca: true,
+    });
   });
 });
 

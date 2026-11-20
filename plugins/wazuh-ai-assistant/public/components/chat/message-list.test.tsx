@@ -22,8 +22,7 @@ function baseMessage(overrides: Partial<UiChatMessage>): UiChatMessage {
 // `.wzMessageRow`/`.wzMessageRow--wide` (chat-page.scss) instead of the whole list sharing
 // `.wzContentMeasure`'s 1060px column. A table-bearing row still gets the `--wide` marker so it
 // fills that content column to its right edge with the results card (bounded by the composer's
-// own column, $wzContentMaxWidth), while a prose row caps its text at 68ch inside the same
-// measure.
+// own column, $wzContentMaxWidth), and a prose row's text fills the same measure.
 describe('MessageList — per-row measure', () => {
   it('gives a prose-only turn the shared (non-wide) row measure', () => {
     const { container } = render(

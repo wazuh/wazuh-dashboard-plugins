@@ -49,9 +49,17 @@ export class WazuhHostsCtrl {
       const entries = await context.wazuh_core.manageHosts.getEntries({
         excludePassword: true,
       });
-      const result = entries.map(entry =>
-        pick(entry, HOST_ENTRY_PUBLIC_FIELDS),
-      );
+      const result = entries.map(entry => {
+        const publicEntry = pick(entry, HOST_ENTRY_PUBLIC_FIELDS);
+        // Only the cluster name is exposed; the manager node name stays on the server
+        if (publicEntry.cluster_info) {
+          // eslint-disable-next-line camelcase -- API host field name
+          publicEntry.cluster_info = pick(publicEntry.cluster_info, [
+            'cluster',
+          ]);
+        }
+        return publicEntry;
+      });
       if (!result.length) {
         return response.ok({ body: [] });
       }

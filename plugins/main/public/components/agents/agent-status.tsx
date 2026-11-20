@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from 'moment-timezone';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import {
   agentStatusColorByAgentStatus,
   agentStatusDescriptionByAgentStatus,
@@ -8,13 +9,14 @@ import {
   TAgentStatus,
 } from '../../../common/services/wz_agent_status';
 import { ColumnWithStatusIcon } from './column-with-status-icon';
-import { EuiIconTip } from '@elastic/eui';
+import { EuiIconTip, EuiSpacer } from '@elastic/eui';
 import {
   AGENT_STATUS_CODE,
   API_NAME_AGENT_STATUS,
 } from '../../../common/constants';
 import '../../styles/common.scss';
 import { Agent } from '../endpoints-summary/types';
+import { formatUIDate } from '../../react-services/time-service';
 import './agent-status.scss';
 
 interface AgentStatusProps {
@@ -22,6 +24,8 @@ interface AgentStatusProps {
   children?: string | null;
   style?: React.CSSProperties;
   agent?: Agent;
+  /** Show the last keep alive of the agent in the tooltip of the status */
+  showLastKeepAlive?: boolean;
 }
 
 export const AgentStatus = ({
@@ -29,12 +33,20 @@ export const AgentStatus = ({
   children,
   style = {},
   agent,
+  showLastKeepAlive = false,
 }: AgentStatusProps) => {
   const statusCodeAgent = AGENT_STATUS_CODE.find(
     status => status.STATUS_CODE === agent?.status_code,
   );
   const label = agentStatusLabelByAgentStatus(status);
   const description = agentStatusDescriptionByAgentStatus(status);
+  // The manager reports no keep alive for agents that never connected
+  const lastKeepAlive =
+    showLastKeepAlive &&
+    status !== API_NAME_AGENT_STATUS.NEVER_CONNECTED &&
+    agent?.lastKeepAlive
+      ? agent.lastKeepAlive
+      : undefined;
   return (
     <div
       className='euiFlexGroup euiFlexGroup--gutterExtraSmall euiFlexGroup--alignItemsCenter euiFlexGroup--directionRow'
@@ -43,7 +55,40 @@ export const AgentStatus = ({
       <ColumnWithStatusIcon
         text={children || label.toLowerCase()}
         color={agentStatusColorByAgentStatus(status)}
-        tooltip={label.toLowerCase()}
+        tooltip={
+          showLastKeepAlive ? (
+            <>
+              <p>
+                <FormattedMessage
+                  id='wazuh.endpointsSummary.agentStatus.connectionStatus'
+                  defaultMessage='Connection status: {status}'
+                  values={{ status: <strong>{label.toLowerCase()}</strong> }}
+                />
+              </p>
+              {lastKeepAlive && (
+                <>
+                  <EuiSpacer size='xs' />
+                  <p>
+                    <FormattedMessage
+                      id='wazuh.endpointsSummary.agentStatus.lastKeepAlive'
+                      defaultMessage='Last keep alive: {relativeTime}'
+                      values={{
+                        relativeTime: (
+                          <strong>{moment(lastKeepAlive).fromNow()}</strong>
+                        ),
+                      }}
+                    />
+                  </p>
+                  <p className='wz-agent-status-tooltip-date'>
+                    {formatUIDate(lastKeepAlive)}
+                  </p>
+                </>
+              )}
+            </>
+          ) : (
+            label.toLowerCase()
+          )
+        }
       />
       <EuiIconTip
         anchorClassName='wz-agent-icon-tip'
@@ -76,7 +121,9 @@ export const AgentStatus = ({
                 )}
               </p>
             )}
+            {/* Skipped when the status tooltip already shows the last keep alive */}
             {status === API_NAME_AGENT_STATUS.DISCONNECTED &&
+              !lastKeepAlive &&
               agent?.lastKeepAlive && (
                 <p>
                   {i18n.translate(

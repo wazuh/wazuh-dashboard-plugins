@@ -440,10 +440,7 @@ describe('MessageBubble', () => {
       expect(screen.queryByText(/Top agents · /)).toBeNull();
     });
 
-    it('holds a suppressed-table answer to the prose measure, like any other prose-only turn', () => {
-      // The bubble opts OUT of the reading measure only to make room for a table (layout contract
-      // §5). With no table drawn there is nothing to make room for, so the answer must not be left
-      // running to the wide table measure.
+    it('renders a suppressed-table answer as prose, like any other prose-only turn', () => {
       render(
         <MessageBubble
           message={baseMessage({
@@ -456,13 +453,10 @@ describe('MessageBubble', () => {
         />,
       );
 
-      // The measure lives on the inner prose container: the outer flex item's own inline
-      // `maxWidth` always wins over a class there, so it does not carry this class at all — see
-      // the "prose measure vs. table breakout" tests below for that.
       const proseContainer = screen
         .getByText('Nothing matched.')
-        .closest('.wzProseMeasure') as HTMLElement;
-      expect(proseContainer).toHaveClass('wzProseMeasure');
+        .closest('.wzProse') as HTMLElement;
+      expect(proseContainer).toHaveClass('wzProse');
     });
   });
 
@@ -520,11 +514,27 @@ describe('MessageBubble', () => {
     );
   });
 
-  // Layout contract §5 ("one measure, one gutter"): prose is held to a fixed reading measure;
-  // block content (a result table) fills the wider content column up to $wzContentMaxWidth — the
-  // same column the composer uses — but is bounded by it, never reaching past the composer's edge.
-  describe('prose measure vs. table breakout (layout contract §5)', () => {
-    it('holds a prose-only assistant answer to the shared reading measure', () => {
+  // Layout contract §5 ("one measure, one gutter"): the answer text and block content (a result
+  // table) both fill the content column up to $wzContentMaxWidth — the same column the composer
+  // uses — so the answer and its card share one width, never reaching past the composer's edge.
+  describe('answer width vs. results card (layout contract §5)', () => {
+    it('gives the user question the full row width, like the answer', () => {
+      render(
+        <MessageBubble
+          message={baseMessage({ role: 'user', content: 'How many agents?' })}
+          resolveDiscoverUrl={noopResolveDiscoverUrl}
+          resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+        />,
+      );
+
+      const bubbleItem = screen
+        .getByText('How many agents?')
+        .closest('.euiFlexItem') as HTMLElement;
+      expect(bubbleItem.style.maxWidth).toBe('100%');
+      expect(bubbleItem.style.width).toBe('100%');
+    });
+
+    it('renders a prose-only assistant answer in the full-width prose container', () => {
       render(
         <MessageBubble
           message={baseMessage({ role: 'assistant', content: 'Six today.' })}
@@ -533,36 +543,30 @@ describe('MessageBubble', () => {
         />,
       );
 
-      // The measure arrives by CLASS, on the INNER prose container — not as an inline `68ch`
-      // restated inside message-bubble.tsx: the figure's single home is `$wzProseMeasure`, which
-      // the next test pins to the stylesheet.
       const proseContainer = screen
         .getByText('Six today.')
-        .closest('.wzProseMeasure') as HTMLElement;
-      expect(proseContainer).toHaveClass('wzProseMeasure');
+        .closest('.wzProse') as HTMLElement;
+      expect(proseContainer).toHaveClass('wzProse');
 
-      // The OUTER flex item does NOT also carry the class: its own inline `maxWidth` (below)
-      // always wins over a class on specificity, so having the class here as well would be dead
-      // weight for a table turn, misleading for a prose-only one.
+      // The assistant column spans the whole row, so the answer text gets the same width as a
+      // results card would.
       const bubbleItem = screen
         .getByText('Six today.')
         .closest('.euiFlexItem') as HTMLElement;
-      expect(bubbleItem).not.toHaveClass('wzProseMeasure');
-      expect(bubbleItem.style.maxWidth).not.toBe('68ch');
+      expect(bubbleItem).not.toHaveClass('wzProse');
+      expect(bubbleItem.style.maxWidth).toBe('100%');
     });
 
-    it('defines the prose measure once, in the stylesheet, from $wzProseMeasure', () => {
-      // The test above proves the bubble opts INTO the measure; this proves the thing it opts into
-      // is the shared token and not a second literal free to drift from it. It has to read the
-      // source directly because jest maps `.scss` to a style mock, so no rendered assertion can
-      // ever observe a value that came from a stylesheet.
+    it('does not cap the answer prose at a reading measure narrower than the results card', () => {
+      // Reads the source directly because jest maps `.scss` to a style mock, so no rendered
+      // assertion can ever observe a value that came from a stylesheet.
       const scssSource = fs.readFileSync(
         path.join(__dirname, 'chat-page.scss'),
         'utf8',
       );
-      expect(scssSource).toMatch(
-        /\.wzProseMeasure\s*\{[^}]*max-width:\s*\$wzProseMeasure/,
-      );
+      expect(scssSource).toMatch(/\.wzProse \{/);
+      expect(scssSource).not.toMatch(/\.wzProse \{[^}]*max-width/);
+      expect(scssSource).not.toMatch(/\$wzProseMeasure/);
     });
 
     it('keeps avatar, prose and meta on the same left edge in a table-carrying (--wide) row, bounded at the content column', () => {
@@ -591,7 +595,7 @@ describe('MessageBubble', () => {
       // None of the avatar, card, or prose/meta carry a per-element left correction in the wide
       // row: the avatar does not break left, the card does not break out to the avatar's edge, and
       // prose/meta carry no wide-row margin.
-      expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzProseMeasure/);
+      expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzProse/);
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzMsgAvatarItem/);
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzMsgMetaRow/);
       expect(scssSource).not.toMatch(/\.wzMessageRow--wide \.wzResultsCard/);
@@ -615,7 +619,7 @@ describe('MessageBubble', () => {
       );
     });
 
-    it('lets a table-carrying answer break out past the prose measure', () => {
+    it('gives a table-carrying answer the full row width', () => {
       const table: TableSpec = {
         columns: [{ id: 'agent', label: 'Agent' }],
         rows: [{ agent: 'web-01' }],
@@ -635,12 +639,11 @@ describe('MessageBubble', () => {
       const bubbleItem = screen
         .getByText('Results (1 row)')
         .closest('.euiFlexItem') as HTMLElement;
-      // Breaking out means declining the 68ch prose measure and filling whatever the ROW allows —
-      // which is now the shared content column ($wzContentMaxWidth), still wider than the prose. The
-      // row-level cap itself lives on `.wzMessageRow--wide` (chat-page.scss), applied one level up
+      // The bubble fills whatever the ROW allows — the shared content column
+      // ($wzContentMaxWidth). The row-level cap itself lives on `.wzMessageRow--wide` (chat-page.scss), applied one level up
       // and asserted in message-list.test.tsx; restating it inline here would be a second copy with
       // nothing keeping the two in step.
-      expect(bubbleItem).not.toHaveClass('wzProseMeasure');
+      expect(bubbleItem).not.toHaveClass('wzProse');
       expect(bubbleItem.style.maxWidth).toBe('100%');
     });
   });

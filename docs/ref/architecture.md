@@ -48,7 +48,7 @@ end
 
 indexer[("Wazuh indexer")]:::ext
 api(["Wazuh server API"]):::ext
-cti(["Wazuh CTI Console"]):::ext
+cti(["Wazuh Console"]):::ext
 llm(["AI providers"]):::ext
 
 user --> browser
@@ -112,7 +112,7 @@ any plugin reaches the server API client as `context.wazuh_core.api.client.asCur
   of the Wazuh indexer (`GET /_plugins/_content_manager/version/check`), stores the result in a
   shared saved object and exposes the `UpdatesNotification` component that `main` renders at the
   bottom of the interface. See [Available updates](modules/available-updates.md).
-- **CTI registration**: registers the environment with the Wazuh CTI Console through the OAuth
+- **CTI registration**: registers the environment with the Wazuh Console through the OAuth
   2.0 device authorization grant, then hands the resulting subscription to the content manager of
   the Wazuh indexer (`/_plugins/_content_manager/subscription`).
 - **CTI feed app**: the **CTI feed** application, under **Threat intelligence**, shows the

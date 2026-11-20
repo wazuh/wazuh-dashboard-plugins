@@ -61,11 +61,12 @@ describe('WazuhHostsCtrl', () => {
         username: 'wazuh-internal-client',
         allow_run_as: 2,
         verify_ca: true,
-        cluster_info: { node: 'node01', cluster: 'wazuh' },
+        cluster_info: { cluster: 'wazuh' },
       };
       const context = makeContext([
         {
           ...visible,
+          cluster_info: { node: 'node01', cluster: 'wazuh' },
           password: 'secret',
           run_as: false,
           key: '/etc/wazuh/key.pem',
