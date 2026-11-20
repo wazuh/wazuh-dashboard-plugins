@@ -1,3 +1,9 @@
 .wz-agent-icon-tip {
   margin-left: 5px;
 }
+
+// Secondary line of the status tooltip, readable on its dark background
+.wz-agent-status-tooltip-date {
+  font-size: 12px;
+  opacity: 0.75;
+}
