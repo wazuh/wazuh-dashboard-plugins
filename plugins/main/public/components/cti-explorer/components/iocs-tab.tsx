@@ -200,7 +200,67 @@ interface IocsTabProps {
   filters: IocFilters;
   onFiltersChange: (filters: IocFilters) => void;
   onOpenIoc: (id: string) => void;
+  /** Bring the IOC list to the top of the view, e.g. when a link opened it filtered. */
+  scrollToList?: boolean;
+  onListScrolled?: () => void;
 }
+
+/** Space left between the fixed headers of the page and the scrolled element. */
+const SCROLL_GAP = 8;
+
+/**
+ * Scrolls the element to the top of the view, below the fixed headers of the
+ * page, which pad the body by their height.
+ */
+const scrollToTop = (
+  element: HTMLElement | null,
+  behavior?: ScrollBehavior,
+) => {
+  if (!element) {
+    return;
+  }
+  const headersHeight = parseFloat(getComputedStyle(document.body).paddingTop);
+  element.style.scrollMarginTop = `${
+    (Number.isNaN(headersHeight) ? 0 : headersHeight) + SCROLL_GAP
+  }px`;
+  element.scrollIntoView({ behavior, block: 'start' });
+};
+
+/** Input that means the user scrolls the page on their own. */
+const USER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown', 'mousedown'];
+
+/**
+ * Keeps the element at the top of the view while `scroll` is on. The catalog
+ * above the list grows when it loads and would push the list out of sight, so
+ * the scroll is repeated until it has loaded, or until the user scrolls first.
+ */
+const useScrollLock = (
+  ref: React.RefObject<HTMLElement>,
+  scroll: boolean,
+  isContentAboveLoading: boolean,
+  onDone?: () => void,
+) => {
+  useEffect(() => {
+    if (!scroll) {
+      return;
+    }
+    scrollToTop(ref.current);
+    if (!isContentAboveLoading) {
+      onDone?.();
+      return;
+    }
+    const release = () => onDone?.();
+    USER_SCROLL_EVENTS.forEach(event =>
+      window.addEventListener(event, release, { passive: true }),
+    );
+    return () =>
+      USER_SCROLL_EVENTS.forEach(event =>
+        window.removeEventListener(event, release),
+      );
+    // `onDone` may be a new function on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scroll, isContentAboveLoading]);
+};
 
 const Breakdown = ({
   title,
@@ -659,11 +719,14 @@ export const IocsTab = ({
   filters,
   onFiltersChange,
   onOpenIoc,
+  scrollToList = false,
+  onListScrolled,
 }: IocsTabProps) => {
   const listRef = useRef<HTMLDivElement>(null);
+  useScrollLock(listRef, scrollToList, summary.loading, onListScrolled);
   const filterOn = (key: keyof IocFilters, value: string) => {
     onFiltersChange({ ...filters, [key]: value });
-    listRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToTop(listRef.current, 'smooth');
   };
 
   return (

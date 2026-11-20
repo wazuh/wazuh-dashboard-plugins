@@ -43,14 +43,14 @@ export const ThreatHuntingEmptyPrompt = ({
             })
       }
       onUnpinAgent={onUnpinAgent}
-    >
-      <p>
-        {i18n.translate('wazuh.threatHunting.emptyState.pinnedAgentFilters', {
+      hint={i18n.translate(
+        'wazuh.threatHunting.emptyState.pinnedAgentFilters',
+        {
           defaultMessage:
             'The pinned agent filters these results. Unpin it to search all agents.',
-        })}
-      </p>
-    </ModuleEmptyState>
+        },
+      )}
+    />
   );
 };
 

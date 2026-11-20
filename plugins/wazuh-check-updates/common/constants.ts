@@ -10,6 +10,8 @@ export const SAVED_OBJECT_USER_PREFERENCES =
 const ctiBasePath = '/api/wazuh-check-updates/cti-registration';
 const ctiFeedBasePath = '/api/wazuh-check-updates/cti-feed';
 export enum routes {
+  /** DELETE clears the registration stored in the indexer. */
+  ctiRegistration = `${ctiBasePath}`,
   checkUpdates = '/api/wazuh-check-updates/updates',
   userPreferences = '/api/wazuh-check-updates/user-preferences/me',
   token = `${ctiBasePath}/token`,
@@ -20,7 +22,7 @@ export enum routes {
   ctiFeedIndicators = `${ctiFeedBasePath}/indicators`,
 }
 
-/** OAuth 2.0 device authorization grant type (RFC 8628) for CTI Console token polling. */
+/** OAuth 2.0 device authorization grant type (RFC 8628) for Wazuh Console token polling. */
 export const CTI_OAUTH_DEVICE_GRANT_TYPE =
   'urn:ietf:params:oauth:grant-type:device_code';
 
@@ -43,7 +45,7 @@ export const CTI_DEFAULT_DEVICE_CODE_EXPIRES_IN_SEC = 30 * SECONDS_PER_MINUTE;
 
 /**
  * Seconds a device code stays pending before the registration modal explains the
- * "Environment already exists" rejection. The CTI console never reports that rejection to
+ * "Environment already exists" rejection. The Wazuh Console never reports that rejection to
  * the token endpoint, so the help is shown once a normal activation should be done.
  */
 export const CTI_ENVIRONMENT_EXISTS_HELP_DELAY_SEC = 60;
@@ -63,8 +65,17 @@ export const CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE = i18n.translate(
   },
 );
 
-/** Wazuh Cyber Threat Intelligence console URL. Uses `#` in the UI until set. */
-export const WAZUH_CTI_CONSOLE_HREF = '';
+/**
+ * Wazuh Console, opened in the browser. It belongs to the same CTI
+ * environment as {@link WAZUH_CTI_CONSOLE_BASE_URL}: change both together.
+ */
+export const WAZUH_CTI_CONSOLE_HREF = 'https://console.pre.cloud.wazuh.com';
+
+/** Pages of the Wazuh Console, appended to {@link WAZUH_CTI_CONSOLE_HREF}. */
+export const ctiConsolePaths = {
+  /** The deployments registered to the organization, with their subscriptions. */
+  deployments: '/cti/deployments',
+} as const;
 
 /**
  * Default base URL of the Wazuh Cyber Threat Intelligence Console API (server-side OAuth device

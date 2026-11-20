@@ -1,11 +1,17 @@
 import React from 'react';
-import { EuiCode, EuiLoadingSpinner, EuiSpacer } from '@elastic/eui';
+import { EuiCode, EuiLoadingSpinner } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
+import { FormattedMessage } from '@osd/i18n/react';
 import { useSelector } from 'react-redux';
 import {
   ModuleEmptyState,
+  ModuleEmptyStateList,
   unpinPinnedAgent,
 } from '../../../../common/no-results/module-empty-state';
+import {
+  getSearchHint,
+  getSearchOrTimeRangeHint,
+} from '../../../../common/no-results/module-empty-state-texts';
 import { DOCS_PATHS } from '../../../../../../common/services/docs-paths';
 import {
   MonitoredDirectories,
@@ -68,7 +74,7 @@ const getDescription = (kind: EmptyStateKind, withCurrentState: boolean) =>
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescriptionShort',
         {
           defaultMessage:
-            "Findings list the changes detected after each file's baseline was recorded. Try changing the search or time range.",
+            "Findings list the changes detected after each file's baseline was recorded.",
         },
       )
     : kind === 'findings'
@@ -76,16 +82,20 @@ const getDescription = (kind: EmptyStateKind, withCurrentState: boolean) =>
         'wazuh.fileIntegrityMonitoring.emptyState.findingsDescription',
         {
           defaultMessage:
-            "Findings list the changes detected after each file's baseline was recorded, so this tab can be empty while the Dashboard and Inventory show the monitored files. Try changing the search or time range.",
+            "Findings list the changes detected after each file's baseline was recorded. This tab can be empty while the Dashboard and Inventory show the monitored files.",
         },
       )
     : i18n.translate(
         'wazuh.fileIntegrityMonitoring.emptyState.dashboardDescription',
         {
           defaultMessage:
-            'Try changing the search. Monitored files appear after the agents scan their monitored directories and record a baseline.',
+            'Monitored files appear after the agents scan their monitored directories and record a baseline.',
         },
       );
+
+/** What to try: Findings are filtered by the time range, the Dashboard state is not. */
+const getHint = (kind: EmptyStateKind) =>
+  kind === 'findings' ? getSearchOrTimeRangeHint() : getSearchHint();
 
 const getEndpointStatusMessage = (
   status: Exclude<MonitoredDirectories['status'], 'loading' | 'monitored'>,
@@ -133,7 +143,7 @@ const EndpointDirectories = ({
   switch (directories.status) {
     case 'loading':
       return (
-        <>
+        <p>
           <EuiLoadingSpinner size='s' />{' '}
           {i18n.translate(
             'wazuh.fileIntegrityMonitoring.emptyState.loadingDirectories',
@@ -141,27 +151,29 @@ const EndpointDirectories = ({
               defaultMessage: 'Loading the monitored directories',
             },
           )}
-        </>
+        </p>
       );
     case 'monitored':
       return (
         <>
-          {i18n.translate(
-            'wazuh.fileIntegrityMonitoring.emptyState.monitoredDirectories',
-            {
-              defaultMessage: 'Monitored directories:',
-            },
-          )}
-          {directories.directories.map(directory => (
-            <React.Fragment key={directory}>
-              {' '}
-              <EuiCode>{directory}</EuiCode>
-            </React.Fragment>
-          ))}
+          <p>
+            {i18n.translate(
+              'wazuh.fileIntegrityMonitoring.emptyState.monitoredDirectories',
+              {
+                defaultMessage: 'Monitored directories:',
+              },
+            )}
+          </p>
+          <ModuleEmptyStateList
+            data-test-subj='wzFimEmptyStateDirectories'
+            items={directories.directories.map(directory => (
+              <EuiCode key={directory}>{directory}</EuiCode>
+            ))}
+          />
         </>
       );
     default:
-      return <>{getEndpointStatusMessage(directories.status)}</>;
+      return <p>{getEndpointStatusMessage(directories.status)}</p>;
   }
 };
 
@@ -197,6 +209,7 @@ export const FimEmptyStateView = ({
           },
         ),
       }}
+      hint={getHint(kind)}
     >
       <p>
         {getDescription(
@@ -204,20 +217,26 @@ export const FimEmptyStateView = ({
           !pinned || ['loading', 'monitored'].includes(pinned.status),
         )}
       </p>
-      <EuiSpacer size='m' />
-      <p>
-        {pinned ? (
-          <EndpointDirectories directories={pinned} />
-        ) : (
-          i18n.translate(
-            'wazuh.fileIntegrityMonitoring.emptyState.selectAgent',
-            {
-              defaultMessage:
-                'Use Explore agent to see the directories an agent monitors.',
-            },
-          )
-        )}
-      </p>
+      {pinned ? (
+        <EndpointDirectories directories={pinned} />
+      ) : (
+        <p>
+          <FormattedMessage
+            id='wazuh.fileIntegrityMonitoring.emptyState.selectAgent'
+            defaultMessage='Use {exploreAgent} to see the directories an agent monitors.'
+            values={{
+              exploreAgent: (
+                <strong>
+                  {i18n.translate(
+                    'wazuh.fileIntegrityMonitoring.emptyState.exploreAgentButtonName',
+                    { defaultMessage: 'Explore agent' },
+                  )}
+                </strong>
+              ),
+            }}
+          />
+        </p>
+      )}
     </ModuleEmptyState>
   );
 };

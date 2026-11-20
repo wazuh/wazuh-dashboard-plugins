@@ -2,10 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import { ReactReduxContext } from 'react-redux';
 import {
   EuiButton,
-  EuiEmptyPrompt,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiHorizontalRule,
+  EuiIcon,
   EuiLink,
   EuiPanel,
+  EuiSpacer,
   EuiText,
+  EuiTitle,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { webDocumentationLink } from '../../../../common/services/web_documentation';
@@ -74,7 +79,17 @@ export interface ModuleEmptyStateProps {
   testSubj: string;
   /** What is empty, for the situation (never received data, pinned agent, search, ...). */
   title: React.ReactNode;
-  /** Why it is empty and what to try. Paragraphs are rendered centered in small text. */
+  /**
+   * What to try first, one short sentence under the title, such as changing the search. It is
+   * the line the user reads after the title, so keep the explanation out of it.
+   */
+  hint?: React.ReactNode;
+  /**
+   * Why it is empty, rendered under the actions in small subdued text. Keep it quick to scan:
+   * - Short paragraphs of one idea each.
+   * - Put checks or steps in a `ModuleEmptyStateList`, not in one comma-separated sentence.
+   * - Bold only the UI names the user acts on, through a `FormattedMessage` placeholder.
+   */
   children?: React.ReactNode;
   /**
    * Unpins the agent. The button is shown whenever an agent is pinned; pass this to replace the
@@ -99,14 +114,41 @@ export interface ModuleEmptyStateProps {
   dataTestSubj?: string;
 }
 
+export interface ModuleEmptyStateListProps {
+  /** Checks or steps, one short sentence each. */
+  items: React.ReactNode[];
+  /** Numbers the items, for steps that follow an order. */
+  ordered?: boolean;
+  'data-test-subj'?: string;
+}
+
+/** Checks or steps of an empty state. */
+export const ModuleEmptyStateList = ({
+  items,
+  ordered = false,
+  'data-test-subj': dataTestSubj,
+}: ModuleEmptyStateListProps) => {
+  const List = ordered ? 'ol' : 'ul';
+  return (
+    <List data-test-subj={dataTestSubj}>
+      {items.map((item, index) => (
+        /* The items are static text, their order never changes. */
+        <li key={index}>{item}</li>
+      ))}
+    </List>
+  );
+};
+
 /**
- * Empty state shared by the module tabs (Dashboard, Inventory and Findings): a centered prompt
- * with the title and the explanation of the situation, the actions and the link to the docs. Each
- * module provides the text and the actions of its situations.
+ * Empty state shared by the module tabs (Dashboard, Inventory and Findings): a block centered in
+ * the panel and left aligned inside, so it reads top to bottom: the title, what to try and the
+ * actions, then, separated and subdued, why it is empty and the link to the docs. Each module
+ * provides the text and the actions of its situations.
  */
 export const ModuleEmptyState = ({
   testSubj,
   title,
+  hint,
   children,
   onUnpinAgent,
   allowUnpinAgent = true,
@@ -143,28 +185,80 @@ export const ModuleEmptyState = ({
   ];
 
   return (
-    <EuiPanel hasBorder hasShadow={false} paddingSize='l'>
-      <EuiEmptyPrompt
-        iconType={iconType}
-        titleSize='s'
-        title={<h2>{title}</h2>}
-        body={children}
-        actions={allActions.length ? allActions : undefined}
-        data-test-subj={dataTestSubj ?? `wz${testSubj}EmptyState`}
-      />
-      {docsLink ? (
-        <EuiText size='s' textAlign='center'>
-          <EuiLink
-            href={docsLink.href}
-            target='_blank'
-            rel='noopener noreferrer'
-            external
-            data-test-subj={docs?.testSubj ?? `wz${testSubj}EmptyStateDocs`}
-          >
-            {docsLink.label}
-          </EuiLink>
-        </EuiText>
-      ) : null}
+    <EuiPanel
+      hasBorder
+      hasShadow={false}
+      paddingSize='l'
+      data-test-subj={dataTestSubj ?? `wz${testSubj}EmptyState`}
+    >
+      {/* A centered block, left aligned inside, so every line starts at the same edge. */}
+      <EuiFlexGroup
+        gutterSize='l'
+        alignItems='flexStart'
+        responsive={false}
+        style={{ maxWidth: 600, margin: '0 auto' }}
+      >
+        <EuiFlexItem grow={false}>
+          <EuiIcon type={iconType} size='xl' color='primary' />
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <EuiTitle size='xs'>
+            <h2>{title}</h2>
+          </EuiTitle>
+          {hint ? (
+            <>
+              <EuiSpacer size='xs' />
+              <EuiText size='s'>
+                <p>{hint}</p>
+              </EuiText>
+            </>
+          ) : null}
+          {allActions.length ? (
+            <>
+              <EuiSpacer size='m' />
+              {/* Small text, so link actions match the size of the text around them. */}
+              <EuiText size='s'>
+                <EuiFlexGroup
+                  gutterSize='s'
+                  alignItems='center'
+                  wrap
+                  responsive={false}
+                >
+                  {allActions.map((action, index) => (
+                    /* The unpin button, then the module actions, in a fixed order. */
+                    <EuiFlexItem key={index} grow={false}>
+                      {action}
+                    </EuiFlexItem>
+                  ))}
+                </EuiFlexGroup>
+              </EuiText>
+            </>
+          ) : null}
+          {children || docsLink ? (
+            <>
+              <EuiHorizontalRule margin='m' />
+              <EuiText size='s' color='subdued'>
+                {children}
+                {docsLink ? (
+                  <p>
+                    <EuiLink
+                      href={docsLink.href}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      external
+                      data-test-subj={
+                        docs?.testSubj ?? `wz${testSubj}EmptyStateDocs`
+                      }
+                    >
+                      {docsLink.label}
+                    </EuiLink>
+                  </p>
+                ) : null}
+              </EuiText>
+            </>
+          ) : null}
+        </EuiFlexItem>
+      </EuiFlexGroup>
     </EuiPanel>
   );
 };

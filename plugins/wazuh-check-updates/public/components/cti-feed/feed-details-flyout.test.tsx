@@ -76,7 +76,7 @@ describe('FeedDetailsFlyout', () => {
       'public-iocs-5',
       't1-iocs-5',
       'cti:catalog:consumer:iocs',
-      'Public',
+      'Open',
       'ready',
       numberFormat.format(989386),
     ].forEach(value => expect(fields).toHaveTextContent(value));
@@ -178,15 +178,29 @@ describe('FeedDetailsFlyout', () => {
     );
   });
 
-  test('does not show the pending sync phases', () => {
+  test('explains the sync steps waiting to be retried', () => {
     renderFlyout({ pending_sync_phases: ['rules', 'detectors'] });
 
-    const flyout = screen.getByTestId('ctiFeedDetailsFlyout');
-    expect(screen.getByTestId('ctiFeedDetailsState')).toHaveTextContent(
-      'This feed is up to date',
+    const state = screen.getByTestId('ctiFeedDetailsState');
+    expect(state).toHaveTextContent(
+      'Some sync steps are waiting to be retried',
     );
-    expect(flyout).not.toHaveTextContent('detectors');
-    expect(flyout).not.toHaveTextContent('Pending');
+    expect(state).toHaveTextContent('steps to finish: rules and detectors');
+    expect(screen.getByTestId('ctiFeedDetailsBadge')).toHaveTextContent(
+      'Retry pending',
+    );
+  });
+
+  test('shows an indeterminate bar while the new content is prepared', () => {
+    renderFlyout({ status: 'running', local_offset: 0, remote_offset: 1899 });
+
+    expect(screen.getByTestId('ctiFeedDetailsProgress')).not.toHaveAttribute(
+      'value',
+    );
+    expect(screen.getByTestId('ctiFeedDetailsPreparing')).toHaveTextContent(
+      'The new content goes live once it is ready',
+    );
+    expect(screen.queryByText(/0 of 1,899 changes synced/)).toBeNull();
   });
 
   test('closes from the footer', () => {

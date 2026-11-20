@@ -178,7 +178,7 @@ export const agentsTableColumns = (
         alignItems='center'
       >
         <EuiFlexItem grow={false}>
-          <AgentStatus status={status} agent={agent} />
+          <AgentStatus status={status} agent={agent} showLastKeepAlive />
         </EuiFlexItem>
         {pendingUpgradeAgentIds.has(agent.id) ? (
           <EuiFlexItem grow={false}>
@@ -241,7 +241,7 @@ export const agentsTableColumns = (
         '-'
       ),
     sortable: true,
-    show: true,
+    show: false,
     searchable: false,
   },
   {

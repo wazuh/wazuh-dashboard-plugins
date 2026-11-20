@@ -41,7 +41,7 @@ describe.skip('Wazuh API', () => {
   });
 
   describe('Wazuh API - /api/check-api', () => {
-    test('[200] Check default api returns node, cluster, status and allow_run_as params', () => {
+    test('[200] Check default api returns cluster, status and allow_run_as params', () => {
       const options = buildAxiosOptions('post', '/api/check-api', {
         id: 'default',
       });
@@ -49,7 +49,7 @@ describe.skip('Wazuh API', () => {
         .then(response => {
           expect(response.status).toBe(200);
           expect(typeof response.data).toBe('object');
-          expect(typeof response.data.node).toBe('string');
+          expect(response.data.node).toBeUndefined();
           expect(typeof response.data.cluster).toBe('string');
           expect(typeof response.data.status).toBe('string');
           expect(typeof response.data.allow_run_as).toBe('number');
@@ -77,7 +77,7 @@ describe.skip('Wazuh API', () => {
   });
 
   describe('Wazuh API - /api/check-stored-api', () => {
-    test('[200] Check default api returns node, cluster, status and allow_run_as params', () => {
+    test('[200] Check default api returns cluster, status and allow_run_as params', () => {
       const options = buildAxiosOptions('post', '/api/check-stored-api', {
         id: 'default',
       });
@@ -89,7 +89,7 @@ describe.skip('Wazuh API', () => {
           expect(typeof response.data.data.id).toBe('string');
           expect(typeof response.data.data.cluster_info).toBe('object');
           expect(typeof response.data.data.cluster_info.status).toBe('string');
-          expect(typeof response.data.data.cluster_info.node).toBe('string');
+          expect(response.data.data.cluster_info.node).toBeUndefined();
           expect(typeof response.data.data.cluster_info.cluster).toBe('string');
         })
         .catch(error => {

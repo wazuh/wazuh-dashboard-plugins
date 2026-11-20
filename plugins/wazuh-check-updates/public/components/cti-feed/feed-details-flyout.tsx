@@ -22,6 +22,7 @@ import {
 import type { CtiConsumer } from '../../../common/cti-consumers';
 import {
   ConsumerSyncState,
+  formatSyncPhases,
   getConsumerSyncState,
   getSyncProgress,
 } from '../../services/cti-consumer-sync-state';
@@ -30,10 +31,9 @@ import { getFeedMetadata } from './feed-metadata';
 import { FeedSyncBadge } from './feed-sync-badge';
 import { CtiTimestamp } from './cti-timestamp';
 import { CheckForUpdatesButton } from './check-for-updates-button';
+import { formatCtiNumber } from '../../services/cti-number-format';
 
 const TITLE_ID = 'ctiFeedDetailsFlyoutTitle';
-
-const numberFormat = new Intl.NumberFormat();
 
 interface StateExplanation {
   color: 'success' | 'primary' | 'warning' | 'danger';
@@ -93,7 +93,28 @@ function getStateExplanation(
           'wazuhCheckUpdates.ctiFeed.details.state.syncingBody',
           {
             defaultMessage:
-              'The indexer is downloading changes from this feed. Detection keeps using the current content until the sync finishes. Refresh the feed sync to see its progress.',
+              'The indexer is downloading changes from this feed. Detection keeps using the current content until the sync finishes. This page follows its progress.',
+          },
+        ),
+      };
+    case 'retryPending':
+      return {
+        color: 'warning',
+        iconType: 'alert',
+        title: i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.details.state.retryPendingTitle',
+          { defaultMessage: 'Some sync steps are waiting to be retried' },
+        ),
+        body: i18n.translate(
+          'wazuhCheckUpdates.ctiFeed.details.state.retryPendingBody',
+          {
+            defaultMessage:
+              'The content of this feed is downloaded, but the last sync left {count, plural, one {a step} other {steps}} to finish: {phases}. Until then, detection may not use all of it. The next sync retries {count, plural, one {it} other {them}}, or use Check for updates to retry now. If it keeps failing, search the indexer logs for the consumer {name}.',
+            values: {
+              phases: formatSyncPhases(state.phases),
+              count: state.phases.length,
+              name: consumer.name,
+            },
           },
         ),
       };
@@ -155,6 +176,37 @@ const SyncProgress: React.FC<{
     );
   }
 
+  // No content of the new data source is live yet: the offsets say nothing until it is.
+  if (state.kind === 'syncing' && state.preparing) {
+    return (
+      <>
+        <EuiProgress
+          size='m'
+          color='primary'
+          label={i18n.translate(
+            'wazuhCheckUpdates.ctiFeed.details.progress.preparing',
+            { defaultMessage: 'Preparing the new content' },
+          )}
+          data-test-subj='ctiFeedDetailsProgress'
+        />
+        <EuiSpacer size='xs' />
+        <EuiText
+          size='xs'
+          color='subdued'
+          data-test-subj='ctiFeedDetailsPreparing'
+        >
+          {i18n.translate(
+            'wazuhCheckUpdates.ctiFeed.details.progress.preparingHint',
+            {
+              defaultMessage:
+                'The new content goes live once it is ready, then the remaining changes sync.',
+            },
+          )}
+        </EuiText>
+      </>
+    );
+  }
+
   // Floor, so a feed that is still behind never reads as 100%.
   const percent = Math.floor(progress * 100);
 
@@ -170,8 +222,8 @@ const SyncProgress: React.FC<{
           {
             defaultMessage: '{synced} of {total} changes synced',
             values: {
-              synced: numberFormat.format(consumer.local_offset),
-              total: numberFormat.format(consumer.remote_offset),
+              synced: formatCtiNumber(consumer.local_offset),
+              total: formatCtiNumber(consumer.remote_offset),
             },
           },
         )}
@@ -276,11 +328,11 @@ function getDetailItems(consumer: CtiConsumer) {
       description: consumer.is_public
         ? i18n.translate(
             'wazuhCheckUpdates.ctiFeed.details.fields.accessPublic',
-            { defaultMessage: 'Public' },
+            { defaultMessage: 'Open' },
           )
         : i18n.translate(
             'wazuhCheckUpdates.ctiFeed.details.fields.accessPrivate',
-            { defaultMessage: 'Private' },
+            { defaultMessage: 'Professional' },
           ),
     },
     {
@@ -301,14 +353,14 @@ function getDetailItems(consumer: CtiConsumer) {
         'wazuhCheckUpdates.ctiFeed.details.fields.localOffset',
         { defaultMessage: 'Local offset' },
       ),
-      description: numberFormat.format(consumer.local_offset),
+      description: formatCtiNumber(consumer.local_offset),
     },
     {
       title: i18n.translate(
         'wazuhCheckUpdates.ctiFeed.details.fields.remoteOffset',
         { defaultMessage: 'Remote offset' },
       ),
-      description: numberFormat.format(consumer.remote_offset),
+      description: formatCtiNumber(consumer.remote_offset),
     },
     {
       title: i18n.translate(
@@ -328,12 +380,18 @@ export interface FeedDetailsFlyoutProps {
   consumer: CtiConsumer;
   onClose: () => void;
   onUpdateRequested: () => void | Promise<void>;
+  /** Some feed is syncing, or an update is known to be running: Check for updates waits. */
+  updateInProgress?: boolean;
+  /** An update is known to be running (see `CheckForUpdatesButton`). */
+  onUpdateRunning?: () => void;
 }
 
 export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
   consumer,
   onClose,
   onUpdateRequested,
+  updateInProgress = false,
+  onUpdateRunning,
 }) => {
   const metadata = getFeedMetadata(consumer);
   const state = getConsumerSyncState(consumer);
@@ -448,6 +506,8 @@ export const FeedDetailsFlyout: React.FC<FeedDetailsFlyoutProps> = ({
             <CheckForUpdatesButton
               fill
               onRequested={onUpdateRequested}
+              updateInProgress={updateInProgress}
+              onUpdateRunning={onUpdateRunning}
               dataTestSubj='ctiFeedDetailsCheckForUpdatesButton'
             />
           </EuiFlexItem>

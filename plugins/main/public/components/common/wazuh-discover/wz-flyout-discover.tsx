@@ -62,6 +62,10 @@ export type WazuhDiscoverProps = {
   filterManager?: tFilterManager;
   initialFilters?: tFilter[];
   initialFetchFilters?: tFilter[];
+  /** Aggregations to request along with the rows, for callers that summarize them. */
+  aggs?: Record<string, unknown>;
+  /** Called with each response, or with nothing when the request fails. */
+  onResults?: (response?: SearchResponse) => void;
 };
 
 const GetExpandedRow = withErrorBoundary(
@@ -110,7 +114,8 @@ export const toTableColumns = (
             value
               ? indexPattern.getFormatterForField(field).convert(value)
               : value
-        : value => value;
+        : // React renders array values without separators
+          value => (Array.isArray(value) ? value.join(', ') : value);
     return {
       field: column.id,
       name: column.displayAsText,
@@ -261,6 +266,8 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
     expandedRowComponent,
     initialFilters,
     initialFetchFilters,
+    aggs,
+    onResults,
   } = props;
 
   if (!DataSource) {
@@ -344,14 +351,17 @@ const WazuhFlyoutDiscoverComponent = (props: WazuhDiscoverProps) => {
       pagination,
       sorting: parseSorting,
       dateRange: absoluteDateRange,
+      aggs,
     })
       .then((response: SearchResponse) => {
         setPagination({
           ...pagination,
         });
         setResults(response);
+        onResults?.(response);
       })
       .catch(error => {
+        onResults?.();
         const searchError = ErrorFactory.create(HttpError, {
           error,
           message: i18n.translate('wazuh.common.wazuhDiscover.fetchDataError', {
