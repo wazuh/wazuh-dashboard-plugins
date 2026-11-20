@@ -22,6 +22,7 @@ import {
 } from '../../../../../../common/services/agent-endpoint';
 import '../group-input/group-input.scss';
 import { AddressOutsideCertificateWarning } from '../../../../enrollment-tokens/components/address-outside-certificate-warning';
+import { AddressCoveredByWildcardNotice } from '../../../../enrollment-tokens/components/address-covered-by-wildcard-notice';
 import { RememberServerEndpointSwitch } from '../../../../common/remember-server-endpoint';
 
 interface ServerAddressInputProps {
@@ -145,6 +146,10 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
                   )}
                 </EndpointDefaultHint>
                 <AddressOutsideCertificateWarning
+                  address={serverAddress.value}
+                  certificateNames={certificateNames}
+                />
+                <AddressCoveredByWildcardNotice
                   address={serverAddress.value}
                   certificateNames={certificateNames}
                 />

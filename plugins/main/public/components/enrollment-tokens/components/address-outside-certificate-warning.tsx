@@ -22,6 +22,32 @@ export const matchesCertificateName = (name: string, address: string) => {
     : name.toLowerCase() === address.toLowerCase();
 };
 
+/* The wildcard name that covers the address, when no exact name does. A typed
+wildcard (`*.example.com`) is a pattern, not an address, so it is covered by
+nothing. */
+export const getCoveringWildcardName = (
+  address: string,
+  certificateNames: string[],
+): string | undefined => {
+  const trimmed = address.trim();
+
+  if (!trimmed || trimmed.includes('*')) {
+    return undefined;
+  }
+
+  if (
+    certificateNames.some(
+      name => !name.includes('*') && matchesCertificateName(name, trimmed),
+    )
+  ) {
+    return undefined;
+  }
+
+  return certificateNames.find(
+    name => name.startsWith('*.') && matchesCertificateName(name, trimmed),
+  );
+};
+
 /* Shared by the token flyout and the deploy wizard: the manager refuses an
 address outside its listener certificate, and the value both views prefill comes
 from `enrollment.dns`, which after a migration is often not in it. */

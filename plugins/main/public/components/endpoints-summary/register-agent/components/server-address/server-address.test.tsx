@@ -26,7 +26,9 @@ jest.mock('../../../../../kibana-services', () => ({
 
 jest.mock(
   '../../../../../react-services/error-management/error-handler/error-handler',
-  () => ({ ErrorHandler: { handleError: jest.fn() } }),
+  () => ({
+    ErrorHandler: { handleError: jest.fn() },
+  }),
 );
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
@@ -130,6 +132,42 @@ describe('ServerAddressInput', () => {
       expect(mockSet).toHaveBeenCalledWith('enrollment.dns', 'manager.local'),
     );
     expect(mockSet).toHaveBeenCalledTimes(3);
+  });
+
+  describe('wildcard certificate names', () => {
+    const notice = () =>
+      document.querySelector(
+        '[data-test-subj="addressCoveredByWildcardNotice"]',
+      );
+
+    it('offers a pattern instead of an option, and puts its suffix in the search box', async () => {
+      getNames.mockResolvedValue(['manager.example.com', '*.acme.example']);
+      render(<Harness names={['manager.example.com', '*.acme.example']} />);
+
+      fireEvent.click(await screen.findByText('*.acme.example'));
+
+      await waitFor(() =>
+        expect((addressInput() as HTMLInputElement).value).toBe(
+          '.acme.example',
+        ),
+      );
+      fireEvent.focus(addressInput());
+      expect(screen.queryAllByText('*.acme.example')).toHaveLength(1);
+    });
+
+    it('says the typed name is covered by the wildcard', async () => {
+      getNames.mockResolvedValue(['*.acme.example']);
+      render(<Harness names={['*.acme.example']} />);
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), {
+        target: { value: 'wazuh.acme.example' },
+      });
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+
+      await waitFor(() => expect(notice()).toBeInTheDocument());
+      expect(notice()).toHaveTextContent('*.acme.example');
+    });
   });
 
   describe('address outside the certificate', () => {

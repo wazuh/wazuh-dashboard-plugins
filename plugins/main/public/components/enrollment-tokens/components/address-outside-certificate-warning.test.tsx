@@ -1,4 +1,7 @@
-import { matchesCertificateName } from './address-outside-certificate-warning';
+import {
+  getCoveringWildcardName,
+  matchesCertificateName,
+} from './address-outside-certificate-warning';
 
 describe('matchesCertificateName', () => {
   it('matches an exact name ignoring case', () => {
@@ -27,5 +30,33 @@ describe('matchesCertificateName', () => {
     expect(matchesCertificateName('*.acme.example', '.acme.example')).toBe(
       false,
     );
+  });
+});
+
+describe('getCoveringWildcardName', () => {
+  const names = ['wazuh.manager.local', '*.acme.example'];
+
+  it('returns the wildcard that covers the address', () => {
+    expect(getCoveringWildcardName('wazuh.acme.example', names)).toBe(
+      '*.acme.example',
+    );
+  });
+
+  it('returns nothing for an exact name, an uncovered address or a pattern', () => {
+    expect(getCoveringWildcardName('wazuh.manager.local', names)).toBe(
+      undefined,
+    );
+    expect(getCoveringWildcardName('a.b.acme.example', names)).toBe(undefined);
+    expect(getCoveringWildcardName('*.acme.example', names)).toBe(undefined);
+    expect(getCoveringWildcardName('', names)).toBe(undefined);
+  });
+
+  it('returns nothing when an exact name also covers the address', () => {
+    expect(
+      getCoveringWildcardName('wazuh.acme.example', [
+        'wazuh.acme.example',
+        '*.acme.example',
+      ]),
+    ).toBe(undefined);
   });
 });

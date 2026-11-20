@@ -10,8 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 
-import React, { useEffect, useState } from 'react';
-import { EuiComboBox, EuiComboBoxOptionOption } from '@elastic/eui';
+import React, { useEffect, useRef, useState } from 'react';
+import { i18n } from '@osd/i18n';
+import {
+  EuiBadge,
+  EuiComboBox,
+  EuiComboBoxOptionOption,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
 import { getListenerCertificateNames } from '../../../services/enrollment-tokens';
 
 interface AddressComboBoxProps {
@@ -65,25 +74,92 @@ export const AddressComboBox = ({
     }
   }, [isLoading, names, onNamesLoaded]);
 
+  const comboBoxRef = useRef<EuiComboBox<string>>(null);
+
   const setValue = (address: string) =>
     onChange({ target: { value: address } });
 
+  /* The wildcard names are not options (an agent cannot connect to one as it
+  is), so each is offered as a pattern: choosing it leaves `.example.com` in
+  the search box with the cursor in front, ready for the missing name. The
+  search box is not controlled, hence the call on the combo box itself. */
+  const wildcardNames = names.filter(name => name.startsWith('*.'));
+  const fillPattern = (pattern: string) => {
+    /* `onSearchChange` and `searchInputRefInstance` are members of the combo
+    box instance that its typings do not declare. */
+    const comboBox = comboBoxRef.current as unknown as {
+      onSearchChange?: (searchValue: string) => void;
+      searchInputRefInstance?: HTMLInputElement | null;
+    } | null;
+
+    setValue('');
+    comboBox?.onSearchChange?.(pattern.slice(1));
+    setTimeout(() => {
+      const input = comboBox?.searchInputRefInstance;
+
+      input?.focus();
+      input?.setSelectionRange?.(0, 0);
+    }, 0);
+  };
+
   return (
-    <EuiComboBox
-      fullWidth={fullWidth}
-      placeholder={placeholder}
-      singleSelection={{ asPlainText: true }}
-      options={names
-        .filter(name => !name.includes('*'))
-        .map(name => ({ label: name }))}
-      selectedOptions={value ? [{ label: value }] : []}
-      onChange={(selected: EuiComboBoxOptionOption[]) =>
-        setValue(selected[0]?.label ?? '')
-      }
-      onCreateOption={(searchValue: string) => setValue(searchValue.trim())}
-      isLoading={isLoading}
-      isInvalid={isInvalid}
-      data-test-subj={dataTestSubj}
-    />
+    <>
+      <EuiComboBox
+        ref={comboBoxRef}
+        fullWidth={fullWidth}
+        placeholder={placeholder}
+        singleSelection={{ asPlainText: true }}
+        options={names
+          .filter(name => !name.includes('*'))
+          .map(name => ({ label: name }))}
+        selectedOptions={value ? [{ label: value }] : []}
+        onChange={(selected: EuiComboBoxOptionOption[]) =>
+          setValue(selected[0]?.label ?? '')
+        }
+        onCreateOption={(searchValue: string) => setValue(searchValue.trim())}
+        isLoading={isLoading}
+        isInvalid={isInvalid}
+        data-test-subj={dataTestSubj}
+      />
+      {wildcardNames.length > 0 && (
+        <>
+          <EuiSpacer size='s' />
+          <EuiFlexGroup
+            gutterSize='s'
+            alignItems='center'
+            responsive={false}
+            wrap
+            data-test-subj='addressWildcardPatterns'
+          >
+            <EuiFlexItem grow={false}>
+              <EuiText size='xs' color='subdued'>
+                {i18n.translate(
+                  'wazuh.enrollmentTokens.addressComboBox.wildcardPatterns.label',
+                  { defaultMessage: 'Also accepted, any name matching:' },
+                )}
+              </EuiText>
+            </EuiFlexItem>
+            {wildcardNames.map(pattern => (
+              <EuiFlexItem key={pattern} grow={false}>
+                <EuiBadge
+                  color='primary'
+                  onClick={() => fillPattern(pattern)}
+                  onClickAriaLabel={i18n.translate(
+                    'wazuh.enrollmentTokens.addressComboBox.wildcardPatterns.useAriaLabel',
+                    {
+                      defaultMessage: 'Use the {pattern} pattern',
+                      values: { pattern },
+                    },
+                  )}
+                  data-test-subj='addressWildcardPattern'
+                >
+                  {pattern}
+                </EuiBadge>
+              </EuiFlexItem>
+            ))}
+          </EuiFlexGroup>
+        </>
+      )}
+    </>
   );
 };

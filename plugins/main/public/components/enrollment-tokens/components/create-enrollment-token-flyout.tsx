@@ -56,6 +56,7 @@ import {
 import { TruncatedValuePopover } from './truncated-value-popover';
 import { AddressComboBox } from './address-combo-box';
 import { AddressOutsideCertificateWarning } from './address-outside-certificate-warning';
+import { AddressCoveredByWildcardNotice } from './address-covered-by-wildcard-notice';
 
 interface CreateEnrollmentTokenFlyoutProps {
   /* Called with `true` once a token was minted, so the listing behind the
@@ -308,6 +309,10 @@ const CreateEnrollmentTokenFlyoutContent = ({
                     )}
                   </EuiText>
                   <AddressOutsideCertificateWarning
+                    address={fields.address?.value}
+                    certificateNames={certificateNames}
+                  />
+                  <AddressCoveredByWildcardNotice
                     address={fields.address?.value}
                     certificateNames={certificateNames}
                   />
