@@ -3517,6 +3517,29 @@ describe('ChatPage — provider provenance and per-conversation memory', () => {
     expect(onProviderChange).not.toHaveBeenCalled();
   });
 
+  it('shows a restored conversation read-only when no provider is configured', async () => {
+    // The no-provider prompt replaces an empty conversation only: saved history stays readable
+    // without a provider, with the composer hidden and a callout offering to add one.
+    const view = renderDeepLinkRestore('p2', [], jest.fn());
+    await settleRestore();
+
+    view.rerenderWith({
+      providers: [],
+      providersLoaded: true,
+      providersError: null,
+      selectedProviderId: '',
+    });
+
+    expect(await screen.findByText('earlier answer')).toBeInTheDocument();
+    expect(
+      screen.getByText('Connect an AI provider to continue this conversation'),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId('wzAiNoProviderPrompt'),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
   it('never re-applies a spent restore when the reader later picks a provider', async () => {
     // The failure mode this guards: a restore request that outlives the render it was made for, and
     // then fires on some LATER render — snapping the picker back to the remembered provider after
