@@ -35,8 +35,7 @@ points:
 - The `CtiRegisterNotification` bottom bar, exposed in the start contract and rendered by the main
   plugin while the environment is not registered. Its **Register now** button opens the CTI feed
   app with the registration modal already open (location state `openRegistration`). The bar is
-  shown only when both `wazuh_check_updates.ctiRegistrationUiEnabled` and
-  `wazuh_check_updates.ctiUpgradeEnabled` are `true`.
+  shown only when `wazuh_check_updates.ctiRegistrationUiEnabled` is `true`.
 
 The routes of the registration flow live under `/api/wazuh-check-updates/cti-registration/`.
 

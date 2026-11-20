@@ -8,31 +8,22 @@ jest.mock('../../kibana-services', () => ({
   getWazuhCheckUpdatesPlugin: jest.fn(),
 }));
 
-const renderWith = (
-  ctiRegistrationUiEnabled: boolean,
-  ctiUpgradeEnabled: boolean,
-) => {
+const renderWith = (ctiRegistrationUiEnabled: boolean) => {
   (getWazuhCheckUpdatesPlugin as jest.Mock).mockReturnValue({
     ctiRegistrationUiEnabled,
-    ctiUpgradeEnabled,
-    CtiRegisterNotification: () => <div>CTI upsell</div>,
+    CtiRegisterNotification: () => <div>CTI registration bar</div>,
   });
   render(<WzCtiRegisterNotification />);
 };
 
 describe('WzCtiRegisterNotification', () => {
-  test('renders the upsell when the CTI UI and the upsell are enabled', () => {
-    renderWith(true, true);
-    expect(screen.getByText('CTI upsell')).toBeInTheDocument();
+  test('renders the registration bar when the CTI registration UI is enabled', () => {
+    renderWith(true);
+    expect(screen.getByText('CTI registration bar')).toBeInTheDocument();
   });
 
-  test('hides the upsell when the upsell is disabled', () => {
-    renderWith(true, false);
-    expect(screen.queryByText('CTI upsell')).not.toBeInTheDocument();
-  });
-
-  test('hides the upsell when the CTI registration UI is off', () => {
-    renderWith(false, true);
-    expect(screen.queryByText('CTI upsell')).not.toBeInTheDocument();
+  test('hides the registration bar when the CTI registration UI is off', () => {
+    renderWith(false);
+    expect(screen.queryByText('CTI registration bar')).not.toBeInTheDocument();
   });
 });

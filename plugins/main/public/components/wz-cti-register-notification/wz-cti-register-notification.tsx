@@ -2,13 +2,10 @@ import React from 'react';
 import { getWazuhCheckUpdatesPlugin } from '../../kibana-services';
 
 export const WzCtiRegisterNotification = () => {
-  const {
-    ctiRegistrationUiEnabled,
-    ctiUpgradeEnabled,
-    CtiRegisterNotification,
-  } = getWazuhCheckUpdatesPlugin();
+  const { ctiRegistrationUiEnabled, CtiRegisterNotification } =
+    getWazuhCheckUpdatesPlugin();
 
-  if (!ctiRegistrationUiEnabled || !ctiUpgradeEnabled) {
+  if (!ctiRegistrationUiEnabled) {
     return null;
   }
 

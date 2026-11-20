@@ -84,11 +84,8 @@ export class WazuhCheckUpdatesPlugin
     setCore(core);
     setWazuhCore(plugins.wazuhCore);
 
-    const {
-      ctiRegistrationUiEnabled,
-      ctiUpgradeEnabled,
-      ctiRegistrationStatusPollIntervalSec,
-    } = this.initializerContext.config.get();
+    const { ctiRegistrationUiEnabled, ctiRegistrationStatusPollIntervalSec } =
+      this.initializerContext.config.get();
 
     setCtiRegistrationStatusPollIntervalSec(
       ctiRegistrationStatusPollIntervalSec,
@@ -99,7 +96,6 @@ export class WazuhCheckUpdatesPlugin
       getAvailableUpdates,
       DismissNotificationCheck,
       ctiRegistrationUiEnabled,
-      ctiUpgradeEnabled,
       ctiRegistrationStatusPollIntervalSec,
       CtiRegisterNotification,
       CtiFeedSyncStatus,

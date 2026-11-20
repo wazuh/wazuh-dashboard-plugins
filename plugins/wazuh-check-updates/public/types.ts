@@ -13,7 +13,6 @@ export interface WazuhCheckUpdatesPluginStart {
   ) => Promise<AvailableUpdates>;
   DismissNotificationCheck: () => JSX.Element | null;
   ctiRegistrationUiEnabled: boolean;
-  ctiUpgradeEnabled: boolean;
   ctiRegistrationStatusPollIntervalSec: number;
   CtiRegisterNotification: () => JSX.Element | null;
   /** Sync state of the CTI feed, linking to the CTI feed app. */
