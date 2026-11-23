@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
-import { EuiCallOut, EuiCode, EuiSpacer } from '@elastic/eui';
-import { useSelector } from 'react-redux';
+import { EuiCallOut, EuiCode, EuiLink, EuiSpacer } from '@elastic/eui';
+import { DOCS_PATHS } from '../../../../common/services/docs-paths';
+import { webDocumentationLink } from '../../../../common/services/web_documentation';
+import { EnhancedFieldConfiguration } from '../../common/form/types';
 
 interface AddressOutsideCertificateWarningProps {
   address: string;
@@ -48,26 +50,57 @@ export const getCoveringWildcardName = (
   );
 };
 
-/* Shared by the token flyout and the deploy wizard: the manager refuses an
-address outside its listener certificate, and the value both views prefill comes
-from `enrollment.dns`, which after a migration is often not in it. */
+/* Nothing to compare with while the names load or when they cannot be loaded. */
+export const isAddressOutsideCertificate = (
+  rawAddress: unknown,
+  certificateNames: string[],
+) => {
+  const address = String(rawAddress ?? '').trim();
+
+  return (
+    address.length > 0 &&
+    certificateNames.length > 0 &&
+    !certificateNames.some(name => matchesCertificateName(name, address))
+  );
+};
+
+/* Empties the address prefilled from `enrollment.dns` once the names load, when
+the manager would refuse it, so the form opens without a warning. `onCleared`
+lets the form take the empty value as its starting point. */
+export const useClearPrefilledAddressOutsideCertificate = (
+  address: EnhancedFieldConfiguration,
+  certificateNames: string[],
+  onCleared?: () => void,
+) => {
+  const isChecked = useRef(false);
+
+  useEffect(() => {
+    if (isChecked.current || certificateNames.length === 0) {
+      return;
+    }
+    isChecked.current = true;
+    if (
+      address.value === address.initialValue &&
+      isAddressOutsideCertificate(address.value, certificateNames)
+    ) {
+      address.onChange({ target: { value: '' } });
+      onCleared?.();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [certificateNames]);
+};
+
+/* Shared by the token flyout and the deploy wizard. The address only changes on
+blur, Enter or picking an option, so the warning never shows while typing. */
 export const AddressOutsideCertificateWarning = ({
   address: rawAddress,
   certificateNames,
 }: AddressOutsideCertificateWarningProps) => {
-  const configuredAddress = useSelector(
-    (state: { appConfig: { data?: Record<string, string> } }) =>
-      state.appConfig.data?.['enrollment.dns'] || '',
-  );
-  const address = String(rawAddress ?? '').trim();
-  const isOutsideCertificate =
-    address.length > 0 &&
-    certificateNames.length > 0 &&
-    !certificateNames.some(name => matchesCertificateName(name, address));
-
-  if (!isOutsideCertificate) {
+  if (!isAddressOutsideCertificate(rawAddress, certificateNames)) {
     return null;
   }
+
+  const address = <EuiCode>{String(rawAddress).trim()}</EuiCode>;
 
   return (
     <>
@@ -79,25 +112,33 @@ export const AddressOutsideCertificateWarning = ({
         data-test-subj='addressOutsideCertificateWarning'
         title={i18n.translate(
           'wazuh.enrollmentTokens.addressOutsideCertificateWarning.title',
-          { defaultMessage: 'The address is not in the manager certificate' },
+          { defaultMessage: 'The manager will refuse this address' },
         )}
       >
         <p>
-          {address === configuredAddress ? (
-            <FormattedMessage
-              id='wazuh.enrollmentTokens.addressOutsideCertificateWarning.fromSetting'
-              defaultMessage='This value comes from the {setting} setting. The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names, add this name to the certificate, or remember another address below to update the setting.'
-              values={{ setting: <EuiCode>enrollment.dns</EuiCode> }}
-            />
-          ) : (
-            i18n.translate(
-              'wazuh.enrollmentTokens.addressOutsideCertificateWarning.typed',
-              {
-                defaultMessage:
-                  'The manager will refuse it unless it is one of the names in its listener certificate. Pick one of the suggested names or add this name to the certificate.',
-              },
-            )
-          )}
+          <FormattedMessage
+            id='wazuh.enrollmentTokens.addressOutsideCertificateWarning.message'
+            defaultMessage="{address} isn't in the manager's certificate. Agents can only connect through an address in that certificate, so the token can't be created. Pick an address from the list, or, if your agents must use {address}, add it to the manager's certificate first. {docsLink}"
+            values={{
+              address,
+              docsLink: (
+                <EuiLink
+                  href={webDocumentationLink(
+                    DOCS_PATHS.agentEnrollmentTroubleshooting,
+                  )}
+                  target='_blank'
+                  external
+                  rel='noopener noreferrer'
+                  data-test-subj='addressOutsideCertificateDocsLink'
+                >
+                  {i18n.translate(
+                    'wazuh.enrollmentTokens.addressOutsideCertificateWarning.docsLink',
+                    { defaultMessage: 'How to add an address' },
+                  )}
+                </EuiLink>
+              ),
+            }}
+          />
         </p>
       </EuiCallOut>
     </>

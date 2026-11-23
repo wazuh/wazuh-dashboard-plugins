@@ -37,7 +37,7 @@ export const AddressCoveredByWildcardNotice = ({
         <EuiIcon type='check' size='s' aria-hidden='true' />{' '}
         <FormattedMessage
           id='wazuh.enrollmentTokens.addressCoveredByWildcardNotice.message'
-          defaultMessage='Covered by {pattern} in the manager certificate.'
+          defaultMessage="Covered by {pattern} in the manager's certificate."
           values={{ pattern: <EuiCode>{pattern}</EuiCode> }}
         />
       </EuiText>

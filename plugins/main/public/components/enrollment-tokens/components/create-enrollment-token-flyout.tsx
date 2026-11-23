@@ -55,7 +55,10 @@ import {
 } from '../../../services/enrollment-tokens';
 import { TruncatedValuePopover } from './truncated-value-popover';
 import { AddressComboBox } from './address-combo-box';
-import { AddressOutsideCertificateWarning } from './address-outside-certificate-warning';
+import {
+  AddressOutsideCertificateWarning,
+  useClearPrefilledAddressOutsideCertificate,
+} from './address-outside-certificate-warning';
 import { AddressCoveredByWildcardNotice } from './address-covered-by-wildcard-notice';
 
 interface CreateEnrollmentTokenFlyoutProps {
@@ -107,7 +110,7 @@ const CreateEnrollmentTokenFlyoutContent = ({
                 'wazuh.enrollmentTokens.createEnrollmentTokenFlyout.addressHelp',
                 {
                   defaultMessage:
-                    'The name agents connect to. Pick one of the names in the manager listener certificate, or type another; an address outside the certificate is refused.',
+                    "The address agents connect to. Pick one from the list, the addresses in the manager's certificate.",
                 },
               )}
             </EuiText>
@@ -144,8 +147,15 @@ const CreateEnrollmentTokenFlyoutContent = ({
     },
   };
 
-  const { fields, errors, changed } = useForm(initialFields);
+  const { fields, errors, changed, doChanges } = useForm(initialFields);
   const { guardAction } = useUnsavedChangesGuard();
+
+  /* The cleared prefill is the starting point, not an unsaved change. */
+  useClearPrefilledAddressOutsideCertificate(
+    fields.address,
+    certificateNames,
+    doChanges,
+  );
 
   /* A field moved away from the value it was offered with, or either switch
   turned on, is work that closing the flyout would throw away. Once the token

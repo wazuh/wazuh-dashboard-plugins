@@ -1,6 +1,10 @@
+import React from 'react';
+import { render } from '@testing-library/react';
+import { useForm } from '../../common/form/hooks';
 import {
   getCoveringWildcardName,
   matchesCertificateName,
+  useClearPrefilledAddressOutsideCertificate,
 } from './address-outside-certificate-warning';
 
 describe('matchesCertificateName', () => {
@@ -58,5 +62,71 @@ describe('getCoveringWildcardName', () => {
         '*.acme.example',
       ]),
     ).toBe(undefined);
+  });
+});
+
+describe('useClearPrefilledAddressOutsideCertificate', () => {
+  let address: unknown;
+  const onCleared = jest.fn();
+
+  const Harness = ({
+    prefill,
+    names,
+    typed,
+  }: {
+    prefill: string;
+    names: string[];
+    typed?: string;
+  }) => {
+    const { fields } = useForm({
+      address: { type: 'text', initialValue: prefill },
+    });
+    address = fields.address.value;
+    React.useEffect(() => {
+      if (typed !== undefined) {
+        fields.address.onChange({ target: { value: typed } });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    useClearPrefilledAddressOutsideCertificate(
+      fields.address,
+      names,
+      onCleared,
+    );
+    return null;
+  };
+
+  beforeEach(() => onCleared.mockReset());
+
+  it('clears a prefilled address outside the certificate once', () => {
+    const { rerender } = render(<Harness prefill='old.example' names={[]} />);
+    expect(address).toBe('old.example');
+
+    rerender(<Harness prefill='old.example' names={['manager.example']} />);
+    expect(address).toBe('');
+    expect(onCleared).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps a prefilled address in the certificate', () => {
+    render(<Harness prefill='wazuh.acme.example' names={['*.acme.example']} />);
+
+    expect(address).toBe('wazuh.acme.example');
+    expect(onCleared).not.toHaveBeenCalled();
+  });
+
+  it('keeps an address entered before the names loaded', () => {
+    const { rerender } = render(
+      <Harness prefill='old.example' names={[]} typed='typed.example' />,
+    );
+
+    rerender(
+      <Harness
+        prefill='old.example'
+        names={['manager.example']}
+        typed='typed.example'
+      />,
+    );
+    expect(address).toBe('typed.example');
+    expect(onCleared).not.toHaveBeenCalled();
   });
 });

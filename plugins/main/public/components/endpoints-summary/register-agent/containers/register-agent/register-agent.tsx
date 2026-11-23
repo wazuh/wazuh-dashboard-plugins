@@ -47,6 +47,7 @@ import {
 } from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
 import { AddressComboBox } from '../../../../enrollment-tokens/components/address-combo-box';
+import { useClearPrefilledAddressOutsideCertificate } from '../../../../enrollment-tokens/components/address-outside-certificate-warning';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -158,7 +159,7 @@ export const RegisterAgent = compose(
                 'wazuh.endpointsSummary.serverAddress.addressHint',
                 {
                   defaultMessage:
-                    'Pick one of the names in the manager listener certificate, or type another.',
+                    "The address agents connect to. Pick one from the list, the addresses in the manager's certificate.",
                 },
               )}
             </EuiText>
@@ -249,6 +250,10 @@ export const RegisterAgent = compose(
   };
 
   const form = useForm(initialFields);
+  useClearPrefilledAddressOutsideCertificate(
+    form.fields.serverAddress,
+    certificateNames,
+  );
 
   const getMasterConfig = async () => {
     return await getMasterConfiguration();
