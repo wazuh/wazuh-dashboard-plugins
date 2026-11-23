@@ -20,6 +20,32 @@ import { getWzCurrentAppID } from '../../kibana-services';
 import { serverApis } from '../../utils/applications';
 import { isLoggingOut } from '../request-handler';
 
+const CLUSTER_INFO_MAX_WAIT = 3000;
+let clusterInfoRequest = { apiId: null, promise: null };
+
+// One request per page load and API, shared by every view; a failure is not retried until a reload
+const loadClusterInfo = apiId => {
+  if (clusterInfoRequest.apiId !== apiId) {
+    clusterInfoRequest = {
+      apiId,
+      promise: ApiCheck.checkStored(apiId)
+        .then(response => {
+          const clusterInfo = response?.data?.data?.cluster_info;
+          if (clusterInfo) {
+            AppState.setClusterInfo(clusterInfo);
+          }
+        })
+        // The menu checks the API too and reports its errors
+        .catch(() => {}),
+    };
+  }
+  // A slow API must not keep the view blank
+  return Promise.race([
+    clusterInfoRequest.promise,
+    new Promise(resolve => setTimeout(resolve, CLUSTER_INFO_MAX_WAIT)),
+  ]);
+};
+
 export function settingsWizard(_, wzMisc, disableErrors = false) {
   try {
     const callCheckStored = async () => {
@@ -32,16 +58,12 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
       }
 
       // The health check can end before it stores the cluster info (e.g. the user leaves the page)
-      if (currentApi && !AppState.getClusterInfo().status) {
-        try {
-          const response = await ApiCheck.checkStored(currentApi);
-          const clusterInfo = response?.data?.data?.cluster_info;
-          if (clusterInfo) {
-            AppState.setClusterInfo(clusterInfo);
-          }
-        } catch (error) {
-          // The menu checks the API too and reports its errors
+      try {
+        if (currentApi && !AppState.getClusterInfo().status) {
+          await loadClusterInfo(currentApi);
         }
+      } catch (error) {
+        // getClusterInfo already reported an unreadable cookie
       }
     };
 
