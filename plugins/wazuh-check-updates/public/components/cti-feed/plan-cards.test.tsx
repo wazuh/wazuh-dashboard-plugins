@@ -12,10 +12,8 @@ describe('PlanCards', () => {
     const open = screen.getByTestId('ctiFeedPlanCard-open');
     const professional = screen.getByTestId('ctiFeedPlanCard-professional');
     expect(open).toHaveAttribute('data-current', 'true');
-    expect(within(open).getByText('Your plan')).toBeInTheDocument();
     expect(within(open).queryByText('Included')).toBeNull();
     expect(professional).toHaveAttribute('data-current', 'false');
-    expect(within(professional).queryByText('Your plan')).toBeNull();
   });
 
   test('marks the Professional feed as the current plan, the Open one as included', () => {
@@ -24,10 +22,9 @@ describe('PlanCards', () => {
     const open = screen.getByTestId('ctiFeedPlanCard-open');
     const professional = screen.getByTestId('ctiFeedPlanCard-professional');
     expect(professional).toHaveAttribute('data-current', 'true');
-    expect(within(professional).getByText('Your plan')).toBeInTheDocument();
     expect(within(open).getByText('Included')).toBeInTheDocument();
     expect(professional).toHaveTextContent(
-      'New vulnerabilities, IOCs and rules, delivered faster.',
+      'Early access to new vulnerabilities, IOCs, and rules.',
     );
     expect(open).toHaveTextContent(
       'Public rules, IOCs and vulnerabilities for every installation.',
@@ -36,6 +33,19 @@ describe('PlanCards', () => {
 
   test('marks no card when the plan is unknown', () => {
     render(<PlanCards currentPlan={null} />);
+
+    expect(screen.getByTestId('ctiFeedPlanCard-open')).toHaveAttribute(
+      'data-current',
+      'false',
+    );
+    expect(screen.getByTestId('ctiFeedPlanCard-professional')).toHaveAttribute(
+      'data-current',
+      'false',
+    );
+  });
+
+  test('shows no "Your plan" badge on the current plan', () => {
+    render(<PlanCards currentPlan='professional' />);
 
     expect(screen.queryByText('Your plan')).toBeNull();
   });

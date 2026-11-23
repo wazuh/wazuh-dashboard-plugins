@@ -2,7 +2,7 @@ import React from 'react';
 import { i18n } from '@osd/i18n';
 import { EuiProgress, EuiLink, EuiText, EuiToolTip } from '@elastic/eui';
 import { TopItem } from '../../interfaces/types';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { formatHomeNumber } from '../../lib/format-number';
 import { getCore } from '../../../../../../kibana-services';
 import { RedirectAppLinks } from '../../../../../../../../../src/plugins/opensearch_dashboards_react/public';
 import { EmptyState } from './empty-state';
@@ -124,7 +124,7 @@ export const BarList: React.FC<BarListProps> = ({
                 />
               </div>
               <EuiText size='s' className='tab-num'>
-                {formatUINumber(item.count)}
+                {formatHomeNumber(item.count)}
               </EuiText>
             </React.Fragment>
           ))
