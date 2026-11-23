@@ -259,14 +259,17 @@ describe('AgentStats', () => {
     const { container } = await renderAndSettle({ id: agent002 });
 
     const text = container.textContent;
-    // How: the nested syntax, as `<stats_report>yes</stats_report>` is ignored
-    expect(text).toContain(
-      '<stats_report><enabled>yes</enabled></stats_report>',
-    );
-    // Where: the agent's local configuration, not the group's
-    expect(text).toContain("inside the <agent> block of the agent's local");
+    // Where: inside `<agent>` of the agent's local configuration, not the group's
+    expect(text).toContain("Add this inside <agent> in the agent's local");
     expect(text).toContain('ossec.conf');
     expect(text).toContain("A group's agent.conf does not accept this option");
+    // How: the nested syntax, as `<stats_report>yes</stats_report>` is ignored
+    const snippet = container.querySelector(
+      queryDataTestAttr('agent-stats-stats-report-snippet'),
+    );
+    expect(snippet?.textContent).toContain('<stats_report>');
+    expect(snippet?.textContent).toContain('<enabled>yes</enabled>');
+    expect(snippet?.textContent).toContain('</stats_report>');
     // Restart and when the first report arrives
     expect(text).toContain('restart the agent');
     expect(text).toContain(
