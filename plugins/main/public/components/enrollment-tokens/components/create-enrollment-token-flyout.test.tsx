@@ -319,7 +319,7 @@ describe('CreateEnrollmentTokenFlyout', () => {
       ).toHaveAttribute(
         'href',
         expect.stringContaining(
-          'user-manual/agent/agent-enrollment/troubleshooting.html',
+          'user-manual/agent/agent-enrollment/troubleshooting.html#enrollment-token-refused-address-not-in-certificate-san',
         ),
       );
     });

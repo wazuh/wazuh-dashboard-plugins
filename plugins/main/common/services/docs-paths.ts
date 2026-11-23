@@ -52,7 +52,7 @@ export const DOCS_PATHS = {
   apiRbac: 'user-manual/user-administration/rbac.html',
   indexerSecurityRoles: 'user-manual/wazuh-indexer/security.html#roles',
   agentEnrollmentTroubleshooting:
-    'user-manual/agent/agent-enrollment/troubleshooting.html',
+    'user-manual/agent/agent-enrollment/troubleshooting.html#enrollment-token-refused-address-not-in-certificate-san',
   /** Page of the CTI feed (published in 5.0-rc). */
   ctiExplorer: 'wazuh-cti/index.html',
 } as const;
