@@ -4,6 +4,7 @@ import { WazuhElasticRoutes } from './wazuh-elastic';
 import { WazuhHostsRoutes } from './wazuh-hosts';
 import { UiLogsRoutes } from './wazuh-utils';
 import { CtiExplorerRoutes } from './cti-explorer';
+import { SavedObjectsMissingFieldsRoutes } from './saved-objects-missing-fields';
 
 export const setupRoutes = (router: IRouter, services) => {
   WazuhApiRoutes(router, services);
@@ -11,4 +12,5 @@ export const setupRoutes = (router: IRouter, services) => {
   WazuhHostsRoutes(router, services);
   UiLogsRoutes(router, services);
   CtiExplorerRoutes(router);
+  SavedObjectsMissingFieldsRoutes(router);
 };

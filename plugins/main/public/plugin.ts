@@ -53,6 +53,7 @@ import { SUPPORTED_LANGUAGES_ARRAY } from '../common/constants';
 import { registerWazuhNavLinks } from './utils/nav-groups';
 import _ from 'lodash';
 import { registerPanelInfoActions } from './components/common/dashboards/panel-info/panel-info-actions';
+import { registerMissingFieldsBadgeAction } from './components/common/dashboards/missing-fields/missing-fields-badge';
 import { panelInfos } from './components/common/dashboards/panel-info/panel-infos';
 import { setAppHelpExtension } from './utils/help-extension';
 import { registerHealthCheckDescriptions } from './utils/health-check-descriptions';
@@ -132,6 +133,7 @@ export class WazuhPlugin
     };
 
     registerPanelInfoActions(plugins.uiActions, panelInfos);
+    registerMissingFieldsBadgeAction(plugins.uiActions);
 
     // Register the supported languages for the query bar, including Wazuh
     // applications IDs to enable the use of Saved queries in our search bar

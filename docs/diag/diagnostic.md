@@ -93,7 +93,8 @@ The start check validates that the passwords are present and well formed, not th
 correct. A password that is present but wrong fails at runtime with a `401`. This happens when the
 password of `kibanaserver` or `wazuh-internal-client` changed after the dashboard stored it in its keystore:
 editing `local.env` afterwards has no effect, because the keystore entry takes
-precedence.
+precedence. A peer on the same host that was reinstalled, or that published a new password, is
+picked up at the next start of the dashboard.
 
 Update the keystore entry (`opensearch.password` or `wazuh_core.hosts.default.password`) and restart
 the dashboard, as described in [Rotation](../ref/getting-started/credentials.md#rotation).

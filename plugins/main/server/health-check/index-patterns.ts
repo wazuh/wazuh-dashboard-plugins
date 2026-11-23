@@ -199,7 +199,7 @@ export const ensureIndexPatternHasTemplate = async (
   return templatesFound;
 };
 
-function getSavedObjectsClient(
+export function getSavedObjectsClient(
   ctx: HealthCheckTaskContext,
   scope: InitializationTaskContext,
 ) {
