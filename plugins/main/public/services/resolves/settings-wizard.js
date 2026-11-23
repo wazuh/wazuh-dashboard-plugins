@@ -30,6 +30,19 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
       } catch (error) {
         throw Error('Error parsing JSON (settingsWizards.callCheckStored 1)');
       }
+
+      // The health check can end before it stores the cluster info (e.g. the user leaves the page)
+      if (currentApi && !AppState.getClusterInfo().status) {
+        try {
+          const response = await ApiCheck.checkStored(currentApi);
+          const clusterInfo = response?.data?.data?.cluster_info;
+          if (clusterInfo) {
+            AppState.setClusterInfo(clusterInfo);
+          }
+        } catch (error) {
+          // The menu checks the API too and reports its errors
+        }
+      }
     };
 
     const setUpCredentials = (msg, redirect = false) => {
@@ -148,7 +161,7 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
               data.data.length > 0 &&
               data.data.find(api => api.id == apiId)
             ) {
-              callCheckStored();
+              await callCheckStored();
             } else {
               AppState.removeCurrentAPI();
               if (data.data.length > 0) {
