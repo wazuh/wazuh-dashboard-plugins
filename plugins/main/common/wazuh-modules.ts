@@ -283,7 +283,7 @@ export const WAZUH_MODULES = {
     appId: 'docker',
     description: i18n.translate('wazuh.common.modules.docker.description', {
       defaultMessage:
-        'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
+        'Monitor and collect the activity from Docker containers.',
     }),
   },
   github: {

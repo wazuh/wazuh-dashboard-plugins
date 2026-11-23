@@ -8,7 +8,7 @@ import {
 } from '../common';
 import { DataGroupResult } from '../../interfaces/data-group';
 import { TopItem } from '../../interfaces/types';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { formatHomeNumber } from '../../lib/format-number';
 
 export interface ThreatTypeCompositionProps {
   /** Top threat types in the catalog (`document.software.type`), by indicator count. */
@@ -49,7 +49,7 @@ export const ThreatTypeComposition: React.FC<ThreatTypeCompositionProps> = ({
       'wazuh.common.homeOverviewDistributionBar.segmentTooltip',
       {
         defaultMessage: '{label}: {count}',
-        values: { label: item.key, count: formatUINumber(item.count) },
+        values: { label: item.key, count: formatHomeNumber(item.count) },
       },
     ),
   }));
