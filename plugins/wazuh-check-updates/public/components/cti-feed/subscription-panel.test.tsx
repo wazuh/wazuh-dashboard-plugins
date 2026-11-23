@@ -153,7 +153,7 @@ describe('SubscriptionPanel', () => {
     expect(
       screen.getByTestId('ctiFeedPlanCard-professional'),
     ).toHaveTextContent(
-      'New vulnerabilities, IOCs and rules, delivered faster.',
+      'Early access to new vulnerabilities, IOCs, and rules.',
     );
     expect(screen.queryByTestId('ctiFeedSubscriptionAction')).toBeNull();
   });
