@@ -24,8 +24,18 @@ export function ExportTableCsv({
   totalItems = 0,
   filters = [],
   title = '',
+  fields,
   maxRows,
   isLoading = false,
+}: {
+  endpoint?: string;
+  totalItems?: number;
+  filters?: Record<string, unknown> | unknown[];
+  title?: string;
+  /* Fields to write, in order. When omitted, the server picks them. */
+  fields?: string[];
+  maxRows?: number;
+  isLoading?: boolean;
 }) {
   const showToast = (color, title, time) => {
     getToasts().add({
@@ -48,7 +58,12 @@ export function ExportTableCsv({
         }),
         3000,
       );
-      await exportCsv(endpoint, [...formatedFilters], `${title.toLowerCase()}`);
+      await exportCsv(
+        endpoint,
+        [...formatedFilters],
+        `${title.toLowerCase()}`,
+        fields,
+      );
     } catch (error) {
       const options = {
         context: `${ExportTableCsv.name}.downloadCsv`,
