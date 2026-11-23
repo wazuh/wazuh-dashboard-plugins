@@ -60,7 +60,7 @@ const toggle = () =>
 
 beforeEach(() => {
   mockSet.mockReset();
-  mockSet.mockResolvedValue(undefined);
+  mockSet.mockResolvedValue(true);
   mockDispatch.mockReset();
   mockHandleError.mockReset();
 });
@@ -118,6 +118,17 @@ describe('RememberServerEndpointSwitch', () => {
     await waitFor(() => expect(mockHandleError).toHaveBeenCalled());
     expect(mockDispatch).not.toHaveBeenCalled();
     await waitFor(() => expect(toggle()).not.toBeChecked());
+  });
+
+  it('leaves the switch off and the store as it was when a setting is refused', async () => {
+    mockSet.mockResolvedValueOnce(true).mockResolvedValue(false);
+    renderSwitch({ value: 'a.example' });
+
+    fireEvent.click(toggle());
+
+    await waitFor(() => expect(mockSet).toHaveBeenCalledTimes(3));
+    await waitFor(() => expect(toggle()).not.toBeChecked());
+    expect(mockDispatch).not.toHaveBeenCalled();
   });
 
   it('is disabled without an address or with an invalid field', () => {

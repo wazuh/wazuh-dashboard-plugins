@@ -40,11 +40,15 @@ export const useRememberServerEndpoint = (fields: ServerEndpointFields) => {
   const save = async (): Promise<boolean> => {
     try {
       // WORKAROUND: this could be done through the getWazuhCorePlugin().configuration but it requires the addition of a setter method
-      await Promise.all(
+      const saved = await Promise.all(
         SERVER_ENDPOINT_SETTINGS.map(({ field, setting }) =>
           getUiSettings().set(setting, fields[field].value),
         ),
       );
+      /* `set` reports a refused save by returning `false`, after its own toast. */
+      if (saved.includes(false)) {
+        return false;
+      }
       /* The settings reach the store only when the app config is loaded, so
       what is read from it would stay stale until a reload. */
       dispatch(

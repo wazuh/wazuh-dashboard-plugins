@@ -76,7 +76,7 @@ const addressInput = () =>
 beforeEach(() => {
   mockAppConfig = {};
   mockSet.mockReset();
-  mockSet.mockResolvedValue(undefined);
+  mockSet.mockResolvedValue(true);
   currentAddress = undefined;
   getNames.mockReset();
 });

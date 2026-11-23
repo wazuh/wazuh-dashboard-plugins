@@ -111,7 +111,7 @@ const mint = async () => {
 
 beforeEach(() => {
   mockSetSetting.mockReset();
-  mockSetSetting.mockResolvedValue(undefined);
+  mockSetSetting.mockResolvedValue(true);
   mockAppConfig = {};
   mockAddressError = () => undefined;
   createToken.mockReset();
