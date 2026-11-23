@@ -21,16 +21,11 @@ const OPEN_FEED_DESCRIPTION = i18n.translate(
 const PROFESSIONAL_FEED_DESCRIPTION = i18n.translate(
   'wazuhCheckUpdates.ctiFeed.subscription.tiers.proDescription',
   {
-    defaultMessage: 'New vulnerabilities, IOCs and rules, delivered faster.',
+    defaultMessage: 'Early access to new vulnerabilities, IOCs, and rules.',
   },
 );
 
 export type FeedPlan = 'open' | 'professional';
-
-const YOUR_PLAN = i18n.translate(
-  'wazuhCheckUpdates.ctiFeed.subscription.plans.yourPlan',
-  { defaultMessage: 'Your plan' },
-);
 
 interface PlanCardProps {
   plan: FeedPlan;
@@ -71,20 +66,7 @@ const PlanCard: React.FC<PlanCardProps> = ({
           <h4>{title}</h4>
         </EuiTitle>
       </EuiFlexItem>
-      {current ? (
-        <EuiFlexItem grow={false}>
-          {/* `hollow` is styled by classes only (named colors are inline styles), so
-              the stylesheet can give it a solid, theme-aware fill. */}
-          <EuiBadge
-            color='hollow'
-            iconType='checkInCircleFilled'
-            className='ctiFeed__planBadge'
-            data-test-subj='ctiFeedPlanCardCurrent'
-          >
-            {YOUR_PLAN}
-          </EuiBadge>
-        </EuiFlexItem>
-      ) : idleBadge ? (
+      {!current && idleBadge ? (
         <EuiFlexItem grow={false}>
           <EuiBadge color='hollow'>{idleBadge}</EuiBadge>
         </EuiFlexItem>

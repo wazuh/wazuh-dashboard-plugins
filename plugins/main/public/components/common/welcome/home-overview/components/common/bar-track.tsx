@@ -1,6 +1,6 @@
 import React from 'react';
 import { EuiText } from '@elastic/eui';
-import { formatUINumber } from '../../../../../../react-services/format-number';
+import { formatHomeNumber } from '../../lib/format-number';
 import { HOME_OVERVIEW_CHROME } from '../../lib/theme-colors';
 
 /** Height of every proportional bar (distribution, dual, gauge). */
@@ -42,7 +42,7 @@ export const LegendItem: React.FC<LegendItemProps> = ({
     <span>{label}</span>
     {count !== undefined && (
       <strong className='tab-num' style={{ color: 'inherit', marginLeft: 4 }}>
-        {formatUINumber(count)}
+        {formatHomeNumber(count)}
       </strong>
     )}
   </EuiText>
