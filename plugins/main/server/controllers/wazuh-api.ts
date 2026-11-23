@@ -915,6 +915,20 @@ export class WazuhApiCtrl {
           }
         }
 
+        // The tables with a column selector send the fields of the columns
+        // they show, so the CSV follows the user's choice and order. The
+        // lists and the files of a group keep their own fixed columns.
+        const requestedFields = request.body.fields;
+        if (
+          Array.isArray(requestedFields) &&
+          requestedFields.length &&
+          !isFiles &&
+          !isArrayOfLists &&
+          !isList
+        ) {
+          fields = requestedFields;
+        }
+
         if (isArrayOfLists) {
           const flatLists = [];
           for (const list of itemsArray) {
