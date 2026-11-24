@@ -28,6 +28,7 @@ import CommandOutput from '../../components/command-output/command-output';
 import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
 import EnrollmentTokenInput from '../../components/enrollment-token/enrollment-token';
+import PackageSource from '../../components/package-source/package-source';
 import { EnrollmentToken } from '../../interfaces/types';
 import {
   getAgentCommandsStepStatus,
@@ -231,11 +232,22 @@ export const Steps = ({
     setInvalidFieldsName(getInvalidFields(form.fields) || []);
   }, [form.fields, enrollmentToken]);
 
-  const { installCommand, startCommand, selectOS, setOptionalParams } =
-    useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
-      osDefinitions: osCommandsDefinitions,
-      optionalParamsDefinitions: optionalParamsDefinitions,
-    });
+  const {
+    installCommand,
+    localInstallCommand,
+    packageName,
+    urlPackage,
+    startCommand,
+    selectOS,
+    setOptionalParams,
+  } = useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
+    osDefinitions: osCommandsDefinitions,
+    optionalParamsDefinitions: optionalParamsDefinitions,
+  });
+  /* Offline endpoints install a package the operator already copied to them. */
+  const [usesLocalPackage, setUsesLocalPackage] = useState(false);
+  const showsLocalInstallCommand =
+    usesLocalPackage && localInstallCommand !== '';
 
   // install - start commands step state
   const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
@@ -431,13 +443,21 @@ export const Steps = ({
       ),
     },
     {
-      title: i18n.translate(
-        'wazuh.endpointsSummary.registerAgentSteps.installCommandTitle',
-        {
-          defaultMessage:
-            'Run the following commands to download and install the agent:',
-        },
-      ),
+      title: showsLocalInstallCommand
+        ? i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.localInstallCommandTitle',
+            {
+              defaultMessage:
+                'Run the following command to install the agent from the package on the endpoint:',
+            },
+          )
+        : i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.installCommandTitle',
+            {
+              defaultMessage:
+                'Run the following commands to download and install the agent:',
+            },
+          ),
       children: passwordPermissionMissing ? (
         <EuiCallOut
           color='warning'
@@ -482,7 +502,11 @@ export const Steps = ({
                 os={registerAgentFormValues.operatingSystem.name}
               />
               <CommandOutput
-                commandText={installCommand}
+                commandText={
+                  showsLocalInstallCommand
+                    ? localInstallCommand
+                    : installCommand
+                }
                 showCommand={showCommandsSections(
                   form.fields,
                   enrollmentTokenIsMissing,
@@ -494,6 +518,17 @@ export const Steps = ({
                   registerAgentFormValues.optionalParams.enrollmentToken
                 }
               />
+              {localInstallCommand ? (
+                <PackageSource
+                  usesLocalPackage={usesLocalPackage}
+                  onChange={checked => {
+                    setUsesLocalPackage(checked);
+                    setInstallCommandWasCopied(false);
+                  }}
+                  packageName={packageName}
+                  urlPackage={urlPackage}
+                />
+              ) : null}
             </>
           ) : null}
         </>

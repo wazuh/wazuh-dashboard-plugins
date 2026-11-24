@@ -26,6 +26,10 @@ interface IUseRegisterCommandsOutput<
     selectedOS?: OS,
   ) => void;
   installCommand: string;
+  /* Installs a package already on the endpoint; empty when the OS defines none. */
+  localInstallCommand: string;
+  packageName: string;
+  urlPackage: string;
   startCommand: string;
   optionalParamsParsed: IOptionalParameters<Params> | {};
 }
@@ -64,6 +68,9 @@ export function useRegisterAgentCommands<
     IOptionalParameters<Params> | {}
   >({});
   const [installCommand, setInstallCommand] = useState('');
+  const [localInstallCommand, setLocalInstallCommand] = useState('');
+  const [packageName, setPackageName] = useState('');
+  const [urlPackage, setUrlPackage] = useState('');
   const [startCommand, setStartCommand] = useState('');
 
   /**
@@ -85,6 +92,9 @@ export function useRegisterAgentCommands<
     const installCommand = commandGenerator.getInstallCommand();
     const startCommand = commandGenerator.getStartCommand();
     setInstallCommand(installCommand);
+    setLocalInstallCommand(commandGenerator.getLocalInstallCommand());
+    setPackageName(commandGenerator.getPackageName());
+    setUrlPackage(commandGenerator.getUrlPackage());
     setStartCommand(startCommand);
   };
 
@@ -122,6 +132,9 @@ export function useRegisterAgentCommands<
     selectOS,
     setOptionalParams,
     installCommand,
+    localInstallCommand,
+    packageName,
+    urlPackage,
     startCommand,
     optionalParamsParsed,
   };

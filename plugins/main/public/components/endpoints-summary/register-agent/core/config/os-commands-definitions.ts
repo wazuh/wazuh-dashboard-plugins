@@ -8,6 +8,10 @@ import {
   getRPMAMD64InstallCommand,
   getRPMARM64InstallCommand,
   getDEBARM64InstallCommand,
+  getDEBLocalInstallCommand,
+  getRPMLocalInstallCommand,
+  getWindowsLocalInstallCommand,
+  getMacOsLocalInstallCommand,
 } from '../../services/register-agent-os-commands-services';
 import {
   scapeSpecialCharsForLinux,
@@ -142,6 +146,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
           gpgKeyUrl: getGpgKeyUrl(),
           aptSource: getAptSource(),
         }),
+      localInstallCommand: props => getDEBLocalInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -153,6 +158,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
       installCommand: props =>
         getRPMAMD64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
+      localInstallCommand: props => getRPMLocalInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -171,6 +177,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
           gpgKeyUrl: getGpgKeyUrl(),
           aptSource: getAptSource(),
         }),
+      localInstallCommand: props => getDEBLocalInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
     {
@@ -182,6 +189,7 @@ const linuxDefinition: IOSDefinition<ILinuxOSTypes, tOptionalParameters> = {
       urlPackage: props => `${getPackagesBaseUrl()}/yum/${props.packageName}`,
       installCommand: props =>
         getRPMARM64InstallCommand({ ...props, gpgKeyUrl: getGpgKeyUrl() }),
+      localInstallCommand: props => getRPMLocalInstallCommand(props),
       startCommand: props => getLinuxStartCommand(props),
     },
   ],
@@ -197,6 +205,7 @@ const windowsDefinition: IOSDefinition<IWindowsOSTypes, tOptionalParameters> = {
       urlPackage: props =>
         `${getPackagesBaseUrl()}/windows/${props.packageName}`,
       installCommand: props => getWindowsInstallCommand(props),
+      localInstallCommand: props => getWindowsLocalInstallCommand(props),
       startCommand: props => getWindowsStartCommand(props),
     },
   ],
@@ -213,6 +222,7 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
         }${getPackageBuildQualifier()}.intel64.pkg`,
       urlPackage: props => `${getPackagesBaseUrl()}/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
+      localInstallCommand: props => getMacOsLocalInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
     {
@@ -223,6 +233,7 @@ const macDefinition: IOSDefinition<IMacOSTypes, tOptionalParameters> = {
         }${getPackageBuildQualifier()}.arm64.pkg`,
       urlPackage: props => `${getPackagesBaseUrl()}/macos/${props.packageName}`,
       installCommand: props => getMacOsInstallCommand(props),
+      localInstallCommand: props => getMacOsLocalInstallCommand(props),
       startCommand: props => getMacosStartCommand(props),
     },
   ],

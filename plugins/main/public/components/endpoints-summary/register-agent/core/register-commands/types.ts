@@ -36,6 +36,10 @@ export type tUrlPackageProps<Param extends string> = tOSEntryProps<Param> & {
 };
 export type tOSEntryInstallCommand<Param extends string> =
   tOSEntryProps<Param> & { urlPackage: string; packageName: string };
+/* Installs a package the operator already copied to the endpoint, so it has no
+URL: the endpoint may have no Internet access. */
+export type tOSEntryLocalInstallCommand<Param extends string> =
+  tOSEntryProps<Param> & { packageName: string };
 
 export interface IOSCommandsDefinition<
   OS extends IOperationSystem,
@@ -45,6 +49,7 @@ export interface IOSCommandsDefinition<
   urlPackage: (props: tUrlPackageProps<Param>) => string;
   packageName: (props: tOSEntryProps<Param>) => string;
   installCommand: (props: tOSEntryInstallCommand<Param>) => string;
+  localInstallCommand?: (props: tOSEntryLocalInstallCommand<Param>) => string;
   startCommand: (props: tOSEntryProps<Param>) => string;
 }
 
@@ -109,6 +114,7 @@ export interface ICommandGeneratorMethods<T extends string> {
     osSelected?: IOperationSystem,
   ): void;
   getInstallCommand(): string;
+  getLocalInstallCommand(): string;
   getStartCommand(): string;
   getUrlPackage(): string;
   getAllCommands(): ICommandsResponse<T>;
