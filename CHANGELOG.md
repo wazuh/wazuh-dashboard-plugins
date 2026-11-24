@@ -12,7 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Fixed the XML editor of the rules, decoders and configuration files requesting a missing snippets file and throwing an error in the browser [#9624](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9624)
 
-## Wazuh v4.14.11 - OpenSearch Dashboards 2.19.7 - Revision 01
+## Wazuh v4.14.11 - OpenSearch Dashboards 2.19.7 - Revision 02
 
 ### Added
 
