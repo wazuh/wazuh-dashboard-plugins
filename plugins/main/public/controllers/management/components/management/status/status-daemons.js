@@ -23,6 +23,7 @@ import { sortBy } from 'lodash';
 
 import { connect } from 'react-redux';
 import { i18n } from '@osd/i18n';
+import { ReadinessCallout } from '../../../../../components/server-readiness';
 
 const statusColors = {
   ok: '#00a69b',
@@ -155,6 +156,11 @@ export class WzStatusDaemons extends Component {
             })}
           </EuiFlexGroup>
         ))}
+        <ReadinessCallout
+          node={Object.fromEntries(
+            listDaemons.map(({ key, value }) => [key, value]),
+          )}
+        />
       </EuiPanel>
     );
   }
