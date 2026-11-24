@@ -38,7 +38,12 @@ interface ClientInternals {
   ) => Promise<RequestOptions>;
 }
 
-function createClient() {
+// `requestUsername: undefined` stands for a request without authentication state
+function createClient(
+  { requestUsername }: { requestUsername: string | undefined } = {
+    requestUsername: 'admin',
+  },
+) {
   const logger = {
     debug: jest.fn(),
     info: jest.fn(),
@@ -52,6 +57,7 @@ function createClient() {
   };
   const dashboardSecurity = {
     getCurrentUser: jest.fn().mockResolvedValue({ username: 'admin' }),
+    getRequestUsername: jest.fn().mockReturnValue(requestUsername),
   };
   const client = new ServerAPIClient(
     logger as unknown as Logger,
@@ -192,6 +198,57 @@ describe('ServerAPIClient.asInternalUser.request', () => {
     await expect(request()).rejects.toThrow('login failed');
     await expect(request()).resolves.toEqual({ status: 200 });
     expect(internals._authenticate).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe('ServerAPIClient.asScoped.request', () => {
+  const send = (cookie: string | undefined, requestUsername?: string) => {
+    const { client } = createClient({ requestUsername });
+    const internals = client as unknown as { _request: jest.Mock };
+    internals._request = jest.fn().mockResolvedValue({ status: 200 });
+    const request = { headers: { cookie } };
+
+    // The token of the caller is always replaced by the one of the cookie
+    return client
+      .asScoped({}, request)
+      .request(
+        'GET',
+        '/agents',
+        {},
+        { apiHostID: 'default', token: 'token-from-the-caller' },
+      )
+      .then(() => internals._request.mock.calls[0][3].token);
+  };
+
+  it('sends the token of the user of the request', async () => {
+    await expect(send('wz-token=abc; wz-user=admin', 'admin')).resolves.toBe(
+      'abc',
+    );
+  });
+
+  it('decodes the username of the cookie', async () => {
+    await expect(
+      send('wz-token=abc; wz-user=jane%40example.com', 'jane@example.com'),
+    ).resolves.toBe('abc');
+  });
+
+  // A session that ended without logging out leaves these cookies behind.
+  it.each([
+    ['belongs to another user', 'wz-token=abc; wz-user=readonly'],
+    ['has no user', 'wz-token=abc'],
+    ['has a malformed user', 'wz-token=abc; wz-user=%E0%A4%A'],
+  ])('sends no token when the cookie %s', async (_name, cookie) => {
+    await expect(send(cookie, 'admin')).resolves.toBeUndefined();
+  });
+
+  it('sends the token when the request has no authentication state', async () => {
+    await expect(
+      send('wz-token=abc; wz-user=readonly', undefined),
+    ).resolves.toBe('abc');
+  });
+
+  it('sends no token without the cookie', async () => {
+    await expect(send(undefined, 'admin')).resolves.toBeUndefined();
   });
 });
 

@@ -3,6 +3,7 @@ import {
   DefaultFactory,
 } from './factories';
 import {
+  HttpAuth,
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from 'src/core/server';
@@ -27,17 +28,25 @@ export interface ISecurityFactory {
     request: OpenSearchDashboardsRequest,
     context?: RequestHandlerContext,
   ): Promise<CurrentUser>;
+  /**
+   * Username the request was authenticated with, read from the authentication
+   * state of the request, so it costs no request to the indexer. `undefined`
+   * when the request has no authentication state, such as the routes that do
+   * not require authentication.
+   */
+  getRequestUsername(request: OpenSearchDashboardsRequest): string | undefined;
   isAdministratorUser(
     context: RequestHandlerContext,
     request: OpenSearchDashboardsRequest,
   ): Promise<void>;
 }
 
-export function createDashboardSecurity({
-  securityDashboards,
-}: PluginSetup): ISecurityFactory {
+export function createDashboardSecurity(
+  { securityDashboards }: PluginSetup,
+  auth?: Pick<HttpAuth, 'get'>,
+): ISecurityFactory {
   const dashboardSecurity = !!securityDashboards
-    ? new OpenSearchDashboardsSecurityFactory()
+    ? new OpenSearchDashboardsSecurityFactory(auth)
     : new DefaultFactory();
 
   enhanceDashboardSecurity(dashboardSecurity);

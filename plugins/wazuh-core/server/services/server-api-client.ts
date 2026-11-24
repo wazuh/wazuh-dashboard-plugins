@@ -14,7 +14,10 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import * as https from 'https';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Logger } from 'opensearch-dashboards/server';
+import {
+  Logger,
+  OpenSearchDashboardsRequest,
+} from 'opensearch-dashboards/server';
 import { getCookieValueByName } from './cookie';
 import { ManageHosts, IAPIHost } from './manage-hosts';
 import { ISecurityFactory } from './security-factory';
@@ -544,10 +547,46 @@ export class ServerAPIClient {
       ) => {
         return await this._request(method, path, data, {
           ...options,
-          token: getCookieValueByName(request.headers.cookie, 'wz-token'),
+          token: this._getScopedUserToken(request),
         });
       },
     };
+  }
+
+  /**
+   * Token of the `wz-token` cookie, only when the `wz-user` cookie says it
+   * belongs to the user of the request. A session that ends without logging
+   * out (it expires, or the user signs in again) leaves the cookies of the
+   * previous user behind, and the requests sent before the new token arrives
+   * would run as that user. Without a token the Server API answers 401 and the
+   * client asks for a token of the current user.
+   * @param request Request of the user
+   * @returns The token, or undefined
+   */
+  private _getScopedUserToken(
+    request: OpenSearchDashboardsRequest,
+  ): string | undefined {
+    const cookie = request.headers.cookie as string;
+    const token = getCookieValueByName(cookie, 'wz-token');
+    if (!token) {
+      return undefined;
+    }
+    const username = this.dashboardSecurity.getRequestUsername(request);
+    // No authentication state: a route that does not require authentication,
+    // such as the logout route that revokes this token.
+    if (username === undefined) {
+      return token;
+    }
+    const tokenUser = getCookieValueByName(cookie, 'wz-user');
+    try {
+      return tokenUser !== undefined &&
+        decodeURIComponent(tokenUser) === username
+        ? token
+        : undefined;
+    } catch {
+      // Malformed URI encoding
+      return undefined;
+    }
   }
 
   /**

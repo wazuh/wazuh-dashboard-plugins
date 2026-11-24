@@ -50,7 +50,10 @@ export class WazuhCorePlugin
 
     core.uiSettings.register(uiSettingsDefs);
 
-    this.services.dashboardSecurity = createDashboardSecurity(plugins);
+    this.services.dashboardSecurity = createDashboardSecurity(
+      plugins,
+      core.http.auth,
+    );
     this._internal.configurationStore = new ConfigurationStore(
       this.logger.get('configuration-store'),
     );
