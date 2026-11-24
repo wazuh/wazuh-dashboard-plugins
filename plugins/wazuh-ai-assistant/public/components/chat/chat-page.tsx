@@ -99,7 +99,7 @@ interface ChatPageProps {
   /** Owned by the app shell (application.tsx); rendered here so the provider selector sits in the
    * chat column's own header row next to the privacy chip, instead of a separate top-level row. */
   onProviderChange: (id: string) => void;
-  /** The no-provider empty state's "Add a provider" CTA — its only caller. Owners wire it to
+  /** The no-provider empty state's "Add provider" CTA — its only caller. Owners wire it to
    * open Settings with the create-provider flyout (`#/settings?addProvider=true`). */
   onNavigateToSettings: () => void;
   /** The no-provider empty state's link to Settings > Privacy & data protection
@@ -705,7 +705,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
     };
 
     const hasProviders = providers.length > 0;
-    const showNoProviderState = providersLoaded && !hasProviders;
+    const noProviders = providersLoaded && !hasProviders;
+    // The no-provider prompt replaces an EMPTY conversation only. A saved conversation opened while
+    // no provider exists still shows its transcript (read-only: the composer is hidden and a status
+    // callout offers to add a provider), so history stays readable without a provider.
+    const showNoProviderState = noProviders && messages.length === 0;
+    const showReadOnlyNoProvider = noProviders && messages.length > 0;
     // Initial mount, before the app shell's provider load has resolved either way: neither the
     // no-provider nor the welcome state can render yet (both depend on `providersLoaded`), so without
     // an explicit state here this window shows a blank pane. Restoring a conversation shows the same
@@ -2770,6 +2775,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
      * each still decides its own visibility; this only decides whether the band exists at all.
      */
     const hasStatusCallout =
+      showReadOnlyNoProvider ||
       sessionExpired ||
       showErrorCallout ||
       managerAuthHint ||
@@ -3184,6 +3190,41 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                       (no dismiss control, and nothing in this file ever calls
                       setSessionExpired(false) except starting a fresh send) until the user reloads,
                       per this fix's brief. */}
+                      {showReadOnlyNoProvider && (
+                        <StatusCallout
+                          title={i18n.translate(
+                            'wazuhAiAssistant.chat.noProviderReadOnly.title',
+                            {
+                              defaultMessage:
+                                'Connect an AI provider to continue this conversation',
+                            },
+                          )}
+                          color='primary'
+                          iconType='iInCircle'
+                          body={i18n.translate(
+                            'wazuhAiAssistant.chat.noProviderReadOnly.body',
+                            {
+                              defaultMessage:
+                                'You can read this conversation, but new questions need a connected AI provider.',
+                            },
+                          )}
+                          action={
+                            <EuiButton
+                              size='s'
+                              onClick={onNavigateToSettings}
+                              data-test-subj='wzAiNoProviderReadOnlyAdd'
+                            >
+                              {i18n.translate(
+                                'wazuhAiAssistant.chat.noProviderReadOnly.action',
+                                {
+                                  defaultMessage: 'Add provider',
+                                },
+                              )}
+                            </EuiButton>
+                          }
+                        />
+                      )}
+
                       {sessionExpired && (
                         <StatusCallout
                           title={i18n.translate(
@@ -3377,8 +3418,9 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                   // because the sticky status-callout band above (`.wzStatusCallouts`) wraps its own
                   // content in a plain `.wzContentMeasure` too — an unscoped `.wzChatPane--welcome
                   // .wzContentMeasure` rule narrowed that band as an unrelated side effect.
+                  // The no-provider prompt stretches the measure too, so it centres vertically.
                   className={
-                    welcomeIsInFlow
+                    welcomeIsInFlow || showNoProviderState
                       ? 'wzContentMeasure wzContentMeasure--stretch wzWelcomeMeasure'
                       : 'wzContentMeasure wzWelcomeMeasure'
                   }
@@ -3499,17 +3541,35 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           // reading as a second, lighter tier of the same heading (the "clear heading
                           // hierarchy" half of the welcome-screen polish pass). Text itself is
                           // unchanged, so the i18n id stays stable.
-                          <EuiText size='m' color='subdued'>
-                            <p>
-                              {i18n.translate(
-                                'wazuhAiAssistant.chat.welcome.subtitle',
-                                {
-                                  defaultMessage:
-                                    'Ask questions about your security data in plain language.',
-                                },
-                              )}
-                            </p>
-                          </EuiText>
+                          <>
+                            <EuiText size='m' color='subdued'>
+                              <p>
+                                {i18n.translate(
+                                  'wazuhAiAssistant.chat.welcome.subtitle',
+                                  {
+                                    defaultMessage:
+                                      'Ask questions about your security data in plain language.',
+                                  },
+                                )}
+                              </p>
+                            </EuiText>
+                            <EuiSpacer size='s' />
+                            <EuiText
+                              size='xs'
+                              color='subdued'
+                              data-test-subj='wzAiWelcomeNotice'
+                            >
+                              <p>
+                                {i18n.translate(
+                                  'wazuhAiAssistant.chat.welcome.aiNotice',
+                                  {
+                                    defaultMessage:
+                                      'Answers are generated by AI from your security data.',
+                                  },
+                                )}
+                              </p>
+                            </EuiText>
+                          </>
                         }
                       />
                       {/* 16, not 24: greeting → cards → composer are one evenly-spaced group — 24/9
@@ -3642,7 +3702,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
             `.wzComposerRow` (chat-page.scss) is the composer's OWN ceiling (`max-height:
             $wzComposerMaxHeight`, internal scroll past that); the textarea's independent 5-row
             autogrow cap lives in chat-input.tsx. */}
-            {!showLoadingState && !showNoProviderState && (
+            {!showLoadingState && !noProviders && (
               <div
                 ref={composerRowRef}
                 onTransitionEnd={handleComposerTransitionEnd}
@@ -3890,7 +3950,7 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                     <p>
                       {i18n.translate('wazuhAiAssistant.chat.disclaimer', {
                         defaultMessage:
-                          'AI responses may contain errors. Always verify critical information.',
+                          'You are chatting with an AI, not a person. Answers may contain errors, so always verify critical information.',
                       })}
                     </p>
                   </EuiText>

@@ -113,7 +113,7 @@ describe('getListenerCertificateNames', () => {
     ]);
   });
 
-  it('leaves out wildcard names', async () => {
+  it('keeps wildcard names', async () => {
     mockApi(['master'], {
       master: tlsResponse(
         listener('master', ['*.example.com', 'master.example.com']),
@@ -121,6 +121,7 @@ describe('getListenerCertificateNames', () => {
     });
 
     await expect(getListenerCertificateNames()).resolves.toEqual([
+      '*.example.com',
       'master.example.com',
     ]);
   });

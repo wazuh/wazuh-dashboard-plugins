@@ -150,6 +150,15 @@ const SyncStatusBadge: React.FC<{ consumer: CtiConsumer }> = ({ consumer }) => {
           })}
         </EuiBadge>
       );
+    case 'retryPending':
+      return (
+        <EuiBadge color='warning' data-test-subj='ctiConsumerSyncStatus'>
+          {i18n.translate(
+            'wazuhCheckUpdates.ctiConsumers.syncStatus.retryPending',
+            { defaultMessage: 'Retry pending' },
+          )}
+        </EuiBadge>
+      );
     case 'failed':
       return (
         <EuiBadge color='danger' data-test-subj='ctiConsumerSyncStatus'>

@@ -266,12 +266,12 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
     !ctiFlowState.isRegistrationComplete();
 
   /*
-   * The CTI console rejects the user code with "Environment already exists" when a
+   * The Wazuh Console rejects the user code with "Environment already exists" when a
    * deployment with this environment UID is still registered there. The rejection rolls
    * back, so the code stays pending and polling only ever sees `authorization_pending`
    * until it expires. The dashboard cannot detect the rejection, so once the code has
    * been pending longer than a normal activation takes, explain it and the way out:
-   * delete that deployment, then enter the same code again (the CTI console hands out the
+   * delete that deployment, then enter the same code again (the Wazuh Console hands out the
    * same pending code until it expires, so a new one cannot be requested).
    */
   useEffect(() => {
@@ -373,7 +373,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               ) : deviceAuth ? (
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalTitleInProgress'
-                  defaultMessage='Complete activation in Wazuh CTI'
+                  defaultMessage='Complete activation in the Wazuh Console'
                 />
               ) : (
                 <FormattedMessage
@@ -393,7 +393,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               >
                 <FormattedMessage
                   id='wazuhCheckUpdates.ctiRegistration.modalSubtitleDeviceFlow'
-                  defaultMessage='Complete your registration in Wazuh Cyber Threat Intelligence using the user code on the activation page. Alternatively, you can click on the link below.'
+                  defaultMessage='Complete your registration in the Wazuh Console using the user code on the activation page. Alternatively, you can click on the link below.'
                 />
               </EuiText>
             </>
@@ -415,23 +415,31 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
         ) : null}
         {showRegistrationIntro ? (
           <EuiText>
-            <FormattedMessage
-              id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
-              defaultMessage='Your instance already gets the Open feed. Register it in the Wazuh Console to manage it there and to upgrade it to the Professional feed, which delivers vulnerabilities, IOCs and rules with no delay. You will need a free Wazuh Console account. For more information, visit our {documentationCTIWazuh}.'
-              values={{
-                documentationCTIWazuh: (
-                  <EuiLink
-                    href='https://cti.wazuh.com/vulnerabilities/cves'
-                    target='_blank'
-                  >
-                    <FormattedMessage
-                      id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditionalLink'
-                      defaultMessage='documentation'
-                    />
-                  </EuiLink>
-                ),
-              }}
-            />
+            <p>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
+                defaultMessage='Your instance already receives the Open CTI feed. Register it in the Wazuh Console to manage your instance and upgrade to the Professional CTI feed, with early access to vulnerabilities, IOCs, and detection rules.'
+              />
+            </p>
+            <p>
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.modalBodyAccountRequired'
+                defaultMessage='A free Wazuh Console account is required. {learnMoreLink}.'
+                values={{
+                  learnMoreLink: (
+                    <EuiLink
+                      href='https://cti.wazuh.com/vulnerabilities/cves'
+                      target='_blank'
+                    >
+                      <FormattedMessage
+                        id='wazuhCheckUpdates.ctiRegistration.modalBodyLearnMoreLink'
+                        defaultMessage='Learn more'
+                      />
+                    </EuiLink>
+                  ),
+                }}
+              />
+            </p>
           </EuiText>
         ) : null}
         {showPermissionDenied ? (
@@ -506,7 +514,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                   title={
                     <FormattedMessage
                       id='wazuhCheckUpdates.ctiRegistration.environmentExistsTitle'
-                      defaultMessage='Did Wazuh CTI show "Environment already exists"?'
+                      defaultMessage='Did the Wazuh Console show "Environment already exists"?'
                     />
                   }
                 >
@@ -514,7 +522,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                     <p>
                       <FormattedMessage
                         id='wazuhCheckUpdates.ctiRegistration.environmentExistsBody'
-                        defaultMessage='This deployment is still registered in Wazuh Cyber Threat Intelligence, which does not report it to the dashboard, so the activation stays pending until the user code expires. To register again:'
+                        defaultMessage='This deployment is still registered in the Wazuh Console, which does not report it to the dashboard, so the activation stays pending until the user code expires. To register again:'
                       />
                     </p>
                     <ol>
@@ -523,7 +531,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                           <>
                             <FormattedMessage
                               id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepDeleteId'
-                              defaultMessage='In Wazuh CTI, go to CTI > Deployments and delete the deployment with this ID:'
+                              defaultMessage='In the Wazuh Console, go to CTI > Deployments and delete the deployment with this ID:'
                             />
                             <br />
                             <EuiCode data-test-subj='ctiRegistrationDeploymentId'>
@@ -549,7 +557,7 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                         ) : (
                           <FormattedMessage
                             id='wazuhCheckUpdates.ctiRegistration.environmentExistsStepDelete'
-                            defaultMessage='In Wazuh CTI, go to CTI > Deployments and delete this deployment.'
+                            defaultMessage='In the Wazuh Console, go to CTI > Deployments and delete this deployment.'
                           />
                         )}
                       </li>

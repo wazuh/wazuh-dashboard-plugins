@@ -50,11 +50,30 @@
   }
 }
 
-// Feed sync rows open the feed details: an inset primary outline on hover makes
-// the whole row read as one target. A shadow, because OUI's `--noBorder` wins
-// over any border set here.
-.ctiFeed__feedRow.euiPanel--isClickable:hover {
+// Feed sync rows: the top part opens the feed details; an inset primary outline
+// around the whole row on its hover makes it read as one target. A shadow, because
+// OUI's `--noBorder` wins over any border set here.
+.ctiFeed__feedRow:has(> .ctiFeed__feedRowButton:hover) {
   box-shadow: inset 0 0 0 $euiBorderWidthThin $euiColorPrimary;
+}
+
+// The clickable part blends into the row: no button border, no own hover effect.
+.euiPanel.ctiFeed__feedRowButton {
+  width: 100%;
+  border: none;
+  text-align: left;
+
+  &:hover,
+  &:focus {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+// The line under a feed row (what it delivered, or the sync progress), aligned with
+// the row text: row padding, icon and the gutter after it.
+.ctiFeed__feedRowFooter {
+  padding: 0 $euiSize $euiSize ($euiSize + $euiSizeXL + $euiSize);
 }
 
 // Feed details: short labels, long identifiers (types, URLs) get the room.
@@ -69,4 +88,75 @@
     min-width: 0;
     overflow-wrap: break-word;
   }
+}
+
+// Subscription details: short labels, the environment ID keeps one line or wraps
+// anywhere on a narrow card.
+// Subscription details: two columns of a subdued label over a bold value.
+.ctiFeed__subscriptionDetails {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $euiSizeM $euiSizeL;
+  margin: 0;
+}
+
+.ctiFeed__subscriptionDetailTitle {
+  font-size: $euiFontSizeS;
+  line-height: $euiLineHeight;
+  color: $euiTextSubduedColor;
+}
+
+.ctiFeed__subscriptionDetailValue {
+  margin: 0;
+  font-size: $euiFontSizeS;
+  font-weight: $euiFontWeightBold;
+  color: $euiTitleColor;
+  min-width: 0;
+}
+
+// Grid items shrink below their content, so a long value can be cut.
+.ctiFeed__subscriptionDetail {
+  min-width: 0;
+}
+
+// One line, cut with an ellipsis; the full value is in a tooltip.
+.ctiFeed__oneLine {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ctiFeed__environmentId {
+  font-family: $euiCodeFontFamily;
+  font-size: $euiFontSizeS;
+  font-weight: $euiFontWeightBold;
+}
+
+// Plan cards: the plan this environment is on gets a primary outline over its tint.
+// A shadow, because OUI renders a colored panel with `--noBorder`.
+.ctiFeed__planCard {
+  height: 100%;
+
+  &--current {
+    box-shadow: inset 0 0 0 $euiBorderWidthThin $euiColorPrimary;
+  }
+}
+
+// Feed sync summary: a plain 14px line next to its icon, not a title.
+.ctiFeed__syncSummaryTitle {
+  margin: 0;
+  font-size: $euiFontSizeS;
+  font-weight: $euiFontWeightRegular;
+  line-height: $euiLineHeight;
+  color: $euiTextColor;
+}
+
+// Page header description: the full width of the header, not the readable line
+// length OUI keeps it to (`grow={false}`: 36em, at least 75% of the column).
+.ctiFeed__header .euiText.euiText--constrainedWidth,
+.ctiFeed__header .ouiText.ouiText--constrainedWidth {
+  max-width: none;
+  min-width: 0;
 }

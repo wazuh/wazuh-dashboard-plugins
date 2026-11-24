@@ -127,6 +127,7 @@ interface IStepsProps {
   canCreateEnrollmentToken: boolean;
   enrollmentToken: EnrollmentToken | null;
   onEnrollmentTokenChange: (enrollmentToken: EnrollmentToken | null) => void;
+  certificateNames: string[];
 }
 
 export const Steps = ({
@@ -138,6 +139,7 @@ export const Steps = ({
   canCreateEnrollmentToken,
   enrollmentToken,
   onEnrollmentTokenChange,
+  certificateNames,
 }: IStepsProps) => {
   /* The enrollment token replaces the password: the agent enrolls with the
   credential the token carries. An operator who cannot mint one can still paste
@@ -313,6 +315,7 @@ export const Steps = ({
             serverPort: form.fields.serverPort,
             serverPath: form.fields.serverPath,
           }}
+          certificateNames={certificateNames}
         />
       ),
       status: getServerAddressStepStatus(form.fields),

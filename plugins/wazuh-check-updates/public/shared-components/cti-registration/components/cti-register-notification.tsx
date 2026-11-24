@@ -21,7 +21,7 @@ import { getCore } from '../../../plugin-services';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { useUserPreferences } from '../../../hooks';
 
-export const CtiUpsellNotification = () => {
+export const CtiRegisterNotification = () => {
   const [dismissed, setDismissed] = useState(false);
 
   const { statusCTI, loading, deviceFlowActive, modalOpen } = useCtiStatus();
@@ -108,7 +108,7 @@ export const CtiUpsellNotification = () => {
                       <EuiText color='ghost'>
                         <FormattedMessage
                           id='wazuhCheckUpdates.ctiUpsell.barMessage'
-                          defaultMessage='The open source Cyber Threat Intelligence feed is already included. Connect to the Wazuh Console to add the Pro feed.'
+                          defaultMessage='The open source Cyber Threat Intelligence feed is already included. Connect to the Wazuh Console to add the Professional feed.'
                         />
                       </EuiText>
                     </EuiFlexItem>

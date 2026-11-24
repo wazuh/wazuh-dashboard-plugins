@@ -14,9 +14,10 @@ const mapStateToProps = state => ({
 });
 
 /**
- * Generate report button of the inventory tabs: downloads the full table of the active sub-tab.
+ * Download CSV button of the inventory tabs: downloads the full table of the active sub-tab as a
+ * CSV file. Its name states the format, unlike Generate report, which produces a PDF.
  */
-export const ButtonInventoryGenerateReport = connect(mapStateToProps)(
+export const ButtonInventoryDownloadCsv = connect(mapStateToProps)(
   ({ tableReportContext }) => {
     const totalResults = tableReportContext?.totalResults;
     const action = useAsyncAction(async () => {
@@ -26,8 +27,8 @@ export const ButtonInventoryGenerateReport = connect(mapStateToProps)(
         ErrorHandler.handleError(
           ErrorFactory.create(HttpError, {
             error,
-            message: i18n.translate('wazuh.common.generateReport.csvError', {
-              defaultMessage: 'Error generating the report',
+            message: i18n.translate('wazuh.common.inventoryDownloadCsv.error', {
+              defaultMessage: 'Error downloading the CSV file',
             }),
           }),
         );
@@ -37,7 +38,7 @@ export const ButtonInventoryGenerateReport = connect(mapStateToProps)(
     return (
       <WzButton
         buttonType='empty'
-        iconType='document'
+        iconType='importAction'
         isLoading={action.running}
         onClick={action.run}
         isDisabled={!totalResults}
@@ -46,7 +47,7 @@ export const ButtonInventoryGenerateReport = connect(mapStateToProps)(
             ? {
                 position: 'top',
                 content: i18n.translate(
-                  'wazuh.common.generateReport.noResultsTooltip',
+                  'wazuh.common.inventoryDownloadCsv.noResultsTooltip',
                   {
                     defaultMessage:
                       'No results match for this search criteria.',
@@ -56,8 +57,8 @@ export const ButtonInventoryGenerateReport = connect(mapStateToProps)(
             : undefined
         }
       >
-        {i18n.translate('wazuh.common.generateReport.button', {
-          defaultMessage: 'Generate report',
+        {i18n.translate('wazuh.common.inventoryDownloadCsv.button', {
+          defaultMessage: 'Download CSV',
         })}
       </WzButton>
     );

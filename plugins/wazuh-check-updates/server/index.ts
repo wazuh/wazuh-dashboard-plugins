@@ -15,7 +15,6 @@ export function plugin(initializerContext: PluginInitializerContext) {
 
 export const configSchema = schema.object({
   ctiRegistrationUiEnabled: schema.boolean({ defaultValue: false }),
-  ctiUpsellEnabled: schema.boolean({ defaultValue: true }),
   ctiRegistrationStatusPollIntervalSec: schema.number({ defaultValue: 30 }),
   /**
    * Base URL of the CTI API. Not present in the shipped configuration file:
@@ -34,7 +33,6 @@ export const config: PluginConfigDescriptor<WazuhCheckUpdatesPluginConfigType> =
   {
     exposeToBrowser: {
       ctiRegistrationUiEnabled: true,
-      ctiUpsellEnabled: true,
       ctiRegistrationStatusPollIntervalSec: true,
     },
     schema: configSchema,

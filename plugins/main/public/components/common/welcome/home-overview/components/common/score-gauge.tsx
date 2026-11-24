@@ -4,7 +4,7 @@ import {
   HOME_OVERVIEW_COLOR,
   HOME_OVERVIEW_COLOR_TINT,
 } from '../../lib/theme-colors';
-import { decimalFormat } from '../../../utils/helpers';
+import { formatHomePercent } from '../../lib/format-number';
 import { BAR_HEIGHT } from './bar-track';
 
 export interface ScoreGaugeProps {
@@ -43,7 +43,7 @@ export const ScoreGauge: React.FC<ScoreGaugeProps> = ({
   const valueColor =
     pct === undefined ? HOME_OVERVIEW_COLOR.disabled : zoneColor(pct);
   const formattedScore =
-    score === undefined ? undefined : decimalFormat().convert(score);
+    score === undefined ? undefined : formatHomePercent(score);
 
   return (
     <div data-test-subj={rest['data-test-subj']}>

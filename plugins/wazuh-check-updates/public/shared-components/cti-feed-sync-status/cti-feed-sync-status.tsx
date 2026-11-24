@@ -47,6 +47,12 @@ const SUMMARY: Record<FeedSyncSummary, { color: string; label: string }> = {
       defaultMessage: 'New feed content available',
     }),
   },
+  retryPending: {
+    color: 'warning',
+    label: i18n.translate('wazuhCheckUpdates.ctiFeedSyncStatus.retryPending', {
+      defaultMessage: 'Feed sync steps to retry',
+    }),
+  },
   failed: {
     color: 'danger',
     label: i18n.translate('wazuhCheckUpdates.ctiFeedSyncStatus.failed', {
@@ -80,6 +86,10 @@ const STATE_LABELS: Record<ConsumerSyncState['kind'], string> = {
   syncing: i18n.translate('wazuhCheckUpdates.ctiFeedSyncStatus.state.syncing', {
     defaultMessage: 'syncing',
   }),
+  retryPending: i18n.translate(
+    'wazuhCheckUpdates.ctiFeedSyncStatus.state.retryPending',
+    { defaultMessage: 'retry pending' },
+  ),
   failed: i18n.translate('wazuhCheckUpdates.ctiFeedSyncStatus.state.failed', {
     defaultMessage: 'sync failed',
   }),

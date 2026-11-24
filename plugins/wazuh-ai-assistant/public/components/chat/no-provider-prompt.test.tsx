@@ -1,5 +1,3 @@
-import fs from 'fs';
-import path from 'path';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -24,18 +22,18 @@ const renderPrompt = (
 };
 
 describe('NoProviderPrompt', () => {
-  it('says what the assistant answers and shows the example questions disabled', () => {
+  it('says what the assistant answers and shows the example questions as previews', () => {
     renderPrompt();
 
     expect(
       screen.getByRole('heading', {
         level: 1,
-        name: 'No AI provider configured',
+        name: 'Connect an AI provider',
       }),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Ask questions about your agents, findings and vulnerabilities in plain language.',
+        'Ask about your agents, findings and vulnerabilities in plain language.',
       ),
     ).toBeInTheDocument();
     for (const question of [
@@ -45,19 +43,13 @@ describe('NoProviderPrompt', () => {
     ]) {
       expect(screen.getByText(question)).toBeInTheDocument();
     }
-    expect(document.querySelectorAll('.euiCard-isDisabled')).toHaveLength(3);
-  });
-
-  it('paints the disabled example cards in the subdued text color, not the disabled one', () => {
-    // Reads the source directly because jest maps `.scss` to a style mock. EUI's disabled text
-    // color sits near 2:1 against the card; the tone is pushed to 4.5:1 in both themes.
-    const scssSource = fs.readFileSync(
-      path.join(__dirname, 'chat-page.scss'),
-      'utf8',
-    );
-    expect(scssSource).toMatch(
-      /\.euiCard\.wzWelcomeCard\.euiCard-isDisabled,\s*\.euiCard\.wzWelcomeCard\.euiCard-isDisabled \.euiCard__titleButton \{[^}]*color: makeHighContrastColor\(\$euiTextSubduedColor, \$euiColorLightestShade\)/,
-    );
+    expect(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'Examples of what you can ask',
+      }),
+    ).toBeInTheDocument();
+    expect(document.querySelectorAll('.euiCard-isDisabled')).toHaveLength(0);
   });
 
   it('says data is sent to the provider and links to the privacy tab', () => {
@@ -65,7 +57,7 @@ describe('NoProviderPrompt', () => {
 
     expect(
       screen.getByText(
-        /the security data read to answer them, are sent to the provider/,
+        /the security data used to answer them are sent to the provider/,
       ),
     ).toBeInTheDocument();
     fireEvent.click(screen.getByText('Privacy & data protection'));
@@ -89,7 +81,9 @@ describe('NoProviderPrompt', () => {
 
   it('adds a provider', () => {
     const { onAddProvider } = renderPrompt();
-    fireEvent.click(screen.getByRole('button', { name: 'Add a provider' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Add your first AI provider' }),
+    );
     expect(onAddProvider).toHaveBeenCalledTimes(1);
   });
 
@@ -100,6 +94,9 @@ describe('NoProviderPrompt', () => {
       screen.queryByText('Which agents are disconnected?'),
     ).not.toBeInTheDocument();
     expect(
+      screen.queryByText('Examples of what you can ask'),
+    ).not.toBeInTheDocument();
+    expect(
       screen.getByText(/agents, findings and vulnerabilities/),
     ).toBeInTheDocument();
   });
@@ -107,7 +104,7 @@ describe('NoProviderPrompt', () => {
   it('disables the add button when settings are locked', () => {
     renderPrompt({ headingLevel: 'h2', isAddProviderDisabled: true });
     expect(
-      screen.getByRole('button', { name: 'Add a provider' }),
+      screen.getByRole('button', { name: 'Add your first AI provider' }),
     ).toBeDisabled();
     expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
   });

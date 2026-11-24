@@ -89,7 +89,18 @@ describe('useCtiRegistrationModal', () => {
 
     act(() => result.current.onDeviceFlowStarted());
 
-    expect(mockUseCtiStatus).toHaveBeenLastCalledWith(1, 30);
+    expect(mockUseCtiStatus).toHaveBeenLastCalledWith(1, 30, {
+      refreshOnFocus: false,
+    });
+  });
+
+  test('passes the refresh on focus option to the status polling', () => {
+    mockStatus(false);
+    renderHook(() => useCtiRegistrationModal(false, { refreshOnFocus: true }));
+
+    expect(mockUseCtiStatus).toHaveBeenLastCalledWith(0, 30, {
+      refreshOnFocus: true,
+    });
   });
 
   test('asks for confirmation before unloading while an activation is pending', () => {

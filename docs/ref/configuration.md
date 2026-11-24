@@ -19,9 +19,8 @@ The following settings can be defined in the configuration file `opensearch_dash
 | `wazuh_core.healthCheckCertificateExpiryCriticalDays`      | days before a server certificate expires at which the certificate validity health check reports red. A value outside the allowed values stops the dashboard from starting    | 7                                 | integer, minimum 1, lower than the warning days                     |
 | `wazuh.disabledSettings`                                   | Define which indexer settings are hidden from the UI                                                                                                                         | `[]`                              | list of: `index-raw-events`                                         |
 | `opensearch_security_analytics.disabledSettings`           | Define which Ruleset Management settings are hidden from the UI                                                                                                              | `[]`                              | list of: `index-discarded-events`, `index-unclassified-events`      |
-| `wazuh_check_updates.ctiRegistrationUiEnabled`             | Show the bottom bar that invites users to register for CTI, together with `ctiUpsellEnabled`. The CTI feed app is always registered                                          | `false`                           | true, false                                                         |
-| `wazuh_check_updates.ctiUpsellEnabled`                     | Show the bottom bar that invites users to register for CTI. The CTI feed app stays                                                                                           | `true`                            | true, false                                                         |
-| `wazuh_check_updates.ctiRegistrationStatusPollIntervalSec` | How often the UI polls the CTI Console registration status, in seconds                                                                                                       | `30`                              | integer                                                             |
+| `wazuh_check_updates.ctiRegistrationUiEnabled`             | Show the bottom bar that invites users to register for CTI while the environment is not registered. The CTI feed app is always registered                                    | `false`                           | true, false                                                         |
+| `wazuh_check_updates.ctiRegistrationStatusPollIntervalSec` | How often the UI polls the Wazuh Console registration status, in seconds                                                                                                     | `30`                              | integer                                                             |
 | `wazuh_check_updates.ctiApiUrl`                            | Base URL of the CTI API. Not set in the shipped configuration file; override only to target another CTI environment                                                          | `https://api.pre.cloud.wazuh.com` | a valid `http`/`https` URL                                          |
 
 The AI Assistant has its own set of `wazuh_ai_assistant.*` settings (`enabled`, `encryptionKey`,
@@ -97,8 +96,9 @@ The packages manage the entries of the `default` host and of the indexer connect
 | `opensearch.username`, `opensearch.password` | `WAZUH_INDEXER_KIBANASERVER_PASSWORD` |
 
 They are read from the environment, `/etc/wazuh-dashboard/local.env` or the peers'
-`export/credentials.env`, at installation and before every start, and the dashboard refuses to start while one of them is missing. A value set in
-`opensearch_dashboards.yml` counts as resolved and is never overridden. See
+`export/credentials.env`, at installation and before every start, and the dashboard refuses to start while one of them is missing. A password already in the
+keystore is replaced only by a different one that a peer on the same host published after the keystore was
+written. A value set in `opensearch_dashboards.yml` counts as resolved and is never overridden. See
 [Credentials](getting-started/credentials.md).
 
 For any other host, add the entry yourself as root, then restart the dashboard. Replace `<HOST_ID>`
@@ -194,11 +194,11 @@ wazuh_core.hosts:
 
 Wazuh dashboard adds the following settings that can be configured in tenant level from **Dashboard management > Dashboards Management > Advanced settings**:
 
-| Setting                | Description                                                                                                                                                  | Default value | Allowed values                |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------- |
-| enrollment.dns         | Define the Wazuh server DNS for the guide to deploy agents                                                                                                   | ''            | any valid DNS or IP           |
-| enrollment.port        | Port of the Wazuh registration server for agent enrollment. Empty uses the agent default (1517)                                                              | ''            | any valid port number         |
-| enrollment.path        | Path prefix the agent prepends to every request to the Wazuh server; must match the server's global prefix. Empty uses the agent default (`/wazuh-manager/`) | ''            | any valid path prefix         |
-| reports.csv.maxRows    | Define the maximum rows to exports in some tables                                                                                                            | 10000         | any number starting from 0    |
-| timeout                | Define the timeout for some requests done from UI                                                                                                            | 20000         | any number starting from 1500 |
-| wazuh.updates.disabled | Define if the updates check is disabled                                                                                                                      | true          | true, false                   |
+| Setting               | Description                                                                                                                                                  | Default value | Allowed values                |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------- | ----------------------------- |
+| enrollment.dns        | Define the Wazuh server DNS for the guide to deploy agents                                                                                                   | ''            | any valid DNS or IP           |
+| enrollment.port       | Port of the Wazuh registration server for agent enrollment. Empty uses the agent default (1517)                                                              | ''            | any valid port number         |
+| enrollment.path       | Path prefix the agent prepends to every request to the Wazuh server; must match the server's global prefix. Empty uses the agent default (`/wazuh-manager/`) | ''            | any valid path prefix         |
+| reports.csv.maxRows   | Define the maximum rows to exports in some tables                                                                                                            | 10000         | any number starting from 0    |
+| timeout               | Define the timeout for some requests done from UI                                                                                                            | 20000         | any number starting from 1500 |
+| check_updates.enabled | Define if the updates check is enabled                                                                                                                       | false         | true, false                   |

@@ -835,20 +835,6 @@ $wzMsgAvatarColumn: 40px;
 }
 
 /**
- * The no-provider prompt shows the example cards disabled. EUI paints disabled card text in its
- * disabled color, which sits near 2:1 against the card in both themes and leaves the questions
- * barely readable. A subdued tone keeps the cards reading as inactive (with the disabled fill and
- * cursor). Plain `$euiTextSubduedColor` is tuned against the page background, and the card's own
- * fill is darker than that in the dark theme (4.3:1 there), so the tone is pushed to 4.5:1 against
- * `$euiColorLightestShade`: the card fill is lighter than that shade in the light theme and darker
- * in the dark one, so the text clears 4.5:1 on the card in both.
- */
-.euiCard.wzWelcomeCard.euiCard-isDisabled,
-.euiCard.wzWelcomeCard.euiCard-isDisabled .euiCard__titleButton {
-  color: makeHighContrastColor($euiTextSubduedColor, $euiColorLightestShade);
-}
-
-/**
  * The user turn's bubble (message-bubble.tsx) folds an inline `borderRadius: 14` — a fifth
  * radius, invented for one element and unreachable from any stylesheet — onto `$wzPanelRadius`:
  * 12 and 14 are indistinguishable at this size, and the doctrine (_redesign.scss's own "one
@@ -1078,15 +1064,51 @@ $wzMsgAvatarColumn: 40px;
 }
 
 /* No-provider prompt (no-provider-prompt.tsx): the welcome cluster's own measure and 16px
-   rhythm; the text keeps EuiEmptyPrompt's 36em measure. */
+   rhythm; the text keeps EuiEmptyPrompt's 36em measure. `flex: 1 1 auto` + `justify-content`
+   centre it vertically in the chat transcript (its measure is a stretched flex column there);
+   in Settings the parent is not a flex container, so both are inert. */
 .wzNoProviderPrompt {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  width: 100%;
   max-width: $wzWelcomeGroupMaxWidth;
   margin-inline: auto;
+
+  /* EuiEmptyPrompt centres itself with `margin: auto`, which in this flex column would eat the
+     free height and push the rest of the prompt to the bottom. */
+  > .euiEmptyPrompt {
+    margin-block: 0;
+  }
 }
 
 .wzNoProviderPrompt__text {
   max-width: 36em;
+}
+
+/* Three columns or one, never 2+1: the shared welcome grid wraps to two columns in a ~500px
+   sidecar and leaves the third example card alone on its own row. The track minimum is a third
+   of the row while three 240px tracks (plus the two 16px gaps, 752px) fit, and the full row
+   otherwise: `(752px - 100%) * 999` is negative when they fit and huge when they don't.
+   In the one-column case the grid is also capped at 360px and centred with the rest of the
+   prompt, so the cards don't stretch across the panel with their content pinned to the left. */
+.wzNoProviderPrompt .wzExampleCardsGrid {
+  max-width: clamp(min(360px, 100%), calc((100% - 752px) * 999), 100%);
+  margin-inline: auto;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(
+      clamp(calc((100% - 32px) / 3), calc((752px - 100%) * 999), 100%),
+      1fr
+    )
+  );
+}
+
+.wzNoProviderPrompt__examplesHeading {
+  color: $euiTextSubduedColor;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }

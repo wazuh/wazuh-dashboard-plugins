@@ -70,6 +70,7 @@ const exportAgentsCsv = async (
   uiSettings: Record<string, unknown> = { 'reports.csv.maxRows': 10_000 },
   path = '/agents',
   agent: Record<string, unknown> = AGENT_WITH_FORMULA_OS_NAME,
+  fields?: string[],
 ) => {
   const ctrl = new WazuhApiCtrl();
   const { context } = makeContext([agent], uiSettings);
@@ -78,7 +79,7 @@ const exportAgentsCsv = async (
   const result = await ctrl.csv(
     context,
     {
-      body: { path, id: 'default', filters: [] },
+      body: { path, id: 'default', filters: [], fields },
     } as unknown as OpenSearchDashboardsRequest,
     response as unknown as OpenSearchDashboardsResponseFactory,
   );
@@ -154,6 +155,40 @@ describe('WazuhApiCtrl.csv', () => {
       ]);
     },
   );
+
+  it('writes only the requested fields, in the requested order', async () => {
+    const fields = ['name', 'id', 'os.name', 'os.version', 'group'];
+    const { response } = await exportAgentsCsv(
+      undefined,
+      '/agents',
+      undefined,
+      fields,
+    );
+
+    const [header, row] = response.ok.mock.calls[0][0].body.split('\n');
+
+    expect(header.split(',')).toEqual([
+      'Name',
+      'ID',
+      'OS name',
+      'OS version',
+      'Group',
+    ]);
+    expect(row).toBe("agent-1,001,'=1+1,22.04,default");
+  });
+
+  it('keeps the fixed columns of the files of a group when fields are requested', async () => {
+    const { response } = await exportAgentsCsv(
+      undefined,
+      '/groups/default/files',
+      { filename: 'agent.conf', hash: { md5: 'abc' } },
+      ['name'],
+    );
+
+    const [header] = response.ok.mock.calls[0][0].body.split('\n');
+
+    expect(header.split(',')).toEqual(['File', 'Checksum']);
+  });
 
   it('does not apply the agent columns to the files of a group', async () => {
     const { response } = await exportAgentsCsv(
