@@ -30,7 +30,8 @@ export const usePendingContentSync = (): PendingSync | null => {
         const names: string[] = (nodes?.data?.data?.affected_items ?? []).map(
           ({ name }: { name: string }) => name,
         );
-        const statuses = await Promise.all(
+        // One unreachable node must not hide the others.
+        const statuses = await Promise.allSettled(
           names.map(async name => {
             const response = await WzRequest.apiReq(
               'GET',
@@ -41,7 +42,11 @@ export const usePendingContentSync = (): PendingSync | null => {
             return { name, blockers: getContentSyncBlockers(node) };
           }),
         );
-        const syncing = statuses.filter(({ blockers }) => blockers.length);
+        const syncing = statuses.flatMap(result =>
+          result.status === 'fulfilled' && result.value.blockers.length
+            ? [result.value]
+            : [],
+        );
         if (!cancelled && syncing.length) {
           setPending({
             nodes: syncing.map(({ name }) => name),

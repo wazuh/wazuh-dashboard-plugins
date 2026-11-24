@@ -92,6 +92,27 @@ describe('ContentSyncCallout', () => {
     ).toBeInTheDocument();
   });
 
+  it('still names a syncing node when another node does not answer', async () => {
+    apiReq.mockImplementation((_method: string, path: string) => {
+      if (path === '/cluster/nodes') {
+        return Promise.resolve({
+          data: {
+            data: { affected_items: [{ name: 'master' }, { name: 'worker' }] },
+          },
+        });
+      }
+      return path.includes('worker')
+        ? Promise.reject(new Error('Node worker is down'))
+        : Promise.resolve(nodeStatus('updating'));
+    });
+    render(<ContentSyncCallout />);
+    expect(
+      await screen.findByText(
+        'Content sync in progress on master. New findings may be delayed.',
+      ),
+    ).toBeInTheDocument();
+  });
+
   it('renders nothing when every node is synced', async () => {
     mockCluster({ master: nodeStatus('ready', true) });
     const { container } = render(<ContentSyncCallout />);
