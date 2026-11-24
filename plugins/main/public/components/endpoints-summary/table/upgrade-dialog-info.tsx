@@ -7,7 +7,6 @@ import { getWazuhAPIVersion } from '../services';
 export const UPGRADE_ERROR_TOAST_LIFETIME_MS = 24 * 60 * 60 * 1000;
 
 const LEGACY_AGENT_VERSION_REGEX = /^v?4\./i;
-const URL_REGEX = /https?:\/\/[^\s"'<>)]+/i;
 
 export const isLegacyAgentVersion = (version?: string): boolean =>
   LEGACY_AGENT_VERSION_REGEX.test(version ?? '');
@@ -29,49 +28,6 @@ export const useUpgradeTargetVersion = (): string | undefined => {
   }, []);
 
   return targetVersion;
-};
-
-/**
- * Names the repository in the upgrade error when the manager returns its URL
- * outside of the message (for example in the detail or the remediation).
- */
-type UpgradeError = {
-  response?: {
-    data?: {
-      detail?: unknown;
-      remediation?: unknown;
-      error?: { remediation?: unknown };
-    };
-  };
-};
-
-export const addRepositoryUrl = (
-  message: string,
-  error: UpgradeError,
-): string => {
-  const data = error?.response?.data;
-  const candidates = [
-    data?.detail,
-    data?.remediation,
-    data?.error?.remediation,
-  ];
-  const url = candidates
-    .map(candidate =>
-      typeof candidate === 'string' ? candidate.match(URL_REGEX)?.[0] : '',
-    )
-    .find(Boolean);
-
-  if (!url || message.includes(url)) {
-    return message;
-  }
-
-  return i18n.translate(
-    'wazuh.endpointsSummary.upgradeDialog.repositoryError',
-    {
-      defaultMessage: '{message} Repository: {url}',
-      values: { message, url },
-    },
-  );
 };
 
 interface UpgradeDialogInfoProps {
@@ -103,7 +59,7 @@ export const UpgradeDialogInfo = ({
             'wazuh.endpointsSummary.upgradeDialog.legacyAgentsNote',
             {
               defaultMessage:
-                'Agents on version 4.x start the upgrade within the next 15 minutes.',
+                'Agents on version 4.x can take up to 15 minutes to start the upgrade.',
             },
           )}
         />

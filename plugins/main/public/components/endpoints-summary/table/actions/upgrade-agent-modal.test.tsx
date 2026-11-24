@@ -114,7 +114,7 @@ describe('UpgradeAgentModal component', () => {
       />,
     );
     expect(
-      await legacy.findByText(/start the upgrade within the next 15 minutes/),
+      await legacy.findByText(/can take up to 15 minutes to start the upgrade/),
     ).toBeInTheDocument();
     legacy.unmount();
 
@@ -127,17 +127,16 @@ describe('UpgradeAgentModal component', () => {
     );
     await current.findByText('The agents will be upgraded to version 5.0.0.');
     expect(
-      current.queryByText(/start the upgrade within the next 15 minutes/),
+      current.queryByText(/can take up to 15 minutes to start the upgrade/),
     ).not.toBeInTheDocument();
   });
 
-  test('should keep the error toast until dismissed and name the repository', async () => {
+  test('should keep the error toast until dismissed', async () => {
     (upgradeAgentService as jest.Mock).mockRejectedValue({
       response: {
         data: {
           message:
             'Could not upgrade agent: No upgrade task was created (1822) - The repository is not reachable',
-          remediation: 'Check https://packages.example.com/5.x',
         },
       },
     });
@@ -159,7 +158,7 @@ describe('UpgradeAgentModal component', () => {
         toastLifeTimeMs: UPGRADE_ERROR_TOAST_LIFETIME_MS,
         error: expect.objectContaining({
           message: expect.stringContaining(
-            'Repository: https://packages.example.com/5.x',
+            'No upgrade task was created (1822) - The repository is not reachable',
           ),
         }),
       }),

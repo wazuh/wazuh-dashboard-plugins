@@ -30,7 +30,6 @@ import { upgradeStatusState } from '../../services/upgrade-status-state';
 import {
   UPGRADE_ERROR_TOAST_LIFETIME_MS,
   UpgradeDialogInfo,
-  addRepositoryUrl,
   isLegacyAgentVersion,
   useUpgradeTargetVersion,
 } from '../upgrade-dialog-info';
@@ -82,7 +81,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
         );
       }
 
-      return addRepositoryUrl(message, error);
+      return message;
     };
 
     const showToast = (

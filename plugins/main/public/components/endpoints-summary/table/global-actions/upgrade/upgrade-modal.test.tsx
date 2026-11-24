@@ -113,7 +113,7 @@ describe('UpgradeAgentsModal component', () => {
       ]);
 
       expect(
-        await findByText(/start the upgrade within the next 15 minutes/),
+        await findByText(/can take up to 15 minutes to start the upgrade/),
       ).toBeInTheDocument();
     });
 
@@ -121,7 +121,7 @@ describe('UpgradeAgentsModal component', () => {
       const { findByText } = renderModal([], true);
 
       expect(
-        await findByText(/start the upgrade within the next 15 minutes/),
+        await findByText(/can take up to 15 minutes to start the upgrade/),
       ).toBeInTheDocument();
     });
 
@@ -132,16 +132,15 @@ describe('UpgradeAgentsModal component', () => {
 
       await findByText('The agents will be upgraded to version 5.0.0.');
       expect(
-        queryByText(/start the upgrade within the next 15 minutes/),
+        queryByText(/can take up to 15 minutes to start the upgrade/),
       ).not.toBeInTheDocument();
     });
 
-    test('keeps the error toast until dismissed and names the repository', async () => {
+    test('keeps the error toast until dismissed', async () => {
       (upgradeAgentsService as jest.Mock).mockRejectedValue({
         response: {
           data: {
             message: 'The repository is not reachable',
-            detail: 'Cannot reach https://packages.example.com/5.x',
           },
         },
       });
@@ -158,8 +157,7 @@ describe('UpgradeAgentsModal component', () => {
         expect.objectContaining({
           toastLifeTimeMs: UPGRADE_ERROR_TOAST_LIFETIME_MS,
           error: expect.objectContaining({
-            message:
-              'The repository is not reachable Repository: https://packages.example.com/5.x',
+            message: 'The repository is not reachable',
           }),
         }),
       );
