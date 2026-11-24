@@ -101,7 +101,7 @@ describe('UpgradeAgentModal component', () => {
     );
 
     expect(
-      await findByText('The agents will be upgraded to version 5.0.0.'),
+      await findByText('The agent will be upgraded to version 5.0.0.'),
     ).toBeInTheDocument();
   });
 
@@ -127,7 +127,7 @@ describe('UpgradeAgentModal component', () => {
         reloadAgents={() => {}}
       />,
     );
-    await current.findByText('The agents will be upgraded to version 5.0.0.');
+    await current.findByText('The agent will be upgraded to version 5.0.0.');
     expect(
       current.queryByText(/next delivery cycle, every 15 minutes by default/),
     ).not.toBeInTheDocument();

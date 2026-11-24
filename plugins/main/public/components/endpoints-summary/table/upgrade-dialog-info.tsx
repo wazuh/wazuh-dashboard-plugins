@@ -33,19 +33,35 @@ export const useUpgradeTargetVersion = (): string | undefined => {
 interface UpgradeDialogInfoProps {
   targetVersion?: string;
   showLegacyAgentsNote: boolean;
+  /** The dialog upgrades one agent, so the target version message is singular. */
+  isSingleAgent?: boolean;
 }
 
 export const UpgradeDialogInfo = ({
   targetVersion,
   showLegacyAgentsNote,
+  isSingleAgent = false,
 }: UpgradeDialogInfoProps) => (
   <>
     {targetVersion ? (
       <EuiText size='s' data-test-subj='upgradeTargetVersion'>
-        {i18n.translate('wazuh.endpointsSummary.upgradeDialog.targetVersion', {
-          defaultMessage: 'The agents will be upgraded to version {version}.',
-          values: { version: targetVersion },
-        })}
+        {isSingleAgent
+          ? i18n.translate(
+              'wazuh.endpointsSummary.upgradeDialog.targetVersionSingleAgent',
+              {
+                defaultMessage:
+                  'The agent will be upgraded to version {version}.',
+                values: { version: targetVersion },
+              },
+            )
+          : i18n.translate(
+              'wazuh.endpointsSummary.upgradeDialog.targetVersion',
+              {
+                defaultMessage:
+                  'The agents will be upgraded to version {version}.',
+                values: { version: targetVersion },
+              },
+            )}
       </EuiText>
     ) : null}
     {showLegacyAgentsNote ? (

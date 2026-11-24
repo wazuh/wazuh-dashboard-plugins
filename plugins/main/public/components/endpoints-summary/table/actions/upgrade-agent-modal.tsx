@@ -215,6 +215,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
             <UpgradeDialogInfo
               targetVersion={targetVersion}
               showLegacyAgentsNote={isLegacyAgentVersion(agent.version)}
+              isSingleAgent
             />
           </EuiFlexItem>
           {showPackageSelector && (
