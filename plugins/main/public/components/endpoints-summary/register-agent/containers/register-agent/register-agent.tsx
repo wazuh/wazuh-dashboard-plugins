@@ -7,6 +7,7 @@ import {
   EuiPage,
   EuiPageBody,
   EuiSpacer,
+  EuiText,
   EuiProgress,
   EuiToolTip,
   EuiButtonIcon,
@@ -46,6 +47,7 @@ import {
 } from '../../../../../services/enrollment-tokens';
 import { EnrollmentToken } from '../../interfaces/types';
 import { AddressComboBox } from '../../../../enrollment-tokens/components/address-combo-box';
+import { useClearPrefilledAddressOutsideCertificate } from '../../../../enrollment-tokens/components/address-outside-certificate-warning';
 import { compose } from 'redux';
 import { endpointSummary } from '../../../../../utils/applications';
 import { getWazuhCorePlugin } from '../../../../../kibana-services';
@@ -76,6 +78,9 @@ export const RegisterAgent = compose(
   const configuration = useSelector(
     (state: { appConfig: { data: any } }) => state.appConfig.data,
   );
+  /* Reported by the address input, to warn about an address the manager would
+  refuse. */
+  const [certificateNames, setCertificateNames] = useState<string[]>([]);
   const [wazuhVersion, setWazuhVersion] = useState('');
   const [loading, setLoading] = useState(false);
   const [wazuhPassword, setWazuhPassword] = useState('');
@@ -147,6 +152,18 @@ export const RegisterAgent = compose(
       component: props => (
         <AddressComboBox
           {...props}
+          onNamesLoaded={setCertificateNames}
+          help={
+            <EuiText size='xs' color='subdued'>
+              {i18n.translate(
+                'wazuh.endpointsSummary.serverAddress.addressHint',
+                {
+                  defaultMessage:
+                    "The address agents connect to. Pick one from the list, the addresses in the manager's certificate.",
+                },
+              )}
+            </EuiText>
+          }
           data-test-subj='registerAgentServerAddress'
         />
       ),
@@ -233,6 +250,10 @@ export const RegisterAgent = compose(
   };
 
   const form = useForm(initialFields);
+  useClearPrefilledAddressOutsideCertificate(
+    form.fields.serverAddress,
+    certificateNames,
+  );
 
   const getMasterConfig = async () => {
     return await getMasterConfiguration();
@@ -373,6 +394,7 @@ export const RegisterAgent = compose(
                       canCreateEnrollmentToken={canCreateEnrollmentToken}
                       enrollmentToken={enrollmentToken}
                       onEnrollmentTokenChange={setEnrollmentToken}
+                      certificateNames={certificateNames}
                       osCard={osCard}
                     />
                   </EuiFlexItem>
