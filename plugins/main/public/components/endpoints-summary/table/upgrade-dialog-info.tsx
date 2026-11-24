@@ -59,7 +59,7 @@ export const UpgradeDialogInfo = ({
             'wazuh.endpointsSummary.upgradeDialog.legacyAgentsNote',
             {
               defaultMessage:
-                'Agents on version 4.x can take up to 15 minutes to start the upgrade.',
+                "Agents on version 4.x start the upgrade on the manager's next delivery cycle, every 15 minutes by default.",
             },
           )}
         />

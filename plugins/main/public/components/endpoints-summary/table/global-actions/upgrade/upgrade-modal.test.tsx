@@ -113,7 +113,7 @@ describe('UpgradeAgentsModal component', () => {
       ]);
 
       expect(
-        await findByText(/can take up to 15 minutes to start the upgrade/),
+        await findByText(/next delivery cycle, every 15 minutes by default/),
       ).toBeInTheDocument();
     });
 
@@ -121,7 +121,7 @@ describe('UpgradeAgentsModal component', () => {
       const { findByText } = renderModal([], true);
 
       expect(
-        await findByText(/can take up to 15 minutes to start the upgrade/),
+        await findByText(/next delivery cycle, every 15 minutes by default/),
       ).toBeInTheDocument();
     });
 
@@ -132,7 +132,7 @@ describe('UpgradeAgentsModal component', () => {
 
       await findByText('The agents will be upgraded to version 5.0.0.');
       expect(
-        queryByText(/can take up to 15 minutes to start the upgrade/),
+        queryByText(/next delivery cycle, every 15 minutes by default/),
       ).not.toBeInTheDocument();
     });
 

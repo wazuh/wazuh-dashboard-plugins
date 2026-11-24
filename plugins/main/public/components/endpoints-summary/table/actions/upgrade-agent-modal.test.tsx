@@ -114,7 +114,9 @@ describe('UpgradeAgentModal component', () => {
       />,
     );
     expect(
-      await legacy.findByText(/can take up to 15 minutes to start the upgrade/),
+      await legacy.findByText(
+        /next delivery cycle, every 15 minutes by default/,
+      ),
     ).toBeInTheDocument();
     legacy.unmount();
 
@@ -127,7 +129,7 @@ describe('UpgradeAgentModal component', () => {
     );
     await current.findByText('The agents will be upgraded to version 5.0.0.');
     expect(
-      current.queryByText(/can take up to 15 minutes to start the upgrade/),
+      current.queryByText(/next delivery cycle, every 15 minutes by default/),
     ).not.toBeInTheDocument();
   });
 
