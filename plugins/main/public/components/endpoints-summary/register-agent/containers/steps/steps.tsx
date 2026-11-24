@@ -28,7 +28,10 @@ import CommandOutput from '../../components/command-output/command-output';
 import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
 import EnrollmentTokenInput from '../../components/enrollment-token/enrollment-token';
-import PackageSource from '../../components/package-source/package-source';
+import InstallCommandOptions, {
+  tCommandSecret,
+} from '../../components/install-command-options/install-command-options';
+import LocalPackageCallout from '../../components/install-command-options/local-package-callout';
 import { EnrollmentToken } from '../../interfaces/types';
 import {
   getAgentCommandsStepStatus,
@@ -246,6 +249,8 @@ export const Steps = ({
   });
   /* Offline endpoints install a package the operator already copied to them. */
   const [usesLocalPackage, setUsesLocalPackage] = useState(false);
+  const [showInstallCommandSecret, setShowInstallCommandSecret] =
+    useState(false);
   const showsLocalInstallCommand =
     usesLocalPackage && localInstallCommand !== '';
 
@@ -295,6 +300,18 @@ export const Steps = ({
       ),
     );
   }, [startCommandWasCopied]);
+
+  const showsInstallCommand = showCommandsSections(
+    form.fields,
+    enrollmentTokenIsMissing,
+  );
+  /* Only one secret is ever in the command: the token replaces the password. */
+  const installCommandSecret: tCommandSecret | undefined =
+    registerAgentFormValues.optionalParams.enrollmentToken
+      ? 'enrollmentToken'
+      : registerAgentFormValues.optionalParams.wazuhPassword
+      ? 'password'
+      : undefined;
 
   const passwordStepTitle = i18n.translate(
     'wazuh.endpointsSummary.registerAgentSteps.passwordTitle',
@@ -501,30 +518,41 @@ export const Steps = ({
               <OsCommandWarning
                 os={registerAgentFormValues.operatingSystem.name}
               />
+              {showsInstallCommand ? (
+                <InstallCommandOptions
+                  secret={installCommandSecret}
+                  showSecret={showInstallCommandSecret}
+                  onShowSecretChange={setShowInstallCommandSecret}
+                  localPackage={
+                    localInstallCommand
+                      ? {
+                          enabled: usesLocalPackage,
+                          onChange: enabled => {
+                            setUsesLocalPackage(enabled);
+                            setInstallCommandWasCopied(false);
+                          },
+                        }
+                      : undefined
+                  }
+                />
+              ) : null}
               <CommandOutput
                 commandText={
                   showsLocalInstallCommand
                     ? localInstallCommand
                     : installCommand
                 }
-                showCommand={showCommandsSections(
-                  form.fields,
-                  enrollmentTokenIsMissing,
-                )}
+                showCommand={showsInstallCommand}
                 os={registerAgentFormValues.operatingSystem.name}
                 onCopy={() => setInstallCommandWasCopied(true)}
                 password={registerAgentFormValues.optionalParams.wazuhPassword}
                 enrollmentToken={
                   registerAgentFormValues.optionalParams.enrollmentToken
                 }
+                showSecret={showInstallCommandSecret}
               />
-              {localInstallCommand ? (
-                <PackageSource
-                  usesLocalPackage={usesLocalPackage}
-                  onChange={checked => {
-                    setUsesLocalPackage(checked);
-                    setInstallCommandWasCopied(false);
-                  }}
+              {showsInstallCommand && showsLocalInstallCommand ? (
+                <LocalPackageCallout
                   packageName={packageName}
                   urlPackage={urlPackage}
                 />
