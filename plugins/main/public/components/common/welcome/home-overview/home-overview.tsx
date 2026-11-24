@@ -18,7 +18,6 @@ import {
 import { useInViewport } from '../../hooks';
 import { withErrorBoundary, withGlobalBreadcrumb } from '../../hocs';
 import { overview } from '../../../../utils/applications';
-import { ContentSyncCallout } from '../../../server-readiness';
 
 /**
  * Searches feeding more than one section run once here: findings on mount, the
@@ -49,7 +48,6 @@ const HomeOverviewBody: React.FC = () => {
         })}
         actions={<QuickAccessMenu />}
       />
-      <ContentSyncCallout />
       <OverviewSection findings={findings} />
       <EuiSpacer size='l' />
       <div ref={enrichmentsRef}>

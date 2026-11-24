@@ -43,9 +43,6 @@ jest.mock('./hooks/use-overview-data', () => ({
     data: { total: 0, feedByType: [], byThreatType: [] },
   })),
 }));
-jest.mock('../../../server-readiness', () => ({
-  ContentSyncCallout: () => null,
-}));
 jest.mock('../../hooks', () => ({
   useInViewport: jest.fn(() => [{ current: null }, true]),
 }));
