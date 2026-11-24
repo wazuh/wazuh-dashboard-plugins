@@ -9,6 +9,11 @@ const analysisd = (status: string) => ({
   spaces: { standard: { available: false, enabled: true, status } },
 });
 
+const blockerRows = () =>
+  Array.from(
+    document.querySelectorAll('[data-test-subj="server-readiness-blocker"]'),
+  ).map(row => row.textContent);
+
 describe('ReadinessCallout', () => {
   it('renders nothing when every daemon is ready', () => {
     const { container } = render(
@@ -34,11 +39,9 @@ describe('ReadinessCallout', () => {
     expect(
       screen.getByText('Syncing, no action needed yet'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'wazuh-manager-analysisd: Content space "standard", syncing',
-      ),
-    ).toBeInTheDocument();
+    expect(blockerRows()).toEqual([
+      'analysisd · Content space "standard"syncing',
+    ]);
     expect(screen.getByText(/can take 10 to 15 minutes/)).toBeInTheDocument();
     expect(screen.getByText(/New findings may be delayed/)).toBeInTheDocument();
   });
@@ -54,14 +57,10 @@ describe('ReadinessCallout', () => {
       />,
     );
     expect(screen.getByText('Action needed')).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'wazuh-manager-analysisd: Content space "standard", sync failed',
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('wazuh-manager-remoted: not running'),
-    ).toBeInTheDocument();
+    expect(blockerRows()).toEqual([
+      'analysisd · Content space "standard"sync failed',
+      'remotednot running',
+    ]);
     expect(screen.getByText(/Check the manager logs/)).toBeInTheDocument();
   });
 
@@ -84,9 +83,7 @@ describe('ReadinessCallout', () => {
         }}
       />,
     );
-    expect(
-      screen.getByText('wazuh-manager-modulesd: Vulnerability feed, syncing'),
-    ).toBeInTheDocument();
+    expect(blockerRows()).toEqual(['modulesd · Vulnerability feedsyncing']);
     expect(
       screen.queryByText(/New findings may be delayed/),
     ).not.toBeInTheDocument();

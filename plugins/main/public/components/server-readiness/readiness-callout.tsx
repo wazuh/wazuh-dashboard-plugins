@@ -1,7 +1,15 @@
 import React from 'react';
 import { i18n } from '@osd/i18n';
-import { EuiCallOut, EuiSpacer, EuiText } from '@elastic/eui';
 import {
+  EuiBadge,
+  EuiCallOut,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiSpacer,
+  EuiText,
+} from '@elastic/eui';
+import {
+  BlockerState,
   NodeStatus,
   getBlockerStateLabel,
   getContentSyncBlockers,
@@ -9,20 +17,37 @@ import {
   getReadinessAdvice,
 } from './readiness';
 
-const blockerLine = (
-  daemon: string,
-  resource: string | undefined,
-  state: string,
-) =>
-  resource
-    ? i18n.translate('wazuh.serverReadiness.callout.blockerWithResource', {
-        defaultMessage: '{daemon}: {resource}, {state}',
-        values: { daemon, resource, state },
+const BADGE_COLORS: Record<BlockerState, string> = {
+  updating: 'hollow',
+  failed: 'warning',
+  unavailable: 'warning',
+  stopped: 'danger',
+};
+
+// The daemon list above already shows the full name.
+const shortName = (daemon: string) => daemon.replace(/^wazuh-manager-/, '');
+
+const adviceText = (advice: 'wait' | 'act', delaysFindings: boolean) => {
+  if (advice === 'wait') {
+    return delaysFindings
+      ? i18n.translate('wazuh.serverReadiness.callout.waitFindingsBody', {
+          defaultMessage:
+            'New findings may be delayed until the sync completes. The first sync after an install can take 10 to 15 minutes; if it takes longer, check the manager logs on this node.',
+        })
+      : i18n.translate('wazuh.serverReadiness.callout.waitBody', {
+          defaultMessage:
+            'The first sync after an install can take 10 to 15 minutes; if it takes longer, check the manager logs on this node.',
+        });
+  }
+  return delaysFindings
+    ? i18n.translate('wazuh.serverReadiness.callout.actFindingsBody', {
+        defaultMessage:
+          'Check the manager logs on this node. New findings may be delayed until the content sync completes.',
       })
-    : i18n.translate('wazuh.serverReadiness.callout.blocker', {
-        defaultMessage: '{daemon}: {state}',
-        values: { daemon, state },
+    : i18n.translate('wazuh.serverReadiness.callout.actBody', {
+        defaultMessage: 'Check the manager logs on this node.',
       });
+};
 
 /** Says what keeps a node from being ready, and whether to wait or act. */
 export const ReadinessCallout: React.FC<{ node: NodeStatus }> = ({ node }) => {
@@ -53,38 +78,32 @@ export const ReadinessCallout: React.FC<{ node: NodeStatus }> = ({ node }) => {
         }
         data-test-subj='server-readiness-callout'
       >
-        <EuiText size='s'>
-          <ul>
-            {nodeBlockers.flatMap(({ daemon, blockers }) =>
-              blockers.map(({ resource, state }) => (
-                <li key={`${daemon}-${resource ?? ''}`}>
-                  {blockerLine(daemon, resource, getBlockerStateLabel(state))}
-                </li>
-              )),
-            )}
-          </ul>
-        </EuiText>
+        {nodeBlockers.flatMap(({ daemon, blockers }) =>
+          blockers.map(({ resource, state }) => (
+            <EuiFlexGroup
+              key={`${daemon}-${resource ?? ''}`}
+              gutterSize='s'
+              alignItems='center'
+              responsive={false}
+              data-test-subj='server-readiness-blocker'
+            >
+              <EuiFlexItem>
+                <EuiText size='s'>
+                  <strong>{shortName(daemon)}</strong>
+                  {resource && <span>{` · ${resource}`}</span>}
+                </EuiText>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiBadge color={BADGE_COLORS[state]}>
+                  {getBlockerStateLabel(state)}
+                </EuiBadge>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          )),
+        )}
         <EuiSpacer size='s' />
-        <EuiText size='s'>
-          <p>
-            {advice === 'wait'
-              ? i18n.translate('wazuh.serverReadiness.callout.waitBody', {
-                  defaultMessage:
-                    'The first sync after an install can take 10 to 15 minutes. If it is still syncing after that, check the manager logs on this node.',
-                })
-              : i18n.translate('wazuh.serverReadiness.callout.actBody', {
-                  defaultMessage:
-                    'Check the manager logs on this node. The daemon stays not ready until this is fixed.',
-                })}
-          </p>
-          {delaysFindings && (
-            <p>
-              {i18n.translate('wazuh.serverReadiness.callout.findingsDelayed', {
-                defaultMessage:
-                  'New findings may be delayed until the content sync completes.',
-              })}
-            </p>
-          )}
+        <EuiText size='s' color='subdued'>
+          <p>{adviceText(advice, delaysFindings)}</p>
         </EuiText>
       </EuiCallOut>
     </>
