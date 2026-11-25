@@ -297,6 +297,8 @@ export enum SettingCategory {
   SECURITY,
   CUSTOMIZATION,
   API_CONNECTION,
+  REPORTING,
+  SERVER_MANAGEMENT,
 }
 
 type TPluginSettingOptionsTextArea = {
@@ -417,7 +419,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.text,
     defaultValue: '',
     validate: SettingsValidator.compose(
@@ -442,7 +444,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.text,
     defaultValue: '',
     validate: SettingsValidator.compose(
@@ -462,7 +464,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.text,
     defaultValue: '',
     validate: SettingsValidator.compose(
@@ -630,20 +632,21 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     },
   },
-  'wazuh.updates.disabled': {
-    title: i18n.translate('wazuhCore.settings.wazuhUpdatesDisabled.title', {
-      defaultMessage: 'Check updates',
+  'check_updates.enabled': {
+    title: i18n.translate('wazuhCore.settings.checkUpdatesEnabled.title', {
+      defaultMessage: 'Check for updates',
     }),
     description: i18n.translate(
-      'wazuhCore.settings.wazuhUpdatesDisabled.description',
+      'wazuhCore.settings.checkUpdatesEnabled.description',
       {
-        defaultMessage: 'Define if the check updates service is disabled.',
+        defaultMessage:
+          'When on, the available updates are checked and the update notifications are shown. When off, no check is done.',
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
     category: SettingCategory.GENERAL,
     type: EpluginSettingType.switch,
-    defaultValue: true,
+    defaultValue: false,
     validate: SettingsValidator.isBoolean,
   },
   healthCheckCertificateExpiryWarningDays: {
@@ -709,7 +712,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
         'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
     }),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.number,
     defaultValue: 20000,
     options: {
@@ -731,7 +734,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.REPORTING,
     type: EpluginSettingType.number,
     defaultValue: 10000,
     options: {
@@ -837,5 +840,5 @@ export const ENROLLMENT_DNS = 'enrollment.dns';
 export const ENROLLMENT_PORT = 'enrollment.port';
 export const ENROLLMENT_PATH = 'enrollment.path';
 export const ENROLLMENT_PASSWORD = 'enrollment.password';
-export const WAZUH_UPDATES_DISABLED = 'wazuh.updates.disabled';
+export const CHECK_UPDATES_ENABLED = 'check_updates.enabled';
 export const REQUEST_TIMEOUT = 'timeout';

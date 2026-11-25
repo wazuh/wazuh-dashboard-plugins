@@ -132,8 +132,9 @@ chmod 700 /etc/wazuh-dashboard/ca /etc/wazuh-dashboard/export
 `.wazuh-dashboard-bootstrap-ca` and import markers. The dashboard refuses to start with any of
 these files owned by another user or writable by one (`UNSAFE`).
 
-The restored keystore entries take precedence over `local.env` and the peers' `export/`, so the dashboard
-uses the restored passwords. If the passwords changed since the backup, update them as described in
+The restored keystore entries take precedence over `local.env`, so the dashboard uses the restored
+passwords. A peer's `export/credentials.env` on the same host replaces one only when it differs and is newer
+than the restored keystore. If the passwords changed since the backup, update them as described in
 [Rotation](getting-started/credentials.md#rotation).
 
 4. Restore the custom assets files

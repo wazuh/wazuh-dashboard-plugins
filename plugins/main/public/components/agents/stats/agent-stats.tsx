@@ -18,6 +18,7 @@ import {
   EuiButton,
   EuiButtonEmpty,
   EuiCode,
+  EuiCodeBlock,
   EuiEmptyPrompt,
   EuiFlexGroup,
   EuiFlexItem,
@@ -26,6 +27,7 @@ import {
   EuiPageBody,
   EuiProgress,
   EuiSpacer,
+  EuiText,
 } from '@elastic/eui';
 import { useDispatch } from 'react-redux';
 import {
@@ -69,6 +71,7 @@ import {
   tParsedIndexPattern,
   useDataSource,
 } from '../../common/data-source';
+import './agent-stats.scss';
 
 const tableColumns = [
   {
@@ -256,6 +259,11 @@ interface AgentStatsBodyProps {
 const STATS_REPORT_DOCS_PATH =
   'user-manual/reference/ossec-conf/agent.html#stats-report';
 
+// The agent ignores `<stats_report>yes</stats_report>` without a warning, so
+// the snippet spells out the nested `enabled`.
+const STATS_REPORT_SNIPPET =
+  '<stats_report>\n  <enabled>yes</enabled>\n</stats_report>';
+
 /** Statistics for a given agent, kept together so a stale fetch result or a
  * still-in-flight one can never be mistaken for the currently viewed agent's
  * data once `agent.id` changes. */
@@ -298,29 +306,58 @@ const AgentStatsBody = withDataSourceInitiated({})(
               </h2>
             }
             body={
-              <p>
-                <FormattedMessage
-                  id='wazuh.endpointsSummary.agentStats.noStatisticsBody'
-                  defaultMessage='This agent does not send statistics. Reporting is off by default: enable {option} in the agent configuration. The first report arrives after one interval, 60 seconds by default. {docsLink}'
-                  values={{
-                    option: <EuiCode>{'<agent><stats_report>'}</EuiCode>,
-                    docsLink: (
-                      <EuiLink
-                        href={webDocumentationLink(STATS_REPORT_DOCS_PATH)}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        external
-                        data-test-subj='agent-stats-stats-report-docs'
-                      >
-                        {i18n.translate(
-                          'wazuh.endpointsSummary.agentStats.statsReportDocsLink',
-                          { defaultMessage: 'Statistics reporting reference' },
-                        )}
-                      </EuiLink>
-                    ),
-                  }}
-                />
-              </p>
+              <>
+                <p className='wz-agent-stats-empty-intro'>
+                  <FormattedMessage
+                    id='wazuh.endpointsSummary.agentStats.noStatisticsBody'
+                    defaultMessage="Reporting is off by default. Add this inside {agentBlock} in the agent's local {ossecConf} and restart the agent:"
+                    values={{
+                      agentBlock: <EuiCode>{'<agent>'}</EuiCode>,
+                      ossecConf: <EuiCode>{'ossec.conf'}</EuiCode>,
+                    }}
+                  />
+                </p>
+                <div className='wz-agent-stats-empty-snippet'>
+                  <EuiCodeBlock
+                    language='xml'
+                    isCopyable
+                    paddingSize='s'
+                    fontSize='m'
+                    data-test-subj='agent-stats-stats-report-snippet'
+                  >
+                    {STATS_REPORT_SNIPPET}
+                  </EuiCodeBlock>
+                </div>
+                <EuiSpacer size='m' />
+                <EuiText size='s' color='subdued'>
+                  <p>
+                    <FormattedMessage
+                      id='wazuh.endpointsSummary.agentStats.noStatisticsNote'
+                      defaultMessage="The first report arrives a few seconds after the restart. A group's {agentConf} does not accept this option. {docsLink}"
+                      values={{
+                        agentConf: <EuiCode>{'agent.conf'}</EuiCode>,
+                        docsLink: (
+                          <EuiLink
+                            href={webDocumentationLink(STATS_REPORT_DOCS_PATH)}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            external
+                            data-test-subj='agent-stats-stats-report-docs'
+                          >
+                            {i18n.translate(
+                              'wazuh.endpointsSummary.agentStats.statsReportDocsLink',
+                              {
+                                defaultMessage:
+                                  'Statistics reporting reference',
+                              },
+                            )}
+                          </EuiLink>
+                        ),
+                      }}
+                    />
+                  </p>
+                </EuiText>
+              </>
             }
             // A single node, because an array of actions is stacked in a column
             actions={

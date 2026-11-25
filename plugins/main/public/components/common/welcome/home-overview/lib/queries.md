@@ -237,9 +237,9 @@ and the top 5 benchmarks with a per-benchmark pass/fail breakdown.
 ```
 
 Score is a fraction `passed / (passed + failed)` (computed in `mapScaTiles` /
-`mapScaBenchmarks`, not in the query) and rendered with the shared
-`decimalFormat()` percent formatter — the same mechanism as the agents-summary
-SCA scan (`welcome/components/sca_scan/sca_scan.tsx`).
+`mapScaBenchmarks`, not in the query) and rendered with `formatHomePercent`
+(`lib/format-number.ts`): the `data` plugin's percent format, which follows the
+percent pattern and the formatting locale of the advanced settings.
 
 ## 5. File Integrity Monitoring — `wazuh-states-fim*`, current
 

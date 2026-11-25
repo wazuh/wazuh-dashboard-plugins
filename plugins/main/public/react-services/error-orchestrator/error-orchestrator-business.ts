@@ -16,13 +16,15 @@ import { UI_LOGGER_LEVELS } from '../../../common/constants';
 import { getToasts } from '../../kibana-services';
 import { ErrorToastOptions } from 'opensearch_dashboards/public';
 
+const DEFAULT_TOAST_LIFETIME_MS = 3000;
+
 export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
   public displayError(errorLog: UIErrorLog) {
     const toast = {
       error: errorLog.error,
       title: errorLog.error.title,
       message: errorLog.error.message,
-      toastLifeTimeMs: 3000,
+      toastLifeTimeMs: errorLog.toastLifeTimeMs ?? DEFAULT_TOAST_LIFETIME_MS,
     };
 
     switch (errorLog.level) {
@@ -30,14 +32,24 @@ export class ErrorOrchestratorBusiness extends ErrorOrchestratorBase {
         getToasts().addInfo(errorLog.error.error, toast as ErrorToastOptions);
         break;
       case UI_LOGGER_LEVELS.WARNING:
-        getToasts().addWarning(errorLog.error.error, toast as ErrorToastOptions);
+        getToasts().addWarning(
+          errorLog.error.error,
+          toast as ErrorToastOptions,
+        );
         break;
       case UI_LOGGER_LEVELS.ERROR:
         const toastError = { ...toast, toastMessage: errorLog.error.message };
-        getToasts().addError(errorLog.error.error, toastError as ErrorToastOptions);
+        getToasts().addError(
+          errorLog.error.error,
+          toastError as ErrorToastOptions,
+        );
         break;
       default:
-        console.log('No error level', errorLog.error.message, errorLog.error.error);
+        console.log(
+          'No error level',
+          errorLog.error.message,
+          errorLog.error.error,
+        );
     }
   }
 }

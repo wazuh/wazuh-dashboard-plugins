@@ -18,10 +18,16 @@ import * as FileSaver from '../services/file-saver';
  * @param {String} path
  * @param {Array} filters
  * @param {String} exportName
+ * @param {String[]} [fields] Fields to write, in order
  */
-const exportCsv = async (path, filters = [], exportName = 'data') => {
+const exportCsv = async (
+  path,
+  filters = [],
+  exportName = 'data',
+  fields = [],
+) => {
   try {
-    const data = await WzRequest.csvReq(path, filters);
+    const data = await WzRequest.csvReq(path, filters, fields);
     const output = data.data ? [data.data] : [];
     const blob = new Blob(output, { type: 'text/csv' });
     FileSaver.saveAs(blob, `${exportName}.csv`);

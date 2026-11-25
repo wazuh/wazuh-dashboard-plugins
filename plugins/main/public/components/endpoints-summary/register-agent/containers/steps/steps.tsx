@@ -28,6 +28,10 @@ import CommandOutput from '../../components/command-output/command-output';
 import ServerAddress from '../../components/server-address/server-address';
 import OptionalsInputs from '../../components/optionals-inputs/optionals-inputs';
 import EnrollmentTokenInput from '../../components/enrollment-token/enrollment-token';
+import InstallCommandOptions, {
+  tCommandSecret,
+} from '../../components/install-command-options/install-command-options';
+import LocalPackageCallout from '../../components/install-command-options/local-package-callout';
 import { EnrollmentToken } from '../../interfaces/types';
 import {
   getAgentCommandsStepStatus,
@@ -127,6 +131,7 @@ interface IStepsProps {
   canCreateEnrollmentToken: boolean;
   enrollmentToken: EnrollmentToken | null;
   onEnrollmentTokenChange: (enrollmentToken: EnrollmentToken | null) => void;
+  certificateNames: string[];
 }
 
 export const Steps = ({
@@ -138,6 +143,7 @@ export const Steps = ({
   canCreateEnrollmentToken,
   enrollmentToken,
   onEnrollmentTokenChange,
+  certificateNames,
 }: IStepsProps) => {
   /* The enrollment token replaces the password: the agent enrolls with the
   credential the token carries. An operator who cannot mint one can still paste
@@ -229,11 +235,24 @@ export const Steps = ({
     setInvalidFieldsName(getInvalidFields(form.fields) || []);
   }, [form.fields, enrollmentToken]);
 
-  const { installCommand, startCommand, selectOS, setOptionalParams } =
-    useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
-      osDefinitions: osCommandsDefinitions,
-      optionalParamsDefinitions: optionalParamsDefinitions,
-    });
+  const {
+    installCommand,
+    localInstallCommand,
+    packageName,
+    urlPackage,
+    startCommand,
+    selectOS,
+    setOptionalParams,
+  } = useRegisterAgentCommands<tOperatingSystem, tOptionalParameters>({
+    osDefinitions: osCommandsDefinitions,
+    optionalParamsDefinitions: optionalParamsDefinitions,
+  });
+  /* Offline endpoints install a package the operator already copied to them. */
+  const [usesLocalPackage, setUsesLocalPackage] = useState(false);
+  const [showInstallCommandSecret, setShowInstallCommandSecret] =
+    useState(false);
+  const showsLocalInstallCommand =
+    usesLocalPackage && localInstallCommand !== '';
 
   // install - start commands step state
   const [installCommandWasCopied, setInstallCommandWasCopied] = useState(false);
@@ -282,6 +301,18 @@ export const Steps = ({
     );
   }, [startCommandWasCopied]);
 
+  const showsInstallCommand = showCommandsSections(
+    form.fields,
+    enrollmentTokenIsMissing,
+  );
+  /* Only one secret is ever in the command: the token replaces the password. */
+  const installCommandSecret: tCommandSecret | undefined =
+    registerAgentFormValues.optionalParams.enrollmentToken
+      ? 'enrollmentToken'
+      : registerAgentFormValues.optionalParams.wazuhPassword
+      ? 'password'
+      : undefined;
+
   const passwordStepTitle = i18n.translate(
     'wazuh.endpointsSummary.registerAgentSteps.passwordTitle',
     { defaultMessage: 'Password' },
@@ -313,6 +344,7 @@ export const Steps = ({
             serverPort: form.fields.serverPort,
             serverPath: form.fields.serverPath,
           }}
+          certificateNames={certificateNames}
         />
       ),
       status: getServerAddressStepStatus(form.fields),
@@ -428,13 +460,21 @@ export const Steps = ({
       ),
     },
     {
-      title: i18n.translate(
-        'wazuh.endpointsSummary.registerAgentSteps.installCommandTitle',
-        {
-          defaultMessage:
-            'Run the following commands to download and install the agent:',
-        },
-      ),
+      title: showsLocalInstallCommand
+        ? i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.localInstallCommandTitle',
+            {
+              defaultMessage:
+                'Run the following command to install the agent from the package on the endpoint:',
+            },
+          )
+        : i18n.translate(
+            'wazuh.endpointsSummary.registerAgentSteps.installCommandTitle',
+            {
+              defaultMessage:
+                'Run the following commands to download and install the agent:',
+            },
+          ),
       children: passwordPermissionMissing ? (
         <EuiCallOut
           color='warning'
@@ -478,19 +518,45 @@ export const Steps = ({
               <OsCommandWarning
                 os={registerAgentFormValues.operatingSystem.name}
               />
+              {showsInstallCommand ? (
+                <InstallCommandOptions
+                  secret={installCommandSecret}
+                  showSecret={showInstallCommandSecret}
+                  onShowSecretChange={setShowInstallCommandSecret}
+                  localPackage={
+                    localInstallCommand
+                      ? {
+                          enabled: usesLocalPackage,
+                          onChange: enabled => {
+                            setUsesLocalPackage(enabled);
+                            setInstallCommandWasCopied(false);
+                          },
+                        }
+                      : undefined
+                  }
+                />
+              ) : null}
               <CommandOutput
-                commandText={installCommand}
-                showCommand={showCommandsSections(
-                  form.fields,
-                  enrollmentTokenIsMissing,
-                )}
+                commandText={
+                  showsLocalInstallCommand
+                    ? localInstallCommand
+                    : installCommand
+                }
+                showCommand={showsInstallCommand}
                 os={registerAgentFormValues.operatingSystem.name}
                 onCopy={() => setInstallCommandWasCopied(true)}
                 password={registerAgentFormValues.optionalParams.wazuhPassword}
                 enrollmentToken={
                   registerAgentFormValues.optionalParams.enrollmentToken
                 }
+                showSecret={showInstallCommandSecret}
               />
+              {showsInstallCommand && showsLocalInstallCommand ? (
+                <LocalPackageCallout
+                  packageName={packageName}
+                  urlPackage={urlPackage}
+                />
+              ) : null}
             </>
           ) : null}
         </>

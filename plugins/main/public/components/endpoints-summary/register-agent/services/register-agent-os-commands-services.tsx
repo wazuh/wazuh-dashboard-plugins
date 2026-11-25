@@ -2,6 +2,7 @@ import { tOptionalParameters } from '../core/config/os-commands-definitions';
 import {
   IOptionalParameters,
   tOSEntryInstallCommand,
+  tOSEntryLocalInstallCommand,
   tOSEntryProps,
 } from '../core/register-commands/types';
 import { tOperatingSystem } from '../hooks/use-register-agent-commands.test';
@@ -82,14 +83,23 @@ const DEB_KEYRING = '/usr/share/keyrings/wazuh.asc';
 const getDEBVerifyCommand = (packageName: string, aptSource: string) =>
   `d=$(mktemp -d) && chmod 755 $d && echo "deb [signed-by=${DEB_KEYRING}] ${aptSource} main" > $d/wazuh.list && echo "Dir::Etc::SourceList \\"$d/wazuh.list\\"; Dir::Etc::SourceParts \\"$d/lists\\"; Dir::State::Lists \\"$d/lists\\"; Dir::Cache \\"$d\\";" > $d/apt.conf && sudo mkdir -m 755 $d/lists $d/lists/partial && sudo apt-get update -qq -c $d/apt.conf && echo "$(sudo apt-cache -c $d/apt.conf show wazuh-agent | awk -v f=/${packageName} '/^Filename:/{x=substr($2,length($2)-length(f)+1)==f} /^$/{x=0} x&&/^SHA256:/{print $2}')  ${packageName}" | sha256sum -c --quiet && sudo rm -rf $d`;
 
+/* Installs a package already on the endpoint, from the current folder: hosts
+without Internet access cannot reach the repository the other commands use. */
+export const getDEBLocalInstallCommand = (
+  props: tOSEntryLocalInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, packageName } = props;
+  return `sudo ${
+    optionals && getAllOptionals(optionals)
+  }dpkg -i ./${packageName}`;
+};
+
 const getDEBInstallCommand = (props: tDEBInstallCommand) => {
-  const { optionals, urlPackage, packageName, gpgKeyUrl, aptSource } = props;
+  const { urlPackage, packageName, gpgKeyUrl, aptSource } = props;
   return `sudo wget -qO ${DEB_KEYRING} ${gpgKeyUrl} && sudo chmod 644 ${DEB_KEYRING} && wget ${urlPackage} && ${getDEBVerifyCommand(
     packageName,
     aptSource,
-  )} && sudo ${
-    optionals && getAllOptionals(optionals)
-  }dpkg -i ./${packageName}`;
+  )} && ${getDEBLocalInstallCommand(props)}`;
 };
 
 export const getDEBAMD64InstallCommand = (props: tDEBInstallCommand) =>
@@ -99,6 +109,15 @@ export const getDEBARM64InstallCommand = (props: tDEBInstallCommand) =>
   getDEBInstallCommand(props);
 
 /******* RPM *******/
+
+export const getRPMLocalInstallCommand = (
+  props: tOSEntryLocalInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, packageName } = props;
+  return `sudo ${
+    optionals && getAllOptionals(optionals)
+  }rpm -ihv ./${packageName}`;
+};
 
 const getRPMInstallCommand = (props: tLinuxInstallCommand) => {
   const { optionals, urlPackage, packageName, gpgKeyUrl } = props;
@@ -142,6 +161,15 @@ export const getWindowsInstallCommand = (
   }${WINDOWS_INSTALLER_WAIT}`;
 };
 
+export const getWindowsLocalInstallCommand = (
+  props: tOSEntryLocalInstallCommand<tOptionalParameters>,
+) => {
+  const { optionals, packageName, name } = props;
+  return `msiexec.exe /i .\\${packageName} /q ${
+    optionals && getAllOptionals(optionals, name)
+  }${WINDOWS_INSTALLER_WAIT}`;
+};
+
 export const getWindowsStartCommand = (
   _props: tOSEntryProps<tOptionalParameters>,
 ) => {
@@ -157,10 +185,12 @@ export const transformOptionalsParamatersMacOSCommand = (command: string) => {
     .trim();
 };
 
-export const getMacOsInstallCommand = (
-  props: tOSEntryInstallCommand<tOptionalParameters>,
+/* The installer reads its settings from /tmp/wazuh_envs, so the command writes
+them there before it runs. */
+export const getMacOsLocalInstallCommand = (
+  props: tOSEntryLocalInstallCommand<tOptionalParameters>,
 ) => {
-  const { optionals, urlPackage, packageName } = props;
+  const { optionals, packageName } = props;
 
   let optionalsForCommand = { ...optionals };
   if (optionalsForCommand?.wazuhPassword) {
@@ -191,8 +221,16 @@ export const getMacOsInstallCommand = (
     : ``;
 
   // Merge environment variables with installation script
-  const macOSInstallationScript = `curl -so ${packageName} ${urlPackage} && ${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./${packageName} -target /`;
-  return macOSInstallationScript;
+  return `${macOSInstallationSetEnvVariablesScript}sudo installer -pkg ./${packageName} -target /`;
+};
+
+export const getMacOsInstallCommand = (
+  props: tOSEntryInstallCommand<tOptionalParameters>,
+) => {
+  const { urlPackage, packageName } = props;
+  return `curl -so ${packageName} ${urlPackage} && ${getMacOsLocalInstallCommand(
+    props,
+  )}`;
 };
 
 export const getMacosStartCommand = (

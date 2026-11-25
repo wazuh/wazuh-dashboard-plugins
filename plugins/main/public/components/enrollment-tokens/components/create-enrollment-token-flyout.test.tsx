@@ -14,12 +14,21 @@ test so only the tests that set them see prefilled fields. */
 let mockAppConfig: Record<string, string> = {};
 let mockAddressError: (value: string) => string | undefined = () => undefined;
 
+const mockSetSetting = jest.fn();
+
 jest.mock('react-redux', () => ({
   useSelector: (selector: (state: AppConfigState) => unknown) =>
     selector({ appConfig: { data: mockAppConfig } }),
+  useDispatch: () => jest.fn(),
 }));
 
+jest.mock(
+  '../../../react-services/error-management/error-handler/error-handler',
+  () => ({ ErrorHandler: { handleError: jest.fn() } }),
+);
+
 jest.mock('../../../kibana-services', () => ({
+  getUiSettings: () => ({ set: mockSetSetting }),
   getWazuhCorePlugin: () => ({
     SettingsValidator: {
       serverEndpointAddress: (value: string) => mockAddressError(value),
@@ -101,6 +110,8 @@ const mint = async () => {
 };
 
 beforeEach(() => {
+  mockSetSetting.mockReset();
+  mockSetSetting.mockResolvedValue(true);
   mockAppConfig = {};
   mockAddressError = () => undefined;
   createToken.mockReset();
@@ -225,6 +236,157 @@ describe('CreateEnrollmentTokenFlyout', () => {
       closeFlyout();
       expect(confirmationIsOpen()).toBe(false);
       expect(onClose).toHaveBeenCalledWith(false);
+    });
+  });
+
+  describe('address outside the certificate', () => {
+    const warning = () =>
+      document.querySelector(
+        '[data-test-subj="addressOutsideCertificateWarning"]',
+      );
+    const createButton = () =>
+      screen.getByText('Create').closest('button') as HTMLElement;
+
+    /* After a migration the setting often carries a name the certificate
+    lacks: the form opens empty rather than with a warning. */
+    it('does not prefill an address outside the certificate', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockResolvedValue(['manager.example.com', '10.0.0.5']);
+      const onClose = renderFlyout();
+
+      await waitFor(() => expect(addressValue()).toBe(''));
+      expect(warning()).toBeNull();
+      expect(createButton()).toBeDisabled();
+
+      closeFlyout();
+      expect(confirmationIsOpen()).toBe(false);
+      expect(onClose).toHaveBeenCalledWith(false);
+    });
+
+    it('keeps a prefilled address in the certificate', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockResolvedValue(['Wazuh.Acme.example', '10.0.0.5']);
+      renderFlyout();
+
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      await screen.findByText('Create');
+      expect(addressValue()).toBe('wazuh.acme.example');
+      expect(warning()).toBeNull();
+    });
+
+    it('keeps a prefilled address a wildcard name covers', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockResolvedValue(['*.acme.example']);
+      renderFlyout();
+
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      await screen.findByText('Create');
+      expect(addressValue()).toBe('wazuh.acme.example');
+    });
+
+    it('keeps the prefill when there are no names to compare with', async () => {
+      mockAppConfig = { 'enrollment.dns': 'wazuh.acme.example' };
+      getNames.mockRejectedValue(new Error('unavailable'));
+      renderFlyout();
+
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      await screen.findByText('Create');
+      expect(addressValue()).toBe('wazuh.acme.example');
+      expect(warning()).toBeNull();
+    });
+
+    it('warns once a typed address outside the certificate is entered', async () => {
+      getNames.mockResolvedValue(['manager.example.com']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), {
+        target: { value: 'other.example.com' },
+      });
+      expect(warning()).toBeNull();
+
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+
+      await waitFor(() => expect(warning()).not.toBeNull());
+      expect(warning()?.textContent).toContain(
+        'The manager will refuse this address',
+      );
+      expect(warning()?.textContent).toContain('other.example.com');
+      expect(
+        document.querySelector(
+          '[data-test-subj="addressOutsideCertificateDocsLink"]',
+        ),
+      ).toHaveAttribute(
+        'href',
+        expect.stringContaining(
+          'user-manual/agent/agent-enrollment/troubleshooting.html#enrollment-token-refused-address-not-in-certificate-san',
+        ),
+      );
+    });
+
+    it('clears the warning once a certificate name is picked', async () => {
+      getNames.mockResolvedValue(['10.0.0.5']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      typeAddress('other.example.com');
+      await waitFor(() => expect(warning()).not.toBeNull());
+
+      fireEvent.focus(addressInput());
+      fireEvent.click(await screen.findByText('10.0.0.5'));
+
+      await waitFor(() => expect(warning()).toBeNull());
+    });
+
+    it('keeps Create enabled, the manager decides', async () => {
+      getNames.mockResolvedValue(['10.0.0.5']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+      typeAddress('other.example.com');
+      await waitFor(() => expect(warning()).not.toBeNull());
+
+      expect(createButton()).not.toBeDisabled();
+    });
+  });
+
+  describe('remember the endpoint', () => {
+    const rememberSwitch = () =>
+      document.querySelector(
+        '[data-test-subj="rememberServerEndpoint"]',
+      ) as HTMLElement;
+
+    it('saves the address, port and prefix as the settings', async () => {
+      mockAppConfig = {
+        'enrollment.dns': 'old.example.com',
+        'enrollment.port': '1517',
+        'enrollment.path': '',
+      };
+      getNames.mockResolvedValue(['manager.example.com']);
+      renderFlyout();
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      typeAddress('manager.example.com');
+      fireEvent.click(rememberSwitch());
+
+      await waitFor(() => expect(mockSetSetting).toHaveBeenCalledTimes(3));
+      expect(mockSetSetting).toHaveBeenCalledWith(
+        'enrollment.dns',
+        'manager.example.com',
+      );
+      expect(mockSetSetting).toHaveBeenCalledWith('enrollment.port', '1517');
+      expect(mockSetSetting).toHaveBeenCalledWith('enrollment.path', '');
+    });
+
+    it('is on for the endpoint the settings already hold', () => {
+      mockAppConfig = { 'enrollment.dns': 'manager.example.com' };
+      renderFlyout();
+
+      expect(rememberSwitch()).toHaveAttribute('aria-checked', 'true');
+    });
+
+    it('cannot be turned on without an address', () => {
+      renderFlyout();
+
+      expect(rememberSwitch()).toBeDisabled();
     });
   });
 

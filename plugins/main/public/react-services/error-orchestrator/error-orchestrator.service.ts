@@ -27,6 +27,7 @@ export class ErrorOrchestratorService {
     severity,
     display = true,
     store = false,
+    toastLifeTimeMs,
     error,
   }: UIErrorLog) {
     const uiErrorLog = {
@@ -35,6 +36,7 @@ export class ErrorOrchestratorService {
       severity,
       display: display && !isLoggingOut(),
       store,
+      toastLifeTimeMs,
       error,
     };
     const errorOrchestrator: ErrorOrchestrator = errorOrchestratorFactory(

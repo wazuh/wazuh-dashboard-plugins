@@ -4,13 +4,12 @@ import {
   EuiText,
   EuiPopover,
   EuiButtonEmpty,
-  EuiSwitch,
   EuiLink,
   EuiSpacer,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
 import { FormattedMessage } from '@osd/i18n/react';
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { SERVER_ADDRESS_TEXTS } from '../../utils/register-agent-data';
 import { EnhancedFieldConfiguration } from '../../../../common/form/types';
 import { InputForm } from '../../../../common/form';
@@ -22,8 +21,9 @@ import {
   AGENT_ENDPOINT_DEFAULT_PORT,
 } from '../../../../../../common/services/agent-endpoint';
 import '../group-input/group-input.scss';
-import { ErrorHandler } from '../../../../../react-services/error-management/error-handler/error-handler';
-import { getUiSettings } from '../../../../../kibana-services';
+import { AddressOutsideCertificateWarning } from '../../../../enrollment-tokens/components/address-outside-certificate-warning';
+import { AddressCoveredByWildcardNotice } from '../../../../enrollment-tokens/components/address-covered-by-wildcard-notice';
+import { RememberServerEndpointSwitch } from '../../../../common/remember-server-endpoint';
 
 interface ServerAddressInputProps {
   formFields: {
@@ -31,17 +31,10 @@ interface ServerAddressInputProps {
     serverPort: EnhancedFieldConfiguration;
     serverPath: EnhancedFieldConfiguration;
   };
+  /* The names in the manager listener certificate, to warn about an address
+  outside them. */
+  certificateNames?: string[];
 }
-
-/* The agent takes the address, the port and the path prefix as a single
-endpoint, but the wizard asks for them separately so each keeps the validation
-that fits it -- a combined string could no longer be checked as a hostname. The
-generated command joins them back together. */
-const SERVER_ADDRESS_SETTINGS = [
-  { field: 'serverAddress', setting: 'enrollment.dns' },
-  { field: 'serverPort', setting: 'enrollment.port' },
-  { field: 'serverPath', setting: 'enrollment.path' },
-] as const;
 
 /* `InputForm` forwards unknown props to the input itself, so the hint is
 rendered through its footer rather than the form row's `helpText`. */
@@ -78,7 +71,7 @@ const popoverServerAddress = (
 );
 
 const ServerAddressInput = (props: ServerAddressInputProps) => {
-  const { formFields } = props;
+  const { formFields, certificateNames = [] } = props;
   const { serverAddress, serverPort, serverPath } = formFields;
   const [isPopoverServerAddress, setIsPopoverServerAddress] = useState(false);
   const onButtonServerAddress = () =>
@@ -86,61 +79,6 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
       isPopoverServerAddress => !isPopoverServerAddress,
     );
   const closeServerAddress = () => setIsPopoverServerAddress(false);
-  const [rememberServerAddress, setRememberServerAddress] = useState(false);
-  /* What was last saved, so returning to the wizard shows the switch already
-  on for the endpoint it is prefilled with. */
-  const [savedEndpoint, setSavedEndpoint] = useState(() =>
-    SERVER_ADDRESS_SETTINGS.map(
-      ({ field }) => formFields[field]?.initialValue ?? '',
-    ),
-  );
-
-  const currentEndpoint = SERVER_ADDRESS_SETTINGS.map(
-    ({ field }) => formFields[field].value,
-  );
-
-  const saveServerAddress = async () => {
-    try {
-      // WORKAROUND: this could be done through the getWazuhCorePlugin().configuration but it requires the addition of a setter method
-      /* The three are saved together: a remembered address whose port or
-      prefix was dropped would prefill an endpoint the operator never used. */
-      await Promise.all(
-        SERVER_ADDRESS_SETTINGS.map(({ field, setting }) =>
-          getUiSettings().set(setting, formFields[field].value),
-        ),
-      );
-    } catch (error) {
-      ErrorHandler.handleError(error, {
-        message: error.message,
-        title: i18n.translate(
-          'wazuh.endpointsSummary.serverAddress.saveErrorTitle',
-          { defaultMessage: 'Error saving the server endpoint configuration' },
-        ),
-      });
-      setRememberServerAddress(false);
-    }
-  };
-
-  const handleToggleRememberAddress = async event => {
-    setRememberServerAddress(event.target.checked);
-    if (event.target.checked) {
-      await saveServerAddress();
-      setSavedEndpoint(currentEndpoint);
-    }
-  };
-
-  const rememberToggleIsDisabled = () =>
-    !serverAddress.value ||
-    SERVER_ADDRESS_SETTINGS.some(({ field }) => !!formFields[field].error);
-
-  useEffect(() => {
-    setRememberServerAddress(
-      [serverAddress.value, serverPort.value, serverPath.value].every(
-        (value, index) => value === savedEndpoint[index],
-      ),
-    );
-  }, [serverAddress.value, serverPort.value, serverPath.value, savedEndpoint]);
-
   return (
     <Fragment>
       <EuiFlexGroup gutterSize='s' wrap>
@@ -197,15 +135,16 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
               </>
             }
             footer={
-              <EndpointDefaultHint>
-                {i18n.translate(
-                  'wazuh.endpointsSummary.serverAddress.addressHint',
-                  {
-                    defaultMessage:
-                      'Pick one of the names in the manager listener certificate, or type another.',
-                  },
-                )}
-              </EndpointDefaultHint>
+              <>
+                <AddressOutsideCertificateWarning
+                  address={serverAddress.value}
+                  certificateNames={certificateNames}
+                />
+                <AddressCoveredByWildcardNotice
+                  address={serverAddress.value}
+                  certificateNames={certificateNames}
+                />
+              </>
             }
             fullWidth={false}
             placeholder={i18n.translate(
@@ -300,14 +239,10 @@ const ServerAddressInput = (props: ServerAddressInputProps) => {
       <EuiSpacer size='s' />
       <EuiFlexGroup wrap>
         <EuiFlexItem grow={false}>
-          <EuiSwitch
-            disabled={rememberToggleIsDisabled()}
-            label={i18n.translate(
-              'wazuh.endpointsSummary.serverAddress.rememberEndpoint',
-              { defaultMessage: 'Remember address, port, and path prefix' },
-            )}
-            checked={rememberServerAddress}
-            onChange={e => handleToggleRememberAddress(e)}
+          <RememberServerEndpointSwitch
+            address={serverAddress}
+            port={serverPort}
+            path={serverPath}
           />
         </EuiFlexItem>
       </EuiFlexGroup>

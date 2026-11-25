@@ -129,6 +129,66 @@ describe('Command Generator', () => {
     expect(command).toBe(mockedCommandValue);
   });
 
+  it('should return the local install command with the package name and the optional params', () => {
+    const localInstallCommand = jest.fn().mockReturnValue('local command');
+    const commandGenerator = new CommandGenerator(
+      [
+        {
+          name: 'linux',
+          options: [
+            {
+              architecture: 'x64',
+              installCommand: mockedCommandsResponse,
+              localInstallCommand,
+              startCommand: mockedCommandsResponse,
+              packageName: () => 'agent.deb',
+              urlPackage: mockedCommandsResponse,
+            },
+          ],
+        },
+      ],
+      optionalParams,
+      '4.4',
+    );
+    commandGenerator.selectOS({ name: 'linux', architecture: 'x64' });
+    commandGenerator.addOptionalParams(optionalValues);
+
+    expect(commandGenerator.getLocalInstallCommand()).toBe('local command');
+    expect(localInstallCommand).toHaveBeenCalledWith(
+      expect.objectContaining({
+        packageName: 'agent.deb',
+        optionals: commandGenerator.getOptionalParamsCommands(),
+      }),
+    );
+    // The package is already on the endpoint, so the command gets no URL.
+    expect(localInstallCommand.mock.calls[0][0]).not.toHaveProperty(
+      'urlPackage',
+    );
+  });
+
+  it('should return an empty local install command when the os defines none', () => {
+    const commandGenerator = new CommandGenerator(
+      osDefinitions,
+      optionalParams,
+      '4.4',
+    );
+    commandGenerator.selectOS({ name: 'linux', architecture: 'x64' });
+
+    expect(commandGenerator.getLocalInstallCommand()).toBe('');
+  });
+
+  it('should throw when the local install command is requested and the os is not selected', () => {
+    const commandGenerator = new CommandGenerator(
+      osDefinitions,
+      optionalParams,
+      '4.4',
+    );
+
+    expect(() => commandGenerator.getLocalInstallCommand()).toThrow(
+      NoOSSelectedException,
+    );
+  });
+
   it('should return all the commands for the os selected', () => {
     const commandGenerator = new CommandGenerator(
       osDefinitions,
