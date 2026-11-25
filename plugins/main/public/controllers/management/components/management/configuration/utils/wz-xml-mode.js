@@ -49,4 +49,22 @@ WazuhXmlMode.prototype.createWorker = function (session) {
 
 WazuhXmlMode.prototype.$id = 'ace/mode/wazuh-xml';
 
+/**
+ * Snippets of the custom XML mode
+ *
+ * With snippets enabled, Ace's language tools load the snippets of the mode
+ * from the `ace/snippets/wazuh-xml` module. When that module is not defined,
+ * Ace requests `snippets/wazuh-xml.js` from the server, which answers with the
+ * app page, and the browser throws a syntax error. The XML mode has no
+ * snippets, so this module defines none.
+ */
+ace.define(
+  'ace/snippets/wazuh-xml',
+  ['require', 'exports', 'module'],
+  (_acequire, exports) => {
+    exports.snippetText = undefined;
+    exports.scope = 'wazuh-xml';
+  },
+);
+
 export default WazuhXmlMode;

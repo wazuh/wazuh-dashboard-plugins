@@ -20,6 +20,32 @@ import { getWzCurrentAppID } from '../../kibana-services';
 import { serverApis } from '../../utils/applications';
 import { isLoggingOut } from '../request-handler';
 
+const CLUSTER_INFO_MAX_WAIT = 3000;
+let clusterInfoRequest = { apiId: null, promise: null };
+
+// One request per page load and API, shared by every view; a failure is not retried until a reload
+const loadClusterInfo = apiId => {
+  if (clusterInfoRequest.apiId !== apiId) {
+    clusterInfoRequest = {
+      apiId,
+      promise: ApiCheck.checkStored(apiId)
+        .then(response => {
+          const clusterInfo = response?.data?.data?.cluster_info;
+          if (clusterInfo) {
+            AppState.setClusterInfo(clusterInfo);
+          }
+        })
+        // The menu checks the API too and reports its errors
+        .catch(() => {}),
+    };
+  }
+  // A slow API must not keep the view blank
+  return Promise.race([
+    clusterInfoRequest.promise,
+    new Promise(resolve => setTimeout(resolve, CLUSTER_INFO_MAX_WAIT)),
+  ]);
+};
+
 export function settingsWizard(_, wzMisc, disableErrors = false) {
   try {
     const callCheckStored = async () => {
@@ -29,6 +55,15 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
         currentApi = JSON.parse(AppState.getCurrentAPI()).id;
       } catch (error) {
         throw Error('Error parsing JSON (settingsWizards.callCheckStored 1)');
+      }
+
+      // The health check can end before it stores the cluster info (e.g. the user leaves the page)
+      try {
+        if (currentApi && !AppState.getClusterInfo().status) {
+          await loadClusterInfo(currentApi);
+        }
+      } catch (error) {
+        // getClusterInfo already reported an unreadable cookie
       }
     };
 
@@ -148,7 +183,7 @@ export function settingsWizard(_, wzMisc, disableErrors = false) {
               data.data.length > 0 &&
               data.data.find(api => api.id == apiId)
             ) {
-              callCheckStored();
+              await callCheckStored();
             } else {
               AppState.removeCurrentAPI();
               if (data.data.length > 0) {
