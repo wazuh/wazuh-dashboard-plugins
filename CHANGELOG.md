@@ -14,6 +14,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh 4.14.12
 
+### Fixed
+
+- Fixed module dashboards loading blank, with an empty `manager.name` filter, when opened right after logging in [#9626](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9626)
+- Fixed the XML editor of the rules, decoders and configuration files requesting a missing snippets file and throwing an error in the browser [#9624](https://github.com/wazuh/wazuh-dashboard-plugins/issues/9624)
+
 ## Wazuh v4.14.11 - OpenSearch Dashboards 2.19.7 - Revision 02
 
 ### Added
