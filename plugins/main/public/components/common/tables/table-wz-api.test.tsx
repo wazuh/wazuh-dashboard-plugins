@@ -15,7 +15,7 @@
 
 import React from 'react';
 import { act } from '@testing-library/react';
-import { mount } from 'enzyme';
+import { mount, ReactWrapper } from 'enzyme';
 import { TableWzAPI } from './table-wz-api';
 import { useAppConfig, useStateStorage } from '../hooks';
 import { WzRequest } from '../../../react-services/wz-request';
@@ -303,5 +303,70 @@ describe('Table WZ API component', () => {
     expect(refreshButton().prop('isDisabled')).toBe(false);
 
     wrapper!.unmount();
+  });
+
+  describe('Export formatted', () => {
+    const mountWithExport = async (props: Record<string, unknown>) => {
+      (useAppConfig as jest.Mock).mockReturnValue({
+        data: { 'reports.csv.maxRows': 10000 },
+      });
+      (WzRequest.apiReq as jest.Mock).mockReturnValue(new Promise(() => {}));
+
+      let wrapper!: ReactWrapper;
+      await act(async () => {
+        wrapper = mount(
+          <TableWzAPI
+            title='Table'
+            downloadCsv
+            tableColumns={[
+              ...columns,
+              {
+                field: 'os.name,os.version',
+                composeField: ['os.name', 'os.version'],
+                name: 'Operating system',
+              },
+              { field: 'actions', name: 'Actions', actions: [] },
+            ]}
+            endpoint={'/agents'}
+            searchTable={false}
+            {...props}
+          />,
+        );
+        await Promise.resolve();
+      });
+      wrapper.update();
+      return wrapper;
+    };
+
+    it('exports the columns chosen in the column selector, in table order', async () => {
+      (useStateStorage as jest.Mock).mockReturnValue([
+        {
+          selectedFields: ['actions', 'name', 'os.name,os.version', 'version'],
+        },
+        jest.fn(),
+      ]);
+
+      const wrapper = await mountWithExport({ showFieldSelector: true });
+
+      expect(wrapper.find('ExportTableCsv').prop('fields')).toEqual([
+        'version',
+        'name',
+        'os.name',
+        'os.version',
+      ]);
+      wrapper.unmount();
+    });
+
+    it('lets the server pick the fields when the table has no column selector', async () => {
+      (useStateStorage as jest.Mock).mockReturnValue([
+        { selectedFields: ['name'] },
+        jest.fn(),
+      ]);
+
+      const wrapper = await mountWithExport({});
+
+      expect(wrapper.find('ExportTableCsv').prop('fields')).toBeUndefined();
+      wrapper.unmount();
+    });
   });
 });

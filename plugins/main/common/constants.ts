@@ -1125,6 +1125,9 @@ export const HEALTH_CHECK_TASK_SERVER_API_RUN_AS = 'server-api:run-as';
 
 export const HEALTH_CHECK_TASK_DASHBOARDS = 'saved-objects:dashboards';
 
+export const HEALTH_CHECK_TASK_SAVED_OBJECTS_MISSING_FIELDS =
+  'saved-objects:missing-fields';
+
 export const HEALTH_CHECK_TASK_NOTIFICATION_CHANNELS =
   'integrations:default-notifications-channels';
 

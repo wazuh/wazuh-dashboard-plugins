@@ -496,14 +496,20 @@ export class WzRequest {
    * Perform a request to generate a CSV
    * @param {String} path
    * @param {Object} filters
+   * @param {String[]} [fields] Fields to write, in order
    */
-  static async csvReq(path, filters) {
+  static async csvReq(path, filters, fields?: string[]) {
     try {
       if (!path || !filters) {
         throw new Error('Missing parameters');
       }
       const id = JSON.parse(AppState.getCurrentAPI()).id;
-      const requestData = { path, id, filters };
+      const requestData = {
+        path,
+        id,
+        filters,
+        ...(fields?.length ? { fields } : {}),
+      };
       const data = await this.genericReq('POST', '/api/csv', requestData);
       return Promise.resolve(data);
     } catch (error) {

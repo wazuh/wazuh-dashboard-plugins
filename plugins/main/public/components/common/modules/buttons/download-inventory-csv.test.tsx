@@ -3,7 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import { ButtonInventoryGenerateReport } from './generate-inventory-report';
+import { ButtonInventoryDownloadCsv } from './download-inventory-csv';
 import { ErrorHandler } from '../../../../react-services/error-management';
 
 jest.mock('../../../../react-services/error-management', () => ({
@@ -17,14 +17,33 @@ const mockStore = configureMockStore();
 const renderButton = (tableReportContext: unknown) =>
   render(
     <Provider store={mockStore({ reportingReducers: { tableReportContext } })}>
-      <ButtonInventoryGenerateReport />
+      <ButtonInventoryDownloadCsv />
     </Provider>,
   );
 
-const getButton = () => screen.getByRole('button', { name: 'Generate report' });
+const getButton = () => screen.getByRole('button', { name: 'Download CSV' });
 
-describe('ButtonInventoryGenerateReport', () => {
+describe('ButtonInventoryDownloadCsv', () => {
   beforeEach(() => jest.clearAllMocks());
+
+  it('names the CSV format, not a report', () => {
+    renderButton({ totalResults: 119, generateReport: jest.fn() });
+
+    expect(getButton()).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Generate report' }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('explains why it is disabled when the table has no results', async () => {
+    renderButton({ totalResults: 0, generateReport: jest.fn() });
+
+    fireEvent.mouseOver(getButton().parentElement as HTMLElement);
+
+    expect(
+      await screen.findByText('No results match for this search criteria.'),
+    ).toBeInTheDocument();
+  });
 
   it('is disabled when no inventory table is published', () => {
     renderButton(null);

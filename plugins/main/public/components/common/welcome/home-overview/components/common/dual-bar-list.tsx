@@ -2,7 +2,7 @@ import React from 'react';
 import { i18n } from '@osd/i18n';
 import { EuiFlexGroup, EuiFlexItem, EuiText } from '@elastic/eui';
 import { HOME_OVERVIEW_COLOR } from '../../lib/theme-colors';
-import { decimalFormat } from '../../../utils/helpers';
+import { formatHomePercent } from '../../lib/format-number';
 import { BarTrack, LegendItem } from './bar-track';
 import { EmptyState } from './empty-state';
 import { ListTitle } from './list-chrome';
@@ -47,8 +47,6 @@ export const DualBarList: React.FC<DualBarListProps> = ({
       />
     );
   }
-
-  const formatter = decimalFormat();
 
   return (
     <div data-test-subj={testSubj}>
@@ -121,7 +119,7 @@ export const DualBarList: React.FC<DualBarListProps> = ({
                 </BarTrack>
               </div>
               <EuiText size='s' className='tab-num'>
-                {formatter.convert(item.score)}
+                {formatHomePercent(item.score)}
               </EuiText>
             </React.Fragment>
           );

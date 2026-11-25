@@ -199,7 +199,7 @@ curl -X POST "https://<DASHBOARD_HOST>:<DASHBOARD_PORT>/api/saved_objects/_impor
 After importing, verify that the migrated objects are accessible and displaying data:
 
 1. Navigate to **☰ Menu > Dashboard management > Dashboards Management > Saved objects** and confirm that the expected dashboards and visualizations appear in the list.
-2. Open each migrated dashboard and confirm that panels load without errors.
+2. Open each migrated dashboard and confirm that panels load without errors. A **Missing fields** badge on a panel lists the fields its visualization or saved search uses that the index pattern does not have. **☰ Menu > Dashboard management > Health check** > **Fields of saved objects** lists every such object.
 3. If a panel shows a "No results found" message, verify that:
    - the index pattern referenced by its visualizations points to `wazuh-findings-v5*` (for alert-based visualizations) or another appropriate 5.x pattern
    - any aggregation or filter fields use the 5.x field names (for example, `wazuh.rule.level` instead of `rule.level`)
@@ -210,6 +210,8 @@ After importing, verify that the migrated objects are accessible and displaying 
 ## Multitenancy
 
 If multitenancy was enabled in the 4.x deployment, repeat the export and import steps for each tenant separately. Saved objects are scoped per tenant — objects exported from one tenant must be imported into the same tenant in 5.x.
+
+The **Fields of saved objects** health check reads only the global tenant. To find objects with missing fields in other tenants, open their dashboards in that tenant and look for the **Missing fields** badge.
 
 ### Using the UI
 

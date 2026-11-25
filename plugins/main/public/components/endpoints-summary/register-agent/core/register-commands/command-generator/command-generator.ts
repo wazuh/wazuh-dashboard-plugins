@@ -149,6 +149,29 @@ export class CommandGenerator<
   }
 
   /**
+   * Gets the command that installs a package already on the endpoint, or an
+   * empty string when the selected operating system defines none.
+   * @throws An error if the operating system is not selected
+   */
+  getLocalInstallCommand(): string {
+    if (!this.osDefinitionSelected) {
+      throw new NoOSSelectedException();
+    }
+    if (!this.osDefinitionSelected.localInstallCommand) {
+      return '';
+    }
+
+    return this.osDefinitionSelected.localInstallCommand({
+      name: this.os as OS['name'],
+      architecture: this.osDefinitionSelected
+        .architecture as OS['architecture'],
+      packageName: this.getPackageName(),
+      wazuhVersion: this.wazuhVersion,
+      optionals: this.optionals as IOptionalParameters<Params>,
+    });
+  }
+
+  /**
    * This method gets the start command for the selected operating system
    * @returns The start command for the selected operating system
    * @throws An error if the operating system is not selected

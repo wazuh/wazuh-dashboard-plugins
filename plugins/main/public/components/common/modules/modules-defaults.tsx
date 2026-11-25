@@ -15,7 +15,7 @@ import { MainMitre } from './main-mitre';
 import { ModuleMitreAttackIntelligence } from '../../overview/mitre/intelligence';
 import { ComplianceTable } from '../../overview/compliance-table';
 import {
-  ButtonInventoryGenerateReport as ButtonInventoryGenerateReportComponent,
+  ButtonInventoryDownloadCsv as ButtonInventoryDownloadCsvComponent,
   ButtonModuleGenerateReport as ButtonModuleGenerateReportComponent,
 } from '../modules/buttons';
 import { OfficePanel } from '../../overview/office/panel';
@@ -165,8 +165,8 @@ const regulatoryComplianceButtons = [
   ButtonComplianceGenerateReport,
 ];
 
-const ButtonInventoryGenerateReport = {
-  component: ButtonInventoryGenerateReportComponent,
+const ButtonInventoryDownloadCsv = {
+  component: ButtonInventoryDownloadCsvComponent,
 };
 
 const renderDiscoverTab = (props: WazuhDiscoverProps) => {
@@ -728,7 +728,7 @@ export const ModulesDefaults = {
         buttons: [
           ButtonAboutITHygiene,
           ButtonExploreAgent,
-          ButtonInventoryGenerateReport,
+          ButtonInventoryDownloadCsv,
         ],
         component: ITHygieneSystemInventory,
       },
@@ -738,7 +738,7 @@ export const ModulesDefaults = {
         buttons: [
           ButtonAboutITHygiene,
           ButtonExploreAgent,
-          ButtonInventoryGenerateReport,
+          ButtonInventoryDownloadCsv,
         ],
         component: ITHygienePackagesInventory,
       },
@@ -748,7 +748,7 @@ export const ModulesDefaults = {
         buttons: [
           ButtonAboutITHygiene,
           ButtonExploreAgent,
-          ButtonInventoryGenerateReport,
+          ButtonInventoryDownloadCsv,
         ],
         component: ITHygieneProcessesInventory,
       },
@@ -758,7 +758,7 @@ export const ModulesDefaults = {
         buttons: [
           ButtonAboutITHygiene,
           ButtonExploreAgent,
-          ButtonInventoryGenerateReport,
+          ButtonInventoryDownloadCsv,
         ],
         component: ITHygieneNetworksInventory,
       },
@@ -768,7 +768,7 @@ export const ModulesDefaults = {
         buttons: [
           ButtonAboutITHygiene,
           ButtonExploreAgent,
-          ButtonInventoryGenerateReport,
+          ButtonInventoryDownloadCsv,
         ],
         component: ITHygieneUsersInventory,
       },
@@ -778,7 +778,7 @@ export const ModulesDefaults = {
         buttons: [
           ButtonAboutITHygiene,
           ButtonExploreAgent,
-          ButtonInventoryGenerateReport,
+          ButtonInventoryDownloadCsv,
         ],
         component: ITHygieneServicesInventory,
       },

@@ -3,12 +3,16 @@ import {
   getAllOptionalsMacos,
   getDEBAMD64InstallCommand,
   getDEBARM64InstallCommand,
+  getDEBLocalInstallCommand,
   getLinuxStartCommand,
   getMacOsInstallCommand,
+  getMacOsLocalInstallCommand,
   getMacosStartCommand,
   getRPMAMD64InstallCommand,
   getRPMARM64InstallCommand,
+  getRPMLocalInstallCommand,
   getWindowsInstallCommand,
+  getWindowsLocalInstallCommand,
   getWindowsStartCommand,
   transformOptionalsParamatersMacOSCommand,
 } from './register-agent-os-commands-services';
@@ -417,5 +421,67 @@ describe('SSL verification states', () => {
     expect(result).toEqual(
       `curl -so wazuh-agent-5.0.0.intel64.pkg https://example.com/package.pkg && echo "${expectedMacosEnvs[state]}" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent-5.0.0.intel64.pkg -target /`,
     );
+  });
+});
+
+/* Hosts without Internet access install a package already copied to them, so the
+commands download nothing and take the package from the current folder. */
+describe('local package install commands', () => {
+  beforeEach(() => {
+    test.optionals = {
+      enrollmentToken: "WAZUH_ENROLLMENT_TOKEN='token'",
+      agentName: "WAZUH_AGENT_NAME='test'",
+    };
+  });
+
+  it('installs a DEB package from the current folder', () => {
+    test.packageName = 'wazuh-agent_5.0.0_amd64.deb';
+    expect(getDEBLocalInstallCommand(test)).toBe(
+      "sudo WAZUH_ENROLLMENT_TOKEN='token' WAZUH_AGENT_NAME='test' dpkg -i ./wazuh-agent_5.0.0_amd64.deb",
+    );
+  });
+
+  it('ends the DEB download command with the local install command', () => {
+    test.packageName = 'wazuh-agent_5.0.0_amd64.deb';
+    expect(
+      getDEBAMD64InstallCommand(test).endsWith(
+        ` && ${getDEBLocalInstallCommand(test)}`,
+      ),
+    ).toBe(true);
+  });
+
+  it('installs an RPM package from the current folder', () => {
+    test.packageName = 'wazuh-agent-5.0.0.x86_64.rpm';
+    expect(getRPMLocalInstallCommand(test)).toBe(
+      "sudo WAZUH_ENROLLMENT_TOKEN='token' WAZUH_AGENT_NAME='test' rpm -ihv ./wazuh-agent-5.0.0.x86_64.rpm",
+    );
+  });
+
+  it('installs an MSI package from the current folder', () => {
+    test.packageName = 'wazuh-agent-5.0.0.msi';
+    expect(getWindowsLocalInstallCommand(test)).toBe(
+      `msiexec.exe /i .\\wazuh-agent-5.0.0.msi /q WAZUH_ENROLLMENT_TOKEN='token' WAZUH_AGENT_NAME='test' ${windowsInstallerWait}`,
+    );
+  });
+
+  it('installs a macOS package from the current folder', () => {
+    test.packageName = 'wazuh-agent-5.0.0.intel64.pkg';
+    const expected = `echo "WAZUH_ENROLLMENT_TOKEN='token' && WAZUH_AGENT_NAME='test'" > /tmp/wazuh_envs && sudo installer -pkg ./wazuh-agent-5.0.0.intel64.pkg -target /`;
+    expect(getMacOsLocalInstallCommand(test)).toBe(expected);
+    expect(getMacOsInstallCommand(test)).toBe(
+      `curl -so ${test.packageName} ${test.urlPackage} && ${expected}`,
+    );
+  });
+
+  it.each([
+    getDEBLocalInstallCommand,
+    getRPMLocalInstallCommand,
+    getWindowsLocalInstallCommand,
+    getMacOsLocalInstallCommand,
+  ])('downloads nothing (%#)', getCommand => {
+    test.packageName = 'package';
+    const command = getCommand(test);
+    expect(command).not.toContain('https://');
+    expect(command).not.toMatch(/wget|curl|Invoke-WebRequest|apt-get/);
   });
 });
