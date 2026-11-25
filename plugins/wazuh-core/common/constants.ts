@@ -297,6 +297,8 @@ export enum SettingCategory {
   SECURITY,
   CUSTOMIZATION,
   API_CONNECTION,
+  REPORTING,
+  SERVER_MANAGEMENT,
 }
 
 type TPluginSettingOptionsTextArea = {
@@ -417,7 +419,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.text,
     defaultValue: '',
     validate: SettingsValidator.compose(
@@ -442,7 +444,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.text,
     defaultValue: '',
     validate: SettingsValidator.compose(
@@ -462,7 +464,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.text,
     defaultValue: '',
     validate: SettingsValidator.compose(
@@ -710,7 +712,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
         'Maximum time, in milliseconds, the app will wait for an API response when making requests to it. It will be ignored if the value is set under 1500 milliseconds.',
     }),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.SERVER_MANAGEMENT,
     type: EpluginSettingType.number,
     defaultValue: 20000,
     options: {
@@ -732,7 +734,7 @@ export const PLUGIN_SETTINGS: Record<string, TPluginSetting> = {
       },
     ),
     source: EConfigurationProviders.PLUGIN_UI_SETTINGS,
-    category: SettingCategory.GENERAL,
+    category: SettingCategory.REPORTING,
     type: EpluginSettingType.number,
     defaultValue: 10000,
     options: {
