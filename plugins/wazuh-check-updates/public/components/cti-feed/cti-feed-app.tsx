@@ -86,7 +86,7 @@ export const CtiFeedApp: React.FC<CtiFeedAppProps> = ({
             'wazuhCheckUpdates.ctiFeed.page.description',
             {
               defaultMessage:
-                'Threat intelligence from Wazuh Cyber Threat Intelligence: your subscription, the sync state of each feed and the content it adds to this environment.',
+                'Manage your Wazuh Cyber Threat Intelligence feeds, monitor their sync status, and explore the threat intelligence available in this environment.',
             },
           )}
           rightSideItems={[

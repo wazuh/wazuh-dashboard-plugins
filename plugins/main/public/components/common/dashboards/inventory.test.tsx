@@ -96,7 +96,7 @@ describe('InventoryDashboardTable', () => {
     ).toHaveClass('wz-no-display');
   });
 
-  it('publishes its table for the Generate report button', async () => {
+  it('publishes its table for the Download CSV button', async () => {
     mockFetchData.mockResolvedValue({ hits: { total: 0, hits: [] } });
     const store = mockStore({});
     const { unmount } = renderInventory(store);

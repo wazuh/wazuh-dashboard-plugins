@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux';
 import { updateReportingTableContext } from '../../../redux/actions/reportingActions';
 
 /**
- * Publishes the mounted inventory table so the Generate report button of the tab can export it.
+ * Publishes the mounted inventory table so the Download CSV button of the tab can export it.
  */
 export function useReportingCommunicateTableContext({
   totalResults,

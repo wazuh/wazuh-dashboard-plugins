@@ -115,3 +115,31 @@ describe('Linux install commands - GPG key', () => {
     },
   );
 });
+
+describe('local package install commands', () => {
+  it.each(
+    osCommandsDefinitions.flatMap(({ name, options }) =>
+      options.map(option => [name, option.architecture, option] as const),
+    ),
+  )('%s %s installs the package from the current folder', (name, _, option) => {
+    const packageName = option.packageName({
+      name,
+      architecture: option.architecture,
+      wazuhVersion: '5.0.0',
+    } as never);
+    const command = option.localInstallCommand!({
+      name,
+      architecture: option.architecture,
+      wazuhVersion: '5.0.0',
+      packageName,
+      optionals: {
+        enrollmentToken: "WAZUH_ENROLLMENT_TOKEN='token'",
+      } as IOptionalParameters<tOptionalParameters>,
+    } as never);
+
+    const localPaths = [`./${packageName}`, `.\\${packageName}`];
+    expect(localPaths.some(path => command.includes(path))).toBe(true);
+    expect(command).toContain("WAZUH_ENROLLMENT_TOKEN='token'");
+    expect(command).not.toMatch(/https?:\/\//);
+  });
+});

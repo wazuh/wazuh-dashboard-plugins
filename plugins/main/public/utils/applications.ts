@@ -375,8 +375,7 @@ export const docker = {
     defaultMessage: 'Docker',
   }),
   description: i18n.translate('wazuh.docker.app.description', {
-    defaultMessage:
-      'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.',
+    defaultMessage: 'Monitor and collect the activity from Docker containers.',
   }),
   docsUrl: webDocumentationLink(DOCS_PATHS.docker),
   euiIconType: LogoDocker,

@@ -37,6 +37,7 @@ import {
 } from '../hooks';
 import { formatUINumber } from '../../../react-services/format-number';
 import { formatSorting } from './format-sorting';
+import { getExportFields } from './get-export-fields';
 
 /**
  * Search input custom filter button
@@ -256,6 +257,10 @@ function TableWzAPIInner(
     }
   }, [rest.reload]);
 
+  const tableColumns = rest.tableColumns.filter(({ field }) =>
+    tableState.selectedFields.includes(field),
+  );
+
   const ReloadButton = (
     <EuiFlexItem grow={false}>
       <EuiButtonEmpty
@@ -321,6 +326,11 @@ function TableWzAPIInner(
                     sort: formatSorting(tableState.sorting),
                   })}
                   title={typeof downloadCsv === 'string' ? downloadCsv : title}
+                  fields={
+                    rest.showFieldSelector
+                      ? getExportFields(tableColumns)
+                      : undefined
+                  }
                   maxRows={maxRows}
                   isLoading={isLoading}
                 />
@@ -379,10 +389,6 @@ function TableWzAPIInner(
         </EuiFlexGroup>
       )}
     </>
-  );
-
-  const tableColumns = rest.tableColumns.filter(({ field }) =>
-    tableState.selectedFields.includes(field),
   );
 
   const table = rest.searchTable ? (

@@ -1,0 +1,16 @@
+// Empty state shown when the agent sends no statistics. The prompt body is an
+// `.euiText`, whose paragraph and `pre` margins leave uneven gaps around the
+// snippet, so they are tightened here.
+.euiText p.wz-agent-stats-empty-intro {
+  margin-bottom: 12px;
+}
+
+.wz-agent-stats-empty-snippet {
+  display: inline-block;
+  max-width: 100%;
+  text-align: left;
+}
+
+.euiText .wz-agent-stats-empty-snippet pre {
+  margin-bottom: 0;
+}
