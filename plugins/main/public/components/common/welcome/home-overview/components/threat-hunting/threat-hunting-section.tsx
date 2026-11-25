@@ -43,7 +43,7 @@ const ThreatHuntingSectionComponent: React.FC<ThreatHuntingSectionProps> = ({
     <div>
       <SectionHeader
         title={i18n.translate('wazuh.common.homeOverviewThreatHunting.title', {
-          defaultMessage: 'Threat hunting',
+          defaultMessage: 'Threat intelligence',
         })}
         description={i18n.translate(
           'wazuh.common.homeOverviewThreatHunting.description',

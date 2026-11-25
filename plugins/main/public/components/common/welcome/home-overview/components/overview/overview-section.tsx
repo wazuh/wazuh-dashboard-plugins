@@ -23,7 +23,6 @@ import {
   getDiscoverFindingsBySeverityUrl,
 } from '../../utils/navigation';
 import { FINDING_SEVERITY_FIELD } from '../../lib/fields';
-import { UI_COLOR_STATUS } from '../../../../../../../common/constants';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Same requirement as the Agents section.
@@ -166,7 +165,6 @@ const OverviewSectionComponent: React.FC<OverviewSectionProps> = ({
                   getMitreFrameworkTacticUrl(item, findings.indexPatternId)
                 }
                 data-test-subj='mitre-top-tactics'
-                barColor={UI_COLOR_STATUS.success}
               />
             )}
           </WidgetGroup>

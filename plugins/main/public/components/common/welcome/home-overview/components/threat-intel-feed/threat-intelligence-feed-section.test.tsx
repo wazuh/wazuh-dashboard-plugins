@@ -63,7 +63,7 @@ describe('ThreatIntelligenceFeedSection', () => {
     render(
       <ThreatIntelligenceFeedSection threatIntel={threatIntelAvailable} />,
     );
-    expect(screen.getByText('Threat intelligence feed')).toBeInTheDocument();
+    expect(screen.getByText('Intelligence feed')).toBeInTheDocument();
     expect(screen.getByText('Ruleset management')).toBeInTheDocument();
     expect(screen.getByText('Threat catalog')).toBeInTheDocument();
     expect(screen.getByText('Rules')).toBeInTheDocument();
