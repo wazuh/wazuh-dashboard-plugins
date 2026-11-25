@@ -48,6 +48,7 @@ describe('ThreatHuntingSection', () => {
         vulnerabilities={vulnerabilitiesAvailable}
       />,
     );
+    expect(screen.getByText('Threat intelligence')).toBeInTheDocument();
     expect(screen.getByText('Threat Hunting')).toBeInTheDocument();
     expect(screen.getByText('MITRE ATT&CK')).toBeInTheDocument();
     expect(screen.getByText('Vulnerability Detection')).toBeInTheDocument();

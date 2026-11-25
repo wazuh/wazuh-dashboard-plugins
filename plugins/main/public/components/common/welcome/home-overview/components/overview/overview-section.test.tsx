@@ -5,6 +5,7 @@ import '../../test-utils/setup-home-overview-test';
 import { OverviewSection } from './overview-section';
 import { useAgentStatus } from '../../hooks/use-overview-data';
 import * as navigation from '../../utils/navigation';
+import { BarList } from '../common';
 import { useUserPermissionsRequirements } from '../../../../hooks/useUserPermissions';
 
 // Explicit factories so the real modules (and their heavy data-source imports)
@@ -36,6 +37,17 @@ jest.mock('../../../../permissions/button', () => ({
 jest.mock('../../../../hooks/useUserPermissions', () => ({
   useUserPermissionsRequirements: jest.fn(),
 }));
+
+// Spy on BarList but keep its real rendering, to read the props a panel passes.
+jest.mock('../common', () => {
+  const actual = jest.requireActual('../common');
+  return {
+    ...actual,
+    BarList: jest.fn((props: React.ComponentProps<typeof actual.BarList>) => (
+      <actual.BarList {...props} />
+    )),
+  };
+});
 
 const asMock = (fn: unknown) => fn as jest.Mock;
 
@@ -100,6 +112,15 @@ describe('OverviewSection', () => {
       { key: 'Initial Access', count: 36231, id: 'TA0001' },
       'idx-1',
     );
+  });
+
+  it('keeps the default bar color of the other bar lists for the top tactics', () => {
+    render(<OverviewSection findings={findingsAvailable} />);
+    const tacticsCall = asMock(BarList).mock.calls.find(
+      ([props]) => props['data-test-subj'] === 'mitre-top-tactics',
+    );
+    expect(tacticsCall).toBeDefined();
+    expect(tacticsCall?.[0].barColor).toBeUndefined();
   });
 
   it('navigates to Threat Hunting from the Findings card title', () => {

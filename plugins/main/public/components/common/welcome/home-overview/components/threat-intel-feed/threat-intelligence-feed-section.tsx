@@ -61,7 +61,7 @@ const ThreatIntelligenceFeedSectionComponent: React.FC<
       <SectionHeader
         title={i18n.translate(
           'wazuh.common.homeOverviewThreatIntelFeed.title',
-          { defaultMessage: 'Threat intelligence feed' },
+          { defaultMessage: 'Intelligence feed' },
         )}
         description={
           <FormattedMessage
