@@ -3,8 +3,6 @@ import {
   EuiCopy,
   EuiIcon,
   EuiSpacer,
-  EuiSwitch,
-  EuiSwitchEvent,
   EuiText,
 } from '@elastic/eui';
 import React, { Fragment, useEffect, useState } from 'react';
@@ -20,12 +18,20 @@ interface ICommandSectionProps {
   os?: tOperatingSystem['name'];
   password?: string;
   enrollmentToken?: string;
+  /* The secret is obfuscated until the operator asks to see it. */
+  showSecret?: boolean;
 }
 
 export default function CommandOutput(props: ICommandSectionProps) {
-  const { commandText, showCommand, onCopy, os, password, enrollmentToken } =
-    props;
-  const [showSecret, setShowSecret] = useState(false);
+  const {
+    commandText,
+    showCommand,
+    onCopy,
+    os,
+    password,
+    enrollmentToken,
+    showSecret = false,
+  } = props;
 
   const onHandleCopy = (command: any) => {
     onCopy && onCopy();
@@ -55,10 +61,6 @@ export default function CommandOutput(props: ICommandSectionProps) {
     }
     setCommandToShow(obfuscated);
   }, [password, enrollmentToken, commandText, showSecret, os]);
-
-  const onChangeShowSecret = (event: EuiSwitchEvent) => {
-    setShowSecret(event.target.checked);
-  };
 
   return (
     <Fragment>
@@ -98,28 +100,7 @@ export default function CommandOutput(props: ICommandSectionProps) {
             </EuiCopy>
           )}
         </div>
-        {showCommand && haveSecret ? (
-          <>
-            <EuiSwitch
-              checked={showSecret}
-              label={
-                enrollmentToken
-                  ? i18n.translate(
-                      'wazuh.endpointsSummary.commandOutput.showEnrollmentToken',
-                      { defaultMessage: 'Show enrollment token' },
-                    )
-                  : i18n.translate(
-                      'wazuh.endpointsSummary.commandOutput.showPassword',
-                      { defaultMessage: 'Show password' },
-                    )
-              }
-              onChange={onChangeShowSecret}
-            />
-            <EuiSpacer size='l' />
-          </>
-        ) : (
-          <EuiSpacer size='s' />
-        )}
+        <EuiSpacer size='s' />
       </EuiText>
     </Fragment>
   );
