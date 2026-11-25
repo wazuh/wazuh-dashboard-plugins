@@ -68,7 +68,8 @@ another's password.
 
 So a setting present in the file counts as resolved. The effective precedence is:
 
-1. The keystore entry.
+1. The keystore entry, unless the same-host publisher's export holds a different value written
+   after the keystore was last written (see [Following the peer's export](#following-the-peers-export)).
 2. `opensearch_dashboards.yml`.
 3. The environment.
 4. `local.env`.
@@ -76,6 +77,25 @@ So a setting present in the file counts as resolved. The effective precedence is
 
 Without a
 `wazuh_core.hosts.default` host, the manager password is not needed.
+
+## Following the peer's export
+
+A reinstalled peer publishes a new password with its new CA. The CA is re-imported whenever it
+differs, so the password follows it. When the entry is in the keystore, the lookup resolves to the
+publisher's `export/credentials.env` (not the environment or `local.env`), the value differs from
+the stored one, and the export file is newer than the keystore, the resolver replaces the entry
+with `keystore add --force` and logs `replaced <entry> in the keystore with the one from <file>`.
+
+- The keystore CLI has no `get`, so the resolver decrypts `opensearch_dashboards.keystore` itself
+  (PBKDF2-SHA512, AES-256-GCM, empty password: the format of `src/legacy/server/keystore/`). The
+  value stays in memory and is never logged.
+- The newer-than check keeps a stale export from reverting a password that an operator changed
+  with `wazuh-passwords-tool.sh`, which writes the keystore. `rbac_control` never updates the
+  export.
+- A keystore that refuses the new value, or a value it would not store as text, is `INVALID` and
+  refuses the start.
+- The environment and `local.env` only fill an empty keystore, and a password in
+  `opensearch_dashboards.yml` is never replaced.
 
 ## Keystore writes
 

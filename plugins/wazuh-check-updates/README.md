@@ -32,11 +32,10 @@ points:
 
 - The registration modal (`ModalCti`), opened from the CTI feed app. `useCtiRegistrationModal`
   holds its open state and cancels a pending activation when the modal closes.
-- The `CtiUpsellNotification` bottom bar, exposed in the start contract and rendered by the main
+- The `CtiRegisterNotification` bottom bar, exposed in the start contract and rendered by the main
   plugin while the environment is not registered. Its **Register now** button opens the CTI feed
   app with the registration modal already open (location state `openRegistration`). The bar is
-  shown only when both `wazuh_check_updates.ctiRegistrationUiEnabled` and
-  `wazuh_check_updates.ctiUpsellEnabled` are `true`.
+  shown only when `wazuh_check_updates.ctiRegistrationUiEnabled` is `true`.
 
 The routes of the registration flow live under `/api/wazuh-check-updates/cti-registration/`.
 
@@ -90,7 +89,7 @@ The app has three panels and one action:
 - **Updates status column:** Indicates the server's status regarding available updates, which can be in one of four states:
   - **Up to date:** The server is up to date with the latest available version.
   - **Available updates:** There are updates available. In this case, you can view the details of the available updates by clicking an icon, and a Flyout will open with the details.
-  - **Checking updates disabled:** The server has the service for checking updates disabled.
+  - **Checking updates disabled:** The service for checking updates is disabled (`check_updates.enabled` is off in Advanced settings).
   - **Error checking updates:** An error occurred when trying to query the Wazuh Server API. In this case, a tooltip will display the error message.
 
 3. The user has the option to force a direct request for available updates to the Wazuh Server API instead of querying them in the saved object. To do this, they can click the "Check updates" button. If there are any changes when retrieving the information, the results will be reflected in the table.

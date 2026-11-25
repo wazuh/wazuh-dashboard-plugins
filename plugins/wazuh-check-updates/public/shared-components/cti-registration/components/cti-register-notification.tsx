@@ -21,7 +21,7 @@ import { getCore } from '../../../plugin-services';
 import { ctiUpsellBarVisible$ } from '../../../services/cti-upsell-bar-state';
 import { useUserPreferences } from '../../../hooks';
 
-export const CtiUpsellNotification = () => {
+export const CtiRegisterNotification = () => {
   const [dismissed, setDismissed] = useState(false);
 
   const { statusCTI, loading, deviceFlowActive, modalOpen } = useCtiStatus();

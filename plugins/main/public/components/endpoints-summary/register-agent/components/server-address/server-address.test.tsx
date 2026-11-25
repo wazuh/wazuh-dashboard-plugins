@@ -7,13 +7,28 @@ import { FormConfiguration } from '../../../../common/form/types';
 import { AddressComboBox } from '../../../../enrollment-tokens/components/address-combo-box';
 import { getListenerCertificateNames } from '../../../../../services/enrollment-tokens';
 
+const mockSet = jest.fn();
+
+let mockAppConfig: Record<string, string> = {};
+
+jest.mock('react-redux', () => ({
+  useDispatch: () => jest.fn(),
+  useSelector: (selector: (state: unknown) => unknown) =>
+    selector({ appConfig: { data: mockAppConfig } }),
+}));
+
 jest.mock('../../../../../kibana-services', () => ({
-  getUiSettings: () => ({ get: jest.fn(), set: jest.fn() }),
+  getUiSettings: () => ({
+    get: jest.fn(),
+    set: (...args: unknown[]) => mockSet(...args),
+  }),
 }));
 
 jest.mock(
   '../../../../../react-services/error-management/error-handler/error-handler',
-  () => ({ ErrorHandler: { handleError: jest.fn() } }),
+  () => ({
+    ErrorHandler: { handleError: jest.fn() },
+  }),
 );
 
 jest.mock('../../../../../services/enrollment-tokens', () => ({
@@ -37,7 +52,7 @@ const fieldsConfiguration: FormConfiguration = {
 
 let currentAddress: unknown;
 
-const Harness = () => {
+const Harness = ({ names = [] }: { names?: string[] }) => {
   const { fields } = useForm(fieldsConfiguration);
   currentAddress = fields.serverAddress.value;
 
@@ -48,6 +63,7 @@ const Harness = () => {
         serverPort: fields.serverPort,
         serverPath: fields.serverPath,
       }}
+      certificateNames={names}
     />
   );
 };
@@ -58,6 +74,9 @@ const addressInput = () =>
   ) as HTMLElement;
 
 beforeEach(() => {
+  mockAppConfig = {};
+  mockSet.mockReset();
+  mockSet.mockResolvedValue(true);
   currentAddress = undefined;
   getNames.mockReset();
 });
@@ -94,5 +113,93 @@ describe('ServerAddressInput', () => {
     fireEvent.keyDown(addressInput(), { key: 'Enter' });
 
     expect(currentAddress).toBe('manager.local');
+  });
+
+  it('remembers the typed endpoint as the enrollment settings', async () => {
+    getNames.mockResolvedValue([]);
+    render(<Harness />);
+    await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+    fireEvent.change(addressInput(), { target: { value: 'manager.local' } });
+    fireEvent.keyDown(addressInput(), { key: 'Enter' });
+    fireEvent.click(
+      document.querySelector(
+        '[data-test-subj="rememberServerEndpoint"]',
+      ) as HTMLElement,
+    );
+
+    await waitFor(() =>
+      expect(mockSet).toHaveBeenCalledWith('enrollment.dns', 'manager.local'),
+    );
+    expect(mockSet).toHaveBeenCalledTimes(3);
+  });
+
+  describe('wildcard certificate names', () => {
+    const notice = () =>
+      document.querySelector(
+        '[data-test-subj="addressCoveredByWildcardNotice"]',
+      );
+
+    it('offers a pattern instead of an option, and puts its suffix in the search box', async () => {
+      getNames.mockResolvedValue(['manager.example.com', '*.acme.example']);
+      render(<Harness names={['manager.example.com', '*.acme.example']} />);
+
+      fireEvent.click(await screen.findByText('*.acme.example'));
+
+      await waitFor(() =>
+        expect((addressInput() as HTMLInputElement).value).toBe(
+          '.acme.example',
+        ),
+      );
+      fireEvent.focus(addressInput());
+      expect(screen.queryAllByText('*.acme.example')).toHaveLength(1);
+    });
+
+    it('says the typed name is covered by the wildcard', async () => {
+      getNames.mockResolvedValue(['*.acme.example']);
+      render(<Harness names={['*.acme.example']} />);
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), {
+        target: { value: 'wazuh.acme.example' },
+      });
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+
+      await waitFor(() => expect(notice()).toBeInTheDocument());
+      expect(notice()).toHaveTextContent('*.acme.example');
+    });
+  });
+
+  describe('address outside the certificate', () => {
+    const warning = () =>
+      document.querySelector(
+        '[data-test-subj="addressOutsideCertificateWarning"]',
+      );
+
+    it('warns that the address is not in the certificate', async () => {
+      getNames.mockResolvedValue([]);
+      render(<Harness names={['manager.example.com']} />);
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), { target: { value: 'other.example' } });
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+
+      await waitFor(() => expect(warning()).not.toBeNull());
+    });
+
+    it('does not warn for a name in the certificate or without names', async () => {
+      getNames.mockResolvedValue([]);
+      const { rerender } = render(<Harness names={['manager.example.com']} />);
+      await waitFor(() => expect(getNames).toHaveBeenCalled());
+
+      fireEvent.change(addressInput(), {
+        target: { value: 'Manager.Example.com' },
+      });
+      fireEvent.keyDown(addressInput(), { key: 'Enter' });
+      expect(warning()).toBeNull();
+
+      rerender(<Harness names={[]} />);
+      expect(warning()).toBeNull();
+    });
   });
 });

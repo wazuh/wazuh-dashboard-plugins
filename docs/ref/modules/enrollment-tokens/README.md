@@ -90,6 +90,15 @@ Select **Create token** to open the creation panel. The action requires the
 Every optional field left empty is omitted from the request, so the manager applies its own
 default rather than a value decided by the interface.
 
+The address is prefilled from the `enrollment.dns` setting when it is in the manager's
+certificate, and the port and the path prefix from `enrollment.port` and `enrollment.path`. An
+`enrollment.dns` outside the certificate is left out, so the field opens empty. An address entered
+outside the certificate shows a warning once it is committed (blur, Enter or picking an option),
+with a link to the troubleshooting page. **Create** stays enabled: the manager decides.
+The **Remember address, port, and path prefix** switch saves the three values as those settings, the
+same way the switch of **Deploy new agent** does, so the next visit to either view is prefilled with
+them.
+
 When the token is minted, the panel replaces the form with the result: the **token text**, the
 **ID**, the **address** and the **expiry**. This is the only moment the token text is available.
 Copy it before closing the panel.

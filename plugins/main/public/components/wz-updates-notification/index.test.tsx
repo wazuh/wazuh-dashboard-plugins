@@ -15,7 +15,7 @@ describe('WzUpdatesNotification tests', () => {
       preloadedState: {
         appConfig: {
           data: {
-            'wazuh.updates.disabled': false,
+            'check_updates.enabled': true,
           },
         },
       },
@@ -29,7 +29,7 @@ describe('WzUpdatesNotification tests', () => {
       preloadedState: {
         appConfig: {
           data: {
-            'wazuh.updates.disabled': true,
+            'check_updates.enabled': false,
           },
         },
       },

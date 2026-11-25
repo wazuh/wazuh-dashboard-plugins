@@ -1816,13 +1816,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 defaultMessage: 'Providers',
               },
             )}
-            description={i18n.translate(
-              'wazuhAiAssistant.settings.providers.description',
-              {
-                defaultMessage:
-                  'Connect and manage the AI providers available to the chat.',
-              },
-            )}
+            // The empty prompt says the same thing centered; a left-aligned line above it clashes.
+            description={
+              providersLoaded && providers.length === 0
+                ? undefined
+                : i18n.translate(
+                    'wazuhAiAssistant.settings.providers.description',
+                    {
+                      defaultMessage:
+                        'Connect and manage the AI providers available to the chat.',
+                    },
+                  )
+            }
           >
             {error && !isFormOpen && (
               <>

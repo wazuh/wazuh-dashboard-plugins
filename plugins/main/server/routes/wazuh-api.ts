@@ -88,6 +88,14 @@ export function WazuhApiRoutes(router: IRouter) {
           id: schema.string(),
           path: schema.string(),
           filters: schema.maybe(schema.any()),
+          // Fields to write, in order. Sent by the tables with a column
+          // selector so the CSV has the columns the table shows.
+          fields: schema.maybe(
+            schema.arrayOf(schema.string({ minLength: 1 }), {
+              minSize: 1,
+              maxSize: 100,
+            }),
+          ),
         }),
       },
     },
