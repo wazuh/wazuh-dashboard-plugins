@@ -27,6 +27,12 @@ import { upgradeAgentService } from '../../services';
 import { Agent } from '../../types';
 import { getToasts } from '../../../../kibana-services';
 import { upgradeStatusState } from '../../services/upgrade-status-state';
+import {
+  UPGRADE_ERROR_TOAST_LIFETIME_MS,
+  UpgradeDialogInfo,
+  isLegacyAgentVersion,
+  useUpgradeTargetVersion,
+} from '../upgrade-dialog-info';
 
 const supportedPlatforms = [
   'debian',
@@ -53,6 +59,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
   ({ agent, onClose, reloadAgents }: UpgradeAgentModalProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [packageType, setPackageType] = useState<'deb' | 'rpm'>();
+    const targetVersion = useUpgradeTargetVersion();
 
     const getUpgradeErrorMessage = (error: any) => {
       const apiMessage = error?.response?.data?.message;
@@ -120,6 +127,7 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
           level: UI_LOGGER_LEVELS.ERROR,
           severity: UI_ERROR_SEVERITIES.BUSINESS,
           store: true,
+          toastLifeTimeMs: UPGRADE_ERROR_TOAST_LIFETIME_MS,
           error: {
             error,
             message: errorMessage,
@@ -202,6 +210,13 @@ export const UpgradeAgentModal = compose(withErrorBoundary)(
                 </EuiDescriptionList>
               </EuiFlexItem>
             </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <UpgradeDialogInfo
+              targetVersion={targetVersion}
+              showLegacyAgentsNote={isLegacyAgentVersion(agent.version)}
+              isSingleAgent
+            />
           </EuiFlexItem>
           {showPackageSelector && (
             <EuiFlexItem>
