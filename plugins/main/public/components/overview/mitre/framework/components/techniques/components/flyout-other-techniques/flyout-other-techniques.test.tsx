@@ -70,7 +70,7 @@ const renderFlyout = (openDiscover = jest.fn()) =>
       onChangeFlyout={jest.fn()}
       openDiscover={openDiscover}
       indexPatternId='pattern'
-      unknownBuckets={buckets}
+      techniqueBuckets={buckets}
       fetchFilters={[]}
     />,
   );
@@ -81,7 +81,7 @@ describe('FlyoutOtherTechniques', () => {
     jest.clearAllMocks();
   });
 
-  it('lists the unknown technique IDs sorted by count', () => {
+  it('lists the technique IDs sorted by count', () => {
     renderFlyout();
     const chips = screen.getAllByText(/T999\d \(\d\)/);
     expect(chips.map(chip => chip.textContent)).toEqual([

@@ -47,11 +47,12 @@ import { DiscoverNoResults } from '../../../../../common/no-results/no-results';
 
 import {
   OTHER_AGGREGATION_KEY,
+  OTHER_TECHNIQUES_BUCKETS_KEY,
   OTHER_TECHNIQUE_ID,
   buildOtherAggregation,
   buildOtherFilter,
-  getCatalogTechniqueIds,
-  getUnknownBuckets,
+  getListedTechniqueIds,
+  getSelectedTacticIds,
 } from './lib/other-technique';
 
 const MITRE_ATTACK = 'mitre-attack';
@@ -69,7 +70,7 @@ type tTechniquesProps = {
 type tTechniquesState = {
   techniquesCount: { key: string; doc_count: number }[];
   otherCount: number;
-  unknownBuckets: { key: string; doc_count: number }[];
+  otherBuckets: { key: string; doc_count: number }[];
   isOtherFlyoutVisible: boolean;
   isFlyoutVisible: Boolean;
   currentTechnique: string;
@@ -95,7 +96,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     isFlyoutVisible: false,
     techniquesCount: [],
     otherCount: 0,
-    unknownBuckets: [],
+    otherBuckets: [],
     isOtherFlyoutVisible: false,
     currentTechnique: '',
     hideAlerts: false,
@@ -151,21 +152,34 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     buildMitreTechniquesFromApi();
   }, [isLoading]);
 
+  // "Others" are the findings of the selected tactics with none of the listed
+  // techniques
+  const selectedTacticIds = getSelectedTacticIds(
+    tacticsObject,
+    selectedTactics,
+  );
+  const getListedIds = () =>
+    getListedTechniqueIds(
+      tacticsObject,
+      selectedTactics,
+      state.mitreTechniques,
+    );
+  const buildCurrentOtherFilter = () =>
+    buildOtherFilter(indexPatternId, selectedTacticIds, getListedIds());
+  // Compared by value: "select all" mutates the same selection object
+  const selectedTacticsKey = selectedTacticIds.join();
+
   useEffect(() => {
     if (isLoading || isSearching) return;
     getTechniquesCount();
-  }, [tacticsObject, isLoading, filterParams, isSearching]);
-
-  // Every ID of the catalog (not only the selected tactics), so the "Others" count
-  // doesn't change when the tactics are toggled
-  const getCatalogIds = () => getCatalogTechniqueIds(state.mitreTechniques);
+  }, [tacticsObject, isLoading, filterParams, isSearching, selectedTacticsKey]);
 
   const getTechniquesCount = async () => {
     try {
       if (!fetchData) {
         return;
       }
-      const catalogIds = getCatalogIds();
+      const hasOther = selectedTacticIds.length > 0;
       const aggs = {
         techniques: {
           terms: {
@@ -173,8 +187,9 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
             size: 1000,
           },
         },
-        // Without a catalog every finding would be "Others"
-        ...(catalogIds.length ? buildOtherAggregation(catalogIds) : {}),
+        ...(hasOther
+          ? buildOtherAggregation(selectedTacticIds, getListedIds())
+          : {}),
       };
       setLoadingAlerts(true);
       const results = await fetchData({
@@ -186,14 +201,13 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         aggs,
       });
       const buckets = results.aggregations?.techniques?.buckets || [];
+      const otherAggregation = results.aggregations?.[OTHER_AGGREGATION_KEY];
       setState({
         ...state,
         techniquesCount: buckets,
-        otherCount:
-          results.aggregations?.[OTHER_AGGREGATION_KEY]?.doc_count || 0,
-        unknownBuckets: catalogIds.length
-          ? getUnknownBuckets(buckets, catalogIds)
-          : [],
+        otherCount: otherAggregation?.doc_count || 0,
+        otherBuckets:
+          otherAggregation?.[OTHER_TECHNIQUES_BUCKETS_KEY]?.buckets || [],
       });
       setLoadingAlerts(false);
     } catch (error) {
@@ -333,9 +347,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
   const addTechniqueFilter = (techniqueID: string) => {
     if (techniqueID === OTHER_TECHNIQUE_ID) {
       const { filterManager } = getDataPlugin().query;
-      filterManager.addFilters([
-        buildOtherFilter(indexPatternId, getCatalogIds()),
-      ]);
+      filterManager.addFilters([buildCurrentOtherFilter()]);
       return;
     }
     addFilter({
@@ -395,10 +407,11 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         defaultMessage: 'Others',
       },
     );
-    // "Others" is shown when it has findings (or the hide switch is off) and it
-    // matches the search box (the search is applied to the label)
+    // "Others" is shown when a tactic is selected, it has findings (or the hide
+    // switch is off) and it matches the search box (applied to the label)
     const searchedText = state.searchText?.trim().toLowerCase();
     const showOther =
+      selectedTacticIds.length > 0 &&
       (!state.hideAlerts || state.otherCount > 0) &&
       (!searchedText || otherLabel.toLowerCase().includes(searchedText));
     const otherItem = showOther
@@ -418,7 +431,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       const tooltipContent = item.isOther
         ? i18n.translate('wazuh.mitreAttack.techniques.other.tooltip', {
             defaultMessage:
-              'View details of Others. This count sums occurrences of unknown technique IDs - a finding tagged with more than one unknown ID is counted once per ID, so the total can exceed the number of distinct findings.',
+              'View details of Others: the findings of the selected tactics that have none of the listed techniques',
           })
         : i18n.translate(
             'wazuh.mitreAttack.techniques.facet.viewDetailsTooltip',
@@ -430,7 +443,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       const noFindingsTooltip = i18n.translate(
         'wazuh.mitreAttack.techniques.other.noFindingsTooltip',
         {
-          defaultMessage: 'There are no findings with unknown technique IDs',
+          defaultMessage:
+            'There are no findings of the selected tactics outside the listed techniques',
         },
       );
       const isOtherEmpty = item.isOther && item.quantity === 0;
@@ -719,11 +733,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
           onChangeFlyout={onChangeOtherFlyout}
           openDiscover={e => openDiscover(e, OTHER_TECHNIQUE_ID)}
           indexPatternId={indexPatternId}
-          unknownBuckets={state.unknownBuckets}
-          fetchFilters={[
-            ...filterParams.filters,
-            buildOtherFilter(indexPatternId, getCatalogIds()),
-          ]}
+          techniqueBuckets={state.otherBuckets}
+          fetchFilters={[...filterParams.filters, buildCurrentOtherFilter()]}
         />
       )}
 

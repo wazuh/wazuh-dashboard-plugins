@@ -48,8 +48,8 @@ type tFlyoutOtherTechniquesProps = {
   onChangeFlyout: (value: boolean) => void;
   openDiscover: (e: React.MouseEvent) => void;
   indexPatternId: string;
-  /** Technique IDs that are not in the catalog, with their finding count */
-  unknownBuckets: { key: string; doc_count: number }[];
+  /** Technique IDs of the "Other" findings, with their finding count */
+  techniqueBuckets: { key: string; doc_count: number }[];
   /** Filters of the findings searched, including the one of "Other" */
   fetchFilters: tFilter[];
 };
@@ -67,7 +67,7 @@ export const FlyoutOtherTechniques = (props: tFlyoutOtherTechniquesProps) => {
     onChangeFlyout,
     openDiscover,
     indexPatternId,
-    unknownBuckets,
+    techniqueBuckets,
     fetchFilters,
   } = props;
   const filterManager = useMemo(() => new FilterManager(getUiSettings()), []);
@@ -120,7 +120,7 @@ export const FlyoutOtherTechniques = (props: tFlyoutOtherTechniquesProps) => {
   const columns = addRenderColumn(
     agentId ? agentTechniquesColumns : techniquesColumns,
   );
-  const sortedBuckets = [...unknownBuckets].sort(
+  const sortedBuckets = [...techniqueBuckets].sort(
     (a, b) => b.doc_count - a.doc_count,
   );
 
@@ -150,16 +150,16 @@ export const FlyoutOtherTechniques = (props: tFlyoutOtherTechniquesProps) => {
                 'wazuh.mitreAttack.techniques.otherFlyout.description',
                 {
                   defaultMessage:
-                    'Findings whose MITRE technique IDs are not in the ATT&CK catalog.',
+                    'Findings of the selected tactics that have none of the listed techniques.',
                 },
               )}
             </p>
             {sortedBuckets.length > 0 && (
               <p style={{ fontWeight: 500, marginBottom: 2 }}>
                 {i18n.translate(
-                  'wazuh.mitreAttack.techniques.otherFlyout.unknownValuesTitle',
+                  'wazuh.mitreAttack.techniques.otherFlyout.techniqueIdsTitle',
                   {
-                    defaultMessage: 'Unknown technique IDs',
+                    defaultMessage: 'Technique IDs of these findings',
                   },
                 )}
               </p>
