@@ -11,12 +11,26 @@
  */
 import { WzMisc } from '../factories/misc';
 import { getHttp, getWazuhCorePlugin } from '../kibana-services';
-import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import {
+  PLUGIN_PLATFORM_REQUEST_HEADERS,
+  PLUGIN_PLATFORM_SYSTEM_REQUEST_HEADERS,
+} from '../../common/constants';
 import { request } from '../services/request-handler';
 import { i18n } from '@osd/i18n';
 
+const buildHeaders = asSystemRequest => ({
+  ...PLUGIN_PLATFORM_REQUEST_HEADERS,
+  'content-type': 'application/json',
+  // A check run on behalf of a timer or poll must not extend the session.
+  ...(asSystemRequest ? PLUGIN_PLATFORM_SYSTEM_REQUEST_HEADERS : {}),
+});
+
 export class ApiCheck {
-  static async checkStored(data, idChanged = false) {
+  static async checkStored(
+    data,
+    idChanged = false,
+    { asSystemRequest = false } = {},
+  ) {
     try {
       const timeout = await getWazuhCorePlugin().configuration.get('timeout');
       const payload = { id: data };
@@ -27,10 +41,7 @@ export class ApiCheck {
       const url = getHttp().basePath.prepend('/api/check-stored-api');
       const options = {
         method: 'POST',
-        headers: {
-          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
-          'content-type': 'application/json',
-        },
+        headers: buildHeaders(asSystemRequest),
         url: url,
         data: payload,
         timeout: timeout,
@@ -69,17 +80,18 @@ export class ApiCheck {
    * Check the status of an API entry
    * @param {String} apiObject
    */
-  static async checkApi(apiEntry, forceRefresh = false) {
+  static async checkApi(
+    apiEntry,
+    forceRefresh = false,
+    { asSystemRequest = false } = {},
+  ) {
     try {
       const timeout = await getWazuhCorePlugin().configuration.get('timeout');
       const url = getHttp().basePath.prepend('/api/check-api');
 
       const options = {
         method: 'POST',
-        headers: {
-          ...PLUGIN_PLATFORM_REQUEST_HEADERS,
-          'content-type': 'application/json',
-        },
+        headers: buildHeaders(asSystemRequest),
         url: url,
         data: { ...apiEntry, forceRefresh },
         timeout: timeout,

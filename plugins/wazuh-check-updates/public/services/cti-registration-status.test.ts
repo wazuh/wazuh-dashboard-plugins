@@ -186,6 +186,34 @@ describe('fetchCtiRegistrationStatus', () => {
     expect(mockHttpGet).toHaveBeenCalledTimes(2);
   });
 
+  it('sends a regular request by default', async () => {
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: false,
+      subscription: { message: null, status: 404 },
+    });
+
+    await fetchCtiRegistrationStatus();
+
+    expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus, {
+      asSystemRequest: false,
+    });
+  });
+
+  it('flags a timer-driven read as a system request', async () => {
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: true,
+      inProgress: false,
+      subscription: { message: null, status: 502 },
+    });
+
+    await fetchCtiRegistrationStatus({ asSystemRequest: true });
+
+    expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus, {
+      asSystemRequest: true,
+    });
+  });
+
   it('reports the server message of a failed device-code poll', async () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     /* eslint-disable camelcase -- status API body uses snake_case */

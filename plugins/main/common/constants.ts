@@ -785,6 +785,13 @@ export const PLUGIN_PLATFORM_REQUEST_HEADERS = {
   'osd-xsrf': 'kibana',
 };
 
+// Flags a request the UI sends on its own (a timer or poll), not on user input.
+// The platform reads it as `isSystemRequest`, and the security plugin doesn't
+// extend the session with it, so an unattended tab still signs out on time.
+export const PLUGIN_PLATFORM_SYSTEM_REQUEST_HEADERS = {
+  'osd-system-request': 'true',
+};
+
 // Plugin app
 export const PLUGIN_APP_NAME = 'dashboard';
 

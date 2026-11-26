@@ -63,9 +63,11 @@ export class WzAuthentication {
    * Requests and returns an user token to the API.
    *
    * @param {boolean} force
+   * @param {boolean} asSystemRequest the request is sent by a timer or poll and
+   * must not extend the user's session
    * @returns {string} token as string or Promise.reject error
    */
-  private static async login(force = false) {
+  private static async login(force = false, asSystemRequest = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI()).id;
 
@@ -76,10 +78,15 @@ export class WzAuthentication {
         );
       }
 
-      const response = await WzRequest.genericReq('POST', '/api/login', {
-        idHost,
-        force,
-      });
+      const response = await WzRequest.genericReq(
+        'POST',
+        '/api/login',
+        {
+          idHost,
+          force,
+        },
+        { asSystemRequest },
+      );
 
       const token = ((response || {}).data || {}).token;
       return token as string;
@@ -92,15 +99,23 @@ export class WzAuthentication {
    * Refreshes the user's token
    *
    * @param {boolean} force
+   * @param {Object} options `asSystemRequest` marks a refresh triggered by a
+   * timer or poll, so it doesn't extend the user's session
    * @returns {void} nothing or Promise.reject error
    */
-  static async refresh(force = false) {
+  static async refresh(
+    force = false,
+    { asSystemRequest = false }: { asSystemRequest?: boolean } = {},
+  ) {
     try {
       // Get user token
-      const token: string = await WzAuthentication.login(force);
+      const token: string = await WzAuthentication.login(
+        force,
+        asSystemRequest,
+      );
       if (!token) {
         // Remove old existent token
-        await WzAuthentication.deleteExistentToken();
+        await WzAuthentication.deleteExistentToken(asSystemRequest);
         return;
       }
 
@@ -108,7 +123,9 @@ export class WzAuthentication {
       const jwtPayload = jwtDecode(token);
 
       // Get user Policies
-      const userPolicies = await WzAuthentication.getUserPolicies();
+      const userPolicies = await WzAuthentication.getUserPolicies(
+        asSystemRequest,
+      );
 
       // Dispatch actions to set permissions and administrator consideration
       store.dispatch(updateUserPermissions(userPolicies));
@@ -159,7 +176,7 @@ export class WzAuthentication {
    *
    * @returns {Object} user's policies or Promise.reject error
    */
-  private static async getUserPolicies() {
+  private static async getUserPolicies(asSystemRequest = false) {
     try {
       var idHost = JSON.parse(AppState.getCurrentAPI() as string).id;
       if (!idHost) {
@@ -172,6 +189,7 @@ export class WzAuthentication {
         'GET',
         '/security/users/me/policies',
         { idHost },
+        { asSystemRequest },
       );
       const policies = ((response || {}).data || {}).data || {};
       return policies;
@@ -185,12 +203,13 @@ export class WzAuthentication {
    *
    * @returns {Object}
    */
-  static async deleteExistentToken() {
+  static async deleteExistentToken(asSystemRequest = false) {
     try {
       const response = await WzRequest.apiReq(
         'DELETE',
         '/security/user/authenticate',
         { delay: 5000 },
+        { asSystemRequest },
       );
 
       return ((response || {}).data || {}).data || {};

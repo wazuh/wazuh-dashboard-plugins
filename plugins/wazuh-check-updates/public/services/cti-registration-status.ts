@@ -121,9 +121,21 @@ function applyStatusBody(body: CtiRegistrationStatusApiBody): void {
   }
 }
 
-export async function hydrateCtiFlowFromServer(): Promise<void> {
+export interface CtiStatusRequestOptions {
+  /**
+   * The read is sent by a timer, not by the user. It is flagged as a system
+   * request so the security plugin doesn't extend the session with it, and an
+   * unattended tab still signs out after the session's inactivity timeout.
+   */
+  asSystemRequest?: boolean;
+}
+
+export async function hydrateCtiFlowFromServer({
+  asSystemRequest = false,
+}: CtiStatusRequestOptions = {}): Promise<void> {
   const body = await getCore().http.get<CtiRegistrationStatusApiBody>(
     routes.ctiRegistrationStatus,
+    { asSystemRequest },
   );
 
   applyStatusBody(body);
@@ -134,8 +146,10 @@ export async function hydrateCtiFlowFromServer(): Promise<void> {
 
 type CtiRegistrationStatusResult = { statusCode: number; message: string };
 
-async function requestCtiRegistrationStatus(): Promise<CtiRegistrationStatusResult> {
-  await hydrateCtiFlowFromServer();
+async function requestCtiRegistrationStatus(
+  options: CtiStatusRequestOptions,
+): Promise<CtiRegistrationStatusResult> {
+  await hydrateCtiFlowFromServer(options);
 
   try {
     if (ctiFlowState.isRegistered()) {
@@ -172,6 +186,7 @@ async function requestCtiRegistrationStatus(): Promise<CtiRegistrationStatusResu
           grant_type: CTI_OAUTH_DEVICE_GRANT_TYPE,
           device_code: deviceCode,
         }),
+        asSystemRequest: options.asSystemRequest,
       },
     )) as Record<string, unknown>;
 
@@ -183,7 +198,7 @@ async function requestCtiRegistrationStatus(): Promise<CtiRegistrationStatusResu
         CTI_REGISTRATION_COMPLETED_BODY.success
     ) {
       ctiFlowState.setRegistrationComplete(true);
-      await hydrateCtiFlowFromServer();
+      await hydrateCtiFlowFromServer(options);
       return {
         statusCode: statusCodes.SUCCESS,
         message: CTI_REGISTRATION_SUCCESS_STATUS_MESSAGE,
@@ -245,11 +260,15 @@ let statusRequestInFlight: Promise<CtiRegistrationStatusResult> | null = null;
  * refresh) share one request: the Wazuh Console redeems a device code once, and
  * a duplicate poll would get `not_found` and report a false failure.
  */
-export function fetchCtiRegistrationStatus(): Promise<CtiRegistrationStatusResult> {
+export function fetchCtiRegistrationStatus(
+  options: CtiStatusRequestOptions = {},
+): Promise<CtiRegistrationStatusResult> {
   if (!statusRequestInFlight) {
-    statusRequestInFlight = requestCtiRegistrationStatus().finally(() => {
-      statusRequestInFlight = null;
-    });
+    statusRequestInFlight = requestCtiRegistrationStatus(options).finally(
+      () => {
+        statusRequestInFlight = null;
+      },
+    );
   }
   return statusRequestInFlight;
 }

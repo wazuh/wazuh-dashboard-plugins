@@ -180,7 +180,7 @@ export default compose(
       return result;
     }
 
-    async getFullLogs(customOffset = 0) {
+    async getFullLogs(customOffset = 0, { asSystemRequest = false } = {}) {
       const { logsPath } = this.state;
       let result = '';
       let totalItems = 0;
@@ -192,9 +192,14 @@ export default compose(
       }
 
       try {
-        const tmpResult = await WzRequest.apiReq('GET', logsPath, {
-          params: this.buildFilters(customOffset),
-        });
+        const tmpResult = await WzRequest.apiReq(
+          'GET',
+          logsPath,
+          {
+            params: this.buildFilters(customOffset),
+          },
+          { asSystemRequest },
+        );
         const resultItems = tmpResult?.data?.data?.affected_items;
         totalItems = tmpResult?.data?.data?.total_affected_items;
         result = this.parseLogsToText(resultItems) || '';
@@ -211,9 +216,9 @@ export default compose(
       return result;
     }
 
-    async setFullLogs() {
+    async setFullLogs({ asSystemRequest = false } = {}) {
       try {
-        const result = await this.getFullLogs();
+        const result = await this.getFullLogs(0, { asSystemRequest });
         this.setState({ logsList: result, offset: 0 });
       } catch (error) {
         const options = {
@@ -424,9 +429,16 @@ export default compose(
     }
 
     setRealTimeInterval() {
-      if (this.state.realTime)
-        this.realTimeInterval = setInterval(() => this.setFullLogs(), 5000);
-      else clearInterval(this.realTimeInterval);
+      if (this.state.realTime) {
+        // The Realtime reads run with no user input: they are sent as system
+        // requests so they don't keep the user's session alive.
+        this.realTimeInterval = setInterval(
+          () => this.setFullLogs({ asSystemRequest: true }),
+          5000,
+        );
+      } else {
+        clearInterval(this.realTimeInterval);
+      }
     }
 
     switchRealTime() {

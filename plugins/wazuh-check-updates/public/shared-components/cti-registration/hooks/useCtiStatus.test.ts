@@ -73,6 +73,29 @@ describe('useCtiStatus — post-registration steady-state re-poll', () => {
     expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalledTimes(1);
   });
 
+  it('sends the re-poll as a system request so it does not extend the session', async () => {
+    mockRegisteredResolution();
+
+    renderHook(() => useCtiStatus(0, 30));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    // The read on mount follows the user's navigation: it is a regular request.
+    expect(mockedFetchCtiRegistrationStatus).toHaveBeenLastCalledWith({
+      asSystemRequest: undefined,
+    });
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    await act(async () => {
+      jest.advanceTimersByTime(30000);
+      await Promise.resolve();
+    });
+
+    expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalledWith({
+      asSystemRequest: true,
+    });
+  });
+
   it('clamps the interval to a minimum of 5 seconds', async () => {
     mockRegisteredResolution();
 
