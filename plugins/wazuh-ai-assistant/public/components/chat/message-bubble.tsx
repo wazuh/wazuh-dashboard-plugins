@@ -479,8 +479,9 @@ function sanitizeProseSegment(segment: string): string {
     stripClosedHtmlComments(segment)
       // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
       // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
-      // matches and passes through untouched.
-      .replace(/<\/?[a-zA-Z][a-zA-Z0-9-]*(?:\s[^<>]*)?\/?>/g, '')
+      // matches and passes through untouched. A tag never spans lines here: a `<div` line with no
+      // `>` would otherwise take every line up to the next `>` (a comparison, a quote) with it.
+      .replace(/<\/?[a-zA-Z][a-zA-Z0-9-]*(?:[ \t][^<>\n]*)?\/?>/g, '')
       // Markdown links: keep the label, drop the target unless it's an explicit http(s) URL — a
       // "plain link... subject to a scheme check" (never javascript:/data:/vbscript:/a bare path).
       // The trailing `\)+` (not just `\)`) also consumes a stray extra ")" that a malicious target

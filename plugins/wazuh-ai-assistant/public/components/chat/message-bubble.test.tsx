@@ -1025,6 +1025,52 @@ describe('AssistantMarkdown — raw HTML and link targets', () => {
     expect(errorLink?.getAttribute('target')).toBe('_blank');
   });
 
+  it.each([
+    [
+      'a later comparison',
+      'one\n\n<script\nthree\n\nfour > 5\n\nfive',
+      ['three', 'four > 5', 'five'],
+    ],
+    [
+      'a later quote',
+      'one\n\n<div\n\ntwo\n\n> quoted\n\nend',
+      ['two', 'quoted', 'end'],
+    ],
+  ])(
+    'keeps every line when an unclosed tag line is followed by %s',
+    (_case, markdown, words) => {
+      const { container } = render(
+        <AssistantMarkdown>{markdown}</AssistantMarkdown>,
+      );
+
+      for (const word of words) {
+        expect(container.textContent).toContain(word);
+      }
+    },
+  );
+
+  it('keeps a quote right under an unclosed tag line', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'<script\n> quoted text'}</AssistantMarkdown>,
+    );
+
+    expect(container.querySelector('blockquote')?.textContent).toContain(
+      'quoted text',
+    );
+  });
+
+  it('shows a tag split over lines as text, with no element', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {'<img\n src=x onerror=alert(1)>\ntail'}
+      </AssistantMarkdown>,
+    );
+
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.textContent).toContain('<img');
+    expect(container.textContent).toContain('tail');
+  });
+
   it('keeps a link title', () => {
     const { container } = render(
       <AssistantMarkdown>
