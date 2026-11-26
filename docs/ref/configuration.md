@@ -18,6 +18,7 @@ The following settings can be defined in the configuration file `opensearch_dash
 | `wazuh_core.healthCheckCertificateExpiryWarningDays`       | days before a server certificate expires at which the certificate validity health check reports yellow. A value outside the allowed values stops the dashboard from starting | 30                                | integer, minimum 1                                                  |
 | `wazuh_core.healthCheckCertificateExpiryCriticalDays`      | days before a server certificate expires at which the certificate validity health check reports red. A value outside the allowed values stops the dashboard from starting    | 7                                 | integer, minimum 1, lower than the warning days                     |
 | `wazuh.disabledSettings`                                   | Define which indexer settings are hidden from the UI                                                                                                                         | `[]`                              | list of: `index-raw-events`                                         |
+| `wazuh.blockCrossSiteLoads`                                | Send `Cross-Origin-Resource-Policy: same-origin` and refuse no-CORS loads from other sites. See [Response headers](#response-headers)                                        | `true`                            | true, false                                                         |
 | `opensearch_security_analytics.disabledSettings`           | Define which Ruleset Management settings are hidden from the UI                                                                                                              | `[]`                              | list of: `index-discarded-events`, `index-unclassified-events`      |
 | `wazuh_check_updates.ctiRegistrationUiEnabled`             | Show the bottom bar that invites users to register for CTI while the environment is not registered. The CTI feed app is always registered                                    | `false`                           | true, false                                                         |
 | `wazuh_check_updates.ctiRegistrationStatusPollIntervalSec` | How often the UI polls the Wazuh Console registration status, in seconds                                                                                                     | `30`                              | integer                                                             |
@@ -127,6 +128,16 @@ None of these cookies sets a `SameSite` attribute. Cross-site request forgery is
 ### Response headers
 
 The dashboard sends `X-Frame-Options: sameorigin` and `X-Content-Type-Options: nosniff` on every response, and `Strict-Transport-Security: max-age=31536000` when it serves HTTPS. A deployment behind a TLS-terminating proxy must send `Strict-Transport-Security` from the proxy instead.
+
+Every response also carries `Cross-Origin-Resource-Policy: same-origin`, and the dashboard refuses with 403 the requests a page of another origin sends to load a dashboard resource without CORS (`<img>`, `<script>`, `<link rel="prefetch">`, `<object>`, `<embed>`). The browser marks them with `Sec-Fetch-Site: same-site` or `cross-site` and `Sec-Fetch-Mode: no-cors`. Otherwise a page on a sibling host, which gets the session cookie because it has no `SameSite` attribute, could tell from the result of such a load whether the user is logged in and roughly which role they have.
+
+These requests still work:
+
+- links, bookmarks and redirects from other sites, and the single sign-on callbacks (SAML POST, OpenID), which are navigations;
+- CORS requests, when `server.cors` is enabled;
+- clients that send no `Sec-Fetch-*` headers: `curl`, API scripts, load-balancer health checks.
+
+`server.customResponseHeaders` cannot override these headers, because the dashboard adds them after it. To turn both measures off, for example when another site must show dashboard images, set `wazuh.blockCrossSiteLoads: false`.
 
 ## SSL/TLS client certificate configuration
 

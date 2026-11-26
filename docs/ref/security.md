@@ -56,6 +56,9 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
 - `server.customResponseHeaders` in `opensearch_dashboards.yml` adds arbitrary response headers
   (for example a stricter `Content-Security-Policy` or `Strict-Transport-Security`) without
   changing dashboard code.
+- `wazuh.blockCrossSiteLoads` (default `true`) sends `Cross-Origin-Resource-Policy: same-origin`
+  and refuses no-CORS loads from other origins, so a page on a sibling host cannot tell whether
+  the user is logged in. See [Response headers](configuration.md#response-headers).
 - `server.xsrf.disableProtection` (default `false`) and `server.xsrf.allowlist` control OSD's
   built-in XSRF protection; only allowlist a path if it must be called without the `osd-xsrf`
   header (most Wazuh dashboard routes don't need to). The older `server.xsrf.whitelist` name is

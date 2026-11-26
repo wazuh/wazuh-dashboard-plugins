@@ -140,6 +140,9 @@ applications in the OpenSearch Dashboards navigation, grouped in categories such
   `node-cron`, that sends the server API requests a user asked to delay.
 - Adds the `x-frame-options`, `x-content-type-options` and, over HTTPS,
   `strict-transport-security` headers to every response.
+- Adds `cross-origin-resource-policy: same-origin` to every response and, before authentication,
+  refuses no-CORS loads from other origins (`server/lib/cross-site-loads.ts`). Turned off with
+  `wazuh.blockCrossSiteLoads: false`.
 
 The browser side of `main` also hosts the [Case Management](modules/case-management/README.md),
 [Incident Response](modules/incident-response/README.md),

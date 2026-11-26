@@ -163,6 +163,7 @@ import { WazuhPluginConfigType } from './config';
 const knownFieldsFilePath = (fileName: string) =>
   path.resolve(__dirname, '../common/known-fields', fileName);
 import { registerRevokeAPITokenOnLogout } from './lib/revoke-api-token-on-logout';
+import { registerBlockCrossSiteLoads } from './lib/cross-site-loads';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -757,6 +758,12 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
     const config$ =
       this.initializerContext.config.create<WazuhPluginConfigType>();
     const config = await config$.pipe(first()).toPromise();
+
+    if (config.blockCrossSiteLoads) {
+      registerBlockCrossSiteLoads(core.http, {
+        logger: this.logger.get('cross-site-loads'),
+      });
+    }
 
     core.capabilities.registerProvider(() => ({
       wazuh: {
