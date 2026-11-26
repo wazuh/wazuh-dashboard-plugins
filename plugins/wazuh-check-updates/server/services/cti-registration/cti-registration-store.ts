@@ -3,6 +3,7 @@ import {
   CTI_DEFAULT_DEVICE_POLL_INTERVAL_SEC,
   CTI_SLOW_DOWN_EXTRA_INTERVAL_SEC,
 } from '../../../common/constants';
+import { resolveCtiVerificationLinks } from '../../../common/cti-verification-links';
 
 export type CtiRegistrationStoreRecord = {
   environmentUuid: string;
@@ -54,18 +55,8 @@ export function parseDeviceAuthorizationForStore(
   }
 
   const user_code = coerceNonEmptyString(o.user_code);
-  const verification_uri = coerceNonEmptyString(
-    o.verification_uri ?? o.verification_uri_complete,
-  );
-  const userCodeParam =
-    user_code.length > 0 ? encodeURIComponent(user_code) : '';
-  const verification_uri_complete =
-    coerceNonEmptyString(o.verification_uri_complete) ||
-    (verification_uri && userCodeParam
-      ? `${verification_uri}${
-          verification_uri.includes('?') ? '&' : '?'
-        }user_code=${userCodeParam}`
-      : '');
+  const { verification_uri, verification_uri_complete } =
+    resolveCtiVerificationLinks(o);
 
   const expiresInSec = coercePositiveInt(
     o.expires_in,
@@ -80,7 +71,7 @@ export function parseDeviceAuthorizationForStore(
   return {
     device_code,
     user_code,
-    verification_uri: verification_uri || verification_uri_complete,
+    verification_uri,
     verification_uri_complete,
     deviceAuthStartedAtMs: now,
     deviceAuthExpiresAtMs: now + expiresInSec * 1000,

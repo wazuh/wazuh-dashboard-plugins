@@ -145,6 +145,26 @@ describe('FeedDetailsFlyout', () => {
     expect(screen.queryByTestId('ctiFeedDetailsResource')).toBeNull();
   });
 
+  test('links an https resource in a new tab', () => {
+    renderFlyout({ resource: 'https://example.test/consumer' });
+
+    const resource = screen.getByTestId('ctiFeedDetailsResource');
+    expect(resource).toHaveAttribute('href', 'https://example.test/consumer');
+    expect(resource).toHaveAttribute('target', '_blank');
+  });
+
+  test.each(['http://example.test/consumer', 'javascript:alert(1)'])(
+    'shows a resource that is not https (%s) as plain text',
+    resource => {
+      renderFlyout({ resource });
+
+      const element = screen.getByTestId('ctiFeedDetailsResource');
+      expect(element).toHaveTextContent(resource);
+      expect(element).not.toHaveAttribute('href');
+      expect(element.closest('a')).toBeNull();
+    },
+  );
+
   test('checks for updates from the footer', async () => {
     mockRequestUpdate.mockResolvedValue({});
     const { onUpdateRequested } = renderFlyout({ status: 'failed' });

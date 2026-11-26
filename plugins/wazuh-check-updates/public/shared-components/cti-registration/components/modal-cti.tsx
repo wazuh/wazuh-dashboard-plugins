@@ -32,6 +32,7 @@ import {
   routes,
   statusCodes,
 } from '../../../../common/constants';
+import { resolveCtiVerificationLinks } from '../../../../common/cti-verification-links';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
 import { CtiConsumersAccordion } from './cti-consumers-accordion';
 import { useCtiRegistrationPermission } from '../hooks/use-cti-registration-permission';
@@ -216,24 +217,11 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       ctiFlowState.setDeviceAuthExpiry(expiresInSec);
       ctiFlowState.setDeviceAuthPendingFor(0);
 
-      const verificationUri =
-        ctiResponse.verification_uri ??
-        ctiResponse.verification_uri_complete ??
-        '';
-      const userCode = ctiResponse.user_code ?? '';
-      const verificationUriComplete =
-        ctiResponse.verification_uri_complete ??
-        (verificationUri && userCode
-          ? `${verificationUri}${
-              verificationUri.includes('?') ? '&' : '?'
-            }user_code=${encodeURIComponent(userCode)}`
-          : '');
-
       const links: CtiDeviceAuthorization = {
-        user_code: userCode,
-        verification_uri: verificationUri || verificationUriComplete,
-        verification_uri_complete: verificationUriComplete,
+        user_code: ctiResponse.user_code ?? '',
+        ...resolveCtiVerificationLinks(ctiResponse),
       };
+      const verificationUriComplete = links.verification_uri_complete;
       setDeviceAuth(links);
       ctiFlowState.setDeviceAuthLinks(links);
       /* eslint-enable camelcase */

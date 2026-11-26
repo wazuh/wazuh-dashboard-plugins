@@ -80,6 +80,52 @@ describe('CtiConsumersAccordion', () => {
   });
 
   it.each([
+    ['https://example.test/resource-1', 'https://example.test/resource-1'],
+    ['http://example.test/resource-1', null],
+    ['javascript:alert(1)', null],
+  ])(
+    'links the resource %p only when it is https',
+    async (resource, expectedHref) => {
+      /* eslint-disable camelcase -- CtiConsumer fixture matches the CTI API's snake_case fields */
+      mockedHttpGet.mockResolvedValue({
+        data: [
+          {
+            name: 'consumer-1',
+            context: 'ctx-1',
+            type: 'type-1',
+            resource,
+            is_public: true,
+            status: 'ready',
+            local_offset: 10,
+            remote_offset: 10,
+          },
+        ],
+      });
+      /* eslint-enable camelcase */
+
+      render(<CtiConsumersAccordion />);
+      await screen.findByText('consumer-1');
+      fireEvent.click(
+        document.querySelector(
+          '[data-test-subj="ctiConsumerDetailsToggle"]',
+        ) as HTMLElement,
+      );
+
+      const resourceItem = document.querySelector(
+        '[data-test-subj="ctiConsumersResourceItem"]',
+      ) as HTMLElement;
+      expect(resourceItem).toHaveTextContent(resource);
+      const link = resourceItem.querySelector('a');
+      if (expectedHref) {
+        expect(link).toHaveAttribute('href', expectedHref);
+        expect(link).toHaveAttribute('target', '_blank');
+      } else {
+        expect(link).toBeNull();
+      }
+    },
+  );
+
+  it.each([
     ['2026-05-21T12:26:16.581939Z', 'formatted 2026-05-21T12:26:16.581939Z'],
     [undefined, '-'],
   ])(

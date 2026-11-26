@@ -1,4 +1,7 @@
-import { CtiRegistrationStore } from './cti-registration-store';
+import {
+  CtiRegistrationStore,
+  parseDeviceAuthorizationForStore,
+} from './cti-registration-store';
 
 describe('CtiRegistrationStore — subscription snapshot + update lock', () => {
   afterEach(() => {
@@ -85,3 +88,45 @@ describe('CtiRegistrationStore — subscription snapshot + update lock', () => {
     expect(freshStore.getSubscriptionSnapshot('env-uuid-1')).toBeUndefined();
   });
 });
+
+/* eslint-disable camelcase -- OAuth device authorization JSON uses snake_case */
+describe('parseDeviceAuthorizationForStore — verification links', () => {
+  it('keeps an https pair on the same origin', () => {
+    const parsed = parseDeviceAuthorizationForStore({
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'https://console.test/register',
+      verification_uri_complete:
+        'https://console.test/register?user_code=WZH-1',
+    });
+    expect(parsed.verification_uri).toBe('https://console.test/register');
+    expect(parsed.verification_uri_complete).toBe(
+      'https://console.test/register?user_code=WZH-1',
+    );
+  });
+
+  it('stores a target on the shown origin when the two fields name different hosts', () => {
+    const parsed = parseDeviceAuthorizationForStore({
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'https://console.test/register',
+      verification_uri_complete: 'https://other.test/register?user_code=WZH-1',
+    });
+    expect(parsed.verification_uri_complete).toBe(
+      'https://console.test/register?user_code=WZH-1',
+    );
+  });
+
+  it('stores no link when neither field is https', () => {
+    const parsed = parseDeviceAuthorizationForStore({
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'http://console.test/register',
+      verification_uri_complete: 'javascript:alert(1)',
+    });
+    expect(parsed.device_code).toBe('dc1');
+    expect(parsed.verification_uri).toBe('');
+    expect(parsed.verification_uri_complete).toBe('');
+  });
+});
+/* eslint-enable camelcase */

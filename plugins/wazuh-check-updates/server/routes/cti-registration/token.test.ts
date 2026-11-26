@@ -129,6 +129,8 @@ describe('CTI token route', () => {
     expect(response.body).toEqual({
       device_code: 'dc1',
       user_code: 'WZH-1',
+      verification_uri: '',
+      verification_uri_complete: '',
     });
     expect(mockedResolve).toHaveBeenCalledWith();
     expect(mockedEvaluatePermission).toHaveBeenCalledWith(mockWazuhClient);
@@ -157,6 +159,52 @@ describe('CTI token route', () => {
     expect(stored?.device_code).toBe('dc1');
     expect(stored?.poll_interval_sec).toBe(7);
     expect(stored?.registrationComplete).toBe(false);
+  });
+
+  test('POST device authorization answers with the validated links, as the status route stores them', async () => {
+    mockedGetCtiToken.mockResolvedValue({
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      verification_uri_complete: 'https://other.test/register?user_code=WZH-1',
+      expires_in: 600,
+      interval: 5,
+    });
+
+    const response = await supertest(innerServer.listener)
+      .post(routes.token)
+      .send({})
+      .expect(200);
+
+    expect(response.body.verification_uri).toBe(
+      'https://example.test/register',
+    );
+    expect(response.body.verification_uri_complete).toBe(
+      'https://example.test/register?user_code=WZH-1',
+    );
+    const stored =
+      CtiRegistrationStore.getInstance().getStatus('resolved-client-id');
+    expect(stored?.verification_uri).toBe(response.body.verification_uri);
+    expect(stored?.verification_uri_complete).toBe(
+      response.body.verification_uri_complete,
+    );
+  });
+
+  test('POST device authorization drops links that are not https', async () => {
+    mockedGetCtiToken.mockResolvedValue({
+      device_code: 'dc1',
+      user_code: 'WZH-1',
+      verification_uri: 'http://example.test/register',
+      verification_uri_complete: 'javascript:alert(1)',
+    });
+
+    const response = await supertest(innerServer.listener)
+      .post(routes.token)
+      .send({})
+      .expect(200);
+
+    expect(response.body.verification_uri).toBe('');
+    expect(response.body.verification_uri_complete).toBe('');
   });
 
   test('POST polling OAuth terminal error clears registration store', async () => {
