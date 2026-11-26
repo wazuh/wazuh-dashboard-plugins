@@ -20,7 +20,10 @@ import {
   getToasts,
   getWazuhCorePlugin,
 } from '../kibana-services';
-import { PLUGIN_PLATFORM_REQUEST_HEADERS } from '../../common/constants';
+import {
+  PLUGIN_PLATFORM_REQUEST_HEADERS,
+  PLUGIN_PLATFORM_SYSTEM_REQUEST_HEADERS,
+} from '../../common/constants';
 import { request, isLoggingOut } from '../services/request-handler';
 import { BehaviorSubject } from 'rxjs';
 import { first, distinctUntilChanged } from 'rxjs/operators';
@@ -169,15 +172,21 @@ export class WzRequest {
     });
   }
 
-  private static async runPrimaryApiRecovery(): Promise<boolean> {
+  private static async runPrimaryApiRecovery(
+    asSystemRequest = false,
+  ): Promise<boolean> {
     try {
-      const hosts = await getCore().http.get('/hosts/apis');
+      const hosts = await getCore().http.get('/hosts/apis', {
+        asSystemRequest,
+      });
       const host = hosts?.[0];
       if (!host?.id) {
         return false;
       }
 
-      const response = await ApiCheck.checkApi(host, true);
+      const response = await ApiCheck.checkApi(host, true, {
+        asSystemRequest,
+      });
       const clusterInfo = response?.data || {};
       if (!clusterInfo || !clusterInfo.cluster) {
         return false;
@@ -198,12 +207,14 @@ export class WzRequest {
     }
   }
 
-  static async recoverPrimaryAPI() {
+  static recoverPrimaryAPI(asSystemRequest = false): Promise<boolean> {
     if (this.recoveringPrimaryApi) {
       return this.recoveringPrimaryApi;
     }
 
-    this.recoveringPrimaryApi = this.runPrimaryApiRecovery().finally(() => {
+    this.recoveringPrimaryApi = this.runPrimaryApiRecovery(
+      asSystemRequest,
+    ).finally(() => {
       this.recoveringPrimaryApi = null;
     });
 
@@ -236,6 +247,8 @@ export class WzRequest {
    * @param {String} method
    * @param {String} path
    * @param {Object} payload
+   * @param {Object} extraOptions `asSystemRequest` flags a request the UI sends
+   * on its own (a timer or poll) so it doesn't extend the user's session.
    */
   static async genericReq(
     method,
@@ -245,6 +258,7 @@ export class WzRequest {
       shouldRetry?: boolean;
       checkCurrentApiIsUp?: boolean;
       overwriteHeaders?: any;
+      asSystemRequest?: boolean;
     } = {
       shouldRetry: true,
       checkCurrentApiIsUp: true,
@@ -263,6 +277,7 @@ export class WzRequest {
       typeof extraOptions.overwriteHeaders === 'object'
         ? extraOptions.overwriteHeaders
         : {};
+    const asSystemRequest = extraOptions.asSystemRequest === true;
     try {
       if (!method || !path) {
         throw new Error('Missing parameters');
@@ -275,6 +290,7 @@ export class WzRequest {
         headers: {
           ...PLUGIN_PLATFORM_REQUEST_HEADERS,
           'content-type': 'application/json',
+          ...(asSystemRequest ? PLUGIN_PLATFORM_SYSTEM_REQUEST_HEADERS : {}),
           ...overwriteHeaders,
         },
         url: url,
@@ -298,6 +314,8 @@ export class WzRequest {
           try {
             const checkStoredResponse = await ApiCheck.checkStored(
               currentApi.id,
+              false,
+              { asSystemRequest },
             );
             const nextApiID = checkStoredResponse?.data?.idChanged;
             const clusterInfo = checkStoredResponse?.data?.data?.cluster_info;
@@ -319,6 +337,7 @@ export class WzRequest {
                   shouldRetry,
                   checkCurrentApiIsUp: false,
                   overwriteHeaders,
+                  asSystemRequest,
                 },
               );
             }
@@ -327,7 +346,7 @@ export class WzRequest {
             // is hashing a large merged.mg): keep the user on the page and let
             // the caller handle the original error.
             if (error?.code !== 'ECONNABORTED') {
-              const recovered = await this.recoverPrimaryAPI();
+              const recovered = await this.recoverPrimaryAPI(asSystemRequest);
               if (recovered) {
                 return this.genericReq(
                   method,
@@ -337,6 +356,7 @@ export class WzRequest {
                     shouldRetry,
                     checkCurrentApiIsUp: false,
                     overwriteHeaders,
+                    asSystemRequest,
                   },
                 );
               }
@@ -379,12 +399,12 @@ export class WzRequest {
         shouldRetry
       ) {
         try {
-          await WzAuthentication.refresh(true);
+          await WzAuthentication.refresh(true, { asSystemRequest });
           return this.genericReq(
             method,
             path,
             this.syncApiRequestPayloadWithSession(path, payload),
-            { shouldRetry: false },
+            { shouldRetry: false, asSystemRequest },
           );
         } catch (error) {
           return ((error || {}).data || {}).message || false
@@ -420,6 +440,7 @@ export class WzRequest {
     options: {
       checkCurrentApiIsUp?: boolean;
       returnOriginalResponse?: boolean;
+      asSystemRequest?: boolean;
     } = { checkCurrentApiIsUp: true, returnOriginalResponse: false },
   ): Promise<IApiResponse<any>> {
     try {
@@ -430,6 +451,7 @@ export class WzRequest {
       const getGenericReqOptions = (options: {
         checkCurrentApiIsUp?: boolean;
         returnOriginalResponse?: boolean;
+        asSystemRequest?: boolean;
       }) => {
         const { returnOriginalResponse, ...restOptions } = options;
         return restOptions;

@@ -125,6 +125,12 @@ describe('ModalCti component', () => {
         /Register it in the Wazuh Console to manage your instance/,
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Console account is required/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Learn more' }),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the Consumers accordion in the success view', async () => {

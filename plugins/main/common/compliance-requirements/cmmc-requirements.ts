@@ -12,7 +12,8 @@
 
 /*
  * Framework: cmmc
- * Catalog version: 1.0.0
+ * Catalog version: 1.1.0
+ * Catalog commit: wazuh/intelligence-data@af191162cd6f8c29914fce2974ed22838ca44c71
  * Edition: 32 CFR Part 170 (CMMC Program final rule), Levels 1-3
  * Source: eCFR (Office of the Federal Register / GPO), 32 CFR Part 170 - CMMC Program, with 48 CFR 52.204-21 and the NIST SP 800-171 Rev 2 requirements CSV that the rule adopts; all three artifacts are listed in index.json
  * Controls: 149

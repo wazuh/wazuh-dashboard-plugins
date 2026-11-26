@@ -421,25 +421,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
                 defaultMessage='Your instance already receives the Open CTI feed. Register it in the Wazuh Console to manage your instance and upgrade to the Professional CTI feed, with early access to vulnerabilities, IOCs, and detection rules.'
               />
             </p>
-            <p>
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalBodyAccountRequired'
-                defaultMessage='A free Wazuh Console account is required. {learnMoreLink}.'
-                values={{
-                  learnMoreLink: (
-                    <EuiLink
-                      href='https://cti.wazuh.com/vulnerabilities/cves'
-                      target='_blank'
-                    >
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiRegistration.modalBodyLearnMoreLink'
-                        defaultMessage='Learn more'
-                      />
-                    </EuiLink>
-                  ),
-                }}
-              />
-            </p>
           </EuiText>
         ) : null}
         {showPermissionDenied ? (

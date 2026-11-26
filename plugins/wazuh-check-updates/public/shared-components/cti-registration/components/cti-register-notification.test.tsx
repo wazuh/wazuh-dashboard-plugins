@@ -78,7 +78,9 @@ describe('CtiRegisterNotification', () => {
     render(<CtiRegisterNotification />);
 
     await waitFor(() => {
-      expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus);
+      expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus, {
+        asSystemRequest: false,
+      });
     });
 
     await waitFor(() => {
@@ -139,7 +141,9 @@ describe('CtiRegisterNotification', () => {
       expect(mockHttpGet).toHaveBeenCalledWith(routes.userPreferences);
     });
     await waitFor(() => {
-      expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus);
+      expect(mockHttpGet).toHaveBeenCalledWith(routes.ctiRegistrationStatus, {
+        asSystemRequest: false,
+      });
     });
 
     expect(screen.queryByText('Register now')).not.toBeInTheDocument();

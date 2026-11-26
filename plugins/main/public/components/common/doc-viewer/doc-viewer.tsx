@@ -11,6 +11,7 @@ import { DocViewTableRowBtnFilterExists } from './table-row-btn-filter-exists';
 import './doc-viewer.scss';
 import { onFilterCellActions } from '../data-grid/filter-cell-actions';
 import { Filter } from '../../../../../../src/plugins/data/common';
+import { sanitizeFormattedValue } from '../index-pattern/sanitize-formatted-value';
 
 const COLLAPSE_LINE_LENGTH = 350;
 const DOT_PREFIX_RE = /(.).+?\./g;
@@ -164,7 +165,7 @@ const DocViewer = (props: tDocViewerProps) => {
             {Object.keys(flattened)
               .sort()
               .map((field, index) => {
-                const value = String(formatted[field]);
+                const value = sanitizeFormattedValue(String(formatted[field]));
                 const fieldMapping = mapping(field);
                 const isCollapsible = value.length > COLLAPSE_LINE_LENGTH;
                 const isCollapsed = isCollapsible && !fieldRowOpen[field];
@@ -264,10 +265,11 @@ const DocViewer = (props: tDocViewerProps) => {
                           data-test-subj={`tableDocViewRow-${field}-value`}
                           /*
                            * Justification for dangerouslySetInnerHTML:
-                           * We just use values encoded by our field formatters
+                           * The value comes from the field formatters and is
+                           * sanitized with sanitizeFormattedValue
                            */
                           // eslint-disable-next-line react/no-danger
-                          dangerouslySetInnerHTML={{ __html: value as string }}
+                          dangerouslySetInnerHTML={{ __html: value }}
                           style={{
                             overflowY: 'auto',
                             wordBreak: 'break-all',

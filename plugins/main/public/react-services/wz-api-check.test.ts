@@ -77,4 +77,39 @@ describe('Wz Api Check', () => {
       }
     });
   });
+
+  describe('asSystemRequest', () => {
+    const mockedAxios = axios as jest.MockedFunction<typeof axios>;
+
+    beforeEach(() => {
+      mockedAxios.mockReset();
+      mockedAxios.mockResolvedValue({ data: {} } as AxiosResponse);
+    });
+
+    it('checkStored sends a regular request by default', async () => {
+      await ApiCheck.checkStored('api-2');
+
+      expect(mockedAxios.mock.calls[0][0].headers).not.toHaveProperty(
+        'osd-system-request',
+      );
+    });
+
+    it('checkStored flags a timer-driven check as a system request', async () => {
+      await ApiCheck.checkStored('api-2', false, { asSystemRequest: true });
+
+      expect(mockedAxios.mock.calls[0][0].headers).toMatchObject({
+        'osd-system-request': 'true',
+      });
+    });
+
+    it('checkApi flags a timer-driven check as a system request', async () => {
+      await ApiCheck.checkApi({ id: 'api-id-mocked' }, true, {
+        asSystemRequest: true,
+      });
+
+      expect(mockedAxios.mock.calls[0][0].headers).toMatchObject({
+        'osd-system-request': 'true',
+      });
+    });
+  });
 });
