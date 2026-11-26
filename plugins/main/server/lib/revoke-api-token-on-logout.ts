@@ -16,16 +16,20 @@ import {
 } from 'opensearch_dashboards/server';
 import { getCookieValueByName } from './cookie';
 
-// Routes of the security plugin that end a session: the logouts (basic, JWT,
-// proxy, OpenID, SAML) and the basic login, which replaces the previous session
+// Logout routes of the security plugin: basic, JWT, proxy, OpenID, SAML
 const LOGOUT_ROUTES = new Set([
   'post /auth/logout',
   'post /api/v1/auth/logout',
   'post /auth/proxy/logout',
   'get /auth/openid/logout',
   'get /auth/saml/logout',
-  'post /auth/login',
 ]);
+
+// The basic login replaces the previous session. Its token is not revoked: the
+// Server API revokes every token of the user, which would also end the token of
+// the user's other sessions. Expiring the cookie is enough for this browser to
+// stop using it.
+const LOGIN_ROUTE = 'post /auth/login';
 
 interface ServerAPIClient {
   asScoped: (
@@ -42,9 +46,9 @@ interface ServerAPIClient {
 }
 
 /**
- * Revoke the Server API token of the user when their dashboard session ends,
- * from any app and any logout method or a new login, and expire its cookie so
- * the next session does not reuse it.
+ * Revoke the Server API token of the user when they log out of the dashboard,
+ * from any app and any logout method, and expire its cookie so the next login
+ * does not reuse it. A new login expires the cookie of the previous session.
  */
 export function registerRevokeAPITokenOnLogout(
   http: Pick<HttpServiceSetup, 'registerOnPreResponse'>,
@@ -56,10 +60,9 @@ export function registerRevokeAPITokenOnLogout(
   // On the response, so only a completed logout counts: not a 404, an XSRF
   // rejection (400) or a failed logout
   http.registerOnPreResponse((request, response, toolkit) => {
-    if (
-      response.statusCode >= 400 ||
-      !LOGOUT_ROUTES.has(`${request.route.method} ${request.route.path}`)
-    ) {
+    const route = `${request.route.method} ${request.route.path}`;
+    const isLogout = LOGOUT_ROUTES.has(route);
+    if (response.statusCode >= 400 || (!isLogout && route !== LOGIN_ROUTE)) {
       return toolkit.next();
     }
 
@@ -69,7 +72,7 @@ export function registerRevokeAPITokenOnLogout(
     }
 
     const apiHostID = getCookieValueByName(cookie, 'wz-api');
-    if (apiHostID) {
+    if (isLogout && apiHostID) {
       // Not awaited, so the logout is not delayed by the Server API
       serverAPIClient
         .asScoped({}, request)
