@@ -126,7 +126,7 @@ None of these cookies sets a `SameSite` attribute. Cross-site request forgery is
 
 ### Response headers
 
-The dashboard sends `X-Frame-Options: sameorigin` and `X-Content-Type-Options: nosniff` on every response, and `Strict-Transport-Security: max-age=31536000` when it serves HTTPS. A deployment behind a TLS-terminating proxy must send `Strict-Transport-Security` from the proxy instead.
+The dashboard sends `X-Frame-Options: sameorigin`, `X-Content-Type-Options: nosniff` and `Cross-Origin-Opener-Policy: same-origin` on every response, and `Strict-Transport-Security: max-age=31536000` when it serves HTTPS. `Cross-Origin-Opener-Policy` keeps a page on another origin from holding a window reference to the dashboard tab, whether that page opened the dashboard or the dashboard opened it, so the page cannot navigate the tab. A deployment behind a TLS-terminating proxy must send `Strict-Transport-Security` from the proxy instead.
 
 ## SSL/TLS client certificate configuration
 

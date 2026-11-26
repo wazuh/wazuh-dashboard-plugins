@@ -163,6 +163,7 @@ import { WazuhPluginConfigType } from './config';
 const knownFieldsFilePath = (fileName: string) =>
   path.resolve(__dirname, '../common/known-fields', fileName);
 import { registerRevokeAPITokenOnLogout } from './lib/revoke-api-token-on-logout';
+import { registerSecurityResponseHeaders } from './lib/security-response-headers';
 
 declare module 'opensearch_dashboards/server' {
   interface RequestHandlerContext {
@@ -724,23 +725,8 @@ export class WazuhPlugin implements Plugin<WazuhPluginSetup, WazuhPluginStart> {
       api: context.wazuh_core.api,
     }));
 
-    // Add custom headers to the responses
-    core.http.registerOnPreResponse((request, response, toolkit) => {
-      const additionalHeaders: Record<string, string> = {
-        'x-frame-options': 'sameorigin',
-        'x-content-type-options': 'nosniff',
-      };
-
-      // HSTS is only honoured by browsers over TLS. Emitting it from a plain
-      // HTTP listener would be a no-op, and a deployment that terminates TLS at
-      // a proxy must set the header there, where the real protocol is known.
-      // `includeSubDomains` is deliberately omitted: a browser pins it for the
-      // whole max-age and it would reach unrelated hosts on sibling subdomains.
-      if (serverInfo.protocol === 'https') {
-        additionalHeaders['strict-transport-security'] = 'max-age=31536000';
-      }
-
-      return toolkit.next({ headers: additionalHeaders });
+    registerSecurityResponseHeaders(core.http, {
+      https: serverInfo.protocol === 'https',
     });
 
     registerRevokeAPITokenOnLogout(core.http, {

@@ -285,7 +285,8 @@ describe('ModalCti component', () => {
 
     expect(window.open).toHaveBeenCalledWith(
       'https://example.test/platform/environments/register?user_code=WZH-999',
-      'wazuh_cti',
+      '_blank',
+      'noopener,noreferrer',
     );
     expect(ctiFlowState.getDeviceAuthLinks()?.verification_uri_complete).toBe(
       'https://example.test/platform/environments/register?user_code=WZH-999',
