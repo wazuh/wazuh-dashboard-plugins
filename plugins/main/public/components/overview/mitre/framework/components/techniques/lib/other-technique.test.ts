@@ -7,7 +7,7 @@ import {
   buildOtherAggregation,
   buildOtherFilter,
   getCatalogTechniqueIds,
-  sortWithOtherLast,
+  getUnknownBuckets,
 } from './other-technique';
 
 describe('other-technique', () => {
@@ -47,24 +47,23 @@ describe('other-technique', () => {
       'T1059',
     ]);
   });
+});
 
-  it('sorts by count and pins Other at the end whatever its count', () => {
-    const result = sortWithOtherLast(
-      [
-        { id: 'T1', quantity: 1 },
-        { id: 'T2', quantity: 5 },
-      ],
-      { id: 'other', quantity: 100 },
-    );
-    expect(result.map(item => item.id)).toEqual(['T2', 'T1', 'other']);
+describe('getUnknownBuckets', () => {
+  it('keeps only the buckets whose ID is not in the catalog', () => {
+    const buckets = [
+      { key: 'T1059', doc_count: 5 },
+      { key: 'T9991', doc_count: 2 },
+      { key: 'T9992', doc_count: 1 },
+    ];
+    expect(getUnknownBuckets(buckets, ['T1059'])).toEqual([
+      { key: 'T9991', doc_count: 2 },
+      { key: 'T9992', doc_count: 1 },
+    ]);
   });
 
-  it('returns only the sorted techniques when there is no Other item', () => {
-    expect(
-      sortWithOtherLast([
-        { id: 'a', quantity: 1 },
-        { id: 'b', quantity: 2 },
-      ]).map(i => i.id),
-    ).toEqual(['b', 'a']);
+  it('returns every bucket when the catalog is empty', () => {
+    const buckets = [{ key: 'T1', doc_count: 1 }];
+    expect(getUnknownBuckets(buckets, [])).toEqual(buckets);
   });
 });

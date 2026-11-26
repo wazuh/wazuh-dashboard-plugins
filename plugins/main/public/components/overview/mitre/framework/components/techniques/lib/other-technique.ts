@@ -3,7 +3,7 @@
 export const TECHNIQUE_FIELD = 'wazuh.rule.mitre.technique.id';
 export const OTHER_TECHNIQUE_ID = '__other__';
 export const OTHER_AGGREGATION_KEY = 'otherTechniques';
-export const OTHER_FILTER_LABEL = 'MITRE technique: Other';
+export const OTHER_FILTER_LABEL = 'MITRE technique: Others';
 
 const MITRE_ATTACK = 'mitre-attack';
 
@@ -76,15 +76,14 @@ export const buildOtherFilter = (
   $state: { store: 'appState' },
 });
 
-type tFacetItem = { id: string; quantity: number };
-
 /**
- * Sort the techniques by count (descending) and pin "Other" at the end
+ * Buckets of the technique IDs that are not in the catalog, from the terms aggregation of
+ * the technique field (a finding with several IDs adds one count to each of them).
  */
-export const sortWithOtherLast = <T extends tFacetItem>(
-  techniques: T[],
-  other?: T,
-): T[] => {
-  const sorted = [...techniques].sort((a, b) => b.quantity - a.quantity);
-  return other ? [...sorted, other] : sorted;
+export const getUnknownBuckets = (
+  buckets: { key: string; doc_count: number }[],
+  catalogIds: string[],
+) => {
+  const catalog = new Set(catalogIds);
+  return buckets.filter(bucket => !catalog.has(bucket.key));
 };
