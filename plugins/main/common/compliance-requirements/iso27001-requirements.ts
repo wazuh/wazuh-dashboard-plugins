@@ -12,7 +12,8 @@
 
 /*
  * Framework: iso_27001
- * Catalog version: 1.0.0
+ * Catalog version: 1.1.0
+ * Catalog commit: wazuh/intelligence-data@af191162cd6f8c29914fce2974ed22838ca44c71
  * Edition: 2022
  * Source: ISO/IEC 27002:2022(E) Information security controls, official preview pages (table of contents), published by ISO/IEC and distributed by ANSI
  * Controls: 93
