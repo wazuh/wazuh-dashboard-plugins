@@ -52,6 +52,8 @@ describe('registerRevokeAPITokenOnLogout', () => {
     ['get /auth/saml/logout', 400],
     ['post /api/request', 200],
     ['post /auth/login', 401],
+    ['get /auth/openid/login', 400],
+    ['post /_opendistro/_security/saml/acs', 401],
   ])('does nothing on %s (status %p)', (route, statusCode) => {
     const { run, request } = setup();
 
@@ -59,14 +61,35 @@ describe('registerRevokeAPITokenOnLogout', () => {
     expect(request).not.toHaveBeenCalled();
   });
 
-  it('expires the cookie without revoking the token on a new login', () => {
+  it.each([
+    ['post /auth/login', 200],
+    ['get /auth/openid/login', 302],
+    ['get /auth/saml/login', 302],
+    ['post /_opendistro/_security/saml/acs', 302],
+    ['post /_opendistro/_security/saml/acs/idpinitiated', 302],
+  ])(
+    'expires the cookie without revoking the token on %s',
+    (route, statusCode) => {
+      const { run, request } = setup();
+
+      expect(run(route, { statusCode })).toEqual(EXPIRE_COOKIE);
+      expect(request).not.toHaveBeenCalled();
+    },
+  );
+
+  it('expires the cookie on a login whose request does not carry it', () => {
     const { run, request } = setup();
 
-    expect(run('post /auth/login')).toEqual(EXPIRE_COOKIE);
+    expect(
+      run('post /_opendistro/_security/saml/acs/idpinitiated', {
+        cookie: 'security_authentication=xyz',
+        statusCode: 302,
+      }),
+    ).toEqual(EXPIRE_COOKIE);
     expect(request).not.toHaveBeenCalled();
   });
 
-  it('does nothing without the wz-token cookie', () => {
+  it('does nothing on a logout without the wz-token cookie', () => {
     const { run, request } = setup();
 
     expect(run('post /auth/logout', { cookie: 'wz-api=default' })).toBe(
