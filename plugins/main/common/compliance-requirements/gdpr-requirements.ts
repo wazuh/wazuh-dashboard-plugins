@@ -12,7 +12,8 @@
 
 /*
  * Framework: gdpr
- * Catalog version: 1.0.0
+ * Catalog version: 1.1.0
+ * Catalog commit: wazuh/intelligence-data@af191162cd6f8c29914fce2974ed22838ca44c71
  * Edition: Regulation (EU) 2016/679
  * Source: Publications Office of the European Union (Cellar), official OJ XHTML of Regulation (EU) 2016/679 (GDPR), CELEX 32016R0679, English. Served by the publisher's own content-negotiation endpoint with Accept: application/xhtml+xml; the eur-lex.europa.eu HTML renderer of the same CELEX sits behind an AWS WAF browser challenge and cannot be fetched programmatically.
  * Controls: 99

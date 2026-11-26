@@ -73,6 +73,29 @@ describe('useCtiStatus — post-registration steady-state re-poll', () => {
     expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalledTimes(1);
   });
 
+  it('sends the re-poll as a system request so it does not extend the session', async () => {
+    mockRegisteredResolution();
+
+    renderHook(() => useCtiStatus(0, 30));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    // The read on mount follows the user's navigation: it is a regular request.
+    expect(mockedFetchCtiRegistrationStatus).toHaveBeenLastCalledWith({
+      asSystemRequest: undefined,
+    });
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    await act(async () => {
+      jest.advanceTimersByTime(30000);
+      await Promise.resolve();
+    });
+
+    expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalledWith({
+      asSystemRequest: true,
+    });
+  });
+
   it('clamps the interval to a minimum of 5 seconds', async () => {
     mockRegisteredResolution();
 
@@ -163,6 +186,44 @@ describe('useCtiStatus — post-registration steady-state re-poll', () => {
       await Promise.resolve();
     });
     expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useCtiStatus — device-flow polling', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    ctiFlowState.reset();
+    mockedFetchCtiRegistrationStatus.mockReset();
+    // The activation stays pending: the device code is not redeemed yet.
+    mockedFetchCtiRegistrationStatus.mockResolvedValue({
+      statusCode: 404,
+      message: 'authorization_pending',
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('sends the activation polls as system requests so they do not extend the session', async () => {
+    ctiFlowState.setDeviceCode('device-code');
+    ctiFlowState.setPollIntervalSec(5);
+
+    renderHook(() => useCtiStatus(0, 30));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    await act(async () => {
+      jest.advanceTimersByTime(ctiFlowState.getPollIntervalSec() * 1000);
+      await Promise.resolve();
+    });
+
+    expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalled();
+    mockedFetchCtiRegistrationStatus.mock.calls.forEach(([options]) =>
+      expect(options).toEqual({ asSystemRequest: true }),
+    );
   });
 });
 

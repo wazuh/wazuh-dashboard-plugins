@@ -12,7 +12,8 @@
 
 /*
  * Framework: hipaa
- * Catalog version: 1.0.0
+ * Catalog version: 1.1.0
+ * Catalog commit: wazuh/intelligence-data@af191162cd6f8c29914fce2974ed22838ca44c71
  * Edition: 45 CFR Part 164 Subpart C, eCFR issue of 2026-08-31
  * Source: eCFR (Office of the Federal Register / GPO), 45 CFR Part 164 Subpart C - Security Standards for the Protection of Electronic Protected Health Information
  * Controls: 64

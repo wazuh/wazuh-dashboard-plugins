@@ -108,41 +108,46 @@ export const useCtiStatus = (
     !ctiFlowState.isRegistrationComplete();
   const modalOpen = ctiFlowState.isModalOpen();
 
-  const fetchStatus = useCallback(async (options?: { silent?: boolean }) => {
-    ctiFlowState.markStatusFetched();
-    try {
-      if (!options?.silent) {
-        setLoading(true);
-      }
-      const response = await fetchCtiRegistrationStatus();
-      setStatusCTI({
-        status: response.statusCode,
-        message: response.message,
-      });
-    } catch (error: unknown) {
-      // A failed request never means "no longer registered", only a real
-      // server response can change that.
-      if (isSteadyRegistered()) {
-        return;
-      }
-      const e = error as { statusCode?: number; message?: string };
-      setStatusCTI({
-        status: e.statusCode ?? statusCodes.NOT_FOUND,
-        message: e.message ?? '',
-      });
-    } finally {
-      if (!options?.silent) {
-        setLoading(false);
-        if (
-          ctiFlowState.getDeviceCode() &&
-          !ctiFlowState.isRegistrationComplete() &&
-          !ctiFlowState.isRegistered()
-        ) {
-          setPollingSeed(s => s + 1);
+  const fetchStatus = useCallback(
+    async (options?: { silent?: boolean; asSystemRequest?: boolean }) => {
+      ctiFlowState.markStatusFetched();
+      try {
+        if (!options?.silent) {
+          setLoading(true);
+        }
+        const response = await fetchCtiRegistrationStatus({
+          asSystemRequest: options?.asSystemRequest,
+        });
+        setStatusCTI({
+          status: response.statusCode,
+          message: response.message,
+        });
+      } catch (error: unknown) {
+        // A failed request never means "no longer registered", only a real
+        // server response can change that.
+        if (isSteadyRegistered()) {
+          return;
+        }
+        const e = error as { statusCode?: number; message?: string };
+        setStatusCTI({
+          status: e.statusCode ?? statusCodes.NOT_FOUND,
+          message: e.message ?? '',
+        });
+      } finally {
+        if (!options?.silent) {
+          setLoading(false);
+          if (
+            ctiFlowState.getDeviceCode() &&
+            !ctiFlowState.isRegistrationComplete() &&
+            !ctiFlowState.isRegistered()
+          ) {
+            setPollingSeed(s => s + 1);
+          }
         }
       }
-    }
-  }, []);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (isStatusStillFresh(pollIntervalSec)) {
@@ -178,7 +183,9 @@ export const useCtiStatus = (
         ) {
           return;
         }
-        await fetchStatus({ silent: true });
+        // Polls the activation (status read and device-code exchange) with no
+        // user input, so it must not extend the session: sent as a system request.
+        await fetchStatus({ silent: true, asSystemRequest: true });
         if (cancelled) {
           return;
         }
@@ -225,8 +232,10 @@ export const useCtiStatus = (
         // timer ticking so polling resumes immediately once visible again
         // (reuses the existing visibilitychange listener below, no
         // duplicate listener needed).
+        // The re-poll runs with no user input, so it must not extend the
+        // session: it is sent as a system request.
         if (typeof document === 'undefined' || !document.hidden) {
-          await fetchStatus({ silent: true });
+          await fetchStatus({ silent: true, asSystemRequest: true });
           if (cancelled) {
             return;
           }

@@ -12,10 +12,12 @@
 
 /*
  * Framework: nis2
- * Catalog version: 1.0.0
+ * Catalog version: 1.1.0
+ * Catalog commit: wazuh/intelligence-data@af191162cd6f8c29914fce2974ed22838ca44c71
  * Edition: Directive (EU) 2022/2555
  * Source: Publications Office of the EU, official OJ text of Directive (EU) 2022/2555 (NIS 2), CELEX 32022L2555, English XHTML rendition
- * Controls: 56
+ * Supplementary source: Publications Office of the EU, official OJ text of Commission Implementing Regulation (EU) 2024/2690, CELEX 32024R2690, English XHTML rendition (Annex: technical and methodological requirements)
+ * Controls: 105
  */
 import { ComplianceRequirement } from './types';
 
@@ -362,5 +364,349 @@ export const nis2RequirementsFile: Record<string, ComplianceRequirement> = {
       'The use of multi-factor authentication or continuous authentication solutions, secured voice, video and text communications and secured emergency communication systems within the entity, where appropriate.',
     category:
       'CHAPTER IV - CYBERSECURITY RISK-MANAGEMENT MEASURES AND REPORTING OBLIGATIONS',
+  },
+  'IR-1.1': {
+    title: 'Policy on the security of network and information systems',
+    description:
+      '1.1.1. For the purpose of Article 21(2), point (a) of Directive (EU) 2022/2555, the policy on the security of network and information systems shall:\n(a) set out the relevant entities’ approach to managing the security of their network and information systems;\n(b) be appropriate to and complementary with the relevant entities’ business strategy and objectives;\n(c) set out network and information security objectives;\n(d) include a commitment to continual improvement of the security of network and information systems;\n(e) include a commitment to provide the appropriate resources needed for its implementation, including the necessary staff, financial resources, processes, tools and technologies;\n(f) be communicated to and acknowledged by relevant employees and relevant interested external parties;\n(g) lay down roles and responsibilities pursuant to point 1.2;\n(h) list the documentation to be kept and the duration of retention of the documentation;\n(i) list the topic-specific policies;\n(j) lay down indicators and measures to monitor its implementation and the current status of relevant entities’ maturity level of network and information security;\n(k) indicate the date of the formal approval by the management bodies of the relevant entities (the ‘management bodies’).\n1.1.2. The network and information system security policy shall be reviewed and, where appropriate, updated by management bodies at least annually and when significant incidents or significant changes to operations or risks occur. The result of the reviews shall be documented.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 1. Policy on the security of network and information systems',
+  },
+  'IR-1.2': {
+    title: 'Roles, responsibilities and authorities',
+    description:
+      '1.2.1. As part of their policy on the security of network and information systems referred to in point 1.1, the relevant entities shall lay down responsibilities and authorities for network and information system security and assign them to roles, allocate them according to the relevant entities’ needs, and communicate them to the management bodies.\n1.2.2. The relevant entities shall require all personnel and third parties to apply network and information system security in accordance with the established network and information security policy, topic-specific policies and procedures of the relevant entities.\n1.2.3. At least one person shall report directly to the management bodies on matters of network and information system security.\n1.2.4. Depending on the size of the relevant entities, network and information system security shall be covered by dedicated roles or duties carried out in addition to existing roles.\n1.2.5. Conflicting duties and conflicting areas of responsibility shall be segregated, where applicable.\n1.2.6. Roles, responsibilities and authorities shall be reviewed and, where appropriate, updated by management bodies at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 1. Policy on the security of network and information systems',
+  },
+  'IR-2.1': {
+    title: 'Risk management framework',
+    description:
+      '2.1.1. For the purpose of Article 21(2), point (a) of Directive (EU) 2022/2555, the relevant entities shall establish and maintain an appropriate risk management framework to identify and address the risks posed to the security of network and information systems. The relevant entities shall perform and document risk assessments and, based on the results, establish, implement and monitor a risk treatment plan. Risk assessment results and residual risks shall be accepted by management bodies or, where applicable, by persons who are accountable and have the authority to manage risks, provided that the relevant entities ensure adequate reporting to the management bodies.\n2.1.2. For the purpose of point 2.1.1, the relevant entities shall establish procedures for identification, analysis, assessment and treatment of risks (‘cybersecurity risk management process’). The cybersecurity risk management process shall be an integral part of the relevant entities’ overall risk management process, where applicable. As part of the cybersecurity risk management process, the relevant entities shall:\n(a) follow a risk management methodology;\n(b) establish the risk tolerance level in accordance with the risk appetite of the relevant entities;\n(c) establish and maintain relevant risk criteria;\n(d) in line with an all-hazards approach, identify and document the risks posed to the security of network and information systems, in particular in relation to third parties and risks that could lead to disruptions in the availability, integrity, authenticity and confidentiality of the network and information systems, including the identification of single point of failures;\n(e) analyse the risks posed to the security of network and information systems, including threat, likelihood, impact, and risk level, taking into account cyber threat intelligence and vulnerabilities;\n(f) evaluate the identified risks based on the risk criteria;\n(g) identify and prioritise appropriate risk treatment options and measures;\n(h) continuously monitor the implementation of the risk treatment measures;\n(i) identify who is responsible for implementing the risk treatment measures and when they should be implemented;\n(j) document the chosen risk treatment measures in a risk treatment plan and the reasons justifying the acceptance of residual risks in a comprehensible manner.\n2.1.3. When identifying and prioritising appropriate risk treatment options and measures, the relevant entities shall take into account the risk assessment results, the results of the procedure to assess the effectiveness of cybersecurity risk-management measures, the cost of implementation in relation to the expected benefit, the asset classification referred to in point 12.1, and the business impact analysis referred to in point 4.1.3.\n2.1.4. The relevant entities shall review and, where appropriate, update the risk assessment results and the risk treatment plan at planned intervals and at least annually, and when significant changes to operations or risks or significant incidents occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 2. Risk management policy',
+  },
+  'IR-2.2': {
+    title: 'Compliance monitoring',
+    description:
+      '2.2.1. The relevant entities shall regularly review the compliance with their policies on network and information system security, topic-specific policies, rules, and standards. The management bodies shall be informed of the status of network and information security on the basis of the compliance reviews by means of regular reporting.\n2.2.2. The relevant entities shall put in place an effective compliance reporting system which shall be appropriate to their structures, operating environments and threat landscapes. The compliance reporting system shall be capable to provide to the management bodies an informed view of the current state of the relevant entities’ management of risks.\n2.2.3. The relevant entities shall perform the compliance monitoring at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 2. Risk management policy',
+  },
+  'IR-2.3': {
+    title: 'Independent review of information and network security',
+    description:
+      '2.3.1. The relevant entities shall review independently their approach to managing network and information system security and its implementation including people, processes and technologies.\n2.3.2. The relevant entities shall develop and maintain processes to conduct independent reviews which shall be carried out by individuals with appropriate audit competence. Where the independent review is conducted by staff members of the relevant entity, the persons conducting the reviews shall not be in the line of authority of the personnel of the area under review. If the size of the relevant entities does not allow such separation of line of authority, the relevant entities shall put in place alternative measures to guarantee the impartiality of the reviews.\n2.3.3. The results of the independent reviews, including the results from the compliance monitoring pursuant to point 2.2 and the monitoring and measurement pursuant to point 7, shall be reported to the management bodies. Corrective actions shall be taken or residual risk accepted according to the relevant entities’ risk acceptance criteria.\n2.3.4. The independent reviews shall take place at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 2. Risk management policy',
+  },
+  'IR-3.1': {
+    title: 'Incident handling policy',
+    description:
+      '3.1.1. For the purpose of Article 21(2), point (b) of Directive (EU) 2022/2555, the relevant entities shall establish and implement an incident handling policy laying down the roles, responsibilities, and procedures for detecting, analysing, containing or responding to, recovering from, documenting and reporting of incidents in a timely manner.\n3.1.2. The policy referred to in point 3.1.1 shall be coherent with the business continuity and disaster recovery plan referred to in point 4.1. The policy shall include:\n(a) a categorisation system for incidents that is consistent with the event assessment and classification carried out pursuant to point 3.4.1;\n(b) effective communication plans including for escalation and reporting;\n(c) assignment of roles to detect and appropriately respond to incidents to competent employees;\n(d) documents to be used in the course of incident detection and response such as incident response manuals, escalation charts, contact lists and templates.\n3.1.3. The roles, responsibilities and procedures laid down in the policy shall be tested and reviewed and, where appropriate, updated at planned intervals and after significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 3. Incident handling',
+  },
+  'IR-3.2': {
+    title: 'Monitoring and logging',
+    description:
+      '3.2.1. The relevant entities shall lay down procedures and use tools to monitor and log activities on their network and information systems to detect events that could be considered as incidents and respond accordingly to mitigate the impact.\n3.2.2. To the extent feasible, monitoring shall be automated and carried out either continuously or in periodic intervals, subject to business capabilities. The relevant entities shall implement their monitoring activities in a way which minimises false positives and false negatives.\n3.2.3. Based on the procedures referred to in point 3.2.1, the relevant entities shall maintain, document, and review logs. The relevant entities shall establish a list of assets to be subject to logging based on the results of the risk assessment carried out pursuant to point 2.1. Where appropriate, logs shall include:\n(a) relevant outbound and inbound network traffic;\n(b) creation, modification or deletion of users of the relevant entities’ network and information systems and extension of the permissions;\n(c) access to systems and applications;\n(d) authentication-related events;\n(e) all privileged access to systems and applications, and activities performed by administrative accounts;\n(f) access or changes to critical configuration and backup files;\n(g) event logs and logs from security tools, such as antivirus, intrusion detection systems or firewalls;\n(h) use of system resources, as well as their performance;\n(i) physical access to facilities;\n(j) access to and use of their network equipment and devices;\n(k) activation, stopping and pausing of the various logs;\n(l) environmental events.\n3.2.4. The logs shall be regularly reviewed for any unusual or unwanted trends. Where appropriate, the relevant entities shall lay down appropriate values for alarm thresholds. If the laid down values for alarm threshold are exceeded, an alarm shall be triggered, where appropriate, automatically. The relevant entities shall ensure that, in case of an alarm, a qualified and appropriate response is initiated in a timely manner.\n3.2.5. The relevant entities shall maintain and back up logs for a predefined period and shall protect them from unauthorised access or changes.\n3.2.6. To the extent feasible, the relevant entities shall ensure that all systems have synchronised time sources to be able to correlate logs between systems for event assessment. The relevant entities shall establish and keep a list of all assets that are being logged and ensure that monitoring and logging systems are redundant. The availability of the monitoring and logging systems shall be monitored independent of the systems they are monitoring.\n3.2.7. The procedures as well as the list of assets that are being logged shall be reviewed and, where appropriate, updated at regular intervals and after significant incidents.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 3. Incident handling',
+  },
+  'IR-3.3': {
+    title: 'Event reporting',
+    description:
+      '3.3.1. The relevant entities shall put in place a simple mechanism allowing their employees, suppliers, and customers to report suspicious events.\n3.3.2. The relevant entities shall, where appropriate, communicate the event reporting mechanism to their suppliers and customers, and shall regularly train their employees how to use the mechanism.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 3. Incident handling',
+  },
+  'IR-3.4': {
+    title: 'Event assessment and classification',
+    description:
+      '3.4.1. The relevant entities shall assess suspicious events to determine whether they constitute incidents and, if so, determine their nature and severity.\n3.4.2. For the purpose of point 3.4.1, the relevant entities shall act in the following manner:\n(a) carry out the assessment based on predefined criteria laid down in advance, and on a triage to determine prioritisation of incident containment and eradication;\n(b) assess the existence of recurring incidents as referred to in Article 4 of this Regulation on a quarterly basis;\n(c) review the appropriate logs for the purposes of event assessment and classification;\n(d) put in place a process for log correlation and analysis, and\n(e) reassess and reclassify events in case of new information becoming available or after analysis of previously available information.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 3. Incident handling',
+  },
+  'IR-3.5': {
+    title: 'Incident response',
+    description:
+      '3.5.1. The relevant entities shall respond to incidents in accordance with documented procedures and in a timely manner.\n3.5.2. The incident response procedures shall include the following stages:\n(a) incident containment, to prevent the consequences of the incident from spreading;\n(b) eradication, to prevent the incident from continuing or reappearing,\n(c) recovery from the incident, where necessary.\n3.5.3. The relevant entities shall establish communication plans and procedures:\n(a) with the Computer Security Incident Response Teams (CSIRTs) or, where applicable, the competent authorities, related to incident notification;\n(b) for communication among staff members of the relevant entity, and for communication with relevant stakeholders external to the relevant entity.\n3.5.4. The relevant entities shall log incident response activities in accordance with the procedures referred to in point 3.2.1, and record evidence.\n3.5.5. The relevant entities shall test at planned intervals their incident response procedures.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 3. Incident handling',
+  },
+  'IR-3.6': {
+    title: 'Post-incident reviews',
+    description:
+      '3.6.1. Where appropriate, the relevant entities shall carry out post-incident reviews after recovery from incidents. The post-incident reviews shall identify, where possible, the root cause of the incident and result in documented lessons learned to reduce the occurrence and consequences of future incidents.\n3.6.2. The relevant entities shall ensure that post-incident reviews contribute to improving their approach to network and information security, to risk treatment measures, and to incident handling, detection and response procedures.\n3.6.3. The relevant entities shall review at planned intervals if incidents led to post-incident reviews.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 3. Incident handling',
+  },
+  'IR-4.1': {
+    title: 'Business continuity and disaster recovery plan',
+    description:
+      '4.1.1. For the purpose of Article 21(2), point (c) of Directive (EU) 2022/2555, the relevant entities shall lay down and maintain a business continuity and disaster recovery plan to apply in the case of incidents.\n4.1.2. The relevant entities’ operations shall be restored according to the business continuity and disaster recovery plan. The plan shall be based on the results of the risk assessment carried out pursuant to point 2.1 and shall include, where appropriate, the following:\n(a) purpose, scope and audience;\n(b) roles and responsibilities;\n(c) key contacts and (internal and external) communication channels;\n(d) conditions for plan activation and deactivation;\n(e) order of recovery for operations;\n(f) recovery plans for specific operations, including recovery objectives;\n(g) required resources, including backups and redundancies;\n(h) restoring and resuming activities from temporary measures.\n4.1.3. The relevant entities shall carry out a business impact analysis to assess the potential impact of severe disruptions to their business operations and shall, based on the results of the business impact analysis, establish continuity requirements for the network and information systems.\n4.1.4. The business continuity plan and disaster recovery plan shall be tested, reviewed and, where appropriate, updated at planned intervals and following significant incidents or significant changes to operations or risks. The relevant entities shall ensure that the plans incorporate lessons learnt from such tests.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 4. Business continuity and crisis management',
+  },
+  'IR-4.2': {
+    title: 'Backup and redundancy management',
+    description:
+      '4.2.1. The relevant entities shall maintain backup copies of data and provide sufficient available resources, including facilities, network and information systems and staff, to ensure an appropriate level of redundancy.\n4.2.2. Based on the results of the risk assessment carried out pursuant to point 2.1 and the business continuity plan, the relevant entities shall lay down backup plans which include the following:\n(a) recovery times;\n(b) assurance that backup copies are complete and accurate, including configuration data and data stored in cloud computing service environment;\n(c) storing backup copies (online or offline) in a safe location or locations, which are not in the same network as the system, and are at sufficient distance to escape any damage from a disaster at the main site;\n(d) appropriate physical and logical access controls to backup copies, in accordance with the asset classification level;\n(e) restoring data from backup copies;\n(f) retention periods based on business and regulatory requirements.\n4.2.3. The relevant entities shall perform regular integrity checks on the backup copies.\n4.2.4. Based on the results of the risk assessment carried out pursuant to point 2.1 and the business continuity plan, the relevant entities shall ensure sufficient availability of resources by at least partial redundancy of the following:\n(a) network and information systems;\n(b) assets, including facilities, equipment and supplies;\n(c) personnel with the necessary responsibility, authority and competence;\n(d) appropriate communication channels.\n4.2.5. Where appropriate, the relevant entities shall ensure that monitoring and adjustment of resources, including facilities, systems and personnel, is duly informed by backup and redundancy requirements.\n4.2.6. The relevant entities shall carry out regular testing of the recovery of backup copies and redundancies to ensure that, in recovery conditions, they can be relied upon and cover the copies, processes and knowledge to perform an effective recovery. The relevant entities shall document the results of the tests and, where needed, take corrective action.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 4. Business continuity and crisis management',
+  },
+  'IR-4.3': {
+    title: 'Crisis management',
+    description:
+      '4.3.1. The relevant entities shall put in place a process for crisis management.\n4.3.2. The relevant entities shall ensure that the crisis management process addresses at least the following elements:\n(a) roles and responsibilities for personnel and, where appropriate, suppliers and service providers, specifying the allocation of roles in crisis situations, including specific steps to follow;\n(b) appropriate communication means between the relevant entities and relevant competent authorities;\n(c) application of appropriate measures to ensure the maintenance of network and information system security in crisis situations.\nFor the purpose of point (b), the flow of information between the relevant entities and relevant competent authorities shall include both obligatory communications, such as incident reports and related timelines, and non-obligatory communications.\n4.3.3. The relevant entities shall implement a process for managing and making use of information received from the CSIRTs or, where applicable, the competent authorities, concerning incidents, vulnerabilities, threats or possible mitigation measures.\n4.3.4. The relevant entities shall test, review and, where appropriate, update the crisis management plan on a regular basis or following significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 4. Business continuity and crisis management',
+  },
+  'IR-5.1': {
+    title: 'Supply chain security policy',
+    description:
+      '5.1.1. For the purpose of Article 21(2), point (d) of Directive (EU) 2022/2555, the relevant entities shall establish, implement and apply a supply chain security policy which governs the relations with their direct suppliers and service providers in order to mitigate the identified risks to the security of network and information systems. In the supply chain security policy, the relevant entities shall identify their role in the supply chain and communicate it to their direct suppliers and service providers.\n5.1.2. As part of the supply chain security policy referred to in point 5.1.1, the relevant entities shall lay down criteria to select and contract suppliers and service providers. Those criteria shall include the following:\n(a) the cybersecurity practices of the suppliers and service providers, including their secure development procedures;\n(b) the ability of the suppliers and service providers to meet cybersecurity specifications set by the relevant entities;\n(c) the overall quality and resilience of ICT products and ICT services and the cybersecurity risk-management measures embedded in them, including the risks and classification level of the ICT products and ICT services;\n(d) the ability of the relevant entities to diversify sources of supply and limit vendor lock-in, where applicable.\n5.1.3. When establishing their supply chain security policy, relevant entities shall take into account the results of the coordinated security risk assessments of critical supply chains carried out in accordance with Article 22(1) of Directive (EU) 2022/2555, where applicable.\n5.1.4. Based on the supply chain security policy and taking into account the results of the risk assessment carried out in accordance with point 2.1 of this Annex, the relevant entities shall ensure that their contracts with the suppliers and service providers specify, where appropriate through service level agreements, the following, where appropriate:\n(a) cybersecurity requirements for the suppliers or service providers, including requirements as regards the security in acquisition of ICT services or ICT products set out in point 6.1;\n(b) requirements regarding awareness, skills and training, and where appropriate certifications, required from the suppliers’ or service providers’ employees;\n(c) requirements regarding the verification of the background of the suppliers’ and service providers’ employees;\n(d) an obligation on suppliers and service providers to notify, without undue delay, the relevant entities of incidents that present a risk to the security of the network and information systems of those entities;\n(e) the right to audit or right to receive audit reports;\n(f) an obligation on suppliers and service providers to handle vulnerabilities that present a risk to the security of the network and information systems of the relevant entities;\n(g) requirements regarding subcontracting and, where the relevant entities allow subcontracting, cybersecurity requirements for subcontractors in accordance with the cybersecurity requirements referred to in point (a);\n(h) obligations on the suppliers and service providers at the termination of the contract, such as retrieval and disposal of the information obtained by the suppliers and service providers in the exercise of their tasks.\n5.1.5. The relevant entities shall take into account the elements referred to in point 5.1.2 and 5.1.3 as part of the selection process of new suppliers and service providers, as well as part of the procurement process referred to in point 6.1.\n5.1.6. The relevant entities shall review the supply chain security policy, and monitor, evaluate and, where necessary, act upon changes in the cybersecurity practices of suppliers and service providers, at planned intervals and when significant changes to operations or risks or significant incidents related to the provision of ICT services or having impact on the security of the ICT products from suppliers and service providers occur.\n5.1.7. For the purpose of point 5.1.6, the relevant entities shall:\n(a) regularly monitor reports on the implementation of the service level agreements, where applicable;\n(b) review incidents related to ICT products and ICT services from suppliers and service providers;\n(c) assess the need for unscheduled reviews and document the findings in a comprehensible manner;\n(d) analyse the risks presented by changes related to ICT products and ICT services from suppliers and service providers and, where appropriate, take mitigating measures in a timely manner.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 5. Supply chain security',
+  },
+  'IR-5.2': {
+    title: 'Directory of suppliers and service providers',
+    description:
+      'The relevant entities shall maintain and keep up to date a registry of their direct suppliers and service providers, including:\n(a) contact points for each direct supplier and service provider;\n(b) a list of ICT products, ICT services, and ICT processes provided by the direct supplier or service provider to the relevant entities.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 5. Supply chain security',
+  },
+  'IR-6.1': {
+    title: 'Security in acquisition of ICT services or ICT products',
+    description:
+      '6.1.1. For the purpose of Article 21(2), point (e) of Directive (EU) 2022/2555, the relevant entities shall set and implement processes to manage risks stemming from the acquisition of ICT services or ICT products for components that are critical for the relevant entities’ security of network and information systems, based on the risk assessment carried out pursuant to point 2.1, from suppliers or service providers throughout their life cycle.\n6.1.2. For the purpose of point 6.1.1, the processes referred to in point 6.1.1 shall include:\n(a) security requirements to apply to the ICT services or ICT products to be acquired;\n(b) requirements regarding security updates throughout the entire lifetime of the ICT services or ICT products, or replacement after the end of the support period;\n(c) information describing the hardware and software components used in the ICT services or ICT products;\n(d) information describing the implemented cybersecurity functions of the ICT services or ICT products and the configuration required for their secure operation;\n(e) assurance that the ICT services or ICT products comply with the security requirements according to point (a);\n(f) methods for validating that the delivered ICT services or ICT products are compliant to the stated security requirements, as well as documentation of the results of the validation.\n6.1.3. The relevant entities shall review and, where appropriate, update the processes at planned intervals and when significant incidents occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.2': {
+    title: 'Secure development life cycle',
+    description:
+      '6.2.1. Before developing a network and information system, including software, the relevant entities shall lay down rules for the secure development of network and information systems and apply them when developing network and information systems in-house, or when outsourcing the development of network and information systems. The rules shall cover all development phases, including specification, design, development, implementation and testing.\n6.2.2. For the purpose of point 6.2.1, the relevant entities shall:\n(a) carry out an analysis of security requirements at the specification and design phases of any development or acquisition project undertaken by the relevant entities or on behalf of those entities;\n(b) apply principles for engineering secure systems and secure coding principles to any information system development activities such as promoting cybersecurity-by-design, zero-trust architectures;\n(c) lay down security requirements regarding development environments;\n(d) establish and implement security testing processes in the development life cycle;\n(e) appropriately select, protect and manage security test data;\n(f) sanitise and anonymise testing data according to the risk assessment carried out pursuant to point 2.1.\n6.2.3. For outsourced development of network and information systems, the relevant entities shall also apply the policies and procedures referred to in points 5 and 6.1.\n6.2.4. The relevant entities shall review and, where necessary, update their secure development rules at planned intervals.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.3': {
+    title: 'Configuration management',
+    description:
+      '6.3.1. The relevant entities shall take the appropriate measures to establish, document, implement, and monitor configurations, including security configurations of hardware, software, services and networks.\n6.3.2. For the purpose of point 6.3.1, the relevant entities shall:\n(a) lay down and ensure security in configurations for their hardware, software, services and networks;\n(b) lay down and implement processes and tools to enforce the laid down secure configurations for hardware, software, services and networks, for newly installed systems as well as for systems in operation over their lifetime.\n6.3.3. The relevant entities shall review and, where appropriate, update configurations at planned intervals or when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.4': {
+    title: 'Change management, repairs and maintenance',
+    description:
+      '6.4.1. The relevant entities shall apply change management procedures to control changes of network and information systems. Where applicable, the procedures shall be consistent with the relevant entities’ general policies concerning change management.\n6.4.2. The procedures referred to in point 6.4.1 shall be applied for releases, modifications and emergency changes of any software and hardware in operation and changes to the configuration. The procedures shall ensure that those changes are documented and, based on the risk assessment carried out pursuant to point 2.1, tested and assessed in view of the potential impact before being implemented.\n6.4.3. In the event that the regular change management procedures could not be followed due to an emergency, the relevant entities shall document the result of the change, and the explanation for why the procedures could not be followed.\n6.4.4. The relevant entities shall review and, where appropriate, update the procedures at planned intervals and when significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.5': {
+    title: 'Security testing',
+    description:
+      '6.5.1. The relevant entities shall establish, implement and apply a policy and procedures for security testing.\n6.5.2. The relevant entities shall:\n(a) establish, based on the risk assessment carried out pursuant to point 2.1, the need, scope, frequency and type of security tests;\n(b) carry out security tests according to a documented test methodology, covering the components identified as relevant for secure operation in a risk analysis;\n(c) document the type, scope, time and results of the tests, including assessment of criticality and mitigating actions for each finding;\n(d) apply mitigating actions in case of critical findings.\n6.5.3. The relevant entities shall review and, where appropriate, update their security testing policies at planned intervals.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.6': {
+    title: 'Security patch management',
+    description:
+      '6.6.1. The relevant entities shall specify and apply procedures, coherent with the change management procedures referred to in point 6.4.1 as well as with vulnerability management, risk management and other relevant management procedures, for ensuring that:\n(a) security patches are applied within a reasonable time after they become available;\n(b) security patches are tested before being applied in production systems;\n(c) security patches come from trusted sources and are checked for integrity;\n(d) additional measures are implemented and residual risks are accepted in cases where a patch is not available or not applied pursuant to point 6.6.2.\n6.6.2. By way of derogation from point 6.6.1(a), the relevant entities may choose not to apply security patches when the disadvantages of applying the security patches outweigh the cybersecurity benefits. The relevant entities shall duly document and substantiate the reasons for any such decision.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.7': {
+    title: 'Network security',
+    description:
+      '6.7.1. The relevant entities shall take the appropriate measures to protect their network and information systems from cyber threats.\n6.7.2. For the purpose of point 6.7.1, the relevant entities shall:\n(a) document the architecture of the network in a comprehensible and up to date manner;\n(b) determine and apply controls to protect the relevant entities’ internal network domains from unauthorised access;\n(c) configure controls to prevent accesses and network communication not required for the operation of the relevant entities;\n(d) determine and apply controls for remote access to network and information systems, including access by service providers;\n(e) not use systems used for administration of the security policy implementation for other purposes;\n(f) explicitly forbid or deactivate unneeded connections and services;\n(g) where appropriate, exclusively allow access to the relevant entities’ network and information systems by devices authorised by those entities;\n(h) allow connections of service providers only after an authorisation request and for a set time period, such as the duration of a maintenance operation;\n(i) establish communication between distinct systems only through trusted channels that are isolated using logical, cryptographic or physical separation from other communication channels and provide assured identification of their end points and protection of the channel data from modification or disclosure;\n(j) adopt an implementation plan for the full transition towards latest generation network layer communication protocols in a secure, appropriate and gradual way and establish measures to accelerate such transition;\n(k) adopt an implementation plan for the deployment of internationally agreed and interoperable modern e-mail communications standards to secure e-mail communications to mitigate vulnerabilities linked to e-mail-related threats and establish measures to accelerate such deployment;\n(l) apply best practices for the security of the DNS, and for Internet routing security and routing hygiene of traffic originating from and destined to the network.\n6.7.3. The relevant entities shall review and, where appropriate, update these measures at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.8': {
+    title: 'Network segmentation',
+    description:
+      '6.8.1. The relevant entities shall segment systems into networks or zones in accordance with the results of the risk assessment referred to in point 2.1. They shall segment their systems and networks from third parties’ systems and networks.\n6.8.2. For that purpose, the relevant entities shall:\n(a) consider the functional, logical and physical relationship, including location, between trustworthy systems and services;\n(b) grant access to a network or zone based on an assessment of its security requirements;\n(c) keep systems that are critical to the relevant entities operation or to safety in secured zones;\n(d) deploy a demilitarised zone within their communication networks to ensure secure communication originating from or destined to their networks;\n(e) restrict access and communications between and within zones to those necessary for the operation of the relevant entities or for safety;\n(f) separate the dedicated network for administration of network and information systems from the relevant entities’ operational network;\n(g) segregate network administration channels from other network traffic;\n(h) separate the production systems for the relevant entities’ services from systems used in development and testing, including backups.\n6.8.3. The relevant entities shall review and, where appropriate, update network segmentation at planned intervals and when significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.9': {
+    title: 'Protection against malicious and unauthorised software',
+    description:
+      '6.9.1. The relevant entities shall protect their network and information systems against malicious and unauthorised software.\n6.9.2. For that purpose, the relevant entities shall in particular implement measures that detect or prevent the use of malicious or unauthorised software. The relevant entities shall, where appropriate, ensure that their network and information systems are equipped with detection and response software, which is updated regularly in accordance with the risk assessment carried out pursuant to point 2.1 and the contractual agreements with the providers.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-6.10': {
+    title: 'Vulnerability handling and disclosure',
+    description:
+      '6.10.1. The relevant entities shall obtain information about technical vulnerabilities in their network and information systems, evaluate their exposure to such vulnerabilities, and take appropriate measures to manage the vulnerabilities.\n6.10.2. For the purpose of point 6.10.1, the relevant entities shall:\n(a) monitor information about vulnerabilities through appropriate channels, such as announcements of CSIRTs, competent authorities or information provided by suppliers or service providers;\n(b) perform, where appropriate, vulnerability scans, and record evidence of the results of the scans, at planned intervals;\n(c) address, without undue delay, vulnerabilities identified by the relevant entities as critical to their operations;\n(d) ensure that their vulnerability handling is compatible with their change management, security patch management, risk management and incident management procedures;\n(e) lay down a procedure for disclosing vulnerabilities in accordance with the applicable national coordinated vulnerability disclosure policy.\n6.10.3. When justified by the potential impact of the vulnerability, the relevant entities shall create and implement a plan to mitigate the vulnerability. In other cases, the relevant entities shall document and substantiate the reason why the vulnerability does not require remediation.\n6.10.4. The relevant entities shall review and, where appropriate, update at planned intervals the channels they use for monitoring vulnerability information.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 6. Security in network and information systems acquisition, development and maintenance',
+  },
+  'IR-7': {
+    title:
+      'Policies and procedures to assess the effectiveness of cybersecurity risk-management measures',
+    description:
+      '7.1. For the purpose of Article 21(2), point (f) of Directive (EU) 2022/2555, the relevant entities shall establish, implement and apply a policy and procedures to assess whether the cybersecurity risk-management measures taken by the relevant entity are effectively implemented and maintained.\n7.2. The policy and procedures referred to in point 7.1 shall take into account results of the risk assessment pursuant to point 2.1 and past significant incidents. The relevant entities shall determine:\n(a) what cybersecurity risk-management measures are to be monitored and measured, including processes and controls;\n(b) the methods for monitoring, measurement, analysis and evaluation, as applicable, to ensure valid results;\n(c) when the monitoring and measuring is to be performed;\n(d) who is responsible for monitoring and measuring the effectiveness of the cybersecurity risk-management measures;\n(e) when the results from monitoring and measurement are to be analysed and evaluated;\n(f) who has to analyse and evaluate these results.\n7.3. The relevant entities shall review and, where appropriate, update the policy and procedures at planned intervals and when significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 7. Policies and procedures to assess the effectiveness of cybersecurity risk-management measures',
+  },
+  'IR-8.1': {
+    title: 'Awareness raising and basic cyber hygiene practices',
+    description:
+      '8.1.1. For the purpose of Article 21(2), point (g) of Directive (EU) 2022/2555, the relevant entities shall ensure that their employees, including members of management bodies, as well as direct suppliers and service providers are aware of risks, are informed of the importance of cybersecurity and apply cyber hygiene practices.\n8.1.2. For the purpose of point 8.1.1, the relevant entities shall offer to their employees, including members of management bodies, as well as to direct suppliers and service providers where appropriate in accordance with point 5.1.4, an awareness raising programme, which shall:\n(a) be scheduled over time, so that the activities are repeated and cover new employees;\n(b) be established in line with the network and information security policy, topic-specific policies and relevant procedures on network and information security;\n(c) cover relevant cyber threats, the cybersecurity risk-management measures in place, contact points and resources for additional information and advice on cybersecurity matters, as well as cyber hygiene practices for users.\n8.1.3. The awareness raising programme shall, where appropriate, be tested in terms of effectiveness. The awareness raising programme shall be updated and offered at planned intervals taking into account changes in cyber hygiene practices, and the current threat landscape and risks posed to the relevant entities.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 8. Basic cyber hygiene practices and security training',
+  },
+  'IR-8.2': {
+    title: 'Security training',
+    description:
+      '8.2.1. The relevant entities shall identify employees, whose roles require security relevant skill sets and expertise, and ensure that they receive regular training on network and information system security.\n8.2.2. The relevant entities shall establish, implement and apply a training program in line with the network and information security policy, topic-specific policies and other relevant procedures on network and information security which lays down the training needs for certain roles and positions based on criteria.\n8.2.3. The training referred to in point 8.2.1 shall be relevant to the job function of the employee and its effectiveness shall be assessed. Training shall take into consideration security measures in place and cover the following:\n(a) instructions regarding the secure configuration and operation of the network and information systems, including mobile devices;\n(b) briefing on known cyber threats;\n(c) training of the behaviour when security-relevant events occur.\n8.2.4. The relevant entities shall apply training to staff members who transfer to new positions or roles which require security relevant skill sets and expertise.\n8.2.5. The program shall be updated and run periodically taking into account applicable policies and rules, assigned roles, responsibilities, as well as known cyber threats and technological developments.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 8. Basic cyber hygiene practices and security training',
+  },
+  'IR-9': {
+    title: 'Cryptography',
+    description:
+      "9.1. For the purpose of Article 21(2), point (h) of Directive (EU) 2022/2555, the relevant entities shall establish, implement and apply a policy and procedures related to cryptography, with a view to ensuring adequate and effective use of cryptography to protect the confidentiality, authenticity and integrity of data in line with the relevant entities’ asset classification and the results of the risk assessment carried out pursuant to point 2.1.\n9.2. The policy and procedures referred to in point 9.1 shall establish:\n(a) in accordance with the relevant entities’ classification of assets, the type, strength and quality of the cryptographic measures required to protect the relevant entities’ assets, including data at rest and data in transit;\n(b) based on point (a), the protocols or families of protocols to be adopted, as well as cryptographic algorithms, cipher strength, cryptographic solutions and usage practices to be approved and required for use in the relevant entities, following, where appropriate, a cryptographic agility approach;\n(c) the relevant entities’ approach to key management, including, where appropriate, methods for the following:\n(i) generating different keys for cryptographic systems and applications;\n(ii) issuing and obtaining public key certificates;\n(iii) distributing keys to intended entities, including how to activate keys when received;\n(iv) storing keys, including how authorised users obtain access to keys;\n(v) changing or updating keys, including rules on when and how to change keys;\n(vi) dealing with compromised keys;\n(vii) revoking keys including how to withdraw or deactivate keys;\n(viii) recovering lost or corrupted keys;\n(ix) backing up or archiving keys;\n(x) destroying keys;\n(xi) logging and auditing of key management-related activities;\n(xii) setting activation and deactivation dates for keys ensuring that the keys can only be used for the specified period of time according to the organization's rules on key management.\n9.3. The relevant entities shall review and, where appropriate, update their policy and procedures at planned intervals, taking into account the state of the art in cryptography.",
+    category: 'Implementing Regulation (EU) 2024/2690, Annex - 9. Cryptography',
+  },
+  'IR-10.1': {
+    title: 'Human resources security',
+    description:
+      '10.1.1. For the purpose of Article 21(2), point (i) of Directive (EU) 2022/2555, the relevant entities shall ensure that their employees and direct suppliers and service providers, wherever applicable, understand and commit to their security responsibilities, as appropriate for the offered services and the job and in line with the relevant entities’ policy on the security of network and information systems.\n10.1.2. The requirement referred to in point 10.1.1 shall include the following:\n(a) mechanisms to ensure that all employees, direct suppliers and service providers, wherever applicable, understand and follow the standard cyber hygiene practices that the relevant entities apply pursuant to point 8.1;\n(b) mechanisms to ensure that all users with administrative or privileged access are aware of and act in accordance with their roles, responsibilities and authorities;\n(c) mechanisms to ensure that members of management bodies understand and act in accordance with their role, responsibilities and authorities regarding network and information system security;\n(d) mechanisms for hiring personnel qualified for the respective roles, such as reference checks, vetting procedures, validation of certifications, or written tests.\n10.1.3. The relevant entities shall review the assignment of personnel to specific roles as referred to in point 1.2, as well as their commitment of human resources in that regard, at planned intervals and at least annually. They shall updatethe assignment where necessary.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 10. Human resources security',
+  },
+  'IR-10.2': {
+    title: 'Verification of background',
+    description:
+      '10.2.1. The relevant entities shall ensure to the extent feasible verification of the background of their employees, and where applicable of direct suppliers and service providers in accordance with point 5.1.4, if necessary for their role, responsibilities and authorisations.\n10.2.2. For the purpose of point 10.2.1, the relevant entities shall:\n(a) put in place criteria, which set out which roles, responsibilities and authorities shall only be exercised by persons whose background has been verified;\n(b) ensure that verification referred to in point 10.2.1 is performed on these persons before they start exercising these roles, responsibilities and authorities, which shall take into consideration the applicable laws, regulations, and ethics in proportion to the business requirements, the asset classification as referred to in point 12.1 and the network and information systems to be accessed, and the perceived risks.\n10.2.3. The relevant entities shall review and, where appropriate, update the policy at planned intervals and update it where necessary.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 10. Human resources security',
+  },
+  'IR-10.3': {
+    title: 'Termination or change of employment procedures',
+    description:
+      '10.3.1. The relevant entities shall ensure that network and information system security responsibilities and duties that remain valid after termination or change of employment of their employees are contractually defined and enforced.\n10.3.2. For the purpose of point 10.3.1, the relevant entities shall include in the individual’s terms and conditions of employment, contract or agreement the responsibilities and duties that are still valid after termination of employment or contract, such as confidentiality clauses.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 10. Human resources security',
+  },
+  'IR-10.4': {
+    title: 'Disciplinary process',
+    description:
+      '10.4.1. The relevant entities shall establish, communicate and maintain a disciplinary process for handling violations of network and information system security policies. The process shall take into consideration relevant legal, statutory, contractual and business requirements.\n10.4.2. The relevant entities shall review and, where appropriate, update the disciplinary process at planned intervals, and when necessary due to legal changes or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 10. Human resources security',
+  },
+  'IR-11.1': {
+    title: 'Access control policy',
+    description:
+      '11.1.1. For the purpose of Article 21(2), point (i) of Directive (EU) 2022/2555, the relevant entities shall establish, document and implement logical and physical access control policies for the access to their network and information systems, based on business requirements as well as network and information system security requirements.\n11.1.2. The policies referred to in point 11.1.1. shall:\n(a) address access by persons, including staff, visitors, and external entities such as suppliers and service providers;\n(b) address access by network and information systems;\n(c) ensure that access is only granted to users that have been adequately authenticated.\n11.1.3. The relevant entities shall review and, where appropriate, update the policies at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-11.2': {
+    title: 'Management of access rights',
+    description:
+      '11.2.1. The relevant entities shall provide, modify, remove and document access rights to network and information systems in accordance with the access control policy referred to in point 11.1.\n11.2.2. The relevant entities shall:\n(a) assign and revoke access rights based on the principles of need-to-know, least privilege and separation of duties;\n(b) ensure that access rights are modified accordingly upon termination or change of employment;\n(c) ensure that access to network and information systems is authorised by the relevant persons;\n(d) ensure that access rights appropriately address third-party access, such as visitors, suppliers and service providers, in particular by limiting access rights in scope and in duration;\n(e) maintain a register of access rights granted;\n(f) apply logging to the management of access rights.\n11.2.3. The relevant entities shall review access rights at planned intervals and shall modify them based on organisational changes. The relevant entities shall document the results of the review including the necessary changes of access rights.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-11.3': {
+    title: 'Privileged accounts and system administration accounts',
+    description:
+      '11.3.1. The relevant entities shall maintain policies for management of privileged accounts and system administration accounts as part of the access control policy referred to in point 11.1.\n11.3.2. The policies referred to in point 11.3.1 shall:\n(a) establish strong identification, authentication such as multi-factor authentication, and authorisation procedures for privileged accounts and system administration accounts;\n(b) set up specific accounts to be used for system administration operations exclusively, such as installation, configuration, management or maintenance;\n(c) individualise and restrict system administration privileges to the highest extent possible,\n(d) provide that system administration accounts are only used to connect to system administration systems.\n11.3.3. The relevant entities shall review access rights of privileged accounts and system administration accounts at planned intervals and be modified based on organisational changes, and shall document the results of the review, including the necessary changes of access rights.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-11.4': {
+    title: 'Administration systems',
+    description:
+      '11.4.1. The relevant entities shall restrict and control the use of system administration systems in accordance with the access control policy referred to in point 11.1.\n11.4.2. For that purpose, the relevant entities shall:\n(a) only use system administration systems for system administration purposes, and not for any other operations;\n(b) separate logically such systems from application software not used for system administrative purposes,\n(c) protect access to system administration systems through authentication and encryption.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-11.5': {
+    title: 'Identification',
+    description:
+      '11.5.1. The relevant entities shall manage the full life cycle of identities of network and information systems and their users.\n11.5.2. For that purpose, the relevant entities shall:\n(a) set up unique identities for network and information systems and their users;\n(b) link the identity of users to a single person;\n(c) ensure oversight of identities of network and information systems;\n(d) apply logging to the management of identities.\n11.5.3. The relevant entities shall only permit identities assigned to multiple persons, such as shared identities, where they are necessary for business or operational reasons and are subject to an explicit approval process and documentation. The relevant entities shall take identities assigned to multiple persons into account in the cybersecurity risk management framework referred to in point 2.1.\n11.5.4. The relevant entities shall regularly review the identities for network and information systems and their users and, if no longer needed, deactivate them without delay.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-11.6': {
+    title: 'Authentication',
+    description:
+      '11.6.1. The relevant entities shall implement secure authentication procedures and technologies based on access restrictions and the policy on access control.\n11.6.2. For that purpose, the relevant entities shall:\n(a) ensure the strength of authentication is appropriate to the classification of the asset to be accessed;\n(b) control the allocation to users and management of secret authentication information by a process that ensures the confidentiality of the information, including advising personnel on appropriate handling of authentication information;\n(c) require the change of authentication credentials initially, at predefined intervals and upon suspicion that the credentials were compromised;\n(d) require the reset of authentication credentials and the blocking of users after a predefined number of unsuccessful log-in attempts;\n(e) terminate inactive sessions after a predefined period of inactivity; and\n(f) require separate credentials to access privileged access or administrative accounts.\n11.6.3. The relevant entities shall to the extent feasible use state-of-the-art authentication methods, in accordance with the associated assessed risk and the classification of the asset to be accessed, and unique authentication information.\n11.6.4. The relevant entities shall review the authentication procedures and technologies at planned intervals.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-11.7': {
+    title: 'Multi-factor authentication',
+    description:
+      '11.7.1. The relevant entities shall ensure that users are authenticated by multiple authentication factors or continuous authentication mechanisms for accessing the relevant entities’ network and information systems, where appropriate, in accordance with the classification of the asset to be accessed.\n11.7.2. The relevant entities shall ensure that the strength of authentication is appropriate for the classification of the asset to be accessed.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 11. Access control',
+  },
+  'IR-12.1': {
+    title: 'Asset classification',
+    description:
+      '12.1.1. For the purpose of Article 21(2), point (i) of Directive (EU) 2022/2555, the relevant entities shall lay down classification levels of all assets, including information, in scope of their network and information systems for the level of protection required.\n12.1.2. For the purpose of point 12.1.1, the relevant entities shall:\n(a) lay down a system of classification levels for assets;\n(b) associate all assets with a classification level, based on confidentiality, integrity, authenticity and availability requirements, to indicate the protection required according to their sensitivity, criticality, risk and business value;\n(c) align the availability requirements of the assets with the delivery and recovery objectives set out in their business continuity and disaster recovery plans.\n12.1.3. The relevant entities shall conduct periodic reviews of the classification levels of assets and update them, where appropriate.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 12. Asset management',
+  },
+  'IR-12.2': {
+    title: 'Handling of assets',
+    description:
+      '12.2.1. The relevant entities shall establish, implement and apply a policy for the proper handling of assets, including information, in accordance with their network and information security policy, and shall communicate the policy on proper handling of assets to anyone who uses or handles assets.\n12.2.2. The policy shall:\n(a) cover the entire life cycle of the assets, including acquisition, use, storage, transportation and disposal;\n(b) provide rules on the safe use, safe storage, safe transport, and the irretrievable deletion and destruction of the assets;\n(c) provide that the transfer shall take place in a secure manner, in accordance with the type of asset to be transferred.\n12.2.3. The relevant entities shall review and, where appropriate, update the policy at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 12. Asset management',
+  },
+  'IR-12.3': {
+    title: 'Removable media policy',
+    description:
+      '12.3.1. The relevant entities shall establish, implement and apply a policy on the management of removable storage media and communicate it to their employees and third parties who handle removable storage media at the relevant entities’ premises or other locations where the removable media is connected to the relevant entities’ network and information systems.\n12.3.2. The policy shall:\n(a) provide for a technical prohibition of the connection of removable media unless there is an organisational reason for their use;\n(b) provide for disabling self-execution from such media and scanning the media for malicious code before they are used on the relevant entities’ systems;\n(c) provide measures for controlling and protecting portable storage devices containing data while in transit and in storage;\n(d) where appropriate, provide measures for the use of cryptographic techniques to protect data on removable storage media.\n12.3.3. The relevant entities shall review and, where appropriate, update the policy at planned intervals and when significant incidents or significant changes to operations or risks occur.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 12. Asset management',
+  },
+  'IR-12.4': {
+    title: 'Asset inventory',
+    description:
+      '12.4.1. The relevant entities shall develop and maintain a complete, accurate, up-to-date and consistent inventory of their assets. They shall record changes to the entries in the inventory in a traceable manner.\n12.4.2. The granularity of the inventory of the assets shall be at a level appropriate for the needs of the relevant entities. The inventory shall include the following:\n(a) the list of operations and services and their description,\n(b) the list of network and information systems and other associated assets supporting the relevant entities’ operations and services.\n12.4.3. The relevant entities shall regularly review and update the inventory and their assets and document the history of changes.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 12. Asset management',
+  },
+  'IR-12.5': {
+    title:
+      'Deposit, return or deletion of assets upon termination of employment',
+    description:
+      'The relevant entities shall establish, implement and apply procedures which ensure that their assets which are under custody of personnel are deposited, returned or deleted upon termination of employment, and shall document the deposit, return and deletion of those assets. Where the deposit, return or deletion of assets is not possible, the relevant entities shall ensure that the assets can no longer access the relevant entities’ network and information systems in accordance with point 12.2.2.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 12. Asset management',
+  },
+  'IR-13.1': {
+    title: 'Supporting utilities',
+    description:
+      '13.1.1. For the purpose of Article 21(2)(c) of Directive (EU) 2022/2555, the relevant entities shall prevent loss, damage or compromise of network and information systems or interruption to their operations due to the failure and disruption of supporting utilities.\n13.1.2. For that purpose, the relevant entities shall, where appropriate:\n(a) protect facilities from power failures and other disruptions caused by failures in supporting utilities such as electricity, telecommunications, water supply, gas, sewage, ventilation and air conditioning;\n(b) consider the use of redundancy in utilities services;\n(c) protect utility services for electricity and telecommunications, which transport data or supply network and information systems, against interception and damage;\n(d) monitor the utility services referred to in point (c) and report to the competent internal or external personnel events outside the minimum and maximum control thresholds referred to in point 13.2.2(b) affecting the utility services;\n(e) conclude contracts for the emergency supply with corresponding services, such as for the fuel for emergency power supply;\n(f) ensure continuous effectiveness, monitor, maintain and test the supply of the network and information systems necessary for the operation of the service offered, in particular the electricity, temperature and humidity control, telecommunications and Internet connection.\n13.1.3. The relevant entities shall test, review and, where appropriate, update the protection measures on a regular basis or following significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 13. Environmental and physical security',
+  },
+  'IR-13.2': {
+    title: 'Protection against physical and environmental threats',
+    description:
+      '13.2.1. For the purpose of Article 21(2)(e) of Directive (EU) 2022/2555, the relevant entities shall prevent or reduce the consequences of events originating from physical and environmental threats, such as natural disasters and other intentional or unintentional threats, based on the results of the risk assessment carried out pursuant to point 2.1.\n13.2.2. For that purpose, the relevant entities shall, where appropriate:\n(a) design and implement protection measures against physical and environmental threats;\n(b) determine minimum and maximum control thresholds for physical and environmental threats;\n(c) monitor environmental parameters and report to the competent internal or external personnel events outside the minimum and maximum control thresholds referred to in point (b).\n13.2.3. The relevant entities shall test, review and, where appropriate, update the protection measures against physical and environmental threats on a regular basis or following significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 13. Environmental and physical security',
+  },
+  'IR-13.3': {
+    title: 'Perimeter and physical access control',
+    description:
+      '13.3.1. For the purpose of Article 21(2)(i) of Directive (EU) 2022/2555, the relevant entities shall prevent and monitor unauthorised physical access, damage and interference to their network and information systems.\n13.3.2. For that purpose, the relevant entities shall:\n(a) on the basis of the risk assessment carried out pursuant to point 2.1, lay down and use security perimeters to protect areas where network and information systems and other associated assets are located;\n(b) protect the areas referred to in point (a) by appropriate entry controls and access points;\n(c) design and implement physical security for offices, rooms and facilities,\n(d) continuously monitor their premises for unauthorised physical access.\n13.3.3. The relevant entities shall test, review and, where appropriate, update the physical access control measures on a regular basis or following significant incidents or significant changes to operations or risks.',
+    category:
+      'Implementing Regulation (EU) 2024/2690, Annex - 13. Environmental and physical security',
   },
 };
