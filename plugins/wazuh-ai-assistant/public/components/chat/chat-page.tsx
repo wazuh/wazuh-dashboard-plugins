@@ -26,7 +26,6 @@ import {
   EuiIcon,
   EuiFlyout,
   EuiFlyoutBody,
-  EuiMarkdownFormat,
   htmlIdGenerator,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -75,11 +74,7 @@ import {
   toPersistedMessages,
 } from '../../../common/chat-history';
 import { MessageList } from './message-list';
-import {
-  errorMarkdownProcessingPlugins,
-  sanitizeAssistantMarkdown,
-  UiChatMessage,
-} from './message-bubble';
+import { AssistantMarkdown, UiChatMessage } from './message-bubble';
 import { createDiscoverUrlResolver } from './discover-link';
 import { createSecurityAnalyticsUrlResolver } from './security-analytics-link';
 import { ChatInput, ChatInputHandle } from './chat-input';
@@ -3276,16 +3271,12 @@ export const ChatPage = React.forwardRef<ChatPageHandle, ChatPageProps>(
                           color='danger'
                           iconType='alert'
                           // `activeError` is the same class of text as a failed turn's
-                          // `failureReason`, so it renders through the same sanitizer and
-                          // plugin list as FailedTurnNotice (message-bubble.tsx).
+                          // `failureReason`, so it renders the same way as FailedTurnNotice
+                          // (message-bubble.tsx).
                           body={
-                            <EuiMarkdownFormat
-                              processingPluginList={
-                                errorMarkdownProcessingPlugins
-                              }
-                            >
-                              {sanitizeAssistantMarkdown(activeError ?? '')}
-                            </EuiMarkdownFormat>
+                            <AssistantMarkdown variant='error'>
+                              {activeError ?? ''}
+                            </AssistantMarkdown>
                           }
                           onDismiss={() => setDismissedError(activeError)}
                         />

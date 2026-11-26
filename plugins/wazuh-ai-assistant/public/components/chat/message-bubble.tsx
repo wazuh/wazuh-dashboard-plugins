@@ -16,6 +16,7 @@ import {
   EuiLink,
   EuiMarkdownFormat,
   EuiMarkdownFormatProps,
+  getDefaultEuiMarkdownParsingPlugins,
   getDefaultEuiMarkdownProcessingPlugins,
 } from '@elastic/eui';
 import { i18n } from '@osd/i18n';
@@ -25,14 +26,80 @@ import { DiscoverLink, ResolveDiscoverUrl } from './discover-link';
 import { ResolveSecurityAnalyticsUrl } from './security-analytics-link';
 import { describeProvenance, describeToolCall } from './tool-call-label';
 
-const ErrorMarkdownLink: React.FC<{
+const isHttpUrl = (url: unknown): boolean =>
+  typeof url === 'string' && /^https?:\/\//i.test(url);
+
+/**
+ * Renders a markdown link as an anchor only when its target is an http(s) URL, and as its label
+ * otherwise. Checked here, at render time, so every link form (inline, reference, nested, bare
+ * URL) goes through the same check.
+ */
+const MarkdownLink: React.FC<{
   href?: string;
   children?: React.ReactNode;
-}> = ({ href, children }) => (
-  <EuiLink href={href} target='_blank' rel='noopener noreferrer'>
-    {children}
-  </EuiLink>
-);
+  newTab?: boolean;
+}> = ({ href, children, newTab }) => {
+  if (!isHttpUrl(href)) {
+    return <>{children}</>;
+  }
+  return newTab ? (
+    <EuiLink href={href} target='_blank' rel='noopener noreferrer'>
+      {children}
+    </EuiLink>
+  ) : (
+    <EuiLink href={href}>{children}</EuiLink>
+  );
+};
+
+const NewTabMarkdownLink: React.FC<{
+  href?: string;
+  children?: React.ReactNode;
+}> = props => <MarkdownLink {...props} newTab />;
+
+interface MarkdownNode {
+  type: string;
+  url?: string;
+  children?: MarkdownNode[];
+}
+
+/** Replaces each non-http(s) inline link with its label, recursively. */
+function unwrapUnsafeLinks(node: MarkdownNode): void {
+  if (!node.children) {
+    return;
+  }
+  node.children = node.children.flatMap(child =>
+    child.type === 'link' && !isHttpUrl(child.url)
+      ? child.children ?? []
+      : [child],
+  );
+  node.children.forEach(unwrapUnsafeLinks);
+}
+
+/**
+ * remark plugin for all markdown this plugin renders:
+ * - turns off raw HTML parsing, so a line such as `<script` or `<!--` with no closing token is
+ *   shown as text instead of opening an HTML block that swallows the rest of the text;
+ * - shows a non-http(s) inline link as its label. EUI's link validator, which runs after this,
+ *   would otherwise show it as raw `[label](target)` text.
+ */
+function restrictAssistantMarkdown(this: {
+  Parser: { prototype: { blockMethods: string[]; inlineMethods: string[] } };
+}) {
+  const parserPrototype = this.Parser.prototype;
+  parserPrototype.blockMethods = parserPrototype.blockMethods.filter(
+    method => method !== 'html',
+  );
+  parserPrototype.inlineMethods = parserPrototype.inlineMethods.filter(
+    method => method !== 'html',
+  );
+  return unwrapUnsafeLinks;
+}
+
+const [remarkParsePlugin, ...otherParsingPlugins] =
+  getDefaultEuiMarkdownParsingPlugins();
+
+const assistantMarkdownParsingPlugins: EuiMarkdownFormatProps['parsingPluginList'] =
+  [remarkParsePlugin, [restrictAssistantMarkdown, {}], ...otherParsingPlugins];
 
 const [
   remarkRehypePlugin,
@@ -41,14 +108,14 @@ const [
 ] = getDefaultEuiMarkdownProcessingPlugins();
 
 /**
- * Builds a `processingPluginList` from EUI's defaults with `components` overriding its renderers.
- * Every list built here renders the `img` node as `null`: all markdown this plugin renders (a
- * finished answer, a failure reason, the error banner) can carry model output or upstream provider
- * text, and a live `<img>` there is an uncontrolled, no-click outbound fetch. Dropping the node at
- * the render layer covers every image form, which a per-form string regex cannot guarantee.
+ * Builds a `processingPluginList` from EUI's defaults. Every list built here renders the `img`
+ * node as `null`: all markdown this plugin renders (a finished answer, a failure reason, the error
+ * banner) can carry model output or upstream provider text, and a live `<img>` there is an
+ * uncontrolled, no-click outbound fetch. Dropping the node at the render layer covers every image
+ * form, which a per-form string regex cannot guarantee.
  */
 function buildMarkdownProcessingPlugins(
-  components: Record<string, React.ElementType> = {},
+  link: React.ElementType,
 ): EuiMarkdownFormatProps['processingPluginList'] {
   return [
     remarkRehypePlugin,
@@ -59,7 +126,7 @@ function buildMarkdownProcessingPlugins(
         ...rehype2reactOptions,
         components: {
           ...rehype2reactOptions.components,
-          ...components,
+          a: link,
           img: () => null,
         },
       },
@@ -70,21 +137,45 @@ function buildMarkdownProcessingPlugins(
 /**
  * `processingPluginList` for error text only — an expanded failure reason and chat-page.tsx's
  * error banner, both of which may carry the operator-configured out-of-credits link
- * (`wazuh_ai_assistant.outOfCreditsMessage`, server/config.ts). On top of the image drop, the `a`
- * renderer opens the link in a new tab: EUI's default sets no `target` and would navigate the
- * dashboard tab itself away to a third-party billing page.
+ * (`wazuh_ai_assistant.outOfCreditsMessage`, server/config.ts). Links open in a new tab: EUI's
+ * default sets no `target` and would navigate the dashboard tab itself away to a third-party
+ * billing page.
  */
-export const errorMarkdownProcessingPlugins = buildMarkdownProcessingPlugins({
-  a: ErrorMarkdownLink,
-});
+const errorMarkdownProcessingPlugins =
+  buildMarkdownProcessingPlugins(NewTabMarkdownLink);
 
 /**
  * `processingPluginList` for a finished assistant answer, which is model output built from tool
- * results that can carry attacker-influenced text. Keeps EUI's stock renderers apart from the image
- * drop.
+ * results that can carry attacker-influenced text.
  */
-export const assistantAnswerProcessingPlugins =
-  buildMarkdownProcessingPlugins();
+const assistantAnswerProcessingPlugins =
+  buildMarkdownProcessingPlugins(MarkdownLink);
+
+/**
+ * Renders model output or provider error text as markdown: sanitized, with raw HTML shown as text,
+ * no images, and only http(s) links. `variant='error'` opens links in a new tab.
+ */
+export const AssistantMarkdown: React.FC<{
+  children: string;
+  variant?: 'answer' | 'error';
+}> = ({ children, variant = 'answer' }) => {
+  const sanitized = useMemo(
+    () => sanitizeAssistantMarkdown(children),
+    [children],
+  );
+  return (
+    <EuiMarkdownFormat
+      parsingPluginList={assistantMarkdownParsingPlugins}
+      processingPluginList={
+        variant === 'error'
+          ? errorMarkdownProcessingPlugins
+          : assistantAnswerProcessingPlugins
+      }
+    >
+      {sanitized}
+    </EuiMarkdownFormat>
+  );
+};
 
 /**
  * "This turn was cut short" affordance, rendered in two places: inside an interrupted assistant
@@ -214,11 +305,7 @@ export const FailedTurnNotice: React.FC<{
             {/* `reason` is either the operator-configured out-of-credits message (which may
                   carry a markdown link to a credits/plan page) or raw upstream provider error
                   text — sanitized before rendering, since neither is safe as raw HTML. */}
-            <EuiMarkdownFormat
-              processingPluginList={errorMarkdownProcessingPlugins}
-            >
-              {sanitizeAssistantMarkdown(reason)}
-            </EuiMarkdownFormat>
+            <AssistantMarkdown variant='error'>{reason}</AssistantMarkdown>
           </EuiText>
         </div>
       )}
@@ -325,10 +412,11 @@ function formatTimestamp(epochMs: number): string {
  * answer is analytical prose; it has no legitimate need to embed a remote image or a raw HTML
  * element.
  *
- * Markdown images are handled at the render layer (`buildMarkdownProcessingPlugins` renders the
- * `img` node as `null`), so this string-level defense covers the rest: it strips raw HTML tags and
- * drops non-http(s) link targets, keeping the label. Fenced code blocks and inline code spans are
- * left untouched, so a literal `<img>` in a code sample still displays as written.
+ * The safety checks live in `AssistantMarkdown`'s plugin lists: no `img` node, raw HTML parsed
+ * as text, and only http(s) links rendered as anchors. This string pass is a cleanup layer on top:
+ * it strips closed HTML tags and drops non-http(s) link targets, keeping the label. Fenced code
+ * blocks and inline code spans are left untouched, so a literal `<img>` in a code sample still
+ * displays as written.
  */
 export function sanitizeAssistantMarkdown(content: string): string {
   // Split on fenced code blocks (```...```) and inline code spans (`...`); the capturing group
@@ -504,14 +592,6 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
           };
         })
       : undefined;
-  // Only the finished-assistant branch below renders through EuiMarkdownFormat (the user bubble
-  // and the streaming branch both render message.content as plain text/JSX, which React already
-  // escapes), so this is only ever read there — memoized on message.content since re-sanitizing
-  // an unchanged, already-finished answer on every unrelated re-render is pure waste.
-  const sanitizedContent = useMemo(
-    () => sanitizeAssistantMarkdown(message.content),
-    [message.content],
-  );
   // One open/closed state PER chip, keyed by what that chip reveals. A single shared panel was
   // tried first and was wrong twice over: clicking one query opened every query on the turn, and
   // because the panel rendered above the chips it pushed them down, so the control that closed it
@@ -623,11 +703,7 @@ const MessageBubbleComponent: React.FC<MessageBubbleProps> = ({
       ) : (
         <div className={PROSE_CLASS}>
           <EuiText size='s'>
-            <EuiMarkdownFormat
-              processingPluginList={assistantAnswerProcessingPlugins}
-            >
-              {sanitizedContent}
-            </EuiMarkdownFormat>
+            <AssistantMarkdown>{message.content}</AssistantMarkdown>
           </EuiText>
         </div>
       )}
