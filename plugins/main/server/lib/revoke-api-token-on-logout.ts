@@ -16,13 +16,15 @@ import {
 } from 'opensearch_dashboards/server';
 import { getCookieValueByName } from './cookie';
 
-// Logout routes of the security plugin: basic, JWT, proxy, OpenID, SAML
+// Routes of the security plugin that end a session: the logouts (basic, JWT,
+// proxy, OpenID, SAML) and the basic login, which replaces the previous session
 const LOGOUT_ROUTES = new Set([
   'post /auth/logout',
   'post /api/v1/auth/logout',
   'post /auth/proxy/logout',
   'get /auth/openid/logout',
   'get /auth/saml/logout',
+  'post /auth/login',
 ]);
 
 interface ServerAPIClient {
@@ -40,9 +42,9 @@ interface ServerAPIClient {
 }
 
 /**
- * Revoke the Server API token of the user when they log out of the dashboard,
- * from any app and any logout method, and expire its cookie so the next login
- * does not reuse it.
+ * Revoke the Server API token of the user when their dashboard session ends,
+ * from any app and any logout method or a new login, and expire its cookie so
+ * the next session does not reuse it.
  */
 export function registerRevokeAPITokenOnLogout(
   http: Pick<HttpServiceSetup, 'registerOnPreResponse'>,

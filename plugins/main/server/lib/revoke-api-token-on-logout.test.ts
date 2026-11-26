@@ -33,6 +33,7 @@ describe('registerRevokeAPITokenOnLogout', () => {
     ['post /auth/proxy/logout', 200],
     ['get /auth/openid/logout', 302],
     ['get /auth/saml/logout', 302],
+    ['post /auth/login', 200],
   ])('revokes the token and expires its cookie on %s', (route, statusCode) => {
     const { run, request } = setup();
 
@@ -51,7 +52,7 @@ describe('registerRevokeAPITokenOnLogout', () => {
     ['post /auth/logout', 400],
     ['get /auth/saml/logout', 400],
     ['post /api/request', 200],
-    ['post /auth/login', 200],
+    ['post /auth/login', 401],
   ])('does nothing on %s (status %p)', (route, statusCode) => {
     const { run, request } = setup();
 
