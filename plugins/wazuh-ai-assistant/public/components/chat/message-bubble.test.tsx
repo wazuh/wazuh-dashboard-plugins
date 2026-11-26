@@ -1094,6 +1094,31 @@ describe('AssistantMarkdown — raw HTML and link targets', () => {
     expect(container.textContent).toContain('two  three');
   });
 
+  it('keeps the text after an unclosed comment when a later paragraph has an arrow', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {
+          'Payload starts with <!-- and was cut off.\n\n**Actions**\n\n1. Block it.\n2. Flow: browser --> WAF --> backend.'
+        }
+      </AssistantMarkdown>,
+    );
+
+    expect(container.textContent).toContain(
+      'Payload starts with <!-- and was cut off.',
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('Actions');
+    expect(container.querySelectorAll('li')).toHaveLength(2);
+    expect(container.textContent).toContain('browser --> WAF --> backend.');
+  });
+
+  it('drops a comment that spans lines within one paragraph', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'one <!-- a\nb --> two'}</AssistantMarkdown>,
+    );
+
+    expect(container.textContent).toBe('one  two');
+  });
+
   it('keeps an HTML-looking line inside the paragraph above it', () => {
     const { container } = render(
       <AssistantMarkdown>{'line one\n<?x\nline two'}</AssistantMarkdown>,

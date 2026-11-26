@@ -456,20 +456,29 @@ export function sanitizeAssistantMarkdown(content: string): string {
 }
 
 /**
- * Drops each closed HTML comment whole, as the renderer did before raw HTML parsing was turned
- * off; an unclosed `<!--` stays and is shown as text. A linear scan: a lazy regex is quadratic on
- * text with many unclosed `<!--`.
+ * Drops each HTML comment that closes within its paragraph, as the renderer did before raw HTML
+ * parsing was turned off; any other `<!--` stays and is shown as text. A comment never spans a
+ * blank line: an unclosed `<!--` would otherwise take every paragraph up to a later `-->` (an
+ * arrow in prose) with it.
  */
 function stripClosedHtmlComments(text: string): string {
+  return text
+    .split(/(\n[ \t]*\n)/)
+    .map(stripParagraphComments)
+    .join('');
+}
+
+// A linear scan: a lazy regex is quadratic on text with many unclosed `<!--`.
+function stripParagraphComments(paragraph: string): string {
   let result = '';
   let from = 0;
   for (;;) {
-    const start = text.indexOf('<!--', from);
-    const end = start === -1 ? -1 : text.indexOf('-->', start + 4);
+    const start = paragraph.indexOf('<!--', from);
+    const end = start === -1 ? -1 : paragraph.indexOf('-->', start + 4);
     if (end === -1) {
-      return result + text.slice(from);
+      return result + paragraph.slice(from);
     }
-    result += text.slice(from, start);
+    result += paragraph.slice(from, start);
     from = end + 3;
   }
 }
