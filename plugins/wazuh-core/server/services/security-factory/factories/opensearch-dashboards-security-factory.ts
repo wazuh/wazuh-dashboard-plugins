@@ -1,5 +1,6 @@
 import { ISecurityFactory } from '..';
 import {
+  HttpAuth,
   OpenSearchDashboardsRequest,
   RequestHandlerContext,
 } from 'opensearch-dashboards/server';
@@ -20,7 +21,7 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
     'user_name',
     'user_requested_tenant',
   ];
-  constructor() {}
+  constructor(private auth?: Pick<HttpAuth, 'get'>) {}
 
   async getCurrentUser(
     request: OpenSearchDashboardsRequest,
@@ -45,6 +46,14 @@ export class OpenSearchDashboardsSecurityFactory implements ISecurityFactory {
 
   getUserName(authContext: any) {
     return authContext['user_name'];
+  }
+
+  getRequestUsername(request: OpenSearchDashboardsRequest) {
+    // The security plugin stores the response of its authinfo API, which it
+    // requests on every authenticated request, as `authInfo`.
+    const { state } =
+      this.auth?.get<{ authInfo?: { user_name?: string } }>(request) ?? {};
+    return state?.authInfo?.user_name;
   }
 
   async isAdministratorUser(
