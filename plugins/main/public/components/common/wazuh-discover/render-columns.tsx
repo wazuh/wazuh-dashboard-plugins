@@ -5,6 +5,7 @@ import { endpointSummary, mitreAttack } from '../../../utils/applications';
 import { WzLink } from '../../wz-link/wz-link';
 import { i18n } from '@osd/i18n';
 import { CTI_CVE_LINK_BASE_PATH } from '../../../../common/constants';
+import { isSafeHttpUrl } from '../../../../common/cti-explorer/cve-record';
 
 export const MAX_ENTRIES_PER_QUERY = 10000;
 
@@ -24,22 +25,28 @@ const renderLinksReference = (value: string) => {
       {value?.split(', ').map((link, index) => (
         <span key={index}>
           {!!index && ', '}
-          <EuiToolTip
-            position='top'
-            content={i18n.translate(
-              'wazuh.common.wazuhDiscover.fieldLinkTooltip.vulnerabilityExternalReference',
-              { defaultMessage: 'Navigate to the vulnerability reference' },
-            )}
-          >
-            <EuiLink
-              href={link}
-              target='_blank'
-              rel='noopener noreferrer'
-              external
+          {/* Only http and https references become links, any other scheme
+              (data:, file:, javascript:, custom app schemes) is plain text. */}
+          {isSafeHttpUrl(link) ? (
+            <EuiToolTip
+              position='top'
+              content={i18n.translate(
+                'wazuh.common.wazuhDiscover.fieldLinkTooltip.vulnerabilityExternalReference',
+                { defaultMessage: 'Navigate to the vulnerability reference' },
+              )}
             >
-              {link}
-            </EuiLink>
-          </EuiToolTip>
+              <EuiLink
+                href={link}
+                target='_blank'
+                rel='noopener noreferrer'
+                external
+              >
+                {link}
+              </EuiLink>
+            </EuiToolTip>
+          ) : (
+            link
+          )}
         </span>
       ))}
     </>
