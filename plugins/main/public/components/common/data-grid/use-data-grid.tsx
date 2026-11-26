@@ -11,7 +11,7 @@ import {
   Filter,
   IndexPattern,
 } from '../../../../../../src/plugins/data/common';
-import dompurify from 'dompurify';
+import { sanitizeFormattedValue } from '../index-pattern/sanitize-formatted-value';
 import { omit } from 'lodash';
 import {
   PaginationOptions,
@@ -240,7 +240,7 @@ export const useDataGrid = (props: tDataGridProps): TDataGridReturn => {
       if (typeof formattedValue === 'undefined') {
         return <span>-</span>;
       } else {
-        const sanitizedCellValue = dompurify.sanitize(formattedValue);
+        const sanitizedCellValue = sanitizeFormattedValue(formattedValue);
         return (
           // eslint-disable-next-line react/no-danger
           <span dangerouslySetInnerHTML={{ __html: sanitizedCellValue }} />

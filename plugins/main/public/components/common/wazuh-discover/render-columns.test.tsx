@@ -39,3 +39,68 @@ describe('wzDiscoverRenderColumns MITRE fields', () => {
     expect(container.querySelector('.wz-ellipsis')).not.toBeNull();
   });
 });
+
+const REFERENCE_FIELDS = [
+  'vulnerability.reference',
+  'vulnerability.scanner.reference',
+  'data.vulnerability.reference',
+  'data.vulnerability.scanner.reference',
+];
+
+const renderReference = (id: string, value: string) => {
+  const column = wzDiscoverRenderColumns.find(column => column.id === id);
+  return render(<>{column?.render?.(value, {})}</>);
+};
+
+describe('wzDiscoverRenderColumns reference fields', () => {
+  it.each(REFERENCE_FIELDS)(
+    '%s renders an https reference as a link',
+    field => {
+      const { container } = renderReference(field, 'https://a.example/x');
+      const anchors = container.querySelectorAll('a');
+
+      expect(anchors).toHaveLength(1);
+      expect(anchors[0].getAttribute('href')).toBe('https://a.example/x');
+    },
+  );
+
+  it.each(
+    REFERENCE_FIELDS.flatMap(field =>
+      [
+        'data:text/html,<script>alert(1)</script>',
+        'file:///etc/passwd',
+        'myapp://open',
+        'javascript:alert(1)',
+      ].map(value => [field, value]),
+    ),
+  )('%s renders %s as text', (field, value) => {
+    const { container } = renderReference(field, value);
+
+    expect(container.querySelector('a')).toBeNull();
+    expect(container.textContent).toBe(value);
+  });
+
+  it.each(REFERENCE_FIELDS)(
+    '%s links only the safe parts of a mixed value',
+    field => {
+      const value =
+        'https://a.example/x, data:text/html,foo, http://b.example/y';
+      const { container } = renderReference(field, value);
+      const hrefs = Array.from(container.querySelectorAll('a')).map(anchor =>
+        anchor.getAttribute('href'),
+      );
+
+      expect(hrefs).toEqual(['https://a.example/x', 'http://b.example/y']);
+      expect(container.textContent).toContain(', data:text/html,foo, ');
+      expect(container.textContent?.startsWith('https://a.example/x')).toBe(
+        true,
+      );
+    },
+  );
+
+  it.each(REFERENCE_FIELDS)('%s renders - for an empty value', field => {
+    const { container } = renderReference(field, '');
+
+    expect(container.textContent).toBe('-');
+  });
+});
