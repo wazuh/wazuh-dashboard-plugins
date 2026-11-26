@@ -183,7 +183,9 @@ export const useCtiStatus = (
         ) {
           return;
         }
-        await fetchStatus({ silent: true });
+        // Polls the activation (status read and device-code exchange) with no
+        // user input, so it must not extend the session: sent as a system request.
+        await fetchStatus({ silent: true, asSystemRequest: true });
         if (cancelled) {
           return;
         }

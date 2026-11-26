@@ -189,6 +189,44 @@ describe('useCtiStatus — post-registration steady-state re-poll', () => {
   });
 });
 
+describe('useCtiStatus — device-flow polling', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    ctiFlowState.reset();
+    mockedFetchCtiRegistrationStatus.mockReset();
+    // The activation stays pending: the device code is not redeemed yet.
+    mockedFetchCtiRegistrationStatus.mockResolvedValue({
+      statusCode: 404,
+      message: 'authorization_pending',
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('sends the activation polls as system requests so they do not extend the session', async () => {
+    ctiFlowState.setDeviceCode('device-code');
+    ctiFlowState.setPollIntervalSec(5);
+
+    renderHook(() => useCtiStatus(0, 30));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    mockedFetchCtiRegistrationStatus.mockClear();
+
+    await act(async () => {
+      jest.advanceTimersByTime(ctiFlowState.getPollIntervalSec() * 1000);
+      await Promise.resolve();
+    });
+
+    expect(mockedFetchCtiRegistrationStatus).toHaveBeenCalled();
+    mockedFetchCtiRegistrationStatus.mock.calls.forEach(([options]) =>
+      expect(options).toEqual({ asSystemRequest: true }),
+    );
+  });
+});
+
 describe('useCtiStatus — freshness guard on remount / visibility focus', () => {
   beforeEach(() => {
     jest.useFakeTimers();
