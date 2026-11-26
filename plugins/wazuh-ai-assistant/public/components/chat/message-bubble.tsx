@@ -34,27 +34,40 @@ const isHttpUrl = (url: unknown): boolean =>
  * otherwise. Checked here, at render time, so every link form (inline, reference, nested, bare
  * URL) goes through the same check.
  */
-const MarkdownLink: React.FC<{
+interface MarkdownLinkProps {
   href?: string;
+  title?: string;
   children?: React.ReactNode;
-  newTab?: boolean;
-}> = ({ href, children, newTab }) => {
+}
+
+const MarkdownLink: React.FC<MarkdownLinkProps & { newTab?: boolean }> = ({
+  href,
+  title,
+  children,
+  newTab,
+}) => {
   if (!isHttpUrl(href)) {
     return <>{children}</>;
   }
   return newTab ? (
-    <EuiLink href={href} target='_blank' rel='noopener noreferrer'>
+    <EuiLink
+      href={href}
+      title={title}
+      target='_blank'
+      rel='noopener noreferrer'
+    >
       {children}
     </EuiLink>
   ) : (
-    <EuiLink href={href}>{children}</EuiLink>
+    <EuiLink href={href} title={title}>
+      {children}
+    </EuiLink>
   );
 };
 
-const NewTabMarkdownLink: React.FC<{
-  href?: string;
-  children?: React.ReactNode;
-}> = props => <MarkdownLink {...props} newTab />;
+const NewTabMarkdownLink: React.FC<MarkdownLinkProps> = props => (
+  <MarkdownLink {...props} newTab />
+);
 
 interface MarkdownNode {
   type: string;
@@ -83,7 +96,14 @@ function unwrapUnsafeLinks(node: MarkdownNode): void {
  *   would otherwise show it as raw `[label](target)` text.
  */
 function restrictAssistantMarkdown(this: {
-  Parser: { prototype: { blockMethods: string[]; inlineMethods: string[] } };
+  Parser: {
+    prototype: {
+      blockMethods: string[];
+      inlineMethods: string[];
+      interruptParagraph: [string, object?][];
+      interruptBlockquote: [string, object?][];
+    };
+  };
 }) {
   const parserPrototype = this.Parser.prototype;
   parserPrototype.blockMethods = parserPrototype.blockMethods.filter(
@@ -92,6 +112,11 @@ function restrictAssistantMarkdown(this: {
   parserPrototype.inlineMethods = parserPrototype.inlineMethods.filter(
     method => method !== 'html',
   );
+  // Otherwise an HTML-looking line still ends the paragraph or quote above it.
+  parserPrototype.interruptParagraph =
+    parserPrototype.interruptParagraph.filter(([name]) => name !== 'html');
+  parserPrototype.interruptBlockquote =
+    parserPrototype.interruptBlockquote.filter(([name]) => name !== 'html');
   return unwrapUnsafeLinks;
 }
 
@@ -414,7 +439,7 @@ function formatTimestamp(epochMs: number): string {
  *
  * The safety checks live in `AssistantMarkdown`'s plugin lists: no `img` node, raw HTML parsed
  * as text, and only http(s) links rendered as anchors. This string pass is a cleanup layer on top:
- * it strips closed HTML tags and drops non-http(s) link targets, keeping the label. Fenced code
+ * it strips closed HTML tags and comments and drops non-http(s) link targets, keeping the label. Fenced code
  * blocks and inline code spans are left untouched, so a literal `<img>` in a code sample still
  * displays as written.
  */
@@ -430,9 +455,28 @@ export function sanitizeAssistantMarkdown(content: string): string {
     .join('');
 }
 
+/**
+ * Drops each closed HTML comment whole, as the renderer did before raw HTML parsing was turned
+ * off; an unclosed `<!--` stays and is shown as text. A linear scan: a lazy regex is quadratic on
+ * text with many unclosed `<!--`.
+ */
+function stripClosedHtmlComments(text: string): string {
+  let result = '';
+  let from = 0;
+  for (;;) {
+    const start = text.indexOf('<!--', from);
+    const end = start === -1 ? -1 : text.indexOf('-->', start + 4);
+    if (end === -1) {
+      return result + text.slice(from);
+    }
+    result += text.slice(from, start);
+    from = end + 3;
+  }
+}
+
 function sanitizeProseSegment(segment: string): string {
   return (
-    segment
+    stripClosedHtmlComments(segment)
       // Raw HTML tags (open, close, self-closing) — the leading-letter requirement after `<`/`</`
       // is what real HTML tags require, so ordinary prose use of `<`/`>` (e.g. "value < 5") never
       // matches and passes through untouched.

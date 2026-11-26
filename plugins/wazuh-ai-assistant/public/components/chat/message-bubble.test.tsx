@@ -1025,6 +1025,38 @@ describe('AssistantMarkdown — raw HTML and link targets', () => {
     expect(errorLink?.getAttribute('target')).toBe('_blank');
   });
 
+  it('keeps a link title', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {'[a](https://example.com/p "Docs")'}
+      </AssistantMarkdown>,
+    );
+
+    expect(container.querySelector('a')?.getAttribute('title')).toBe('Docs');
+  });
+
+  it('drops a closed HTML comment whole and keeps the lines around it', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {'one\n\n<!-- note -->\n\ntwo <!-- c --> three'}
+      </AssistantMarkdown>,
+    );
+
+    expect(container.textContent).not.toContain('note');
+    expect(container.textContent).not.toContain('<!--');
+    expect(container.textContent).toContain('one');
+    expect(container.textContent).toContain('two  three');
+  });
+
+  it('keeps an HTML-looking line inside the paragraph above it', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'line one\n<?x\nline two'}</AssistantMarkdown>,
+    );
+
+    expect(container.querySelectorAll('p')).toHaveLength(1);
+    expect(container.textContent).toContain('line two');
+  });
+
   it('shows comparisons in prose unchanged', () => {
     const { container } = render(
       <AssistantMarkdown>{'value < 5 and > 10'}</AssistantMarkdown>,
