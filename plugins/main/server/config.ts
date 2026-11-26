@@ -26,7 +26,6 @@ const disabledSettingSchema = schema.string({
 
 export const configSchema = schema.object({
   disabledSettings: schema.arrayOf(disabledSettingSchema, { defaultValue: [] }),
-  blockCrossSiteLoads: schema.boolean({ defaultValue: true }),
 });
 
 export type WazuhPluginConfigType = TypeOf<typeof configSchema>;
