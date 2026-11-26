@@ -46,6 +46,15 @@ import { tFilterParams } from '../../mitre';
 import { getDataPlugin } from '../../../../../../kibana-services';
 import { DiscoverNoResults } from '../../../../../common/no-results/no-results';
 
+import {
+  OTHER_AGGREGATION_KEY,
+  OTHER_TECHNIQUE_ID,
+  buildOtherAggregation,
+  buildOtherFilter,
+  getCatalogTechniqueIds,
+  sortWithOtherLast,
+} from './lib/other-technique';
+
 const MITRE_ATTACK = 'mitre-attack';
 
 type tTechniquesProps = {
@@ -60,11 +69,13 @@ type tTechniquesProps = {
 
 type tTechniquesState = {
   techniquesCount: { key: string; doc_count: number }[];
+  otherCount: number;
   isFlyoutVisible: Boolean;
   currentTechnique: string;
   hideAlerts: boolean;
   actionsOpen: string;
   filteredTechniques: boolean | [string];
+  searchText: string;
   mitreTechniques: [];
   hover: string;
 };
@@ -83,10 +94,12 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
   const [state, setState] = useState<tTechniquesState>({
     isFlyoutVisible: false,
     techniquesCount: [],
+    otherCount: 0,
     currentTechnique: '',
     hideAlerts: false,
     actionsOpen: '',
     filteredTechniques: false,
+    searchText: '',
     mitreTechniques: [],
     hover: '',
   });
@@ -142,11 +155,16 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     getTechniquesCount();
   }, [tacticsObject, isLoading, filterParams, isSearching]);
 
+  // Every ID of the catalog (not only the selected tactics), so the "Other" count
+  // doesn't change when the tactics are toggled
+  const getCatalogIds = () => getCatalogTechniqueIds(state.mitreTechniques);
+
   const getTechniquesCount = async () => {
     try {
       if (!fetchData) {
         return;
       }
+      const catalogIds = getCatalogIds();
       const aggs = {
         techniques: {
           terms: {
@@ -154,6 +172,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
             size: 1000,
           },
         },
+        // Without a catalog every finding would be "Other"
+        ...(catalogIds.length ? buildOtherAggregation(catalogIds) : {}),
       };
       setLoadingAlerts(true);
       const results = await fetchData({
@@ -168,6 +188,8 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       setState({
         ...state,
         techniquesCount: buckets,
+        otherCount:
+          results.aggregations?.[OTHER_AGGREGATION_KEY]?.doc_count || 0,
       });
       setLoadingAlerts(false);
     } catch (error) {
@@ -194,6 +216,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
   };
 
   const buildPanel = techniqueID => {
+    const isOther = techniqueID === OTHER_TECHNIQUE_ID;
     return [
       {
         id: 0,
@@ -213,6 +236,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
             ),
             icon: <EuiIcon type='magnifyWithPlus' size='m' />,
             onClick: () => {
+              addTechniqueFilter(techniqueID, false);
               closeActionsMenu();
             },
           },
@@ -225,22 +249,28 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
             ),
             icon: <EuiIcon type='magnifyWithMinus' size='m' />,
             onClick: () => {
+              addTechniqueFilter(techniqueID, true);
               closeActionsMenu();
             },
           },
-          {
-            name: i18n.translate(
-              'wazuh.mitreAttack.techniques.actionsMenu.viewTechniqueDetails',
-              {
-                defaultMessage: 'View technique details',
-              },
-            ),
-            icon: <EuiIcon type='filebeatApp' size='m' />,
-            onClick: () => {
-              closeActionsMenu();
-              showFlyout(techniqueID);
-            },
-          },
+          // There is no MITRE description for "Other"
+          ...(isOther
+            ? []
+            : [
+                {
+                  name: i18n.translate(
+                    'wazuh.mitreAttack.techniques.actionsMenu.viewTechniqueDetails',
+                    {
+                      defaultMessage: 'View technique details',
+                    },
+                  ),
+                  icon: <EuiIcon type='filebeatApp' size='m' />,
+                  onClick: () => {
+                    closeActionsMenu();
+                    showFlyout(techniqueID);
+                  },
+                },
+              ]),
         ],
       },
     ];
@@ -357,21 +387,28 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
     filterManager.addFilters([newFilter]);
   };
 
-  const openDiscover = (e, techniqueID) => {
+  const addTechniqueFilter = (techniqueID: string, negate: boolean) => {
+    if (techniqueID === OTHER_TECHNIQUE_ID) {
+      const { filterManager } = getDataPlugin().query;
+      filterManager.addFilters([
+        buildOtherFilter(indexPatternId, getCatalogIds(), negate),
+      ]);
+      return;
+    }
     addFilter({
       key: 'wazuh.rule.mitre.technique.id',
       value: techniqueID,
-      negate: false,
+      negate,
     });
+  };
+
+  const openDiscover = (e, techniqueID) => {
+    addTechniqueFilter(techniqueID, false);
     onSelectedTabChanged(TAB_VIEW_ID_EVENTS);
   };
 
   const openDashboard = (e, techniqueID) => {
-    addFilter({
-      key: 'wazuh.rule.mitre.technique.id',
-      value: techniqueID,
-      negate: false,
-    });
+    addTechniqueFilter(techniqueID, false);
     onSelectedTabChanged(TAB_VIEW_ID_DASHBOARD);
   };
 
@@ -409,124 +446,155 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
       .filter(technique =>
         state.hideAlerts ? technique.quantity !== 0 : true,
       );
-    const tacticsToRenderOrdered = tacticsToRender
-      .sort((a, b) => b.quantity - a.quantity)
-      .map((item, idx) => {
-        const tooltipContent = i18n.translate(
-          'wazuh.mitreAttack.techniques.facet.viewDetailsTooltip',
-          {
-            defaultMessage: 'View details of {label} ({id})',
-            values: { label: item.label, id: item.id },
-          },
-        );
-        const toolTipAnchorClass =
-          'wz-display-inline-grid' +
-          (state.hover === item.id ? ' wz-mitre-width' : ' ');
-        return (
-          <EuiFlexItem
-            onMouseEnter={() => setState({ ...state, hover: item.id })}
-            onMouseLeave={() => setState({ ...state, hover: '' })}
-            key={idx}
-            style={{
-              border: '1px solid #8080804a',
-              maxWidth: 'calc(25% - 8px)',
-              maxHeight: 41,
-            }}
-          >
-            <EuiPopover
-              id='techniqueActionsContextMenu'
-              anchorClassName='wz-width-100'
-              button={
-                <EuiFacetButton
-                  style={{
-                    width: '100%',
-                    padding: '0 5px 0 5px',
-                    lineHeight: '40px',
-                    maxHeight: 40,
-                  }}
-                  quantity={item.quantity}
-                  className={'module-table'}
-                  onClick={() => showFlyout(item.id)}
+    const otherLabel = i18n.translate(
+      'wazuh.mitreAttack.techniques.other.label',
+      {
+        defaultMessage: 'Other',
+      },
+    );
+    // "Other" is shown when it has findings (or the hide switch is off) and it
+    // matches the search box (the search is applied to the label)
+    const searchedText = state.searchText?.trim().toLowerCase();
+    const showOther =
+      (!state.hideAlerts || state.otherCount > 0) &&
+      (!searchedText || otherLabel.toLowerCase().includes(searchedText));
+    const otherItem = showOther
+      ? {
+          id: OTHER_TECHNIQUE_ID,
+          label: otherLabel,
+          quantity: state.otherCount,
+          isOther: true,
+        }
+      : undefined;
+    const itemsToRender = sortWithOtherLast<any>(tacticsToRender, otherItem);
+    const tacticsToRenderOrdered = itemsToRender.map((item, idx) => {
+      const tooltipContent = item.isOther
+        ? i18n.translate('wazuh.mitreAttack.techniques.other.tooltip', {
+            defaultMessage:
+              'Findings whose MITRE technique IDs are not in the catalog',
+          })
+        : i18n.translate(
+            'wazuh.mitreAttack.techniques.facet.viewDetailsTooltip',
+            {
+              defaultMessage: 'View details of {label} ({id})',
+              values: { label: item.label, id: item.id },
+            },
+          );
+      const toolTipAnchorClass =
+        'wz-display-inline-grid' +
+        (state.hover === item.id ? ' wz-mitre-width' : ' ');
+      return (
+        <EuiFlexItem
+          onMouseEnter={() => setState({ ...state, hover: item.id })}
+          onMouseLeave={() => setState({ ...state, hover: '' })}
+          key={idx}
+          style={{
+            border: '1px solid #8080804a',
+            maxWidth: 'calc(25% - 8px)',
+            maxHeight: 41,
+          }}
+        >
+          <EuiPopover
+            id='techniqueActionsContextMenu'
+            anchorClassName='wz-width-100'
+            button={
+              <EuiFacetButton
+                style={{
+                  width: '100%',
+                  padding: '0 5px 0 5px',
+                  lineHeight: '40px',
+                  maxHeight: 40,
+                }}
+                quantity={item.quantity}
+                className={'module-table'}
+                onClick={() =>
+                  item.isOther
+                    ? setState({ ...state, actionsOpen: item.id })
+                    : showFlyout(item.id)
+                }
+              >
+                <EuiToolTip
+                  position='top'
+                  content={tooltipContent}
+                  anchorClassName={toolTipAnchorClass}
                 >
-                  <EuiToolTip
-                    position='top'
-                    content={tooltipContent}
-                    anchorClassName={toolTipAnchorClass}
+                  <span
+                    style={{
+                      display: 'block',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      ...(item.isOther
+                        ? { fontStyle: 'italic', opacity: 0.75 }
+                        : {}),
+                    }}
                   >
-                    <span
-                      style={{
-                        display: 'block',
-                        overflow: 'hidden',
-                        whiteSpace: 'nowrap',
-                        textOverflow: 'ellipsis',
-                      }}
-                    >
-                      {item.label}
-                    </span>
-                  </EuiToolTip>
+                    {item.label}
+                  </span>
+                </EuiToolTip>
 
-                  {state.hover === item.id && (
-                    <span style={{ float: 'right', position: 'fixed' }}>
-                      <EuiToolTip
-                        position='top'
-                        content={i18n.translate(
-                          'wazuh.mitreAttack.techniques.facet.showInDashboardTooltip',
-                          {
-                            defaultMessage: 'Show {id} in {tabName}',
-                            values: {
-                              id: item.id,
-                              tabName: TAB_VIEW_NAME_DASHBOARD,
-                            },
+                {state.hover === item.id && (
+                  <span style={{ float: 'right', position: 'fixed' }}>
+                    <EuiToolTip
+                      position='top'
+                      content={i18n.translate(
+                        'wazuh.mitreAttack.techniques.facet.showInDashboardTooltip',
+                        {
+                          defaultMessage: 'Show {id} in {tabName}',
+                          values: {
+                            id: item.id,
+                            tabName: TAB_VIEW_NAME_DASHBOARD,
                           },
-                        )}
-                      >
-                        <EuiIcon
-                          onClick={e => {
-                            openDashboard(e, item.id);
-                            e.stopPropagation();
-                          }}
-                          color='primary'
-                          type='visualizeApp'
-                        ></EuiIcon>
-                      </EuiToolTip>{' '}
-                      &nbsp;
-                      <EuiToolTip
-                        position='top'
-                        content={i18n.translate(
-                          'wazuh.mitreAttack.techniques.facet.inspectInFindingsTooltip',
-                          {
-                            defaultMessage: 'Inspect {id} in {tabName}',
-                            values: {
-                              id: item.id,
-                              tabName: TAB_VIEW_NAME_EVENTS,
-                            },
+                        },
+                      )}
+                    >
+                      <EuiIcon
+                        onClick={e => {
+                          openDashboard(e, item.id);
+                          e.stopPropagation();
+                        }}
+                        color='primary'
+                        type='visualizeApp'
+                      ></EuiIcon>
+                    </EuiToolTip>{' '}
+                    &nbsp;
+                    <EuiToolTip
+                      position='top'
+                      content={i18n.translate(
+                        'wazuh.mitreAttack.techniques.facet.inspectInFindingsTooltip',
+                        {
+                          defaultMessage: 'Inspect {id} in {tabName}',
+                          values: {
+                            id: item.id,
+                            tabName: TAB_VIEW_NAME_EVENTS,
                           },
-                        )}
-                      >
-                        <EuiIcon
-                          onClick={e => {
-                            openDiscover(e, item.id);
-                            e.stopPropagation();
-                          }}
-                          color='primary'
-                          type='discoverApp'
-                        ></EuiIcon>
-                      </EuiToolTip>
-                    </span>
-                  )}
-                </EuiFacetButton>
-              }
-              isOpen={state.actionsOpen === item.id}
-              closePopover={() => closeActionsMenu()}
-              panelPaddingSize='none'
-              style={{ width: '100%' }}
-              anchorPosition='downLeft'
-            >
-              <EuiContextMenu initialPanelId={0} panels={buildPanel(item.id)} />
-            </EuiPopover>
-          </EuiFlexItem>
-        );
-      });
+                        },
+                      )}
+                    >
+                      <EuiIcon
+                        onClick={e => {
+                          openDiscover(e, item.id);
+                          e.stopPropagation();
+                        }}
+                        color='primary'
+                        type='discoverApp'
+                      ></EuiIcon>
+                    </EuiToolTip>
+                  </span>
+                )}
+              </EuiFacetButton>
+            }
+            isOpen={state.actionsOpen === item.id}
+            closePopover={() => closeActionsMenu()}
+            panelPaddingSize='none'
+            style={{ width: '100%' }}
+            anchorPosition='downLeft'
+          >
+            <EuiContextMenu initialPanelId={0} panels={buildPanel(item.id)} />
+          </EuiPopover>
+        </EuiFlexItem>
+      );
+    });
     if (isSearching || loadingAlerts || isLoading) {
       return (
         <EuiFlexItem
@@ -536,7 +604,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         </EuiFlexItem>
       );
     }
-    if (tacticsToRender.length) {
+    if (itemsToRender.length) {
       return (
         <EuiFlexGrid
           columns={techniqueColumnsResponsive()}
@@ -571,7 +639,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
 
   const onChange = searchValue => {
     if (!searchValue) {
-      setState({ ...state, filteredTechniques: false });
+      setState({ ...state, filteredTechniques: false, searchText: '' });
       setIsSearching(false);
     }
   };
@@ -595,10 +663,11 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         setState({
           ...state,
           filteredTechniques,
+          searchText: searchValue,
         });
         setIsSearching(false);
       } else {
-        setState({ ...state, filteredTechniques: false });
+        setState({ ...state, filteredTechniques: false, searchText: '' });
         setIsSearching(false);
       }
     } catch (error) {
@@ -615,7 +684,7 @@ export const Techniques = withWindowSize((props: tTechniquesProps) => {
         },
       };
       getErrorOrchestrator().handleError(options);
-      setState({ ...state, filteredTechniques: false });
+      setState({ ...state, filteredTechniques: false, searchText: '' });
       setIsSearching(false);
     }
   };
