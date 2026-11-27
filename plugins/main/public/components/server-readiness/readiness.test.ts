@@ -2,6 +2,7 @@
 import {
   getContentSyncBlockers,
   getDaemonBlockers,
+  getDaemonState,
   getNodeBlockers,
   getReadinessAdvice,
 } from './readiness';
@@ -68,9 +69,20 @@ describe('getDaemonBlockers', () => {
     });
     expect(
       getDaemonBlockers(
-        modulesd({ enabled: true, available: true, status: 'updating' }),
+        modulesd({
+          enabled: true,
+          available: true,
+          status: 'updating',
+          last_successful_update: 1795797672,
+        }),
       ),
-    ).toEqual([{ resource: 'Vulnerability feed', state: 'updating' }]);
+    ).toEqual([
+      {
+        resource: 'Vulnerability feed',
+        state: 'updating',
+        lastSync: 1795797672,
+      },
+    ]);
     expect(
       getDaemonBlockers(
         modulesd({ enabled: false, available: false, status: 'failed' }),
@@ -78,21 +90,119 @@ describe('getDaemonBlockers', () => {
     ).toEqual([]);
   });
 
-  it('reports the wazuh-db global database and any reason given', () => {
+  it('reports a vulnerability module the manager could not reach', () => {
+    // What the manager sends when the module does not answer.
+    expect(
+      getDaemonBlockers({
+        ready: false,
+        running: true,
+        modules: {
+          'vulnerability-detector': { available: false, status: 'failed' },
+        },
+      }),
+    ).toEqual([{ resource: 'Vulnerability feed', state: 'unreachable' }]);
+  });
+
+  it('reports an engine that did not answer', () => {
+    expect(
+      getDaemonBlockers(
+        { ready: false, running: true },
+        'wazuh-manager-analysisd',
+      ),
+    ).toEqual([{ resource: 'Engine', state: 'unreachable' }]);
+  });
+
+  it('reports an enrollment password that is not ready', () => {
+    expect(
+      getDaemonBlockers({
+        ready: false,
+        running: true,
+        enrollment_password: { ready: false },
+      }),
+    ).toEqual([{ resource: 'Enrollment password', state: 'unavailable' }]);
+  });
+
+  it('reports the wazuh-db global database and an unreachable status endpoint', () => {
     expect(
       getDaemonBlockers({
         ready: false,
         running: true,
         global: { available: false },
+      }),
+    ).toEqual([{ resource: 'Global database', state: 'unavailable' }]);
+    expect(
+      getDaemonBlockers({
+        ready: false,
+        running: true,
         reason: 'status endpoint unreachable: timeout',
       }),
     ).toEqual([
-      { resource: 'Global database', state: 'unavailable' },
       {
-        resource: 'status endpoint unreachable: timeout',
-        state: 'unavailable',
+        resource: 'Status endpoint',
+        state: 'unreachable',
+        detail: 'status endpoint unreachable: timeout',
       },
     ]);
+  });
+});
+
+describe('lastSync', () => {
+  it('carries the last successful sync of a resource, 0 when it never synced', () => {
+    expect(
+      getDaemonBlockers({
+        ready: false,
+        running: true,
+        spaces: {
+          standard: {
+            available: false,
+            enabled: true,
+            status: 'failed',
+            last_successful_update: 0,
+          },
+        },
+        ioc: {
+          url_full: {
+            available: false,
+            status: 'updating',
+            last_successful_update: 1795462428,
+          },
+        },
+      }),
+    ).toEqual([
+      {
+        resource: 'Content space "standard"',
+        state: 'failed',
+        contentSpace: true,
+        lastSync: 0,
+      },
+      {
+        resource: 'IOC database "url_full"',
+        state: 'updating',
+        lastSync: 1795462428,
+      },
+    ]);
+  });
+});
+
+describe('getDaemonState', () => {
+  it('is ready for a ready daemon', () => {
+    expect(getDaemonState({ ready: true, running: true })).toBe('ready');
+  });
+
+  it('is notReady when the server gives no reason', () => {
+    expect(getDaemonState({ ready: false, running: true })).toBe('notReady');
+  });
+
+  it('takes the most severe blocker', () => {
+    expect(
+      getDaemonState({
+        ready: false,
+        running: true,
+        ioc: { url_full: { available: false, status: 'updating' } },
+        geo: { asn: { available: false, status: 'failed' } },
+      }),
+    ).toBe('failed');
+    expect(getDaemonState({ ready: false, running: false })).toBe('stopped');
   });
 });
 

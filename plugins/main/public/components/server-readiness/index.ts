@@ -1,1 +1,1 @@
-export { ReadinessCallout } from './readiness-callout';
+export { DaemonReadiness } from './daemon-readiness';

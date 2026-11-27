@@ -10,161 +10,29 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiIconTip,
-  EuiPanel,
-  EuiText,
-  EuiTitle,
-} from '@elastic/eui';
-import { sortBy } from 'lodash';
-
+import React from 'react';
+import PropTypes from 'prop-types';
+import { EuiPanel } from '@elastic/eui';
 import { connect } from 'react-redux';
-import { i18n } from '@osd/i18n';
-import { ReadinessCallout } from '../../../../../components/server-readiness';
+import { DaemonReadiness } from '../../../../../components/server-readiness';
 
-const statusColors = {
-  ok: '#00a69b',
-  warn: '#ffd45c',
-  error: '#ff645c',
+export const WzStatusDaemons = ({ state }) => (
+  <EuiPanel>
+    <DaemonReadiness
+      node={Object.fromEntries(
+        state.listDaemons.map(({ key, value }) => [key, value]),
+      )}
+    />
+  </EuiPanel>
+);
+
+WzStatusDaemons.propTypes = {
+  state: PropTypes.shape({
+    listDaemons: PropTypes.arrayOf(
+      PropTypes.shape({ key: PropTypes.string, value: PropTypes.any }),
+    ).isRequired,
+  }).isRequired,
 };
-
-const chunk = (arr, size) =>
-  Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size),
-  );
-
-export class WzStatusDaemons extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  render() {
-    const { listDaemons } = this.props.state;
-
-    const textStyle = {
-      marginLeft: '4px',
-    };
-
-    const generalStatus =
-      listDaemons.find(({ key }) => key === 'ready')?.value === true;
-
-    const groupedDaemons = chunk(
-      sortBy(
-        listDaemons.filter(({ key }) => key !== 'ready'),
-        'key',
-      ),
-      2,
-    );
-
-    return (
-      <EuiPanel>
-        <EuiFlexGroup alignItems='center'>
-          <EuiFlexItem>
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <EuiTitle size='m'>
-                  <h2>
-                    {i18n.translate('wazuh.serverStatus.daemons.title', {
-                      defaultMessage: 'Daemons',
-                    })}
-                  </h2>
-                </EuiTitle>
-              </EuiFlexItem>
-              <EuiFlexItem
-                grow={false}
-                className='wz-status-daemons-overview-ready'
-              >
-                <EuiText>
-                  <EuiIconTip
-                    type='dot'
-                    color={generalStatus ? statusColors.ok : statusColors.warn}
-                    size='l'
-                    aria-label={i18n.translate(
-                      'wazuh.serverStatus.daemons.generalStatusAriaLabel',
-                      { defaultMessage: 'Daemon status general' },
-                    )}
-                    content={i18n.translate(
-                      'wazuh.serverStatus.daemons.generalStatusTooltip',
-                      {
-                        defaultMessage:
-                          'ready: {ready, select, yes {yes} other {no}}',
-                        values: { ready: generalStatus ? 'yes' : 'no' },
-                      },
-                    )}
-                  />
-                  <span style={textStyle}>
-                    {generalStatus
-                      ? i18n.translate('wazuh.serverStatus.daemons.ready', {
-                          defaultMessage: 'ready',
-                        })
-                      : i18n.translate('wazuh.serverStatus.daemons.notReady', {
-                          defaultMessage: 'not ready',
-                        })}
-                  </span>
-                </EuiText>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        {groupedDaemons.map((daemonGroup, index) => (
-          <EuiFlexGroup key={`daemon_group_${index}`}>
-            {daemonGroup.map(daemon => {
-              const ready = daemon.value?.ready === true;
-              const running = daemon.value?.running === true;
-
-              let statusColor = '';
-
-              if (running && ready) {
-                statusColor = statusColors.ok;
-              } else if (!running) {
-                statusColor = statusColors.error;
-              } else {
-                statusColor = statusColors.warn;
-              }
-
-              return (
-                <EuiFlexItem key={daemon.key}>
-                  <EuiText>
-                    <EuiIconTip
-                      type='dot'
-                      color={statusColor}
-                      size='m'
-                      aria-label={i18n.translate(
-                        'wazuh.serverStatus.daemons.daemonStatusAriaLabel',
-                        { defaultMessage: 'Daemon status info' },
-                      )}
-                      content={i18n.translate(
-                        'wazuh.serverStatus.daemons.daemonStatusTooltip',
-                        {
-                          defaultMessage:
-                            'ready:  {ready, select, yes {yes} other {no}}, running: {running, select, yes {yes} other {no}}',
-                          values: {
-                            ready: ready ? 'yes' : 'no',
-                            running: running ? 'yes' : 'no',
-                          },
-                        },
-                      )}
-                    />
-                    <span style={textStyle}>{daemon.key}</span>
-                  </EuiText>
-                </EuiFlexItem>
-              );
-            })}
-          </EuiFlexGroup>
-        ))}
-        <ReadinessCallout
-          node={Object.fromEntries(
-            listDaemons.map(({ key, value }) => [key, value]),
-          )}
-        />
-      </EuiPanel>
-    );
-  }
-}
 
 const mapStateToProps = state => {
   return {
