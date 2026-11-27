@@ -25,6 +25,19 @@ const LOGOUT_ROUTES = new Set([
   'get /auth/saml/logout',
 ]);
 
+// Login routes of the security plugin: basic, and the start and completion of
+// the OpenID and SAML logins. A new login replaces the previous session. Its
+// token is not revoked: the Server API revokes every token of the user, which
+// would also end the token of the user's other sessions. Expiring the cookie is
+// enough for this browser to stop using it.
+const LOGIN_ROUTES = new Set([
+  'post /auth/login',
+  'get /auth/openid/login',
+  'get /auth/saml/login',
+  'post /_opendistro/_security/saml/acs',
+  'post /_opendistro/_security/saml/acs/idpinitiated',
+]);
+
 interface ServerAPIClient {
   asScoped: (
     context: unknown,
@@ -42,7 +55,7 @@ interface ServerAPIClient {
 /**
  * Revoke the Server API token of the user when they log out of the dashboard,
  * from any app and any logout method, and expire its cookie so the next login
- * does not reuse it.
+ * does not reuse it. A new login expires the cookie of the previous session.
  */
 export function registerRevokeAPITokenOnLogout(
   http: Pick<HttpServiceSetup, 'registerOnPreResponse'>,
@@ -54,20 +67,22 @@ export function registerRevokeAPITokenOnLogout(
   // On the response, so only a completed logout counts: not a 404, an XSRF
   // rejection (400) or a failed logout
   http.registerOnPreResponse((request, response, toolkit) => {
-    if (
-      response.statusCode >= 400 ||
-      !LOGOUT_ROUTES.has(`${request.route.method} ${request.route.path}`)
-    ) {
+    const route = `${request.route.method} ${request.route.path}`;
+    const isLogout = LOGOUT_ROUTES.has(route);
+    if (response.statusCode >= 400 || (!isLogout && !LOGIN_ROUTES.has(route))) {
       return toolkit.next();
     }
 
+    // A login expires the cookie even when the request does not carry it: the
+    // IdP-initiated SAML login is a POST from another site, and the browser
+    // does not send the cookie on it
     const { cookie } = request.headers;
-    if (!getCookieValueByName(cookie, 'wz-token')) {
+    if (isLogout && !getCookieValueByName(cookie, 'wz-token')) {
       return toolkit.next();
     }
 
     const apiHostID = getCookieValueByName(cookie, 'wz-api');
-    if (apiHostID) {
+    if (isLogout && apiHostID) {
       // Not awaited, so the logout is not delayed by the Server API
       serverAPIClient
         .asScoped({}, request)
