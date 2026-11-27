@@ -228,7 +228,9 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       setLoading(false);
 
       if (verificationUriComplete) {
-        window.open(verificationUriComplete, 'wazuh_cti');
+        // No reference back to the dashboard tab, so the opened page cannot
+        // navigate it. The dialog polls the server, so the window is not used.
+        window.open(verificationUriComplete, '_blank', 'noopener,noreferrer');
       }
 
       onDeviceFlowStarted?.();
