@@ -31,6 +31,8 @@ import {
 import { InlineReasoningMarkupFilter } from './inline-reasoning-markup-filter';
 import { fetchWithTemperatureFallback } from './temperature-fallback';
 
+const COHERE_API_HOSTNAME = 'api.cohere.ai';
+
 /** Per-index accumulation of a streamed `tool_calls` delta until the provider closes it out. */
 interface ToolCallAccumulator {
   id?: string;
@@ -137,7 +139,10 @@ export class OpenAiCompatibleAdapter implements ProviderAdapter {
       if (options?.tools?.length) {
         nextBody.tools = toOpenAiTools(options.tools);
         nextBody.tool_choice = toOpenAiToolChoice(options.toolChoice ?? 'auto');
-        nextBody.parallel_tool_calls = false;
+        // Cohere rejects this optional field even when it is false.
+        if (new URL(url).hostname !== COHERE_API_HOSTNAME) {
+          nextBody.parallel_tool_calls = false;
+        }
       }
       return nextBody;
     };
