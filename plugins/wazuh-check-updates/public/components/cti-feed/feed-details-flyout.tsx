@@ -20,6 +20,7 @@ import {
   EuiTitle,
 } from '@elastic/eui';
 import type { CtiConsumer } from '../../../common/cti-consumers';
+import { isHttpsUrl } from '../../../common/cti-verification-links';
 import {
   ConsumerSyncState,
   formatSyncPhases,
@@ -274,16 +275,27 @@ const COPY_RESOURCE_LABEL = i18n.translate(
 const ResourceValue: React.FC<{ resource: string }> = ({ resource }) => (
   <EuiFlexGroup gutterSize='xs' alignItems='center' responsive={false}>
     <EuiFlexItem style={{ minWidth: 0 }}>
-      <EuiLink
-        href={resource}
-        target='_blank'
-        rel='noopener noreferrer'
-        title={resource}
-        className='eui-textTruncate'
-        data-test-subj='ctiFeedDetailsResource'
-      >
-        {resource}
-      </EuiLink>
+      {/* The resource comes from the consumers index: link it only when https. */}
+      {isHttpsUrl(resource) ? (
+        <EuiLink
+          href={resource}
+          target='_blank'
+          rel='noopener noreferrer'
+          title={resource}
+          className='eui-textTruncate'
+          data-test-subj='ctiFeedDetailsResource'
+        >
+          {resource}
+        </EuiLink>
+      ) : (
+        <span
+          title={resource}
+          className='eui-textTruncate'
+          data-test-subj='ctiFeedDetailsResource'
+        >
+          {resource}
+        </span>
+      )}
     </EuiFlexItem>
     <EuiFlexItem grow={false}>
       <EuiCopy textToCopy={resource} beforeMessage={COPY_RESOURCE_LABEL}>

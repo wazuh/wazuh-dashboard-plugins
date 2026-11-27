@@ -32,6 +32,7 @@ import {
   routes,
   statusCodes,
 } from '../../../../common/constants';
+import { resolveCtiVerificationLinks } from '../../../../common/cti-verification-links';
 import { CtiDeviceAuthLinks } from './cti-device-auth-links';
 import { CtiConsumersAccordion } from './cti-consumers-accordion';
 import { useCtiRegistrationPermission } from '../hooks/use-cti-registration-permission';
@@ -216,31 +217,20 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
       ctiFlowState.setDeviceAuthExpiry(expiresInSec);
       ctiFlowState.setDeviceAuthPendingFor(0);
 
-      const verificationUri =
-        ctiResponse.verification_uri ??
-        ctiResponse.verification_uri_complete ??
-        '';
-      const userCode = ctiResponse.user_code ?? '';
-      const verificationUriComplete =
-        ctiResponse.verification_uri_complete ??
-        (verificationUri && userCode
-          ? `${verificationUri}${
-              verificationUri.includes('?') ? '&' : '?'
-            }user_code=${encodeURIComponent(userCode)}`
-          : '');
-
       const links: CtiDeviceAuthorization = {
-        user_code: userCode,
-        verification_uri: verificationUri || verificationUriComplete,
-        verification_uri_complete: verificationUriComplete,
+        user_code: ctiResponse.user_code ?? '',
+        ...resolveCtiVerificationLinks(ctiResponse),
       };
+      const verificationUriComplete = links.verification_uri_complete;
       setDeviceAuth(links);
       ctiFlowState.setDeviceAuthLinks(links);
       /* eslint-enable camelcase */
       setLoading(false);
 
       if (verificationUriComplete) {
-        window.open(verificationUriComplete, 'wazuh_cti');
+        // No reference back to the dashboard tab, so the opened page cannot
+        // navigate it. The dialog polls the server, so the window is not used.
+        window.open(verificationUriComplete, '_blank', 'noopener,noreferrer');
       }
 
       onDeviceFlowStarted?.();
@@ -419,25 +409,6 @@ export const ModalCti: React.FC<LinkCtiProps> = ({
               <FormattedMessage
                 id='wazuhCheckUpdates.ctiRegistration.modalBodyAdditional'
                 defaultMessage='Your instance already receives the Open CTI feed. Register it in the Wazuh Console to manage your instance and upgrade to the Professional CTI feed, with early access to vulnerabilities, IOCs, and detection rules.'
-              />
-            </p>
-            <p>
-              <FormattedMessage
-                id='wazuhCheckUpdates.ctiRegistration.modalBodyAccountRequired'
-                defaultMessage='A free Wazuh Console account is required. {learnMoreLink}.'
-                values={{
-                  learnMoreLink: (
-                    <EuiLink
-                      href='https://cti.wazuh.com/vulnerabilities/cves'
-                      target='_blank'
-                    >
-                      <FormattedMessage
-                        id='wazuhCheckUpdates.ctiRegistration.modalBodyLearnMoreLink'
-                        defaultMessage='Learn more'
-                      />
-                    </EuiLink>
-                  ),
-                }}
               />
             </p>
           </EuiText>

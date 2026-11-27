@@ -9,6 +9,7 @@ import {
 import { getHttpErrorMessage } from '../../common/http-error';
 import type { CtiRegistrationStatusApiBody } from '../../common/cti-registration-status-api';
 import type { CtiDeviceAuthorization } from '../shared-components/cti-registration/types';
+import { resolveCtiVerificationLinks } from '../../common/cti-verification-links';
 import { ctiFlowState } from './cti-flow-state';
 import { getCore } from '../plugin-services';
 
@@ -26,25 +27,13 @@ function buildDeviceAuthLinksFromStatusBody(
   body: CtiRegistrationStatusApiBody,
 ): CtiDeviceAuthorization | null {
   const userCode = body.user_code ?? '';
-  const verificationUri =
-    body.verification_uri ?? body.verification_uri_complete ?? '';
-  const verificationUriComplete =
-    body.verification_uri_complete ??
-    (verificationUri && userCode
-      ? `${verificationUri}${
-          verificationUri.includes('?') ? '&' : '?'
-        }user_code=${encodeURIComponent(userCode)}`
-      : '');
+  const links = resolveCtiVerificationLinks(body);
 
-  if (!userCode && !verificationUri && !verificationUriComplete) {
+  if (!userCode && !links.verification_uri) {
     return null;
   }
 
-  return {
-    user_code: userCode,
-    verification_uri: verificationUri || verificationUriComplete,
-    verification_uri_complete: verificationUriComplete,
-  };
+  return { user_code: userCode, ...links };
 }
 
 /**

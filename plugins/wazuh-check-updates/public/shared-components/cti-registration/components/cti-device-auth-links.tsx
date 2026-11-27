@@ -62,37 +62,42 @@ export const CtiDeviceAuthLinks: React.FC<Props> = ({ deviceAuth }) => (
         </EuiCopy>
       </EuiFlexItem>
     </EuiFlexGroup>
-    <EuiSpacer size='m' />
-    <EuiText size='s'>
-      <FormattedMessage
-        id='wazuhCheckUpdates.ctiRegistration.verificationLinkLabel'
-        defaultMessage='Activation link:'
-      />{' '}
-      <EuiLink
-        className='eui-textBreakWord'
-        href={deviceAuth.verification_uri_complete}
-        target='_blank'
-        rel='noopener noreferrer'
-        data-test-subj='ctiDeviceVerificationLink'
-      >
-        {deviceAuth.verification_uri}
-      </EuiLink>
-    </EuiText>
-    <EuiSpacer size='s' />
-    <EuiCopy textToCopy={deviceAuth.verification_uri_complete}>
-      {(copy: () => void) => (
-        <EuiButtonEmpty
-          size='xs'
-          iconType='copyClipboard'
-          onClick={copy}
-          data-test-subj='ctiCopyVerificationUrl'
-        >
+    {/* Empty when the console answered with no https link: show none. */}
+    {deviceAuth.verification_uri_complete ? (
+      <>
+        <EuiSpacer size='m' />
+        <EuiText size='s'>
           <FormattedMessage
-            id='wazuhCheckUpdates.ctiRegistration.copyActivationUrl'
-            defaultMessage='Copy activation link'
-          />
-        </EuiButtonEmpty>
-      )}
-    </EuiCopy>
+            id='wazuhCheckUpdates.ctiRegistration.verificationLinkLabel'
+            defaultMessage='Activation link:'
+          />{' '}
+          <EuiLink
+            className='eui-textBreakWord'
+            href={deviceAuth.verification_uri_complete}
+            target='_blank'
+            rel='noopener noreferrer'
+            data-test-subj='ctiDeviceVerificationLink'
+          >
+            {deviceAuth.verification_uri}
+          </EuiLink>
+        </EuiText>
+        <EuiSpacer size='s' />
+        <EuiCopy textToCopy={deviceAuth.verification_uri_complete}>
+          {(copy: () => void) => (
+            <EuiButtonEmpty
+              size='xs'
+              iconType='copyClipboard'
+              onClick={copy}
+              data-test-subj='ctiCopyVerificationUrl'
+            >
+              <FormattedMessage
+                id='wazuhCheckUpdates.ctiRegistration.copyActivationUrl'
+                defaultMessage='Copy activation link'
+              />
+            </EuiButtonEmpty>
+          )}
+        </EuiCopy>
+      </>
+    ) : null}
   </>
 );

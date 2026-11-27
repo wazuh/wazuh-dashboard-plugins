@@ -1,5 +1,5 @@
 import React from 'react';
-import dompurify from 'dompurify';
+import { sanitizeFormattedValue } from './sanitize-formatted-value';
 
 export const IndexPatternFormattedField = ({ indexPattern, doc, field }) => {
   // Format the value using the field formatter
@@ -8,7 +8,7 @@ export const IndexPatternFormattedField = ({ indexPattern, doc, field }) => {
   if (typeof formattedValue === 'undefined') {
     return <span>-</span>;
   } else {
-    const sanitizedCellValue = dompurify.sanitize(formattedValue);
+    const sanitizedCellValue = sanitizeFormattedValue(formattedValue);
     return (
       // eslint-disable-next-line react/no-danger
       <span dangerouslySetInnerHTML={{ __html: sanitizedCellValue }} />

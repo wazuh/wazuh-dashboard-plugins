@@ -138,8 +138,9 @@ applications in the OpenSearch Dashboards navigation, grouped in categories such
 - Runs two jobs at start: an initialization job that logs the environment and ensures the
   OpenSearch Dashboards index and its template exist, and an in-memory queue, scheduled with
   `node-cron`, that sends the server API requests a user asked to delay.
-- Adds the `x-frame-options`, `x-content-type-options`, `cross-origin-resource-policy` and, over
-  HTTPS, `strict-transport-security` headers to every response.
+- Adds the `x-frame-options`, `x-content-type-options`, `cross-origin-opener-policy`,
+  `cross-origin-resource-policy` and, over HTTPS, `strict-transport-security` headers to every
+  response.
 
 The browser side of `main` also hosts the [Case Management](modules/case-management/README.md),
 [Incident Response](modules/incident-response/README.md),
