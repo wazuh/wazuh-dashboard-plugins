@@ -15,7 +15,6 @@ describe('registerSecurityResponseHeaders', () => {
         'x-frame-options': 'sameorigin',
         'x-content-type-options': 'nosniff',
         'cross-origin-opener-policy': 'same-origin',
-        'cross-origin-resource-policy': 'same-origin',
         'strict-transport-security': 'max-age=31536000',
       },
     });
@@ -27,7 +26,6 @@ describe('registerSecurityResponseHeaders', () => {
         'x-frame-options': 'sameorigin',
         'x-content-type-options': 'nosniff',
         'cross-origin-opener-policy': 'same-origin',
-        'cross-origin-resource-policy': 'same-origin',
       },
     });
   });

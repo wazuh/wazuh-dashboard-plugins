@@ -28,8 +28,6 @@ export function registerSecurityResponseHeaders(
     // `same-origin-allow-popups` would keep the reference to the windows the
     // dashboard opens.
     'cross-origin-opener-policy': 'same-origin',
-    // Other origins can't load responses to learn if the user is logged in
-    'cross-origin-resource-policy': 'same-origin',
   };
 
   // HSTS is only honoured by browsers over TLS. Emitting it from a plain
