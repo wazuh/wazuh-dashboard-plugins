@@ -16,6 +16,12 @@ describe('isCrossSiteLoad', () => {
     ['same-site', 'no-cors', 'image'],
     ['same-site', 'navigate', 'object'],
     ['cross-site', 'navigate', 'embed'],
+    // The page can time them even if the browser hides the response
+    ['same-site', 'cors', 'empty'],
+    ['cross-site', 'cors', 'empty'],
+    ['same-site', 'navigate', 'iframe'],
+    ['cross-site', 'navigate', 'frame'],
+    ['same-site', 'websocket', 'websocket'],
   ])('is true for site %s, mode %s, dest %s', (site, mode, dest) => {
     expect(isCrossSiteLoad(fetchMetadata(site, mode, dest))).toBe(true);
   });
@@ -25,14 +31,11 @@ describe('isCrossSiteLoad', () => {
     [undefined, undefined, undefined],
     ['same-origin', 'no-cors', 'script'],
     ['same-origin', 'cors', 'empty'],
+    ['same-origin', 'navigate', 'iframe'],
     ['none', 'navigate', 'document'],
     // Links, redirects, SSO callbacks (SAML POST, OpenID GET)
     ['cross-site', 'navigate', 'document'],
     ['same-site', 'navigate', 'document'],
-    ['cross-site', 'navigate', 'iframe'],
-    // CORS requests cannot read the response without the server's consent
-    ['cross-site', 'cors', 'empty'],
-    ['same-site', 'cors', 'empty'],
   ])('is false for site %s, mode %s, dest %s', (site, mode, dest) => {
     expect(isCrossSiteLoad(fetchMetadata(site, mode, dest))).toBe(false);
   });

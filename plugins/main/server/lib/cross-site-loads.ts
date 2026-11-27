@@ -14,21 +14,19 @@ import { HttpServiceSetup, Logger } from 'opensearch_dashboards/server';
 type RequestHeaders = Record<string, string | string[] | undefined>;
 
 /**
- * True for a browser request that a page of another origin sent to load a
- * resource without CORS (`<img>`, `<script>`, `<link rel="prefetch">`…) or to
- * fill an `<object>` or `<embed>`. Top-level and frame navigations (links, SSO
- * callbacks), CORS requests and clients without fetch metadata are not.
+ * True for a browser request that a page of another site sent for anything but
+ * a top-level navigation: `<img>`, `<script>`, `<link rel="prefetch">`, `fetch()`
+ * (CORS too), iframes, `<object>`, `<embed>`… Links and SSO callbacks, which
+ * are top-level navigations, and clients without fetch metadata are not.
  */
 export function isCrossSiteLoad(headers: RequestHeaders): boolean {
   const site = headers['sec-fetch-site'];
   if (site !== 'same-site' && site !== 'cross-site') {
     return false;
   }
-  const mode = headers['sec-fetch-mode'];
-  const dest = headers['sec-fetch-dest'];
-  return (
-    mode === 'no-cors' ||
-    (mode === 'navigate' && (dest === 'object' || dest === 'embed'))
+  return !(
+    headers['sec-fetch-mode'] === 'navigate' &&
+    headers['sec-fetch-dest'] === 'document'
   );
 }
 

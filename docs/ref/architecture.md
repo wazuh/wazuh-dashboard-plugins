@@ -141,8 +141,8 @@ applications in the OpenSearch Dashboards navigation, grouped in categories such
 - Adds the `x-frame-options`, `x-content-type-options`, `cross-origin-opener-policy` and, over
   HTTPS, `strict-transport-security` headers to every response.
 - Adds `cross-origin-resource-policy: same-origin` to every response and, before authentication,
-  refuses no-CORS loads from other origins (`server/lib/cross-site-loads.ts`). Turned off with
-  `wazuh.blockCrossSiteLoads: false`.
+  refuses requests from other sites except top-level navigations
+  (`server/lib/cross-site-loads.ts`). Turned off with `wazuh.blockCrossSiteLoads: false`.
 
 The browser side of `main` also hosts the [Case Management](modules/case-management/README.md),
 [Incident Response](modules/incident-response/README.md),
