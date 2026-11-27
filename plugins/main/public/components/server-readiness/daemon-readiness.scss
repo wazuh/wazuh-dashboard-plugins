@@ -1,0 +1,23 @@
+.wzDaemonReadiness__row {
+  padding: $euiSizeXS 0;
+  border-bottom: $euiBorderThin;
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.wzDaemonReadiness__blocker {
+  margin: $euiSizeXS 0 0 ($euiSize + $euiSizeXS);
+  padding-left: $euiSizeS;
+  border-left: $euiBorderWidthThick solid $euiBorderColor;
+}
+
+.wzDaemonReadiness__shrink {
+  min-width: 0;
+}
+
+.wzDaemonReadiness__spinner {
+  margin-left: $euiSizeXS;
+  vertical-align: middle;
+}
