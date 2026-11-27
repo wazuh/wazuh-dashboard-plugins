@@ -3,9 +3,8 @@ import fs from 'fs';
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { EuiMarkdownFormat } from '@elastic/eui';
 import {
-  errorMarkdownProcessingPlugins,
+  AssistantMarkdown,
   MessageBubble,
   sanitizeAssistantMarkdown,
   UiChatMessage,
@@ -898,17 +897,243 @@ describe('MessageBubble — image safety', () => {
 
   it('error markdown drops images and still opens links in a new tab', () => {
     const { container } = render(
-      <EuiMarkdownFormat processingPluginList={errorMarkdownProcessingPlugins}>
+      <AssistantMarkdown variant='error'>
         {
           'Top up [here](https://billing.example/plan). ![x](http://evil.example/e)'
         }
-      </EuiMarkdownFormat>,
+      </AssistantMarkdown>,
     );
 
     expect(container.querySelectorAll('img')).toHaveLength(0);
     const link = screen.getByText('here').closest('a');
     expect(link?.getAttribute('href')).toBe('https://billing.example/plan');
     expect(link?.getAttribute('target')).toBe('_blank');
+  });
+});
+
+describe('AssistantMarkdown — raw HTML and link targets', () => {
+  const blockStarts = [
+    '<script',
+    '<pre',
+    '<style',
+    '<!--',
+    '<?',
+    '<!D',
+    '<![CDATA[',
+    '<div',
+    '<p',
+  ];
+  const withLine = (line: string) =>
+    `one\n\ntwo\n\n${line}\nthree\n\nfour\n\nfive\n`;
+  const expectEveryLine = (container: HTMLElement) => {
+    for (const word of ['one', 'two', 'three', 'four', 'five']) {
+      expect(container.textContent).toContain(word);
+    }
+  };
+
+  it.each(blockStarts)(
+    'shows every line of an answer around a "%s" line, as text',
+    line => {
+      const { container } = render(
+        <AssistantMarkdown>{withLine(line)}</AssistantMarkdown>,
+      );
+
+      expectEveryLine(container);
+      expect(container.textContent).toContain(line);
+      // Paragraphs only: no element was built from the line.
+      expect(
+        container.querySelectorAll('.euiMarkdownFormat > div > :not(p)'),
+      ).toHaveLength(0);
+    },
+  );
+
+  it.each(blockStarts)(
+    'shows every line of error text around a "%s" line',
+    line => {
+      const { container } = render(
+        <AssistantMarkdown variant='error'>{withLine(line)}</AssistantMarkdown>,
+      );
+
+      expectEveryLine(container);
+    },
+  );
+
+  it('shows every line of a failure reason around a "<script" line', () => {
+    const { container } = render(
+      <MessageBubble
+        message={baseMessage({
+          role: 'assistant',
+          content: '',
+          failureReason: withLine('<script'),
+        })}
+        resolveDiscoverUrl={noopResolveDiscoverUrl}
+        resolveSecurityAnalyticsUrl={noopResolveSecurityAnalyticsUrl}
+      />,
+    );
+    fireEvent.click(screen.getByText('Show reason'));
+
+    expectEveryLine(container);
+  });
+
+  it('keeps later links working after a tag rebuilt by the link cleanup', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {
+          'x <a[](x) href=https://c1.invalid/>c1 then [docs](https://example.com/d)'
+        }
+      </AssistantMarkdown>,
+    );
+
+    const link = screen.getByText('docs').closest('a');
+    expect(link?.getAttribute('href')).toBe('https://example.com/d');
+    expect(container.textContent).toContain('c1');
+  });
+
+  it.each([
+    ['inline', '[c1](data:text/plain,c1)'],
+    ['nested', '[c1][](x)(data:text/plain,c1)'],
+    ['reference', '[c1][r]\n\n[r]: data:text/plain,c1'],
+    ['nested relative path', '[c1][](x)(/app/home#m)'],
+    ['reference javascript', '[c1][r]\n\n[r]: javascript:alert(1)'],
+  ])('renders a non-http(s) %s link as its label only', (_form, markdown) => {
+    for (const variant of ['answer', 'error'] as const) {
+      const { container, unmount } = render(
+        <AssistantMarkdown variant={variant}>{markdown}</AssistantMarkdown>,
+      );
+
+      expect(container.querySelector('a, button')).toBeNull();
+      expect(container.textContent?.trim()).toBe('c1');
+      unmount();
+    }
+  });
+
+  it.each([
+    ['inline', '[c1](https://example.com/p)'],
+    ['reference', '[c1][r]\n\n[r]: https://example.com/p'],
+  ])('keeps an http(s) %s link as an anchor', (_form, markdown) => {
+    const answer = render(<AssistantMarkdown>{markdown}</AssistantMarkdown>);
+    const answerLink = answer.container.querySelector('a');
+    expect(answerLink?.getAttribute('href')).toBe('https://example.com/p');
+    expect(answerLink?.getAttribute('target')).toBeNull();
+    answer.unmount();
+
+    const error = render(
+      <AssistantMarkdown variant='error'>{markdown}</AssistantMarkdown>,
+    );
+    const errorLink = error.container.querySelector('a');
+    expect(errorLink?.getAttribute('href')).toBe('https://example.com/p');
+    expect(errorLink?.getAttribute('target')).toBe('_blank');
+  });
+
+  it.each([
+    [
+      'a later comparison',
+      'one\n\n<script\nthree\n\nfour > 5\n\nfive',
+      ['three', 'four > 5', 'five'],
+    ],
+    [
+      'a later quote',
+      'one\n\n<div\n\ntwo\n\n> quoted\n\nend',
+      ['two', 'quoted', 'end'],
+    ],
+  ])(
+    'keeps every line when an unclosed tag line is followed by %s',
+    (_case, markdown, words) => {
+      const { container } = render(
+        <AssistantMarkdown>{markdown}</AssistantMarkdown>,
+      );
+
+      for (const word of words) {
+        expect(container.textContent).toContain(word);
+      }
+    },
+  );
+
+  it('keeps a quote right under an unclosed tag line', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'<script\n> quoted text'}</AssistantMarkdown>,
+    );
+
+    expect(container.querySelector('blockquote')?.textContent).toContain(
+      'quoted text',
+    );
+  });
+
+  it('shows a tag split over lines as text, with no element', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {'<img\n src=x onerror=alert(1)>\ntail'}
+      </AssistantMarkdown>,
+    );
+
+    expect(container.querySelector('img')).toBeNull();
+    expect(container.textContent).toContain('<img');
+    expect(container.textContent).toContain('tail');
+  });
+
+  it('keeps a link title', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {'[a](https://example.com/p "Docs")'}
+      </AssistantMarkdown>,
+    );
+
+    expect(container.querySelector('a')?.getAttribute('title')).toBe('Docs');
+  });
+
+  it('drops a closed HTML comment whole and keeps the lines around it', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {'one\n\n<!-- note -->\n\ntwo <!-- c --> three'}
+      </AssistantMarkdown>,
+    );
+
+    expect(container.textContent).not.toContain('note');
+    expect(container.textContent).not.toContain('<!--');
+    expect(container.textContent).toContain('one');
+    expect(container.textContent).toContain('two  three');
+  });
+
+  it('keeps the text after an unclosed comment when a later paragraph has an arrow', () => {
+    const { container } = render(
+      <AssistantMarkdown>
+        {
+          'Payload starts with <!-- and was cut off.\n\n**Actions**\n\n1. Block it.\n2. Flow: browser --> WAF --> backend.'
+        }
+      </AssistantMarkdown>,
+    );
+
+    expect(container.textContent).toContain(
+      'Payload starts with <!-- and was cut off.',
+    );
+    expect(container.querySelector('strong')?.textContent).toBe('Actions');
+    expect(container.querySelectorAll('li')).toHaveLength(2);
+    expect(container.textContent).toContain('browser --> WAF --> backend.');
+  });
+
+  it('drops a comment that spans lines within one paragraph', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'one <!-- a\nb --> two'}</AssistantMarkdown>,
+    );
+
+    expect(container.textContent).toBe('one  two');
+  });
+
+  it('keeps an HTML-looking line inside the paragraph above it', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'line one\n<?x\nline two'}</AssistantMarkdown>,
+    );
+
+    expect(container.querySelectorAll('p')).toHaveLength(1);
+    expect(container.textContent).toContain('line two');
+  });
+
+  it('shows comparisons in prose unchanged', () => {
+    const { container } = render(
+      <AssistantMarkdown>{'value < 5 and > 10'}</AssistantMarkdown>,
+    );
+
+    expect(container.textContent).toBe('value < 5 and > 10');
   });
 });
 
