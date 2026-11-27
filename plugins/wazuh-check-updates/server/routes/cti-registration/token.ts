@@ -17,6 +17,7 @@ import {
   CTI_OAUTH_DEVICE_GRANT_TYPE,
   CTI_REGISTRATION_COMPLETED_BODY,
 } from '../../../common/constants';
+import { resolveCtiVerificationLinks } from '../../../common/cti-verification-links';
 import {
   ctiRegistrationAccessError,
   getCtiRegistrationAccess,
@@ -170,8 +171,13 @@ export const getCtiTokenRoute = (router: IRouter) => {
           );
         }
 
+        // The browser shows, opens and copies these links: answer with the
+        // validated pair, never the console's raw values.
         return response.ok({
-          body: tokenResponse,
+          body: {
+            ...tokenResponse,
+            ...resolveCtiVerificationLinks(tokenResponse ?? {}),
+          },
         });
       } catch (error) {
         const finalError =

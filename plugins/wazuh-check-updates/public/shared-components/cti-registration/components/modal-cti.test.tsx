@@ -298,6 +298,70 @@ describe('ModalCti component', () => {
     );
   });
 
+  it('shows, opens and copies one address when the answer names two hosts', async () => {
+    /* eslint-disable camelcase -- OAuth device authorization JSON uses snake_case */
+    mockHttpPost.mockResolvedValue({
+      device_code: 'mock_device_code_123',
+      user_code: 'WZH-999',
+      verification_uri: 'https://example.test/register',
+      verification_uri_complete:
+        'https://other.test/register?user_code=WZH-999',
+    });
+    /* eslint-enable camelcase */
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Register' }));
+
+    const expected = 'https://example.test/register?user_code=WZH-999';
+    await waitFor(() => {
+      expect(window.open).toHaveBeenCalledWith(expected, 'wazuh_cti');
+    });
+    const link = document.querySelector(
+      '[data-test-subj="ctiDeviceVerificationLink"]',
+    );
+    expect(link).toHaveAttribute('href', expected);
+    expect(link).toHaveTextContent('https://example.test/register');
+    expect(ctiFlowState.getDeviceAuthLinks()?.verification_uri_complete).toBe(
+      expected,
+    );
+  });
+
+  it('opens no window when the answer has no https link', async () => {
+    /* eslint-disable camelcase -- OAuth device authorization JSON uses snake_case */
+    mockHttpPost.mockResolvedValue({
+      device_code: 'mock_device_code_123',
+      user_code: 'WZH-999',
+      verification_uri: 'http://example.test/register',
+      verification_uri_complete: 'javascript:alert(1)',
+    });
+    /* eslint-enable camelcase */
+    render(
+      <ModalCti
+        handleModalToggle={handleModalToggleMock}
+        statusCTI={defaultStatusCti}
+        refetchStatus={mockRefetchStatus}
+      />,
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Register' }));
+
+    await waitFor(() => {
+      expect(ctiFlowState.getDeviceCode()).toBe('mock_device_code_123');
+    });
+    expect(window.open).not.toHaveBeenCalled();
+    expect(screen.getByText('WZH-999')).toBeInTheDocument();
+    expect(
+      document.querySelector('[data-test-subj="ctiDeviceVerificationLink"]'),
+    ).toBeNull();
+    expect(
+      document.querySelector('[data-test-subj="ctiCopyVerificationUrl"]'),
+    ).toBeNull();
+  });
+
   it('closes on Escape after Register is clicked, even without focus inside the modal', async () => {
     render(
       <ModalCti

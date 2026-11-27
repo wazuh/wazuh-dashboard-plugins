@@ -124,6 +124,53 @@ describe('hydrateCtiFlowFromServer', () => {
     );
     expect(ctiFlowState.getEnvironmentUid()).toBe('env-uuid-1');
   });
+
+  /* eslint-disable camelcase -- status API body uses snake_case */
+  it('restores activation links that show and open the same origin, https only', async () => {
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: true,
+      device_code: 'dc-pending',
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      verification_uri_complete: 'https://other.test/register?user_code=WZH-1',
+      expires_in_remaining_sec: 600,
+      environment_uid: 'env-uuid-1',
+      subscription: { message: null, status: null },
+    });
+
+    await hydrateCtiFlowFromServer();
+
+    expect(ctiFlowState.getDeviceAuthLinks()).toEqual({
+      user_code: 'WZH-1',
+      verification_uri: 'https://example.test/register',
+      verification_uri_complete:
+        'https://example.test/register?user_code=WZH-1',
+    });
+  });
+
+  it('restores no link target when the stored links are not https', async () => {
+    mockHttpGet.mockResolvedValue({
+      registrationComplete: false,
+      inProgress: true,
+      device_code: 'dc-pending',
+      user_code: 'WZH-1',
+      verification_uri: 'http://example.test/register',
+      verification_uri_complete: 'data:text/html,x',
+      expires_in_remaining_sec: 600,
+      environment_uid: 'env-uuid-1',
+      subscription: { message: null, status: null },
+    });
+
+    await hydrateCtiFlowFromServer();
+
+    expect(ctiFlowState.getDeviceAuthLinks()).toEqual({
+      user_code: 'WZH-1',
+      verification_uri: '',
+      verification_uri_complete: '',
+    });
+  });
+  /* eslint-enable camelcase */
 });
 
 describe('fetchCtiRegistrationStatus', () => {

@@ -19,6 +19,7 @@ import {
 import { getCore } from '../../../plugin-services';
 import { routes } from '../../../../common/constants';
 import { getHttpErrorMessage } from '../../../../common/http-error';
+import { isHttpsUrl } from '../../../../common/cti-verification-links';
 import type {
   CtiConsumer,
   CtiConsumersResponse,
@@ -388,7 +389,11 @@ export const CtiConsumersAccordion: React.FC = () => {
                             ? field.format(consumer)
                             : formatFieldValue(consumer[field.key])
                         }
-                        href={field.isLink ? consumer.resource : undefined}
+                        href={
+                          field.isLink && isHttpsUrl(consumer.resource)
+                            ? consumer.resource
+                            : undefined
+                        }
                         dataTestSubj={field.dataTestSubj}
                       />
                     ))}
