@@ -14,7 +14,7 @@ import { HttpServiceSetup, Logger } from 'opensearch_dashboards/server';
 type RequestHeaders = Record<string, string | string[] | undefined>;
 
 /**
- * True for a browser request that a page of another site sent for anything but
+ * True for a browser request that a page of another origin sent for anything but
  * a top-level navigation: `<img>`, `<script>`, `<link rel="prefetch">`, `fetch()`
  * (CORS too), iframes, `<object>`, `<embed>`… Links and SSO callbacks, which
  * are top-level navigations, and clients without fetch metadata are not.
@@ -33,8 +33,8 @@ export function isCrossSiteLoad(headers: RequestHeaders): boolean {
 /**
  * Stop pages of other origins from loading dashboard responses, which would
  * tell them whether the user is logged in and roughly which role they have.
- * The browser is told with `Cross-Origin-Resource-Policy`, and the server
- * refuses the loads of browsers that do not enforce it.
+ * `Cross-Origin-Resource-Policy` hides the response; the 403 before auth also
+ * hides how long the server took, which differs when the user is logged in.
  */
 export function registerBlockCrossSiteLoads(
   http: Pick<HttpServiceSetup, 'registerOnPreAuth' | 'registerOnPreResponse'>,

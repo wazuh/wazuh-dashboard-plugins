@@ -58,7 +58,7 @@ Follow these recommendations to secure a Wazuh dashboard deployment.
   changing dashboard code. It cannot override the headers the dashboard sets itself, see
   [Response headers](configuration.md#response-headers).
 - `wazuh.blockCrossSiteLoads` (default `true`) sends `Cross-Origin-Resource-Policy: same-origin`
-  and refuses requests from other sites except links, so a page on a sibling host cannot tell
+  and refuses requests from other origins except links, so a page on a sibling host cannot tell
   whether the user is logged in. See [Response headers](configuration.md#response-headers).
 - `server.xsrf.disableProtection` (default `false`) and `server.xsrf.allowlist` control OSD's
   built-in XSRF protection; only allowlist a path if it must be called without the `osd-xsrf`
