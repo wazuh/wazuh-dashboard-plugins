@@ -22,7 +22,8 @@ Open the menu and go to **Threat intelligence > CTI feed**.
 
 The app is always available. `wazuh_check_updates.ctiRegistrationUiEnabled` in
 `opensearch_dashboards.yml` only decides whether the bottom bar that invites users to register is
-shown. See [Configuration](../configuration.md).
+shown. The shipped configuration file sets it to `true`. To hide the bar, set it to `false` and
+restart the dashboard. See [Configuration](../configuration.md).
 
 ## Subscription
 
